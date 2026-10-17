@@ -109,7 +109,8 @@ public sealed partial class ScummV5Archive
                         mask = ScummV4Archive.DecodeMaskStrips(_resources, zp.Start, 8, zp.Start + zp.Size, box.W, box.H);
                 }
                 catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException or IndexOutOfRangeException) { continue; }
-                images.Add(new ScummV4ObjectImage(id, box.X, box.Y, box.W, box.H, pixels) { Mask = mask });
+                var stateNumber = int.TryParse(state.Tag.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var n) ? n : 1;
+                images.Add(new ScummV4ObjectImage(id, box.X, box.Y, box.W, box.H, pixels) { Mask = mask, State = stateNumber });
             }
         }
         return images;

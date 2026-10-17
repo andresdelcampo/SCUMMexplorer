@@ -2,9 +2,11 @@ namespace SCUMMexplorer.Core.Scumm;
 
 public sealed partial class ScummActorTable
 {
+    private bool _v2Animations;
     /// <summary>Native new-game actor state; generic preview tables keep their existing defaults.</summary>
     internal void InitializeV2Game(bool classic)
     {
+        _v2Animations = true;
         // Actor_v2::initActor (actor.cpp): native speeds 1,1; this runtime stores pixels (8,2).
         // resetScumm (scumm.cpp) additionally assigns each v1 actor its own costume number.
         foreach (var actor in _actors)

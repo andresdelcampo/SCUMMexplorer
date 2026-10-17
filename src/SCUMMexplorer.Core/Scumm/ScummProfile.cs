@@ -192,13 +192,18 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             HasFirstVisitScenes = game.Id is not (GameId.Loom or GameId.LoomVga)
                 && (dialect == ScummScriptDialect.V3Indy3 && (game.Version == ScummVersion.V3 || roomFileGame) || dialect == ScummScriptDialect.V4 && game.V4Archive is null && game.V4Disks is not null
                     // S5 MonkeyCd (17 October 2026): the v5 format, for the one v5 family whose boot the session follows (S4b); Monkey Island 2 and Indy 4 have no S4b yet.
-                    || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.MonkeyCd),
+                    || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.MonkeyCd
+                    // S5 Indy4 (17 October 2026): Indiana Jones and the Fate of Atlantis, the second v5 family with an S4b boot.
+                    || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.Indy4
+                    || GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced),
             ExtraTimerVariables = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
             BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
-                or GameFamily.ZakClassic or GameFamily.ZakEnhanced,
+                or GameFamily.ZakClassic or GameFamily.ZakEnhanced
+                // S4b Indy4 (17 October 2026): script 1 loads Barnett College (Room 4) with user input off; the playable prologue starts when local script 206 turns it on.
+                || GameSupport.FamilyOf(game) == GameFamily.Indy4,
             // vars.cpp ScummEngine_v5::resetScummVars: if (_game.id == GID_MONKEY) _scummVars[74] = 1225 (the CD release).
             GameVariablesAtStart = GameSupport.FamilyOf(game) switch
             {

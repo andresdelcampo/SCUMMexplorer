@@ -15,6 +15,19 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Sound in play: a sound that starts a disc track plays that stretch of the disc's audio. Tracks with loop count 0xFF repeat until a script stops them, and effects keep the chosen device.
 - Validation: `ScummMonkeyCdPlayTests` (4 tests); the Monkey floppy, Indy3, cutscene and sound tests; the LOOM and Scumm regression (1055 passed); one WPF check through the real window. Record: [monkeycd-play-20261017](../.verification/monkeycd-play-20261017/README.md).
 
+## 17 October: Indiana Jones and the Fate of Atlantis boots and shows its first-visit rooms (S4b and S5, Indy4)
+
+- **Boot:** the talkie CD (`indy4 vga en`) runs through the logo (Room 68), no room, and Barnett College (Room 4) until local script 206 gives the player control: 721 frames, unsupported 0, no assumed input (script 1 takes the same branch for boot parameter 0 and ScummVM's copy-protection bypass -7873). `BootEndsWhenPlayerHasControl` for Indy4.
+- **Engine, shared and additive:** `o5_soundKludge` commands 8, 9, 10/11 become start/stop/stop-all events (others are presentation); a v5 game's sound lengths come from the iMUSE AdLib timeline's default path, labelled estimates; v5 objects keep one image per state and the first visit draws the settled state's image (43 of 96 rooms could not run before); `getActorScale` (estimate); the v5 wait for the sentence script.
+- **Rooms:** 96 of 96 without a gap (Settled 60, FrameLimit 25, RoomLeft 11); Rooms 76, 77, 87 keep a camera-after-walk item. Objects stays partial until S6; registry unchanged.
+- **Validation:** `ScummIndy4SessionTests` (4), `ScummIndy4FirstVisitTests` (5, Rooms 32, 46, 50 pinned); regression filter 980 passed, 5 skipped, 0 failed. Records: [indy4-session-20261017](../.verification/indy4-session-20261017/README.md), [indy4-objects-20261017](../.verification/indy4-objects-20261017/README.md).
+
+## 17 October: Maniac/Zak first-visit source previews (S5; visual acceptance open)
+
+- Added reached first-visit object previews and hotspots for all four v1/v2 families, with a reviewed Maniac party-input recipe outside the engine. Corrected old object flags, duplicate image drawing, pseudo-room arrivals, settling and actor costume initialization.
+- All 221 rooms open without audit errors; 216 have no detector findings. Sixteen real-window checks pass. Retained black regions, camera/alignment uncertainty and shown-lit dark rooms remain explicit; source checks and app captures do not establish native visual equivalence.
+- Objects remains Partial; S6 was not started. [Checkpoint, family evidence and validation](checkpoints/20261017-S5-ManiacZak.md).
+
 ## 17 October: classic and enhanced Maniac Mansion and Zak boot in the generic session (S4b)
 
 - Added v1/v2 data sources, dialect-specific decoding and a separate bounded executor partial, with native engine variables, actor defaults, verb slots, sentence/object dispatch, cutscene restoration and sound clocks. Source-backed fixes also restore the wide classic Maniac introduction room and preserve native message character counts.

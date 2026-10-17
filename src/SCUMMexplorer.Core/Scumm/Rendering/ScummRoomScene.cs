@@ -12,13 +12,15 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
     Func<int, ScummCostume?> Costumes, bool IsFirstRoomOfTheGame, IReadOnlyList<string> Notes)
 {
     public ScummSessionSnapshot Snapshot => State.Snapshot;
+    /// <summary>v1/v2 draw only intrinsic bit 8; later engines use the whole state nibble.</summary>
+    public byte IntrinsicStateMask { get; init; } = 0x0F;
 
     /// <summary>The object states the game's index gives (the picture selection needs them for objects the scripts did not touch).</summary>
     public IReadOnlyDictionary<int, byte> IndexedStates { get; init; } = new Dictionary<int, byte>();
 
     /// <summary>A selection of its own for a view: inspecting stored alternatives changes it, and the cached scene's must stay as the scripts left it.</summary>
     public RoomObjectSelection NewSelection() =>
-        new(Images, Snapshot.ObjectStates, Snapshot.ObjectPositions, Records, Room, IndexedStates, Snapshot.DrawOrder);
+        new(Images, Snapshot.ObjectStates, Snapshot.ObjectPositions, Records, Room, IndexedStates, Snapshot.DrawOrder, IntrinsicStateMask);
 
     /// <summary>The room's pixels with the objects the scripts made visible, drawn through the room colour table (<c>roomColorLegacy</c>).</summary>
     public byte[] Compose()
@@ -79,11 +81,12 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
         var at = Snapshot.ObjectPositions.TryGetValue(record.Id, out var moved) ? moved : new RoomObjectPosition(record.X, record.Y);
         if (at == new RoomObjectPosition(0, 0)) return false;
         if (Snapshot.ObjectOwners.GetValueOrDefault(record.Id, (byte)0x0F) != 0x0F || Snapshot.IsUntouchable(record.Id)) return false;
+        if (IntrinsicStateMask == 8 && (Snapshot.ObjectStates.GetValueOrDefault(record.Id) & 2) != 0) return false;
         var current = record;
         for (var steps = 0; current.ParentLocalIndex != 0; steps++)
         {
             var parent = Records.FirstOrDefault(item => item.LocalIndex == current.ParentLocalIndex);
-            if (steps > Records.Count || parent is null || (Snapshot.ObjectStates.GetValueOrDefault(parent.Id) & 0x0F) != current.ParentRequiredState) return false;
+            if (steps > Records.Count || parent is null || (Snapshot.ObjectStates.GetValueOrDefault(parent.Id) & IntrinsicStateMask) != current.ParentRequiredState) return false;
             current = parent;
         }
         return true;
@@ -116,7 +119,7 @@ public static class ScummRoomFirstVisit
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or NotSupportedException) { return null; }
         })).Value;
 
-    public static ScummRoomScene Run(GameLibrary game, int roomId, int randomSeed = 0)
+    public static ScummRoomScene Run(GameLibrary game, int roomId, int randomSeed = 0, Action<ScummGameSession>? prepareBoot = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         var profile = ScummProfile.For(game);
@@ -124,7 +127,12 @@ public static class ScummRoomFirstVisit
         var data = ScummDataSources.For(game);
         ScummIndexedObjectSnapshot indexed;
         RoomImage room;
-        if (data is ScummV5DataSource v5)
+        if (data is ScummV2DataSource v2)
+        {
+            indexed = v2.ReadIndexedObjects();
+            room = v2.ReadBackground(roomId);
+        }
+        else if (data is ScummV5DataSource v5)
         {
             // A v5 game (S5 MonkeyCd): the index's DOBJ gives the starting states, the resource file the room's picture.
             var holder = game.V4ArchiveFor(resource) ?? throw new InvalidDataException($"Room {roomId:00} is not in the game's resource file.");
@@ -146,14 +154,17 @@ public static class ScummRoomFirstVisit
             indexed = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
             room = new ScummV3EgaRoomDecoder().Decode(File.ReadAllBytes(resource.FilePath));
         }
-        var session = new ScummGameSession(game, indexed, randomSeed, null, profile.UsesV4Archive ? data : null);
+        var session = new ScummGameSession(game, indexed, randomSeed, null, data);
+        prepareBoot?.Invoke(session);
         var bootRoom = session.CurrentRoomId == roomId;
         if (!bootRoom) session.VisitRoom(resource);
         var settled = session.Settle();
         var records = data.ReadRoom(roomId).Objects;
-        var images = data.ReadObjectImages(roomId);
         var snapshot = settled.State.Snapshot;
-        var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions, records, room, indexed.States, snapshot.DrawOrder);
+        // v5 objects store one image per state (S5 Indy4): the settled state picks it.
+        var images = data is ScummV5DataSource stateImages ? stateImages.ReadObjectImages(roomId, snapshot.ObjectStates) : data.ReadObjectImages(roomId);
+        var stateMask = (byte)(profile.EngineVersion <= ScummVersion.V2 ? 8 : 15);
+        var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions, records, room, indexed.States, snapshot.DrawOrder, stateMask);
         var notes = new List<string>
         {
             bootRoom ? $"Room {roomId:00} is the first room of the game: the boot's own state after {settled.Frames} more frames."
@@ -167,6 +178,6 @@ public static class ScummRoomFirstVisit
         };
         return new ScummRoomScene(roomId, room, records, images, settled.State, selection, settled.Outcome, settled.Frames, settled.LeftTo,
             id => { try { return session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
-            bootRoom, notes) { IndexedStates = indexed.States };
+            bootRoom, notes) { IndexedStates = indexed.States, IntrinsicStateMask = stateMask };
     }
 }

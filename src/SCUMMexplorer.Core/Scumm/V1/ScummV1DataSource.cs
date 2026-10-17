@@ -36,5 +36,11 @@ public sealed class ScummV1DataSource : ScummV2DataSource
         return new(states, owners);
     }
     protected override (int Width, int Height) ReadDimensions(byte[] bytes) => (bytes[4] * 8, bytes[5] * 8);
+    public override RoomImage ReadBackground(int room)
+    {
+        var decoded = RoomBytes(room);
+        for (var i = 0; i < decoded.Length; i++) decoded[i] ^= 0xFF;
+        return new ScummV1RoomDecoder(_classicGame).Decode(decoded);
+    }
     public override IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) => ScummOldRoomObjects.ReadV1Images(RoomBytes(room), _classicGame);
 }

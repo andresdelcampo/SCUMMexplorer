@@ -160,7 +160,34 @@ public sealed class ScummGameSession : ScummSession
                 ? adlib.ReadLifetime(part, timing, halfTempo: true)
                 : new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib part in the disks' sound blocks");
         }
+        // S4b Indy4 (17 October 2026): a v5 game plays its music through iMUSE; the AdLib part's own timeline (ScummImuseTimeline, the S3 player's default
+        // path: hooks at 0, markers not acted on) gives how long a sound plays. A song whose timeline jumps back loops until a script stops it.
+        if (game.V4Disks is { } v5Disks && v5Disks.Disks.OfType<ScummV5Archive>().FirstOrDefault() is { } v5)
+        {
+            var parts = new Dictionary<int, byte[]?>();
+            foreach (var sound in v5.ReadSounds()) parts.TryAdd(sound.Id, sound.ImuseAdlib);
+            var lifetimes = new Dictionary<int, ScummSoundLifetime>();
+            return resource => resource.ResourceId is not int id ? new(ScummSoundLifetimeKind.Unknown, null, false, "no sound id")
+                : lifetimes.TryGetValue(id, out var known) ? known : lifetimes[id] = ImuseLifetime(parts.GetValueOrDefault(id));
+        }
         return resource => adlib.ReadLifetime(resource, timing);
+    }
+
+    private static ScummSoundLifetime ImuseLifetime(byte[]? part)
+    {
+        if (part is null) return new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib iMUSE part in the sound block");
+        try
+        {
+            var timeline = ScummImuseTimeline.Build(ScummImuseSong.Parse(part));
+            const string why = "iMUSE default path (hooks 0, markers and script-set loops not simulated): an estimate";
+            return timeline.Loops
+                ? new(ScummSoundLifetimeKind.Looping, null, true, why)
+                : new(ScummSoundLifetimeKind.Finite, (int)Math.Min(int.MaxValue, Math.Ceiling(timeline.EndSeconds * 472)), true, why);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or ArgumentException or IndexOutOfRangeException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, $"the iMUSE part could not be read: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -289,8 +316,11 @@ public sealed class ScummGameSession : ScummSession
     private Dictionary<int, int> ObjectValues()
     {
         var values = new Dictionary<int, int>(_runtime.ObjectStates.Count);
-        foreach (var pair in _runtime.ObjectStates) values[pair.Key] = pair.Value;
-        foreach (var pair in _runtime.ObjectPositions) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
+        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
+        foreach (var pair in _runtime.ObjectStates)
+            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key] = pair.Value;
+        foreach (var pair in _runtime.ObjectPositions)
+            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
         return values;
     }
 
@@ -319,10 +349,13 @@ public sealed class ScummGameSession : ScummSession
     {
         bool Ambient(int id) => changes.TryGetValue(id, out var queue) && queue.Count >= 4;
         var hash = new HashCode();
+        // v1/v2 background scripts animate objects in rooms that are not loaded. Their flags still
+        // belong to persistent state, but cannot keep the current room's picture from settling.
+        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
         foreach (var pair in _runtime.ObjectStates.OrderBy(item => item.Key))
-            if (!Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
+            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
         foreach (var pair in _runtime.ObjectPositions.OrderBy(item => item.Key))
-            if (!Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
+            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
         foreach (var actor in Actors) { hash.Add(actor.Number); hash.Add(actor.Room); hash.Add(actor.X); hash.Add(actor.Y); hash.Add(actor.Visible); hash.Add(actor.Look.Costume); }
         foreach (var colour in _runtime.ShadowPalette.Take(16)) hash.Add(colour);
         foreach (var colour in _runtime.RoomColors.Take(16)) hash.Add(colour);

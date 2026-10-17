@@ -4,7 +4,7 @@
 |---|---|
 | Families (`GameFamily`) | `ZakClassic`, `ZakEnhanced` |
 | Fixtures (folders under `Games`) | `zak ega en` (classic, English), `zakE ega en` (enhanced, English) |
-| SCUMM version(s) and script dialect | classic v1 (`ScummScriptDialect.V2`), enhanced v2 (`V2`) |
+| SCUMM version(s) and script dialect | classic v1 (`ScummScriptDialect.V1`), enhanced v2 (`V2`) |
 | Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
 | Script map | [ZAK_SCRIPT_MAP.md](ZAK_SCRIPT_MAP.md) |
 | Other notes | none |
@@ -14,5 +14,5 @@
 
 | Edition / release | Local folder | Differences that matter (opening, scripts, text, graphics, audio) | Checked in S9 |
 |---|---|---|---|
-| Classic (v1) | `zak ega en` | 10 of 35 costume colours still estimates | no |
+| Classic (v1) | `zak ega en` | 24 of 35 costume colours derived, 11 labelled estimates (S4b refresh); own v1 scripts and actor format | no |
 | Enhanced (v2) | `zakE ega en` | one-byte object index | no |

@@ -165,10 +165,11 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         }
         if (room == place.CurrentRoom)
         {
+            var wasVisible = actor.Visible == true;
             // putActor on a walking actor: stopActorMoving and the stand frame, then adjustActorPos.
             if (actor.Visible == true && actor.Moving != 0) StartAnimation(actor, actor.StandFrame, place);
             AdjustPosition(actor, place, show: true);
-            ShowCostume(actor, place);
+            if (!_v2Animations || !wasVisible) ShowCostume(actor, place);
         }
         else
         {
@@ -311,7 +312,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
             return;
         }
         actor.Animation.AnimationCounter = 0;
-        if (frame == actor.InitFrame) actor.Animation.Reset();
+        if (!_v2Animations && frame == actor.InitFrame) actor.Animation.Reset();
         CostumeData(costumeId)?.DecodeAnimation(actor.Animation, frame, ScummCostume.NewDirToOldDir(facing));
         actor.Frame = frame;
     }
@@ -344,8 +345,9 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
                 if (InRoom(actor, place)) TurnTo(actor, direction);
                 return $"turn to {direction}";
             default:
-                StartAnimation(actor, value, place);
-                return $"frame {value}";
+                var frame = _v2Animations ? value >> 2 : value;
+                StartAnimation(actor, frame, place);
+                return $"frame {frame}";
         }
     }
 
@@ -484,6 +486,17 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
     /// <summary><c>showActor</c> (v3): a costume that needs init starts its init frame.</summary>
     private void ShowCostume(Actor actor, Placement place)
     {
+        if (_v2Animations)
+        {
+            // Actor::showActor, versions 1/2: compose three partial animations after one reset.
+            // startAnimActor deliberately does not reset again for initFrame in these versions.
+            actor.Animation.Reset();
+            StartAnimation(actor, actor.StandFrame, place);
+            StartAnimation(actor, actor.InitFrame, place);
+            StartAnimation(actor, actor.TalkStopFrame, place);
+            actor.CostumeNeedsInit = false;
+            return;
+        }
         if (!actor.CostumeNeedsInit || actor.Costume == 0) return;
         StartAnimation(actor, actor.InitFrame, place);
         actor.CostumeNeedsInit = false;
