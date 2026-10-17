@@ -89,6 +89,7 @@ public partial class MainWindow
         ObjectsNote.Text = "";
         ShowPlayFrame();
         PlayScreenImage.Focus();
+        UpdatePlaybackControls();
     }
 
     /// <summary>Stops the frames and gives the room view back (another game, another kind of resource).</summary>
@@ -100,6 +101,7 @@ public partial class MainWindow
         PlayScreenImage.Visibility = Visibility.Collapsed;
         PlayScreenImage.Cursor = null;
         RoomDisplayGroup.Visibility = Visibility.Visible;
+        if (PlayCutscenes) UpdatePlayCutsceneControls();
     }
 
     private void PlayTimer_Tick(object? sender, EventArgs e)
@@ -118,6 +120,7 @@ public partial class MainWindow
         _playFrame++;
         if (_playTimer is { } timer) timer.Interval = TimeSpan.FromMilliseconds(_play.FrameJiffies * 1000.0 / 60);
         ShowPlayFrame();
+        RefreshPlayControlsOnFrame();
     }
 
     private void ShowPlayFrame()

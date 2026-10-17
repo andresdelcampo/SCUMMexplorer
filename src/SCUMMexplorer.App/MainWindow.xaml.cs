@@ -349,6 +349,7 @@ public partial class MainWindow : Window
         _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
         _cdCutsceneGroups = null;
         StartCdSetupDerivation(game);
+        StartPlayCutsceneDerivation(game);
         if (cdIndexed is not null) _indexedStates = cdIndexed.States;
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
@@ -4468,13 +4469,24 @@ public partial class MainWindow : Window
 
     private void PlaybackPause_Click(object sender, RoutedEventArgs e)
     {
+        // S7: during play the bar's Pause is the app's Pause key (R-7.16).
+        if (PlayActive) { _playPaused = !_playPaused; ShowPlayFrame(); UpdatePlaybackControls(); return; }
         if (_playbackPaused) ResumeScenePlayback();
         else PauseScenePlayback();
     }
 
-    private void SkipCutscene_Click(object sender, RoutedEventArgs e) => SkipCutscene();
+    private void SkipCutscene_Click(object sender, RoutedEventArgs e)
+    {
+        // S7: during play, Skip is Esc: abortCutscene from the override point only (R-7.16).
+        if (PlayActive) { if (_play!.CutsceneSkippable) _play.PressKey(0x1B); PlayScreenImage.Focus(); return; }
+        SkipCutscene();
+    }
 
-    private void SkipLine_Click(object sender, RoutedEventArgs e) => SkipTalk("the Skip line button, same as '.'");
+    private void SkipLine_Click(object sender, RoutedEventArgs e)
+    {
+        if (PlayActive) { _play!.SkipMessage(); PlayScreenImage.Focus(); return; }
+        SkipTalk("the Skip line button, same as '.'");
+    }
 
     /// <summary>
     /// Escape during a cutscene (ScummVM <c>processKeyboard</c>: <c>abortCutscene</c> while <c>VAR_CUTSCENEEXIT_KEY</c>
@@ -4506,7 +4518,7 @@ public partial class MainWindow : Window
         (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||
          session.DraftPlaying);
 
-    private bool CanStartCutscene => GameClickActive && !SessionInScene &&
+    private bool CanStartCutscene => PlayCutscenes ? PlayCanStartCutscene : GameClickActive && !SessionInScene &&
         (_playback is null || !PlaybackHasActivity && !_playbackPaused);
 
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
@@ -4514,6 +4526,8 @@ public partial class MainWindow : Window
     {
         UpdateGameStatusButton(); // Inspection is available during playback too; editing stays guarded.
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
+        // S7: a game played through its verbs has its own bar (MainWindow.PlayCutscenes.cs).
+        if (PlayCutscenes) { UpdatePlayCutsceneControls(); return; }
         var active = GameClickActive && IsLoomGame;
         UpdateInteractButton();
         // Step plays one frame of a paused scene; with nothing paused there is nothing to step.

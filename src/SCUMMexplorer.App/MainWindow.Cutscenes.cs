@@ -192,9 +192,10 @@ public partial class MainWindow
     private void CountScanStep(object owner)
     {
         // A run for a game that was replaced (or reopened) keeps going in the background; its steps must not count into the new run's bar.
-        if (!ReferenceEquals(_cdSetupPlanner, owner)) return;
+        bool Current() => ReferenceEquals(_cdSetupPlanner, owner) || ReferenceEquals(_playPlanner, owner);
+        if (!Current()) return;
         if (Interlocked.Increment(ref _scanDone) > _scanTotal && _scanTotal > 0) Interlocked.Exchange(ref _scanDone, _scanTotal);
-        Dispatcher.BeginInvoke(DispatcherPriority.Background, () => { if (ReferenceEquals(_cdSetupPlanner, owner)) UpdateScanProgress(); });
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, () => { if (Current()) UpdateScanProgress(); });
     }
 
     /// <summary>The scan's note: what it is doing and how far it is, as a percentage and a bar. Hidden when the scan is over or none runs.</summary>
@@ -205,7 +206,7 @@ public partial class MainWindow
         CutsceneScanProgress.Maximum = Math.Max(1, _scanTotal);
         CutsceneScanProgress.Value = Math.Min(_scanDone, _scanTotal);
         CutsceneScanProgress.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
-        CutsceneScanNote.Text = (_cdRoomListsDone
+        CutsceneScanNote.Text = ((PlayCutscenes ? _playRoomListsDone : _cdRoomListsDone)
             ? $"Working out how each scene starts… {percent}%\nThe scenes can already be played; the notes fill in as this finishes."
             : $"Looking for the scenes that happen in each room… {percent}%\nThe first launch takes a while; the result is kept for the next one.");
         if (!running) UpdatePlaybackControls();
@@ -388,6 +389,7 @@ public partial class MainWindow
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems(ISet<string>? onlyIds = null)
     {
         if (_game is { Id: GameId.LoomVga }) return [("cd-intro", CdIntroItem()), .. CdCutsceneItems()];
+        if (PlayCutscenes) return PlayCutsceneItems();
         var scanned = ScannedCutscenes && onlyIds is null ? CdCutsceneItems() : [];
         // A demo has no catalog of scenes: the full game's replays name its rooms, objects and scripts.
         if (_game is { IsDemo: true }) return [("demo-preview", DemoPreviewItem())];
@@ -402,6 +404,7 @@ public partial class MainWindow
 
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
+        if (PlayCutscenes) return PlayCutsceneItems(roomId).Select(choice => choice.Item).ToList();
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
         if (ScannedCutscenes)
         {

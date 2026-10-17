@@ -20,7 +20,9 @@ public class GameSupportTests
         var indy = GameSupport.For(Game(GameId.IndianaJones3, ScummVersion.V3));
         Assert.True(indy.Rooms && indy.Texts);
         Assert.True(indy.LiveSession); // S6 (16 October 2026): played through its own verbs (ScummIndy3PlayTests)
-        Assert.False(indy.Cutscenes || indy.Status);
+        Assert.True(indy.Cutscenes); // S7 (17 October 2026): the list derived from its scripts, playable (ScummIndy3CutsceneTests)
+        Assert.Equal(SupportLevel.Partial, indy[SupportFeature.Cutscenes]);
+        Assert.False(indy.Status);
         Assert.True(indy.Audio && indy.Scripts); // its sounds play and its scripts are read (README matrix)
 
         // Any other old-v3 game whose index parsed gets the same limited look: room pictures and texts.
