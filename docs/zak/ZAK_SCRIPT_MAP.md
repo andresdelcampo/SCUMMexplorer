@@ -4,7 +4,7 @@ This map records **Zak McKracken-specific** script roles, variable meanings, ver
 
 ## Edition scope
 
-Classic v1 (`Games/zak ega en`, DOS EGA, English; global scripts decoded in the v2 dialect), recorded 14 October 2026. Rows explicitly marked **Enhanced** use `Games/zakE ega en` (DOS v2, English), decoded again on 17 October after the actor palette/name operand correction. Classic rows are preserved separately.
+Classic v1 (`Games/zak ega en`, DOS EGA, English; now decoded in the distinct v1 dialect established by S4b), initially recorded 14 October 2026. Rows explicitly marked **Enhanced** use `Games/zakE ega en` (DOS v2, English), decoded again on 17 October after the actor palette/name operand correction. Classic rows are preserved separately.
 
 ## Row format (every table below)
 
@@ -45,6 +45,17 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 | Room | What it is, entry/exit script facts, local scripts | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic 23, loaded as 207 | Selects 403, 406, 407 and 411; offsets and some other pseudo-layout positions differ from Enhanced | decoded | Entry +0x0066–0x00AF | 2026-10-17 |
+| Classic 36, loaded as 199 | Draws 568, 566, 567 and 564; 565's branch requires object 302 intrinsic-on | decoded | Entry +0x0108–0x0171 | 2026-10-17 |
+| Classic 53, loaded as 158 | Wide layout draws 748, 749, 747, 741–745; 748/749 are at native Y=3 here, versus Y=1 in Enhanced | decoded | Entry +0x0046–0x0069, +0x00F6–0x0124 | 2026-10-17 |
+| Classic 8, loaded as 144 | Draws 197 and clears/touches 192 in this travel-office layout | decoded | Entry +0x0242–0x0277 | 2026-10-17 |
+| Classic 14, loaded as 129 | Makes 309 intrinsic-on/touchable; 298 depends on its lock bit | decoded | Entry +0x002C–0x0066 | 2026-10-17 |
+| Classic 9, loaded as 146 | Enables 222 and draws 224; the other layouts use 225–227 | decoded | Entry +0x0038–0x0065 | 2026-10-17 |
+| Classic 33, loaded as 182 | First branch adjusts boxes and resources, skipping the alternate-layout object writes | decoded | Entry +0x0004–0x0052 | 2026-10-17 |
+| Classic 37, loaded as 170 | Source variables choose open/closed alternatives 572/570 and 573/571, followed by optional 574/575 | decoded | Entry +0x00A4–0x00DF | 2026-10-17 |
+| Classic 27, loaded as 185 | Branch clears 445, runs native background object work, and skips alternate-layout 446/454/456 writes | decoded | Entry +0x0037–0x009E; alternate +0x00AB/+0x00B1/+0x00B4 | 2026-10-17 |
+| Classic 10 | Clears 230–235, selects boxes through 229/238 state, and conditionally starts object 240/231 scripts; no unconditional intrinsic-on image write | decoded | Entry +0x0019–0x0082 | 2026-10-17 |
+| Classic 35, loaded as 195 | Uses the projection-room branch; alternative 194 draws 559/560 instead | decoded | Entry +0x000B–0x0076; +0x0080/+0x0085 | 2026-10-17 |
 | Enhanced 23, loaded as 207 | Clears 403–411's intrinsic/touch flags, then selects 403, 406, 407 and 411 for this layout; other literal draws belong to other pseudo numbers | decoded | Entry +0x0004–0x0014, +0x0082–0x00CB | 2026-10-17 |
 | Enhanced 36, loaded as 199 | Initial clear loop followed by the 199 branch draws 568, 566, 567, 564; object 565 is conditional on object 302 being intrinsic-on | decoded | Entry +0x0004–0x000E, +0x0110–0x0179 | 2026-10-17 |
 | Enhanced 53, loaded as 158 | Draws 748, 749, 747, 741–745 in the wide-layout branch; the two extra ornaments 739/740 belong to 156 and are not drawn for 158 | decoded | Entry +0x003C–0x007F, +0x0092–0x00CA, +0x00FE–0x012C | 2026-10-17 |
