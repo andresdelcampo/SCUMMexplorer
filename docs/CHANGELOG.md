@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: the first v5 game boots in the generic session (S4b, MonkeyCd)
+
+- **Data source:** `ScummV5DataSource` (Core/Scumm/V5) reads scripts, objects, object images with masks, walk boxes with the box matrix, scale slots, costumes and the `DOBJ` object table of `MONKEY.000`/`MONKEY.001` through `ScummV5Archive`; `ScummDataSources.For` returns it for a v5 game.
+- **Engine:** the v5 variables (`ScummVars`, vars.cpp) and their start values (`VAR_INPUTMODE`, `VAR_FADE_DELAY`, `VAR_V5_TALK_STRING_Y`, `GID_MONKEY`'s var 74); the CD music timer of a game whose sounds play disc tracks (`ScummCdAudioTracks`, soundcd.cpp); v5 `drawObject` sub-opcodes and `pickupObject` (0x25 family), nested `getInventoryCount`; `getActorFromPos` answered in every generic session.
+- **Boot:** no copy protection; rooms 0, 10, 0, 0, 38; 1573 frames; the player has control at the lookout (Room 38) while the opening's track plays; unsupported 0, no assumed input; left alone it reaches Room 96 and the dock (Room 33). Registry unchanged.
+- **Validation:** `ScummMonkeyCdSessionTests` (5); session, play, first-visit, support and reader neighbours 191 passed; LOOM 836 passed, 5 skipped. Record: [monkeycd-session-20261017](../.verification/monkeycd-session-20261017/README.md).
+
 ## 17 October: cutscenes from the scripts, playable (S7, MonkeyFloppy)
 
 - **List:** the floppy Monkey Island's verbs exist after the boot (Script 22), so the shared planner titles its entries with them (`Room 33 · Look at poster`); 294 triggers, 164 entries (63 scenes, 101 dialogue and reactions), 104 begin from a fresh start. Acceptance: the poster's first Look at (Room 33 object 438 verb 0x09), Room 37's entry (Script 60) and Room 19's entry (the ship, Part II, on to Room 7) begin from a fresh start (`ScummMonkeyFloppyCutsceneTests`); Script 117 (the bar's first exit) is found but needs the door open. Registry: Cutscenes – → ◐.
