@@ -636,7 +636,9 @@ public sealed class ScummBoundedScriptExecutor
                 continue;
             }
 
-            if (instruction.Operation == "waitForSentence" && runtime?.ScriptRunning is not null &&
+            // The v5 reader names the same wait "waitFor sentence" (o5_wait sub-opcode 4; S5 Indy4, Room 28 local script 208).
+            if ((instruction.Operation == "waitForSentence" || instruction.Operation == "waitFor" && instruction.Operands == "sentence") &&
+                runtime?.ScriptRunning is not null &&
                 knownVariables.TryGetValue(ScummVars.SentenceScript, out var sentenceScriptNumber))
             {
                 // o5_wait (SO_WAIT_FOR_SENTENCE): the script waits while a sentence is queued (none is frozen here), and, with none queued,
@@ -1591,7 +1593,7 @@ public sealed class ScummBoundedScriptExecutor
 
     private static bool IsActorQuery(string operation) => operation is
         "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom" or
-        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving";
+        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale";
 
     private static bool IsActorPlacement(string operation) => operation is
         "putActor" or "putActorAtObject" or "putActorInRoom" or "walkActorTo" or "walkActorToObject" or
@@ -2031,6 +2033,8 @@ public sealed class ScummBoundedScriptExecutor
             "getActorFacing" => actor.Look.Direction,
             // o5_getActorMoving: the actor's _moving flags.
             "getActorMoving" => actor.Moving,
+            // o5_getActorScale (v5 0x3B): the actor's _scalex.
+            "getActorScale" => actor.Look.Scale,
             _ => actor.Y
         };
         if (value is null)
@@ -2047,9 +2051,11 @@ public sealed class ScummBoundedScriptExecutor
             detail = $"{operation} reads actor {number}, whose {what} the preview does not know ({actor.Look.Estimate ?? actor.Unknown ?? "not known"})";
             return false;
         }
-        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving")
+        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale")
         {
             answer = value.Value;
+            // S5 Indy4: the scale actorOps set; the walk-box scaling of a moving actor (setupActorScale) is not simulated, so the value is an estimate.
+            if (operation == "getActorScale") estimate = $"actor {number}: the scale set by actorOps (walk-box scaling is not simulated)";
             if (operation == "getActorFacing" && actor.Look.Estimate is not null) estimate = $"actor {number}: {actor.Look.Estimate}";
             detail = "known value";
             return true;
@@ -2671,6 +2677,7 @@ public sealed class ScummBoundedScriptExecutor
                 "getActorWalkBox" => actor.WalkBox, "getActorRoom" => actor.Room,
                 "getActorX" => actor.X, "getActorY" => actor.Y, "getActorCostume" => actor.Look.Costume,
                 "getActorElevation" => actor.Look.Elevation, "getActorFacing" => actor.Look.Direction,
+                "getActorScale" => actor.Look.Scale,
                 _ => actor.Moving
             };
             var reason = op is "getActorX" or "getActorY" or "getActorRoom" or "getActorWalkBox" ? actor.Estimate :
