@@ -79,14 +79,15 @@ public sealed class ScummV2DataSource : IScummDataSource
     public IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> ReadObjectVerbs(int room, IReadOnlyList<ScummRoomObjectRecord> records)
     {
         var sources = ScummOldScripts.ReadRoomScripts(RoomBytes(room), room).Where(s => s.ObjectId.HasValue).ToArray();
-        return records.ToDictionary(r => r.Id, r => (IReadOnlyList<ScummObjectVerbEntry>)sources.Where(s => s.ObjectId == r.Id)
+        return records.GroupBy(r => r.Id).Select(group => group.Last()).ToDictionary(r => r.Id, r => (IReadOnlyList<ScummObjectVerbEntry>)sources.Where(s => s.ObjectId == r.Id && s.Offset == r.CodeOffset)
             .Select(s => Entry(s)).ToArray());
     }
     private static ScummObjectVerbEntry Entry(OldScriptSource s) => new(s.ObjectId!.Value, s.VerbId!.Value, s.Offset,
         s.Offset + 15, s.Offset + s.StartOffset, s.Offset + s.Code.Length);
     public ScummScriptDisassembly ReadObjectVerb(int room, ScummRoomObjectRecord record, int verbId, out ScummObjectVerbEntry selectedEntry)
     {
-        var sources = ScummOldScripts.ReadRoomScripts(RoomBytes(room), room).Where(s => s.ObjectId == record.Id).ToArray();
+        var selected = ReadRoom(room).Objects.Last(r => r.Id == record.Id); // getObjectIndex scans backwards.
+        var sources = ScummOldScripts.ReadRoomScripts(RoomBytes(room), room).Where(s => s.ObjectId == record.Id && s.Offset == selected.CodeOffset).ToArray();
         var source = sources.FirstOrDefault(s => s.VerbId == verbId) ?? sources.FirstOrDefault(s => s.VerbId == 255)
             ?? throw new InvalidDataException($"Object {record.Id} has no verb 0x{verbId:X2} or fallback entry.");
         selectedEntry = Entry(source);

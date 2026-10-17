@@ -40,7 +40,7 @@ public static class ScummOldScripts
             yield return new OldScriptSource($"Room {room:00} / Exit script", room, null, null, null, room, exit, decoded[exit..exitEnd]);
         }
         var count = decoded[20];
-        if (count < 2 || 28 + 4 * count > decoded.Length) yield break;
+        if (count == 0 || 28 + 4 * count > decoded.Length) yield break;
         var codes = Enumerable.Range(0, count).Select(i => Word(decoded, 28 + 2 * count + 2 * i)).Where(c => c > 0 && c + 15 <= decoded.Length).OrderBy(c => c).ToArray();
         foreach (var code in codes)
         {
