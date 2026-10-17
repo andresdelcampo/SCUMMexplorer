@@ -33,7 +33,7 @@ Remaining limits include sentence UI rendering, unretained actor name/sound pres
 
 ## Validation
 
-Final focused command: `rtk proxy dotnet test tests/SCUMMexplorer.Tests --no-restore --filter "FullyQualifiedName~ScummManiacEnhancedSessionTests|FullyQualifiedName~ScummV2ExecutorTests|FullyQualifiedName~ScummV2ObjectSlotTests|FullyQualifiedName~ScummV1DataSourceTests|FullyQualifiedName~LoomBoundedScriptExecutorTests" --verbosity quiet`.
+Final focused command: `rtk proxy dotnet test tests/SCUMMexplorer.Tests --no-restore --filter "FullyQualifiedName~ScummManiacEnhancedSessionTests|FullyQualifiedName~ScummManiacClassicSessionTests|FullyQualifiedName~ScummV2ExecutorTests|FullyQualifiedName~ScummV2InitialActorTests|FullyQualifiedName~LoomBoundedScriptExecutorTests" --verbosity quiet`.
 
-39 passed, 0 failed, 0 skipped. Includes exact enhanced endpoint/party regression, all enhanced rooms, classic adapters, special object dispatch, unsigned/state/bit/indirect/coordinate semantics and existing old-v3 executor checks. NU1900 reflects unavailable NuGet vulnerability metadata. Parent orchestrator performs the required master merge/build/full suite separately.
+47 passed, 0 failed, 0 skipped. Includes both Maniac endpoints, all enhanced rooms, native actor defaults, special object dispatch, unsigned/state/bit/indirect/coordinate semantics, alias estimate provenance and existing old-v3 executor checks. NU1900 reflects unavailable NuGet vulnerability metadata. Parent orchestrator performs the required master merge/build/full suite separately.
 
