@@ -572,7 +572,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         (actor.DestX, actor.DestY, actor.DestBox, actor.DestDir) = (endX, endY, endBox, direction);
         actor.Point3 = null;
         actor.CurBox = actor.WalkBox ?? ScummWalkBoxSet.InvalidBox;
-        actor.Moving = (actor.Moving & MoveInLeg) | MoveNewLeg;
+        actor.Moving = _v2Animations ? (actor.Moving & ~MoveLastLeg) | MoveInLeg | MoveNewLeg : (actor.Moving & MoveInLeg) | MoveNewLeg;
         // When every box of the room routes to the end box (or the actor ignores boxes), the
         // walk ends there wherever it started, so on arrival an estimate about the start
         // (an assumed arrival, a seeded pick) no longer applies to the position.
@@ -601,7 +601,8 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
                 actor.Moving = 0;
                 continue;
             }
-            if (_useV4Walking) WalkActorV4(actor, place);
+            if (_v2Animations) WalkActorV2(actor, place);
+            else if (_useV4Walking) WalkActorV4(actor, place);
             else WalkActor(actor, place);
             moved.Add(actor.Number);
         }

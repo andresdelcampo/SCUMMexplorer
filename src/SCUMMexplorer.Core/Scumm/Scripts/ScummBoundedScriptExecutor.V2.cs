@@ -310,7 +310,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "stopObjectCode": case "breakHere": case "jumpRelative": case "increment": case "decrement":
             case "isNotEqual": case "isEqual": case "beginOverride":
             case "equalZero": case "notEqualZero": case "delay": case "delayVariable": case "getRandomNr":
-            case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom":
+            case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom": case "loadRoomWithEgo":
             case "isScriptRunning": case "isSoundRunning": case "getObjectOwner": case "setOwnerOf":
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":

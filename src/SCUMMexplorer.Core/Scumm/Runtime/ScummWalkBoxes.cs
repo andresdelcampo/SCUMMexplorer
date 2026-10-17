@@ -40,6 +40,7 @@ public sealed class ScummWalkBoxSet
 
     private readonly byte[] _flags;
     private readonly byte[] _matrix;
+    public bool UsesV2Matrix { get; internal init; }
 
     internal ScummWalkBoxSet(IReadOnlyList<ScummWalkBox> boxes, byte[] matrix, int tableOffset, bool matrixTruncated)
     {
@@ -63,7 +64,7 @@ public sealed class ScummWalkBoxSet
     /// <summary>The CD room's scale slots (SA block; ScummVM <c>_scaleSlots</c>): scale and y at two points, interpolated between them.</summary>
     public IReadOnlyList<(int Scale1, int Y1, int Scale2, int Y2)> ScaleSlots { get; internal set; } = [];
 
-    public ScummWalkBoxSet Clone() => new(Boxes, _matrix, TableOffset, MatrixTruncated) { ScaleSlots = ScaleSlots };
+    public ScummWalkBoxSet Clone() => new(Boxes, _matrix, TableOffset, MatrixTruncated) { ScaleSlots = ScaleSlots, UsesV2Matrix = UsesV2Matrix };
 
     /// <summary>
     /// The scale the box gives an actor at <paramref name="y"/> (ScummVM <c>setupActorScale</c>: the box's scale word, or with bit 15 set the
@@ -157,7 +158,7 @@ public sealed class ScummWalkBoxSet
                 if (threshold > 0 && QuickReject(corners, x, y, threshold)) continue;
                 if (Contains(box, x, y))
                     return new BoxAdjustment(x, y, box, x, y);
-                var (distance, closestX, closestY) = ClosestPointOnBox(corners, x, y);
+                var (distance, closestX, closestY) = UsesV2Matrix ? ClosestPointV2(corners, x, y) : ClosestPointOnBox(corners, x, y);
                 if (distance < bestDist)
                 {
                     validX = resultX = closestX;
@@ -182,6 +183,12 @@ public sealed class ScummWalkBoxSet
         if (from == to) return to;
         if (to == InvalidBox) return -1;
         if (from == InvalidBox) return to;
+        if (UsesV2Matrix)
+        {
+            if (from < 0 || from >= Count || to < 0 || to >= Count || from >= _matrix.Length) return -1;
+            var at = Count + _matrix[from] + to;
+            return at < _matrix.Length ? unchecked((sbyte)_matrix[at]) : -1;
+        }
         var position = _matrix.Length > 0 && _matrix[0] == 0xFF ? 1 : 0;
         for (var index = 0; index < from && position < _matrix.Length; index++)
         {
@@ -196,6 +203,15 @@ public sealed class ScummWalkBoxSet
             position += 3;
         }
         return destination;
+    }
+
+    internal static (int Distance, int X, int Y) ClosestPointV2(ScummWalkBox box, int x, int y)
+    {
+        ScummBoxPoint Native(ScummBoxPoint p) => new(p.X >> 3, p.Y >> 1);
+        var native = box with { UpperLeft = Native(box.UpperLeft), UpperRight = Native(box.UpperRight),
+            LowerLeft = Native(box.LowerLeft), LowerRight = Native(box.LowerRight) };
+        var (distance, px, py) = ClosestPointOnBox(native, x >> 3, y >> 1);
+        return (distance, px * 8, py * 2);
     }
 
     public static (int Distance, int X, int Y) ClosestPointOnBox(ScummWalkBox box, int x, int y)
@@ -439,7 +455,10 @@ public static class ScummWalkBoxReader
             boxes.Add(new ScummWalkBox(index, new ScummBoxPoint(decodedRoom[at + 2] * 8, upper), new ScummBoxPoint(decodedRoom[at + 3] * 8, upper),
                 new ScummBoxPoint(decodedRoom[at + 5] * 8, lower), new ScummBoxPoint(decodedRoom[at + 4] * 8, lower), decodedRoom[at + 6], decodedRoom[at + 7]));
         }
-        return new ScummWalkBoxSet(boxes, [], table, false);
+        var matrixStart = table + 1 + count * 8;
+        var matrixSize = count * (count + 1);
+        if (matrixStart + matrixSize > decodedRoom.Length) throw new InvalidDataException("The v2 box matrix runs past the room.");
+        return new ScummWalkBoxSet(boxes, decodedRoom.AsSpan(matrixStart, matrixSize).ToArray(), table, false) { UsesV2Matrix = true };
     }
 
     public static ScummWalkBoxSet Read(ReadOnlySpan<byte> encodedRoom) => ReadPlain(LflEncoding.DecodeXorFF(encodedRoom));
