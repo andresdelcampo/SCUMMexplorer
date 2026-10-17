@@ -286,8 +286,11 @@ public sealed class ScummGameSession : ScummSession
     private Dictionary<int, int> ObjectValues()
     {
         var values = new Dictionary<int, int>(_runtime.ObjectStates.Count);
-        foreach (var pair in _runtime.ObjectStates) values[pair.Key] = pair.Value;
-        foreach (var pair in _runtime.ObjectPositions) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
+        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
+        foreach (var pair in _runtime.ObjectStates)
+            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key] = pair.Value;
+        foreach (var pair in _runtime.ObjectPositions)
+            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
         return values;
     }
 
@@ -316,10 +319,13 @@ public sealed class ScummGameSession : ScummSession
     {
         bool Ambient(int id) => changes.TryGetValue(id, out var queue) && queue.Count >= 4;
         var hash = new HashCode();
+        // v1/v2 background scripts animate objects in rooms that are not loaded. Their flags still
+        // belong to persistent state, but cannot keep the current room's picture from settling.
+        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
         foreach (var pair in _runtime.ObjectStates.OrderBy(item => item.Key))
-            if (!Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
+            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
         foreach (var pair in _runtime.ObjectPositions.OrderBy(item => item.Key))
-            if (!Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
+            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
         foreach (var actor in Actors) { hash.Add(actor.Number); hash.Add(actor.Room); hash.Add(actor.X); hash.Add(actor.Y); hash.Add(actor.Visible); hash.Add(actor.Look.Costume); }
         foreach (var colour in _runtime.ShadowPalette.Take(16)) hash.Add(colour);
         foreach (var colour in _runtime.RoomColors.Take(16)) hash.Add(colour);

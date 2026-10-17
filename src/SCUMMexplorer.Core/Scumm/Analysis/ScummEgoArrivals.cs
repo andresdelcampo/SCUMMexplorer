@@ -74,9 +74,11 @@ public sealed class ScummEgoArrivalIndex
             foreach (var instruction in script.Instructions.Where(item => item.Operation == "pseudoRoom"))
             {
                 var parts = instruction.Operands.Split([',', '[', ']', ' '], StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 2 || !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var real)) continue;
+                static bool Number(string text, out int value) => int.TryParse(text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? text[2..] : text,
+                    text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? NumberStyles.HexNumber : NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
+                if (parts.Length < 2 || !Number(parts[0], out var real)) continue;
                 foreach (var item in parts.Skip(1))
-                    if (int.TryParse(item, NumberStyles.Integer, CultureInfo.InvariantCulture, out var pseudo)) pseudoRooms[pseudo | 0x80] = real;
+                    if (Number(item, out var pseudo)) pseudoRooms[pseudo | 0x80] = real;
             }
             foreach (var instruction in script.Instructions.Where(item => item.Operation == "loadRoomWithEgo"))
             {

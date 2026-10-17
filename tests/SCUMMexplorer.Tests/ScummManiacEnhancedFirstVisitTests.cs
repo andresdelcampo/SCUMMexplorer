@@ -15,6 +15,8 @@ public sealed class ScummManiacEnhancedFirstVisitTests
         if (!Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
         var scene = ManiacFirstVisit.Run(game, room);
+        Assert.Equal(ScummSettleOutcome.Settled, scene.Outcome);
+        Assert.InRange(scene.Frames, 90, 600);
         Assert.True(ScummProfile.For(game).HasFirstVisitScenes);
         Assert.Equal(active, scene.Images.Where(scene.Selection.IsActive).Select(image => image.Id).Order().ToArray());
         Assert.Empty(scene.Gaps());
