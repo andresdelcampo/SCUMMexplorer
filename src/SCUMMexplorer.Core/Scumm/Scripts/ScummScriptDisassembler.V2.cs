@@ -108,10 +108,25 @@ internal static partial class ScummScriptDisassembler
             case "assignVarByte": return (name, Join(R(), Raw()));
             case "increment": case "decrement": return (name, R());
             case "delayVariable": return (name, R());
-            case "delay": { var a = cursor.ReadByte(); var b = cursor.ReadByte(); var c = cursor.ReadByte(); return ("delay", $"{a | b << 8 | c << 16}"); }
+            // o2_delay stores the complement of the 24-bit duration (script_v2.cpp).
+            case "delay": { var a = cursor.ReadByte(); var b = cursor.ReadByte(); var c = cursor.ReadByte(); return ("delay", $"{0xFFFFFF - (a | b << 8 | c << 16)}"); }
             case "setObjPreposition": return (name, Join(W(0x80), Raw()));
             case "resourceRoutines": return (name, Join(B(0x80), Raw()));
-            case "actorOps": case "roomOps": return (name, Join(B(0x80), B(0x40), $"sub={Raw()}"));
+            case "actorOps":
+            {
+                var actor = B(0x80);
+                var argument = B(0x40);
+                var sub = cursor.ReadByte();
+                var operands = Join(actor, argument, $"sub=0x{sub:X2}");
+                // o2_actorOps: v1 uses the actor number as the palette index; v2 reads
+                // an additional byte. SO_ACTOR_NAME consumes its inline resource string.
+                if (sub == 2 && cursor.Dialect != ScummScriptDialect.V1)
+                    operands = Join(operands, $"palette={Raw()}");
+                else if (sub == 3)
+                    operands = Join(operands, $"name={ReadV2PlainString(cursor)}");
+                return (name, operands);
+            }
+            case "roomOps": return (name, Join(B(0x80), B(0x40), $"sub={Raw()}"));
             case "actorFromPos": case "findObject": return (name, Join(R(), B(0x80), B(0x40)));
             case "print": case "printEgo": return DecodeV2Print(cursor, opcode, name);
             case "setObjectName": return (name, Join(W(0x80), ReadV2PlainString(cursor)));
