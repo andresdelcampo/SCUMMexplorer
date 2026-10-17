@@ -837,7 +837,9 @@ public partial class MainWindow : Window
             var button = new Button
             {
                 Content = text,
-                ToolTip = $"Object {label.Id} · {label.X}, {label.Y} · {label.Width} × {label.Height}. A stored object; the game's scripts decide whether it is present.",
+                ToolTip = $"Object {label.Id} · {label.X}, {label.Y} · {label.Width} × {label.Height}. " +
+                    (_browsedScene is not null ? "Selectable in the room state reached by its scripts."
+                        : "A stored object; the game's scripts decide whether it is present."),
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 3),
                 Padding = new Thickness(8, 3, 8, 3),
@@ -949,7 +951,7 @@ public partial class MainWindow : Window
         }
         // First visit of a game the generic session boots (R-5.3, R-6.12a): the room as the session leaves it, with its actors; the plain background where that cannot run.
         if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
-            ScummRoomFirstVisit.Cached(game, firstVisitRoom) is { } firstVisit)
+            ReadFirstVisit(game, firstVisitRoom) is { } firstVisit)
             return CreateRoomCardBitmap(firstVisit.Room, firstVisit.ComposeWithActors(), firstVisit.State.CameraX ?? 0, firstVisit.DisplayPalette());
         if (game.V4Disks is not null && game.V4ArchiveFor(roomResource) is { } browsed)
         {
@@ -1371,7 +1373,7 @@ public partial class MainWindow : Window
             // First visit of a browsed old-bundle game (R-5.3): the entry hooks and scripts run in a fresh generic session; the plain background where that cannot run.
             ScummRoomScene? browsedScene = null;
             if (_game is { } sceneGame && ScummProfile.For(sceneGame).HasFirstVisitScenes && resource.ResourceId is int sceneRoomId)
-                browsedScene = await Task.Run(() => ScummRoomFirstVisit.Cached(sceneGame, sceneRoomId), token);
+                browsedScene = await Task.Run(() => ReadFirstVisit(sceneGame, sceneRoomId), token);
             _browsedScene = browsedScene;
             var room = browsedScene?.Room ?? cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
                 : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
