@@ -44,9 +44,8 @@ public sealed record ScummV4ObjectImage(int Id, int X, int Y, int Width, int Hei
     /// <summary>The image's own depth mask (one byte per pixel, 0 or 1), or null when it carries none.</summary>
     public byte[]? Mask { get; init; }
 
-    /// <summary>The object state that shows this image: 1 for a v4 object's only image; the number of its <c>IMnn</c> block in a v5 room (S4b Monkey2).</summary>
+    /// <summary>The object state this image is drawn for (v5 <c>IMnn</c>, nn the state in hex; ScummVM <c>getObjectImage(ptr, getState(obj))</c>). 1 before v5.</summary>
     public int State { get; init; } = 1;
-
     /// <summary>Pixels the image does not draw (a v5 strip with a transparent codec, at the room's transparent colour); null when it draws all.</summary>
     public bool[]? Transparent { get; init; }
 }

@@ -1,0 +1,18 @@
+Play started: room 38, image visible Visible, cursor system pointer hidden, room view Collapsed, Normal-mode note "", tooltip none; the scene sound player follows it: True
+Room 33 after 220 window frames; Guybrush at (346, 133)
+verbs drawn: 0x01 "" (0,152), 0x04 "Give" (9,155), 0x02 "Open" (6,171), 0x03 "Close" (6,187), 0x09 "Pick up" (49,155), 0x08 "Look at" (48,171), 0x0A "Talk to" (50,187), 0x07 "Use" (113,155), 0x05 "Push" (108,171), 0x06 "Pull" (112,187), 0xC8 "" (160,152), 0xC9 "" (200,152), 0xCA "" (240,152), 0xCB "" (280,152), 0xCC "" (160,176), 0xCD "" (200,176), 0xCE "" (240,176), 0xCF "" (280,176), 0xD0 "" (144,152), 0xD1 "" (144,176), 0x64 "Walk to" (139,145)
+click on Look at: runInputScript(1, 8, 1) click on verb 0x08 at screen (50, 173)
+pointer on the poster: sentence line "Look at poster"
+click on the poster: runInputScript(2, 0, 1) click in the room at screen (92, 104), room (276, 104)
+cutscene True, skippable True, messages [Re-elect Governor Marley.]
+Esc through the window's key handler: taken True; cutscene False; messages [ ]
+key 'l': last input key 'l', the shortcut of verb 0x08; sentence line "Look at poster"
+right click on the poster through the window: runInputScript(2, 0, 2) right click in the room at screen (84, 104), room (268, 104); Look at poster sentences 1 -> 2; messages [Re-elect Governor Marley.]
+frames played by the window: 251
+-- scene sound log (device AdLib)
+   frame 1 4751 ms stop 98  | Room 38 exit script +0x0000 stopSound 0x62
+   frame 2 4868 ms start 104 music (AdLib) | Room 96 local script 200 +0x0027 startSound 0x68
+   frame 2 5244 ms opened 104 music (AdLib) | audio True, duration 13,2 s; Room 96 local script 200 +0x0027 startSound 0x68
+   frame 134 19582 ms stop 104  | Room 96 local script 200 +0x0033 stopSound 0x68
+   frame 134 19622 ms start 122 music (AdLib) | Room 33 entry script +0x0048 startSound 0x7A
+   frame 134 19729 ms opened 122 music (AdLib) | audio True, duration 145,267 s; Room 33 entry script +0x0048 startSound 0x7A

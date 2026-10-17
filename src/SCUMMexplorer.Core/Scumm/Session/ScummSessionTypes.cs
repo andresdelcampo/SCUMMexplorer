@@ -28,7 +28,10 @@ public sealed record ScummSessionSnapshot(
     /// ScummVM <c>findObject</c> skips untouchable objects. Unknown classes count as touchable.
     /// </summary>
     public bool IsUntouchable(int objectId) =>
-        ObjectClasses.TryGetValue(objectId, out var bits) && ScummObjectClasses.Has(bits, ScummObjectClasses.Untouchable);
+        ObjectClasses.TryGetValue(objectId, out var bits) && ScummObjectClasses.Has(bits, UntouchableClass);
+
+    /// <summary>The class number of <c>kObjectClassUntouchable</c> in this game (<see cref="ScummProfile.UntouchableClass"/>; 24 up to version 4).</summary>
+    public int UntouchableClass { get; init; } = ScummObjectClasses.Untouchable;
 
     /// <summary>Every seeded <c>getRandomNr</c> stand-in taken on this route, in order.</summary>
     public IReadOnlyList<ScummRandomPick> RandomPicks => Picks ?? [];

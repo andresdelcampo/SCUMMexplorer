@@ -6,13 +6,14 @@ public static class ScummObjectHitTest
 {
     public static (int Found, string? Unknown) Find(IReadOnlyList<ScummRoomObjectRecord> records,
         IReadOnlyDictionary<int, byte> states, IReadOnlyDictionary<int, RoomObjectPosition> positions,
-        IReadOnlyDictionary<int, uint> classes, int x, int y)
+        IReadOnlyDictionary<int, uint> classes, int x, int y, int untouchableClass = ScummObjectClasses.Untouchable)
     {
         var byLocalIndex = records.GroupBy(item => item.LocalIndex).ToDictionary(group => group.Key, group => group.First());
         foreach (var record in records)
         {
+            // kObjectClassUntouchable: class 24 in the small-header games, 32 from version 5 (ScummProfile.UntouchableClass; S6 MonkeyCd, 17 October 2026).
             if (record.Id < 1 || classes.TryGetValue(record.Id, out var bits) &&
-                ScummObjectClasses.Has(bits, ScummObjectClasses.Untouchable)) continue;
+                ScummObjectClasses.Has(bits, untouchableClass)) continue;
             var at = positions.TryGetValue(record.Id, out var moved) ? (moved.X, moved.Y) : (record.X, record.Y);
             if (!(at.Item1 <= x && at.Item1 + record.Width > x && at.Item2 <= y && at.Item2 + record.Height > y)) continue;
             var current = record;

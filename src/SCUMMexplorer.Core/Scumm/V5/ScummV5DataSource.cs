@@ -80,20 +80,26 @@ public sealed class ScummV5DataSource : IScummDataSource
         return new ScummRoomData(browsed.Records, names, boxes, boxError, width, height);
     }
 
-    /// <summary>
-    /// One image per object (the room-object views key on the object id): its first state's (<c>IM01</c>). A v5 object can store one image per state
-    /// (Monkey Island 2 rooms do; S4b Monkey2, 17 October 2026); <see cref="ReadObjectImages(int, IReadOnlyDictionary{int, byte})"/> picks by state.
-    /// </summary>
-    public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) => ReadObjectImages(room, new Dictionary<int, byte>());
+    /// <summary>One image per object: its first stored state (IM01 as a rule), the image a state above 0 shows when no state is known.</summary>
+    public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) => ReadObjectImages(room, null);
 
     /// <summary>
-    /// One image per object, the one its state shows: ScummVM <c>drawObject</c> finds the image block <c>IMnn</c> with n the object's state (state 0 draws
-    /// nothing, so its first image stands in; the object is inactive anyway). An object whose state has no image of its own keeps its first.
+    /// One image per object for the given states (S5 Indy4, 17 October 2026): a v5 object stores one image per state (<c>IM01</c>, <c>IM02</c>, …) and
+    /// ScummVM's <c>drawObject</c> takes <c>getObjectImage(ptr, getState(obj))</c>; an object in a state that has no image of its own draws nothing and is
+    /// left out. An object in state 0, or not in <paramref name="states"/>, keeps its first stored image (not drawn while its state is 0).
     /// </summary>
-    public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room, IReadOnlyDictionary<int, byte> states) =>
-        Read(() => _archive.ReadObjectImages(room)).GroupBy(i => i.Id)
-            .Select(group => group.FirstOrDefault(i => states.TryGetValue(i.Id, out var state) && (state & 0x0F) == i.State) ?? group.First())
-            .Select(i => new RoomObjectImage(i.Id, i.X, i.Y, i.Width, i.Height, i.Pixels) { Mask = i.Mask, Transparent = i.Transparent }).ToArray();
+    public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room, IReadOnlyDictionary<int, byte>? states)
+    {
+        var result = new List<RoomObjectImage>();
+        foreach (var group in Read(() => _archive.ReadObjectImages(room)).GroupBy(image => image.Id))
+        {
+            var state = states is not null && states.TryGetValue(group.Key, out var known) ? known : 0;
+            var image = state > 0 ? group.FirstOrDefault(i => i.State == state) : group.OrderBy(i => i.State).First();
+            if (image is null) continue;
+            result.Add(new RoomObjectImage(image.Id, image.X, image.Y, image.Width, image.Height, image.Pixels) { Mask = image.Mask, Transparent = image.Transparent });
+        }
+        return result;
+    }
 
     public IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> ReadObjectVerbs(int room, IReadOnlyList<ScummRoomObjectRecord> records)
     {

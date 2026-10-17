@@ -303,6 +303,16 @@ public sealed class ScummScriptRuntimeState
     /// </summary>
     public bool PublishesCursorVariables { get; set; }
     /// <summary>
+    /// The class number <c>findObject</c> skips as untouchable (<see cref="ScummProfile.UntouchableClass"/>): 24 for the small-header games, 32 from version 5
+    /// (object.cpp <c>getClass</c>, ScummVM master read 17 October 2026).
+    /// </summary>
+    public int UntouchableClass { get; set; } = ScummObjectClasses.Untouchable;
+    /// <summary>
+    /// <c>cursorCommand charsetColors</c> per charset: colour-map entries (0 to 15) a script replaced (ScummVM <c>_charsetData[charset]</c>); a text drawn with
+    /// that charset takes them in place of the charset file's own map.
+    /// </summary>
+    public Dictionary<int, Dictionary<int, byte>> CharsetColors { get; } = [];
+    /// <summary>
     /// The room (main) screen's rows from <c>roomOps setScreen</c> (ScummVM <c>initScreens(top, bottom)</c>): the text screen is above <c>Top</c>, the verb
     /// screen from <c>Bottom</c> down. ScummVM's start value for these versions is (16, 144) (<c>resetScumm</c>), until a script sets it.
     /// </summary>

@@ -69,13 +69,29 @@ public abstract partial class ScummSession
         if (!_charsets.TryGetValue(chosen, out var charset))
             // A version 3 engine reads 99.LFL - n (the 256-colour Indiana Jones too: one file per room, the same charset files as EGA; S6 Indy3Vga).
             _charsets[chosen] = charset = ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
+        // cursorCommand charsetColors (S6 MonkeyCd, 17 October 2026: Script 22 gives the verbs' charset 6 the entries 0, 6, 2): the colours the game set replace
+        // the file's own map, as ScummVM's _charsetData does.
+        if (charset is ScummV4Charset v4 && _runtime.CharsetColors.TryGetValue(chosen, out var entries) && entries.Count > 0)
+        {
+            var key = (chosen, string.Join(",", entries.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}={pair.Value}")));
+            if (!_coloredCharsets.TryGetValue(key, out var colored)) _coloredCharsets[key] = colored = v4.WithColors(entries);
+            return colored;
+        }
         return charset;
     }
+
+    private readonly Dictionary<(int Number, string Colors), ScummV4Charset> _coloredCharsets = [];
 
     private ScummV4Charset? ReadArchiveCharset(int number)
     {
         IEnumerable<ScummV4Archive> archives = _game.V4Archive is { } single ? [single] : _game.V4Disks?.Disks.OfType<ScummV4Archive>() ?? [];
         foreach (var archive in archives)
+        {
+            try { if (archive.ReadCharset(number) is { } charset) return charset; }
+            catch (InvalidDataException) { }
+        }
+        // Version 5 (S6 MonkeyCd, 17 October 2026): the CHAR blocks the index's DCHR directory points at, the same font after their 8-byte block header.
+        foreach (var archive in _game.V4Disks?.Disks.OfType<ScummV5Archive>() ?? [])
         {
             try { if (archive.ReadCharset(number) is { } charset) return charset; }
             catch (InvalidDataException) { }
@@ -92,7 +108,20 @@ public abstract partial class ScummSession
         ArgumentNullException.ThrowIfNull(verb);
         if (verb.Name is null) return [];
         var raw = ScummTextDecoder.ParseEscaped(verb.Name);
-        return ScummTextDecoder.ConvertMessage(raw, _runtime.GlobalVariables, _runtime.ObjectName, PlayVerbName, out _);
+        return ScummTextDecoder.ConvertMessage(raw, _runtime.GlobalVariables, _runtime.ObjectName, PlayVerbName, PlayStringText, out _);
+    }
+
+    // convertStringMessage (code 7): the string resource stringOps loaded; version 3 reads the number from a variable first, versions 4 and 5 take it as it is
+    // (ScummVM charset.cpp/string.cpp, master read 17 October 2026; Monkey Island CD's sentence line, Script 12, puts string 49 between verb and object).
+    private byte[]? PlayStringText(int operand)
+    {
+        var number = operand;
+        if (ScummProfile.For(_game).EngineVersion == ScummVersion.V3)
+        {
+            if (!_runtime.GlobalVariables.TryGetValue($"var[0x{operand & 0x1FFF:X3}]", out var read)) return null;
+            number = read;
+        }
+        return number != 0 && _runtime.Strings.TryGetValue(number & 0xFF, out var text) ? text : null;
     }
 
     // convertVerbMessage: the verb in use (not saved, a text verb) with that number.

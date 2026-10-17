@@ -144,6 +144,22 @@ public sealed partial class ScummV5Archive : IBrowsableArchive
     public ScummV4Costume? FindCostume(int id) => ReadCostumes().FirstOrDefault(c => c.Id == id);
 
     /// <summary>
+    /// Charset <paramref name="number"/> from the <c>DCHR</c> directory, or null when the index has none: a <c>CHAR</c> block whose body (after its 8-byte header) is the
+    /// font of <see cref="ScummV4Charset"/> (ScummVM <c>CharsetRendererCommon::setCurID</c>: the font starts 29 bytes into a version 5 resource, 8 header bytes and 21).
+    /// </summary>
+    public ScummV4Charset? ReadCharset(int number)
+    {
+        foreach (var (id, _, position) in ReadDirectory("DCHR"))
+        {
+            if (id != number || position + 8 > _resources.Length || Encoding.Latin1.GetString(_resources, position, 4) != "CHAR") continue;
+            var size = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(position + 4));
+            if (size < 8 || position + size > _resources.Length) return null;
+            return ScummV4Charset.Parse(_resources.AsSpan(position + 8, size - 8).ToArray(), number);
+        }
+        return null;
+    }
+
+    /// <summary>
     /// The sounds that start a track of the game's CD (Monkey Island 1 CD): a <c>SOUN</c> block without a <c>SOU </c> part whose bytes 24 to 31 are the track number, the loop
     /// count (0xFF: for ever) and the start and end as minutes, seconds and frames (ScummVM <c>soundcd.cpp</c>, <c>getCDTrackIdFromSoundId</c>).
     /// </summary>

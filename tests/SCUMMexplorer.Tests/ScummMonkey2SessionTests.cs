@@ -116,9 +116,9 @@ public sealed class ScummMonkey2SessionTests
         // [0x10D, 5, 1, 0]: player command 13 (volume fade) for sound 5, which is not playing: -1 (findActivePlayer finds none), exact.
         // [0x0D, 5]: status of sound 5: 0. Then [0x10C, 5, 0, 1]: a hook for a song that is not playing: -1.
         var words = ScummBoundedScriptExecutor.SoundKludgeWords("[0x010D, 0x0005, var[0x010], 0x0000]",
-            new Dictionary<string, ushort> { ["var[0x010]"] = 7 });
+            new Dictionary<string, ushort> { ["var[0x010]"] = 7 })!;
         Assert.Equal([0x010D, 5, 7, 0], words);
         Assert.Null(ScummBoundedScriptExecutor.SoundKludgeWords("[0x010D, var[0x011]]", new Dictionary<string, ushort>()));
-        Assert.Equal([-1], ScummBoundedScriptExecutor.SoundKludgeWords("[0xFFFF]", new Dictionary<string, ushort>()));
+        Assert.Equal([-1], ScummBoundedScriptExecutor.SoundKludgeWords("[0xFFFF]", new Dictionary<string, ushort>())!);
     }
 }

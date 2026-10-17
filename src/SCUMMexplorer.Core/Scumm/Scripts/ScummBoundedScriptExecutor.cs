@@ -311,10 +311,10 @@ public sealed partial class ScummBoundedScriptExecutor
             // An event behind a branch on a seeded pick is a possible outcome, not a reached one.
             var scriptEvent = inventoryScriptStart ?? ScummScriptEvent.FromInstruction(script, instruction,
                 onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
-            // o5_soundKludge start, stop and stop-all are sound events (ScummBoundedScriptExecutor.SoundKludge.cs).
-            if (scriptEvent is null && instruction.Operation == "soundKludge")
-                scriptEvent = SoundKludgeEvent(script, instruction, knownVariables,
-                    onEstimatedPath || OperandIsEstimated(instruction.Operands, estimated, knownVariables) ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
+            if (instruction.Operation == "soundKludge" && runtime is not null &&
+                SoundKludgeEvent(script, instruction, knownVariables, estimated,
+                    onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached) is { } kludge)
+                scriptEvent = kludge;
             if (scriptEvent is not null) scriptEvent = scriptEvent with { Executed = true };
             // o5_actorFollowCamera -> setCameraFollows (actor.cpp): an actor that is not in the current room starts that room's scene (startScene), then the
             // camera is put on the actor. The first game that relies on it is Monkey Island's boot (script 1 ends with the ego put in room 38 while room 0 is current).
@@ -669,7 +669,9 @@ public sealed partial class ScummBoundedScriptExecutor
                 continue;
             }
 
-            if (instruction.Operation == "waitForSentence" && runtime?.ScriptRunning is not null &&
+            // The v5 reader names the same wait "waitFor sentence" (o5_wait sub-opcode 4; S5 Indy4, Room 28 local script 208).
+            if ((instruction.Operation == "waitForSentence" || instruction.Operation == "waitFor" && instruction.Operands == "sentence") &&
+                runtime?.ScriptRunning is not null &&
                 (runtime.IsV2 || knownVariables.ContainsKey(ScummVars.SentenceScript)))
             {
                 var sentenceScriptNumber = runtime.IsV2 ? 2 : knownVariables[ScummVars.SentenceScript];
@@ -908,22 +910,6 @@ public sealed partial class ScummBoundedScriptExecutor
                 continue;
             }
 
-            if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands == "sentence" && runtime.ScriptRunning is not null)
-            {
-                // o5_wait (SO_WAIT_FOR_SENTENCE, S5 Monkey2): goes on when no sentence is queued and the sentence script (VAR_SENTENCE_SCRIPT) is not running;
-                // otherwise breaks and runs the instruction again next frame.
-                var sentenceScript = knownVariables.GetValueOrDefault(ScummVars.SentenceScript);
-                var sentenceRunning = sentenceScript != 0 && runtime.ScriptRunning(sentenceScript).Running;
-                if (runtime.Sentences.Count > 0 || sentenceRunning)
-                {
-                    trace.Add($"waiting for the sentence at +0x{instruction.Offset:X4} ({runtime.Sentences.Count} queued, script {sentenceScript} {(sentenceRunning ? "running" : "idle")})");
-                    resumeOffset = instruction.Offset;
-                    break;
-                }
-                pc = next;
-                continue;
-            }
-
             if (runtime is not null && instruction.Operation is "delay" or "delayVariable" &&
                 TryReadDelay(instruction, knownVariables, out var jiffies))
             {
@@ -972,6 +958,26 @@ public sealed partial class ScummBoundedScriptExecutor
                         ? int.Parse(number.AsSpan(2), System.Globalization.NumberStyles.HexNumber) : null;
                     trace.Add($"charset {(runtime.Charset?.ToString() ?? "unknown (a variable)")} (charsetSet at +0x{instruction.Offset:X4})");
                     PublishCursorVariables(runtime, knownVariables);
+                    pc = next;
+                    continue;
+                }
+                if (command == "charsetColors")
+                {
+                    // o5_cursorCommand case 14 (script_v5.cpp, master read 17 October 2026): the list's values become entries 0, 1, 2… of the current charset's
+                    // colour map (_charsetColorMap and _charsetData[_string[1]._default.charset]); a value that cannot be read leaves its entry alone.
+                    var open = instruction.Operands.IndexOf('[');
+                    var close = instruction.Operands.LastIndexOf(']');
+                    var colours = new Dictionary<int, byte>();
+                    if (open >= 0 && close > open)
+                    {
+                        var items = instruction.Operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        for (var i = 0; i < items.Length && i < 16; i++)
+                            if (TryReadValue(items[i], knownVariables, out var colour, out _)) colours[i] = (byte)colour;
+                    }
+                    var target = runtime.Charset ?? 0;
+                    if (!runtime.CharsetColors.TryGetValue(target, out var map)) runtime.CharsetColors[target] = map = [];
+                    foreach (var (entry, colour) in colours) map[entry] = colour;
+                    trace.Add($"charset {target} colours {string.Join(", ", colours.Select(pair => $"{pair.Key}={pair.Value}"))} (charsetColors at +0x{instruction.Offset:X4})");
                     pc = next;
                     continue;
                 }
@@ -1058,6 +1064,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 continue;
             }
 
+            // o5_soundKludge's answer (S4b Monkey2; reconciled with S4b Indy4's sound events above, 17 October 2026): VAR_SOUNDRESULT, labelled where estimated.
             if (instruction.Operation == "soundKludge")
             {
                 if (ApplySoundKludge(instruction, runtime, knownVariables, estimated, onEstimatedPath, limitations, trace) is { } kludgeProblem)
@@ -1526,7 +1533,7 @@ public sealed partial class ScummBoundedScriptExecutor
     /// </summary>
     private static (int Found, string? Unknown) FindObjectAt(IReadOnlyList<ScummRoomObjectRecord> roomObjects,
         IReadOnlyDictionary<int, byte> states, ScummScriptRuntimeState runtime, int x, int y)
-        => ScummObjectHitTest.Find(roomObjects, states, runtime.ObjectPositions, runtime.ObjectClasses, x, y);
+        => ScummObjectHitTest.Find(roomObjects, states, runtime.ObjectPositions, runtime.ObjectClasses, x, y, runtime.UntouchableClass);
 
     /// <summary>
     /// ScummVM <c>ScummEngine_v4::o4_pickupObject</c> (script_v4.cpp, which v3 shares): an object the room does not have, or one already held
@@ -2097,7 +2104,7 @@ public sealed partial class ScummBoundedScriptExecutor
             "getActorFacing" => actor.Look.Direction,
             // o5_getActorMoving: the actor's _moving flags.
             "getActorMoving" => actor.Moving,
-            // o5_getActorScale (S5 Monkey2): the actor's _scalex.
+            // o5_getActorScale (v5 0x3B): the actor's _scalex.
             "getActorScale" => actor.Look.Scale,
             _ => actor.Y
         };
@@ -2118,6 +2125,8 @@ public sealed partial class ScummBoundedScriptExecutor
         if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale")
         {
             answer = value.Value;
+            // S5 Indy4: the scale actorOps set; the walk-box scaling of a moving actor (setupActorScale) is not simulated, so the value is an estimate.
+            if (operation == "getActorScale") estimate = $"actor {number}: the scale set by actorOps (walk-box scaling is not simulated)";
             if (operation == "getActorFacing" && actor.Look.Estimate is not null) estimate = $"actor {number}: {actor.Look.Estimate}";
             detail = "known value";
             return true;
@@ -2743,6 +2752,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 "getActorWalkBox" => actor.WalkBox, "getActorRoom" => actor.Room,
                 "getActorX" => actor.X, "getActorY" => actor.Y, "getActorCostume" => actor.Look.Costume,
                 "getActorElevation" => actor.Look.Elevation, "getActorFacing" => actor.Look.Direction,
+                "getActorScale" => actor.Look.Scale,
                 _ => actor.Moving
             };
             var reason = op is "getActorX" or "getActorY" or "getActorRoom" or "getActorWalkBox" ? actor.Estimate :
@@ -3288,7 +3298,26 @@ public sealed partial class ScummBoundedScriptExecutor
         return bytes.ToArray();
     }
 
-    private static bool IsPresentationOperation(string operation) => operation is
+    // o5_soundKludge (0x4C in v4/v5) hands its word list to iMUSE (Sound::soundKludge, then IMuseInternal::doCommand_internal, imuse.cpp, ScummVM master
+    // read 17 October 2026): a[0] = param << 8 | command. Param 0: 8 startSound, 9 stopSound, 10 and 11 stopAllSounds; these change which sounds play
+    // and become the same events as startSound/stopSound/stopMusic. A lone -1 only flushes the sound queue. Every other command (priority, volume, pan,
+    // transpose, speed, jump, loop, hook, fade, trigger queue) changes how a playing song sounds or when its markers fire, never which sounds play:
+    // it stays a presentation operation not applied (IsPresentationOperation), reported in the limitations.
+    private static ScummScriptEvent? SoundKludgeEvent(ScummScriptDisassembly script, ScummScriptInstruction instruction,
+        IDictionary<string, ushort> knownVariables, IReadOnlySet<string> estimated, ScummScriptEventCertainty certainty)
+    {
+        var items = instruction.Operands.Trim().TrimStart('[').TrimEnd(']').Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (items.Length < 1 || !TryReadValue(items[0], knownVariables, out var head, out _) || head >> 8 != 0) return null;
+        var command = head & 0xFF;
+        if (command is 10 or 11)
+            return ScummScriptEvent.FromInstruction(script, instruction with { Operation = "stopMusic", Operands = "" }, certainty);
+        if (command is not (8 or 9) || items.Length < 2 || !TryReadValue(items[1], knownVariables, out var sound, out _)) return null;
+        if (OperandIsEstimated(items[1], estimated, knownVariables)) certainty = ScummScriptEventCertainty.Conditional;
+        return ScummScriptEvent.FromInstruction(script,
+            instruction with { Operation = command == 8 ? "startSound" : "stopSound", Operands = $"0x{sound:X4}" }, certainty);
+    }
+
+    private static bool IsPresentationOperation(string operation) => operation is "soundKludge" or
         "matrixOps" or "roomOps" or "actorOps" or "setClass" or "animateActor" or "putActor" or "putActorInRoom" or
         "faceActor" or "walkActorTo" or "walkActorToActor" or "walkActorToObject" or "putActorAtObject" or
         "setCameraAt" or "panCameraTo" or "lights" or "resourceRoutines" or "print" or "printEgo" or

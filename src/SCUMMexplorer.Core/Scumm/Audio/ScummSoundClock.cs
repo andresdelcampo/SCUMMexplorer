@@ -124,6 +124,8 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
         if (!_voices.TryGetValue(id, out var voice))
             return (false, _estimatedStops.Contains(id) ? "the stop followed a seeded route" : null);
         return (true, voice.Estimated ? "the start followed a seeded route" :
-            voice.Lifetime.Kind == ScummSoundLifetimeKind.Unknown ? voice.Lifetime.Reason ?? "native completion is unresolved" : null);
+            voice.Lifetime.Kind == ScummSoundLifetimeKind.Unknown ? voice.Lifetime.Reason ?? "native completion is unresolved"
+            // A finite length that carries a reason is an estimate (the v5 iMUSE default path, S4b Indy4); the others are the resource's own length.
+            : voice.Lifetime.Kind == ScummSoundLifetimeKind.Finite ? voice.Lifetime.Reason : null);
     }
 }
