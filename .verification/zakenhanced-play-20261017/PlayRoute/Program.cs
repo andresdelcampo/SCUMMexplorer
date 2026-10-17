@@ -3,6 +3,17 @@ using SCUMMexplorer.Core.Discovery;
 // Genuine boot and screen inputs only. No scene visits, direct sentence calls, or state edits.
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
+if (args.Length > 2 && args[2] == "boxes")
+{
+    var boxes = data.ReadRoom(7).WalkBoxes!;
+    var matrix = (byte[])typeof(ScummWalkBoxSet).GetField("_matrix", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(boxes)!;
+    var details = new List<string> { $"table {boxes.TableOffset}; matrix {Convert.ToHexString(matrix)}" };
+    for (var from = 0; from < boxes.Count; from++)
+        details.Add($"from{from}: " + string.Join(",", Enumerable.Range(0, boxes.Count).Select(to => boxes.GetNextBox(from, to))));
+    File.WriteAllLines(args[1], details);
+    Console.WriteLine(string.Join(Environment.NewLine, details));
+    return;
+}
 if (args.Length > 2 && args[2] == "source")
 {
     var source = new List<string>();
@@ -36,6 +47,8 @@ void Log(string label)
     lines.AddRange(session.Snapshot.ObjectOwners.Where(p => p.Value == 1).Select(p => $"owner {p.Key}={p.Value}"));
     lines.AddRange(new[] { 0, 4, 8, 9, 10, 26, 27, 28, 29, 30, 31, 32, 33, 35 }.Select(n => $"var{n}={session.Snapshot.KnownGlobalVariables.GetValueOrDefault($"var[0x{n:X3}]")}"));
     lines.AddRange(session.Actors.Where(a => a.Number == 1).Select(a => $"ego room={a.Room} position={a.X},{a.Y}"));
+    if (session.CurrentRoomId == 7)
+        lines.AddRange(data.ReadRoom(7).Objects.Select(record => $"shop object {record.Id} state={session.Snapshot.ObjectStates.GetValueOrDefault(record.Id)} owner={session.Snapshot.ObjectOwners.GetValueOrDefault(record.Id, (byte)15)} at{record.X},{record.Y} name={ScummTextDecoder.DecodeGlyphs(data.ReadRoom(7).ObjectNames.GetValueOrDefault(record.Id) ?? [])}"));
 }
 Log("boot");
 var commands = args.Skip(2).SelectMany(arg => arg.StartsWith('@') ? File.ReadAllLines(arg[1..]).Where(line => line.Length > 0 && !line.StartsWith('#')) : new[] { arg });
@@ -44,11 +57,24 @@ foreach (var command in commands)
     var fields = command.Split(',');
     if (fields[0] == "wait")
         for (var frame = 0; frame < int.Parse(fields[1]); frame++) session.AdvanceFrame();
-    else if (fields[0] is "untilskip" or "untilcontrol")
+    else if (fields[0] is "untilskip" or "untilcontrol" or "untilroom")
     {
-        bool Reached() => fields[0] == "untilskip" ? session.CutsceneSkippable : session.UserInputOn && !session.InCutscene;
-        for (var frame = 0; frame < int.Parse(fields[1]) && !Reached(); frame++) session.AdvanceFrame();
-        if (!Reached()) throw new InvalidOperationException($"{command}: condition not reached");
+        bool Reached() => fields[0] == "untilroom" ? session.CurrentRoomId == int.Parse(fields[1]) : fields[0] == "untilskip" ? session.CutsceneSkippable : session.UserInputOn && !session.InCutscene;
+        for (var frame = 0; frame < int.Parse(fields[^1]) && !Reached(); frame++) session.AdvanceFrame();
+        if (!Reached())
+        {
+            Log($"FAILED {command}");
+            // Read-only runtime diagnostics for source-backed engine fixes; never writes actor state.
+            var runtime = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
+            var actors = (Array)typeof(ScummActorTable).GetField("_actors", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(runtime.Actors)!;
+            var actor = actors.GetValue(1)!;
+            lines.AddRange(actor.GetType().GetProperties().Select(property => $"actor diagnostic {property.Name}={property.GetValue(actor)}"));
+            lines.AddRange(runtime.WalkBoxes!.Boxes.Select(box => $"box diagnostic {box}"));
+            lines.AddRange(session.PendingScriptSummary);
+            lines.AddRange(session.SessionTrace.TakeLast(100));
+            File.WriteAllLines(args[1], lines);
+            throw new InvalidOperationException($"{command}: condition not reached");
+        }
     }
     else if (fields[0] == "click")
         lines.Add($"input {session.ClickScreen(int.Parse(fields[1]), int.Parse(fields[2]), out var why)} refused={why}");
@@ -74,3 +100,4 @@ lines.AddRange(session.SessionTrace.Where(s => !s.Contains(" waits ") && !s.Cont
 lines.AddRange(session.Snapshot.Uncertainties.Distinct());
 File.WriteAllLines(args[1], lines);
 Console.WriteLine(string.Join(Environment.NewLine, lines.Where(line => line.StartsWith("==") || line.StartsWith("ego ") || line.StartsWith("escape ")).TakeLast(20)));
+
