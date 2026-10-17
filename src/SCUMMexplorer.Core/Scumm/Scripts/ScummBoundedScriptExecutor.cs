@@ -67,7 +67,7 @@ public sealed record ScummBoundedScriptResult(
 /// Executes a small, bounded subset of old-v3 bytecode for inspection. It only
 /// commits object changes when the bytecode operands and the relevant path are known.
 /// </summary>
-public sealed class ScummBoundedScriptExecutor
+public sealed partial class ScummBoundedScriptExecutor
 {
     /// <summary>
     /// A marker key (in the variables and in the estimated set) for a game whose bit variables are a separate array: ScummVM aliases a bit onto its
@@ -289,6 +289,10 @@ public sealed class ScummBoundedScriptExecutor
             // An event behind a branch on a seeded pick is a possible outcome, not a reached one.
             var scriptEvent = inventoryScriptStart ?? ScummScriptEvent.FromInstruction(script, instruction,
                 onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
+            // o5_soundKludge start, stop and stop-all are sound events (ScummBoundedScriptExecutor.SoundKludge.cs).
+            if (scriptEvent is null && instruction.Operation == "soundKludge")
+                scriptEvent = SoundKludgeEvent(script, instruction, knownVariables,
+                    onEstimatedPath || OperandIsEstimated(instruction.Operands, estimated, knownVariables) ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
             if (scriptEvent is not null) scriptEvent = scriptEvent with { Executed = true };
             // o5_actorFollowCamera -> setCameraFollows (actor.cpp): an actor that is not in the current room starts that room's scene (startScene), then the
             // camera is put on the actor. The first game that relies on it is Monkey Island's boot (script 1 ends with the ego put in room 38 while room 0 is current).
@@ -998,6 +1002,17 @@ public sealed class ScummBoundedScriptExecutor
                         ? $"isSoundRunning reads sound {sound} as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x{instruction.Offset:X4})"
                         : $"isSoundRunning reads sound {sound} as silent because this route did not start it (+0x{instruction.Offset:X4})");
                 trace.Add($"{resultKey} = {(running ? 1 : 0)}: sound {sound} {(running ? "playing" : "silent")}{(soundEstimate is null ? "" : " (estimate)")}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "soundKludge")
+            {
+                if (ApplySoundKludge(instruction, runtime, knownVariables, estimated, onEstimatedPath, limitations, trace) is { } kludgeProblem)
+                {
+                    unresolved = $"{kludgeProblem} at +0x{instruction.Offset:X4}";
+                    break;
+                }
                 pc = next;
                 continue;
             }
