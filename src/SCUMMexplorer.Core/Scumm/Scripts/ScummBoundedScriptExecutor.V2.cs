@@ -21,7 +21,7 @@ public sealed partial class ScummBoundedScriptExecutor
     // are handed to the shared executor; source offsets and encoded lengths remain those of the original instruction.
     private static bool PrepareV2Instruction(ScummScriptInstruction source, IDictionary<string, ushort> variables,
         IDictionary<int, byte> states, ScummScriptRuntimeState runtime, IReadOnlyList<ScummRoomObjectRecord> objects,
-        List<string> trace, out ScummScriptInstruction instruction, out bool handled, out int? branch, out string problem)
+        List<string> trace, bool estimatedPath, out ScummScriptInstruction instruction, out bool handled, out int? branch, out string problem)
     {
         instruction = source;
         handled = false;
@@ -32,6 +32,32 @@ public sealed partial class ScummBoundedScriptExecutor
         string Value(int n, int scale = 1) => Read(n, out var value) ? $"0x{unchecked((ushort)(value * scale)):X4}" : p[n];
         switch (source.Operation)
         {
+            case "verbOps":
+                if (!Read(0, out var verbNumber)) return false;
+                var bracket = source.Operands.IndexOf('[');
+                if (bracket < 0 || !source.Operands.EndsWith(']')) return false;
+                var verbBody = source.Operands[(bracket + 1)..^1];
+                if (verbBody.StartsWith("delete ") && TryReadValue(verbBody[7..], variables, out var deletedSlot, out _))
+                {
+                    if (deletedSlot >= 99) return false;
+                    trace.Add(runtime.Verbs.DeleteV2(deletedSlot));
+                }
+                else if (verbBody.StartsWith("state ") && TryReadValue(verbBody[6..], variables, out var mode, out _))
+                    trace.Add(runtime.Verbs.SetV2Mode(verbNumber, mode));
+                else
+                {
+                    var fields = verbBody.Split(';', 4, StringSplitOptions.TrimEntries);
+                    if (fields.Length != 4 || !fields[0].StartsWith("position ") || !fields[1].StartsWith("slot ") ||
+                        !fields[2].StartsWith("preposition ") || !fields[3].StartsWith("name, \"")) return false;
+                    var xy = fields[0][9..].Split(',', StringSplitOptions.TrimEntries);
+                    if (xy.Length != 2 || !TryReadValue(xy[0], variables, out var vx, out _) || !TryReadValue(xy[1], variables, out var vy, out _) ||
+                        !TryReadValue(fields[1][5..], variables, out var slot, out _) || !TryReadValue(fields[2][12..], variables, out var prep, out _)) return false;
+                    if (slot >= 99) return false;
+                    trace.Add(runtime.Verbs.CreateV2(verbNumber, slot, vx, vy, prep, fields[3][7..^1],
+                        charset: runtime.Charset ?? 0, yOffset: runtime.V2VerbYOffset, estimate: estimatedPath ? "verb setup follows an estimated route" : null));
+                }
+                handled = true;
+                return true;
             case "setCameraAt": case "panCameraTo":
                 if (!Read(0, out _)) return false;
                 instruction = source with { Operands = Value(0, 8) };

@@ -204,7 +204,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
                     .Any(operand => OperandIsEstimated(operand, estimated, knownVariables))) onEstimatedPath = true;
                 var before = new Dictionary<string, ushort>(knownVariables);
-                if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace,
+                if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace, onEstimatedPath,
                     out instruction, out var handled, out var branch, out var problem))
                 {
                     unresolved = $"{problem} at +0x{pc:X4}";

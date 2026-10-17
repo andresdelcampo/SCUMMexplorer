@@ -5,6 +5,20 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ExecutorTests
 {
     [Fact]
+    public void VerbSetupUsesTheExplicitSlotAndDynamicDelete()
+    {
+        var runtime = Runtime();
+        var created = Run(runtime, ("verbOps", "0x03, [position 0x01, 0x14; slot 0x02; preposition 0x01; name, \"Open\"]"));
+        Assert.Null(created.UnresolvedReason);
+        var verb = Assert.Single(runtime.Verbs.Snapshot(), v => v.VerbId == 3);
+        Assert.Equal(3, verb.Slot);
+        Assert.Equal(8, verb.X);
+        Assert.Equal(160, verb.Y);
+        var deleted = Run(runtime, ("move", "var[0x050], 0x02"), ("verbOps", "0x00, [delete var[0x050]]"));
+        Assert.Null(deleted.UnresolvedReason);
+        Assert.DoesNotContain(runtime.Verbs.Snapshot(), v => v.VerbId == 3);
+    }
+    [Fact]
     public void PrintNormalizesOldTextAndPreservesNativeCharacterCount()
     {
         var runtime = Runtime();
