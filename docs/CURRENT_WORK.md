@@ -1,5 +1,7 @@
 # Current work
 
+**S4b ManiacEnhanced in progress (17 October, Maniac/Zak orchestrator).** The isolated agent owns the new v2 data source and executor partial, plus small additive profile/variable/session changes. ZakEnhanced follows sequentially because it shares that engine work. LOOM, Indy3 and Monkey Island behavior and records are outside this item.
+
 Updated 14 October 2026. This is the single plan and session handoff. Completed work and validation belong in [CHANGELOG](CHANGELOG.md); source knowledge belongs in the game references.
 
 ## Status

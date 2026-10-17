@@ -64,6 +64,7 @@ public static class ScummDataSources
     {
         ArgumentNullException.ThrowIfNull(game);
         var profile = ScummProfile.For(game);
+        if (game.Version == ScummVersion.V2) return new ScummV2DataSource(game);
         // A game stored as one file per room (the 256-colour Indiana Jones): its single archive is built from the room files (S4b Indy3Vga).
         if (profile.UsesV4Archive && game.V4Archive is null && game.V4Disks?.Disks is [ScummV4Archive { IsRoomFileGame: true } roomFiles])
             return new ScummV4RoomFileDataSource(roomFiles, profile.Dialect);
