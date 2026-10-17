@@ -35,7 +35,7 @@ public abstract partial class ScummSession
         if (estimatedLoad)
             _uncertainties.Add($"Room {room.ResourceId:00} entered by estimated execution at {load!.SourceLabel} +0x{load.Offset:X4}; execution continues without promoting the transition's certainty.");
         var withEgo = load is { Operation: "loadRoomWithEgo", ResolvedArguments: { Count: 4 } } ? load : null;
-        int? ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) && ScummActorTable.IsValid(egoValue) ? egoValue : null;
+        int? ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : null;
         if (withEgo is not null)
         {
             // o5_loadRoomWithEgo: ego->putActor(room) before startScene; the ego

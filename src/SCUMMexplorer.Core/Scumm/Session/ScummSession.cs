@@ -50,7 +50,7 @@ public abstract partial class ScummSession
         });
         _data = data ?? ScummDataSources.For(game);
         _runtime = new ScummScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes,
-            useV4Walking: ScummProfile.For(game).UsesV4Walking)
+            useV4Walking: ScummProfile.For(game).UsesV4Walking, actorCount: ScummProfile.For(game).ActorCount)
         {
             EngineVersion = ScummProfile.For(game).EngineVersion,
             Random = new ScummSeededRandom(randomSeed),
@@ -733,7 +733,7 @@ public abstract partial class ScummSession
                 _runtime.SetGlobalVariable(ScummVars.V2.CursorState, saved.Cursor);
                 _runtime.ApplyV2UserState(saved.UserState | 4 | 2 | 1);
             }
-            if (_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && ScummActorTable.IsValid(ego))
+            if (_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && _runtime.Actors.Contains(ego))
             {
                 _runtime.Camera.Mode = ScummCamera.FollowActor;
                 _runtime.Camera.Follows = ego;

@@ -181,7 +181,7 @@ public abstract partial class ScummSession
         var cameraState = _runtime.Camera;
         ScummActorSnapshot? followed = null;
         if (cameraState.Mode == ScummCamera.FollowActor || cameraState.MovingToActor)
-            followed = ScummActorTable.IsValid(cameraState.Follows) ? _runtime.Actors[cameraState.Follows] : null;
+            followed = _runtime.Actors.Contains(cameraState.Follows) ? _runtime.Actors[cameraState.Follows] : null;
         var moved = cameraState.Move(camera, min, max, bounds, followed?.X);
         if (moved == camera) return;
         _runtime.WriteCameraPixels(moved);
@@ -196,7 +196,7 @@ public abstract partial class ScummSession
     /// True while the ego (<c>VAR_EGO</c>) walks or turns. Playback waits for this, not for every actor: ambient
     /// actors (script 042's swan speck in Room 02) walk from point to point without end.
     /// </summary>
-    public bool EgoMoving => _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && ScummActorTable.IsValid(ego) &&
+    public bool EgoMoving => _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && _runtime.Actors.Contains(ego) &&
                              _runtime.Actors[ego] is { Moving: not 0 } actor && actor.Room == _currentRoom?.ResourceId;
 
     /// <summary>
@@ -212,7 +212,7 @@ public abstract partial class ScummSession
             var (min, max) = _runtime.CameraRange ?? bounds;
             var camera = _runtime.Camera;
             var target = camera.DestX;
-            if (camera.MovingToActor && ScummActorTable.IsValid(camera.Follows) && _runtime.Actors[camera.Follows].X is int actorX)
+            if (camera.MovingToActor && _runtime.Actors.Contains(camera.Follows) && _runtime.Actors[camera.Follows].X is int actorX)
                 target = actorX;
             target = Math.Clamp(Math.Clamp(target, min, Math.Max(min, max)), bounds.Min, bounds.Max);
             return x / 8 != target / 8;

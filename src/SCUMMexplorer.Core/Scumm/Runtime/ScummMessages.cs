@@ -320,7 +320,7 @@ public sealed class ScummMessageTable
         }
         else
         {
-            if (!ScummActorTable.IsValid(actor))
+            if (!runtime.Actors.Contains(actor))
                 return $"print for actor {actor}, which is not a valid actor; ScummVM's derefActor would stop the game";
             var state = runtime.Actors[actor];
             if (state.Room is null)

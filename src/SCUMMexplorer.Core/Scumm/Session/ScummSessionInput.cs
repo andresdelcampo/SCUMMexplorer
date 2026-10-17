@@ -34,6 +34,7 @@ public abstract partial class ScummSession
     public ScummObjectActionResult Click(int x, int y, bool doubleClick = false)
     {
         BeforeInput();
+        if (_runtime.IsV2) return ClickV2(x, y);
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before clicking in it.");
         _uncertainties.StartStep();
@@ -294,7 +295,41 @@ public abstract partial class ScummSession
         {
             _runtime.SetGlobalVariable(ScummVars.V2.ClickArea, KeyClickArea);
             // runInputScript (v1/v2): fixed script 4; keyboard state is VAR_KEYPRESS, not v3 locals.
-            RunStartedScript(4, 0, null, 0);
+            RunStartedScript(4, 0, new Dictionary<string, ushort>
+            {
+                ["local[0x000]"] = KeyClickArea, ["local[0x001]"] = (ushort)key, ["local[0x002]"] = 1
+            }, 0);
+        }
+        finally { _dispatchScope--; _entersRoomLoads--; }
+        return FinishInput(beforeNotes, beforeEvents);
+    }
+
+    private ScummObjectActionResult ClickV2(int x, int y)
+    {
+        if (_currentRoom?.ResourceId is not int room) throw new InvalidOperationException("Visit a room before clicking in it.");
+        _uncertainties.StartStep();
+        var beforeNotes = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        var input = $"Assumed input: a room click at ({x}, {y}) through v2 script 4";
+        LastAction = new ScummObjectActionResult(room, 0, 0, 0, null, null, null, null, [], input);
+        _uncertainties.Add(input);
+        if (_runtime.UserPut <= 0 || _roomSize is not { } size || x < 0 || y < 0 || x >= size.Width || y >= size.Height)
+        {
+            _uncertainties.Add("The click was not sent: input is off or the point is outside the room.");
+            return FinishInput(beforeNotes, beforeEvents);
+        }
+        _pointer = (x, y);
+        _pointerNote = "the assumed boot selection";
+        PlaceVirtualMouse();
+        _runtime.SetGlobalVariable(ScummVars.V2.ClickArea, SceneClickArea);
+        _dispatchScope++;
+        _entersRoomLoads++;
+        try
+        {
+            RunStartedScript(4, 0, new Dictionary<string, ushort>
+            {
+                ["local[0x000]"] = SceneClickArea, ["local[0x001]"] = 0, ["local[0x002]"] = 0
+            }, 0);
         }
         finally { _dispatchScope--; _entersRoomLoads--; }
         return FinishInput(beforeNotes, beforeEvents);

@@ -173,7 +173,7 @@ public sealed class ScummGameSession : ScummSession
         var arrival = $"Room {roomId:00} selected without playing the route to it (state preview): its entry scripts ran from the state the boot left.";
         _runtime.Messages.RouteSkipped($"Room {roomId:00} was entered without its route, so prints on the route to it did not run");
         var arrivals = ScummEgoArrivalIndex.For(_game);
-        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !ScummActorTable.IsValid(ego)) return EnterWithoutEgo(room, arrival, arrivals);
+        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return EnterWithoutEgo(room, arrival, arrivals);
         var candidates = arrivals.Into(roomId);
         if (candidates.Count == 0)
         {

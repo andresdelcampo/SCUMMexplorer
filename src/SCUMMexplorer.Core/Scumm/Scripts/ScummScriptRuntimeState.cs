@@ -29,12 +29,12 @@ public sealed class ScummScriptRuntimeState
     }
     public ScummScriptRuntimeState(IReadOnlyDictionary<int, byte> initialStates,
         IReadOnlyDictionary<int, byte>? initialOwners = null,
-        IReadOnlyDictionary<int, uint>? initialClasses = null, bool useV4Walking = false)
+        IReadOnlyDictionary<int, uint>? initialClasses = null, bool useV4Walking = false, int actorCount = ScummActorTable.Count)
     {
         ObjectStates = new Dictionary<int, byte>(initialStates);
         ObjectOwners = initialOwners is null ? [] : new Dictionary<int, byte>(initialOwners);
         ObjectClasses = initialClasses is null ? [] : new Dictionary<int, uint>(initialClasses);
-        Actors = new ScummActorTable(useV4Walking);
+        Actors = new ScummActorTable(useV4Walking, actorCount);
         Actors.NativeMutation = NotifyNativeMutation;
         Messages.NativeMutation = () => NotifyNativeMutation("message");
         Camera.NativeMutation = () => NotifyNativeMutation("camera");
