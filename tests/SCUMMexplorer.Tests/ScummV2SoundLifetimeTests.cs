@@ -39,6 +39,8 @@ public sealed class ScummV2SoundLifetimeTests
         clock.Advance(1);
         Assert.False(clock.Status(1).Running);
         Assert.Equal(1, clock.MusicTimer());
+        clock.StopAll();
+        Assert.Equal(0, clock.MusicTimer());
     }
 
     [Fact]
@@ -49,6 +51,16 @@ public sealed class ScummV2SoundLifetimeTests
         Assert.Equal(ScummSoundLifetimeKind.Looping, loop.Kind);
         Assert.Equal(2, loop.LoopStartCallback);
         Assert.Equal(4, loop.LoopEndCallback);
+        var clock = new ScummSoundClock(_ => loop);
+        clock.Start(1, false);
+        clock.Advance(100);
+        Assert.Equal(1, clock.MusicTimer());
+        clock.Stop(1);
+        Assert.Equal(0, clock.MusicTimer());
+        clock.Start(1, false);
+        clock.Advance(100);
+        clock.StopAll();
+        Assert.Equal(0, clock.MusicTimer());
         Assert.Equal(ScummSoundLifetimeKind.Unknown, player.ReadV2Lifetime(Resource(0xFF)).Kind);
     }
 }

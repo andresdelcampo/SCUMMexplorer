@@ -24,11 +24,16 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
 
     // The music timer a song of the AdLib player left behind: that player's timer keeps its last value after the song stops, until the next song starts.
     private int _heldTimer;
+    private bool _heldTimerIsV2;
 
     public void Start(int id, bool estimated)
     {
         var lifetime = resolve(id);
-        if (lifetime.KeepsMusicTimer) _heldTimer = 0;
+        if (lifetime.KeepsMusicTimer)
+        {
+            _heldTimer = 0;
+            _heldTimerIsV2 = lifetime.TimerValues is not null;
+        }
         _voices[id] = new(lifetime, _jiffies, estimated);
         _estimatedStops.Remove(id);
     }
@@ -39,18 +44,22 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
     /// <summary>The sounds the clock has playing now, in no particular order.</summary>
     public IReadOnlyList<int> Playing => _voices.Keys.ToArray();
 
-    public void Stop(int id, bool estimated = false)
+    public void Stop(int id, bool estimated = false) => StopVoice(id, estimated, naturalEnd: false);
+
+    private void StopVoice(int id, bool estimated, bool naturalEnd)
     {
         if (_voices.TryGetValue(id, out var voice) && voice.Lifetime.KeepsMusicTimer)
-            _heldTimer = MarkersPassed(voice);
+            // Player_V2 stopSound clears every channel word; natural completion preserves the channel timer.
+            _heldTimer = voice.Lifetime.TimerValues is not null && !naturalEnd ? 0 : MarkersPassed(voice);
         _voices.Remove(id);
         if (estimated) _estimatedStops.Add(id); else _estimatedStops.Remove(id);
     }
 
     public void StopAll()
     {
+        if (_heldTimerIsV2) _heldTimer = 0;
         foreach (var voice in _voices.Values)
-            if (voice.Lifetime.KeepsMusicTimer) _heldTimer = Math.Max(_heldTimer, MarkersPassed(voice));
+            if (voice.Lifetime.KeepsMusicTimer && voice.Lifetime.TimerValues is null) _heldTimer = Math.Max(_heldTimer, MarkersPassed(voice));
         _voices.Clear();
         _estimatedStops.Clear();
     }
@@ -62,7 +71,7 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
         var ended = _voices.Where(pair => pair.Value.Lifetime is { Kind: ScummSoundLifetimeKind.Finite, Callbacks: int callbacks } &&
             (_jiffies - pair.Value.Started) * 472 >= callbacks * 60L).Select(pair => pair.Key).ToArray();
         // A song that ends within this advance has counted every marker it has by then.
-        foreach (var id in ended) Stop(id, _voices[id].Estimated);
+        foreach (var id in ended) StopVoice(id, _voices[id].Estimated, naturalEnd: true);
         return ended;
     }
 
