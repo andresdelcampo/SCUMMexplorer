@@ -5,6 +5,19 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummV2SessionVariableTests
 {
+    [Theory]
+    [InlineData("zak ega en")]
+    [InlineData("zakE ega en")]
+    public void ZakStartsWithTheEngineSpeedThatSelectsItsFullIntroduction(string fixture)
+    {
+        var folder = Path.Combine(TestGames.Root, fixture);
+        if (!Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        ScummV2DataSource data = game.Version == ScummVersion.V1 ? new ScummV1DataSource(game) : new ScummV2DataSource(game);
+        var session = new ScummGameSession(game, data.ReadIndexedObjects(), data: data, boot: false);
+        Assert.Equal((ushort)0x7FFF, session.Snapshot.KnownGlobalVariables[ScummVars.V2.MachineSpeed]);
+    }
+
     [Fact]
     public void OldObjectEntrySkipsItsHeaderAndCutsceneRestoresTheSentenceVerb()
     {

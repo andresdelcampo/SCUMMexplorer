@@ -29,8 +29,7 @@ public sealed class ScummGameSession : ScummSession
         if (!_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.CharInc, ScummProfile.CharIncAtStart);
         // resetScummVars (scumm.cpp): the lights start as base palette, actors' own colours and room lights on (1 | 8 | 2).
         _runtime.SetGlobalVariable(_runtime.CurrentLightsVariable, 11);
-        if (!_runtime.IsV2)
-            foreach (var (variable, value) in profile.EngineVariablesAtStart) _runtime.SetGlobalVariable(variable, value);
+        foreach (var (variable, value) in profile.EngineVariablesAtStart) _runtime.SetGlobalVariable(variable, value);
         // The engine allocates every global variable zeroed (scumm.cpp: _scummVars = calloc), so a variable no script has written yet reads 0, not "unknown".
         for (var variable = 0; variable < profile.GlobalVariableCount; variable++)
         {

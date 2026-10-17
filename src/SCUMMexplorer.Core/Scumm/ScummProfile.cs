@@ -67,7 +67,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // VAR_V5_TALK_STRING_Y = -0x50 in ScummEngine_v5::resetScummVars, and the game's own GameVariablesAtStart below.
             ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0), (ScummVars.InputMode, 3), (ScummVars.FadeDelay, 3),
                (ScummVars.TalkStringY, unchecked((ushort)-0x50)), .. GameVariablesAtStart]
-            : EngineVersion >= ScummVersion.V4 ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0)] : [];
+            : EngineVersion >= ScummVersion.V4 ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0)]
+            : EngineVersion <= ScummVersion.V2 ? GameVariablesAtStart : [];
 
     /// <summary>
     /// Variables the engine sets for one game only (edition data): <c>ScummEngine_v5::resetScummVars</c> gives <c>GID_MONKEY</c> (The Secret of Monkey Island CD,
@@ -179,7 +180,13 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
             BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
             // vars.cpp ScummEngine_v5::resetScummVars: if (_game.id == GID_MONKEY) _scummVars[74] = 1225 (the CD release).
-            GameVariablesAtStart = GameSupport.FamilyOf(game) == GameFamily.MonkeyCd ? [("var[0x04A]", 1225)] : [],
+            GameVariablesAtStart = GameSupport.FamilyOf(game) switch
+            {
+                GameFamily.MonkeyCd => [("var[0x04A]", 1225)],
+                // vars.cpp ScummEngine_v2::resetScummVars: Zak's engine speed enables the elaborate introduction.
+                GameFamily.ZakClassic or GameFamily.ZakEnhanced => [(ScummVars.V2.MachineSpeed, 0x7FFF)],
+                _ => []
+            },
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
             PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
