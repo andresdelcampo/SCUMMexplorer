@@ -4,6 +4,26 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummOldPlayInputTests
 {
+    [Fact]
+    public void OldInventoryScrollResetsWhenEgoOrOwnershipChanges()
+    {
+        var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
+        if (!Directory.Exists(folder)) return;
+        var session = ScummGameSession.BootForPlay(new GameFolderScanner().Scan(folder), out _);
+        var runtime = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
+        Array.Clear(runtime.InventorySlots);
+        foreach (var id in Enumerable.Range(100, 6)) { runtime.AddToInventorySlots(id); runtime.ObjectOwners[id] = 1; }
+        runtime.AddToInventorySlots(200); runtime.ObjectOwners[200] = 2;
+        runtime.SetGlobalVariable(ScummVars.V2.Ego, 1);
+        session.PressPlayKey('j', out _);
+        Assert.Equal(102, session.PressPlayKey('i', out _)!.Value);
+        runtime.SetGlobalVariable(ScummVars.V2.Ego, 2);
+        Assert.Equal(200, session.PressPlayKey('i', out _)!.Value);
+        runtime.SetGlobalVariable(ScummVars.V2.Ego, 1);
+        session.PressPlayKey('j', out _);
+        runtime.ObjectOwners[100] = 2;
+        Assert.Equal(101, session.PressPlayKey('i', out _)!.Value);
+    }
     [Theory]
     [InlineData("mmansion ega en", 1, 270, 16)]
     [InlineData("mmansion ega en", 1, 90, 0)]

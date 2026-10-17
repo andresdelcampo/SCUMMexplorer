@@ -300,8 +300,22 @@ public abstract partial class ScummSession
     public void SkipMessage() => _runtime.Messages.SkipTalkDelay();
 
     private int _v2InventoryOffset;
-    private int[] V2Inventory() => _runtime.InventorySlots.Where(id => id != 0 &&
-        _runtime.ObjectOwners.GetValueOrDefault(id) == _runtime.GlobalVariables.GetValueOrDefault(EgoVariable)).ToArray();
+    private int _v2InventoryEgo = -1;
+    private (int Id, byte Owner)[] _v2InventorySeen = [];
+    private int[] V2Inventory()
+    {
+        var ego = _runtime.GlobalVariables.GetValueOrDefault(EgoVariable);
+        var contents = _runtime.InventorySlots.Where(id => id != 0).Select(id => (Id: id, Owner: _runtime.ObjectOwners.GetValueOrDefault(id))).ToArray();
+        // handleMouseOver(updateInventory): native inventory updates reset scrolling,
+        // including actor switches and owner/slot changes, before drawing or picking.
+        if (_v2InventoryEgo != ego || !_v2InventorySeen.SequenceEqual(contents))
+        {
+            _v2InventoryOffset = 0;
+            _v2InventoryEgo = ego;
+            _v2InventorySeen = contents;
+        }
+        return contents.Where(item => item.Owner == ego).Select(item => item.Id).ToArray();
+    }
     private void ScrollV2Inventory(int delta)
     {
         var count = V2Inventory().Length;
