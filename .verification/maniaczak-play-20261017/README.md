@@ -5,7 +5,7 @@
 | Families / stage | ManiacClassic, ManiacEnhanced, ZakClassic, ZakEnhanced / S6 |
 | Date / author | 17 October 2026 / Maniac-Zak orchestrator |
 | Fixtures | `D:/Juegos/Lucas/mmansion ega en`, `mmansionE ega es`, `zak ega en`, `zakE ega en` |
-| Registry | Pending verification; no claim from a successful build alone |
+| Registry | Objects and Play Full for all four bounded native routes; other cells unchanged |
 
 ## What was done
 
@@ -21,7 +21,18 @@ Working directory: `D:/Documents/Personal/Code Projects/SCUMMexplorer/.worktrees
 rtk proxy dotnet build .verification/maniaczak-play-20261017/PlayWindowCheck/PlayWindowCheck.csproj --no-restore -p:NuGetAudit=false --verbosity quiet
 ```
 
-Initial App/harness compilation: zero warnings and errors after fixing nullable flow in the startup guard. Built application: `.worktrees/maniaczak-s6/Exe/Debug/SCUMMexplorer.exe`. The route harness is `Exe/PlayWindowCheck/Debug/net10.0-windows/PlayWindowCheck.exe`.
+App/harness compilation: zero warnings and errors. Built application: `.worktrees/maniaczak-s6/Exe/Debug/SCUMMexplorer.exe`. The route harness is `Exe/PlayWindowCheck/Debug/net10.0-windows/PlayWindowCheck.exe`.
+
+All four real-window routes pass; screenshots were inspected. The reproducible action files live beside `PlayWindowCheck/Program.cs`.
+
+| Family | Local capture/log directory | Final window frame | Inputs (plus Escape) | Verified finish |
+|---|---|---:|---:|---|
+| ManiacClassic | `window-classic-final` | 3310 | 15 | Room 1, key held and selected from displayed inventory |
+| ManiacEnhanced | `window-enhanced-final` | 1554 | 13 | Room 1, Spanish sentence and key inventory selection |
+| ZakClassic | `window-zakclassic-final` | 2911 | 32 | Room 7, Buy refusal completed, player control and phone bill inventory restored |
+| ZakEnhanced | `window-zakenhanced-final` | 2911 | 32 | Same native route and return of control, independently checked |
+
+The Classic Maniac window route uses longer fixed waits than its 1993-frame headless route. Window frame totals include the initial timer frames. All four routes check the composed sentence, pickup, native choice, walked exit and override skip. No physical mouse automation or original-interpreter observation is claimed.
 
 ## Real-window method
 
@@ -35,11 +46,11 @@ No ScummVM executable is launched. Engine behavior is compared to source, and ea
 
 S5 black-region, camera, lighting and actor-alignment findings remain in the S5 checkpoint until specific evidence closes them. A working bounded route is not a full-game completion claim. Each family record must disclose untested branches and remaining blockers.
 
-Failed evidence kept: the initial native walking implementation allowed real exits but changed both Maniac Room 2 first-visit tests from Settled to FrameLimit (21 passed, 2 failed in the 23-test S5 selection). A read-only actor trace found a stationary turning loop: the requested direction disagreed with the walk box's remapped direction. This was sent to the shared owner; the settled-state assertions were not weakened. Final regression results must follow the correction.
+Failed evidence kept: the initial native walking implementation changed both Maniac Room 2 first-visit tests from Settled to FrameLimit (21 passed, 2 failed in the 23-test S5 selection). Native direction tables fixed the stationary turning loop; the settled-state assertions were not weakened. The first window attempt also exposed a harness-only missing RoutedEvent on synthetic Escape; the corrected event passed. Zak's shop cleanup exposed the later-engine player-class predicate incorrectly allowing an NPC-only box; the native ego/range predicate fixed both editions. Inventory scrolling resets after actor/ownership changes, following independent review. The closest-point calculation still uses the generic polygon metric in native coordinate units; untested walking paths remain a limitation.
 
 ## User checks
 
-Pending verified routes. Perceived timing and sound are manual checks, not an approval gate inside this run.
+Follow the action files/family records in the app and check physical mouse feel, perceived timing, text pacing and PC-speaker/PCjr synchronization. These are manual checks, not an approval gate inside this run.
 
 ## Where facts went
 

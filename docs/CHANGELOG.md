@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: native Maniac Mansion and Zak McKracken Play (S6, all four families)
+
+- Classic/enhanced Maniac and Zak now use native v1/v2 verbs, sentence, inventory, cursor and DOS fonts. Input goes through script 4; first Play keeps Maniac's party menu. Held objects retain their code and owner position, and inventory scrolling resets when the actor or inventory changes.
+- Native box routing, direction remapping, player-actor identity and actor draw offsets support the checked routes. Both Maniac routes select the party, skip the opening, walk out and take/select the key. Both Zak routes take the phone bill, skip the reached alien scene, walk to the shop, choose Buy and finish its CashCard refusal with control restored.
+- Four real-window routes pass; Objects and Play become Full and both generated matrices are updated. This is bounded route support, not a complete playthrough or original-interpreter picture comparison. S5 visual findings, native darkness/flashlight, the generic closest-point walking approximation and untested editions remain disclosed. Proposed R-7.19 to R-7.21 are retained separately.
+- Parallel work used four family worktrees with one shared-engine owner. Concurrent master changes were retained. Build/full-suite evidence and exact window commands are in the [checkpoint](checkpoints/20261017-S6-ManiacZak.md) and [integration record](../.verification/maniaczak-play-20261017/README.md).
+
 ## 17 October: play through Monkey Island CD's own interface (S6, MonkeyCd)
 
 - The R-7.18 route runs on the CD release through its own interface (v5): from the dock, where the game goes on to by itself after the lookout. It looks at the poster and skips that cutscene, goes through the door to the SCUMM Bar and holds the pirates' dialogue, then walks to the voodoo shop and picks up the rubber chicken. The chicken appears in the inventory as its Room 99 icon. A right click runs the default verb (`var[0x0B6]`). **Objects ✔ and Play ✔** for MonkeyCd.

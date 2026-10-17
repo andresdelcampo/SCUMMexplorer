@@ -1,6 +1,6 @@
 # SCUMM script reference
 
-This reference separates engine-defined variables and script behavior from the meanings a game assigns to scripts, variables, bits and verbs. Its scope is DOS SCUMM v3 and v4, with narrower version and format limits stated below. A shared opcode handler does not make every operand or behavior identical across versions.
+This reference separates engine-defined variables and script behavior from the meanings a game assigns to scripts, variables, bits and verbs. Version and format limits are stated per section, including the separate DOS v1/v2 contract. A shared opcode handler does not make every operand or behavior identical across versions.
 
 For LOOM's script IDs, story state, draft verbs and room examples, see the [LOOM script map](../loom/LOOM_SCRIPT_MAP.md). Its EGA numeric tables are edition-specific evidence; CD/VGA uses SCUMM v4 and must be decoded independently.
 

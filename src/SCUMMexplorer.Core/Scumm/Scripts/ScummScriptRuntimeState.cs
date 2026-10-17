@@ -23,7 +23,7 @@ public sealed class ScummScriptRuntimeState
     /// <summary>Actor_v2::isPlayer uses the current ego in Maniac v1, otherwise globals 42 and 43 (actor.cpp).</summary>
     public bool IsPlayerActor(int number) => IsV2
         ? IsClassicManiac ? GlobalVariables.GetValueOrDefault(EgoVariable) == number
-            : GlobalVariables.GetValueOrDefault("var[0x02A]") <= number && number <= GlobalVariables.GetValueOrDefault("var[0x02B]")
+            : GlobalVariables.GetValueOrDefault(ScummVars.V2.FirstPlayerActor) <= number && number <= GlobalVariables.GetValueOrDefault(ScummVars.V2.LastPlayerActor)
         : ObjectClasses.TryGetValue(number, out var bits) && ScummObjectClasses.Has(bits, ScummActorTable.PlayerClass);
     public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
     public int V2UserState { get; private set; }
