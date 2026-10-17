@@ -54,6 +54,7 @@ public sealed partial class ScummBoundedScriptExecutor
         string Value(int n, int scale = 1) => Read(n, out var value) ? $"0x{unchecked((ushort)(value * scale)):X4}" : p[n];
         switch (source.Operation)
         {
+            case "dummy" when source.Opcode == 0xEE: handled = true; return true;
             case "verbOps":
                 if (!Read(0, out var verbNumber)) return false;
                 var bracket = source.Operands.IndexOf('[');
@@ -188,18 +189,18 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (p.Length < 3 || !Read(0, out var actor) || !Read(1, out var argument) || !p[2].StartsWith("sub=0x") ||
                     !int.TryParse(p[2].AsSpan(6), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var sub)) return false;
                 if (actor == 0 && sub == 5) { runtime.V2DefaultTalkColor = argument; handled = true; return true; }
-                var operation = sub switch { 1 => $"sound, {argument}", 4 => $"costume, {argument}", 5 => $"talkColor, {argument}", _ => null };
+                var operation = sub switch { 1 => $"sound, 0x{argument:X2}", 4 => $"costume, 0x{argument:X2}", 5 => $"talkColor, 0x{argument:X2}", _ => null };
                 if (sub == 2 && runtime.EngineVersion == SCUMMexplorer.Core.Domain.ScummVersion.V1)
-                    operation = $"palette, {actor}, {argument}";
+                    operation = $"palette, 0x{actor:X2}, 0x{argument:X2}";
                 if (sub == 2 && p.Length > 3 && p[3].StartsWith("palette=0x") && int.TryParse(p[3].AsSpan(10), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var color))
-                    operation = $"palette, {color}, {argument}";
+                    operation = $"palette, 0x{color:X2}, 0x{argument:X2}";
                 if (sub == 3)
                 {
                     var name = source.Operands.IndexOf("name=", StringComparison.Ordinal);
                     if (name >= 0) operation = "actorName, " + source.Operands[(name + 5)..];
                 }
                 if (operation is null || actor == 0) return false;
-                instruction = source with { Operands = $"{actor}, [{operation}]" };
+                instruction = source with { Operands = $"0x{actor:X2}, [{operation}]" };
                 return true;
             case "cutscene": instruction = source with { Operands = "[]" }; return true;
             case "endCutscene": return true;
@@ -220,7 +221,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 return true;
             case "setActorElevation":
                 if (!Read(0, out var raised) || !Read(1, out var elevation)) return false;
-                instruction = source with { Operation = "actorOps", Operands = $"{raised}, [elevation, 0x{unchecked((ushort)(sbyte)elevation):X4}]" };
+                instruction = source with { Operation = "actorOps", Operands = $"0x{raised:X2}, [elevation, 0x{unchecked((ushort)(sbyte)elevation):X4}]" };
                 return true;
             case "doSentence":
                 if (!Read(0, out var verb)) return false;

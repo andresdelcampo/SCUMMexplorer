@@ -5,6 +5,16 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ExecutorTests
 {
     [Fact]
+    public void ActorCostumeNormalizationRetainsKnownPlacement()
+    {
+        var runtime = Runtime();
+        var run = Run(runtime, ("putActor", "0x03, 0x05, 0x06"), ("actorOps", "0x03, 0x0C, sub=0x04"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(40, runtime.Actors[3].X);
+        Assert.Equal(12, runtime.Actors[3].Look.Costume);
+        Assert.Null(runtime.Actors[3].Unknown);
+    }
+    [Fact]
     public void PickupPreservesStateFlagsAndDoesNotLaunchAnInventoryScript()
     {
         var runtime = Runtime();
