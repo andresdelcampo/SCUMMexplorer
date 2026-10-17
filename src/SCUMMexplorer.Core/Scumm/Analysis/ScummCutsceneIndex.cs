@@ -16,8 +16,11 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <param name="SeparateFrom">Verbs from this number up are each their own entry (LOOM's drafts), or null when no verb is.</param>
 /// <param name="Word">The verb as a word for a title ("Look at", "Push"); null or empty when the game does not name it.</param>
 /// <param name="AimsAt">Verbs whose title reads "&lt;word&gt; at &lt;object&gt;" (LOOM's drafts) rather than "&lt;word&gt; &lt;object&gt;".</param>
+/// <param name="NamesSharedCode">An object's verbs whose entries point at the same code are named after the lowest of them, so they group as one
+/// scene (a verb-based game: Indy3's light switch answers Push, Pull, Use and Turn off with one script). LOOM keeps each verb's own name: its
+/// catalog lists each draft separately and its notes name the verb (false).</param>
 public sealed record ScummCutsceneVerbs(int? Look, int? WalkTo, int? Use, int? SeparateFrom = null,
-    Func<int, string?>? Word = null, Func<int, bool>? AimsAt = null)
+    Func<int, string?>? Word = null, Func<int, bool>? AimsAt = null, bool NamesSharedCode = false)
 {
     /// <summary>No verb has a role and none is named: every verb is listed by its number.</summary>
     public static ScummCutsceneVerbs None { get; } = new(null, null, null);
@@ -130,9 +133,15 @@ public static partial class ScummCutsceneIndex
             {
                 var record = roomData.Objects.First(o => o.Id == objectId);
                 var name = roomData.ObjectNames.TryGetValue(objectId, out var raw) ? System.Text.Encoding.Latin1.GetString(raw).Trim().TrimEnd('@').Trim() : "";
-                foreach (var verb in entries.Where(v => !v.IsFallback))
+                // Verbs whose entries point at the same code run one script (Indy3's light switch: Push, Pull, Use and Turn off), so the code is
+                // named after the lowest of them and the triggers group as one scene.
+                var real = entries.Where(v => !v.IsFallback).ToArray();
+                foreach (var verb in real)
+                {
+                    var owner = verbs.NamesSharedCode ? real.Where(v => v.ScriptOffset == verb.ScriptOffset).Min(v => v.VerbId) : verb.VerbId;
                     Trigger(objectId, name, verb.VerbId, Try(() => data.ReadObjectVerb(room, record, verb.VerbId, out _)),
-                        $"Room {room} object {objectId} verb 0x{verb.VerbId:X2}");
+                        $"Room {room} object {objectId} verb 0x{owner:X2}");
+                }
             }
         }
         return found.OrderBy(c => c.Room).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).ToArray();

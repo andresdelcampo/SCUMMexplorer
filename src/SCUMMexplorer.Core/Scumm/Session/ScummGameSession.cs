@@ -161,6 +161,21 @@ public sealed class ScummGameSession : ScummSession
         return EnterRoom(room, $"{arrival} {label}", load, label);
     }
 
+    /// <summary>
+    /// Plays a room's entry again (S7, 17 October 2026, to play a room's entry cutscene): a room the session is not in is visited as
+    /// <see cref="VisitRoom"/> does; the room it is in is loaded again as a <c>loadRoom</c> of the current room would (ScummVM <c>startScene</c>: the
+    /// exit code, then the entry hook and entry script from the state the session has). An exploration action and a state preview, never a reached outcome.
+    /// </summary>
+    public ScummSessionSnapshot EnterRoomAgain(GameResource room)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        if (_currentRoom?.ResourceId != room.ResourceId) return VisitRoom(room);
+        _uncertainties.StartStep();
+        var label = $"Room {room.ResourceId:00} entered again to play its entry scripts (an exploration action, as a loadRoom of the current room would; state preview).";
+        _uncertainties.Add(label);
+        return EnterRoom(room, label);
+    }
+
     // A visit with no arrival to follow. A room the game's pseudoRoom instructions map other numbers to is loaded under one of them, as every load of
     // it in the game's own code would be (its entry code tells the uses apart by VAR_ROOM, so under its own number it would draw none of them):
     // a seeded, labelled pick among those numbers, since no literal arrival says which comes first.
