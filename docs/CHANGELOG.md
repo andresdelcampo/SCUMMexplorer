@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: the Spanish copies (S9, Indy3Ega and Indy3Vga)
+
+- **Checked:** `indy3 ega es` and `indy3 vga es` against the English references for S4b, S5, S6 (route of R-7.18 and its sounds) and S7: same boot (the EGA copy-protection answer derived from its own script), room audits 88/88 and 87/87 without a gap and equal to English per room, the route through the same ids, the cutscene scan equal per entry (90 begin from a fresh start after the shared run fix). No edition failed; registry unchanged.
+- **Differences, all in data:** texts and charsets (EGA Spanish adds ñ ¿ ¡ glyphs; the 256-colour Spanish copy writes ñ as `~` and has no glyph for its ¿ ¡, which are drawn as nothing as its width table says); offsets that follow a text (Room 73 local script 205's sound, read from the script by the test); the two Spanish copies are separate translations.
+- **Tests:** Spanish route cases in `ScummIndy3PlayTests` and `ScummIndy3VgaPlayTests`, Spanish releases in `ScummIndy3CutsceneTests`, a per-copy charset coverage test; skip without the folders. Indy3, support, first-visit, play-sound and session tests: 71 passed. No shared code changed.
+- **Open (owner of `ScummCutsceneIndex`):** the scan's first text and object names lose CP437 letters in Spanish titles. Window look through the real window: ¿ on the Room 1 verb line. Record: [.verification/indy3-editions-20261017](../.verification/indy3-editions-20261017/README.md).
+
 ## 17 October: cutscenes from the scripts, playable (S7, MonkeyFloppy)
 
 - **List:** the floppy Monkey Island's verbs exist after the boot (Script 22), so the shared planner titles its entries with them (`Room 33 · Look at poster`); 294 triggers, 164 entries (63 scenes, 101 dialogue and reactions), 104 begin from a fresh start. Acceptance: the poster's first Look at (Room 33 object 438 verb 0x09), Room 37's entry (Script 60) and Room 19's entry (the ship, Part II, on to Room 7) begin from a fresh start (`ScummMonkeyFloppyCutsceneTests`); Script 117 (the bar's first exit) is found but needs the door open. Registry: Cutscenes – → ◐.
