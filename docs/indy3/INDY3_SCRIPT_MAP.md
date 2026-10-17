@@ -69,6 +69,10 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | 1 | dialogue with Marcus ("Hello Marcus!") before the copy-protection screen | decoded | Script 1 +0x02F0 | 2026-10-14 |
 | 92 | copy-protection screen: the first click on the full-screen object 929 (fallback verb) starts local 201, which picks the three random numbers and starts 205 (computes `var[0x063..0x066]`) and 203 (prints "Check Section ..., Row ..., Column ..."); local 204 checks each answer with `isEqual var[0x06A], n` then `isNotEqual var[0x062+n], local[0x000]`; the twelve answer objects 932 to 943 (fallback verb) start 204 with their number 0 to 11 in local 0; after four right answers `var[0x039]` = 1 and `bit[0x5E4]` stays 0 | decoded | Room 92 object 929 verb fallback +0x0013; local scripts 201 to 205; objects 932 to 943 | 2026-10-14 |
 | 73 | first playable room (a gym with a ring, two boxers and Indy); local scripts 200 to 204 | decoded | Script 1 +0x0564; Room 73 | 2026-10-14 |
+| 73 (cutscenes, S7) | the entry's span is in locals 205 and 206 and begins nothing from a fresh start, even with the entry played again; the room's list (fresh runs) holds Open door (`global script 26`), Use/Walk to locker room (local 203, `global script 111`, "Ten minutes later"), Pick up mallet (local 205) and the light switch (object 837) | run (S7 headless run, both releases) | Room 73 entry; `.verification/indy3-cutscenes-20261017/indy3-ega-list.txt` | 2026-10-17 |
+| 22 | castle room: the entry starts `global script 77` and `global script 129`, a cutscene of 97 instructions with 5 lines ("Meanwhile, elsewhere in the castle…") and 2 room loads; begins from a fresh start (98 frames) | run (S7 headless run, both releases) | Room 22 entry | 2026-10-17 |
+| 80 | the entry's local 201 holds a cutscene of 31 instructions and 4 lines ("Dad! How'd you get here before me?"); begins from a fresh start (136 frames) | run (S7 headless run, both releases) | Room 80 entry; Room 80 local script 201 | 2026-10-17 |
+| 1 (cutscenes, S7) | the office door's Walk to (object 23 verb 0x0A) reaches `global script 55` (the students, "STUDENTS! STUDENTS! PLEASE BE PATIENT!", 7 lines, 1 room load), which begins nothing from a fresh start (its condition is not decoded) | decoded (scan); run (not begun) | Room 01 object 23 verb 0x0A; global script 55 | 2026-10-17 |
 
 ## Verbs and the input chain
 
@@ -100,6 +104,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | Object 842 (Room 76) | started with verb 0xFA by the room's entry | decoded | Room 76 entry +0x0013 | 2026-10-14 |
 | Objects 0x034A, 0x034B | owned by actors 14 and 2 by Room 76's entry | decoded | Room 76 entry +0x000B, +0x000F | 2026-10-14 |
 | Object 834 (Room 73) | target of the boot's `doSentence`; its verb 0x0A starts the room's local script 203 | decoded | Script 1 +0x0569; Room 73 object 834 verb 0x0A | 2026-10-14 |
+| Object 837 (Room 73), the light switch | verbs 0x05 Turn off, 0x06 Push, 0x07 Pull and 0x08 Use point at one code block: one cutscene of 27 instructions and 2 lines ("HEY!! WHO TURNED OUT THE LIGHTS!!"), one entry in the cutscene list; begins from a fresh start (66 frames) | decoded (verb table); run (S7) | Room 73 object 837 verb table; Room 73 object 837 verb 0x05 | 2026-10-17 |
 | Class 0x85, 0x87, 0x88, 0x8E, 0x8F, 0x90 | tested by the sentence script (actor, can-pick-up and similar roles; meanings not decoded) | reading | Script 2 | 2026-10-14 |
 
 ## Actors and costumes

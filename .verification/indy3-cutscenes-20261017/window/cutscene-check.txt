@@ -1,0 +1,9 @@
+Play started in Room 73; playback bar Visible; room button Visible, enabled True; scan note Visible: "Looking for the scenes that happen in each room… 9% The first launch takes a while; the result is kept for the next one."
+background runs done after 59 s: True; scan 153 of 153
+Room 73 list (4): Room 73 · Open door | Room 73 · Use locker room | Room 73 · Pick up mallet | Room 73 · Turn off light switch; button Visible, enabled True, caption Play Cutscene ▴
+played "Room 73 · Turn off light switch": cutscenes begun 9 -> 10, in cutscene True, status "Playing Room 73 · Turn off light switch from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+light switch scene over: in cutscene False, room 73
+picker built: CutscenePickerWindow
+picker entries: 95; first five: Room 01 · Open door | Room 01 · Turn on drinking fountain | Room 02 · Pick up package | Room 02 · Look statue | Room 06 · Entry
+played "Room 22 · Entry" from the picker: room 22, cutscenes begun 10 -> 11, in cutscene True; Skip enabled False; status "Playing Room 22 · Entry from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+frames played by the window: 586
