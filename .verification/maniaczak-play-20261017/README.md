@@ -34,6 +34,27 @@ All four real-window routes pass; screenshots were inspected. The reproducible a
 
 The Classic Maniac window route uses longer fixed waits than its 1993-frame headless route. Window frame totals include the initial timer frames. All four routes check the composed sentence, pickup, native choice, walked exit and override skip. No physical mouse automation or original-interpreter observation is claimed.
 
+Example window command (substitute the matching fixture/action file for the other three):
+
+```powershell
+rtk proxy .\Exe\PlayWindowCheck\Debug\net10.0-windows\PlayWindowCheck.exe "D:\Juegos\Lucas\zakE ega en" ".verification/maniaczak-play-20261017/window-zakenhanced-final" 1 ".verification/maniaczak-play-20261017/PlayWindowCheck/zak-enhanced.json"
+```
+
+Final integration commands, in the working directory above:
+
+```powershell
+$env:SCUMM_UPDATE_SUPPORT_MATRIX = '1'
+rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore -p:NuGetAudit=false --filter FullyQualifiedName~SupportMatrixTests --verbosity quiet
+$env:SCUMM_UPDATE_SUPPORT_MATRIX = $null
+rtk proxy dotnet build SCUMMexplorer.slnx --no-restore -p:NuGetAudit=false --verbosity quiet
+$env:SCUMM_SOUND_TEST_ROOT = 'D:\Juegos\Lucas\loom ega mt32 en'
+$env:SCUMM_INDY3_EGA_TEST_ROOT = 'D:\Juegos\Lucas\indy3 ega en'
+$env:SCUMM_MT32_ROM_ROOT = 'D:\Juegos\Lucas\mt32'
+rtk proxy dotnet test SCUMMexplorer.slnx --no-build --no-restore --verbosity quiet --logger "trx;LogFileName=maniaczak-s6-final-merged.trx" --results-directory ".verification/maniaczak-play-20261017/test-results"
+```
+
+Before the latest master merge, the full suite passed 1187 tests, zero failed, five skipped (6m19s). Master then advanced with Monkey2 work; its changes were merged, both matrices regenerated (three tests passed), and the solution rebuilt with zero warnings/errors. The final merged full-suite result is recorded in the checkpoint and generated TRX file.
+
 ## Real-window method
 
 `PlayWindowCheck <fixture> <output> <selected room> <actions.json>` opens the actual MainWindow with a private `SCUMM_EXPLORER_PROFILE_ROOT`. It selects a room through the tree, checks that the window's timer advances, then drives that same timer handler deterministically. Clicks use the same session API as the image mouse handler after coordinate mapping; text and Esc use the window's own handlers. It checks the Normal-mode note and tooltip, cursor, route assertions and captures, and exits nonzero on failure. It never writes story variables or invokes object verbs directly. This is a window-integration check, not a check of physical mouse mapping or perceived timing. Logs and PNG captures stay local and ignored.

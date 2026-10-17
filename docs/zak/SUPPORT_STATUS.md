@@ -9,7 +9,7 @@ Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last
 | S3 Sound | done (earlier) | Sound ✔ | – | PCjr/Tandy not listened |
 | S4b Session | done | unchanged | [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md) | Own v1 opening reaches Room 1 in 1804 frames, player control on, no cutscene; stable for 120 more frames. Supersedes the earlier ClassicBoot blocker |
 | S5 Objects | source preview implemented; visual acceptance open | Objects ◐ unchanged | [.verification/zakclassic-objects-20261017](../../.verification/zakclassic-objects-20261017/README.md) | 58 rooms open; Room 44 gap flag retained; original-game comparison not performed |
-| S6 Play | native route implemented and verified | see generated support matrix | [.verification/zakclassic-play-20261017](../../.verification/zakclassic-play-20261017/README.md) | Three genuine-input tests and real-window route pass; native Buy choice, reached cutscene skip and returned control; S5 visual limits retained |
+| S6 Play | done (bounded native route) | Objects/Play Full | [.verification/zakclassic-play-20261017](../../.verification/zakclassic-play-20261017/README.md) | Three genuine-input tests and real-window route pass; native Buy choice, reached cutscene skip and returned control; S5 visual limits retained |
 | S7 Cutscenes | not started | Cutscenes – | – | |
 | S8 State | not started | Status – | – | requested in a run: no |
 | S9 Editions | not started | – | – | |
