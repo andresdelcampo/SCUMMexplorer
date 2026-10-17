@@ -19,6 +19,7 @@ public sealed class ScummScriptRuntimeState
     public int V2DefaultTalkColor { get; set; } = 15;
     /// <summary>The source-defined classic Maniac verb screen offset; other v1/v2 games use zero.</summary>
     public int V2VerbYOffset { get; set; }
+    public bool IsClassicManiac { get; set; }
     public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
     public int V2UserState { get; private set; }
     public Action<bool>? V2FreezeScripts { get; set; }
@@ -270,6 +271,8 @@ public sealed class ScummScriptRuntimeState
     public ScummCamera Camera { get; } = new();
     /// <summary>The stored name of an object of the current room (text code 6), or null; set by the session at each room entry.</summary>
     public Func<int, byte[]?>? ObjectName { get; set; }
+    /// <summary>Names changed by reached old-engine setObjectName operations, retained with the session's resource state.</summary>
+    public Dictionary<int, byte[]> ObjectNameOverrides { get; } = [];
     /// <summary>Messages as reached <c>print</c>s left them: text slots, the talk message and its delay, drawn strings.</summary>
     public ScummMessageTable Messages { get; } = new();
     /// <summary>Verb slots as reached <c>verbOps</c> left them (the verb bar and the verb-area close-up).</summary>

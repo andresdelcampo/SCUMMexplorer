@@ -75,7 +75,7 @@ public abstract partial class ScummSession
         _currentObjects = roomData.Objects;
         // getObjOrActorName for text code 6: the stored names of this room's objects.
         var objectNames = roomData.ObjectNames;
-        _runtime.ObjectName = id => objectNames.TryGetValue(id, out var name) ? name : InventoryObjectName(id);
+        _runtime.ObjectName = id => CurrentObjectName(id, objectNames.TryGetValue(id, out var name) ? name : InventoryObjectName(id));
         _runtime.WalkBoxFlagsUnknown = null;
         _runtime.WalkBoxes = roomData.WalkBoxes;
         if (roomData.WalkBoxError is not null)
@@ -148,7 +148,7 @@ public abstract partial class ScummSession
         _runtime.Actors.HideAll();
         _runtime.Messages.RoomEntered(_runtime);
         _currentObjects = [];
-        _runtime.ObjectName = _ => null;
+        _runtime.ObjectName = _runtime.IsV2 ? id => CurrentObjectName(id, InventoryObjectName(id)) : _ => null;
         _runtime.WalkBoxFlagsUnknown = null;
         _runtime.WalkBoxes = null;
         _runtime.RoomCameraBounds = _runtime.CameraRange = null;
@@ -387,6 +387,10 @@ public abstract partial class ScummSession
         }
         return images.FirstOrDefault(item => item.Id == objectId);
     }
+
+    // A renamed resource still has to be present in this room or inventory for getObjOrActorName to find it.
+    private byte[]? CurrentObjectName(int id, byte[]? storedName) =>
+        _runtime.IsV2 && storedName is not null && _runtime.ObjectNameOverrides.TryGetValue(id, out var renamed) ? renamed : storedName;
 
     /// <summary>A game whose room entry must also erase the previous room's strings from the verb screen (a menu room) says so here.</summary>
     protected virtual bool ErasesVerbScreenOnEntry => false;

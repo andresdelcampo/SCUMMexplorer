@@ -184,7 +184,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
-            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
+            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
+                or GameFamily.ZakClassic or GameFamily.ZakEnhanced,
             // vars.cpp ScummEngine_v5::resetScummVars: if (_game.id == GID_MONKEY) _scummVars[74] = 1225 (the CD release).
             GameVariablesAtStart = GameSupport.FamilyOf(game) switch
             {
