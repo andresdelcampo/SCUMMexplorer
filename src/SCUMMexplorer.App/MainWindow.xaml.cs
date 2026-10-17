@@ -706,6 +706,7 @@ public partial class MainWindow : Window
     internal static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes)
     {
         var background = game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
+        if (ScummProfile.For(game).HasFirstVisitScenes) return background;
         // The objects that are visible at the start of the game are painted over the background.
         var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
         return ScummOldRoomObjects.ComposeVisible(background, bytes, game.V1Game, states);
@@ -903,8 +904,10 @@ public partial class MainWindow : Window
         if (label is not null) Box(label, true);
     }
 
-    private static IReadOnlyList<BrowsedObjectLabel> ReadOlderObjects(GameLibrary game, byte[] bytes)
+    private static IReadOnlyList<BrowsedObjectLabel> ReadOlderObjects(GameLibrary game, byte[] bytes, ScummRoomScene? scene = null)
     {
+        if (scene is not null) return ReadOlderFirstVisitObjects(bytes, scene);
+        if (ScummProfile.For(game).HasFirstVisitScenes) return [];
         var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
         return ScummOldRoomObjects.Read(LflEncoding.DecodeXorFF(bytes), states).Where(entry => entry.Visible && entry.Name.Length > 0)
             .Select(entry => new BrowsedObjectLabel(entry.Id, entry.Name, entry.X, entry.Y, entry.Width, entry.Height)).ToList();
@@ -1392,7 +1395,7 @@ public partial class MainWindow : Window
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
                 // Names the pointer reveals: the drawn objects of a v1 or v2 game; every named object of a v4 or v5 game (their starting states come from scripts).
-                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
+                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes, browsedScene) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
                     : _game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : [];
                 _currentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
