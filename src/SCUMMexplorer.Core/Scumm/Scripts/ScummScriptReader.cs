@@ -44,6 +44,8 @@ public sealed record ScummScriptDisassembly(
     string? ContainerName = null,
     int? CodeFileOffset = null)
 {
+    /// <summary>The entry within the retained bytecode resource (old v1/v2 object verbs keep their header and backward-jump address space).</summary>
+    public int EntryOffset { get; init; }
     public int DecodedBytes => Instructions.Sum(instruction =>
         instruction.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length);
 

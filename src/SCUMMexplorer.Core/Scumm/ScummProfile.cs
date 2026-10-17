@@ -91,7 +91,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <c>actorFollowCamera</c> on an actor that is not in the current room starts that room's scene (ScummVM camera.cpp <c>setCameraFollows</c>, read 14 October 2026).
     /// Modelled for the generic session of the version 4 games (Monkey Island's boot ends script 1 that way); LOOM's sessions keep reporting it as not modelled.
     /// </summary>
-    public bool CameraFollowStartsScene => EngineVersion >= ScummVersion.V4;
+    public bool CameraFollowStartsScene => EngineVersion <= ScummVersion.V2 || EngineVersion >= ScummVersion.V4;
 
     /// <summary>
     /// Bit variables (<c>bit[n]</c>) are stored apart from the word variables (ScummVM <c>readVar</c>/<c>writeVar</c>, script.cpp, read 15 October 2026: up to

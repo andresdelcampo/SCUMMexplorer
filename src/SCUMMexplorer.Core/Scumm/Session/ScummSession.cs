@@ -433,6 +433,7 @@ public abstract partial class ScummSession
         IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
         ScriptFrame? frame = null)
     {
+        if (startOffset == 0) startOffset = script.EntryOffset;
         if (depth >= MaxNestedScripts)
         {
             _uncertainties.Add($"Nested script limit reached in {script.Context ?? $"Script {script.ScriptId:00}"}.");
@@ -683,6 +684,10 @@ public abstract partial class ScummSession
             _runtime.ApplyV2UserState(4 | 2 | 1 | 8);
             _runtime.Sentences.Clear();
             StopRunningScript(2);
+            _runtime.SetGlobalVariable(ScummVars.V2.SentenceVerb, _runtime.GlobalVariables.GetValueOrDefault("var[0x026]"));
+            _runtime.SetGlobalVariable(ScummVars.V2.SentenceObject1, 0);
+            _runtime.SetGlobalVariable(ScummVars.V2.SentenceObject2, 0);
+            _runtime.SetGlobalVariable(ScummVars.V2.SentencePreposition, 0);
             return "";
         }
         if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var arguments))
@@ -739,7 +744,19 @@ public abstract partial class ScummSession
                 _runtime.Camera.Follows = ego;
                 if (_runtime.Actors[ego].Room == _runtime.CurrentRoom && _runtime.Actors[ego].X is int x)
                     SetCamera(x, _runtime.Actors[ego].Estimate, "endCutscene follows ego at x = {0}");
-                else _uncertainties.Add("v2 endCutscene follows an ego outside the current room; its room transition is not yet modelled.");
+                else if (_runtime.Actors[ego].Room is int targetRoom && _runtime.EngineVersion == ScummVersion.V2)
+                {
+                    // o2_endCutscene calls actorFollowCamera; its startScene must use the same bounded dispatch as a script load.
+                    return HandleEvent(scriptEvent with
+                    {
+                        Kind = ScummScriptEventKind.RoomLoaded, Operation = "actorFollowCamera",
+                        Operands = $"0x{ego:X2} (endCutscene)", TargetKind = ResourceKind.Room, TargetId = targetRoom,
+                        ResolvedArguments = [ego]
+                    }, depth) ?? "";
+                }
+                else _uncertainties.Add(_runtime.EngineVersion == ScummVersion.V1
+                    ? "Classic endCutscene room/camera restoration is not yet modelled."
+                    : $"v2 endCutscene cannot follow actor {ego}: its room or position is unresolved.");
             }
             return "";
         }

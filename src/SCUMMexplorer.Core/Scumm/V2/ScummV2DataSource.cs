@@ -35,7 +35,7 @@ public sealed class ScummV2DataSource : IScummDataSource
         return source is null ? null : Decode(source, room);
     }
     private ScummScriptDisassembly Decode(OldScriptSource source, int id) =>
-        _reader.DecodeCode(source.Code, id, source.Container, source.Offset, source.StartOffset) with { Context = source.Label };
+        _reader.DecodeCode(source.Code, id, source.Container, source.Offset, source.StartOffset) with { Context = source.Label, EntryOffset = source.StartOffset };
 
     public ScummIndexedObjectSnapshot ReadIndexedObjects()
     {
