@@ -54,4 +54,3 @@ After the logical-room correction, all **6 Classic flight tests passed**, 59.33 
 ScummVM comparison is source only: native OBCD masks and logical actor-room semantics follow the Core owner's official `script_v2.cpp`/actor/camera source review of 18 October 2026. The Classic instruction anchors above and the terminal choice geometry (Buy657 rectangle48,104,64,16; Cancel658 rectangle208,104,64,16) were independently decoded from this fixture. Source execution does not establish original-game pictures, physical event delivery, timing or audio synchronization. The harness retains a source `I can't reach it.` line before boarding; it does not suppress messages or turn the bounded result into a full-fidelity claim.
 
 Game facts belong in the parent's [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md); tracker/checkpoint links are updated by the parent. No proposed requirement is needed for native header predicates, payment or player-chosen terminal actions.
-
