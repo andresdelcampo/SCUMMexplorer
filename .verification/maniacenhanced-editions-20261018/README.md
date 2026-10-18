@@ -57,4 +57,4 @@ No new user action required. Parent inspected the real window's TV preview: Room
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Family owner updates [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md) and [tracker](../../docs/maniac/SUPPORT_STATUS.md). Parent owns shared engine font notes, attribution, registry, final checkpoint and handoff. Decoder is `ScummV2NativeFont`; tests are `ScummManiacEnhancedEditionTests`.
+The [tracker](../../docs/maniac/SUPPORT_STATUS.md) and edition index record coverage. The [existing script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md) is unchanged: no new script fact was introduced. Generic extraction behavior is documented in [engine resource notes](../../docs/engine/SCUMM_RESOURCE_FORMATS.md); this record retains the executable descriptor evidence. Parent owns attribution, registry, final checkpoint and handoff. Decoder is `ScummV2NativeFont`; tests are `ScummManiacEnhancedEditionTests`.

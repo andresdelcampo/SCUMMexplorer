@@ -15,6 +15,11 @@ and `CharsetRendererV2` (read 17 October 2026). Copyright the ScummVM
 contributors; GPL-3.0-or-later. Drawing reuses the v3 one-bit renderer, as
 ScummVM's v2 renderer does.
 
+`ScummV2NativeFont.cs` adapts the executable-font extraction loop preserved in
+ScummVM's `charset-fontdata.cpp` (reviewed 18 October 2026), under the same
+GPL-3.0-or-later terms. It decodes only fingerprinted local data; no game
+executable or extracted font is shipped.
+
 The PC speaker envelope, modulation and synthesis implementation in
 `src/SCUMMexplorer.Core/Scumm/Audio/ScummPcSpeakerAudio.cs` and the companion
 `LoomPcSpeakerModulationTable.cs` adapt the ScummVM
