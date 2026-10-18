@@ -8,6 +8,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Native party bindings/player ranges and reached actor names supply identities per edition. Ownership-only writes retain slots, source room/code, state/classes and unrelated session values. Opaque session/frame/signature/revision tokens reject stale or cross-session edits; any game frame invalidates Undo. Choices carry explicit attribution and are not played scenes.
 - Twelve family tests and 39 integrated focused checks pass; all four real-window Apply/Undo/Cancel routes pass with inspected captures and prior pause-state restoration. A native-slot regression fixes the initial false refusal on Zak's resident special handlers without allowing real foreground actions. Failed guard/config/display checks are retained. Existing visual, sound/timing, walking, costume and alternate-copy limits remain.
 - Proposed R-12.7–R-12.10 are separate. [Checkpoint](checkpoints/20261018-S8-ManiacZak.md) and [integration evidence](../.verification/maniaczak-state-20261018/README.md) hold exact commands, final build/suite numbers and family links.
+- Final validation against master `cb17c44`: 1240 passed, zero failed, five skipped; solution build zero warnings/errors; three matrix checks and all four real-window checks passed.
 
 ## 18 October: bounded Maniac/Zak edition checks and native Spanish font (S9, all four families)
 
