@@ -52,6 +52,20 @@ if (args[0] == "dump")
             continue;
         }
         var p = spec.Split(':');
+        if (p[0] == "objs")
+        {
+            // S6 Indy4 (17 October 2026): a room's objects with their names, places and the verbs they answer.
+            var room = int.Parse(p[1]);
+            var archive = dumpGame.V4Disks!.Disks.OfType<ScummV5Archive>().First();
+            var records = source.ReadRoom(room).Objects;
+            Console.WriteLine($"== objects of room {room}");
+            foreach (var group in archive.ReadObjectVerbs(room).GroupBy(v => v.ObjectId))
+            {
+                var r = records.FirstOrDefault(o => o.Id == group.Key);
+                Console.WriteLine($"{group.Key} \"{group.First().ObjectName}\" at ({r?.X},{r?.Y}) {r?.Width}x{r?.Height} walk ({r?.WalkX},{r?.WalkY}) verbs {string.Join(" ", group.Select(v => $"0x{v.VerbId:X2}"))}");
+            }
+            continue;
+        }
         ScummScriptDisassembly? d = p[0] switch
         {
             "g" => source.GlobalScript(int.Parse(p[1])),
