@@ -5,6 +5,47 @@ namespace SCUMMexplorer.Core.Scumm;
 public sealed partial class ScummBoundedScriptExecutor
 {
     private const string V2IndirectReads = "engine:v2-indirect-reads";
+
+    // script_v2.cpp dispatches 0x66/0xE6 to o5_getClosestObjActor (script_v5.cpp).
+    // vars.cpp setupScummVars v2 uses raw words 19/20 for the inclusive actor range.
+    // Read from ScummVM master, 18 October 2026. Descending search and strict comparison
+    // intentionally retain the greatest id on a tie and reject distances of 255 or more.
+    private static bool TryApplyV2Closest(ScummScriptInstruction instruction,
+        Dictionary<string, ushort> variables, HashSet<string> estimated, ScummScriptRuntimeState runtime,
+        IReadOnlyList<ScummRoomObjectRecord> objects, bool estimatedPath, List<string> trace,
+        HashSet<string> limitations, out string? problem)
+    {
+        problem = $"getClosestObjActor operands or actor range are unknown at +0x{instruction.Offset:X4}";
+        const string minimumKey = "var[0x013]", maximumKey = "var[0x014]";
+        var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+        if (parts.Length != 2 || !TryGetVariableKey(parts[0], variables, out var destination) ||
+            !TryReadValue(parts[1], variables, out _, out _) ||
+            !variables.TryGetValue(minimumKey, out var minimum) || !variables.TryGetValue(maximumKey, out var maximum)) return false;
+        var closest = 255;
+        var closestDistance = 255;
+        var isEstimate = estimatedPath || estimated.Contains(minimumKey) || estimated.Contains(maximumKey) ||
+            OperandIsEstimated(parts[1], estimated, variables);
+        var positionEstimates = new HashSet<string>(StringComparer.Ordinal);
+        // The native do/while examines maximum once even when minimum > maximum.
+        for (var candidate = (int)maximum; ; candidate--)
+        {
+            if (!TryMeasureDistance(parts[1], $"0x{candidate:X4}", runtime, objects, variables,
+                    out var distance, out var detail, out var positionEstimate))
+            { problem = $"getClosestObjActor: {detail} at +0x{instruction.Offset:X4}"; return false; }
+            if (positionEstimate is not null) { isEstimate = true; positionEstimates.Add(positionEstimate); }
+            if (distance < closestDistance) { closestDistance = distance; closest = candidate; }
+            if (candidate - 1 < minimum) break;
+        }
+        variables[destination] = (ushort)closest;
+        RefreshBitAliases(destination, variables);
+        MarkEstimated(estimated, destination, isEstimate);
+        runtime.NotifyGlobalMutation(destination);
+        foreach (var estimate in positionEstimates)
+            limitations.Add($"getClosestObjActor reads {estimate}, so what follows is an estimate (+0x{instruction.Offset:X4})");
+        trace.Add($"{destination} = {closest}: getClosestObjActor {parts[1]}, inclusive range {minimum}..{maximum}{(isEstimate ? " (estimate)" : "")}");
+        problem = null;
+        return true;
+    }
     private static bool TryApplyV2Pickup(ScummScriptInstruction instruction, IDictionary<string, ushort> variables,
         IReadOnlyList<ScummRoomObjectRecord> objects, ScummScriptRuntimeState runtime, List<int> drawQueue,
         List<string> trace, ScummScriptEventCertainty certainty, out string problem)
@@ -227,6 +268,12 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (p.Length != 3 || !Read(1, out _) || !Read(2, out _)) return false;
                 instruction = source with { Operands = $"{p[0]}, {Value(1, 8)}, {Value(2, 2)}" };
                 return true;
+            case "walkActorToActor":
+                // script_v5.cpp walkActorToActor: <=v2 multiplies every distance by 8,
+                // including 0xFF (the actor-width sentinel belongs only to later engines).
+                if (p.Length != 3 || !Read(2, out _)) return false;
+                instruction = source with { Operands = $"{p[0]}, {p[1]}, {Value(2, 8)}" };
+                return true;
             case "startScript": case "chainScript":
                 instruction = source with { Operands = source.Operands + ", []" };
                 return true;
@@ -249,7 +296,15 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (sub == 3)
                 {
                     var name = source.Operands.IndexOf("name=", StringComparison.Ordinal);
-                    if (name >= 0) operation = "actorName, " + source.Operands[(name + 5)..];
+                    if (name >= 0 && runtime.Actors.Contains(actor))
+                    {
+                        var names = ScummTextDecoder.DecodeLiterals(source.Operands[(name + 5)..]);
+                        if (names.Count != 1) return false;
+                        runtime.ActorNames[actor] = names[0];
+                        runtime.NotifyNativeMutation("actor-name", actor);
+                        handled = true;
+                        return true;
+                    }
                 }
                 if (operation is null || actor == 0) return false;
                 instruction = source with { Operands = $"0x{actor:X2}, [{operation}]" };
@@ -317,7 +372,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "isScriptRunning": case "isSoundRunning": case "getObjectOwner": case "setOwnerOf":
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
-            case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
+            case "animateActor": case "faceActor": case "setBoxFlags":
             case "resourceRoutines": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject": case "getDist":
                 return true;
             default: return false;

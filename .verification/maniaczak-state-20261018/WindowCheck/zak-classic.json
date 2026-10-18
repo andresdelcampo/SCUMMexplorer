@@ -1,0 +1,71 @@
+[
+    {
+        "Value":  1,
+        "Op":  "room"
+    },
+    {
+        "Count":  150,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "w",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  65,
+        "Op":  "roomclick",
+        "X":  50
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "01-native-sentence",
+        "Op":  "save"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "d",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  62,
+        "Op":  "roomclick",
+        "X":  55
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Op":  "owner",
+        "Value":  1,
+        "X":  15
+    }
+]

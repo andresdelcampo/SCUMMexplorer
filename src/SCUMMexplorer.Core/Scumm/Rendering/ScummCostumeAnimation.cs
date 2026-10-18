@@ -327,9 +327,13 @@ public sealed partial class ScummCostume
     /// <summary>
     /// Maps a costume colour to the EGA colour drawn (<c>ClassicCostumeRenderer::setPalette</c> for GF_OLD_BUNDLE with
     /// the lights on): entry c of the actor's palette, except the costume's palette colour, which draws entry 0.
+    /// The optional lights word also implements the v1 native two-colour darkness table and v2 gray/black palette
+    /// (<c>byleRLEDecode_C64</c> and <c>setPalette</c>, read 18 October 2026). Inspection defaults to lights on.
     /// </summary>
-    public byte MapColor(byte color, IReadOnlyList<byte>? actorPalette, int actorNumber = 0) =>
-        _classicGame is { } classic ? ScummV1ActorColors.LiveColor(classic, actorNumber, color, actorPalette) :
+    public byte MapColor(byte color, IReadOnlyList<byte>? actorPalette, int actorNumber = 0, int lights = 11) =>
+        _classicGame is { } classic ? (lights & 8) != 0 ? ScummV1ActorColors.LiveColor(classic, actorNumber, color, actorPalette)
+            : color is 2 or 3 ? ScummV1RoomDecoder.EgaColors(classic)[11] : (byte)0 :
+        (lights & 8) == 0 ? color != PaletteColor && color == 12 ? (byte)0 : (byte)8 :
         _colorTable is not null ? _colorTable[color % _colorTable.Length] :
         actorPalette is null
             ? color == PaletteColor ? (byte)0 : color
@@ -340,9 +344,9 @@ public sealed partial class ScummCostume
     /// (costume colour 0) are skipped. Returns the number of pixels written.
     /// </summary>
     public int Compose(IReadOnlyList<ScummCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null, int scale = 255, int actorNumber = 0)
+        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null, int scale = 255, int actorNumber = 0, int lights = 11)
     {
-        if (scale < 255) return ComposeScaled(cels, target, targetWidth, targetHeight, x, y, actorPalette, mask, coverage, scale, actorNumber);
+        if (scale < 255) return ComposeScaled(cels, target, targetWidth, targetHeight, x, y, actorPalette, mask, coverage, scale, actorNumber, lights);
         // mask: the z-plane the actor is drawn behind (same size as the target); a set pixel hides the actor's pixel
         // (ScummVM byleRLEDecode: masked when mask[0] & maskbit).
         var written = 0;
@@ -358,7 +362,7 @@ public sealed partial class ScummCostume
                 var color = cel.Pixels[row * cel.Width + column];
                 if (color == 0) continue;
                 if (mask is not null && mask[ty * targetWidth + tx] != 0) continue;
-                target[ty * targetWidth + tx] = MapColor(color, actorPalette, actorNumber);
+                target[ty * targetWidth + tx] = MapColor(color, actorPalette, actorNumber, lights);
                 if (coverage is not null) coverage[ty * targetWidth + tx] = true;
                 written++;
             }
@@ -371,7 +375,7 @@ public sealed partial class ScummCostume
     /// neighbouring cels so limbs still meet; pixels are taken nearest-neighbour. An estimate of ScummVM's scale table drawing.
     /// </summary>
     private int ComposeScaled(IReadOnlyList<ScummCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette, byte[]? mask, bool[]? coverage, int scale, int actorNumber)
+        int x, int y, IReadOnlyList<byte>? actorPalette, byte[]? mask, bool[]? coverage, int scale, int actorNumber, int lights)
     {
         var written = 0;
         foreach (var cel in cels)
@@ -391,7 +395,7 @@ public sealed partial class ScummCostume
                     var color = cel.Pixels[row * cel.Width + Math.Min(cel.Width - 1, (tx - left) * cel.Width / (right - left))];
                     if (color == 0) continue;
                     if (mask is not null && mask[py * targetWidth + px] != 0) continue;
-                    target[py * targetWidth + px] = MapColor(color, actorPalette, actorNumber);
+                    target[py * targetWidth + px] = MapColor(color, actorPalette, actorNumber, lights);
                     if (coverage is not null) coverage[py * targetWidth + px] = true;
                     written++;
                 }

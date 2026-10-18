@@ -18,6 +18,8 @@ public sealed class ScummGameSession : ScummSession
         _cdTracks = ScummCdAudioTracks.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
+        // ScummEngine_v2 constructor (scumm.cpp): inherited by DOS v1 as well.
+        if (_runtime.IsV2) _runtime.Flashlight = (6, 4);
         if (_runtime.IsV2) _runtime.Actors.InitializeV2Game(profile.Dialect == ScummScriptDialect.V1);
         _runtime.V2VerbYOffset = profile.V2VerbYOffset;
         _runtime.IsClassicManiac = profile.RestoresClassicCutsceneScene;
@@ -370,7 +372,10 @@ public sealed class ScummGameSession : ScummSession
     public ScummRoomCapture CaptureRoom() => Capture();
 
     private ScummRoomCapture Capture() => new(Snapshot, Actors, CameraX, _runtime.ShadowPalette.ToArray(), _runtime.RoomColors.ToArray(),
-        _runtime.GlobalVariables.GetValueOrDefault(_runtime.CurrentLightsVariable), _runtime.Flashlight, CurrentWalkBoxes);
+        _runtime.GlobalVariables.GetValueOrDefault(_runtime.CurrentLightsVariable), _runtime.Flashlight, CurrentWalkBoxes)
+        { RoomPointer = ScreenPointer is { } pointer ? (pointer.X, pointer.Y - MainScreen.Top)
+              : Pointer is { } roomPointer ? (roomPointer.X - ViewLeft, roomPointer.Y) : (0, 0),
+          ViewLeft = ViewLeft, ViewWidth = 320, ViewHeight = MainScreen.Bottom - MainScreen.Top };
 
     private long Signature(Dictionary<int, Queue<int>> changes, int frame)
     {
@@ -476,7 +481,13 @@ public enum ScummSettleOutcome { Settled, RoomLeft, FrameLimit }
 
 /// <summary>Everything the picture of a room needs, taken at one frame while the room was current.</summary>
 public sealed record ScummRoomCapture(ScummSessionSnapshot Snapshot, IReadOnlyList<ScummActorSnapshot> Actors, int? CameraX,
-    byte[] ShadowPalette, byte[] RoomColors, int Lights, (int X, int Y) Flashlight, ScummWalkBoxSet? WalkBoxes);
+    byte[] ShadowPalette, byte[] RoomColors, int Lights, (int X, int Y) Flashlight, ScummWalkBoxSet? WalkBoxes)
+{
+    public (int X, int Y) RoomPointer { get; init; }
+    public int ViewLeft { get; init; }
+    public int ViewWidth { get; init; } = 320;
+    public int ViewHeight { get; init; } = 200;
+}
 
 /// <summary>The settled state of a visited room, the frames it took and, when a script left the room, the room it went to.</summary>
 public sealed record ScummSettleResult(ScummRoomCapture State, ScummSettleOutcome Outcome, int Frames, int? LeftTo);

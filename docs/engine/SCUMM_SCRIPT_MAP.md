@@ -152,4 +152,12 @@ The v2 engine's fixed scripts (input 4, sentence 2, post-entry 5), camera/mouse 
 
 ## Explorer evidence
 
+### SCUMM v1/v2 closest query and actor approach distance (18 October 2026)
+
+`script_v2.cpp` dispatches opcodes `66`/`E6` to `o5_getClosestObjActor`. It searches the inclusive engine actor range (words 19/20) in descending order, starting with result/distance `FF`. Only a strictly shorter distance replaces the result: the highest id wins ties; distances of 255 or more never select a candidate. There is no self exclusion. The native do/while examines the maximum once even if the range is inverted. Distance uses the existing `getObjActToObjActDist` rules, including native old coordinate units, inventory-owner position, absence and the zero distance for two actors together in a non-current nonzero room. Unknown preview inputs remain unresolved; estimated ranges/positions retain their provenance.
+
+`ScummEngine_v5::walkActorToActor` multiplies every v1/v2 approach distance by eight before adding/subtracting it from the target's pixel position. In these versions `FF` is the literal distance 255 (2040 pixels), **not** the later-engine width sentinel. The executor normalizes this operand beside the other v1/v2 coordinates; the shared actor walker retains the native current-room/valid-actor guards. This prevents a four-pixel destination offset from being fed to a walker stepping in eight-pixel native units.
+
+Evidence: engine. Sources: ScummVM [`script_v2.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v2.cpp), [`script_v5.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v5.cpp) (`o5_getClosestObjActor`, `walkActorToActor`), [`object.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/object.cpp) (`getObjActToObjActDist`) and [`vars.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/vars.cpp), master read 18 October 2026. [Bounded checks and retained limits](../../.verification/maniacclassic-fidelity-20261018/README.md). These facts establish execution semantics, not original-game visual or timing acceptance.
+
 Decoded instructions, engine interpretations, source readings, observed execution and explorer preview assumptions are different evidence categories. Catalog arrivals, seeded randomness, synthetic input timing and direct story edits retain their labels. Dated LOOM session mappings and validation remain in the [game map](../loom/LOOM_SCRIPT_MAP.md#historical-session-mapping-september-baseline).

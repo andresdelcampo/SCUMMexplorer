@@ -62,6 +62,14 @@ public class SupportConformanceTests
         // Objects ✔ outside LOOM needs the first visit (S5) and click responses (S6).
         if (support[SupportFeature.Objects] == SupportLevel.Full && game.Id is not (GameId.Loom or GameId.LoomVga))
             Assert.True(ScummProfile.For(game).HasFirstVisitScenes && ScummProfile.For(game).PlaysThroughVerbs);
+        // S8 Maniac/Zak: the boot exposes own-source character identities; family state tests pin Apply/Undo.
+        if (support[SupportFeature.Status] == SupportLevel.Full && family is
+            GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced)
+        {
+            var status = ScummGameSession.BootForPlay(game, out _).CaptureInventoryStatus();
+            Assert.NotEmpty(status.Characters);
+            Assert.Contains(status.Characters, character => !string.IsNullOrWhiteSpace(character.Name));
+        }
         // Cutscenes outside LOOM (S7): ◐ only, a list derived from the game's scripts by the engine's scan, played in the play session; a hand-validated
         // catalog (✔) exists only for the LOOM reference (R-8.18). ScummIndy3CutsceneTests runs three scenes from a fresh start.
         if (support[SupportFeature.Cutscenes] != SupportLevel.None && game.Id is not (GameId.Loom or GameId.LoomVga))

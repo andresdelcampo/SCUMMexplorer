@@ -71,7 +71,8 @@ public abstract partial class ScummSession
         var chosen = number ?? _runtime.Charset ?? 0;
         if (!_charsets.TryGetValue(chosen, out var charset))
             // A version 3 engine reads 99.LFL - n (the 256-colour Indiana Jones too: one file per room, the same charset files as EGA; S6 Indy3Vga).
-            _charsets[chosen] = charset = _runtime.IsV2 ? new ScummV2Charset((int)_runtime.EngineVersion, OldPlayLanguage)
+            _charsets[chosen] = charset = _runtime.IsV2 ? new ScummV2Charset((int)_runtime.EngineVersion, OldPlayLanguage,
+                nativeFont: ScummV2NativeFont.TryLoad(_game.FolderPath) ?? ReadOnlyMemory<byte>.Empty)
                 : ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
         // cursorCommand charsetColors (S6 MonkeyCd, 17 October 2026: Script 22 gives the verbs' charset 6 the entries 0, 6, 2): the colours the game set replace
         // the file's own map, as ScummVM's _charsetData does.

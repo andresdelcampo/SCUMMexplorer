@@ -20,6 +20,8 @@ public sealed class ScummScriptRuntimeState
     /// <summary>The source-defined classic Maniac verb screen offset; other v1/v2 games use zero.</summary>
     public int V2VerbYOffset { get; set; }
     public bool IsClassicManiac { get; set; }
+    /// <summary>Names assigned by reached v1/v2 actorOps, retained as source text.</summary>
+    public Dictionary<int, string> ActorNames { get; } = [];
     /// <summary>Actor_v2::isPlayer uses the current ego in Maniac v1, otherwise globals 42 and 43 (actor.cpp).</summary>
     public bool IsPlayerActor(int number) => IsV2
         ? IsClassicManiac ? GlobalVariables.GetValueOrDefault(EgoVariable) == number

@@ -81,12 +81,14 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
 | **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
 | **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
-| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – |
-| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 <!-- support-matrix:end -->
+
+Maniac/Zak edition coverage at the [18 October S9 checkpoint](checkpoints/20261018-S9-ManiacZak.md): classic English Maniac, enhanced Spanish Maniac, classic English Zak and enhanced English Zak only. There is one local copy per family; no additional language, demo or revision within a family was available to establish compatibility. These checks do not raise the existing feature levels.
 
 ✔ works (Full), ◐ partly, – not supported. What each column asks for, at each level:
 
@@ -101,7 +103,7 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | Scripts | – | raw disassembly in the family's dialect, and the Readable view | scripts offered |
 | Play | – | live room: actors, camera, clicks run the game's scripts | LOOM; Indiana Jones 3 EGA through its own verbs (§7.1) |
 | Cutscenes | list derived from the scripts, not hand-validated | hand-validated catalog (English Roland LOOM only) | – |
-| Status | – | Game Status editor | LOOM only today |
+| Status | – | Game Status editor (LOOM fields; explicit held-inventory choices for Maniac/Zak) | LOOM status tests; Maniac/Zak edit/undo and window checks |
 
 Family notes (what is behind a row):
 
@@ -410,6 +412,15 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 | R-12.5 | LOOM | Editing is allowed only when the session can be edited (not while a cutscene plays); the staff held/not held and notes edits go through supported session edits (the disclosed off-island staff setup runs the real pickup). The window refreshes every 250 ms while open. | Code |
 | R-12.6 | LOOM | The picker note for pitches: the source raises available pitches to five at Room 13's Use response leading to Room 15 (`Use response` in VGA (the scan finds no doorway for it), `Reached Room 15` in EGA). | Doc |
 
+### 12.1. Inventory status for Maniac Mansion and Zak McKracken
+
+| ID | Tag | Requirement | Basis |
+|---|---|---|---|
+| R-12.7 | ManiacClassic, ManiacEnhanced, ZakClassic, ZakEnhanced | With a live session, `Game Status` opens an inventory window showing the current character and room, and held items across the edition's source-established playable characters. Names come from that copy's data; unresolved identities are not invented. Raw identifiers, source evidence and limitations belong in Advanced. This adds a view across characters beyond the current-character inventory strip. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+| R-12.8 | Same four families | The user can explicitly reassign an item **already present in the native inventory** to a resolved eligible character through supported session edits. The window says these are the user's exploration choices, not played scenes or earned pickups. Edits change only inventory ownership: keep the item's slot, retained room/code, intrinsic state, classes, other items, variables and actors. No new item creation, removal into the world, puzzle-flag editor, actor teleport or costume edit. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+| R-12.9 | Same four families | `Apply` validates the entire pending batch before writing; `Cancel` discards pending changes; `Undo last change` restores the last applied batch only while its original session and relevant state still match. Invalid targets, stale snapshots and cross-session undo are rejected without partial changes. Editing is disabled during boot, cutscenes, movement, dialogue or queued input. The modal inventory window pauses the live Play clock and restores its earlier playback state on close; opening/closing alone never advances or changes game state. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+| R-12.10 | Same four families | Applying or undoing an edit immediately refreshes the inventory view and the native inventory strip without running scripts or fabricating story progress. A concise choice label remains visible; detailed change attribution is Advanced. A source-derived edit/undo round trip and the real-window Apply/Cancel/Undo route must pass for each family before Status is Full. Unresolved edition contracts fail closed. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+
 ## 13. Audio
 
 | ID | Tag | Requirement | Basis |
@@ -462,4 +473,4 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 ## 17. Out of scope (today)
 
-Objects with first-visit state, click responses and live play for games beyond LOOM, Indy3 (EGA and 256 colours), Monkey Island 1 floppy/CD, and Maniac Mansion and Zak McKracken classic/enhanced (the remaining games show their first visit or stored object boxes only); unresolved v1 costume colours; v5 script-driven sound hooks not yet exercised by live routes; games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`. Maniac/Zak bounded Play does not close S5 original-game picture comparison or native darkness/flashlight rendering.
+Objects with first-visit state, click responses and live play for games beyond LOOM, Indy3 (EGA and 256 colours), Monkey Island 1 floppy/CD, and Maniac Mansion and Zak McKracken classic/enhanced (the remaining games show their first visit or stored object boxes only); unresolved v1 costume colours; v5 script-driven sound hooks not yet exercised by live routes; games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`. Maniac/Zak native darkness/flashlight rendering is implemented in the 18 October fidelity pass; bounded Play still does not close S5 original-game picture comparison, full-story prerequisites or the walking-metric approximation.

@@ -1,0 +1,9 @@
+*-before.txt
+*-after.txt
+source-*.txt
+window-*/
+test-results/
+!classic-baseline-summary.txt
+!enhanced-baseline-summary.txt
+!classic-results.txt
+!enhanced-results.txt

@@ -217,7 +217,10 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         actor.Costume = costume;
         actor.Animation.Reset();
         actor.LookEstimate = costume is null ? "its costume is unknown" : null;
-        for (var i = 0; i < 16; i++) actor.Palette[i] = (byte)i;
+        // Actor::setActorCostume (ScummVM actor.cpp, read 18 October 2026):
+        // v1 retains its dynamic actor color array across costume changes.
+        if (!_v1Costumes)
+            for (var i = 0; i < 16; i++) actor.Palette[i] = (byte)i;
         if (actor.Visible == false) return;
         if (actor.Visible is null)
         {

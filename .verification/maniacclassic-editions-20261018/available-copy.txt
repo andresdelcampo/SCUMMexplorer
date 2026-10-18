@@ -1,0 +1,20 @@
+D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-classic-s9\.verification\maniacclassic-editions-20261018\Check\Program.cs(20,13): warning CS8714: The type 'string?' cannot be used as type parameter 'TKey' in the generic type or method 'Enumerable.ToDictionary<TSource, TKey>(IEnumerable<TSource>, Func<TSource, TKey>, IEqualityComparer<TKey>?)'. Nullability of type argument 'string?' doesn't match 'notnull' constraint. [D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-classic-s9\.verification\maniacclassic-editions-20261018\Check\ManiacClassicEditionCheck.csproj]
+Local folder inventory: indy3 demo en; indy3 ega en; indy3 ega es; indy3 vga en; indy3 vga es; indy4 classic vga es; indy4 talkie vga es; indy4 vga en; loom demo long ega en; loom demo short ega en; loom ega de; loom ega en; loom ega es; loom ega fr; loom ega it; loom ega mt32 en; loom ega mt32 es; loom ega v1.2 es; loom vga en; loom vga en kixx; mi2 classic es; mi2 mt32 en; mi2 sb16 en; mi2 talkie en; mi2 talkie es; mmansion ega en; mmansionE ega es; monkey1 ega en; monkey1 ega es; monkey1 vga en; monkey1 vga es; mt32; zak ega en; zakE ega en
+Fixture: D:\Juegos\Lucas\mmansion ega en; family=ManiacClassic; edition=English, Maniac Mansion classic; demo=False
+Version=V1; engine=V1; dialect=V1; reader=ScummV1DataSource
+Detection: A classic SCUMM v1 game (fixed-size index in 00.LFL): room backgrounds and costumes are shown; objects, scripts and sounds are not read for this game yet.
+Resources Other: 1
+Resources Room: 52
+Resources Costume: 23
+Resources Script: 173
+Resources Sound: 61
+Resources Executable: 2
+00.LFL: 1972 bytes, SHA256=DF58146AF5ADEF2B03F5361F97998AF27A6B4C5A98AD6C54FA63C3A30166A1DB
+45.LFL: 10986 bytes, SHA256=3F57F0FC889459D35080DF1D9CF339363C3EF80C00F30F36AF38F41D5D5061D9
+MANIAC.EXE: 63647 bytes, SHA256=4969E6FFE61F2131FD8E9E355BA77AC6C94A7B838C8646B8D2182235C384A1B5
+Content-only identity agrees: True
+Spanish label transform present: False
+Reviewed native startup: room=44; control=True; cutscene=False; deliveredInputs=0
+Own-data scan: 59 triggers; 27 groups; 25 scenes
+Native verbs: 09=Push, 05=Turn off, 04=Turn on
+PASS available-copy checks. Alternate classic releases: BLOCKED, no additional local copy identified. Not an original-game comparison.

@@ -2,6 +2,11 @@
 
 ## ScummVM
 
+The DOS v1/v2 flashlight nibble curves and compositing in
+`Scumm/Rendering/ScummV2Lighting.cs`, actor darkness palettes and flashlight defaults
+adapt ScummVM `gfx.cpp`, `costume.cpp` and `scumm.cpp` (read 18 October 2026).
+Copyright the ScummVM contributors; GPL-3.0-or-later.
+
 The v1/v2 walking and direction tables in `Scumm/Runtime/ScummActors.V2.cs`,
 old walk-box routing, and native Play interface behavior adapt ScummVM's
 [`actor.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/actor.cpp),
@@ -14,6 +19,11 @@ The DOS v1/v2 built-in charset and language replacement tables in
 and `CharsetRendererV2` (read 17 October 2026). Copyright the ScummVM
 contributors; GPL-3.0-or-later. Drawing reuses the v3 one-bit renderer, as
 ScummVM's v2 renderer does.
+
+`ScummV2NativeFont.cs` adapts the executable-font extraction loop preserved in
+ScummVM's `charset-fontdata.cpp` (reviewed 18 October 2026), under the same
+GPL-3.0-or-later terms. It decodes only fingerprinted local data; no game
+executable or extracted font is shipped.
 
 The PC speaker envelope, modulation and synthesis implementation in
 `src/SCUMMexplorer.Core/Scumm/Audio/ScummPcSpeakerAudio.cs` and the companion

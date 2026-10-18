@@ -200,6 +200,13 @@ public sealed partial class ScummBoundedScriptExecutor
 
             if (runtime is { IsV2: true })
             {
+                if (instruction.Operation == "getClosestObjActor")
+                {
+                    if (!TryApplyV2Closest(instruction, knownVariables, estimated, runtime, roomObjects,
+                        onEstimatedPath, trace, limitations, out unresolved)) break;
+                    pc = next;
+                    continue;
+                }
                 // Normalization can resolve operands into literals. Retain their uncertainty before doing so;
                 // conservatively keep the remainder of this bounded run conditional after any estimated read.
                 if (instruction.Operands.Split(',', StringSplitOptions.TrimEntries)

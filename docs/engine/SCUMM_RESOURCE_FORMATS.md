@@ -8,6 +8,17 @@ The DOS v1/v2 charset is an engine-supplied 8 by 8 bitmap font, not a later `CHA
 
 The old room box table has eight-byte boxes followed by a routing matrix: one row-offset byte per box, then the rows. The lookup uses `boxCount + matrix[from] + to`, interpreting the result as a signed byte (`-1` is unreachable). Coordinates use eight-pixel x and two-pixel y units; path arithmetic must use those units before returning pixels. Sources: ScummVM `room.cpp`, `boxes.cpp`, `actor.cpp`, read 17 October 2026; implementation `ScummWalkBoxReader.ReadV2` / `ScummActors.V2`.
 
+S9 (18 October 2026): a reviewed DOS v2 executable can supply its own font through
+`ScummV2NativeFont`. The descriptor fingerprints the complete executable, encoded
+range, decoded prefix and final 1024-byte font; unknown or absent executables keep
+the existing fallback. The extraction loop is preserved in ScummVM
+`charset-fontdata.cpp` (reviewed 18 October): a seven-byte repeated-row marker is
+expanded before selecting 128 eight-row glyphs. A contiguous executable slice is
+not necessarily a font: the enhanced Maniac copy's low glyphs are encoded. Native
+bytes bypass language substitutions and draw through the same v1/v2 renderer.
+The [edition record](../../.verification/maniacenhanced-editions-20261018/README.md)
+retains the descriptor evidence, full-glyph checks and rejected raw-slice attempt.
+
 ## Index and container layouts
 
 | Layout | Games seen | Files | Index | Code |

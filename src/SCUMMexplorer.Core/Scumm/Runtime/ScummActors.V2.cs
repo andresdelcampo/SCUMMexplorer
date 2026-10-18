@@ -3,6 +3,7 @@ namespace SCUMMexplorer.Core.Scumm;
 public sealed partial class ScummActorTable
 {
     private bool _v2Animations;
+    private bool _v1Costumes;
     // Actor_v2::walkActor/actorWalkStep and inherited calcMovementFactor (actor.cpp,
     // read 17 October 2026). Runtime positions stay pixels; native arithmetic uses 8x2 units.
     private void WalkActorV2(Actor actor, Placement place)
@@ -102,6 +103,7 @@ public sealed partial class ScummActorTable
     internal void InitializeV2Game(bool classic)
     {
         _v2Animations = true;
+        _v1Costumes = classic;
         // Actor_v2::initActor (actor.cpp): native speeds 1,1; this runtime stores pixels (8,2).
         // resetScumm (scumm.cpp) additionally assigns each v1 actor its own costume number.
         foreach (var actor in _actors)

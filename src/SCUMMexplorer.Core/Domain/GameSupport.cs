@@ -87,10 +87,11 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
         // S6 Maniac/Zak (17 October 2026): native bounded routes and real-window checks; visual limits in the checkpoint.
         // S7 (18 October): script-derived lists with fresh-run proofs and window playback; Partial, not a hand-validated catalog.
-        Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
-        Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
-        Row_(GameFamily.ZakEnhanced, "**Zak McKracken** enhanced", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
-        Row_(GameFamily.ZakClassic, "**Zak McKracken** classic", [F, F, F, P, F, F, F, F, P, N], Explore, ExplorePreview),
+        // S8 (18 October): explicit held-inventory choices, guarded atomic Apply/Undo; no puzzle flags or new items.
+        Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ZakEnhanced, "**Zak McKracken** enhanced", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ZakClassic, "**Zak McKracken** classic", [F, F, F, P, F, F, F, F, P, F], Explore, ExplorePreview),
         // Another old-v3 game (Zak McKracken EGA and the like): the room pictures and the texts need nothing game-specific. Limited on purpose.
         Row_(GameFamily.OtherV3, "Other old-v3 game", [F, N, N, N, N, F, N, N, N, N], BackgroundsAndTexts, BrowsedPreview, false),
         Row_(GameFamily.OtherBrowsed, "Other browsed game", [F, P, F, P, P, F, F, N, N, N], Browsed, BrowsedPreview, false)

@@ -70,6 +70,7 @@ public abstract partial class ScummSession
 
     protected ScummSessionSnapshot AdvanceOneFrame()
     {
+        _inventoryStatusFrame++;
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
         // processActors ends the previous frame: animateCostume steps the limbs of the actors in the room.
