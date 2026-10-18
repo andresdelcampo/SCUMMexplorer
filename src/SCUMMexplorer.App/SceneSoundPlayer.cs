@@ -18,6 +18,12 @@ namespace SCUMMexplorer.App;
 /// </summary>
 public sealed class SceneSoundPlayer
 {
+    /// <summary>
+    /// A sound that keeps playing until a script stops it: once its wave reaches <paramref name="End"/> (null: the wave's end) it goes on from
+    /// <paramref name="Restart"/>. A CD track with loop count 0xFF restarts from its beginning (S6 MonkeyCd); an iMUSE song from its loop point (S6 Monkey2).
+    /// </summary>
+    public sealed record Loop(TimeSpan Restart, TimeSpan? End);
+
     public enum SoundMode { None, PcSpeaker, Adlib, Roland, Pcjr }
     public SoundMode Mode { get; private set; } = SoundMode.Adlib;
 
@@ -60,6 +66,7 @@ public sealed class SceneSoundPlayer
         /// <summary>True while the track is still being rendered; the game's frames wait for it (see <see cref="IsPreparing"/>).</summary>
         public bool Preparing { get; set; }
         public bool Stopped { get; set; }
+        public Loop? Loop { get; set; }
     }
 
     private readonly ScummAdlibAudio _adlib = new();
@@ -71,7 +78,7 @@ public sealed class SceneSoundPlayer
     private ScummSession? _session;
     // How a sound becomes a wave for a session whose game the built-in renderer does not cover (the browsed sound player's own rendering); null: built-in.
     private Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? _render;
-    private Func<int, bool>? _loopsForever;
+    private Func<int, SoundMode, Loop?>? _loops;
     private int _seen;
     private int _frames;
     private bool _paused;
@@ -95,12 +102,13 @@ public sealed class SceneSoundPlayer
 
     /// <summary>Follows <paramref name="session"/> from its next sound event on; a new session stops the old one's sounds.</summary>
     /// <param name="render">Renders a sound with the device's rendition (AdLib already at its output level); null uses the built-in LOOM renderer.</param>
-    /// <param name="loopsForever">Sounds that start again when they end until a script stops them (a CD track with loop count 0xFF; S6 MonkeyCd); null: none.</param>
+    /// <param name="loops">Sounds that go on until a script stops them, and from where (<see cref="Loop"/>: a CD track with loop count 0xFF, S6 MonkeyCd;
+    /// an iMUSE song that jumps back, S6 Monkey2), for the device that plays them; null: none.</param>
     public void Attach(GameLibrary game, ScummSession session, Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? render = null,
-        Func<int, bool>? loopsForever = null)
+        Func<int, SoundMode, Loop?>? loops = null)
     {
         StopAll("session replaced");
-        _loopsForever = loopsForever;
+        _loops = loops;
         if (!ReferenceEquals(game, _game) || !Equals(render, _render))
         {
             _renders.Clear();
@@ -119,6 +127,13 @@ public sealed class SceneSoundPlayer
     {
         if (_session is not { } session || _game is null) return;
         _frames++;
+        // A looping song whose wave has reached its loop's end goes on from its loop point, as the game's player jumps back (S6 Monkey2).
+        foreach (var voice in _voices)
+            if (voice is { Loop.End: TimeSpan end, Player: { } looping } && looping.Position >= end)
+            {
+                looping.Position = voice.Loop.Restart;
+                Log.Add(new(_frames, _clock.ElapsedMilliseconds, "loop", voice.SoundId, "", $"from {voice.Loop.Restart.TotalSeconds:0.###} s at {end.TotalSeconds:0.###} s"));
+            }
         var events = session.SoundEvents;
         for (; _seen < events.Count; _seen++)
         {
@@ -192,7 +207,7 @@ public sealed class SceneSoundPlayer
             return;
         }
         var mode = Mode;
-        var voice = new Voice { SoundId = id, StartedAt = _clock.ElapsedMilliseconds };
+        var voice = new Voice { SoundId = id, StartedAt = _clock.ElapsedMilliseconds, Loop = _loops?.Invoke(id, mode) };
         _voices.Add(voice);
         var frame = _frames;
         var render = Render(id, mode);
@@ -233,9 +248,10 @@ public sealed class SceneSoundPlayer
         };
         player.MediaEnded += (_, _) =>
         {
-            if (!voice.Stopped && _loopsForever?.Invoke(id) == true)
+            if (!voice.Stopped && voice.Loop is { } loop)
             {
-                player.Position = TimeSpan.Zero;
+                player.Position = loop.Restart;
+                Log.Add(new(_frames, _clock.ElapsedMilliseconds, "loop", id, kind, $"from {loop.Restart.TotalSeconds:0.###} s at the end"));
                 player.Play();
                 return;
             }
