@@ -1,0 +1,9 @@
+  SCUMMexplorer.Core -> D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s9\Exe\SCUMMexplorer.Core\Debug\net10.0\SCUMMexplorer.Core.dll
+  SCUMMexplorer.Tests -> D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s9\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll
+Test run for D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s9\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 1 s - SCUMMexplorer.Tests.dll (net10.0)
