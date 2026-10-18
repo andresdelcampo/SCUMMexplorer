@@ -27,6 +27,8 @@ public partial class MainWindow
     private WriteableBitmap? _playBitmap;
     // The play game's sounds that play a track of its disc (null for a game without them).
     private ScummCdAudioTracks? _playCdTracks;
+    // S6 Indy4 (17 October 2026): the spoken lines of a talkie, played as the game's texts start and stop them.
+    private readonly TalkieSpeechPlayer _playSpeech = new();
 
     private bool PlayActive => _playTimer is not null && _play is not null;
 
@@ -77,6 +79,7 @@ public partial class MainWindow
             // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
             // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd).
             if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, _playCdTracks is { } loops ? loops.LoopsForever : null);
+            if (game.Speech is { } speech && !_playSpeech.Follows(_play.Messages)) _playSpeech.Attach(speech, _play.Messages);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
             // The old engine's opening can wait on the player's party choice.
             // Its first Play screen must retain that live input, not visit the
@@ -87,6 +90,8 @@ public partial class MainWindow
                 // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.
                 _sceneSound.StopAll("another room was picked from the list during play");
                 _play.VisitRoom(resource);
+                // The visit's entry scripts are a state preview: their lines are not spoken.
+                if (game.Speech is { } visitSpeech) _playSpeech.Attach(visitSpeech, _play.Messages);
             }
         }
         catch (Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or InvalidOperationException or NotSupportedException)
@@ -115,6 +120,7 @@ public partial class MainWindow
         _playTimer?.Stop();
         _playTimer = null;
         if (_play is not null && _sceneSound.Follows(_play)) _sceneSound.StopAll("play was left");
+        _playSpeech.Detach();
         PlayScreenImage.Visibility = Visibility.Collapsed;
         PlayScreenImage.Cursor = null;
         RoomDisplayGroup.Visibility = Visibility.Visible;
@@ -128,12 +134,13 @@ public partial class MainWindow
         if (_playPaused != _playSoundPaused)
         {
             _playSoundPaused = _playPaused;
-            if (_playPaused) _sceneSound.Pause(); else _sceneSound.Resume();
+            if (_playPaused) { _sceneSound.Pause(); _playSpeech.Pause(); } else { _sceneSound.Resume(); _playSpeech.Resume(); }
         }
         // As in LOOM, a sound the game just started holds the frames while it is rendered, so music and scene stay in step.
         if (_playPaused || _sceneSound.IsPreparing) return;
         _play.AdvanceFrame();
         _sceneSound.Update();
+        _playSpeech.Update();
         _playFrame++;
         if (_playTimer is { } timer) timer.Interval = TimeSpan.FromMilliseconds(_play.FrameJiffies * 1000.0 / 60);
         ShowPlayFrame();
