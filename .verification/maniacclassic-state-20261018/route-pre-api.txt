@@ -1,0 +1,4 @@
+Native key route: room=1, owner55=3, control=True
+var[0x02F]=3
+var[0x030]=1
+var[0x031]=5

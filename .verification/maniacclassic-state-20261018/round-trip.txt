@@ -1,0 +1,13 @@
+Native key route: room=1, owner55=3, control=True
+var[0x02F]=3
+var[0x030]=1
+var[0x031]=5
+Eligible actor 1: Syd; Script 4 +0x00EF: ego <- var[0x030], followed by actorFollowCamera
+Eligible actor 3: Dave; Script 4 +0x00DC: ego <- var[0x02F], followed by actorFollowCamera
+Eligible actor 5: Bernard; Script 4 +0x0102: ego <- var[0x031], followed by actorFollowCamera
+Held object 55: key; owner=3; slot=0; room=1
+Room item reassignment: applied=False; refusal=The item is not a resolved held inventory item.
+Apply held key: applied=True; owner=1; refusal=
+Stale snapshot: applied=False; refusal=The inventory view is stale; reopen it.
+Undo: applied=True; owner=3; refusal=
+PASS: explicit choice, not a played scene; native acquisition precedes the edit.
