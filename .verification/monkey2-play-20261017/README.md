@@ -39,7 +39,7 @@ Exe\Monkey2PlayWindowCheck\Debug\net10.0-windows\Monkey2PlayWindowCheck.exe "D:\
 ## Results (numbers)
 
 - `ScummMonkey2PlayTests`: 3 of 3 pass (route, right click, play screen). `ScummPlayScreenStateImageTests` 1, `ScummImuseMusicTests` 2, `V5ImuseLoopTests` (3 new) pass.
-- Play, sound, iMUSE, Monkey, Indy, cutscene, conformance and architecture filter: 219 of 219 pass (before the registry change). The Indy3, LOOM, Scumm and iMUSE regression with the data roots set: see "Regression" below.
+- Play, sound, iMUSE, Monkey, Indy, cutscene, conformance and architecture filter: 219 of 219 pass (before the registry change). The Indy3, LOOM, Scumm and iMUSE regression with the data roots set (`SCUMM_INDY3_EGA_TEST_ROOT`, `SCUMM_SOUND_TEST_ROOT`, `SCUMM_MT32_ROM_ROOT`), after the registry change: 1101 passed, 5 skipped, 0 failed in 4 min 4 s. The test host then stayed alive without exiting and was stopped by hand about 45 minutes later. The results had all been reported; the cause, a foreground thread left by some test, was not looked into.
 - Route timing:
 
   | Point on the route | Frame |
