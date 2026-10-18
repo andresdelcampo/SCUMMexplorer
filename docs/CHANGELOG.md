@@ -13,6 +13,30 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
   - Text verbs skip the two bytes of codes 9, 10, 12, 13 and 14 (d5af7d3).
 - Validation: `ScummMonkey2PlayTests` (3), `ScummPlayScreenStateImageTests`, `ScummImuseMusicTests`, `V5ImuseLoopTests`; the play, sound, Monkey, Indy, cutscene and conformance filter; the LOOM and Scumm regression; one WPF check through the real window. Record: [monkey2-play-20261017](../.verification/monkey2-play-20261017/README.md).
 
+## 18 October: native Maniac/Zak engine fidelity (all four families)
+
+- Classic Maniac continues through Script 174 after a genuine boot-to-doorbell route. Native closest-query edges/ties and v1/v2 actor-approach units are implemented; no actor/room workaround.
+- Native darkness, flashlight geometry/defaults and dark actor palettes are rendered in Play, room previews and thumbnails. Four actual-window bitmap comparisons and both Zak moving beams pass; captures inspected. Version rules preserve later-family behavior.
+- V1 costume changes now retain dynamic palettes. ZakClassic context evidence includes early boss palette 0, later 7, variable writers and alternate actors; the 24-derived/11-estimate card table stays Partial.
+- Two previously capped starts complete per Zak edition (646/907 frames). Three retained caps are classified native ticket-state waits or the terminal Escape/restart loop; no prerequisites/input fabricated. Cutscenes stays Partial. Matrix regeneration passes three checks; final integrated validation is in the [checkpoint](checkpoints/20261018-Fidelity-ManiacZak.md).
+- Final validation against master `9430cb5`: **1286 passed, zero failed, five skipped** (7m37s); build zero warnings/errors; 65 integrated focused checks, three matrix checks and four actual-window processes passed. Maniac battery Use-with insertion remains unresolved after two retained attempts; native acquisition succeeds, no successful battery beam is claimed.
+
+## 18 October: explicit Maniac/Zak inventory status and undo (S8, all four families)
+
+- Game Status shows held inventory across the source-established playable characters, with explicit reassignment, Apply/Cancel and guarded Undo. The window pauses Play and restores its prior state. Status None → Full for this bounded editor; README/REQUIREMENTS matrices regenerated. No new items, puzzle flags, party changes or actor placement edits.
+- Native party bindings/player ranges and reached actor names supply identities per edition. Ownership-only writes retain slots, source room/code, state/classes and unrelated session values. Opaque session/frame/signature/revision tokens reject stale or cross-session edits; any game frame invalidates Undo. Choices carry explicit attribution and are not played scenes.
+- Twelve family tests and 39 integrated focused checks pass; all four real-window Apply/Undo/Cancel routes pass with inspected captures and prior pause-state restoration. A native-slot regression fixes the initial false refusal on Zak's resident special handlers without allowing real foreground actions. Failed guard/config/display checks are retained. Existing visual, sound/timing, walking, costume and alternate-copy limits remain.
+- Proposed R-12.7–R-12.10 are separate. [Checkpoint](checkpoints/20261018-S8-ManiacZak.md) and [integration evidence](../.verification/maniaczak-state-20261018/README.md) hold exact commands, final build/suite numbers and family links.
+- Final validation against master `cb17c44`: 1240 passed, zero failed, five skipped; solution build zero warnings/errors; three matrix checks and all four real-window checks passed.
+
+## 18 October: bounded Maniac/Zak edition checks and native Spanish font (S9, all four families)
+
+- Content inventory finds one local copy per family. Available-copy checks pass; additional-language/revision/demo comparisons are blocked by missing data. Classic/enhanced are separate families. README/REQUIREMENTS edition notes are explicit; feature levels remain unchanged and matrix checks pass.
+- The supplied enhanced Spanish executable provides its actual font through a reviewed descriptor and source-backed decoding. All 128 text slots pass (127 drawable glyphs and the existing marker suppression), correcting 11 localized glyphs; real-window TV text displays `músicos y diseñadores`. Missing/unreviewed executables retain the previous fallback. The rejected raw-slice attempt was reverted and its failed evidence retained. No font/executable asset is shipped.
+- Two obsolete v1/v2 detection notes and Maniac's documented classic dialect are corrected. Independent review found no actionable issue. Existing original-game visual/timing, darkness/flashlight, walking, Classic Maniac Script 174 and Zak estimate/frame-bound limits remain open; no ScummVM executable, S8, catalog or seed work.
+- [Checkpoint](checkpoints/20261018-S9-ManiacZak.md) and [integration record](../.verification/maniaczak-editions-20261018/README.md) link family records, exact commands and final validation.
+- Final validation: 1227 passed, zero failed, five skipped; solution build zero warnings/errors; three matrix checks and the targeted real-window font check pass.
+
 ## 18 October: Monkey Island CD lists its cutscenes from its scripts and plays them (S7, MonkeyCd)
 
 - The shared scan reads the CD's v5 resource file (through its disc image) unchanged: 286 triggers, 160 entries (62 scenes), 101 begin from a fresh start; titles use the CD's own verb names after the boot (2 Open … 8 Look at, 0x0A Talk to, 0x0B Walk to); `verb 0x50` and `verb 0x3D` stay raw because the game names neither.

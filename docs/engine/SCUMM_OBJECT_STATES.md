@@ -28,6 +28,14 @@ For a game with no game-specific session (Indiana Jones and the Last Crusade EGA
 - **A room the game only loads under pseudo room numbers** (see [pseudo rooms](SCUMM_SCRIPT_MAP.md)) is visited under the number a decoded `loadRoomWithEgo` into it uses (arrivals from the room's own code, which lead from one pseudo room to another, count only when no other exists); without such an arrival, under one of the numbers the game's `pseudoRoom` instructions give it (seeded, labelled). Visited under its own number its entry script would draw none of its layouts.
 - An arrival from the room's own code is never the first visit when another arrival exists (a first visit comes from elsewhere).
 
+## v1/v2 held inventory and explicit status choices (S8, 18 October 2026)
+
+Native `object.cpp::putOwner` stores ownership separately; `script_v2.cpp::o2_actorOps` suboperation 3 retains an actor name. Reached names are now retained by the v1/v2 executor. In the status reader, native input-script assignments to ego followed by `actorFollowCamera` establish selected-party variable bindings. Where no such bindings exist, the source-written engine player range supplies candidates. Own-edition facts belong in the Maniac/Zak script maps; an unresolved identity is not guessed.
+
+Native `script_v2.cpp::o2_doSentence` distinguishes ordinary object slots from special (`0xFD`) and background/special (`0xFA`) handlers. A resident special handler can loop while the player has control; it is not by itself an unfinished player action. The status guard rejects executing code, input/sentence work, ordinary foreground object slots, queued input, movement, dialogue and cutscenes. Source reviewed 18 October 2026; the slot-lifecycle regression and retained failed all-slot guard are in the [S8 record](../../.verification/maniaczak-state-20261018/README.md).
+
+Proposed R-12.7–R-12.10 define the explicit editor policy: change only an already-held item's owner among source-established playable characters, preserving its native slot and retained room/code, state/classes, other items, actors and words. This is the owner-table component, not a native Give, pickup, inventory callback or puzzle outcome. It never supplies hidden scene prerequisites. Apply/Undo are attributed as choices; session identity, frame generation, exact relevant signature and revision protect atomic batches and conservative undo. A playback frame invalidates undo, so the window pauses Play while open. No item creation or arbitrary flag/state editor is included.
+
 ## Historical old-v3 format evidence
 
 The following byte offsets, object IDs and counts belong to the supplied Spanish EGA audits of 27 September. They remain source evidence for that edition, not a fresh English/VGA inventory.
@@ -61,6 +69,14 @@ Engine sources: ScummVM `engines/scumm/object.cpp`, `script_v2.cpp`, `room.cpp`,
 - In `33.LFL`, the entry script starts at decoded offset 14,750. At 14,837 it tests bit variable `0x8D81`. One branch draws objects 551–554; the other draws 547–550. Later bytecode draws 545 and 546, whose exact-size peers are cleared by `drawObject`. This explains how the former manual arrangement could arise, but the branch value and the point at which the room should be sampled still depend on game execution. The script also starts other scripts and has multiple frame breaks. A list of image IDs alone is not a verified first-visit snapshot.
 - In `28.LFL`, the entry script starts at decoded offset 31,388. Its early loops clear 483–489 and 476–482, then set 490–496 to state 1. Later drawing sequences for 483–489 and 476–482 are interspersed with actor commands and frame breaks. Thus 490–496 are a script-proven coherent early frame, but the stable post-entry view still requires running the remaining sequence. Selecting one image per black area would mix these sequences without evidence that they coexist at the same time.
 - All 76 indexed rooms have embedded entry scripts. The sampled room objects in the global index start at state zero. A room-wide first-visit view therefore requires following script execution and persistent game variables; it cannot be recovered by initializing every object from the index or by filling black pixels.
+
+## DOS SCUMM v1/v2 lighting and actor palette persistence (18 October 2026)
+
+Source: ScummVM `gfx.cpp::drawFlashlight`, `scumm.cpp` v2 constructor/render order, `costume.cpp::ClassicCostumeRenderer::setPalette` / `byleRLEDecode_C64`, and `actor.cpp::Actor::setActorCostume`, read 18 October 2026. [Lighting record](../../.verification/maniacenhanced-fidelity-20261018/README.md) pins fetched source hashes; [palette record](../../.verification/zakclassic-fidelity-20261018/README.md) retains reached contexts. These statements apply to DOS v1/v2, not later renderers.
+
+- Room light bit 2 exposes the composed background/objects; without it the front background is black. Bit 4 restores a pointer-centered flashlight window from that composition. Snap, viewport clipping and asymmetric nibble corner masks follow separate native v1/v2 tables. Default dimensions are 6x4 eight-pixel strips, inherited by v1; reached script instructions can resize them.
+- Room colour mapping precedes lighting. Actors are drawn afterward, with native colour mode bit 8. V1's dark pixel codes use its native colour-11 remap/black; v2 uses gray 8 with the source black/entry-12 behavior. Actor geometry, ownership and story state are not changed by rendering. A full room preview and live Play use the same composition and apply the display palette once.
+- V1 actor costume changes retain every dynamic palette slot. V2 and the existing later old-bundle path retain their identity reset. A costume may therefore appear in multiple native contexts with different colours; a reached context does not turn a global costume card estimate into a universal palette rule.
 
 ## Sources
 

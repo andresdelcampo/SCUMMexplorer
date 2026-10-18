@@ -1,0 +1,36 @@
+﻿costume 1: suit=13 basis=Script alternatives=5 Script 108 @00D8 sets costume 1 on actor 1; palette 13 set @00EC
+costume 2: suit=2 basis=Script alternatives=1 Script 102 @0164 sets costume 2 on actor 10; palette 2 set @0168
+costume 3: suit=3 basis=Script alternatives=0 Script 102 @0373 sets costume 3 on actor 11; palette 3 set @037C
+costume 4: suit=8 basis=Estimate alternatives=0 the palette in effect for actor 4 when it wears this costume depends on the run; 8 is the first value the scripts set for that actor's palette; possible writes (actor 4: constants [8], variable writes [var[0x0C4] at Script 05 @000F; var[0x0C4] at Script 108 @00FC; var[0x0C4] at Room 26 / Object 66 / Fallback verb @003C]) are not proof of this costume's reached colours
+costume 5: suit=14 basis=Estimate alternatives=0 the palette in effect for actor 1 when it wears this costume depends on the run; 14 is what the boot script leaves in that actor's palette; possible writes (actor 1: constants [0, 14, 13], variable writes []; actor 5: constants [11], variable writes []) are not proof of this costume's reached colours
+costume 6: suit=4 basis=Estimate alternatives=0 the palette in effect for actor 2 when it wears this costume depends on the run; 4 is the first value the scripts set for that actor's palette; possible writes (actor 2: constants [4], variable writes []; actor 6: constants [6], variable writes []) are not proof of this costume's reached colours
+costume 7: suit=3 basis=Estimate alternatives=0 the palette in effect for actor 3 when it wears this costume depends on the run; 3 is the first value the scripts set for that actor's palette; possible writes (actor 3: constants [3], variable writes []; actor 4: constants [8], variable writes [var[0x0C4] at Script 05 @000F; var[0x0C4] at Script 108 @00FC; var[0x0C4] at Room 26 / Object 66 / Fallback verb @003C]; actor 7: constants [7], variable writes []) are not proof of this costume's reached colours
+costume 8: suit=12 basis=Estimate alternatives=0 the palette in effect for actor 8 when it wears this costume depends on the run; 12 is the first value the scripts set for that actor's palette; possible writes (actor 8: constants [12, 2], variable writes []) are not proof of this costume's reached colours
+costume 9: suit=14 basis=Estimate alternatives=0 the palette in effect for actor 1 when it wears this costume depends on the run; 14 is what the boot script leaves in that actor's palette; possible writes (actor 1: constants [0, 14, 13], variable writes []; actor 9: constants [3], variable writes []) are not proof of this costume's reached colours
+costume 10: suit=9 basis=Script alternatives=0 Room 40 / Entry script @002C sets costume 10 on actor 11; palette 9 set @0030
+costume 11: suit=3 basis=Script alternatives=0 Script 108 @008C sets costume 11 on actor 9; palette 3 set @0090
+costume 12: suit=11 basis=Estimate alternatives=0 the palette in effect for actor 5 when it wears this costume depends on the run; 11 is the first value the scripts set for that actor's palette; possible writes (actor 5: constants [11], variable writes []; actor 12: constants [9, 14, 12, 2, 1], variable writes []) are not proof of this costume's reached colours
+costume 13: suit=11 basis=Estimate alternatives=0 the palette in effect for actor 5 when it wears this costume depends on the run; 11 is the first value the scripts set for that actor's palette; possible writes (actor 5: constants [11], variable writes []) are not proof of this costume's reached colours
+costume 14: suit=6 basis=Estimate alternatives=0 the palette in effect for actor 6 when it wears this costume depends on the run; 6 is the first value the scripts set for that actor's palette; possible writes (actor 6: constants [6], variable writes []) are not proof of this costume's reached colours
+costume 15: suit=6 basis=Estimate alternatives=0 the palette in effect for actor 6 when it wears this costume depends on the run; 6 is the first value the scripts set for that actor's palette; possible writes (actor 6: constants [6], variable writes []) are not proof of this costume's reached colours
+costume 16: suit=1 basis=Script alternatives=0 Room 07 / Entry script @002D sets costume 16 on actor 10; palette 1 set @0035
+costume 17: suit=1 basis=Script alternatives=0 Script 39 @002B sets costume 17 on actor 10; palette 1 set @0023
+costume 18: suit=9 basis=Script alternatives=0 Script 39 @010C sets costume 18 on actor 12; palette 9 set @0033
+costume 19: suit=2 basis=Script alternatives=0 Room 40 / Entry script @0056 sets costume 19 on actor 12; palette 2 set @005A
+costume 20: suit=12 basis=Script alternatives=1 Room 26 / Entry script @000C sets costume 20 on actor 12; palette 12 set @0008
+costume 21: suit=9 basis=Script alternatives=0 Room 38 / Entry script @000E sets costume 21 on actor var[0x042]; palette 9 set @0012
+costume 22: suit=1 basis=Script alternatives=0 Room 19 / Entry script @0013 sets costume 22 on actor 10; palette 1 set @000B
+costume 23: suit=9 basis=Script alternatives=0 Room 08 / Entry script @016F sets costume 23 on actor 10; palette 9 set @0173
+costume 24: suit=9 basis=Script alternatives=0 Room 44 / Entry script @003B sets costume 24 on actor 10; palette 9 set @0043
+costume 25: suit=9 basis=Script alternatives=0 Room 08 / Entry script @01F5 sets costume 25 on actor 10; palette 9 set @01F9
+costume 26: suit=12 basis=Script alternatives=2 Script 108 @007C sets costume 26 on actor 8; palette 12 set @0080
+costume 27: suit=1 basis=Script alternatives=0 Room 10 / Object 240 / Verb 0xFD @003B sets costume 27 on actor 11; palette 1 set @003F
+costume 28: suit=7 basis=Script alternatives=2 Script 108 @00E8 sets costume 28 on actor 7; palette 7 set @0100
+costume 29: suit=14 basis=Script alternatives=0 Room 35 / Entry script @0035 sets costume 29 on actor 10; palette 14 set @002D
+costume 30: suit=14 basis=Script alternatives=0 Script 01 @0011 sets costume 30 on actor 1; palette 14 set @010C
+costume 31: suit=7 basis=Script alternatives=0 Script 01 @0104 sets costume 31 on actor 10; palette 7 set @0108
+costume 32: suit=7 basis=Estimate alternatives=0 the palette in effect for actor 10 when it wears this costume depends on the run; 7 is what the boot script leaves in that actor's palette; possible writes (actor 10: constants [7, 1, 2, 9, 4, 14], variable writes []) are not proof of this costume's reached colours
+costume 33: suit=7 basis=Script alternatives=0 Script 99 @0025 sets costume 33 on actor 10; palette 7 set @0029
+costume 34: suit=7 basis=Script alternatives=0 Room 02 / Object 115 / Verb 0xFD @0013 sets costume 34 on actor 10; palette 7 set @0017
+costume 35: suit=1 basis=Script alternatives=0 Room 44 / Entry script @0099 sets costume 35 on actor 12; palette 1 set @0090
+SETTINGS=111 VARIABLE=19

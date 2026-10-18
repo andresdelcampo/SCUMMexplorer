@@ -1,0 +1,10 @@
+INVENTORY mmansion ega en: ManiacClassic, V1, English, Maniac Mansion classic, rooms=52
+INVENTORY mmansionE ega es: ManiacEnhanced, V2, Spanish, Maniac Mansion enhanced, rooms=53
+Enhanced editions available=1; classic is a different family.
+DATA globals=169; room45 fingerprint=AF22D5CC9774D55BA73F8B092372BB5CE23624F00A93860C55298559D5606E23
+EXE AF7A7F667789E4FCA76F4C195BB2996F622D50E796E6CF01E64E4D0A1E0D477A; font 098B285F43AEC7C97CA2C05D07D31365D2C8371304645AFFC20FEBCE7B12453D
+RENDER previous built-in: native text parity=117/128 (slot64 marker suppressed); differing slots=[60,61,62,91,92,93,95,123,124,125,126]
+RENDER current session: native text parity=128/128 (slot64 marker suppressed); differing slots=[]
+TEXT readable label: Qué es el teléfono (raw script bytes retained)
+PREVIEW own-data scan=59/27; word15=Qué es; no whole-census rerun
+Alternate enhanced edition comparisons: BLOCKED, no second local enhanced copy.

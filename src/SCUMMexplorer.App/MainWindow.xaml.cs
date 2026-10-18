@@ -267,19 +267,20 @@ public partial class MainWindow : Window
     }, _game, () => IsAdvancedMode, _game?.Id == GameId.LoomVga ? null : LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
 
 
-    /// <summary>Game Status exists only for a loaded LOOM game with a live session; every other state hides it.</summary>
-    private bool GameStatusAvailable => _game is { Id: GameId.Loom or GameId.LoomVga } && _session is not null;
+    /// <summary>Each status editor is offered only for a loaded game with its matching live session.</summary>
+    private bool GameStatusAvailable => (_game is { Id: GameId.Loom or GameId.LoomVga } && _session is not null) || InventoryStatusAvailable;
 
     private void UpdateGameStatusButton()
     {
         GameStatusButton.Visibility = GameStatusAvailable ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = GameStatusAvailable;
+        GameStatusButton.ToolTip = InventoryStatusAvailable ? "Inspect held items and make explicit inventory choices." : "Inspect or explicitly edit this exploration session's staff, notes and drafts.";
     }
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {
         if (!GameStatusAvailable) { UpdateGameStatusButton(); return; }
-        try { BuildGameStatusWindow().ShowDialog(); }
+        try { if (InventoryStatusAvailable) ShowInventoryStatus(); else BuildGameStatusWindow().ShowDialog(); }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NullReferenceException)
         {
             MessageBox.Show(this, ex.Message, "Game Status could not open", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1507,7 +1508,9 @@ public partial class MainWindow : Window
         var notFollowed = scene.Snapshot.Uncertainties.Count(item => item.Contains("not modeled", StringComparison.Ordinal) || item.Contains("depends on", StringComparison.Ordinal) ||
                                                                       item.Contains("could not", StringComparison.Ordinal) || item.Contains("unknown", StringComparison.Ordinal));
         return string.Join(" ", scene.Notes) + (scene.Snapshot.Picks is { Count: > 0 } ? $" Random values the scripts asked for were picked by the explorer ({scene.Snapshot.Picks.Count} seeded picks)." : "") +
-               (scene.RoomLit ? "" : " The game starts this room dark (VAR_CURRENT_LIGHTS without room lights); it is shown lit.") +
+               (scene.RoomLit ? "" : scene.EngineVersion is 1 or 2
+                   ? " The game's native darkness and flashlight state are rendered."
+                   : " The game starts this room dark (VAR_CURRENT_LIGHTS without room lights); it is shown lit.") +
                (notFollowed > 0 ? $" {notFollowed} things the run could not follow are in the session notes." : "");
     }
 
@@ -1710,7 +1713,7 @@ public partial class MainWindow : Window
         var cameraX = SessionModeToggle.IsChecked == true && _session is not null
             ? _session.CameraX ?? 0
             : _pendingCameraX ?? 0;
-        SetRoomCardThumbnail(resource, CreateRoomCardBitmap(room, _objectSelection.Compose(room), cameraX, DisplayPalette(room)));
+        SetRoomCardThumbnail(resource, CreateRoomCardBitmap(room, ComposeRoomPreview(room), cameraX, DisplayPalette(room)));
     }
 
     private void SetRoomCardThumbnail(GameResource resource, BitmapSource bitmap)
@@ -1720,7 +1723,7 @@ public partial class MainWindow : Window
             var liveCameraX = SessionModeToggle.IsChecked == true && _session is not null
                 ? _session.CameraX ?? 0
                 : _pendingCameraX ?? 0;
-            bitmap = CreateRoomCardBitmap(liveRoom, _objectSelection.Compose(liveRoom), liveCameraX, DisplayPalette(liveRoom));
+            bitmap = CreateRoomCardBitmap(liveRoom, ComposeRoomPreview(liveRoom), liveCameraX, DisplayPalette(liveRoom));
         }
         var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
         if (card is null) return;
@@ -3655,7 +3658,7 @@ public partial class MainWindow : Window
         var room = _currentRoom;
         // SCUMM repaints active objects in reverse directory order, then
         // paints queued drawObject calls on top in call order.
-        var pixels = _objectSelection.Compose(room);
+        var pixels = ComposeRoomPreview(room);
         var depthMask = room.DepthMask;
         RoomMaskToggle.IsEnabled = depthMask is not null;
         RoomMaskToggle.ToolTip = depthMask is null
@@ -4798,7 +4801,8 @@ public partial class MainWindow : Window
     private IReadOnlyList<uint> DisplayPalette(RoomImage room)
     {
         // A browsed first visit: the colour table and the shadow palette the game's scripts left (the room picture and its objects; actors use the shadow palette only).
-        if (_browsedScene is { } scene && ReferenceEquals(scene.Room, room)) return scene.BackgroundPalette();
+        if (_browsedScene is { } scene && ReferenceEquals(scene.Room, room))
+            return scene.EngineVersion is 1 or 2 ? scene.DisplayPalette() : scene.BackgroundPalette();
         if (_session is not { } session || room.Palette.Count > 256) return room.Palette;
         return DisplayPalette(room, session.ShadowPalette);
     }

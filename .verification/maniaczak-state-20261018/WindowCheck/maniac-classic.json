@@ -1,0 +1,171 @@
+[
+    {
+        "Op":  "room",
+        "Value":  45
+    },
+    {
+        "Op":  "save",
+        "Text":  "01-party-choice"
+    },
+    {
+        "Op":  "roomclick",
+        "X":  76,
+        "Y":  104
+    },
+    {
+        "Op":  "frames",
+        "Count":  100
+    },
+    {
+        "Op":  "roomclick",
+        "X":  196,
+        "Y":  104
+    },
+    {
+        "Op":  "frames",
+        "Count":  100
+    },
+    {
+        "Op":  "roomclick",
+        "X":  292,
+        "Y":  60
+    },
+    {
+        "Op":  "frames",
+        "Count":  100
+    },
+    {
+        "Op":  "untilroom",
+        "Value":  44,
+        "Count":  5000
+    },
+    {
+        "Op":  "untilskip",
+        "Count":  1000
+    },
+    {
+        "Op":  "save",
+        "Text":  "02-override"
+    },
+    {
+        "Op":  "escape"
+    },
+    {
+        "Op":  "untilcontrol",
+        "Count":  2000
+    },
+    {
+        "Op":  "roomclick",
+        "X":  8,
+        "Y":  120
+    },
+    {
+        "Op":  "frames",
+        "Count":  500
+    },
+    {
+        "Op":  "room",
+        "Value":  1
+    },
+    {
+        "Op":  "click",
+        "X":  8,
+        "Y":  136
+    },
+    {
+        "Op":  "frames",
+        "Count":  200
+    },
+    {
+        "Op":  "click",
+        "X":  8,
+        "Y":  136
+    },
+    {
+        "Op":  "frames",
+        "Count":  200
+    },
+    {
+        "Op":  "click",
+        "X":  8,
+        "Y":  136
+    },
+    {
+        "Op":  "frames",
+        "Count":  200
+    },
+    {
+        "Op":  "click",
+        "X":  8,
+        "Y":  136
+    },
+    {
+        "Op":  "frames",
+        "Count":  200
+    },
+    {
+        "Op":  "text",
+        "Text":  "d"
+    },
+    {
+        "Op":  "frames",
+        "Count":  1
+    },
+    {
+        "Op":  "click",
+        "X":  112,
+        "Y":  108
+    },
+    {
+        "Op":  "frames",
+        "Count":  1
+    },
+    {
+        "Op":  "save",
+        "Text":  "03-sentence-112"
+    },
+    {
+        "Op":  "click",
+        "X":  112,
+        "Y":  108
+    },
+    {
+        "Op":  "frames",
+        "Count":  500
+    },
+    {
+        "Op":  "text",
+        "Text":  "d"
+    },
+    {
+        "Op":  "frames",
+        "Count":  1
+    },
+    {
+        "Op":  "click",
+        "X":  152,
+        "Y":  108
+    },
+    {
+        "Op":  "frames",
+        "Count":  1
+    },
+    {
+        "Op":  "save",
+        "Text":  "03-sentence-152"
+    },
+    {
+        "Op":  "click",
+        "X":  152,
+        "Y":  108
+    },
+    {
+        "Op":  "frames",
+        "Count":  500
+    },
+    {
+        "Op":  "owner",
+        "X":  55,
+        "Value":  3
+    }
+]

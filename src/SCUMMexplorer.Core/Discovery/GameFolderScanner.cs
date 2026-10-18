@@ -170,9 +170,9 @@ public sealed class GameFolderScanner
             GameId.IndianaJones3 =>
                 "Indiana Jones and the Last Crusade files found. The SCUMM version is not confirmed because no supported old-v3 index was parsed.",
             _ when isV1 =>
-                "A classic SCUMM v1 game (fixed-size index in 00.LFL): room backgrounds and costumes are shown; objects, scripts and sounds are not read for this game yet.",
+                "A classic SCUMM v1 game: the fixed-size 00.LFL index and its room, costume, script and sound resource directories were read.",
             _ when indexWasParsed && isV2 =>
-                "An enhanced SCUMM v2 game (the 00.LFL index lists one byte per object): room backgrounds and costumes are shown; objects, scripts and sounds are not read for this game yet.",
+                "An enhanced SCUMM v2 game: the 00.LFL index (one byte per object) and its room, costume, script and sound resource directories were read.",
             _ when indexWasParsed =>
                 "The old-v3 SCUMM index in 00.LFL was parsed; game identity and resource-specific support are not confirmed.",
             _ => "Folder contents found. Game and SCUMM version are not confirmed yet."

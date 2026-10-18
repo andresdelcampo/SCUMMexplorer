@@ -1,0 +1,87 @@
+﻿=== zakE ega en 2/0/0 ===
+frame 0 room 2 cutscene False begun 1 havemsg 0
+PENDING Script 126 offset +0004 delay 600 freeze 0
+frame 1000 room 16 cutscene True begun 2 havemsg 0
+PENDING Script 126 offset +0048 delay  freeze 0
+frame 2000 room 16 cutscene True begun 2 havemsg 0
+PENDING Script 126 offset +0048 delay  freeze 0
+frame 3000 room 16 cutscene True begun 2 havemsg 0
+PENDING Script 126 offset +0048 delay  freeze 0
+frame 4000 room 16 cutscene True begun 2 havemsg 0
+PENDING Script 126 offset +0048 delay  freeze 0
+frame 5000 room 16 cutscene True begun 2 havemsg 0
+PENDING Script 126 offset +0048 delay  freeze 0
+frame 6000 room 16 cutscene True begun 2 havemsg 0
+PENDING Script 126 offset +0048 delay  freeze 0
+TRACE cutscene at Script 126 +0x0004 (native v1/v2 scope)
+=== zakE ega en 11/0/0 ===
+frame 0 room 11 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +0018 delay 60 freeze 0
+frame 1000 room 1 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +01C5 delay  freeze 0
+frame 2000 room 1 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +01C5 delay  freeze 0
+frame 3000 room 1 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +01C5 delay  freeze 0
+frame 4000 room 1 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +01C5 delay  freeze 0
+frame 5000 room 1 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +01C5 delay  freeze 0
+frame 6000 room 1 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +01C5 delay  freeze 0
+TRACE cutscene at Script 104 +0x0003 (native v1/v2 scope)
+=== zakE ega en 11/249/1 ===
+frame 0 room 11 cutscene True begun 2 havemsg 0
+PENDING Script 104 offset +0018 delay 60 freeze 0
+frame 1000 room 11 cutscene True begun 3 havemsg 0
+PENDING Script 104 offset +003F delay  freeze 1
+PENDING Script 105 offset +005E delay  freeze 0
+frame 2000 room 11 cutscene True begun 3 havemsg 0
+PENDING Script 104 offset +003F delay  freeze 1
+PENDING Script 105 offset +005E delay  freeze 0
+frame 3000 room 11 cutscene True begun 3 havemsg 0
+PENDING Script 104 offset +003F delay  freeze 1
+PENDING Script 105 offset +005E delay  freeze 0
+frame 4000 room 11 cutscene True begun 3 havemsg 0
+PENDING Script 104 offset +003F delay  freeze 1
+PENDING Script 105 offset +005E delay  freeze 0
+frame 5000 room 11 cutscene True begun 3 havemsg 0
+PENDING Script 104 offset +003F delay  freeze 1
+PENDING Script 105 offset +005E delay  freeze 0
+frame 6000 room 11 cutscene True begun 3 havemsg 0
+PENDING Script 104 offset +003F delay  freeze 1
+PENDING Script 105 offset +005E delay  freeze 0
+TRACE cutscene at Script 104 +0x0003 (native v1/v2 scope)
+TRACE cutscene at Script 105 +0x0000 (native v1/v2 scope)
+=== zakE ega en 14/55/11 ===
+frame 0 room 14 cutscene True begun 2 havemsg 0
+frame 1000 room 16 cutscene True begun 3 havemsg 0
+PENDING Script 96 offset +018A delay  freeze 0
+frame 2000 room 16 cutscene True begun 3 havemsg 0
+PENDING Script 96 offset +018A delay  freeze 0
+frame 3000 room 16 cutscene True begun 3 havemsg 0
+PENDING Script 96 offset +018A delay  freeze 0
+frame 4000 room 16 cutscene True begun 3 havemsg 0
+PENDING Script 96 offset +018A delay  freeze 0
+frame 5000 room 16 cutscene True begun 3 havemsg 0
+PENDING Script 96 offset +018A delay  freeze 0
+frame 6000 room 16 cutscene True begun 3 havemsg 0
+PENDING Script 96 offset +018A delay  freeze 0
+TRACE cutscene at Script 67 +0x01A1 (native v1/v2 scope)
+TRACE endCutscene follows ego at x = 160 (estimate)
+TRACE cutscene at Script 96 +0x0000 (native v1/v2 scope)
+=== zakE ega en 23/410/253 ===
+frame 0 room 23 cutscene False begun 1 havemsg 0
+frame 1000 room 23 cutscene True begun 2 havemsg 1
+PENDING Script 78 offset +01EF delay 87 freeze 0
+frame 2000 room 23 cutscene True begun 2 havemsg 1
+PENDING Script 78 offset +01EF delay 291 freeze 0
+frame 3000 room 23 cutscene True begun 2 havemsg 1
+PENDING Script 78 offset +0211 delay 194 freeze 0
+frame 4000 room 23 cutscene True begun 2 havemsg 1
+PENDING Script 78 offset +01EF delay 97 freeze 0
+frame 5000 room 23 cutscene True begun 2 havemsg 0
+PENDING Script 78 offset +0211 delay 0 freeze 0
+frame 6000 room 23 cutscene True begun 2 havemsg 1
+PENDING Script 78 offset +0211 delay 204 freeze 0
+TRACE cutscene at Script 78 +0x0000 (native v1/v2 scope)

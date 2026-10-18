@@ -129,6 +129,7 @@ public partial class MainWindow
         PlayScreenImage.Visibility = Visibility.Visible;
         ObjectsNote.Text = "";
         ShowPlayFrame();
+        UpdateGameStatusButton();
         PlayScreenImage.Focus();
         UpdatePlaybackControls();
     }
@@ -142,6 +143,7 @@ public partial class MainWindow
         PlayScreenImage.Visibility = Visibility.Collapsed;
         PlayScreenImage.Cursor = null;
         RoomDisplayGroup.Visibility = Visibility.Visible;
+        UpdateGameStatusButton();
         if (PlayCutscenes) UpdatePlayCutsceneControls();
     }
 

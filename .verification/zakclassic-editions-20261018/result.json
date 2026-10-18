@@ -1,0 +1,28 @@
+{
+  "Family": "ZakClassic",
+  "inventory": [
+    {
+      "Folder": "D:/Juegos/Lucas\\zak ega en",
+      "Title": "Zak McKracken and the Alien Mindbenders",
+      "Edition": "English, Zak McKracken classic",
+      "Version": "V1"
+    }
+  ],
+  "IndexSha256": "E2EA0E3CD72C412665458CFF8C5202BBB7AE2322EDE0D35190485D875CA1356F",
+  "Edition": "English, Zak McKracken classic",
+  "Version": "V1",
+  "Dialect": "V1",
+  "DataSource": "ScummV1DataSource",
+  "RoomsRead": 58,
+  "Resources": {
+    "Other": 1,
+    "Room": 58,
+    "Costume": 35,
+    "Script": 151,
+    "Sound": 110,
+    "Executable": 1
+  },
+  "FirstSceneText": "0xFF, [text \u0022Meanwhile, back in the secret room^\u0022]",
+  "ApostrophePixelSha256": "17C09F4A2A5CF61D755A14C1D921C6F341359E553CF447BC2BFF459E96944BD1",
+  "AlternateEditionCoverage": "Blocked: no alternate local family copy; Enhanced is a separate family"
+}

@@ -24,17 +24,18 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
         new(Images, Snapshot.ObjectStates, Snapshot.ObjectPositions, Records, Room, IndexedStates, Snapshot.DrawOrder, IntrinsicStateMask);
 
     /// <summary>The room's pixels with the objects the scripts made visible, drawn through the room colour table (<c>roomColorLegacy</c>).</summary>
-    public byte[] Compose()
+    public byte[] Compose(RoomObjectSelection? selection = null)
     {
-        var pixels = Selection.Compose(Room);
+        var pixels = (selection ?? Selection).Compose(Room);
         var map = State.RoomColors;
         for (var i = 0; i < pixels.Length; i++) pixels[i] = map[pixels[i]];
-        return pixels;
+        return ScummV2Lighting.Compose(pixels, Room.Width, Room.Height, State.Lights, State.Flashlight, EngineVersion,
+            State.RoomPointer, State.ViewLeft, State.ViewWidth, State.ViewHeight);
     }
 
     /// <summary>The actors the scripts left in the room, as an indexed layer the size of the room.</summary>
     public ScummActorLayer ActorLayer() => ScummActorRenderer.Render(State.Actors, RoomId, Room.Width, Room.Height, Costumes,
-        Selection.ComposeDepthMask(Room), State.WalkBoxes, Snapshot.ObjectClasses, Room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray(), EngineVersion);
+        Selection.ComposeDepthMask(Room), State.WalkBoxes, Snapshot.ObjectClasses, Room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray(), EngineVersion, State.Lights);
 
     /// <summary>The objects with the actors over them.</summary>
     public byte[] ComposeWithActors()

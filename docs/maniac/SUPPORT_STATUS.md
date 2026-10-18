@@ -1,5 +1,13 @@
 # Maniac Mansion (classic v1) support status
 
+## Engine fidelity — 18 October 2026 (current)
+
+Classic Script 174's native closest-object/actor query is implemented. The genuine boot/party/key/Push-doorbell route continues another 3000 frames through Ed's outdoor response and return, retaining Dave's key and player control. Source-native query boundaries, ties and approach units have regressions. [Classic record](../../.verification/maniacclassic-fidelity-20261018/README.md).
+
+Both editions now render native room darkness, actor dark colours and flashlight geometry/defaults. Four-family source checks and actual-window comparisons supersede the earlier shown-lit limitation; Maniac Room 5 is black behind native gray actors. The battery prerequisite remains enforced, with its final source-action result in the [lighting record](../../.verification/maniacenhanced-fidelity-20261018/README.md). Direct exploration preparation is not an earned puzzle route. Original-game picture/timing acceptance, walking metric, other parties/puzzles and unavailable same-family releases remain open.
+
+Registry levels are unchanged: bounded Play/Objects/Status already Full, Cutscenes Partial pending a hand-validated catalog. Classic costume acceptance is retained. Decision: implement version rules from source and retain unresolved story state; no automatic battery/party/actor changes, room fills, authored catalog or seed. Revert the linked fidelity commits to undo. [Integration checkpoint](../checkpoints/20261018-Fidelity-ManiacZak.md) records final validation and handoff; dated sections below retain their historical scope.
+
 Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root) | Last updated: 2026-10-18 | Owner: Maniac/Zak orchestrator
 
 | Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
@@ -11,12 +19,12 @@ Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root
 | S5 Objects | source preview implemented; visual acceptance open | Objects ◐ | .verification/maniacclassic-objects-20261017 | All 52 rooms open through the reviewed party recipe; native object flags and live classic actors. Original-game picture comparison was prohibited; six native coin-slot detector findings remain recorded. |
 | S6 Play | done (bounded native route) | Play/Objects Full | .verification/maniacclassic-play-20261017 | Genuine party choices, override skip, walked exit, composed sentence, mat/key pickup, rendered inventory and inventory selection; original-game picture/timing acceptance remains open. |
 | S7 Cutscenes | done (bounded source-derived list) | Cutscenes Partial; parent owns matrix | .verification/maniacclassic-cutscenes-20261018 | 59 triggers/27 groups; six fresh starts begin; three source-attributed proofs and real-window actions. No complete-story or original-game fidelity claim. |
-| S8 State | not started | Status – | – | requested in a run: no |
-| S9 Editions | not started | – | – | |
+| S8 State | done (bounded inventory editor, both families) | Status Full | .verification/maniacclassic-state-20261018; .verification/maniacenhanced-state-20261018 | Genuine pickup, guarded Apply/Cancel/Undo and both actual-window checks pass; source-selected party only. |
+| S9 Editions | available-copy checks done; alternate releases blocked | unchanged | .verification/maniacclassic-editions-20261018 | One English classic copy; identity, native startup/play/scene and edition-boundary regressions pass. Enhanced is a separate family. |
 
 Blocked on: S5 original-game picture comparison is unperformed because this run prohibits launching ScummVM. Source-level comparisons and real-window captures do not substitute for that evidence.
-Next: S9 edition checks remain separate and unstarted; S8 is opt-in. Retain original-game visual limits and the bounded S7 distinction, including the doorbell continuation query. The selected party and direct scene starts do not establish a complete playthrough.
-Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/2`), not stored in the game files; lights-off colour 11 is not applied.
+Next: retain the clean fidelity checkpoint. Native inventory Use-with composition for acquired batteries/flashlight remains unresolved after two bounded approaches; distinguish input handling from reached action/story context before any fix. Alternate-release S9 comparison needs another same-family copy. Earlier original-game visual limits and state-gated S7 scenes remain open; no complete playthrough is established.
+Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/2`), not stored in the game files. Native lights-off colour behavior is now implemented; original-game visual comparison is still unperformed.
 
 ## Decision log
 
@@ -30,8 +38,32 @@ Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/
 | 2026-10-17 | S6 | How to check a player choice in a game without Talk to? | invent a dialogue / use the native party menu | The user chooses Syd/Bernard/Start through real input; proposed R-7.21 preserves the game's interface. Sentence, exit, pickup, displayed inventory and override skip remain required | revert the S6 proposal and its dependent route claims together |
 | 2026-10-17 | S6 | Classic and enhanced text fonts differ | reuse later external charsets / use the native built-in tables | Use ScummVM's 8-by-8 font data and the source-defined language substitutions; reviewed resource hashes select language, never folder names | revert the old-interface charset integration; keep the source evidence |
 | 2026-10-18 | S7 | No scenes named by the user | invent catalog entries / choose from the source scan | Three distinct source-scanned responses with observable lines and bounded returns; disclose the fingerprinted startup choices and retain the post-doorbell query gap | revert family S7 enablement and dependent preparation, preserving evidence |
+| 2026-10-18 | S9 | Only one release per Maniac family is local | Treat classic/enhanced as alternates / record missing data | Keep the families separate; check reference identity and compatibility boundaries, reuse bounded S6/S7 evidence and block unavailable alternate-release comparisons; cells unchanged | Add another same-family fixture and run only its plausible differences |
+| 2026-10-18 | S8 | Which characters and state edits add useful scope? | Every named actor and arbitrary flags / current-party held inventory | Derive party bindings from the edition's native ego-switch script; use executed names; permit only explicit ownership reassignment of already held items, preserving slot/code/state and supporting guarded Undo. This adds a cross-character view without inventing story progress | Revert proposed R-12.7–R-12.10 and the dependent dialog/API claims together |
 
 Facts about the game's scripts: [MANIAC_SCRIPT_MAP.md](MANIAC_SCRIPT_MAP.md).
+
+## ManiacClassic and ManiacEnhanced — S8 checkpoint, 18 October 2026
+
+The explicit S8 request adds a held-inventory view across the currently selected party and guarded owner reassignment. Each edition supplies its own actor names and native party-variable bindings; named NPCs and unselected kids are not eligible recipients. Missing names fail closed. Apply changes only ownership; Cancel discards the pending draft, and Undo restores the last batch while its session and state remain current. The window pauses playback; Undo is deliberately refused after any intervening frame. These are explicit exploration choices, not played scenes or a native Give action.
+
+Classic: three new state tests plus one family conformance row pass. The genuine S6 mat/key route reaches key 55 owned by Dave; the explicit edit moves it to Syd, and Undo restores Dave, retaining slot 0 and Room 1 source code. Guards reject room objects, named NPCs, unselected kids, mixed invalid/duplicate batches, stale views, reused undo, startup and queued input. Variables, object state/classes, other owners, actor state, room and scene count remain unchanged. The three tests also pass with the final shared attribution and running-action guard.
+
+Enhanced: three state tests pass. Its own native route reaches the held `llave` after 1553 frames and twelve delivered inputs; the same owner round trip 3→1→3 preserves its slot and Room 1 code. The shared API records explicit edit attribution without pretending a scene ran. Both actual-window Apply/Undo/Cancel checks pass, preserving prior running/paused clock state; captures were inspected. Status is Full for this bounded inventory editor. Final full-suite validation is in the [integration checkpoint](../checkpoints/20261018-S8-ManiacZak.md).
+
+Records: [classic S8](../../.verification/maniacclassic-state-20261018/README.md), [enhanced S8](../../.verification/maniacenhanced-state-20261018/README.md). Proposed R-12.7–R-12.10 define this bounded inventory feature; no arbitrary puzzle flags, new items, actor placements, party changes, seed or hand-authored catalog are included. Earlier original-game visual/timing/listening and unavailable-edition limitations remain unchanged.
+
+## ManiacClassic and ManiacEnhanced — S9 checkpoint, 18 October 2026
+
+The local inventory contains only English classic and Spanish enhanced Maniac. These are separate families: neither validates another release of the other. Available reference-copy checks are recorded; additional same-family languages, demos and patched copies remain blocked by missing data. Registry levels are unchanged, and the complete-story, original-game visual/timing and listening limitations remain.
+
+Classic content identification agrees independently of the folder label. Its production V1 reader, engine and dialect expose 52 rooms, 23 costumes, 173 scripts and 61 sounds. Reviewed native startup reaches Room 44 with control; its source list still has 59 triggers/27 groups/25 scenes. Fourteen focused checks and one classic conformance row pass. Two new regressions show that unreviewed menu bytes reject automatic inputs without changing the session and that an edition label alone does not select the Spanish preview converter. The parent corrected the obsolete scanner reading limitation; both new tests pass again with that correction.
+
+The enhanced worker independently verifies its Spanish v2 reference (53 rooms, 169 global scripts), its own native inputs and executable-derived font. Four edition tests pass: all 128 text slots match the decoded native font (127 drawable glyphs; slot 64 is natively suppressed), correcting eleven mismatched slots in the earlier built-in fallback. The source list remains 59 triggers/27 groups; the full S7 census is reused. Its [record](../../.verification/maniacenhanced-editions-20261018/README.md) owns the hashes, extraction descriptor and retained failed evidence. This validates the supplied enhanced copy, not another release.
+
+For the exact reviewed Spanish `MANIAC.EXE`, the source decoder and renderer replace the earlier native-font mismatch; the parent's actual-window TV capture shows the accented text. A missing or unreviewed executable keeps the old fallback, so the S7 uncertainty remains for that path. The encoded executable span is not a raw 128-glyph font; the enhanced record retains that failed approach and its correction. No original-game execution or subjective timing comparison is implied.
+
+Records: [classic S9](../../.verification/maniacclassic-editions-20261018/README.md), [enhanced S9](../../.verification/maniacenhanced-editions-20261018/README.md). S8 and authored seeds remain opt-in; another S9 comparison requires another supplied same-family release.
 
 ## ManiacClassic and ManiacEnhanced — S7 checkpoint, 18 October 2026
 
