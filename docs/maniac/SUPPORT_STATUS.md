@@ -1,5 +1,9 @@
 # Maniac Mansion (classic v1) support status
 
+## Admin Game Status clarification — 18 October 2026
+
+The user's explicit clarification supersedes S8's held-only edit scope: Game Status is an admin editor and must offer the game's inventory items without requiring earned pickups, with pictured source-established character recipients and native capacity. Admin choices remain separate from earned gameplay and unrelated puzzle flags. The old S8 records below preserve their historical scope; they do not establish this expanded acceptance. The explicit catalog/grant/capacity/Undo editor is implemented. Status is rebaselined to **Partial** under the broader all-items requirement while indirect pickup-target coverage remains unresolved. Implementation review and final validation are recorded at the [admin checkpoint](../checkpoints/20261018-Admin-ManiacZak.md).
+
 ## Native battery/flashlight Use-with — 18 October 2026 (current)
 
 Both supplied editions now compose and execute the native two-object inventory sentence. The missing engine behavior was object-header prepositions: Classic resolves its automatic verb preposition during sentence drawing; enhanced explicitly queries the header. Correct native input delivers object 167 then 84, and a repeated click on the selected flashlight executes the action. The game's own battery code sets its mode to 2 and consumes the batteries; native Switch on then enables the moving beam. A wrong held target retains the batteries and their state. No battery flag, owner, input mode or story prerequisite is supplied to make insertion work.

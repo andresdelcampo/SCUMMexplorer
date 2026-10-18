@@ -51,4 +51,4 @@ No ScummVM executable was run, and no game data, user profile, ROM, save or junc
 
 Open either Maniac or Zak edition in Normal mode: the sound selector is in the existing header. Between scenes, choose PC Speaker or PCjr/Tandy and listen. During a native scene the selector is disabled until the scene ends. Press Space and check that Pause immediately becomes Play, then press Space again. Pause a skippable scene and click Skip: it continues from the game's skip point. An unavailable Skip alongside Pause, or an active Skip without a room launch entry, is valid under the clarified requirements when the corresponding native state/list differs.
 
-Parent requirements/checkpoint record: `docs/checkpoints/20261018-AdminStatus-ManiacZak.md` (parent owns its final filename and integration result).
+Parent requirements/checkpoint record: [admin checkpoint](../../docs/checkpoints/20261018-Admin-ManiacZak.md).

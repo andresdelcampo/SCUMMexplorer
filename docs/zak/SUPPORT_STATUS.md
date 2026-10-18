@@ -1,5 +1,9 @@
 # Zak McKracken (classic v1) support status
 
+## Admin Game Status clarification — 18 October 2026
+
+The user's explicit clarification supersedes S8's held-only edit scope: Game Status is an admin editor and must offer the game's inventory items without requiring earned pickups, with source-established recipients and native capacity. Admin choices remain separate from earned gameplay and unrelated ticket/puzzle flags. The old S8 records below preserve their historical scope; they do not establish this expanded acceptance. The explicit catalog/grant/capacity/Undo editor is implemented. Status is rebaselined to **Partial** under the broader all-items requirement while indirect pickup-target coverage remains unresolved. Implementation review and final validation are recorded at the [admin checkpoint](../checkpoints/20261018-Admin-ManiacZak.md).
+
 ## Flight preparation and ticket state — 18 October 2026 (current, both editions)
 
 Both supplied editions recover the CashCard through native knife/card input, retain the logical airport number across the alien scene, and use the reservations menu's own destination/Buy/Cancel choices. The demonstrated engine gaps were the v1/v2 object-header class mask and actor logical-room retention, including camera follows between aliases of the same room resource. Source rules are version-specific; no game/room/offset exception or story-state assignment.
