@@ -24,7 +24,7 @@ public static class ManiacCutsceneSetup
         // Room45 is the reviewed character menu in both supported editions, as recorded in S4b/S6.
         // No engine-layer room exception or story-state mutation is involved.
         if (session.CurrentRoomId != 45) return false;
-        if (session.DeliveredInput.Count != 0)
+        if (session.DeliveredInput.Count != 0 || session.HasPendingPlayInput)
             throw new InvalidOperationException("Finish the character selection before launching a scene; the preview preserves the choices already entered.");
         ManiacFirstVisit.Prepare(game, session);
         return true;
