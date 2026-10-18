@@ -52,7 +52,28 @@ public sealed class ScummImuseTimeline
         JumpBackSeconds = jumps;
     }
 
-    public static ScummImuseTimeline Build(ScummImuseSong song, double minLoopSeconds = MinLoopSeconds, double maxSeconds = MaxSeconds)
+    public static ScummImuseTimeline Build(ScummImuseSong song, double minLoopSeconds = MinLoopSeconds, double maxSeconds = MaxSeconds) =>
+        Build(song, minLoopSeconds, maxSeconds, 0, 0);
+
+    /// <summary>
+    /// The song with a jump hook a script armed while it played (S6 Monkey2, 17 October 2026; ScummVM master read 17 October 2026: <c>soundKludge</c>
+    /// [0x10C, sound, 0, value] is <c>Player::setHook</c> class 0, <c>HookDatas::set</c> puts the value in <c>_jump[0]</c>; the sysex 0x7D 48 jumps when its id
+    /// is 0 or equals <c>_jump[0]</c>, and an id below 0x80 is used up when taken, <c>Player::maybe_jump</c>). From <paramref name="armedAtSeconds"/> of playing
+    /// time on, the hook markers with id <paramref name="hookValue"/> are taken too; the unrolling limits count from that second.
+    /// </summary>
+    /// <remarks>
+    /// A taken hook that names another track of the file (<paramref name="track"/> gives it) ends the unrolling there: the song goes on in that track from the
+    /// target and plays it on its default path; the timeline then holds the events up to the jump, <see cref="SwitchedToTrack"/> names the track, and
+    /// <see cref="EndSeconds"/> adds that track's rest (a looping track makes the whole song loop: <see cref="EndedOnLoop"/>).
+    /// </remarks>
+    public static ScummImuseTimeline BuildWithHook(ScummImuseSong song, int hookValue, double armedAtSeconds, Func<int, ScummImuseSong?>? track = null) =>
+        Build(song, armedAtSeconds + MinLoopSeconds, armedAtSeconds + MaxSeconds, hookValue, armedAtSeconds, track);
+
+    /// <summary>The track a taken hook switched to (<see cref="BuildWithHook"/>), or null.</summary>
+    public int? SwitchedToTrack { get; private init; }
+
+    private static ScummImuseTimeline Build(ScummImuseSong song, double minLoopSeconds, double maxSeconds, int hookValue, double armedAtSeconds,
+        Func<int, ScummImuseSong?>? trackOf = null)
     {
         var events = song.Events;
         var items = new List<ScummImuseTimelineItem>(events.Count);
@@ -119,7 +140,24 @@ public sealed class ScummImuseTimeline
                 case 48 when e.Data.Length > 3:
                 {
                     var buf = ScummImuseSong.Decode(e.Data.AsSpan(3), 9);
-                    if (buf.Length < 7 || buf[0] != 0) break; // only the always-taken hook
+                    if (buf.Length < 7) break;
+                    if (buf[0] != 0)
+                    {
+                        // A hook with an id jumps only when a script armed that id (BuildWithHook); one below 0x80 is used up by the jump.
+                        if (hookValue == 0 || buf[0] != hookValue || Playing(e.Tick) < armedAtSeconds) break;
+                        if (hookValue < 0x80) hookValue = 0;
+                        var toTrack = BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(1));
+                        if (toTrack != 0 && trackOf?.Invoke(toTrack) is { } other)
+                        {
+                            // Player::jump: setTrack, then jumpToTick in that track; the rest of the song is that track from the target.
+                            var at = Playing(e.Tick);
+                            var otherTarget = (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * TicksPerBeat + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
+                            var rest = Build(other);
+                            var tail = Math.Max(0, rest.EndSeconds - other.SecondsAt(Math.Min(otherTarget, other.Ticks)));
+                            jumps.Add(at);
+                            return new ScummImuseTimeline(items, at + tail, jumpsBack, rest.EndedOnLoop, jumps) { SwitchedToTrack = toTrack };
+                        }
+                    }
                     var target = (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * TicksPerBeat + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
                     if (target > song.Ticks) break; // jumpToTick fails past the end of the track
                     if (Jump(e.Tick, target)) { index = events.Count; }

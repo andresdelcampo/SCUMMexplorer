@@ -1,4 +1,4 @@
-using SCUMMexplorer.Core.Domain;
+﻿using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
@@ -16,6 +16,7 @@ public sealed class ScummGameSession : ScummSession
             AdlibLifetime(game), ScummCdAudioTracks.For(game) is { } cd ? cd.Lifetime : null)
     {
         _cdTracks = ScummCdAudioTracks.For(game);
+        _imuse = ScummImuseMusic.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
         if (_runtime.IsV2) _runtime.Actors.InitializeV2Game(profile.Dialect == ScummScriptDialect.V1);
@@ -88,6 +89,8 @@ public sealed class ScummGameSession : ScummSession
     // S4b MonkeyCd (17 October 2026): a game whose sounds play tracks of its disc (ScummCdAudioTracks; ScummVM GF_AUDIOTRACKS). The drive plays one track at a
     // time, and VAR_MUSIC_TIMER follows the CD timer, which playCDTrack sets to 0 and which then adds one per jiffy (soundcd.cpp, sound.cpp updateMusicTimer).
     private readonly ScummCdAudioTracks? _cdTracks;
+    // The game's iMUSE songs (v5), for the jump hooks scripts arm while a song plays (S6 Monkey2).
+    private readonly ScummImuseMusic? _imuse;
     private int? _cdSound;
     private int _cdTimer;
     private bool _cdTimerRunning;
@@ -171,6 +174,38 @@ public sealed class ScummGameSession : ScummSession
                 : lifetimes.TryGetValue(id, out var known) ? known : lifetimes[id] = ImuseLifetime(parts.GetValueOrDefault(id));
         }
         return resource => adlib.ReadLifetime(resource, timing);
+    }
+
+    /// <summary>
+    /// A jump hook (class 0) a script armed for a playing v5 song (S6 Monkey2, 17 October 2026): the song's AdLib timeline is played again with the hook taken
+    /// from the second it was armed (<see cref="ScummImuseTimeline.BuildWithHook"/>), so a song that jumps to its ending ends on the session's clock (Monkey Island 2's
+    /// Room 4 local script 204 waits for sound 108 to end after arming hook 1, +0x016A..+0x01BA). The other hook classes change how it sounds, not its length.
+    /// </summary>
+    protected override string? SoundHookArmed(int soundId, int hookClass, int value)
+    {
+        if (hookClass != 0 || value == 0 || _imuse?.Part(soundId, ScummImuseDevice.Adlib) is not { } part) return null;
+        string? result = null;
+        RetimeSound(soundId, (_, playedSeconds) =>
+        {
+            try
+            {
+                var timeline = ScummImuseTimeline.BuildWithHook(ScummImuseSong.Parse(part), value, playedSeconds, Track);
+                ScummImuseSong? Track(int number) { try { return ScummImuseSong.Parse(part, number); } catch (InvalidDataException) { return null; } }
+                const string why = "iMUSE path with the armed jump hook (markers and other script-set changes not simulated): an estimate";
+                if (timeline.Loops && (timeline.EndedOnLoop || timeline.EndSeconds >= playedSeconds + ScummImuseTimeline.MaxSeconds))
+                {
+                    result = $"jump hook {value} armed after {playedSeconds:0.##} s; the song still loops";
+                    return new(ScummSoundLifetimeKind.Looping, null, true, why);
+                }
+                result = $"jump hook {value} armed after {playedSeconds:0.##} s; the song ends at {timeline.EndSeconds:0.##} s" + (timeline.SwitchedToTrack is int other ? $" (its track {other})" : "");
+                return new(ScummSoundLifetimeKind.Finite, (int)Math.Min(int.MaxValue, Math.Ceiling(timeline.EndSeconds * 472)), true, why);
+            }
+            catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or ArgumentException or IndexOutOfRangeException)
+            {
+                return null;
+            }
+        });
+        return result;
     }
 
     private static ScummSoundLifetime ImuseLifetime(byte[]? part)

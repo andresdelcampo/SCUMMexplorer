@@ -60,6 +60,7 @@ public abstract partial class ScummSession
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.VerbEntrypoint = ObjectVerbEntrypoint;
         _runtime.SoundRunning = _soundClock.Status;
+        _runtime.SoundHook = SoundHookArmed;
         _runtime.OverrideChanged = RecordOverride;
         _runtime.V2FreezeScripts = FreezeV2Scripts;
         _runtime.Actors.CostumeSource = _data.ReadCostume;
@@ -540,6 +541,12 @@ public abstract partial class ScummSession
     /// stops what its profile's driver stops (<see cref="ScummProfile.MusicStart"/>). LOOM's session keeps its own behaviour.
     /// </summary>
     protected virtual void BeforeSoundStarts(ScummScriptEvent start, int soundId) { }
+
+    /// <summary>A script armed a hook of a playing song (<see cref="ScummScriptRuntimeState.SoundHook"/>); null: the generic session does not follow it.</summary>
+    protected virtual string? SoundHookArmed(int soundId, int hookClass, int value) => null;
+
+    /// <summary>Changes how a playing sound goes on from now (see <see cref="ScummSoundClock.Retime"/>).</summary>
+    protected bool RetimeSound(int soundId, Func<ScummSoundLifetime, double, ScummSoundLifetime?> change) => _soundClock.Retime(soundId, change);
 
     /// <summary>A script stopped one sound (<paramref name="soundId"/>) or every sound (null); the game's session may follow what the engine stops with it.</summary>
     protected virtual void AfterScriptStopsSound(int? soundId) { }
