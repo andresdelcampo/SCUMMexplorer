@@ -1,0 +1,12 @@
+[
+  {"op":"frames","count":150}, {"op":"visit","value":2}, {"op":"frames","count":300},
+  {"op":"untilskip","count":1200}, {"op":"key","value":27}, {"op":"control","count":1200},
+  {"op":"frames","count":100}, {"op":"activate","object":26,"value":14}, {"op":"frames","count":100},
+  {"op":"visit","value":1}, {"op":"frames","count":100},
+  {"op":"verb","value":11}, {"op":"frames","count":2},
+  {"op":"inventory","object":26}, {"op":"frames","count":2},
+  {"op":"roomclick","x":248,"y":90}, {"op":"frames","count":2},
+  {"op":"sentence","text":"Use butter knife with plastic card"}, {"op":"capture","text":"cashcard-use"},
+  {"op":"roomclick","x":248,"y":90}, {"op":"frames","count":180},
+  {"op":"owner","object":18,"value":1}, {"op":"capture","text":"cashcard-recovered"}
+]

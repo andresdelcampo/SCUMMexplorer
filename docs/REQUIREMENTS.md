@@ -92,6 +92,8 @@ Maniac/Zak edition coverage at the [18 October S9 checkpoint](checkpoints/202610
 
 The [18 October Maniac Use-with checkpoint](checkpoints/20261018-UseWith-ManiacZak.md) closes native battery/flashlight inventory composition and execution in both supplied editions, including consumption, wrong-target refusal and subsequent beam rendering. Preparation remains explicit exploration; full-story and original-game picture/timing acceptance remain open. Feature levels are unchanged.
 
+The [18 October Zak flight-preparation checkpoint](checkpoints/20261018-Flight-ManiacZak.md) checks both supplied editions' native CashCard recovery, reservation Buy/Cancel, ticket guards, boarding and meal-service release after explicit exploration preparation. Object51 is peanuts, not a ticket. Logical airport context is retained; the native cruising timer/destination arrival and an earned bus journey remain separate. Feature levels are unchanged.
+
 ✔ works (Full), ◐ partly, – not supported. What each column asks for, at each level:
 
 | Column | ◐ Partial | ✔ Full | Checked by |

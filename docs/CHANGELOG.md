@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Zak native CashCard, ticket choices and boarding, both editions
+
+- Old object-header class masks now permit the native knife/card combination. Actor logical-room identity survives mapped resources, scene changes and same-resource camera follows. Later engines retain their behavior; no story-state shortcut or object-specific engine rule.
+- Both supplied editions use native Buy/Cancel choices and ticket guards, board, consume the ticket, serve peanuts and release Script104's wait. The old "ticket object51" interpretation was wrong: it is peanuts; actual tickets are82/83.
+- Preparation is disclosed room previews/direct knife pickup. Two failed bus-input approaches remain parked; the native 28800-jiffy cruising timer and destination arrival remain separate. Matrices retain their levels. Own-edition tests, review, actual windows and final full-suite/build result: [flight checkpoint](checkpoints/20261018-Flight-ManiacZak.md).
+
 ## 18 October: Fate of Atlantis cutscenes from its scripts, with their speech (S7, Indy4)
 
 - **The list.** The shared scan gives 666 triggers and 426 entries (182 scenes). 210 begin from a fresh start (the credits); the eight-worker runs match the single-threaded ones.

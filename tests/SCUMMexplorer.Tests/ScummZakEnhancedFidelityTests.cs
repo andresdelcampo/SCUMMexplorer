@@ -40,7 +40,7 @@ public sealed class ScummZakEnhancedFidelityTests(ITestOutputHelper output)
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void FreshFlightStartRetainsItsUnmetNativeTicketOwnerGuard(bool openObject)
+    public void FreshFlightPreviewRetainsItsNativePeanutServiceWait(bool openObject)
     {
         if (Planner.Value is null) return;
         var session = Session(out var data, out var observations);

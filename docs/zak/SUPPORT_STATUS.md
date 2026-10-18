@@ -1,8 +1,18 @@
 # Zak McKracken (classic v1) support status
 
-## Engine fidelity — 18 October 2026 (current, both editions)
+## Flight preparation and ticket state — 18 October 2026 (current, both editions)
 
-Native actor-approach distances now use v1/v2 units. Two of the five formerly capped starts finish in each edition (646 and 907 frames). The other three bounds are classified: the Room 11 entry and object-action previews wait while ticket object 51 remains room-owned; the Room 23 terminal sequence deliberately waits for Escape/restart. The object-action actor wait is fixed before the later ticket wait. No prerequisite owner/flag or automatic Escape is supplied. [Classic scenes](../../.verification/zakclassic-fidelity-scenes-20261018/README.md), [Enhanced scenes](../../.verification/zakenhanced-fidelity-20261018/README.md), [before/after results](../../.verification/zak-fidelity-20261018/README.md).
+Both supplied editions recover the CashCard through native knife/card input, retain the logical airport number across the alien scene, and use the reservations menu's own destination/Buy/Cancel choices. The demonstrated engine gaps were the v1/v2 object-header class mask and actor logical-room retention, including camera follows between aliases of the same room resource. Source rules are version-specific; no game/room/offset exception or story-state assignment.
+
+Native Buy issues the ticket, the gate consumes it and clears departure, and Script 116 serves peanuts 51, releasing Script 104's wait and returning cabin control within the 2500-frame observation. Object 51 is **peanuts**, not a ticket; actual tickets are 82/83. Cancel refunds the old ticket and leaves no valid replacement; the gate refuses boarding. Wrong-tool and wrong-airport guards remain effective. [Classic record](../../.verification/zakclassic-flight-20261018/README.md), [enhanced record](../../.verification/zakenhanced-flight-20261018/README.md), [independent review](../../.verification/zak-flight-review-20261018/README.md).
+
+Preparation uses disclosed room previews and direct native knife pickup, followed by actual interface input; it does not establish an earned bus/airport journey. Two failed bus-input approaches remain parked. Boarding/safety/meal completion is not destination arrival: the native 28800-jiffy flight timer remains. No production completion cap is raised and no ticket, currency, owner, actor position or automatic choice is supplied. Original-game picture/timing/listening, other destinations/puzzles and alternate releases remain open.
+
+Registry levels are unchanged: Cutscenes Partial, Classic Costumes Partial with 24 derived/11 estimates. Final window/build/matrix/full-suite and integration results are in the [flight checkpoint](../checkpoints/20261018-Flight-ManiacZak.md). The older records retain their dated failures; this section supersedes their ticket-object interpretation.
+
+## Engine fidelity — preceding 18 October 2026 pass, both editions
+
+Native actor-approach distances use v1/v2 units. Two of the five formerly capped starts finish in each edition (646 and 907 frames). The Room 11 fresh previews were unprepared meal-service waits on peanuts 51, misidentified as a ticket in the historical record; the new preparation above releases that wait through native boarding/service. Room 23 deliberately waits for Escape/restart. No prerequisite owner/flag or automatic Escape is supplied. [Classic scenes](../../.verification/zakclassic-fidelity-scenes-20261018/README.md), [Enhanced scenes](../../.verification/zakenhanced-fidelity-20261018/README.md), [retained before/after results](../../.verification/zak-fidelity-20261018/README.md).
 
 Both editions render native darkness and moving flashlight beams. Their own pickup/Switch on code selects the reached 9x7 beam; actual-window bitmap/Play checks pass. The visited dark Room 36 is an ending backdrop: these are disclosed exploration rendering checks, not an earned ending. [Lighting record](../../.verification/maniacenhanced-fidelity-20261018/README.md).
 
@@ -25,13 +35,14 @@ Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last
 | S8 State | done (bounded inventory editor) | Status Full | [S8 record](../../.verification/zakclassic-state-20261018/README.md) | Own native bill pickup; three tests and actual-window Apply/Undo/Cancel pass. Ordinary player actions block edits; resident special handlers do not. |
 
 Blocked on: the 11 estimated costumes (4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 32) retain context-dependent actors, earlier writers and branch/call-order uncertainty. Native palette preservation and representative reached contexts are verified; they do not establish one universal card palette. No original-game comparison was performed.
-Next: retain the clean fidelity checkpoint. Further scene work needs genuine flight/story preparation; alternate-release S9 checks need another same-family copy. Preserve card estimates and version-specific palette evidence. No full-game completion is claimed.
+Next: retain the clean flight-preparation checkpoint. Full timed travel/arrival, the parked earned bus approach and broader story routes remain separate; alternate-release S9 checks need another same-family copy. Preserve card estimates and version-specific palette evidence. No full-game completion is claimed.
 Open uncertainties: Room 38 variable actor, control flow/call order, native visual acceptance, and source story prerequisites beyond the bounded routes.
 
 ## Decision log
 
 | Date | Stage | Open question | Options | Choice and why | How to undo |
 |---|---|---|---|---|---|
+| 2026-10-18 | Flight | How to release the recorded owner51 wait and preserve ticket context? | Supply a ticket/owner/room flag / trace actual identity and native preparation | Correct the peanuts/ticket distinction, native header masks and actor logical-room retention; verify Buy/Cancel/boarding/service through source input after disclosed preparation, retaining failed bus attempts and pending flight timer | Revert bounded flight implementation/tests/notes together, preserving historical evidence and unrelated work |
 | 2026-10-17 | S5 Classic | Treat source previews as original-game comparison, or alter state to remove the Room 44 detector flag? | claim full acceptance / force a fill / retain limits | retain source state and visual acceptance limits; all 58 rooms open and three object-state tests pass, but native comparison is prohibited and no state fill is justified | complete a later authorized visual comparison; no workaround to remove |
 | 2026-10-18 | S7 Classic | Which scenes prove the unnamed request? | invented catalog / source examples | use independently scanned Room 8 entry, bakery doorbell and shop Buy; retain five capped runs and estimated costume colours | remove family tests/record; no seed or catalog |
 | 2026-10-18 | S9 Classic | No alternate family copy exists locally | infer from Enhanced / record missing coverage | Enhanced is separate; bounded available-copy contracts pass, S7 reused; alternate comparisons blocked, registry and costume estimates unchanged | add a real alternate fixture in a later authorized pass |

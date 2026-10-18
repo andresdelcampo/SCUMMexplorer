@@ -47,7 +47,7 @@ public sealed class ScummZakClassicFlightTests(ITestOutputHelper output)
     {
         var (game, data, s) = PreparedKnife(observer); UseCard(s, data, 26);
         Assert.Equal(1, s.Snapshot.ObjectOwners[18]);
-        // Explicit airport preview: native logical144 is Miami, backed by physical Room8.
+        // Explicit airport preview: native logical144 is backed by physical Room8.
         // It is not an earned bus journey; the original departure145 is deliberately wrong here.
         s.VisitRoom(game.Rooms.Single(r => r.ResourceId == 8));
         Assert.Equal(144, s.Snapshot.KnownGlobalVariables["var[0x004]"]);
