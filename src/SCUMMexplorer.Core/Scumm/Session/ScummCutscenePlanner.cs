@@ -17,10 +17,11 @@ public sealed class ScummCutscenePlanner
     private readonly ConcurrentDictionary<(int, int, int), ScummCutsceneRunResult> _runs = [];
 
     /// <param name="newSession">A fresh session booted to the first playable room; by default <see cref="ScummGameSession.BootForPlay"/>.</param>
-    public ScummCutscenePlanner(GameLibrary game, Func<ScummGameSession>? newSession = null)
+    public ScummCutscenePlanner(GameLibrary game, Func<ScummGameSession>? newSession = null, string? preparationNote = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         _game = game;
+        PreparationNote = preparationNote;
         _newSession = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
         var booted = _newSession();
         Verbs = VerbsOf(booted);
@@ -30,6 +31,8 @@ public sealed class ScummCutscenePlanner
 
     /// <summary>The game's verbs as the titles name them: every text verb the boot left, by the name its script gave it (<c>verbOps name</c>).</summary>
     public ScummCutsceneVerbs Verbs { get; }
+
+    public string? PreparationNote { get; }
 
     public IReadOnlyList<ScummCutscene> Triggers { get; }
 
@@ -69,6 +72,9 @@ public sealed class ScummCutscenePlanner
 
     /// <summary>The start sentence of a scene's note: what its fresh-start run showed, or that it is still being checked.</summary>
     public string StartNote(ScummCutscene trigger) =>
+        (PreparationNote is { Length: > 0 } note ? note + " " : "") + RunNote(trigger);
+
+    private string RunNote(ScummCutscene trigger) =>
         !TryGetRun(trigger, out var run) ? "Whether a fresh start begins it is still being checked (open the list again in a few seconds)."
         : run.Begun ? "A fresh start begins its cutscene (checked by a headless run" + (run.RoomsEntered.Count > 0 ? $"; it went on to {RoomList(run.RoomsEntered)})." : ").")
         : "A fresh start did not begin its cutscene in a headless run" + (run.Failure is { } failure ? $" ({failure})" : "") +
