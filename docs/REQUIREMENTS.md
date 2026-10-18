@@ -107,7 +107,7 @@ The [18 October Zak flight-preparation checkpoint](checkpoints/20261018-Flight-M
 | Scripts | – | raw disassembly in the family's dialect, and the Readable view | scripts offered |
 | Play | – | live room: actors, camera, clicks run the game's scripts | LOOM; Indiana Jones 3 EGA through its own verbs (§7.1) |
 | Cutscenes | list derived from the scripts, not hand-validated | hand-validated catalog (English Roland LOOM only) | – |
-| Status | – | Admin Game Status editor (§12): LOOM fields; inventory catalog grants and recipient selection for inventory games | LOOM status tests; inventory catalog/capacity/edit/undo and window checks, including native artwork |
+| Status | View/limited edits, incomplete item catalog or missing required native artwork | Admin Game Status editor (§12): LOOM fields; inventory catalog grants and recipient selection for inventory games | LOOM status tests; inventory catalog/capacity/edit/undo and window checks, including native artwork |
 
 Family notes (what is behind a row):
 

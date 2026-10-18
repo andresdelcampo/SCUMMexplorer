@@ -62,13 +62,19 @@ public class SupportConformanceTests
         // Objects ✔ outside LOOM needs the first visit (S5) and click responses (S6).
         if (support[SupportFeature.Objects] == SupportLevel.Full && game.Id is not (GameId.Loom or GameId.LoomVga))
             Assert.True(ScummProfile.For(game).HasFirstVisitScenes && ScummProfile.For(game).PlaysThroughVerbs);
-        // S8 Maniac/Zak: the boot exposes own-source character identities; family state tests pin Apply/Undo.
-        if (support[SupportFeature.Status] == SupportLevel.Full && family is
+        // Admin status: even a pending startup choice exposes a source-derived item catalog.
+        // Family admin tests pin native capacity, grants, retained code and atomic edit/undo.
+        if (support[SupportFeature.Status] != SupportLevel.None && family is
             GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced)
         {
             var status = ScummGameSession.BootForPlay(game, out _).CaptureInventoryStatus();
             Assert.NotEmpty(status.Characters);
             Assert.Contains(status.Characters, character => !string.IsNullOrWhiteSpace(character.Name));
+            Assert.NotEmpty(status.Catalog);
+            Assert.Equal(status.Catalog.Count, status.Catalog.Select(item => item.ObjectId).Distinct().Count());
+            Assert.All(status.Catalog, item => Assert.Contains(game.Rooms, room => room.ResourceId == item.SourceRoomId));
+            Assert.True(status.Capacity > 0);
+            Assert.Equal(status.Capacity, status.FreeSlots + status.Items.Count);
         }
         // Cutscenes outside LOOM (S7): ◐ only, a list derived from the game's scripts by the engine's scan, played in the play session; a hand-validated
         // catalog (✔) exists only for the LOOM reference (R-8.18). ScummIndy3CutsceneTests runs three scenes from a fresh start.
