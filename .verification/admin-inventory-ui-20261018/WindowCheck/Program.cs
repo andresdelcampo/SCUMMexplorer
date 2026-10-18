@@ -205,7 +205,13 @@ internal static class Program
                                 ((Button)dialog.FindName("ApplyButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                                 Require(session.Snapshot.ObjectOwners[held.X] == targetActor, "Apply did not change owner");
                                 Require(!session.Snapshot.Inventory.Contains(held.X), "Native current-character inventory did not refresh");
-                                Require(Unrelated() == beforeState, "Apply changed unrelated game state");
+                                var afterApplyState = Unrelated();
+                                if (afterApplyState != beforeState)
+                                {
+                                    File.WriteAllText(Path.Combine(output, "unrelated-before.json"), beforeState);
+                                    File.WriteAllText(Path.Combine(output, "unrelated-after.json"), afterApplyState);
+                                }
+                                Require(afterApplyState == beforeState, "Apply changed unrelated game state");
                                 Save("status-applied", dialog);
                                 ((Button)dialog.FindName("UndoButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                                 Require(session.Snapshot.ObjectOwners[held.X] == held.Value, "Undo did not restore owner");

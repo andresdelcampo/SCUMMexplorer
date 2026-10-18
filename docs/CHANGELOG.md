@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: admin Game Status clarification and shared playback controls, Maniac/Zak
+
+- Requirements now permit explicit unearned inventory grants, pictured Maniac recipients and future native icons for graphical inventory games. The old held-only restriction is superseded; grants never silently complete unrelated puzzles/conversations.
+- Source catalogs offer 49 named items per Maniac edition and 82 per Zak edition, all seven pictured Maniac kids, native 80-slot capacity, atomic Apply Changes/Undo and pending-choice Close. Status is Partial under the broader all-items requirement while indirect targets, including Zak's letter 139, remain unclassified. Both generated matrices follow the registry.
+- Normal sound selection is restored through supported capabilities. Generic scene locks, immediate transport/caption refresh and paused Skip resume match LOOM, with v1/v2 game variables preserved across device changes. Pause/current native Skip/room launch availability are explicitly independent.
+- Final solution build zero warnings/errors; required full suite **1357 passed, zero failed, five skipped**, all 18 new cases executed; scoped and real-window checks are recorded separately. One concurrent window assertion did not reproduce and is retained without claiming a production fix. [Checkpoint](checkpoints/20261018-Admin-ManiacZak.md), [integration evidence](../.verification/maniaczak-admin-20261018/README.md).
+
 ## 18 October: Zak native CashCard, ticket choices and boarding, both editions
 
 - Old object-header class masks now permit the native knife/card combination. Actor logical-room identity survives mapped resources, scene changes and same-resource camera follows. Later engines retain their behavior; no story-state shortcut or object-specific engine rule.
