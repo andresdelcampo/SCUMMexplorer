@@ -118,14 +118,22 @@ public abstract partial class ScummSession
         if (ActorsMoving || CameraMoving) return "A character or the camera is moving.";
         if (Messages.HaveMsg != 0) return "Dialogue is still playing.";
         if (HasPendingPlayInput || _runtime.Sentences.Count != 0) return "Player input is still pending.";
-        if (_executing.Count != 0 || IsScriptRunning(PlayInputScript).Running || IsScriptRunning(2).Running ||
-            _pending.Any(x => x.Frame.ObjectNumber is not null && !x.Frame.Stopped))
+        if (InventoryPlayerActionRunning)
             return "A player action is still running.";
         var ego = _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable);
         if (characters.Length == 0 || !characters.Any(x => x.ActorId == ego && !string.IsNullOrWhiteSpace(x.Name)))
             return "Playable character identities are unresolved.";
         return null;
     }
+
+    // o2_doSentence distinguishes ordinary foreground object slots from FA
+    // background+special and FD special slots. Those resident handlers may
+    // animate indefinitely while the player has control; only an ordinary
+    // pending slot is an unfinished player action. Executing code still blocks.
+    protected bool InventoryPlayerActionRunning => _executing.Count != 0 ||
+        IsScriptRunning(PlayInputScript).Running || IsScriptRunning(2).Running ||
+        _pending.Any(x => x.Frame.ObjectNumber is not null && !x.Frame.Stopped &&
+            !x.Frame.Recursive && !x.Frame.FreezeResistant);
 
     private ScummInventoryCharacter[] InventoryCharacters()
     {

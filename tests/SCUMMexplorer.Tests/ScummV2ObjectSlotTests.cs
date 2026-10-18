@@ -2,6 +2,21 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummV2ObjectSlotTests
 {
+    [Fact]
+    public void InventoryGuardAllowsResidentSpecialSlotsButRejectsForegroundActions()
+    {
+        if (Session() is not { } session) return;
+        session.Pending(101, false, true); // native FD special
+        session.Pending(107, true, true); // native FA background + special
+        Assert.False(session.InventoryActionRunning);
+        session.Pending(101, false, false); // same object, independent foreground action
+        Assert.True(session.InventoryActionRunning);
+        session.Stop(101);
+        Assert.False(session.InventoryActionRunning);
+        session.Start(107, false, true); // even special code is unsafe while executing
+        Assert.True(session.InventoryActionRunning);
+    }
+
     private static SlotSession? Session()
     {
         var folder = Path.Combine(TestGames.Root, "zakE ega en");
@@ -55,6 +70,13 @@ public sealed class ScummV2ObjectSlotTests
         : ScummSession(game, data.ReadIndexedObjects(), 0, null, data,
             _ => new(ScummSoundLifetimeKind.Unknown, null, false, "slot test"))
     {
+        public bool InventoryActionRunning => InventoryPlayerActionRunning;
+        public void Pending(int id, bool background, bool special)
+        {
+            var frame = ReplaceV2ObjectSlot(id, background, special);
+            var code = new ScummScriptDisassembly(id, 1, 0, 0, 0, [], null, null, [], []);
+            _pending.Add(new(code, 0, new Dictionary<string, ushort>(), 1, null, [], false, frame));
+        }
         public object Start(int id, bool background, bool special)
         {
             var frame = ReplaceV2ObjectSlot(id, background, special);
