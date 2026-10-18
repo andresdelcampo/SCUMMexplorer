@@ -59,6 +59,9 @@ public abstract partial class ScummSession
         _globalScriptCount = _data.GlobalScriptCount;
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.VerbEntrypoint = ObjectVerbEntrypoint;
+        _runtime.ObjectPreposition = ObjectPreposition;
+        _runtime.SetObjectPreposition = SetObjectPreposition;
+        _runtime.CopyV2InventoryHeader = CopyV2InventoryHeader;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.SoundHook = SoundHookArmed;
         _runtime.OverrideChanged = RecordOverride;

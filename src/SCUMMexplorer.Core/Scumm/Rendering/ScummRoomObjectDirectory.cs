@@ -6,7 +6,11 @@ namespace SCUMMexplorer.Core.Scumm;
 public sealed record ScummRoomObjectRecord(
     int Id, int LocalIndex, int X, int Y, int Width, int Height,
     int ParentLocalIndex, byte ParentRequiredState, int WalkX, int WalkY,
-    byte Direction, int CodeOffset, int? ImageOffset);
+    byte Direction, int CodeOffset, int? ImageOffset)
+{
+    /// <summary>DOS v1/v2 OBCD byte 12 high three bits; separate from the low five walk-Y bits.</summary>
+    public byte Preposition { get; init; }
+}
 
 /// <summary>Reads the local object directory and code headers of a DOS EGA old-v3 room.</summary>
 public sealed class ScummRoomObjectDirectory

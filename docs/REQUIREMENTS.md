@@ -90,6 +90,8 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 
 Maniac/Zak edition coverage at the [18 October S9 checkpoint](checkpoints/20261018-S9-ManiacZak.md): classic English Maniac, enhanced Spanish Maniac, classic English Zak and enhanced English Zak only. There is one local copy per family; no additional language, demo or revision within a family was available to establish compatibility. These checks do not raise the existing feature levels.
 
+The [18 October Maniac Use-with checkpoint](checkpoints/20261018-UseWith-ManiacZak.md) closes native battery/flashlight inventory composition and execution in both supplied editions, including consumption, wrong-target refusal and subsequent beam rendering. Preparation remains explicit exploration; full-story and original-game picture/timing acceptance remain open. Feature levels are unchanged.
+
 ✔ works (Full), ◐ partly, – not supported. What each column asks for, at each level:
 
 | Column | ◐ Partial | ✔ Full | Checked by |

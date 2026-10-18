@@ -56,6 +56,7 @@ public sealed partial class ScummBoundedScriptExecutor
         { trace.Add($"v2 pickup {obj}: absent from room or already in inventory"); problem = ""; return true; }
         if (!variables.TryGetValue(runtime.EgoVariable, out var ego) || !runtime.ObjectStates.TryGetValue(obj, out var state)) return false;
         if (!runtime.AddToInventorySlots(obj)) { problem = "v2 inventory is full"; return false; }
+        runtime.CopyV2InventoryHeader?.Invoke(obj);
         if (runtime.CurrentRoom is int room) runtime.InventoryRooms[obj] = room;
         runtime.SetObjectOwner(obj, (byte)ego);
         runtime.AddInventoryObject(obj);
@@ -97,6 +98,23 @@ public sealed partial class ScummBoundedScriptExecutor
         ushort Global(string key) => variables.TryGetValue(key, out var value) ? value : (ushort)0;
         switch (source.Operation)
         {
+            // script_v2.cpp o2_get/setObjPreposition: OBCD+12 high three bits.
+            // Header access follows native room/inventory location; it is never guessed from an id.
+            case "getObjPreposition":
+                if (!Read(1, out var prepObject) || !TryGetVariableKey(p[0], variables, out var prepDestination) ||
+                    runtime.ObjectPreposition?.Invoke(prepObject) is not int prepValue) return false;
+                variables[prepDestination] = (ushort)prepValue;
+                RefreshBitAliases(prepDestination, variables);
+                runtime.NotifyGlobalMutation(prepDestination);
+                trace.Add($"{prepDestination} = {prepValue} (native object {prepObject} preposition)");
+                handled = true;
+                return true;
+            case "setObjPreposition":
+                if (!Read(0, out var changedObject) || !Read(1, out var changedPrep) ||
+                    runtime.SetObjectPreposition?.Invoke(changedObject, (byte)(changedPrep & 7)) != true) return false;
+                trace.Add($"object {changedObject} preposition = {changedPrep & 7} (native header)");
+                handled = true;
+                return true;
             case "setObjectName":
                 if (!Read(0, out var renamed)) return false;
                 var quote = source.Operands.IndexOf('"');
@@ -111,8 +129,14 @@ public sealed partial class ScummBoundedScriptExecutor
                     variables.TryGetValue("var[0x01D]", out var sentencePrep) && sentencePrep == 0 && variables.TryGetValue("var[0x01A]", out var sentenceVerbNumber))
                 {
                     var sentenceVerb = runtime.Verbs.Snapshot().FirstOrDefault(v => v.VerbId == sentenceVerbNumber);
-                    if (sentenceVerb?.Preposition == 255) return false; // Requires old object header prep lookup.
-                    if (sentenceVerb is not null) variables["var[0x01D]"] = (ushort)sentenceVerb.Preposition;
+                    if (sentenceVerb is not null)
+                    {
+                        var prep = sentenceVerb.Preposition == 255 ? runtime.ObjectPreposition?.Invoke(sentenceObject) : sentenceVerb.Preposition;
+                        if (prep is null) return false;
+                        variables[ScummVars.V2.SentencePreposition] = (ushort)prep;
+                        RefreshBitAliases(ScummVars.V2.SentencePreposition, variables);
+                        runtime.NotifyGlobalMutation(ScummVars.V2.SentencePreposition);
+                    }
                 }
                 if ((runtime.V2UserState & 0x20) != 0)
                     runtime.V2DrawnSentence = (Global(ScummVars.V2.SentenceVerb), Global(ScummVars.V2.SentenceObject1),

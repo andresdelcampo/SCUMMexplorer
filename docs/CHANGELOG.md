@@ -10,6 +10,12 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - **Speech in scenes from the list (shared App).** A room-entry scene played in a room opened for it speaks its lines from the visit (`TalkieSpeechPlayer.Attach(from)`).
 - **Registry.** Indy4 Cutscenes is ◐; the matrix is regenerated. `ScummIndy4CutsceneTests` (3) covers Smith's scene (Room 1), Sophia's lecture (Room 11, then backstage) and the diving suit (Room 82, then Room 42) from a fresh start, plus the lecture's spoken line. Window check, decisions and uncertainties: [record](../.verification/indy4-cutscenes-20261018/README.md).
 
+## 18 October: native Maniac battery/flashlight Use-with, both editions
+
+- Native object-header prepositions now work for v1/v2 room and retained inventory code. Classic's automatic sentence preposition and enhanced's explicit opcode both use the source bits; pickup preserves a changed header. No object-specific engine exception or input-mode assignment.
+- Both supplied Maniac editions compose their own two-object sentence, insert and consume the batteries through native inventory input, and switch on the flashlight. Wrong-target and missing-battery checks preserve the native prerequisite. Preparation is a labelled exploration action, not an earned story route.
+- Support levels remain unchanged. Own-edition tests, independent review, actual-window evidence and final suite/build results: [Use-with checkpoint](checkpoints/20261018-UseWith-ManiacZak.md). Original-game visual/timing comparison, walking approximation, other puzzles/parties and alternate same-family releases remain open.
+
 ## 18 October: Fate of Atlantis plays through its own interface, with its spoken lines (S6, Indy4)
 
 - **The route.** The acceptance route of R-7.18 runs from Barnett College (`ScummIndy4PlayTests`):
