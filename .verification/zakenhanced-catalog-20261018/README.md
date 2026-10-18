@@ -5,7 +5,7 @@
 | Family / stage | ZakEnhanced / S8 admin inventory catalog completion |
 | Fixture and edition | `Games/zakE ega en` (English enhanced v2, external `D:/Juegos/Lucas`) |
 | Date and author | 2026-10-18, ZakEnhanced catalog agent |
-| Commits | Core milestone `b09d6bd`, independently cherry-picked as `59248609`; this record accompanies the separate Enhanced verification commit |
+| Commits | Core milestone `b09d6bd`, independently cherry-picked as `59248609`; Enhanced verification `62781385`; conservative Core follow-up `59173d0`, independently cherry-picked as `7f82cbfe`, before the remaining family windows |
 | Registry change | Parent owns registry/matrices; the supplied copy's complete 76-item roster is verified here. No registry edit in this worker. |
 
 ## What was done
@@ -27,6 +27,11 @@ rtk proxy dotnet run --project .verification/zakenhanced-catalog-20261018/Probe/
 rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore -p:NuGetAudit=false --filter FullyQualifiedName~ScummZakEnhancedInventoryCatalogTests --verbosity minimal
 rtk proxy dotnet build .verification/zakenhanced-catalog-20261018/WindowCheck/WindowCheck.csproj --no-restore -p:NuGetAudit=false --verbosity minimal
 rtk proxy dotnet run --project .verification/zakenhanced-catalog-20261018/WindowCheck/WindowCheck.csproj --no-build -- .verification/zakenhanced-catalog-20261018/window-output
+rtk proxy dotnet build .verification/admin-inventory-ui-20261018/WindowCheck/InventoryStatusWindowCheck.csproj -p:NuGetAudit=false --verbosity minimal
+rtk proxy dotnet run --project .verification/admin-inventory-ui-20261018/WindowCheck/InventoryStatusWindowCheck.csproj --no-build -- "D:/Juegos/Lucas/mmansion ega en" .verification/zakenhanced-catalog-20261018/maniac-classic-window 44 .verification/admin-inventory-ui-20261018/WindowCheck/maniac-classic.json
+rtk proxy dotnet run --project .verification/admin-inventory-ui-20261018/WindowCheck/InventoryStatusWindowCheck.csproj --no-build -- "D:/Juegos/Lucas/mmansionE ega es" .verification/zakenhanced-catalog-20261018/maniac-enhanced-window 44 .verification/admin-inventory-ui-20261018/WindowCheck/maniac-enhanced.json
+rtk proxy dotnet run --project .verification/admin-inventory-ui-20261018/WindowCheck/InventoryStatusWindowCheck.csproj --no-build -- "D:/Juegos/Lucas/zak ega en" .verification/zakenhanced-catalog-20261018/zak-classic-window 1 .verification/admin-inventory-ui-20261018/WindowCheck/zak-classic.json
+rtk proxy dotnet run --project .verification/maniaczak-admin-inventory-20261018/Probe/Probe.csproj -p:NuGetAudit=false --verbosity quiet
 ```
 
 The Probe emits its complete machine-readable script-context census to ignored `Exe/Probe/Debug/net10.0/scripts.json`; console output can be redirected to ignored `audit.txt`. No original game asset is committed. The actual-window harness sets private profile/cache paths under its output directory. The parent reserved the WPF slot; no other harness window ran concurrently.
@@ -38,6 +43,18 @@ The Probe emits its complete machine-readable script-context census to ignored `
 - **15 new tests pass**, zero failed/skipped, **32 seconds**. They cover both letter verbs; nested-handler source offsets and the corrected roster; native nest pickup through its source tool-class guard; seven native shop-prefix/commit cases; all 76 catalog entries granting/transferring and undoing with exact native/unrelated state restoration; complete decode census; and native retained nest Use/card Read execution in Room 1, outside their source rooms.
 - WindowCheck build: **zero warnings/errors**, 4.90 seconds. Actual Normal-mode window check: **PASS**, exit 0. Search for letter offers no item; search/grant/Undo for nest 53 and card 27 preserves their native source rooms 13/3 and restores exact state. Six PNG captures are retained locally; four key captures were visually inspected (no-letter result, both grants and restored catalog). Native Zak picture/name, readable source item labels and clean Normal presentation are visible.
 - Earlier native 80-slot overflow, stale-batch and exact-key Undo checks are unchanged; parent owns their integrated rerun and final full suite. No shared UI or production code is changed by this worker.
+
+Parent subsequently requested the three remaining family windows in this worker's exclusively leased WPF slot. All ran **serially**, after `59173d0`; each exited zero with `PASS`. Their existing JSON routes were used without changes. Existing harness build: **zero warnings/errors**, 8.22 seconds.
+
+| Actual-window fixture | Catalog | Native route and admin checks | Local PNGs |
+|---|---:|---|---:|
+| ManiacClassic English | 48 named | Native key acquisition/transfer/Undo; all seven source character pictures; unselected Razor receives badge 214 from room 4; grant/Undo, pending capacity, close discard and both prior clock states pass | 12 |
+| ManiacEnhanced Spanish | 48 named | Native key acquisition/transfer/Undo; all seven source character pictures; unselected Razor receives item 200 from room 14 with its own Spanish name; grant/Undo, pending capacity, close discard and both prior clock states pass | 13 |
+| ZakClassic English | 76 named | Native phone-bill acquisition/transfer/Undo; newly included abandoned bird nest 53 granted to Annie with retained room 13; grant/Undo, pending capacity, close discard and both prior clock states pass | 9 |
+
+The three additional windows preserve **34 captures**, with five key captures visually inspected: each applied grant and both seven-character Maniac dropdowns. Together with the dedicated Enhanced window above, this run preserves **40 captures / nine inspected key captures across four family windows**, all passing. The ZakClassic Annie recipient has no initialized portrait in this reached state; its source name remains visible without invented art, consistent with the existing disclosed Zak artwork contract. Maniac's seven-of-seven picture requirement is verified separately in both editions.
+
+The existing four-family source Probe also passes explicit per-family roster assertions after `59173d0`: **48 / 48 / 76 / 76** entries, no object 35 in either Maniac catalog, no 139 or shop displays 183–189 in either Zak catalog, and 53 included in both Zak copies. Maniac's unrelated native items numbered 188/189 remain valid; exclusions are not shared numeric allowlists. The raw source output is retained as ignored `all-family-catalogs.txt`.
 
 ## Comparison with ScummVM (source files and date; runtime comparison if any)
 
