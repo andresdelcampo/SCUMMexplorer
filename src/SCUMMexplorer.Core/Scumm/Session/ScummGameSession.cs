@@ -51,11 +51,17 @@ public sealed class ScummGameSession : ScummSession
         {
             // convertVerbMessage for prints: Script 18 says a dialogue choice through code 5 of the chosen verb (+0x0068).
             _runtime.VerbName = PlayVerbName;
+            // convertStringMessage in prints (S6 Indy4, 17 October 2026): Script 17 +0x00D9 says the chosen dialogue line through code 5, and the line's verb name
+            // is code 7 of a string Room 10 local 208 loaded (with the line's speech codes).
+            if (profile.Version >= ScummVersion.V5) _runtime.StringText = PlayStringText;
         }
         _musicStart = profile.MusicStart;
         _bootInput = profile.BootInput;
         _waitsForControl = profile.BootEndsWhenPlayerHasControl;
         if (boot) Boot();
+        // S6 Indy4 (17 October 2026): from the end of the boot, a talkie's line lasts until its spoken sample ends (ScummVM processSfxQueues), its length
+        // read from the speech bank. The headless boot keeps the text's own timing, so its frame count stays as S4b pinned it (Monkey Island 2 talkie, Indy 4).
+        if (game.Speech is { } speech) Messages.SpeechJiffies = (offset, length) => SpeechJiffies(speech, offset, length);
     }
 
     /// <summary>
@@ -80,6 +86,26 @@ public sealed class ScummGameSession : ScummSession
             ?? game.V4Disks?.Disks.OfType<ScummV5Archive>().FirstOrDefault()?.ReadIndexedObjects()
             ?? throw new InvalidDataException("The game has no v4 or v5 index to read its objects from.");
         return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
+    }
+
+    private readonly Dictionary<int, int?> _speechJiffies = [];
+
+    /// <summary>The spoken line's length in jiffies (1/60 s): its samples over its rate, from the voice file in the speech bank; null if it cannot be read.</summary>
+    private int? SpeechJiffies(ScummSpeechBank speech, int offset, int length)
+    {
+        if (_speechJiffies.TryGetValue(offset, out var known)) return known;
+        int? jiffies;
+        try
+        {
+            var wave = speech.ReadWave(offset, length);
+            var rate = BitConverter.ToInt32(wave, 24);
+            jiffies = rate <= 0 ? null : (int)Math.Ceiling((wave.Length - 44) / 2.0 * 60 / rate);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or NotSupportedException or ArgumentException)
+        {
+            jiffies = null;
+        }
+        return _speechJiffies[offset] = jiffies;
     }
 
     // S6 sound (16 October 2026): a music start stops what the game's AdLib driver stops (ScummProfile.MusicStart). The session's device is AdLib whatever

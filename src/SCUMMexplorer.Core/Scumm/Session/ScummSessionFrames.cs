@@ -132,6 +132,13 @@ public abstract partial class ScummSession
             _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
             return Snapshot;
         }
+        // S6 Indy4 (17 October 2026): setCameraFollows starts a scene only for an actor outside the current room. Room 04 local 200's endCutscene runs Script 21,
+        // whose own actorFollowCamera (dispatched in this frame) has already entered Room 05; the caller's follow at +0x0093 then finds Indy there.
+        if (roomLoad.Operation == "actorFollowCamera" && target.ResourceId == _runtime.CurrentRoom)
+        {
+            _visitTrace.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4}: actorFollowCamera finds the actor in Room {target.ResourceId:00} already; no second startScene");
+            return Snapshot;
+        }
         EnterReachedLoad(roomLoad, target, null, "after a frame advance");
         return Snapshot;
     }
@@ -271,17 +278,24 @@ public abstract partial class ScummSession
             var target = request.Event.TargetId == NullRoom ? null : IndexedRoom(request.Event.TargetId!.Value);
             // The script that loaded the room is still a live slot while the room is entered (ScummVM startScene runs inside the script's
             // own opcode), so the room's entry code sees it with isScriptRunning.
-            _loadingFrames.Add(request.Frame);
-            try
+            // S6 Indy4 (17 October 2026): setCameraFollows starts a scene only for an actor outside the current room. When the deferred follow is dispatched
+            // after the script that called it nested (Room 04 local 200's endCutscene ran Script 21) has itself entered that room, the room is not entered twice.
+            if (request.Event.Operation == "actorFollowCamera" && target is not null && target.ResourceId == _runtime.CurrentRoom)
+                _visitTrace.Add($"{request.Event.SourceLabel} +0x{request.Event.Offset:X4}: actorFollowCamera finds the actor in Room {target.ResourceId:00} already; no second startScene");
+            else
             {
-                if (target is null) EnterNullRoom(request.Event, when);
-                else EnterReachedLoad(request.Event, target, request.Frame, when);
+                _loadingFrames.Add(request.Frame);
+                try
+                {
+                    if (target is null) EnterNullRoom(request.Event, when);
+                    else EnterReachedLoad(request.Event, target, request.Frame, when);
+                }
+                finally
+                {
+                    _loadingFrames.Remove(request.Frame);
+                }
+                entered = true;
             }
-            finally
-            {
-                _loadingFrames.Remove(request.Frame);
-            }
-            entered = true;
             _visitTrace.Add($"{request.Event.SourceLabel} continues at +0x{item.Offset:X4} in Room {target?.ResourceId ?? NullRoom:00} after {request.Event.Operation}");
             _dispatchScope++;
             try

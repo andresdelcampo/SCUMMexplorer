@@ -68,6 +68,12 @@ public readonly record struct ScummVoiceCue(int Offset, int Length)
     public const int LeadInFrames = 150;
 }
 
+/// <summary>
+/// A talkie's spoken line (S6 Indy4, 17 October 2026): the sample's offset in the speech bank and its VCTL size, as the text's code 10 gives them,
+/// the session time (jiffies) it started, and its length in jiffies read from the sample (null when unknown); or a stop (<c>stopTalk</c>).
+/// </summary>
+public readonly record struct ScummSpeechEvent(int Offset, int Length, long Jiffies, int? DurationJiffies, bool IsStop);
+
 /// <summary>A <c>drawBox</c> rectangle in screen coordinates, corners inclusive.</summary>
 public sealed record ScummScreenBox(int Left, int Top, int Right, int Bottom, int Color)
 {
@@ -310,7 +316,7 @@ public sealed class ScummMessageTable
     private string ActorTalk(ScummPrintRequest request, Slot slot, ScummScriptRuntimeState runtime, List<string> estimates)
     {
         var buffer = ScummTextDecoder.ConvertMessage(request.Text!, request.Variables ?? runtime.GlobalVariables,
-            runtime.ObjectName, runtime.VerbName, out var conversionNote);
+            runtime.ObjectName, runtime.VerbName, runtime.StringText, out var conversionNote);
         if (conversionNote is not null) estimates.Add(conversionNote);
         var actor = request.ActorToPrintFor;
         if (actor == NoActor)
@@ -365,7 +371,7 @@ public sealed class ScummMessageTable
     private string DrawString(ScummPrintRequest request, Slot slot, ScummScriptRuntimeState runtime, List<string> estimates)
     {
         var buffer = ScummTextDecoder.ConvertMessage(request.Text!, request.Variables ?? runtime.GlobalVariables,
-            runtime.ObjectName, runtime.VerbName, out var conversionNote);
+            runtime.ObjectName, runtime.VerbName, runtime.StringText, out var conversionNote);
         if (conversionNote is not null) estimates.Add(conversionNote);
         if (slot.PositionEstimate is not null && !request.Operations.Any(item => item.Name == "position"))
             estimates.Add($"the position carries over from an earlier print: {slot.PositionEstimate}");
@@ -509,6 +515,9 @@ public sealed class ScummMessageTable
         // stopTalk (v3): the talking actor in the current room goes back to its talk-stop frame.
         if (_useTalkAnims && TalkingActor != NoActor) TalkAnimation?.Invoke(TalkingActor, false);
         _useTalkAnims = false;
+        // stopTalk stops the talk sound (Sound::stopTalkSound): a line still speaking is cut.
+        if (SpeechPlaying) _speechEvents.Add(new ScummSpeechEvent(0, 0, Jiffies, null, true));
+        _speechEndsAt = null;
         HaveMsg = 0;
         TalkDelay = 0;
         TalkingActor = NoActor;
@@ -525,6 +534,8 @@ public sealed class ScummMessageTable
         if (TalkDelay > 0) return;
         if (HaveMsg == 1)
         {
+            // A talkie's message ends when its text delay is over and its spoken line has finished (Sound::processSfxQueues: finished && _talkDelay == 0).
+            if (SpeechPlaying) return;
             StopTalk();
             return;
         }
@@ -607,6 +618,17 @@ public sealed class ScummMessageTable
                     estimates.Add($"a colour code in the text (colour {color}) is not modelled; the whole text keeps the message colour");
                     break;
                 }
+                case 10 when _bufferPos + 13 < _buffer.Count && _buffer[_bufferPos + 2] is 0xFF or 0xFE && _buffer[_bufferPos + 3] == 10 &&
+                             _buffer[_bufferPos + 6] is 0xFF or 0xFE && _buffer[_bufferPos + 7] == 10 && _buffer[_bufferPos + 10] is 0xFF or 0xFE && _buffer[_bufferPos + 11] == 10:
+                {
+                    // The talkie's spoken line (ScummVM handleNextCharsetCode case 10, read 17 October 2026): four codes give the sample's offset in the
+                    // speech bank (bytes 0, 1, 4, 5) and the size of its VCTL block (bytes 8, 9, 12, 13); talkSound(a, b, 2) starts it.
+                    var offset = _buffer[_bufferPos] | _buffer[_bufferPos + 1] << 8 | _buffer[_bufferPos + 4] << 16 | _buffer[_bufferPos + 5] << 24;
+                    var length = _buffer[_bufferPos + 8] | _buffer[_bufferPos + 9] << 8 | _buffer[_bufferPos + 12] << 16 | _buffer[_bufferPos + 13] << 24;
+                    _bufferPos += 14;
+                    StartSpeech(offset, length, estimates);
+                    break;
+                }
                 case 10 or 13 or 14:
                     estimates.Add($"text code {c} is not modelled");
                     _bufferPos += 2;
@@ -615,6 +637,30 @@ public sealed class ScummMessageTable
                     return (0, true);
             }
         }
+    }
+
+    /// <summary>
+    /// How long a spoken line of the speech bank plays, in jiffies, from its offset and VCTL size (the session gives it from the game's
+    /// <c>MONSTER.SOU</c>); null when the game has no bank or the sample cannot be read. Without it a line ends with its text, as before.
+    /// </summary>
+    public Func<int, int, int?>? SpeechJiffies { get; set; }
+
+    private readonly List<ScummSpeechEvent> _speechEvents = [];
+    private long? _speechEndsAt;
+
+    /// <summary>Every spoken line a shown text started, and every stop of a line still playing (<c>stopTalk</c> stops the talk sound), in order.</summary>
+    public IReadOnlyList<ScummSpeechEvent> SpeechEvents => _speechEvents;
+
+    /// <summary>True while the last started line still plays on the session clock.</summary>
+    public bool SpeechPlaying => _speechEndsAt is long end && Jiffies < end;
+
+    private void StartSpeech(int offset, int length, List<string> estimates)
+    {
+        if (SpeechPlaying) _speechEvents.Add(new ScummSpeechEvent(0, 0, Jiffies, null, true));
+        var duration = SpeechJiffies?.Invoke(offset, length);
+        _speechEvents.Add(new ScummSpeechEvent(offset, length, Jiffies, duration, false));
+        _speechEndsAt = duration is int jiffies ? Jiffies + jiffies : null;
+        if (duration is null && SpeechJiffies is not null) estimates.Add($"the spoken line at {offset} could not be read; the line lasts as its text");
     }
 
     /// <summary><c>VAR_HAVE_MSG</c> (v3 var 3).</summary>

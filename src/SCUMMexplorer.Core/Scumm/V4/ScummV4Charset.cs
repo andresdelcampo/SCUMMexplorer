@@ -137,7 +137,12 @@ public sealed class ScummV4Charset : IScummTextCharset
         {
             int glyph = glyphs[index];
             if (glyph == 0) break;
-            if (glyph is 0xFF or 0xFE) { index++; continue; }
+            if (glyph is 0xFF or 0xFE)
+            {
+                // drawString: codes 9, 10, 12, 13 and 14 carry two operand bytes (S6 Indy4, 17 October 2026: a dialogue line's speech codes, code 10).
+                if (++index < glyphs.Count && glyphs[index] is 9 or 10 or 12 or 13 or 14) index += 2;
+                continue;
+            }
             if (glyph == '@') continue;
             var glyphWidth = CharWidth(glyph);
             if (left + glyphWidth > ScummV3MessageRenderer.ScreenWidth) break;

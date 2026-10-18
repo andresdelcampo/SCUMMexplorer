@@ -167,7 +167,7 @@ public static class ScummTextDecoder
                     if (!TryReadVariable(value, variables, out var verb))
                         note = $"the text shows the name of the verb in variable 0x{value:X4}, which is unknown here";
                     else if (verb != 0 && verbName(verb) is { } verbText)
-                        output.AddRange(ConvertMessage(verbText, variables, objectName, null, out _));
+                        output.AddRange(ConvertMessage(verbText, variables, objectName, null, stringText, out _));
                     break;
                 case 7 when stringText is not null:
                     if (stringText(value) is { } stored) output.AddRange(ConvertMessage(stored, variables, objectName, verbName, null, out _));

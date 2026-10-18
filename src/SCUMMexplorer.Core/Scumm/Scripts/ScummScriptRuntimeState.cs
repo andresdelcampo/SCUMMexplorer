@@ -169,6 +169,11 @@ public sealed class ScummScriptRuntimeState
     public Func<int, int, int>? ActorFromPosition { get; set; }
     /// <summary>ScummVM <c>convertVerbMessage</c> (text code 5): the name of the verb in use with that number; null where the session does not model it.</summary>
     public Func<int, byte[]?>? VerbName { get; set; }
+    /// <summary>
+    /// ScummVM <c>convertStringMessage</c> (text code 7) for printed text: the string resource with that operand; null where the session does not model it.
+    /// S6 Indy4 (17 October 2026): a dialogue line is a verb whose name is code 7 of a string, and the chosen line is printed through code 5.
+    /// </summary>
+    public Func<int, byte[]?>? StringText { get; set; }
     public bool AddToInventorySlots(int subject)
     {
         var free = Array.IndexOf(InventorySlots, 0);

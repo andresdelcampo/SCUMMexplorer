@@ -3238,7 +3238,9 @@ public sealed partial class ScummBoundedScriptExecutor
                     {
                         var parts = instruction.Operands.Split(',', 3, StringSplitOptions.TrimEntries);
                         if (parts.Length != 3 || !TryReadValue(parts[1], knownVariables, out var id, out _)) { handled = false; return true; }
-                        if (!onEstimatedPath) runtime.Strings[id & 0xFF] = UnescapeStringOperand(parts[2]);
+                        // S6 Indy4 (17 October 2026): the text is the instruction's own literal, so a seeded-pick path (R-1.4, labelled) stores it as it turns on the
+                        // verbs that show it: Room 10 local 208 fills the dialogue lines, strings 0x29 up, after a getRandomNr.
+                        runtime.Strings[id & 0xFF] = UnescapeStringOperand(parts[2]);
                         return true;
                     }
                     case "createString" or "copyString":

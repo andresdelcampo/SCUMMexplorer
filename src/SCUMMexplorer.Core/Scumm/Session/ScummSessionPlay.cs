@@ -116,7 +116,7 @@ public abstract partial class ScummSession
 
     // convertStringMessage (code 7): the string resource stringOps loaded; version 3 reads the number from a variable first, versions 4 and 5 take it as it is
     // (ScummVM charset.cpp/string.cpp, master read 17 October 2026; Monkey Island CD's sentence line, Script 12, puts string 49 between verb and object).
-    private byte[]? PlayStringText(int operand)
+    protected byte[]? PlayStringText(int operand)
     {
         var number = operand;
         if (ScummProfile.For(_game).EngineVersion == ScummVersion.V3)
