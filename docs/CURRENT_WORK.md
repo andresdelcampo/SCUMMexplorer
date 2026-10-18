@@ -4,6 +4,8 @@
 
 **S7 Maniac/Zak derived lists implemented (18 October, separate orchestrator).** Cutscenes Partial for all four families, with three completed source examples per family and four passing real-window checks. Maniac lists 27 groups (6 classic/7 enhanced fresh starts); Zak lists 54 (13 starts per edition, five frame bounds). State-gated entries, post-scene Script 174, rendered Spanish fonts and earlier S5/S6 limits remain disclosed. Next: S9; S8 is opt-in. [Checkpoint](checkpoints/20261018-S7-ManiacZak.md), [dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md).
 
+**S9 Maniac/Zak in progress (18 October, separate orchestrator).** Three family workers audit available editions in isolated worktrees; ZakClassic follows ZakEnhanced as its own item. The root currently holds one copy per family, so additional-edition compatibility remains unverified. Parent exclusively owns shared changes: a demonstrated Spanish rendered-font mismatch will use a fingerprinted native font descriptor and an additive v1/v2 charset loader; no other-family renderer behavior changes. [Plan/checkpoint](checkpoints/20261018-S9-ManiacZak.md).
+
 # Current work
 
 **S4b Maniac/Zak done (17 October, separate orchestrator).** ManiacClassic and ManiacEnhanced reach stable Room 44 control through explicitly selected Syd/Bernard party inputs; ZakClassic and ZakEnhanced finish their full introductions in Room 1 with stable control. Registry levels are unchanged. [Checkpoint and validation](checkpoints/20261017-S4b-ManiacZak.md), [dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md). Next for these four families: S5, then S6 verb-based play, S7 and S9. LOOM, Indy3 and Monkey Island remain the other orchestrator's scope.
