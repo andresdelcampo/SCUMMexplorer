@@ -8,6 +8,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Native darkness, flashlight geometry/defaults and dark actor palettes are rendered in Play, room previews and thumbnails. Four actual-window bitmap comparisons and both Zak moving beams pass; captures inspected. Version rules preserve later-family behavior.
 - V1 costume changes now retain dynamic palettes. ZakClassic context evidence includes early boss palette 0, later 7, variable writers and alternate actors; the 24-derived/11-estimate card table stays Partial.
 - Two previously capped starts complete per Zak edition (646/907 frames). Three retained caps are classified native ticket-state waits or the terminal Escape/restart loop; no prerequisites/input fabricated. Cutscenes stays Partial. Matrix regeneration passes three checks; final integrated validation is in the [checkpoint](checkpoints/20261018-Fidelity-ManiacZak.md).
+- Final validation against master `9430cb5`: **1286 passed, zero failed, five skipped** (7m37s); build zero warnings/errors; 65 integrated focused checks, three matrix checks and four actual-window processes passed. Maniac battery Use-with insertion remains unresolved after two retained attempts; native acquisition succeeds, no successful battery beam is claimed.
 
 ## 18 October: explicit Maniac/Zak inventory status and undo (S8, all four families)
 

@@ -54,7 +54,7 @@ Two of the five formerly capped starts now finish in each edition. One further a
 
 Per-family regression results and own-edition source offsets are in the enhanced/classic scene records added by the worker; final solution/matrix/full-suite/window results are in the [checkpoint](../../docs/checkpoints/20261018-Fidelity-ManiacZak.md).
 
-Integrated focused run: **65 passed, zero failed/skipped**, with four-family Play and LOOM EGA/CD safeguards. Solution build: zero warnings/errors. Matrix checks: three passed, levels unchanged. Full suite pending. Read-only independent review found no actionable engine/rendering/App issue; four actual-window lighting checks pass in the linked lighting record. Local reports are `test-results/fidelity-focused.trx` and `test-results/maniaczak-fidelity-full.trx`.
+Integrated focused run: **65 passed, zero failed/skipped**, with four-family Play and LOOM EGA/CD safeguards. Solution build: zero warnings/errors. Matrix checks: three passed, levels unchanged. Full suite against master `9430cb5`: **1286 passed, zero failed, five skipped**, 1291 total, **7m37s** (18 October 15:14:14–15:21:52 CEST), with all three external fixture settings. Read-only independent review found no actionable engine/rendering/App issue; four actual-window lighting checks pass in the linked lighting record. Local reports are `test-results/fidelity-focused.trx` and `test-results/maniaczak-fidelity-full.trx`.
 
 ## Comparison with ScummVM (source files and date; runtime comparison if any)
 
