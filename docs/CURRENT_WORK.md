@@ -2,6 +2,8 @@
 
 **S6 Maniac/Zak bounded native Play done (17 October, separate orchestrator).** All four family routes pass headless and in the real window: native verbs/sentence/inventory, walked exits, pickups, choices and override skip. Maniac retains player party selection; Zak completes the shop response and returns control. Objects and Play are Full; README/REQUIREMENTS matrices are regenerated. S5 original-game visual limits, native darkness/flashlight and untested paths remain explicit. Next: S7 and S9; S8 only if requested. [Checkpoint](checkpoints/20261017-S6-ManiacZak.md), [dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md).
 
+**S7 Maniac/Zak in progress (18 October, separate orchestrator).** Four family items in isolated worktrees. ManiacEnhanced owns shared Core cutscene scan/planner/runtime prerequisites; parent owns App integration, requirements, registry and generated matrices. Other family workers perform independent scans, source evidence and tests. Existing S5/S6 limitations remain. [Plan](checkpoints/20261018-S7-ManiacZak.md).
+
 # Current work
 
 **S4b Maniac/Zak done (17 October, separate orchestrator).** ManiacClassic and ManiacEnhanced reach stable Room 44 control through explicitly selected Syd/Bernard party inputs; ZakClassic and ZakEnhanced finish their full introductions in Room 1 with stable control. Registry levels are unchanged. [Checkpoint and validation](checkpoints/20261017-S4b-ManiacZak.md), [dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md). Next for these four families: S5, then S6 verb-based play, S7 and S9. LOOM, Indy3 and Monkey Island remain the other orchestrator's scope.
