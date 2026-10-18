@@ -1,37 +1,62 @@
 <Window x:Class="SCUMMexplorer.App.InventoryStatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Game Status" Width="820" Height="600" MinWidth="680" MinHeight="440"
+        Title="Game Status" Width="900" Height="720" MinWidth="780" MinHeight="560"
         WindowStartupLocation="CenterOwner" Background="#101821" Foreground="#E7E0D2">
+    <Window.Resources>
+        <DataTemplate x:Key="CharacterChoiceTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding Portrait}" Width="30" Height="54" Margin="0,0,8,0" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
     <Grid Margin="24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel>
             <TextBlock Text="Game Status" FontSize="24" FontWeight="SemiBold"/>
             <TextBlock x:Name="SessionSummary" Foreground="#C6B99F" Margin="0,6,0,16"/>
-            <TextBlock Text="Inventory across your characters" FontSize="17"/>
-            <TextBlock Text="These are your exploration choices, not played scenes or earned pickups."
+            <TextBlock Text="Edit your characters’ inventory" FontSize="17"/>
+            <TextBlock Text="Admin choices: add items or move them between characters. These are not earned pickups or played scenes."
                        TextWrapping="Wrap" Foreground="#C6B99F" Margin="0,6,0,16"/>
         </StackPanel>
-        <Grid Grid.Row="1" Background="#273642" Margin="0,0,0,1">
+        <Grid Grid.Row="1" Margin="0,0,0,18">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="All game items" Margin="0,0,0,5"/>
+                <TextBox x:Name="ItemSearch" TextChanged="ItemSearch_TextChanged" ToolTip="Find an item" AutomationProperties.Name="Find an item" Margin="0,0,0,5"
+                         Background="#1B2833" Foreground="#E7E0D2" BorderBrush="#4A5962" Padding="8,5"/>
+                <ComboBox x:Name="CatalogItems" SelectionChanged="CatalogItems_SelectionChanged" MinHeight="44"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                <TextBlock Text="Give to" Margin="0,0,0,5"/>
+                <ComboBox x:Name="GrantRecipient" SelectionChanged="CatalogItems_SelectionChanged" MinHeight="72" MaxDropDownHeight="520"/>
+            </StackPanel>
+            <Button Grid.Column="2" x:Name="AddItemButton" Content="Add item" Click="AddItem_Click" VerticalAlignment="Bottom" Padding="16,10"/>
+        </Grid>
+        <Grid Grid.Row="2" Background="#273642" Margin="0,0,0,1">
             <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <TextBlock Text="Item" Margin="10,9"/>
             <TextBlock Grid.Column="1" Text="Held by" Margin="10,9"/>
             <TextBlock Grid.Column="2" Text="Move to" Margin="10,9"/>
         </Grid>
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#151F29">
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#151F29">
             <StackPanel x:Name="InventoryRows"/>
         </ScrollViewer>
-        <StackPanel Grid.Row="3" Margin="0,14,0,14">
-            <TextBlock x:Name="ChoiceSummary" Text="Changes take effect when you press Apply." TextWrapping="Wrap" Foreground="#C6B99F"/>
-            <TextBlock x:Name="AdvancedEvidence" TextWrapping="Wrap" Foreground="#9FABAE" FontSize="11" Margin="0,6,0,0" Visibility="Collapsed"/>
+        <StackPanel Grid.Row="4" Margin="0,14,0,14">
+            <TextBlock x:Name="CapacitySummary" Foreground="#C6B99F" Margin="0,0,0,6"/>
+            <TextBlock x:Name="ChoiceSummary" Text="Changes take effect when you press Apply Changes. Close discards pending choices." TextWrapping="Wrap" Foreground="#C6B99F"/>
+            <ScrollViewer MaxHeight="100" VerticalScrollBarVisibility="Auto" Visibility="{Binding Visibility, ElementName=AdvancedEvidence}">
+                <TextBlock x:Name="AdvancedEvidence" TextWrapping="Wrap" Foreground="#9FABAE" FontSize="11" Margin="0,6,0,0" Visibility="Collapsed"/>
+            </ScrollViewer>
         </StackPanel>
-        <DockPanel Grid.Row="4" LastChildFill="False">
+        <DockPanel Grid.Row="5" LastChildFill="False">
             <Button x:Name="UndoButton" Content="Undo last change" Click="Undo_Click" Padding="14,8" DockPanel.Dock="Left"/>
-            <Button x:Name="CancelButton" Content="Cancel" Click="Cancel_Click" IsCancel="True" Padding="18,8" DockPanel.Dock="Right" Margin="10,0,0,0"/>
-            <Button x:Name="ApplyButton" Content="Apply" Click="Apply_Click" IsDefault="True" Padding="18,8" DockPanel.Dock="Right"/>
+            <Button x:Name="CancelButton" Content="Close" Click="Cancel_Click" IsCancel="True" Padding="18,8" DockPanel.Dock="Right" Margin="10,0,0,0"/>
+            <Button x:Name="ApplyButton" Content="Apply Changes" Click="Apply_Click" IsDefault="True" Padding="18,8" DockPanel.Dock="Right"/>
         </DockPanel>
     </Grid>
 </Window>
