@@ -9,13 +9,13 @@ Family: Indy4 | Fixture: `Games/indy4 vga en` (`ATLANTIS.cue`) | Last updated: 1
 | S3 Sound | in progress, **partial** | Sound | [v5-sound-leftovers-20261014](../../.verification/v5-sound-leftovers-20261014/README.md) | listening check listed in the run report: yes; result: pending |
 | S4b Session | done (17 Oct) | – | [indy4-session-20261017](../../.verification/indy4-session-20261017/README.md) | logo (Room 68), Barnett College (Room 4) with the player in control after 721 frames; unsupported 0; no assumed input |
 | S5 Objects | done (17 Oct); Full with S6 | Objects (Full) | [indy4-objects-20261017](../../.verification/indy4-objects-20261017/README.md) | 96/96 rooms without a gap; Rooms 76, 77, 87 keep a camera-after-walk item; the ten-room comparison with ScummVM is not done |
-| S6 Play | done (18 Oct) | Play (Full) | [indy4-play-20261017](../../.verification/indy4-play-20261017/README.md) | route: prologue click, Esc skip, sentence, take, dialogue line with speech, crates + fire escape cutscene skip to Room 12; spoken lines from MONSTER.SOU in play; current-state images and iMUSE in play come from S6 Monkey2 (not on master yet) |
+| S6 Play | done (18 Oct) | Play (Full) | [indy4-play-20261017](../../.verification/indy4-play-20261017/README.md) | route: prologue click, Esc skip, sentence, take, dialogue line with speech, crates + fire escape cutscene skip to Room 12; spoken lines from MONSTER.SOU in play; current-state images and iMUSE in play from S6 Monkey2 (merged, 8fa733e) |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | indy4 talkie vga es and classic vga es are local; the classic (floppy) release may ask the copy-protection question the talkie skips |
 
-Blocked on: S6 Monkey2's shared play additions (current-state object images, iMUSE music in play) for the play view's images and music; the script-driven sound hooks with them.
-Next: S7 Cutscenes; merge the Monkey2 play additions and re-run the window check; the user checks of the S6 record.
+Blocked on: nothing.
+Next: S7 Cutscenes; the user checks of the S6 record.
 Open uncertainties: as Monkey Island 2. The CD image has a single data track (`TRACK 1 MODE1/2352` only), so there are no CD audio tracks to list; its music is iMUSE on the devices (456 parts, 226 loop). Session sound lengths are the iMUSE default path (estimates). A magenta line crosses Room 4's picture after the boot (not investigated).
 
 ## Decision log

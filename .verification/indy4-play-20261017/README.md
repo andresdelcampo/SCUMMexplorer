@@ -47,7 +47,7 @@ Exe\Indy4PlayWindowCheck\Debug\net10.0-windows\Indy4PlayWindowCheck.exe "D:\Jueg
 ## Results (numbers)
 
 - `ScummIndy4PlayTests`: 3 of 3 pass (route; main-menu key and a verb's key; a line lasts as its sample). Indy4 and Monkey2 filter: 22 of 22.
-- Regression filter before the last master merge: **1222 passed, 5 skipped (LOOM dumps), 0 failed**. After merging master `b1174cd`: **1289 passed, 5 skipped, 0 failed**.
+- Regression filter before the last master merge: **1222 passed, 5 skipped (LOOM dumps), 0 failed**. After merging master `b1174cd`: **1289 passed, 5 skipped, 0 failed**. After merging master `8fa733e` (S6 Monkey2), with the iMUSE filter added: **1298 passed, 5 skipped, 0 failed**.
 - Route frames: Room 5 at 239, New York at 572, newspaper taken at 670, dialogue choices at 743, climb at 1011, Room 12 at 1012.
 - Spoken lines measured from the samples: Marcus 0x0507BB6E 215 jiffies; "But--" 0x040B3E4B 13 jiffies; the boot and the route start 16 lines up to the dialogue.
 - The real window (`window/play-check.txt`, `window/play-0*.png`):
@@ -76,7 +76,7 @@ The bundled ScummVM was not run (brief). The same route side by side in ScummVM 
 - **Speech timing applies after the boot only.** The headless boot keeps the text's own timing, so the S4b frame counts of Indy4 and Monkey Island 2 (talkie) stay as pinned. With speech timing the MI2 talkie boot exceeds 5000 frames.
 - **Mouth sync is not modelled.** That is the VCTL words and the talk frames during speech.
 - **The first inventory slot (object 23, the magazine) draws no icon.** Script 10 gave it image object 0. It was taken during Smith's cutscene in Room 1; not investigated.
-- **Shared play additions owned by S6 Monkey2 are not on master yet.** These are the current-state object image and iMUSE music during play. The route does not depend on them. Play's music for Indy4 is today's (`RenderPlaySound`, device rendering), and the play view still draws each object's first state image.
+- **Shared play additions from S6 Monkey2** (current-state object images, iMUSE music with loops and jump hooks, text verbs skipping code operands) were merged from master `8fa733e` and are used as they are. The route and the window check were re-run on them. The window check does not log music; listening is a user check.
 - **Not covered.** The prologue's other rooms, the Biff conversation's way in, and the fist fight.
 - **Timing.** Perceived timing and audio-visual sync are the user's check (R-2.4).
 
