@@ -53,6 +53,7 @@ public sealed partial class ScummBoundedScriptExecutor
         var p = source.Operands.Split(',', StringSplitOptions.TrimEntries);
         bool Read(int n, out ushort value) { value = 0; return n < p.Length && TryReadValue(p[n], variables, out value, out _); }
         string Value(int n, int scale = 1) => Read(n, out var value) ? $"0x{unchecked((ushort)(value * scale)):X4}" : p[n];
+        ushort Global(string key) => variables.TryGetValue(key, out var value) ? value : (ushort)0;
         switch (source.Operation)
         {
             case "setObjectName":
@@ -72,7 +73,10 @@ public sealed partial class ScummBoundedScriptExecutor
                     if (sentenceVerb?.Preposition == 255) return false; // Requires old object header prep lookup.
                     if (sentenceVerb is not null) variables["var[0x01D]"] = (ushort)sentenceVerb.Preposition;
                 }
-                trace.Add("v2 sentence display requested; sentence-line rendering remains S6");
+                if ((runtime.V2UserState & 0x20) != 0)
+                    runtime.V2DrawnSentence = (Global(ScummVars.V2.SentenceVerb), Global(ScummVars.V2.SentenceObject1),
+                        Global(ScummVars.V2.SentenceObject2), Global(ScummVars.V2.SentencePreposition));
+                trace.Add("v2 native sentence line redrawn");
                 handled = true;
                 return true;
             case "dummy" when source.Opcode == 0xEE: handled = true; return true;
@@ -304,13 +308,12 @@ public sealed partial class ScummBoundedScriptExecutor
                 variables["var[0x01A]"] = verb;
                 variables["var[0x01B]"] = objectA;
                 variables["var[0x01C]"] = objectB;
-                trace.Add("v2 sentence display state updated; sentence rendering is not implemented");
-                handled = true;
-                return true;
+                  return PrepareV2Instruction(source with { Operation = "drawSentence" }, variables, states, runtime, objects,
+                      trace, estimatedPath, out instruction, out handled, out branch, out problem);
             case "stopObjectCode": case "breakHere": case "jumpRelative": case "increment": case "decrement":
             case "isNotEqual": case "isEqual": case "beginOverride":
             case "equalZero": case "notEqualZero": case "delay": case "delayVariable": case "getRandomNr":
-            case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom":
+            case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom": case "loadRoomWithEgo":
             case "isScriptRunning": case "isSoundRunning": case "getObjectOwner": case "setOwnerOf":
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":

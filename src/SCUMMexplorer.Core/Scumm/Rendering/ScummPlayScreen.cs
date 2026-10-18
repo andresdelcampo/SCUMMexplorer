@@ -46,17 +46,18 @@ public sealed class ScummPlayScreen
         {
             var resource = _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId);
             if (resource is null) return null;
-            var image = ScummProfile.For(_game).UsesV4Archive
+            var image = _data is ScummV2DataSource v2 ? v2.ReadBackground(roomId) : ScummProfile.For(_game).UsesV4Archive
                 ? (_game.V4ArchiveFor(resource) ?? throw new InvalidDataException($"Room {roomId:00} is on none of the game's disks.")).DecodeRoom(roomId)
                 : new ScummV3EgaRoomDecoder().Decode(File.ReadAllBytes(resource.FilePath));
             _rooms[roomId] = room = (image, _data.ReadRoom(roomId).Objects, _data.ReadObjectImages(roomId));
         }
         var capture = _session.CaptureRoom();
         var snapshot = capture.Snapshot;
-        var selection = new RoomObjectSelection(room.Images, snapshot.ObjectStates, snapshot.ObjectPositions, room.Records, room.Room, _indexedStates, snapshot.DrawOrder);
+        byte intrinsicMask = _data is ScummV2DataSource ? (byte)8 : (byte)15;
+        var selection = new RoomObjectSelection(room.Images, snapshot.ObjectStates, snapshot.ObjectPositions, room.Records, room.Room, _indexedStates, snapshot.DrawOrder, intrinsicStateMask: intrinsicMask);
         return new ScummRoomScene(roomId, room.Room, room.Records, room.Images, capture, selection, ScummSettleOutcome.Settled, 0, null,
             id => { try { return _session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
-            false, []) { IndexedStates = _indexedStates };
+            false, []) { IndexedStates = _indexedStates, IntrinsicStateMask = intrinsicMask, EngineVersion = (int)ScummProfile.For(_game).EngineVersion };
     }
 
     /// <summary>The screen at this frame; <paramref name="frame"/> drives the cursor's colour cycle.</summary>
@@ -110,7 +111,7 @@ public sealed class ScummPlayScreen
         if (cursor && _session.ScreenPointer is { } pointer)
         {
             var colour = Colour(basePalette, CursorColors[(frame >> 1) & 3]);
-            foreach (var (dx, dy) in CursorPoints)
+            foreach (var (dx, dy) in _data is ScummV2DataSource ? OldCursorPoints : CursorPoints)
             {
                 var (px, py) = (pointer.X + dx, pointer.Y + dy);
                 if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * ScummPlayFrame.Width + px] = colour;
@@ -126,6 +127,23 @@ public sealed class ScummPlayScreen
     /// <summary>The cursor's lit pixels as offsets from the pointer (the hotspot, 8, 7 of the 16 × 16 image).</summary>
     public static IReadOnlyList<(int Dx, int Dy)> CursorPoints { get; } =
         [.. Enumerable.Range(0, 16).SelectMany(row => Enumerable.Range(0, 16).Where(bit => (CrossHairImage[row] & (1 << bit)) != 0).Select(bit => (15 - bit - 8, row - 7)))];
+    // ScummEngine_v2::setBuiltinCursor, DOS 23x21 crosshair, hotspot (11,10).
+    public static IReadOnlyList<(int Dx, int Dy)> OldCursorPoints { get; } = BuildOldCursor();
+    private static IReadOnlyList<(int, int)> BuildOldCursor()
+    {
+        var points = new HashSet<(int, int)>();
+        foreach (var sign in new[] { -1, 1 })
+        {
+            for (var i = 5; i <= 11; i++) points.Add((sign * i, 0));
+            for (var i = 3; i <= 10; i++) points.Add((0, sign * i));
+            foreach (var other in new[] { -1, 1 })
+            {
+                for (var i = 1; i <= 3; i++) { points.Add((sign * (5 + i), other * i)); points.Add((sign * i, other * (3 + i))); }
+                points.Add((sign * 7, other)); points.Add((sign, other * 5));
+            }
+        }
+        return points.ToArray();
+    }
     private static uint Colour(IReadOnlyList<uint> palette, byte index) => index < palette.Count ? palette[index] | 0xFF000000u : 0xFF000000u;
 
     /// <summary>The 16 EGA colours (for the screen outside a room).</summary>

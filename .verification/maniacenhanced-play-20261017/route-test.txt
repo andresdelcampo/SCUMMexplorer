@@ -1,0 +1,98 @@
+  SCUMMexplorer.Core -> D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s6\Exe\SCUMMexplorer.Core\Debug\net10.0\SCUMMexplorer.Core.dll
+  SCUMMexplorer.Tests -> D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s6\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll
+Test run for D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s6\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s6\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.3)
+[xUnit.net 00:00:00.08]   Discovering: SCUMMexplorer.Tests
+[xUnit.net 00:00:00.21]   Discovered:  SCUMMexplorer.Tests
+[xUnit.net 00:00:00.23]   Starting:    SCUMMexplorer.Tests
+[xUnit.net 00:00:02.45]   Finished:    SCUMMexplorer.Tests
+  Passed SCUMMexplorer.Tests.ScummManiacEnhancedPlayTests.PartyChoiceSkipSentenceWalkingAndPickupUseTheNativeInterface [2 s]
+  Standard Output Messages:
+ frame 1: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (76, 120), room (76, 104) }; room=45, sentence=
+ frame 102: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (196, 120), room (196, 104) }; room=45, sentence=
+ frame 203: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (292, 76), room (292, 60) }; room=45, sentence=
+ abortCutscene: Script 131 continues at its skip jump +0x0008, var[0x005] = 1
+ frame 940: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (8, 136), room (8, 120) }; room=44, sentence=Ir a 
+ ScummRoomObjectRecord { Id = 55, LocalIndex = 3, X = 408, Y = 80, Width = 16, Height = 8, ParentLocalIndex = 4, ParentRequiredState = 8, WalkX = 408, WalkY = 80, Direction = 2, CodeOffset = 17492, ImageOffset = 16342 }
+ ScummRoomObjectRecord { Id = 54, LocalIndex = 4, X = 336, Y = 80, Width = 88, Height = 8, ParentLocalIndex = 0, ParentRequiredState = 0, WalkX = 376, WalkY = 80, Direction = 2, CodeOffset = 17434, ImageOffset = 16106 }
+ frame 1089: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (8, 136), room (648, 120) }; room=1, sentence=Ir a
+ frame 1290: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (8, 136), room (496, 120) }; room=1, sentence=Ir a
+ entrance: frame=1490, viewLeft=352, ego=512
+ frame 1492: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (24, 100), room (376, 84) }; room=1, sentence=Coger felpudo
+ frame 1493: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (24, 100), room (376, 84) }; room=1, sentence=Coger felpudo
+ frame 1544: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (168, 100), room (416, 84) }; room=1, sentence=Coger llave
+ frame 1545: ScummPlayInput { Area = 2, Value = 0, Mode = 1, Description = click in the room at screen (168, 100), room (416, 84) }; room=1, sentence=Coger llave
+ frame 1554: ScummPlayInput { Area = 3, Value = 55, Mode = 0, Description = click on inventory object 55 }; room=1, sentence=Ir a llave
+ complete: frames=1554; inputs=13; keyOwner=3; sentence=Ir a llave
+ Script 02 +0x01AD: startObject runs object 260 verb 0x0D
+ Script 02 +0x01AD: startObject runs object 263 verb 0x0D
+ Script 02 +0x01AD: startObject runs object 403 verb 0x0D
+ abortCutscene: Script 131 continues at its skip jump +0x0008, var[0x005] = 1
+ Script 02 +0x01AD: startObject runs object 258 verb 0x0D
+ Script 02 +0x01AD: startObject runs object 54 verb 0x0E
+ Script 02 +0x01AD: startObject runs object 55 verb 0x0E
+ Script 2 +0077: doSentence 0x03, var[0x009], var[0x00A], sub=0x01
+ Script 2 +007C: doSentence 0xFB
+ Script 2 +00E9: doSentence var[0x008], var[0x009], var[0x00A], sub=0x00
+ Script 2 +00EE: doSentence 0x0E, var[0x009], 0x0000, sub=0x00
+ Script 2 +0104: doSentence var[0x008], var[0x009], var[0x00A], sub=0x00
+ Script 2 +0109: doSentence 0x0E, var[0x00A], 0x0000, sub=0x00
+ Script 2 +01AD: doSentence var[0x008], var[0x009], var[0x00A], sub=0x01
+ Script 2 +01B2: doSentence var[0x01A], var[0x01B], var[0x01C], sub=0x02
+ Script 4 +00DC: doSentence 0xFC
+ Script 4 +00F1: doSentence 0xFC
+ Script 4 +0106: doSentence 0xFC
+ Script 4 +0130: doSentence 0xFB
+ Script 4 +013C: doSentence var[0x01A], 0x0000, 0x0000, sub=0x02
+ Script 4 +0155: doSentence var[0x01A], var[0x01B], 0x0000, sub=0x02
+ Script 4 +01B3: doSentence 0xFB
+ Script 4 +01E5: doSentence 0xFB
+ Script 4 +0291: doSentence var[0x01A], var[0x01B], var[0x01C], sub=0x02
+ Script 4 +02B9: doSentence 0xFC
+ Script 4 +02BB: doSentence var[0x01A], var[0x01B], var[0x01C], sub=0x00
+ Script 4 +02E0: doSentence 0xFC
+ Script 4 +02EC: doSentence 0xFB
+ Script 131 +0007: beginOverride 0x18, 0x0201
+ Script 131 +0239: endCutscene 
+ Room 45 object 260 verb 13: ScummObjectVerbEntry { ObjectId = 260, VerbId = 255, CodeOffset = 6897, TableOffset = 6912, ScriptOffset = 6916, ResourceEnd = 6987, IsFallback = True, Label = Fallback verb }
+ +0013: move var[0x06D], 0x0001
+ +0017: print 0xFF, [text "Syd - un aspirante a m}sico que quiere\xFF\x01montar su propia banda new wave."]
+ +0055: increment var[0x047]
+ +0057: startScript 0x72
+ +0059: stopObjectCode 
+ Room 45 object 263 verb 13: ScummObjectVerbEntry { ObjectId = 263, VerbId = 255, CodeOffset = 7151, TableOffset = 7166, ScriptOffset = 7170, ResourceEnd = 7241, IsFallback = True, Label = Fallback verb }
+ +0013: move var[0x06D], 0x0005
+ +0017: print 0xFF, [text "Bernard - presidente del club de f>sica\xFF\x01y ganador del Premio Bicho Raro."]
+ +0057: startScript 0x72
+ +0059: stopObjectCode 
+ Room 45 object 403 verb 13: ScummObjectVerbEntry { ObjectId = 403, VerbId = 255, CodeOffset = 7484, TableOffset = 7499, ScriptOffset = 7503, ResourceEnd = 7553, IsFallback = True, Label = Fallback verb }
+ +0013: startSound 0x36
+ +0015: isGreater var[0x06F], 0x0003, +37  ->  0x0040
+ +001B: print 0xFF, [text "   Elige dos chavales adem=s de Dave."]
+ +003D: jumpRelative +4  ->  0x0044
+ +0040: move var[0x06E], 0x0001
+ +0044: stopObjectCode 
+ Room 44 object 258 verb 13: ScummObjectVerbEntry { ObjectId = 258, VerbId = 13, CodeOffset = 6268, TableOffset = 6283, ScriptOffset = 6287, ResourceEnd = 6294, IsFallback = False, Label = Verb 0x0D }
+ +0013: loadRoomWithEgo 0x0101, 0x01, walkTo=(-1, -1)
+ +0019: stopObjectCode 
+ Room 1 object 54 verb 14: ScummObjectVerbEntry { ObjectId = 54, VerbId = 14, CodeOffset = 17434, TableOffset = 17449, ScriptOffset = 17464, ResourceEnd = 17492, IsFallback = False, Label = Verb 0x0E }
+ +001E: ifState var[0x009], IntrinsicOff, +18  ->  0x0034
+ +0022: printEgo ego, [text "Lo dejar] aqu>."]
+ +0031: jumpRelative +2  ->  0x0036
+ +0034: setState var[0x009], IntrinsicOn
+ +0036: stopObjectCode 
+ Room 1 object 55 verb 14: ScummObjectVerbEntry { ObjectId = 55, VerbId = 14, CodeOffset = 17492, TableOffset = 17507, ScriptOffset = 17518, ResourceEnd = 17554, IsFallback = False, Label = Verb 0x0E }
+ +001A: pickupObject var[0x009]
+ +001C: stopObjectCode 
+
+
+
+Test Run Successful.
+Total tests: 1
+     Passed: 1
+ Total time: 2,8782 Seconds

@@ -71,6 +71,12 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 | Verb / script | Meaning | Evidence | Source | Date |
 |---|---|---|---|---|
+| Enhanced native sentence | First object click composes; clicking native sentence area5 executes the selected verb and objects | reached from real keys/clicks | Script4 +0x01B4 `drawSentence`, +0x01DC `doSentence`; fixed input Script4 and sentence Script2 | 2026-10-17 |
+| Enhanced drawer92 / phonebill15 | Open drawer exposes bill; Pick up puts bill in native inventory; Read held bill produces the payment reminder | reached | Room1 object92 verb1 +0x002D; object15 verb14 +0x0025, verb12 +0x0028 starts Script41 | 2026-10-17 |
+| Enhanced bedroom exit | Open door84 then Walk through it reaches living room2 | reached | Room1 object84 verb1 +0x0056, verb13 +0x0066 | 2026-10-17 |
+| Enhanced alien cutscene | Room2 entry starts the timed scene; real Esc resumes its override and restores the player's room | reached | Room2 entry +0x0049 starts126; Script126 +0x000D override jump to+0x01B4, +0x01CA ends cutscene | 2026-10-17 |
+| Enhanced native shop choice | Room7 installs Buy17/Sell18; Buy noseglasses40 invokes the shopkeeper's CashCard response | reached | Object183 entryFD +0x002D/+0x003D; object40 verb17 +0x0029 starts24; Script24 +0x0113 prints shopkeeper response | 2026-10-17 |
+| Classic native play route | Independent v1 execution verifies the same sentence, drawer92/bill15, door84, Script126 override, Buy17/noseglasses40 response and restored control | reached; three tests and WPF | Classic fixture's own decoded entries have the offsets listed above; Script24 +0x02D6 walks back and +0x02EE ends the exchange; `.verification/zakclassic-play-20261017` | 2026-10-17 |
 
 ## Objects and classes
 

@@ -59,6 +59,7 @@ public partial class MainWindow
     private async Task StartPlayAsync(GameResource resource, CancellationToken token)
     {
         if (_game is not { } game || resource.ResourceId is not int roomId) return;
+        var startingSession = _play is null || _playFolder != game.FolderPath;
         try
         {
             if (_play is null || _playFolder != game.FolderPath)
@@ -77,7 +78,11 @@ public partial class MainWindow
             // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd).
             if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, _playCdTracks is { } loops ? loops.LoopsForever : null);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
-            if (_play.CurrentRoomId != roomId)
+            // The old engine's opening can wait on the player's party choice.
+            // Its first Play screen must retain that live input, not visit the
+            // browsed room or reuse the first-visit preview's assumed choices.
+            var keepOpening = startingSession && ScummProfile.For(game).EngineVersion <= ScummVersion.V2;
+            if (!keepOpening && _play.CurrentRoomId != roomId)
             {
                 // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.
                 _sceneSound.StopAll("another room was picked from the list during play");
@@ -146,7 +151,7 @@ public partial class MainWindow
         // R-7.9: the game's cursor replaces the system pointer while the game shows it, and nothing shows while it is off.
         PlayScreenImage.Cursor = Cursors.None;
         if (IsAdvancedMode)
-            PlayScreenImage.ToolTip = $"Room {frame.RoomId:00} · input script {_play.Snapshot.KnownGlobalVariables.GetValueOrDefault(ScummVars.VerbScript)} · " +
+            PlayScreenImage.ToolTip = $"Room {frame.RoomId:00} · input script {_play.PlayInputScript} · " +
                                       (_play.DeliveredInput.LastOrDefault() is { } last ? $"last input runInputScript({last.Area}, {last.Value}, {last.Mode}): {last.Description}" : "no input yet") +
                                       (_playPaused ? " · paused" : "");
         else PlayScreenImage.ToolTip = null;

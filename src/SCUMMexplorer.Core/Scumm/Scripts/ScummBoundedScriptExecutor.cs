@@ -1728,7 +1728,7 @@ public sealed partial class ScummBoundedScriptExecutor
         TryReadValue(operand, variables, out var value, out _) ? unchecked((short)value) : null;
 
     private static ScummActorTable.Placement PlacementOf(ScummScriptRuntimeState runtime) =>
-        new(runtime.CurrentRoom, runtime.WalkBoxes, runtime.WalkBoxFlagsUnknown, runtime.ObjectClasses);
+        new(runtime.CurrentRoom, runtime.WalkBoxes, runtime.WalkBoxFlagsUnknown, runtime.ObjectClasses, runtime.IsPlayerActor);
 
     /// <summary>
     /// ScummVM <c>whereIsObject</c> then <c>getObjectXYPos</c> for v3: an object of
@@ -2176,6 +2176,12 @@ public sealed partial class ScummBoundedScriptExecutor
         (int X, int Y)? Locate(int number, ScummActorSnapshot? actor, out string? unknown)
         {
             unknown = null;
+            // getObjectOrActorXY: inventory objects occupy their owner's position.
+            if (runtime.IsV2 && runtime.InventorySlots.Contains(number))
+            {
+                var owner = runtime.ObjectOwners.GetValueOrDefault(number);
+                return runtime.Actors.Contains(owner) ? Locate(owner, runtime.Actors[owner], out unknown) : null;
+            }
             if (number < runtime.Actors.Capacity)
             {
                 // getObjectOrActorXY: an actor counts only in the current room.

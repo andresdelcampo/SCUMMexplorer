@@ -223,8 +223,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             },
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
-            // S6 MonkeyCd (17 October 2026): the CD release plays through the same kind of interface (Script 4 input, Script 2 sentences) on version 5.
-            PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
+            // S6 MonkeyCd and Maniac/Zak (17 October 2026): native version-specific input and presentation.
+            PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
+                or GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced,
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
             // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
             MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic

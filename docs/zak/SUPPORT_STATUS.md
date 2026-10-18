@@ -9,13 +9,13 @@ Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last
 | S3 Sound | done (earlier) | Sound ✔ | – | PCjr/Tandy not listened |
 | S4b Session | done | unchanged | [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md) | Own v1 opening reaches Room 1 in 1804 frames, player control on, no cutscene; stable for 120 more frames. Supersedes the earlier ClassicBoot blocker |
 | S5 Objects | source preview implemented; visual acceptance open | Objects ◐ unchanged | [.verification/zakclassic-objects-20261017](../../.verification/zakclassic-objects-20261017/README.md) | 58 rooms open; Room 44 gap flag retained; original-game comparison not performed |
-| S6 Play | not started | Play – | – | |
+| S6 Play | done (bounded native route) | Objects/Play Full | [.verification/zakclassic-play-20261017](../../.verification/zakclassic-play-20261017/README.md) | Three genuine-input tests and real-window route pass; native Buy choice, reached cutscene skip and returned control; S5 visual limits retained |
 | S7 Cutscenes | not started | Cutscenes – | – | |
 | S8 State | not started | Status – | – | requested in a run: no |
 | S9 Editions | not started | – | – | |
 
 Blocked on: the 11 currently estimated costumes (4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 32) need reached actor/palette state or variable operands resolved. This supersedes the older ten-costume list; costumes 1 and 35 now have script evidence, while costume 13 is estimated. No comparison with a running ScummVM was performed.
-Next: resolve the retained S5 acceptance limits, then S6 verb-based play, S7 cutscenes, S9 editions; re-derive estimated costumes from reached actor state without promoting unresolved colors. No dependent stage is complete.
+Next: retain the S5 acceptance limits while progressing S7 cutscenes and S9 editions; re-derive estimated costumes from reached actor state without promoting unresolved colors. S6's bounded native play route is verified; no full-game completion is claimed.
 Open uncertainties: see the record (variable actor in Room 38; control flow inside a costume/palette span ignored).
 
 ## Decision log
@@ -37,9 +37,10 @@ Family: ZakEnhanced | Fixture: `D:/Juegos/Lucas/zakE ega en` | Owner: Zak S4b wo
 |---|---|---|---|---|
 | S4b Session | done | unchanged | [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md) | Adapter reads all 58 rooms / 148 present scripts; own opening reaches Room 1 in 1828 frames, control on, no cutscene; stable for 120 more frames |
 | S5 Objects | source preview implemented; visual acceptance open | Objects ◐ unchanged | [.verification/zakenhanced-objects-20261017](../../.verification/zakenhanced-objects-20261017/README.md) | All-room source audit and three settled-state regressions; see record for retained gap flags and comparison limits |
-| S6 verb-based Play / S7 Cutscenes / S9 Editions | not started | unchanged | same | S5 acceptance limits remain explicit |
+| S6 verb-based Play | done (bounded native route) | Objects/Play Full | [.verification/zakenhanced-play-20261017](../../.verification/zakenhanced-play-20261017/README.md) | Real sentence composition/execution, phone-bill pickup/inventory, room exits, reached alien-scene skip, native Buy choice and shopkeeper response; no forced story state |
+| S7 Cutscenes / S9 Editions | not started | unchanged | same | S5 acceptance limits remain explicit |
 
-Both editions run their own source-defined full opening and Script 108 post-dream action; no game variable, room or answer was forced. Random bedroom events and propagated effects remain labelled estimates. No unsupported opcode remains on the bounded acceptance routes. Shared slot dispatch and individual sound timelines are implemented; inventory-held code, active nested object-slot replacement continuation and Player_V2 priority/next-sound arbitration remain explicit limitations if reached. Sentence presentation belongs to S6. No native ScummVM was executed, and no registry cell was raised.
+S4b baseline (historical): both editions run their own source-defined full opening and Script 108 post-dream action; no game variable, room or answer was forced. Random bedroom events and propagated effects remain labelled estimates. No unsupported opcode remains on the bounded acceptance routes. Shared slot dispatch and individual sound timelines are implemented; inventory-held code, active nested object-slot replacement continuation and Player_V2 priority/next-sound arbitration remain explicit limitations if reached. Sentence presentation belongs to S6. No native ScummVM was executed, and no registry cell was raised.
 
 Enhanced S5 acceptance remains open: the requested run prohibits executing ScummVM, so the required ten-room original-game picture comparison was replaced by explicitly labelled source comparisons, not claimed as completed. Residual geometric gap flags are retained; no pixels or story state were filled. See the record for exact results. Shared corrections are version-level, not Zak room exceptions.
 
