@@ -8,6 +8,7 @@
 | Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
 | Script map | [MANIAC_SCRIPT_MAP.md](MANIAC_SCRIPT_MAP.md) |
 | Play evidence | [Classic English](../../.verification/maniacclassic-play-20261017/README.md), [Enhanced Spanish](../../.verification/maniacenhanced-play-20261017/README.md) |
+| Cutscene evidence | [Classic English](../../.verification/maniacclassic-cutscenes-20261018/README.md), [Enhanced Spanish](../../.verification/maniacenhanced-cutscenes-20261018/README.md) |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |
 
 ## Editions

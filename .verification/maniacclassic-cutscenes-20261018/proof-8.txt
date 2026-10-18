@@ -1,0 +1,34 @@
+Source Room 8 object 157 verb 05
++0049 ifState var[0x009], IntrinsicOn, +49  ->  0x007E
++004D stopScript 0x8F
++004F setState var[0x009], IntrinsicOn
++0051 startSound 0x0C
++0053 startScript 0x37
++0055 startScript 0x0C
++0057 stopScript 0x8F
++0059 move var[0x0AD], 0x0000
++005D setState 0x00E4, IntrinsicOff
++0060 setState 0x00BE, IntrinsicOff
++0063 setState 0x00BF, IntrinsicOff
++0066 setState 0x00A4, IntrinsicOff
++0069 stopScript 0x15
++006B setState 0x00CA, IntrinsicOff
++006E setState 0x00CB, IntrinsicOff
++0071 setState 0x00CC, IntrinsicOff
++0074 setState 0x00CD, IntrinsicOff
++0077 setState 0x00CF, IntrinsicOff
++007A move var[0x0AC], 0x0000
++007E stopObjectCode
+Frame 154, Room 31: Oh great, someone shut the power off!
+Frame 225, Room 31: We're going to have another meltdown!!
+Frame 297, Room 31: How can I take over the world
+when I'm on a budget?
+Frame 387, Room 31: I always get stuck with cheap equipment.
+Frame 462, Room 31: Boy is the meteor going to be pissed.
+Frame 560, Room 31: TENTACLE!!! FRONT AAAAAAAND CENTER!
+Frame 652, Room 31: Yes sir, Dr. Fred sir,
+Frame 700, Room 31: Purple Tentacle at your disposal, sir.
+Frame 772, Room 31: Quick! Go check out the reactor.
+Frame 835, Room 31: Yes sir!
+Result: begun=True, frames=905, currentRoom=8, inCutscene=False
+cutscene at Script 47 +0x0001 (native v1/v2 scope)
