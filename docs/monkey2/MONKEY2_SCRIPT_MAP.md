@@ -43,11 +43,18 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
+| Script 76 | LeChuck catches Guybrush with the voodoo key (Room 74, Part 3): `cutscene` +0x0000, starts sound 176 +0x0019, waits for the song's beat 9 (`soundKludge [0x0100, 0xB0, 7]`, +0x0090..+0x00DF) before LeChuck walks in, then a dialogue (waits for `var[0x0AF]`, +0x05D2..+0x05DC) | decoded, play | Script 76 | 2026-10-18 |
+| Script 101 | Captain Dread's scenes (Room 22 entry); its first print is only a string control `\xFF\x07` | decoded | Script 101 +0x00BE | 2026-10-18 |
 
 ## Rooms
 
 | Room | What it is, entry/exit script facts, local scripts | Evidence | Source | Date |
 |---|---|---|---|---|
+| Room 7 entry | starts local script 202 when `var[0x066]` = 0x0B (back from Room 11's window) and local script 203 (Largo at the bridge) when `bit[0x168]` is set; 203 clears the bit, waits for Guybrush at x ≤ 0x2E1, gives control, and begins its cutscene (sound 151) only when he walks west of x 0x29E | decoded | Room 07 entry script, local script 203 +0x0000..+0x007C | 2026-10-18 |
+| Room 9 object 73 (barkeeper) | verb 0x0A: the Bloody Lip dialogue (local scripts 213, 212, 203, global script 70; sound 152 from Script 151 +0x0028) | decoded, play | Room 09 object 73 verb 0x0A | 2026-10-18 |
+| Room 13 (Largo's room at the inn) | local script 211 waits 1800 jiffies (+0x0004), then a cutscene (+0x0010): Largo comes in ("Who let you into my room?!!"), starts sound 182 (+0x0072); Guybrush ends in Room 12 | decoded, play | Room 13 local scripts 211, 213 | 2026-10-18 |
+| Room 74 object 755 (voodoo key to jail) | verb 0x09 starts Script 76 | decoded, play | Room 74 object 755 verb 0x09 +0x0000 | 2026-10-18 |
+| Room 80 | the bone-song sheet: the entry prints the verses from string 0x2E and waits for a click (`var[0x06A]`, +0x01F1..+0x01F7) | decoded | Room 80 entry script | 2026-10-18 |
 
 ## Verbs and the input chain
 
@@ -88,6 +95,9 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 | Sound 108 | the campfire song (92 s of track 0, looping on its hook-0 marker); hook-1 markers every 2.8 s jump to track 1 (beat 4, tick 400), whose rest ends it: after Room 4 local script 204 arms hook 1 at 92.6 s the song ends at 98.97 s (session clock, estimate) | reading, play | sound 108 ADL/ROL parts; Room 04 local script 204 +0x016A | 2026-10-17 |
 | Sound 107 | Woodtick music (AdLib rendition 233.6 s before its loop point) | play | Room 04 entry script +0x006D | 2026-10-17 |
 | Sound 151 | Largo's theme (AdLib 190.5 s) | play | Room 07 local script 203 +0x0075 | 2026-10-17 |
+| `soundKludge [0x0100, s, 7]` | `Player::getParam` 7, the song's beat (tick / 480 + 1); 8 the tick in the beat; 110 sites (Scripts 47, 48, 52, 58, 76, 119, 120, 122, 146, 164, 165, 199; Rooms 5, 17, 20, 40, 56, 60, 79, 86); 7 and 8 answered from the song's AdLib timeline since S7 (estimate) | decoded, play | `CutsceneList find` | 2026-10-18 |
+| Sound 176 | LeChuck's arrival (AdLib 185 s) | play | Script 76 +0x0019 | 2026-10-18 |
+| Sound 182 | Largo in his room (AdLib 200.7 s) | play | Room 13 local script 211 +0x0072 | 2026-10-18 |
 | Sound 6 | the sign breaking | decoded | Room 07 object 46 verb 9 +0x0010 | 2026-10-17 |
 
 ## Open questions

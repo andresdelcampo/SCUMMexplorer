@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Monkey Island 2 cutscenes from its scripts, with a song's beat (S7, Monkey2)
+
+- **The list.** The shared scan gives 536 triggers and 260 entries (76 scenes) with the game's verb names after the boot (Open … Walk to); 165 begin from a fresh start; eight-worker runs take 153 s in the harness and 140–174 s in the window on first launch (each run boots MI2 in about 0.9 s).
+- **A song's beat (shared Core).** `soundKludge` player command 0 (`Player::getParam`) 7 and 8, the beat and the tick in the beat, are answered from the playing song's AdLib timeline (estimate). LeChuck's arrival (Script 76) waited for beat 9 for ever; it now plays through to its dialogue. The play boot reaches the campfire after 2841 frames (3409) since the campfire story follows its song.
+- **First texts.** The talkie's speech controls no longer show (code 10's operands; the same change as S7 Indy4).
+- **Registry.** Monkey2 Cutscenes is ◐; the matrix is regenerated. `ScummMonkey2CutsceneTests` (3): Talk to barkeeper (Room 9), Largo's room (Room 13 entry, on to Room 12), the voodoo key (Room 74, Part 3) with its song 176 and the beat. Window check, decisions and uncertainties (Largo at the bridge needs a walk): [record](../.verification/monkey2-cutscenes-20261018/README.md).
+
 ## 18 October: Fate of Atlantis cutscenes from its scripts, with their speech (S7, Indy4)
 
 - **The list.** The shared scan gives 666 triggers and 426 entries (182 scenes). 210 begin from a fresh start (the credits); the eight-worker runs match the single-threaded ones.

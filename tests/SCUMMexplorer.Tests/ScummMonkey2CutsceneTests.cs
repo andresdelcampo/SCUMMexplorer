@@ -7,13 +7,13 @@ namespace SCUMMexplorer.Tests;
 
 /// <summary>
 /// S7 Cutscenes for Monkey Island 2: LeChuck's Revenge (SCUMM v5, fixture <c>mi2 talkie en</c>; 18 October 2026): the engine's scan (<see cref="ScummCutsceneIndex"/>)
-/// lists the game's cutscene triggers from its resource file, titled with the verb names its verb script gives after the boot (2 Open â€¦ 8 Look at, 9 Pick up,
+/// lists the game's cutscene triggers from its resource file, titled with the verb names its verb script gives after the boot (2 Open … 8 Look at, 9 Pick up,
 /// 0x0A Talk to, 0x0B Walk to), and three scenes begin from a fresh start in a headless run of the generic session (<see cref="ScummCutsceneRun"/>): in Woodtick,
 /// Talk to barkeeper in the Bloody Lip (Room 9 object 73 verb 0x0A, "Yeah, boy?") and the entry of Largo's room at the inn (Room 13, "Who let you into my
 /// room?!!", which goes on to Room 12), and in Part 3 Pick up voodoo key to jail (Room 74 object 755 verb 0x09, global script 76: LeChuck comes in). Script 76
 /// starts its iMUSE song (sound 176) and waits for the song's beat 9 (<c>soundKludge</c> player command 0, <c>getParam</c> 7) before LeChuck walks in; the
 /// session answers the beat from the song's AdLib timeline (an estimate). The talkie's speech codes (four <c>\xFF\x0A</c> controls) leave no letters in the first
-/// texts. Registry: Cutscenes â—. Record: <c>.verification/monkey2-cutscenes-20261018/README.md</c>. Skips without the data.
+/// texts. Registry: Cutscenes ◐. Record: <c>.verification/monkey2-cutscenes-20261018/README.md</c>. Skips without the data.
 /// </summary>
 public sealed class ScummMonkey2CutsceneTests(ITestOutputHelper output)
 {
@@ -45,18 +45,18 @@ public sealed class ScummMonkey2CutsceneTests(ITestOutputHelper output)
         Assert.True(planner.Groups.Count >= 250, $"only {planner.Groups.Count} groups");
 
         var barkeeper = GroupOf(planner, 9, 73, TalkTo);
-        Assert.Equal("Room 09 Â· Talk to barkeeper", ScummCutsceneTitles.Title(barkeeper.First));
+        Assert.Equal("Room 09 · Talk to barkeeper", ScummCutsceneTitles.Title(barkeeper.First));
         Assert.Equal("Yeah, boy?", barkeeper.First.FirstText);
         var largo = GroupOf(planner, 13, 0, 0);
-        Assert.Equal("Room 13 Â· Entry", ScummCutsceneTitles.Title(largo.First));
+        Assert.Equal("Room 13 · Entry", ScummCutsceneTitles.Title(largo.First));
         Assert.True(largo.IsScene);
         // The line's four speech controls (\xFF\x0A and two bytes each, often letters) are not part of the text.
         Assert.Equal("Who let you into my room?!!", largo.First.FirstText);
         var key = GroupOf(planner, 74, 755, PickUp);
-        Assert.Equal("Room 74 Â· Pick up voodoo key to jail", ScummCutsceneTitles.Title(key.First));
+        Assert.Equal("Room 74 · Pick up voodoo key to jail", ScummCutsceneTitles.Title(key.First));
         Assert.Contains("global script 76", key.First.Scripts);
         // A verb the game's verb script does not name keeps its number (the code an inventory object reaches when given to someone).
-        Assert.Equal("Room 22 Â· verb 0x50 Captain Dread", ScummCutsceneTitles.Title(GroupOf(planner, 22, 239, 0x50).First));
+        Assert.Equal("Room 22 · verb 0x50 Captain Dread", ScummCutsceneTitles.Title(GroupOf(planner, 22, 239, 0x50).First));
     }
 
     [Fact]

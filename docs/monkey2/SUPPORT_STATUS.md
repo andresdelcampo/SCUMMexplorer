@@ -1,6 +1,6 @@
 # Monkey Island 2 support status
 
-Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 en` for the Roland and Sound Blaster data) | Last updated: 18 October 2026 | Owner: S6 Monkey2 agent
+Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 en` for the Roland and Sound Blaster data) | Last updated: 18 October 2026 | Owner: S7 Monkey2 agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -10,12 +10,12 @@ Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 e
 | S4b Session | **done (17 Oct)** | – (unchanged: S4b changes no cell) | [monkey2-session-20261017](../../.verification/monkey2-session-20261017/README.md) | boots to the campfire (Room 4) in 3409 frames, player in control, unsupported 0, one assumed click (the full game); `ScummMonkey2SessionTests` |
 | S5 Objects | **done (17 Oct)** | Objects ✔ (raised with S6's route) | [monkey2-objects-20261017](../../.verification/monkey2-objects-20261017/README.md) | 107 of 110 rooms without a gap (104–106: image-holder rooms), 0 not followed; Rooms 39, 55, 79 pinned (`ScummMonkey2FirstVisitTests`); ScummVM picture comparison not done (user check) |
 | S6 Play | **done (17–18 Oct)** | Play ✔ | [monkey2-play-20261017](../../.verification/monkey2-play-20261017/README.md) | route from Woodtick (Room 7): look + skip, take the shovel, Largo's two dialogue lists, the door to Room 8; right click; iMUSE music in play with loop points; jump hooks followed (`ScummMonkey2PlayTests`) |
-| S7 Cutscenes | not started | Cutscenes | | |
+| S7 Cutscenes | **done (18 Oct)** | Cutscenes ◐ | [monkey2-cutscenes-20261018](../../.verification/monkey2-cutscenes-20261018/README.md) | 536 triggers, 260 entries (76 scenes), 165 begin from a fresh start; Talk to barkeeper (Room 9), Largo's room (Room 13 entry), LeChuck and the key (Room 74, Part 3) with its iMUSE song (`ScummMonkey2CutsceneTests`); song beat for `getParam` (estimate); window derivation 140–174 s |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | mi2 classic es, mi2 talkie es are local |
 
 Blocked on: nothing. Still unmodelled (labelled estimates): hooks of classes 1–5 (part on/off, volume, program, transposes), script loop control, markers and the trigger queue, fades (MI2's status ignores a fading player), the music timer, concurrent-sound special cases (`startSound_internal`: sounds 100, 107, 113, 115, 118).
-Next: S7 Cutscenes. S6 done 17–18 Oct; user checks in the S6 record (music in play on Roland/AdLib, the route side by side with ScummVM).
+Next: S8 State (if requested) or S9 Editions. S7 done 18 Oct; user checks in the S7 record (LeChuck's entrance on the beat, Largo's room after 30 s). Still unmodelled after S7: player parameters other than the beat (7) and the tick (8); Largo at the bridge needs a player walk (not begun from a fresh start).
 Open uncertainties: S4b: soundKludge player commands, markers and the trigger queue are answered 0 as labelled estimates; VAR_MUSIC_TIMER is not driven by the iMUSE song; the boot's end (Room 4) not compared with the original. S3: loops are taken at the from-point to the tick (ScummVM: first 250 Hz timer step at or after it); where a looping song stops in the wave (3 minutes) is ours.
 
 ## Decision log
@@ -42,3 +42,7 @@ Open uncertainties: S4b: soundKludge player commands, markers and the trigger qu
 | 2026-10-17 | S6 | Talkie dialogue choices drew code bytes | strip codes in the session; skip them in the charset as `drawString` | the charset (`DrawPlainLine`), as ScummVM | revert d5af7d3 |
 | 2026-10-17 | S6 | Which choices the route takes | any | the first of each list (bribe; "Then who keeps up the law…"): the shortest route to the robbery, and both show a list through a different input script (14, 206) | change the verb ids in the test |
 | 2026-10-17 | S4b/S5 | Reconcile with S4b/S5 Indy4 (merged to master in parallel; same features written twice) | keep both; keep one of each | one of each: Indy4's `SoundKludgeEvent` (start 8, stop 9, stop-all 10/11 as sound events) and its iMUSE AdLib-timeline lifetimes (`ScummGameSession.ImuseLifetime`, with its `ScummSoundClock.Status` labels; Monkey2's ROL fallback dropped); Indy4's `ReadObjectImages(room, states)` (a state with no image of its own draws nothing), its `State` field, sentence wait and `getActorScale`; Monkey2 keeps `ApplySoundKludge` (`VAR_SOUNDRESULT`, -1 for a song not playing, labelled estimates), the transparent strips, the click boot input and the v5 `setPalColor` | re-add the dropped Monkey2 versions from 9c47419, 18bd3d3, cbafbd5, 9e1b0f4 |
+| 2026-10-18 | S7 | Script 76 (LeChuck, Room 74) looped for ever on `getParam` 7 of sound 176 (answered 0) | leave the scene unended; answer the beat from the song's AdLib timeline | the timeline (ScummVM `getBeatIndex`), params 7 and 8 only, labelled estimate; generic for v5 (110 sites in MI2); the play boot now ends after 2841 frames (3409) | revert 624afe5 |
+| 2026-10-18 | S7 | First texts showed the talkie's speech-control bytes | blank every control operand; blank code 10's only | code 10 only: blanking every operand changed LOOM and Monkey lists; the same change as S7 Indy4, master's text kept at the merge | revert 8279555 |
+| 2026-10-18 | S7 | Derivation time (260 runs, ~0.9 s boot each; 140–174 s in the window) | accept with 8 workers; share a snapshot of the booted session | accept: the MonkeyCd rule already applies; a session snapshot is a larger change for one family; time recorded | – |
+| 2026-10-18 | S7 | Acceptance scenes | Largo at the bridge (Room 7 entry); others | Room 9 barkeeper, Room 13 entry, Room 74 key: Largo's bridge scene needs a player walk west of x 670 (Room 7 local script 203 +0x0043..+0x0072), which a fresh start does not do | change the triples in the test |
