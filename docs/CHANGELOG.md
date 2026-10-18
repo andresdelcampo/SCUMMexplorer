@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: native Maniac battery/flashlight Use-with, both editions
+
+- Native object-header prepositions now work for v1/v2 room and retained inventory code. Classic's automatic sentence preposition and enhanced's explicit opcode both use the source bits; pickup preserves a changed header. No object-specific engine exception or input-mode assignment.
+- Both supplied Maniac editions compose their own two-object sentence, insert and consume the batteries through native inventory input, and switch on the flashlight. Wrong-target and missing-battery checks preserve the native prerequisite. Preparation is a labelled exploration action, not an earned story route.
+- Support levels remain unchanged. Own-edition tests, independent review, actual-window evidence and final suite/build results: [Use-with checkpoint](checkpoints/20261018-UseWith-ManiacZak.md). Original-game visual/timing comparison, walking approximation, other puzzles/parties and alternate same-family releases remain open.
+
 ## 18 October: Fate of Atlantis plays through its own interface, with its spoken lines (S6, Indy4)
 
 - **The route.** The acceptance route of R-7.18 runs from Barnett College (`ScummIndy4PlayTests`):

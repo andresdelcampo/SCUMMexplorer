@@ -1,5 +1,11 @@
 # Maniac Mansion (classic v1) support status
 
+## Native battery/flashlight Use-with — 18 October 2026 (current)
+
+Both supplied editions now compose and execute the native two-object inventory sentence. The missing engine behavior was object-header prepositions: Classic resolves its automatic verb preposition during sentence drawing; enhanced explicitly queries the header. Correct native input delivers object 167 then 84, and a repeated click on the selected flashlight executes the action. The game's own battery code sets its mode to 2 and consumes the batteries; native Switch on then enables the moving beam. A wrong held target retains the batteries and their state. No battery flag, owner, input mode or story prerequisite is supplied to make insertion work.
+
+Preparation uses labelled room previews and direct radio pickup/Open and flashlight pickup, not an earned journey to those rooms. This closes the retained Use-with engine gap, without claiming a complete puzzle route or original-game visual/timing acceptance. Existing support levels remain unchanged. Source findings, own-edition regressions and final integrated validation: [Use-with checkpoint](../checkpoints/20261018-UseWith-ManiacZak.md), [classic record](../../.verification/maniacclassic-usewith-20261018/README.md), [enhanced record](../../.verification/maniacenhanced-usewith-20261018/README.md). Earlier dated sections retain their historical limits.
+
 ## Engine fidelity — 18 October 2026 (current)
 
 Classic Script 174's native closest-object/actor query is implemented. The genuine boot/party/key/Push-doorbell route continues another 3000 frames through Ed's outdoor response and return, retaining Dave's key and player control. Source-native query boundaries, ties and approach units have regressions. [Classic record](../../.verification/maniacclassic-fidelity-20261018/README.md).
@@ -23,13 +29,14 @@ Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root
 | S9 Editions | available-copy checks done; alternate releases blocked | unchanged | .verification/maniacclassic-editions-20261018 | One English classic copy; identity, native startup/play/scene and edition-boundary regressions pass. Enhanced is a separate family. |
 
 Blocked on: S5 original-game picture comparison is unperformed because this run prohibits launching ScummVM. Source-level comparisons and real-window captures do not substitute for that evidence.
-Next: retain the clean fidelity checkpoint. Native inventory Use-with composition for acquired batteries/flashlight remains unresolved after two bounded approaches; distinguish input handling from reached action/story context before any fix. Alternate-release S9 comparison needs another same-family copy. Earlier original-game visual limits and state-gated S7 scenes remain open; no complete playthrough is established.
+Next: retain the clean Use-with checkpoint. Alternate-release S9 comparison needs another same-family copy. Earlier original-game visual limits, walking metric, other parties/puzzles and state-gated S7 scenes remain open; no complete playthrough is established.
 Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/2`), not stored in the game files. Native lights-off colour behavior is now implemented; original-game visual comparison is still unperformed.
 
 ## Decision log
 
 | Date | Stage | Open question | Options | Choice and why | How to undo |
 |---|---|---|---|---|---|
+| 2026-10-18 | Use-with | Native held battery selection stops before composing a second object | Assign an input mode/story flag / implement the source header semantics | Implement OBCD prepositions and Classic automatic sentence drawing; retain native repeated-target execution, own-edition refusal/consumption proofs and explicit preparation boundaries | Revert the bounded Use-with implementation/tests/notes together; preserve the retained baseline and unrelated work |
 | 2026-10-14 | S2 | Where does a v1 Maniac costume's colour come from? | (a) keep costume number = actor number as an assumption; (b) read the scripts for who wears which costume | (b): ScummVM `scumm.cpp` starts actor n with costume n and the scripts never give another costume (only costume 0 on a variable actor), so the old estimate is confirmed as the real rule; `ScummV1ActorColors` records it as `InitialState` | revert the commit; the renderer then needs the actor argument back |
 | 2026-10-14 | S2 | Raise Costumes to ✔? | raise on source evidence alone / keep ◐ until compared with a running ScummVM | keep ◐ (the stage requires the side-by-side comparison; none could be run) | superseded: the user decided (14 Oct) that Maniac Mansion classic is complete on the source evidence, and the cell is ✔; revert the one registry line to undo |
 | 2026-10-17 | S5 | How to leave the party menu for a first-visit preview? | assign story variables / send reviewed native inputs | Fingerprint the edition's menu, send the S4b Syd/Bernard/Start clicks and label the assumed choice; fail closed on an unreviewed menu | revert the `ManiacFirstVisit` recipe/provider and restore the plain-background fallback |

@@ -1,0 +1,20 @@
+[
+  {"op":"menu","x":76,"y":104}, {"op":"frames","frames":100},
+  {"op":"menu","x":196,"y":104}, {"op":"frames","frames":100},
+  {"op":"menu","x":292,"y":60}, {"op":"openingSkip"}, {"op":"control"},
+  {"op":"visit","room":2}, {"op":"settle"},
+  {"op":"activate","object":142,"verb":14}, {"op":"activate","object":142,"verb":1}, {"op":"frames","frames":120},
+  {"op":"visit","room":7}, {"op":"frames","frames":10},
+  {"op":"activate","object":84,"verb":14}, {"op":"frames","frames":10},
+  {"op":"owner","object":167,"value":3}, {"op":"owner","object":84,"value":3},
+  {"op":"verb","verb":11}, {"op":"frames","frames":4},
+  {"op":"inventory","object":167}, {"op":"frames","frames":4},
+  {"op":"inventory","object":84}, {"op":"frames","frames":4},
+  {"op":"text","text":"Use batteries in flashlight"}, {"op":"capture","text":"use-with"},
+  {"op":"inventory","object":84}, {"op":"battery"}, {"op":"frames","frames":40},
+  {"op":"capture","text":"battery-inserted"},
+  {"op":"verb","verb":4}, {"op":"frames","frames":4},
+  {"op":"inventory","object":84}, {"op":"frames","frames":4},
+  {"op":"inventory","object":84}, {"op":"frames","frames":20},
+  {"op":"visit","room":5}, {"op":"frames","frames":20}, {"op":"beam"}
+]
