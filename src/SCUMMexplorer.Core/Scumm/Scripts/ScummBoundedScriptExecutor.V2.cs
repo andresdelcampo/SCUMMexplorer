@@ -98,6 +98,10 @@ public sealed partial class ScummBoundedScriptExecutor
         ushort Global(string key) => variables.TryGetValue(key, out var value) ? value : (ushort)0;
         switch (source.Operation)
         {
+            case "putActorInRoom":
+                if (!Read(0, out var roomActor) || !Read(1, out var nativeRoom)) return false;
+                runtime.RememberV2ActorRoom(roomActor, nativeRoom);
+                return true;
             // o2_ifClassOfIs tests a mask in OBCD+6; missing code always jumps, including mask zero.
             case "ifClassOfIs":
                 if (!Read(0, out var classObject) || !Read(1, out var classOperand) ||
@@ -403,7 +407,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "equalZero": case "notEqualZero": case "delay": case "delayVariable": case "getRandomNr":
             case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom": case "loadRoomWithEgo":
             case "isScriptRunning": case "isSoundRunning": case "getObjectOwner": case "setOwnerOf":
-            case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
+            case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "setBoxFlags":
             case "resourceRoutines": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject": case "getDist":
