@@ -1,4 +1,4 @@
-using SCUMMexplorer.Core.Discovery;
+﻿using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Tests;
@@ -11,9 +11,9 @@ namespace SCUMMexplorer.Tests;
 /// </summary>
 public sealed class ScummMonkey2FirstVisitTests
 {
-    private static GameLibrary? Game()
+    private static GameLibrary? Game(string copy = "mi2 talkie en")
     {
-        var path = Path.Combine(TestGames.Root, "mi2 talkie en");
+        var path = Path.Combine(TestGames.Root, copy);
         return File.Exists(Path.Combine(path, "monkey2.000")) || File.Exists(Path.Combine(path, "MONKEY2.000")) ? new GameFolderScanner().Scan(path) : null;
     }
 
@@ -43,13 +43,25 @@ public sealed class ScummMonkey2FirstVisitTests
         Assert.NotEqual(guest.Pixels[hole], composed[y * scene.Room.Width + x]);
     }
 
-    [Theory]
-    [InlineData(39, new[] { 391, 409 })]
-    [InlineData(55, new[] { 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 647 })]
-    [InlineData(79, new[] { 772, 776 })]
-    public void ARoomSettlesWithTheObjectsItsScriptsDraw(int room, int[] active)
+    /// <summary>S9 Monkey2 (18 October 2026): the same rooms in every local copy settle with the same objects (record
+    /// <c>.verification/monkey2-editions-20261018/README.md</c>; the room audit compares all 110 rooms).</summary>
+    public static TheoryData<string, int, int[]> Rooms()
     {
-        if (Game() is not { } game) return;
+        var data = new TheoryData<string, int, int[]>();
+        foreach (var copy in new[] { "mi2 talkie en", "mi2 mt32 en", "mi2 sb16 en", "mi2 classic es", "mi2 talkie es" })
+        {
+            data.Add(copy, 39, [391, 409]);
+            data.Add(copy, 55, [615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 647]);
+            data.Add(copy, 79, [772, 776]);
+        }
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(Rooms))]
+    public void ARoomSettlesWithTheObjectsItsScriptsDraw(string copy, int room, int[] active)
+    {
+        if (Game(copy) is not { } game) return;
 
         var scene = ScummRoomFirstVisit.Run(game, room);
 

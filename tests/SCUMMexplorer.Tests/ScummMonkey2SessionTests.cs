@@ -14,11 +14,20 @@ public sealed class ScummMonkey2SessionTests
 {
     private static readonly string[] Unsupported = ["unsupported", "not modeled", "could not", "disassembly stops", "undecoded", "cannot", "needs a session", "unknown", "depends on"];
 
-    private static string? Folder()
+    private static string? Folder(string copy = "mi2 talkie en")
     {
-        var path = Path.Combine(TestGames.Root, "mi2 talkie en");
+        var path = Path.Combine(TestGames.Root, copy);
         return File.Exists(Path.Combine(path, "monkey2.000")) || File.Exists(Path.Combine(path, "MONKEY2.000")) ? path : null;
     }
+
+    /// <summary>
+    /// S9 Monkey2 (18 October 2026): every local copy, and whether its boot asks the recipe copy protection (edition data, read from the copies: the floppy
+    /// releases' Script 130 has no skip for boot parameter 0; the fan talkie's has). Record: <c>.verification/monkey2-editions-20261018/README.md</c>.
+    /// </summary>
+    public static TheoryData<string, bool> Copies => new()
+    {
+        { "mi2 talkie en", false }, { "mi2 mt32 en", true }, { "mi2 sb16 en", true }, { "mi2 classic es", true }, { "mi2 talkie es", false }
+    };
 
     private static ScummGameSession Boot(string folder, out GameLibrary game)
     {
@@ -42,7 +51,8 @@ public sealed class ScummMonkey2SessionTests
         Assert.Equal(ScummVersion.V5, profile.EngineVersion);
         Assert.True(profile.BootEndsWhenPlayerHasControl);
         // Script 131 +0x0067: object 0x484 is "Monkey Island 2" (Regular Mode), 0x485 "Monkey 2 Lite".
-        Assert.Equal(new ScummBootInputPlan(null, ClickObject: 0x484), profile.BootInput);
+        // The floppy releases first ask the recipe copy protection: Script 130 keeps the four digits it expects in var[0x206] (+0x0134).
+        Assert.Equal(new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4), profile.BootInput);
         // GID_MONKEY's var[74] = 1225 is the CD release's only.
         Assert.DoesNotContain(profile.EngineVariablesAtStart, item => item.Variable == "var[0x04A]");
 
@@ -57,10 +67,11 @@ public sealed class ScummMonkey2SessionTests
         Assert.NotEqual(data.ReadObjectImages(108).Single(i => i.Id == 1154).Pixels, data.ReadObjectImages(108, states).Single(i => i.Id == 1154).Pixels);
     }
 
-    [Fact]
-    public void TheBootTakesTheFullGameAndReachesTheCampfireWithThePlayerInControl()
+    [Theory]
+    [MemberData(nameof(Copies))]
+    public void TheBootTakesTheFullGameAndReachesTheCampfireWithThePlayerInControl(string copy, bool asksCopyProtection)
     {
-        if (Folder() is not { } folder) return;
+        if (Folder(copy) is not { } folder) return;
 
         var session = Boot(folder, out _);
         var report = session.BootReport!;
@@ -72,8 +83,19 @@ public sealed class ScummMonkey2SessionTests
         Assert.True(session.PlayerHasControl);
         Assert.False(session.InCutscene);
         AssertNothingUnsupported(session);
-        // The one assumed input: a click on "Monkey Island 2" through the game's input script (Script 131); no key is pressed.
-        Assert.Single(session.SessionTrace, item => item.StartsWith("boot: Player input assumed", StringComparison.Ordinal));
+        var assumed = session.SessionTrace.Where(item => item.StartsWith("boot: Player input assumed", StringComparison.Ordinal)).ToArray();
+        if (asksCopyProtection)
+        {
+            // R-15.5/R-15.7: Enter at Script 128's "PRESS ENTER TO BEGIN LAME-O COPY PROTECTION", then the four digits Script 130 itself derived into
+            // var[0x206] (read, never written) through input script 131 (keys '0'..'9'), then the choice; the script never reaches its systemOps quit.
+            Assert.Equal(3, assumed.Length);
+            Assert.StartsWith("boot: Player input assumed: key", assumed[0], StringComparison.Ordinal);
+            Assert.StartsWith("boot: Player input assumed: the digits of var[0x206] = ", assumed[1], StringComparison.Ordinal);
+            Assert.Equal(4, session.SessionTrace.Count(item => item.StartsWith("key: ", StringComparison.Ordinal) && item.Contains("runs script 131 with [4, 0x3", StringComparison.Ordinal)));
+            assumed = assumed[2..];
+        }
+        // The one assumed input of the choice: a click on "Monkey Island 2" through the game's input script (Script 131); no key is pressed.
+        Assert.Single(assumed);
         Assert.Contains(session.SessionTrace, item => item.StartsWith("boot: Player input assumed: a click on object 1156 in Room 108", StringComparison.Ordinal));
         Assert.Contains(session.SessionTrace, item => item.StartsWith("input: click in the room", StringComparison.Ordinal) && item.Contains("runs script 131 with [2, 0, 1]"));
         Assert.Equal(0, session.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x062]"));
