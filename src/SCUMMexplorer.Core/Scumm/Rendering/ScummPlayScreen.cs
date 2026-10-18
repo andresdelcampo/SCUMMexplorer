@@ -75,7 +75,7 @@ public sealed class ScummPlayScreen
         if (scene is not null)
         {
             var room = scene.Compose();
-            var background = scene.BackgroundPalette();
+            var background = scene.EngineVersion <= 2 ? scene.DisplayPalette() : scene.BackgroundPalette();
             var actors = scene.ActorLayer();
             var actorPalette = scene.DisplayPalette();
             var width = scene.Room.Width;

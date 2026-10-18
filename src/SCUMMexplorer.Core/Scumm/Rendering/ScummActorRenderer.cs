@@ -55,7 +55,7 @@ public static class ScummActorRenderer
 
     public static ScummActorLayer Render(IEnumerable<ScummActorSnapshot> actors, int currentRoom, int width, int height,
         Func<int, ScummCostume?> costumes, byte[]? depthMask = null, ScummWalkBoxSet? boxes = null,
-        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null, int engineVersion = 3)
+        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null, int engineVersion = 3, int lights = 11)
     {
         var pixels = new byte[width * height];
         Array.Fill(pixels, Transparent);
@@ -98,7 +98,16 @@ public static class ScummActorRenderer
             // CD game: a box with a scale of its own (word or slot) sets it where the actor stands, else the actor's own (actorOps scale) holds.
             var scale = Math.Clamp((actor.WalkBox is int scaleBox && !actor.IgnoreBoxes.GetValueOrDefault() ? boxes?.BoxScale(scaleBox, y) : null) ?? look.Scale, 1, 255);
             int Scaled(int value) => scale < 255 ? (int)Math.Floor(value * (double)scale / 255) : value;
-            var written = costume.Compose(cels, pixels, width, height, drawX, top, look.Palette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale, actor.Number);
+            var actorPalette = look.Palette;
+            if (engineVersion == 2 && (lights & 8) != 0)
+            {
+                // ClassicCostumeRenderer::setPalette: DOS EGA v2 keeps entry 12 red even after an actor palette write.
+                var nativePalette = actorPalette.ToArray();
+                if (nativePalette.Length > 12) nativePalette[12] = 12;
+                actorPalette = nativePalette;
+            }
+            var written = costume.Compose(cels, pixels, width, height, drawX, top, actorPalette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale, actor.Number,
+                engineVersion <= 2 ? lights : 11);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
                 drawX + Scaled(cels.Min(cel => cel.Left)), top + Scaled(cels.Min(cel => cel.Top)),
                 drawX + Scaled(cels.Max(cel => cel.Left + cel.Width)), top + Scaled(cels.Max(cel => cel.Top + cel.Height)));

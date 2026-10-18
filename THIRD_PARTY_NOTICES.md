@@ -2,6 +2,11 @@
 
 ## ScummVM
 
+The DOS v1/v2 flashlight nibble curves and compositing in
+`Scumm/Rendering/ScummV2Lighting.cs`, actor darkness palettes and flashlight defaults
+adapt ScummVM `gfx.cpp`, `costume.cpp` and `scumm.cpp` (read 18 October 2026).
+Copyright the ScummVM contributors; GPL-3.0-or-later.
+
 The v1/v2 walking and direction tables in `Scumm/Runtime/ScummActors.V2.cs`,
 old walk-box routing, and native Play interface behavior adapt ScummVM's
 [`actor.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/actor.cpp),
