@@ -55,7 +55,7 @@ public static class ScummActorRenderer
 
     public static ScummActorLayer Render(IEnumerable<ScummActorSnapshot> actors, int currentRoom, int width, int height,
         Func<int, ScummCostume?> costumes, byte[]? depthMask = null, ScummWalkBoxSet? boxes = null,
-        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null)
+        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null, int engineVersion = 3)
     {
         var pixels = new byte[width * height];
         Array.Fill(pixels, Transparent);
@@ -83,7 +83,10 @@ public static class ScummActorRenderer
                 continue;
             }
             var cels = costume.Draw(look.Animation, direction);
-            var top = y - elevation;
+            var top = y - elevation * (engineVersion <= 2 ? 2 : 1);
+            // Actor_v2::prepareDrawActorCostume: DOS strip offsets depend on
+            // engine version and facing; runtime actor coordinates remain unchanged.
+            var drawX = x + (engineVersion <= 2 ? look.Facing == 270 ? 16 : engineVersion == 2 ? 8 : 0 : 0);
             // Plane 1 is the only mask plane in v3; an unknown box draws the actor in front (noted as an estimate).
             var actorClasses = classes is not null && classes.TryGetValue(actor.Number, out var bits) ? bits : 0u;
             var forceClip = ScummObjectClasses.Has(actorClasses, AlwaysClipClass);
@@ -95,10 +98,10 @@ public static class ScummActorRenderer
             // CD game: a box with a scale of its own (word or slot) sets it where the actor stands, else the actor's own (actorOps scale) holds.
             var scale = Math.Clamp((actor.WalkBox is int scaleBox && !actor.IgnoreBoxes.GetValueOrDefault() ? boxes?.BoxScale(scaleBox, y) : null) ?? look.Scale, 1, 255);
             int Scaled(int value) => scale < 255 ? (int)Math.Floor(value * (double)scale / 255) : value;
-            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale, actor.Number);
+            var written = costume.Compose(cels, pixels, width, height, drawX, top, look.Palette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale, actor.Number);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
-                x + Scaled(cels.Min(cel => cel.Left)), top + Scaled(cels.Min(cel => cel.Top)),
-                x + Scaled(cels.Max(cel => cel.Left + cel.Width)), top + Scaled(cels.Max(cel => cel.Top + cel.Height)));
+                drawX + Scaled(cels.Min(cel => cel.Left)), top + Scaled(cels.Min(cel => cel.Top)),
+                drawX + Scaled(cels.Max(cel => cel.Left + cel.Width)), top + Scaled(cels.Max(cel => cel.Top + cel.Height)));
             var estimate = string.Join("; ", new[] { actor.Estimate, look.Estimate, boxNote }.Where(text => text is not null));
             drawn.Add(new ScummDrawnActor(actor.Number, costumeId, x, y, elevation, look.Frame ?? -1, direction, bounds,
                 written, estimate.Length == 0 ? null : estimate) { ZPlane = zPlane });

@@ -405,6 +405,12 @@ public abstract partial class ScummSession
         if (objectId == 0 || _currentRoom is null) return;
         var record = _runtime.IsV2 ? _currentObjects.LastOrDefault(item => item.Id == objectId)
             : _currentObjects.FirstOrDefault(item => item.Id == objectId);
+        var objectRoom = _currentRoom.ResourceId!.Value;
+        if (_runtime.IsV2 && _runtime.InventorySlots.Contains(objectId) && _runtime.InventoryRooms.TryGetValue(objectId, out var heldRoom))
+        {
+            objectRoom = heldRoom;
+            record = _data.ReadRoom(heldRoom).Objects.LastOrDefault(item => item.Id == objectId);
+        }
         if (record is null)
         {
             _uncertainties.Add($"{source}: startObject {objectId}, verb 0x{verbId:X2}: the object is not in Room {_currentRoom.ResourceId:00}; its code runs only if it is held, and inventory code is not modelled.");
@@ -417,7 +423,7 @@ public abstract partial class ScummSession
         }
         ScummScriptDisassembly script;
         ScummObjectVerbEntry selectedEntry;
-        try { script = _data.ReadObjectVerb(_currentRoom.ResourceId!.Value, record, verbId, out selectedEntry); }
+        try { script = _data.ReadObjectVerb(objectRoom, record, verbId, out selectedEntry); }
         catch (InvalidDataException ex) when (ex.Message.Contains("has no verb", StringComparison.Ordinal))
         {
             _visitTrace.Add($"{source}: object {objectId} has no verb 0x{verbId:X2} and no fallback, so startObject does nothing");
@@ -701,6 +707,7 @@ public abstract partial class ScummSession
                 _runtime.CurrentRoom ?? NullRoom, _runtime.Camera.Mode));
             _cutscenes.Push((0, _executing.Count > 0 ? _executing[^1] : null));
             CutscenesBegun++;
+            _visitTrace.Add($"cutscene at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} (native v1/v2 scope)");
             _overrides.Remove(_cutscenes.Count);
             _runtime.SetGlobalVariable(ScummVars.V2.CursorState, 200);
             _runtime.ApplyV2UserState(4 | 2 | 1 | 8);

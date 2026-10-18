@@ -25,7 +25,7 @@ public abstract partial class ScummSession
     }
 
     protected ScummActorTable.Placement CurrentPlacement() =>
-        new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses);
+        new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses, _runtime.IsPlayerActor);
 
     protected ScummSessionSnapshot EnterRoom(GameResource room, string arrival, ScummScriptEvent? load = null, string? assumedArrival = null,
         Action<int>? placeAfterLoadRoom = null)

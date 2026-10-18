@@ -1,0 +1,353 @@
+[
+    {
+        "Value":  1,
+        "Op":  "room"
+    },
+    {
+        "Count":  150,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "w",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  65,
+        "Op":  "roomclick",
+        "X":  50
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "01-native-sentence",
+        "Op":  "save"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "d",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  62,
+        "Op":  "roomclick",
+        "X":  55
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Op":  "owner",
+        "Value":  1,
+        "X":  15
+    },
+    {
+        "Text":  "02-phone-bill-inventory",
+        "Op":  "save"
+    },
+    {
+        "Text":  "w",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  65,
+        "Op":  "roomclick",
+        "X":  307
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "e",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  65,
+        "Op":  "roomclick",
+        "X":  307
+    },
+    {
+        "Count":  1200,
+        "Op":  "untilroom",
+        "Value":  16
+    },
+    {
+        "Count":  120,
+        "Op":  "untilskip"
+    },
+    {
+        "Text":  "03-native-cutscene",
+        "Op":  "save"
+    },
+    {
+        "Op":  "escape"
+    },
+    {
+        "Count":  300,
+        "Op":  "untilcontrol"
+    },
+    {
+        "Text":  "e",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  125,
+        "Op":  "click",
+        "X":  300
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Y":  125,
+        "Op":  "click",
+        "X":  300
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Y":  125,
+        "Op":  "click",
+        "X":  300
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "w",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  65,
+        "Op":  "roomclick",
+        "X":  625
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "e",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  65,
+        "Op":  "roomclick",
+        "X":  625
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "e",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  125,
+        "Op":  "click",
+        "X":  300
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Y":  125,
+        "Op":  "click",
+        "X":  300
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Y":  30,
+        "Op":  "roomclick",
+        "X":  750
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "w",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  40,
+        "Op":  "roomclick",
+        "X":  270
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "e",
+        "Op":  "text"
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  40,
+        "Op":  "roomclick",
+        "X":  270
+    },
+    {
+        "Count":  180,
+        "Op":  "frames"
+    },
+    {
+        "Y":  161,
+        "Op":  "click",
+        "X":  105
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  16,
+        "Op":  "roomclick",
+        "X":  330
+    },
+    {
+        "Count":  2,
+        "Op":  "frames"
+    },
+    {
+        "Y":  145,
+        "Op":  "click",
+        "X":  10
+    },
+    {
+        "Count":  120,
+        "Op":  "frames"
+    },
+    {
+        "Count":  60,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "CashCards only!",
+        "Op":  "message"
+    },
+    {
+        "Text":  "04-native-buy-response",
+        "Op":  "save"
+    },
+    {
+        "Value":  7,
+        "Op":  "room"
+    },
+    {
+        "Op":  "owner",
+        "Value":  1,
+        "X":  15
+    },
+    {
+        "Text":  "sentence script 2 runs verb 0x11 with objects 40 and 0",
+        "Op":  "trace"
+    },
+    {
+        "Count":  1200,
+        "Op":  "untilcontrol"
+    },
+    {
+        "Op":  "control"
+    },
+    {
+        "Text":  "05-returned-control",
+        "Op":  "save"
+    }
+]

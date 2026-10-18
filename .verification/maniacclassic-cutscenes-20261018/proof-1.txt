@@ -1,0 +1,18 @@
+Source Room 1 object 394 verb 09
++001F startSound 0x27
++0021 isEqual var[0x05C], 0x0000, +29  ->  0x0044
++0027 isScriptRunning var[0x001], 0x57
++002A isEqual var[0x001], 0x0000, +18  ->  0x0042
++0030 getActorRoom var[0x001], 0x0B
++0033 isEqual var[0x001], 0x001A, +6  ->  0x003F
++0039 move var[0x08F], 0x0001
++003D startScript 0x57
++003F jumpRelative +2  ->  0x0044
++0042 startScript 0x61
++0044 stopObjectCode
+Frame 47, Room 26: Oh, the doorbell!
+Frame 88, Room 26: I wonder if that's my package?
+Frame 164, Room 26:
+Result: begun=True, frames=187, currentRoom=1, inCutscene=False
+cutscene at Script 87 +0x001F (native v1/v2 scope)
+Retained limitation: Script 174 +0x0000: unsupported v2 getClosestObjActor (var[0x0C9], var[0x0C8]) at +0x0000

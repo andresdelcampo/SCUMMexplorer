@@ -25,6 +25,29 @@ public partial class MainWindow
 
     private bool PlayCanStartCutscene => PlayActive && !_play!.InCutscene;
 
+    private static bool UsesManiacCutsceneSetup(GameLibrary game) =>
+        GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
+
+    private static ScummCutscenePlanner NewPlayCutscenePlanner(GameLibrary game) => UsesManiacCutsceneSetup(game)
+        ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game) : new(game);
+
+    private bool PreparePlayCutsceneStartup(GameLibrary game)
+    {
+        if (!UsesManiacCutsceneSetup(game) || _play is not { } session) return true;
+        try
+        {
+            if (SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PrepareIfNeeded(game, session))
+                _sceneSound.StopAll("the cutscene's disclosed startup preview was prepared");
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException)
+        {
+            StatusText.Text = "The scene could not start here. Finish choosing your characters first.";
+            StatusText.ToolTip = IsAdvancedMode ? ex.Message : null;
+            return false;
+        }
+    }
+
     /// <summary>Derives the list and runs every scene once from a fresh start, off the UI thread, from the moment the game opens.</summary>
     private void StartPlayCutsceneDerivation(GameLibrary game)
     {
@@ -39,7 +62,7 @@ public partial class MainWindow
         // game shares the one copy, as before.
         var ownReader = game.V4Archive is not null || game.V4Disks is not null;
         var copies = ownReader ? new ThreadLocal<GameLibrary>(() => new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(game.FolderPath)) : null;
-        var planner = new Lazy<ScummCutscenePlanner>(() => copies is null ? new ScummCutscenePlanner(game)
+        var planner = new Lazy<ScummCutscenePlanner>(() => copies is null ? NewPlayCutscenePlanner(game)
             : new ScummCutscenePlanner(copies.Value!, () => ScummGameSession.BootForPlay(copies.Value!, out _)));
         _playPlanner = planner;
         _scanDone = 0; _scanTotal = 0;
@@ -62,7 +85,11 @@ public partial class MainWindow
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) { _playRoomListsDone = true; UpdatePlaybackControls(); } });
             }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException)
+            {
+                // A rejected/unreviewed start offers no scenes; its progress indicator must finish too.
+                Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) { _playRoomListsDone = true; UpdatePlaybackControls(); } });
+            }
         });
     }
 
@@ -111,13 +138,15 @@ public partial class MainWindow
     {
         var trigger = group.First;
         if (_game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
+        if (!PreparePlayCutsceneStartup(game)) return;
         if (_currentRoomResource?.ResourceId != trigger.Room)
         {
             SelectResourceInTree(room);
             // The room view boots or continues play in the opened room; wait for it (a first boot takes a few seconds).
-            for (var wait = 0; wait < 600 && !(PlayActive && _play!.CurrentRoomId == trigger.Room); wait++) await Task.Delay(50);
+            for (var wait = 0; wait < 600 && !(PlayActive && (_play!.CurrentRoomId == trigger.Room || UsesManiacCutsceneSetup(game) && _play.CurrentRoomId == 45)); wait++) await Task.Delay(50);
         }
         if (!PlayActive || _play is not { } session) return;
+        if (!PreparePlayCutsceneStartup(game)) return;
         _playPaused = false;
         var title = PickerVerbTitle(ScummCutsceneTitles.Title(trigger), trigger.IsRoomEntry ? 0 : trigger.VerbId);
         IReadOnlyList<string> uncertainties;

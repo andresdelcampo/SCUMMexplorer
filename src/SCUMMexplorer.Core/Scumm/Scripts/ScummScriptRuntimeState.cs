@@ -20,8 +20,14 @@ public sealed class ScummScriptRuntimeState
     /// <summary>The source-defined classic Maniac verb screen offset; other v1/v2 games use zero.</summary>
     public int V2VerbYOffset { get; set; }
     public bool IsClassicManiac { get; set; }
+    /// <summary>Actor_v2::isPlayer uses the current ego in Maniac v1, otherwise globals 42 and 43 (actor.cpp).</summary>
+    public bool IsPlayerActor(int number) => IsV2
+        ? IsClassicManiac ? GlobalVariables.GetValueOrDefault(EgoVariable) == number
+            : GlobalVariables.GetValueOrDefault(ScummVars.V2.FirstPlayerActor) <= number && number <= GlobalVariables.GetValueOrDefault(ScummVars.V2.LastPlayerActor)
+        : ObjectClasses.TryGetValue(number, out var bits) && ScummObjectClasses.Has(bits, ScummActorTable.PlayerClass);
     public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
     public int V2UserState { get; private set; }
+    public (int Verb, int Object1, int Object2, int Preposition)? V2DrawnSentence { get; set; }
     public Action<bool>? V2FreezeScripts { get; set; }
     /// <summary>script_v2.cpp setUserState, scumm.h USERSTATE flags (17 October 2026).</summary>
     public void ApplyV2UserState(int state)

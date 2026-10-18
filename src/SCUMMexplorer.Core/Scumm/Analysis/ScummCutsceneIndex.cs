@@ -93,10 +93,10 @@ public static partial class ScummCutsceneIndex
 {
     public const int Depth = 3;
 
-    [GeneratedRegex(@"^(?:0x)?([0-9A-Fa-f]+),")]
+    [GeneratedRegex(@"^(?:0x)?([0-9A-Fa-f]+)(?:,|$)")]
     private static partial Regex LiteralScriptNumber();
 
-    [GeneratedRegex(@"text, ""(.*?)""")]
+    [GeneratedRegex(@"text,?\s+""(.*?)""")]
     private static partial Regex TextOperand();
 
     /// <param name="doorways">The rooms a look, walk-to or use verb's code leads to (the game's doorway finder), or null.</param>
@@ -202,7 +202,7 @@ public static partial class ScummCutsceneIndex
                 var operand = i.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "";
                 if (operand.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(operand[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var target)) summary.Targets.Add(target);
             }
-            if (i.Operation == "print" && TextOperand().Match(i.Operands) is { Success: true } m)
+            if ((i.Operation == "print" || i.Operation == "printEgo" && data is ScummV2DataSource) && TextOperand().Match(i.Operands) is { Success: true } m)
             {
                 var text = ScummTextDecoder.DecodeLine(m.Groups[1].Value).Trim();
                 if (text.Length > 0 && !texts.Contains(text)) texts.Add(text);

@@ -22,6 +22,9 @@ public abstract partial class ScummSession
 
     /// <summary>The inputs delivered to the input script so far (Advanced trace, R-7.17).</summary>
     public IReadOnlyList<ScummPlayInput> DeliveredInput => _deliveredInput;
+    public bool HasPendingPlayInput => _queuedInput.Count != 0;
+    /// <summary>The native input script: fixed script 4 before v3, VAR_VERB_SCRIPT thereafter.</summary>
+    public int PlayInputScript => _runtime.IsV2 ? 4 : _runtime.GlobalVariables.GetValueOrDefault(VerbScriptVariable);
 
     /// <summary>The room screen's rows (<c>initScreens</c>): the text screen is above, the verb screen from <c>Bottom</c> down.</summary>
     public (int Top, int Bottom) MainScreen => _runtime.MainScreen;
@@ -68,7 +71,8 @@ public abstract partial class ScummSession
         var chosen = number ?? _runtime.Charset ?? 0;
         if (!_charsets.TryGetValue(chosen, out var charset))
             // A version 3 engine reads 99.LFL - n (the 256-colour Indiana Jones too: one file per room, the same charset files as EGA; S6 Indy3Vga).
-            _charsets[chosen] = charset = ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
+            _charsets[chosen] = charset = _runtime.IsV2 ? new ScummV2Charset((int)_runtime.EngineVersion, OldPlayLanguage)
+                : ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
         // cursorCommand charsetColors (S6 MonkeyCd, 17 October 2026: Script 22 gives the verbs' charset 6 the entries 0, 6, 2): the colours the game set replace
         // the file's own map, as ScummVM's _charsetData does.
         if (charset is ScummV4Charset v4 && _runtime.CharsetColors.TryGetValue(chosen, out var entries) && entries.Count > 0)
@@ -151,13 +155,13 @@ public abstract partial class ScummSession
     public ScummVerbAreaPicture PlayVerbArea()
     {
         var charset = PlayCharset(0) ?? CurrentPlayCharset();
-        var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v)).ToArray();
+        var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v) && (!_runtime.IsV2 || (_runtime.V2UserState & 0x80) != 0)).ToArray();
         if (charset is null) return VerbArea();
         var plain = ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, null, n => PlayCharset(n)));
-        if (!CursorShown || _screenPointer is not { } pointer || pointer.Y < ScummVerbArea.Top) return plain;
+        if (!CursorShown || _screenPointer is not { } pointer || pointer.Y < ScummVerbArea.Top) return DrawOldInterface(plain, charset);
         var over = ScummVerbArea.FindVerbAt(plain.Items, pointer.X, pointer.Y);
-        return over is null ? plain
-            : ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, over.Slot, n => PlayCharset(n)));
+        return DrawOldInterface(over is null ? plain
+            : ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, over.Slot, n => PlayCharset(n))), charset);
     }
 
     /// <summary>
@@ -182,10 +186,26 @@ public abstract partial class ScummSession
         PointAtScreen((x, y));
         refused = InputRefusal();
         if (refused is not null) return null;
-        var mode = rightButton ? profile.RightClickInputMode : profile.ClickInputMode;
+        var mode = rightButton ? profile.RightClickInputMode : _runtime.IsV2 ? 1 : profile.ClickInputMode;
         var press = rightButton ? "right click" : "click";
         ScummPlayInput input;
-        if (y >= _runtime.MainScreen.Top && y < _runtime.MainScreen.Bottom)
+        if (_runtime.IsV2 && y >= _runtime.MainScreen.Bottom && y <= _runtime.MainScreen.Bottom + 8)
+            input = new(5, 0, 0, "click on the native sentence line");
+        else if (_runtime.IsV2 && y >= _runtime.MainScreen.Bottom + 32)
+        {
+            var relativeY = y - _runtime.MainScreen.Bottom - 32;
+            if (relativeY >= 16) return null;
+            if (x is >= 144 and < 176)
+            {
+                ScrollV2Inventory(relativeY < 8 ? -2 : 2);
+                return null;
+            }
+            var slot = (relativeY / 8) * 2 + (x >= 176 ? 1 : 0);
+            var obj = V2Inventory().Skip(_v2InventoryOffset + slot).FirstOrDefault();
+            if (obj == 0) return null;
+            input = new(3, obj, 0, $"click on inventory object {obj}");
+        }
+        else if (y >= _runtime.MainScreen.Top && y < _runtime.MainScreen.Bottom)
         {
             var (roomX, roomY) = VirtualPoint(x, y);
             input = new(SceneClickArea, 0, mode, $"{press} in the room at screen ({x}, {y}), room ({roomX}, {roomY})");
@@ -210,6 +230,7 @@ public abstract partial class ScummSession
     {
         bool Is(string variable) => _runtime.GlobalVariables.TryGetValue(variable, out var value) && value != 0 && value == key;
         refused = key <= 0 || key > 0x1FF ? "it is not a key code the engine sends"
+            : _runtime.IsV2 && key is 319 or 322 or 32 ? "it is an engine save/load, restart or pause key (the app's controls)"
             : Is(RestartKeyVariable) ? "it is the engine's restart key (Restart is the app's)"
             : Is(PauseKeyVariable) ? "it is the pause key (the app's Pause)"
             : key is '.' or 0x1B ? "it is an engine key (the app's Skip line or Skip)"
@@ -218,6 +239,19 @@ public abstract partial class ScummSession
             : InputRefusal();
         if (refused is not null) return null;
         var verb = _runtime.Verbs.Snapshot().FirstOrDefault(item => item.Mode == 1 && item.Key != 0 && item.Key == key);
+        if (_runtime.IsV2 && verb is null)
+        {
+            if (key is 'u' or 'j') { ScrollV2Inventory(key == 'u' ? -2 : 2); return null; }
+            var slot = key switch { 'i' => 0, 'o' => 1, 'k' => 2, 'l' => 3, _ => -1 };
+            if (slot >= 0)
+            {
+                var obj = V2Inventory().Skip(_v2InventoryOffset + slot).FirstOrDefault();
+                if (obj == 0) return null;
+                var inventoryInput = new ScummPlayInput(3, obj, 0, $"inventory key {DescribeKey(key)}, object {obj}");
+                _queuedInput.Enqueue(inventoryInput);
+                return inventoryInput;
+            }
+        }
         var input = verb is not null
             ? new ScummPlayInput(VerbClickArea, verb.VerbId, 1, $"key {DescribeKey(key)}, the shortcut of verb 0x{verb.VerbId:X2}")
             : new ScummPlayInput(KeyClickArea, key, 1, $"key {DescribeKey(key)}");
@@ -228,7 +262,7 @@ public abstract partial class ScummSession
     private string? InputRefusal() =>
         _currentRoom is null ? "no room is on screen"
         : _runtime.UserPut <= 0 ? "user input is off (cursorCommand)"
-        : !_runtime.GlobalVariables.TryGetValue(VerbScriptVariable, out var script) || script == 0 ? "no input script is set (VAR_VERB_SCRIPT is 0)"
+        : !_runtime.IsV2 && (!_runtime.GlobalVariables.TryGetValue(VerbScriptVariable, out var script) || script == 0) ? "no input script is set (VAR_VERB_SCRIPT is 0)"
         : null;
 
     // checkExecVerbs: each queued input runs the script VAR_VERB_SCRIPT holds now, with (area, value, mode) as its first locals.
@@ -242,7 +276,15 @@ public abstract partial class ScummSession
                 _visitTrace.Add($"input: {input.Description} not delivered: {refused}");
                 continue;
             }
-            var script = _runtime.GlobalVariables[VerbScriptVariable];
+            var script = _runtime.IsV2 ? 4 : _runtime.GlobalVariables[VerbScriptVariable];
+            if (_runtime.IsV2)
+            {
+                _runtime.SetGlobalVariable(ScummVars.V2.ClickArea, (ushort)input.Area);
+                if (input.Area == VerbClickArea) _runtime.SetGlobalVariable(ScummVars.V2.ClickVerb, (ushort)input.Value);
+                if (input.Area == 3) _runtime.SetGlobalVariable(ScummVars.V2.ClickObject, (ushort)input.Value);
+                // processKeyboard converts DOS F1..F9 to the old engine's 1..9 key values.
+                if (input.Area == KeyClickArea) _runtime.SetGlobalVariable(ScummVars.V2.Keypress, (ushort)(input.Value is >= 315 and <= 323 ? input.Value - 314 : input.Value));
+            }
             _deliveredInput.Add(input);
             _visitTrace.Add($"input: {input.Description} runs script {script} with [{input.Area}, {input.Value}, {input.Mode}] (runInputScript)");
             RunStartedScript(script, 0, new Dictionary<string, ushort>(StringComparer.Ordinal)
@@ -257,4 +299,28 @@ public abstract partial class ScummSession
 
     /// <summary>'.' (the engine's talk-stop key, R-7.11): the current message ends at once.</summary>
     public void SkipMessage() => _runtime.Messages.SkipTalkDelay();
+
+    private int _v2InventoryOffset;
+    private int _v2InventoryEgo = -1;
+    private (int Id, byte Owner)[] _v2InventorySeen = [];
+    private int[] V2Inventory()
+    {
+        var ego = _runtime.GlobalVariables.GetValueOrDefault(EgoVariable);
+        var contents = _runtime.InventorySlots.Where(id => id != 0).Select(id => (Id: id, Owner: _runtime.ObjectOwners.GetValueOrDefault(id))).ToArray();
+        // handleMouseOver(updateInventory): native inventory updates reset scrolling,
+        // including actor switches and owner/slot changes, before drawing or picking.
+        if (_v2InventoryEgo != ego || !_v2InventorySeen.SequenceEqual(contents))
+        {
+            _v2InventoryOffset = 0;
+            _v2InventoryEgo = ego;
+            _v2InventorySeen = contents;
+        }
+        return contents.Where(item => item.Owner == ego).Select(item => item.Id).ToArray();
+    }
+    private void ScrollV2Inventory(int delta)
+    {
+        var count = V2Inventory().Length;
+        if (delta < 0 && _v2InventoryOffset >= 2 || delta > 0 && _v2InventoryOffset + 4 < count)
+            _v2InventoryOffset += delta;
+    }
 }

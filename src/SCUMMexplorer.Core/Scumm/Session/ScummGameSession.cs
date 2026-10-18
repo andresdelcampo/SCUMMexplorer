@@ -22,6 +22,7 @@ public sealed class ScummGameSession : ScummSession
         if (_runtime.IsV2) _runtime.Actors.InitializeV2Game(profile.Dialect == ScummScriptDialect.V1);
         _runtime.V2VerbYOffset = profile.V2VerbYOffset;
         _runtime.IsClassicManiac = profile.RestoresClassicCutsceneScene;
+        if (_runtime.IsClassicManiac) _runtime.MainScreen = (16, 152); // resetScumm: classic DOS Maniac's 136-row room.
         if (profile.SeparateBitVariables)
         {
             // readVar/writeVar: from version 4 the bit variables are _bitVars, not bits of the word variables.
@@ -364,7 +365,7 @@ public sealed class ScummGameSession : ScummSession
     private int ActorFromPosition(int x, int y)
     {
         if (_currentRoom?.ResourceId is not int room || _roomSize is not { } size) return 0;
-        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostume, classes: _runtime.ObjectClasses);
+        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostume, classes: _runtime.ObjectClasses, engineVersion: (int)_runtime.EngineVersion);
         foreach (var actor in layer.Actors.OrderBy(item => item.Number))
         {
             if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;

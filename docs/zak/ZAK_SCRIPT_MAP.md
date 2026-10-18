@@ -36,8 +36,15 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
+| Enhanced Script 140 | Room 8 entry reaches the second secret-room scene; delay 240, cutscene, "Meanwhile, back in the secret room^", then Room 16 | decoded | Script 140 +0x0000/+0x0004/+0x0014; S7 scan `8/0/0` | 2026-10-18 |
+| Enhanced Script 39 | Room 3 doorbell Push/Use reaches the baker's response; first line "We're closed, and we're out of fresh bread anyway." | decoded | Object 147 verb 9 +0x0067; Script 39 cutscene +0x0000, first response +0x0070, end +0x015E | 2026-10-18 |
+| Enhanced Script 24 | Shop Buy group is represented by tool kit 34; its verb 17 sets price 45 and starts the purchase cutscene. Other sale objects including nose glasses 40 share this script | decoded | Object 34 verb 17 +0x0026/+0x002A; Script 24 +0x0000..+0x02EE | 2026-10-18 |
+| Enhanced Script 126 | Room 2 entry starts the first secret-room scene. Fresh S7 preview begins but reaches the 6000-frame bound; the S6 genuine route proved its Escape path, not unskipped completion | decoded / play (Explorer only) | Entry +0x0049; Script 126 +0x0004..+0x01CA; S7 census and S6 route record | 2026-10-18 |
 | Enhanced Script 1 | Starts the opening in Room 46, starts Script 127, then ends the opening and starts Script 108 | decoded | Script 1 +0x0058, +0x0078, +0x0533 to +0x053F | 2026-10-17 |
 | Enhanced Script 108 | Names and configures actors; starts Scripts 9 and 19; places actor 1 in Room 1. The post-dream branch runs object 90 verb 1 through the sentence queue, waits, walks actor 1 to script coordinates (21,56), and restores cursor/user input | decoded | Script 108 +0x00DE to +0x0165, +0x0264 to +0x0266, +0x0290 to +0x02EC | 2026-10-17 |
+| Classic Script 140 | Room 8 entry reaches the second secret-room scene; first line "Meanwhile, back in the secret room^"; S7 fresh preview begins and ends | decoded / play (Explorer only) | Script 140 +0x0004 cutscene, +0x0014 first line, +0x036E end; S7 `8/0/0` proof | 2026-10-18 |
+| Classic Script 39 | Doorbell Push/Use reaches the baker; its Classic actor operations shift the response/end offsets from Enhanced | decoded | Object 147 verb 9 +0x0067; Script 39 +0x0000 cutscene, +0x0078 first response, +0x0166 end | 2026-10-18 |
+| Classic Script 24 | Shop Buy group's tool kit34 sets price45 and starts the purchase cutscene; its fresh S7 direct action ends within256frames | decoded / play (Explorer only) | Object34 verb17 +0x0026/+0x002A; Script24 +0x0000; S7 proof | 2026-10-18 |
 
 ## Rooms
 
@@ -71,6 +78,12 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 | Verb / script | Meaning | Evidence | Source | Date |
 |---|---|---|---|---|
+| Enhanced native sentence | First object click composes; clicking native sentence area5 executes the selected verb and objects | reached from real keys/clicks | Script4 +0x01B4 `drawSentence`, +0x01DC `doSentence`; fixed input Script4 and sentence Script2 | 2026-10-17 |
+| Enhanced drawer92 / phonebill15 | Open drawer exposes bill; Pick up puts bill in native inventory; Read held bill produces the payment reminder | reached | Room1 object92 verb1 +0x002D; object15 verb14 +0x0025, verb12 +0x0028 starts Script41 | 2026-10-17 |
+| Enhanced bedroom exit | Open door84 then Walk through it reaches living room2 | reached | Room1 object84 verb1 +0x0056, verb13 +0x0066 | 2026-10-17 |
+| Enhanced alien cutscene | Room2 entry starts the timed scene; real Esc resumes its override and restores the player's room | reached | Room2 entry +0x0049 starts126; Script126 +0x000D override jump to+0x01B4, +0x01CA ends cutscene | 2026-10-17 |
+| Enhanced native shop choice | Room7 installs Buy17/Sell18; Buy noseglasses40 invokes the shopkeeper's CashCard response | reached | Object183 entryFD +0x002D/+0x003D; object40 verb17 +0x0029 starts24; Script24 +0x0113 prints shopkeeper response | 2026-10-17 |
+| Classic native play route | Independent v1 execution verifies the same sentence, drawer92/bill15, door84, Script126 override, Buy17/noseglasses40 response and restored control | reached; three tests and WPF | Classic fixture's own decoded entries have the offsets listed above; Script24 +0x02D6 walks back and +0x02EE ends the exchange; `.verification/zakclassic-play-20261017` | 2026-10-17 |
 
 ## Objects and classes
 

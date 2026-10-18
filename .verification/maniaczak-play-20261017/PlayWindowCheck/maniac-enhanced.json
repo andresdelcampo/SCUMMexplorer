@@ -1,0 +1,164 @@
+[
+    {
+        "Value":  45,
+        "Op":  "room"
+    },
+    {
+        "Text":  "01-party-choice",
+        "Op":  "save"
+    },
+    {
+        "Y":  104,
+        "Op":  "roomclick",
+        "X":  76
+    },
+    {
+        "Count":  100,
+        "Op":  "frames"
+    },
+    {
+        "Y":  104,
+        "Op":  "roomclick",
+        "X":  196
+    },
+    {
+        "Count":  100,
+        "Op":  "frames"
+    },
+    {
+        "Y":  60,
+        "Op":  "roomclick",
+        "X":  292
+    },
+    {
+        "Count":  100,
+        "Op":  "frames"
+    },
+    {
+        "Count":  5000,
+        "Op":  "untilroom",
+        "Value":  44
+    },
+    {
+        "Count":  1000,
+        "Op":  "untilskip"
+    },
+    {
+        "Text":  "02-override",
+        "Op":  "save"
+    },
+    {
+        "Op":  "escape"
+    },
+    {
+        "Count":  2000,
+        "Op":  "untilcontrol"
+    },
+    {
+        "Y":  136,
+        "Op":  "click",
+        "X":  8
+    },
+    {
+        "Count":  1000,
+        "Op":  "untilroom",
+        "Value":  1
+    },
+    {
+        "Count":  120,
+        "Op":  "frames"
+    },
+    {
+        "Y":  136,
+        "Op":  "click",
+        "X":  8
+    },
+    {
+        "Count":  200,
+        "Op":  "frames"
+    },
+    {
+        "Y":  136,
+        "Op":  "click",
+        "X":  8
+    },
+    {
+        "Count":  200,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "d",
+        "Op":  "text"
+    },
+    {
+        "Count":  1,
+        "Op":  "frames"
+    },
+    {
+        "Y":  84,
+        "Op":  "roomclick",
+        "X":  376
+    },
+    {
+        "Count":  1,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "03-sentence",
+        "Op":  "save"
+    },
+    {
+        "Y":  84,
+        "Op":  "roomclick",
+        "X":  376
+    },
+    {
+        "Count":  51,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "d",
+        "Op":  "text"
+    },
+    {
+        "Count":  1,
+        "Op":  "frames"
+    },
+    {
+        "Y":  84,
+        "Op":  "roomclick",
+        "X":  416
+    },
+    {
+        "Count":  1,
+        "Op":  "frames"
+    },
+    {
+        "Y":  84,
+        "Op":  "roomclick",
+        "X":  416
+    },
+    {
+        "Count":  500,
+        "Op":  "untilowner",
+        "Value":  3,
+        "X":  55
+    },
+    {
+        "Text":  "04-key-inventory",
+        "Op":  "save"
+    },
+    {
+        "Y":  180,
+        "Op":  "click",
+        "X":  8
+    },
+    {
+        "Count":  1,
+        "Op":  "frames"
+    },
+    {
+        "Text":  "05-inventory-selection",
+        "Op":  "save"
+    }
+]
