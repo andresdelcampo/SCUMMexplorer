@@ -88,6 +88,8 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
 <!-- support-matrix:end -->
 
+Maniac/Zak edition coverage at the [18 October S9 checkpoint](checkpoints/20261018-S9-ManiacZak.md): classic English Maniac, enhanced Spanish Maniac, classic English Zak and enhanced English Zak only. There is one local copy per family; no additional language, demo or revision within a family was available to establish compatibility. These checks do not raise the existing feature levels.
+
 ✔ works (Full), ◐ partly, – not supported. What each column asks for, at each level:
 
 | Column | ◐ Partial | ✔ Full | Checked by |
