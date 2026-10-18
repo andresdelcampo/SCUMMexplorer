@@ -43,6 +43,7 @@ public abstract partial class ScummSession
             if (ego is int egoNumber)
             {
                 var before = _runtime.Actors[egoNumber];
+                _runtime.RememberV2ActorRoom(egoNumber, load!.TargetId);
                 _runtime.Actors.Put(egoNumber, before.X, before.Y, room.ResourceId, CurrentPlacement(), ego);
             }
             else _runtime.Actors.ForgetAll($"{load!.SourceLabel} +0x{load.Offset:X4} moves the ego, whose actor number (var[0x001]) is unknown");

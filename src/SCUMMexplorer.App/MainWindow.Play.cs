@@ -96,6 +96,7 @@ public partial class MainWindow
                 var session = await Task.Run(() => ScummGameSession.BootForPlay(game, out objects), token);
                 if (token.IsCancellationRequested) return;
                 _play = session;
+                UpdatePlaySoundCard();
                 _playScreen = new ScummPlayScreen(game, session, objects!.States);
                 _playFolder = game.FolderPath;
                 _playCdTracks = ScummCdAudioTracks.For(game);
@@ -223,6 +224,7 @@ public partial class MainWindow
         PlayScreenImage.Focus();
         e.Handled = true;
         if (_play!.ClickScreen(point.X, point.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
+        UpdatePlaybackControls();
     }
 
     // R-7.16 (Rule, confirmed by the user 16 Oct): the right button goes to the game only where its scripts read it (ScummProfile.RightClickReachesGame:
@@ -237,12 +239,27 @@ public partial class MainWindow
 
     private bool PlayRightClickReachesGame => PlayActive && _game is { } game && ScummProfile.For(game).RightClickReachesGame;
 
+    private void UpdatePlaySoundCard()
+    {
+        // vars.cpp's device numbers (also ScummGameSession.AdlibCard): v1/v2
+        // have no VAR_SOUNDCARD at var[0x030]; that word is their game's state.
+        if (_play is null || _game is not { } game || ScummProfile.For(game).EngineVersion < ScummVersion.V3) return;
+        _play.SoundCard = _sceneSound.Mode switch
+        {
+            SceneSoundPlayer.SoundMode.Roland => 4,
+            SceneSoundPlayer.SoundMode.Adlib => 3,
+            SceneSoundPlayer.SoundMode.Pcjr => 1,
+            _ => 0
+        };
+    }
+
     // One right press at a game screen point, as the image's handler delivers it after mapping the pointer.
     private ScummPlayInput? PlayRightClick(int x, int y)
     {
         if (!PlayRightClickReachesGame) return null;
         var input = _play!.ClickScreen(x, y, true, out var refused);
         if (input is null && IsAdvancedMode) StatusText.ToolTip = $"Right click not delivered: {refused}";
+        UpdatePlaybackControls();
         return input;
     }
 
@@ -257,13 +274,14 @@ public partial class MainWindow
             // The game's pause key (VAR_PAUSE_KEY, Space in Indiana Jones) is the app's Pause.
             _playPaused = !_playPaused;
             ShowPlayFrame();
+            UpdatePlaybackControls();
             e.Handled = true;
             return true;
         }
         if (key == Key.Escape && !_fullscreen)
         {
             // R-7.16: Esc skips a cutscene only from its override point (abortCutscene); otherwise the game reads it as its key.
-            if (_play!.CutsceneSkippable) _play.PressKey(0x1B);
+            SkipPlayCutscene();
             e.Handled = true;
             return true;
         }
@@ -277,6 +295,7 @@ public partial class MainWindow
         };
         if (code is not int value) return false;
         _play!.PressPlayKey(value, out _);
+        UpdatePlaybackControls();
         e.Handled = true;
         return true;
     }
@@ -288,7 +307,8 @@ public partial class MainWindow
         var character = e.Text[0];
         if (character is < ' ' or > '~' || character == ' ') return;
         e.Handled = true;
-        if (character == '.') { _play!.SkipMessage(); return; }
+        if (character == '.') { _play!.SkipMessage(); UpdatePlaybackControls(); return; }
         _play!.PressPlayKey(character, out _);
+        UpdatePlaybackControls();
     }
 }

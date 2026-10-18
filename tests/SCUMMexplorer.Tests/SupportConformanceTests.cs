@@ -62,13 +62,41 @@ public class SupportConformanceTests
         // Objects ✔ outside LOOM needs the first visit (S5) and click responses (S6).
         if (support[SupportFeature.Objects] == SupportLevel.Full && game.Id is not (GameId.Loom or GameId.LoomVga))
             Assert.True(ScummProfile.For(game).HasFirstVisitScenes && ScummProfile.For(game).PlaysThroughVerbs);
-        // S8 Maniac/Zak: the boot exposes own-source character identities; family state tests pin Apply/Undo.
-        if (support[SupportFeature.Status] == SupportLevel.Full && family is
+        // Admin status: even a pending startup choice exposes a source-derived item catalog.
+        // Family admin tests pin native capacity, grants, retained code and atomic edit/undo.
+        if (support[SupportFeature.Status] != SupportLevel.None && family is
             GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced)
         {
-            var status = ScummGameSession.BootForPlay(game, out _).CaptureInventoryStatus();
+            var inventorySession = ScummGameSession.BootForPlay(game, out _);
+            var status = inventorySession.CaptureInventoryStatus();
             Assert.NotEmpty(status.Characters);
             Assert.Contains(status.Characters, character => !string.IsNullOrWhiteSpace(character.Name));
+            Assert.NotEmpty(status.Catalog);
+            if (support[SupportFeature.Status] == SupportLevel.Full)
+            {
+                // Per-fixture counts are independently established by the complete source censuses.
+                var maniac = family is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
+                Assert.Equal(maniac ? 48 : 76, status.Catalog.Count);
+                var bounds = inventorySession.InventoryCatalogNotes.Where(note =>
+                    note.StartsWith("Catalog call-depth bound:", StringComparison.Ordinal) ||
+                    note.StartsWith("Catalog path-state bound:", StringComparison.Ordinal)).ToArray();
+                if (maniac) Assert.Empty(bounds);
+                // Zak's recording/input loop remains explicitly bounded. Own-edition census tests
+                // independently classify its earlier target71 and all later inventory effects.
+                else Assert.All(bounds, note => Assert.StartsWith("Catalog path-state bound: Script 55 +", note));
+                Assert.All(status.Catalog, item => Assert.False(string.IsNullOrWhiteSpace(item.Name)));
+                if (maniac) Assert.DoesNotContain(status.Catalog, item => item.ObjectId == 35);
+                else
+                {
+                    Assert.Contains(status.Catalog, item => item.ObjectId == 53);
+                    Assert.Contains(status.Catalog, item => item.ObjectId == 27);
+                    Assert.DoesNotContain(status.Catalog, item => item.ObjectId == 139 || item.ObjectId is >= 183 and <= 189);
+                }
+            }
+            Assert.Equal(status.Catalog.Count, status.Catalog.Select(item => item.ObjectId).Distinct().Count());
+            Assert.All(status.Catalog, item => Assert.Contains(game.Rooms, room => room.ResourceId == item.SourceRoomId));
+            Assert.True(status.Capacity > 0);
+            Assert.Equal(status.Capacity, status.FreeSlots + status.Items.Count);
         }
         // Cutscenes outside LOOM (S7): ◐ only, a list derived from the game's scripts by the engine's scan, played in the play session; a hand-validated
         // catalog (✔) exists only for the LOOM reference (R-8.18). ScummIndy3CutsceneTests runs three scenes from a fresh start.

@@ -90,7 +90,9 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Maniac/Zak (17 October 2026): native bounded routes and real-window checks; visual limits in the checkpoint.
         // S7 (18 October): script-derived lists with fresh-run proofs and window playback; Partial, not a hand-validated catalog.
-        // S8 (18 October): explicit held-inventory choices, guarded atomic Apply/Undo; no puzzle flags or new items.
+        // Admin clarification (18 October): catalog grants, native capacity and atomic Apply/Undo;
+        // Catalog completion (18 October): own-edition source census, all-item grant/retained-code/Undo,
+        // native capacity and pictured-recipient window checks establish the admin inventory contract.
         Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.ZakEnhanced, "**Zak McKracken** enhanced", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),

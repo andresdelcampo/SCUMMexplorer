@@ -9,6 +9,26 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - **First texts.** The talkie's speech controls no longer show (code 10's operands; the same change as S7 Indy4).
 - **Registry.** Monkey2 Cutscenes is ◐; the matrix is regenerated. `ScummMonkey2CutsceneTests` (3): Talk to barkeeper (Room 9), Largo's room (Room 13 entry, on to Room 12), the voodoo key (Room 74, Part 3) with its song 176 and the beat. Window check, decisions and uncertainties (Largo at the bridge needs a walk): [record](../.verification/monkey2-cutscenes-20261018/README.md).
 
+## 18 October: complete admin inventory catalogs, Maniac/Zak
+
+- Own-edition source censuses establish 48 inventory items per Maniac edition and 76 per Zak edition. Zak nest53 is added; seven shop display headers and Maniac's bank35 are removed as false positives. Letter139 is a scene container; native Read/Pickup gives card27.
+- Generic source flow preserves finite alternate targets, caller arguments and special-handler identities, with native comparison/alias/mutation semantics. Explicit Zak recording-loop bounds have independent finite inventory-coverage proofs. No room/item engine exception or earned prerequisite is introduced.
+- All-item grant/retained-verb/exact-Undo and native capacity/stale checks support Status Full for all four families. Four sequential windows retain all seven Maniac recipient pictures and correct catalog choices. Both generated matrices follow only those four cell changes.
+- Final solution build zero warnings/errors; three matrix checks; required full suite **1,422 passed, zero failed, five skipped**, all **65 new cases passed**. Five sequential window processes pass, with 46 captures and 13 visual inspections; source-analysis limits remain explicit. [Checkpoint](checkpoints/20261018-Catalog-ManiacZak.md), [integration evidence](../.verification/maniaczak-catalog-20261018/README.md).
+
+## 18 October: admin Game Status clarification and shared playback controls, Maniac/Zak
+
+- Requirements now permit explicit unearned inventory grants, pictured Maniac recipients and future native icons for graphical inventory games. The old held-only restriction is superseded; grants never silently complete unrelated puzzles/conversations.
+- Source catalogs offer 49 named items per Maniac edition and 82 per Zak edition, all seven pictured Maniac kids, native 80-slot capacity, atomic Apply Changes/Undo and pending-choice Close. Status is Partial under the broader all-items requirement while indirect targets, including Zak's letter 139, remain unclassified. Both generated matrices follow the registry.
+- Normal sound selection is restored through supported capabilities. Generic scene locks, immediate transport/caption refresh and paused Skip resume match LOOM, with v1/v2 game variables preserved across device changes. Pause/current native Skip/room launch availability are explicitly independent.
+- Final solution build zero warnings/errors; required full suite **1357 passed, zero failed, five skipped**, all 18 new cases executed; scoped and real-window checks are recorded separately. One concurrent window assertion did not reproduce and is retained without claiming a production fix. [Checkpoint](checkpoints/20261018-Admin-ManiacZak.md), [integration evidence](../.verification/maniaczak-admin-20261018/README.md).
+
+## 18 October: Zak native CashCard, ticket choices and boarding, both editions
+
+- Old object-header class masks now permit the native knife/card combination. Actor logical-room identity survives mapped resources, scene changes and same-resource camera follows. Later engines retain their behavior; no story-state shortcut or object-specific engine rule.
+- Both supplied editions use native Buy/Cancel choices and ticket guards, board, consume the ticket, serve peanuts and release Script104's wait. The old "ticket object51" interpretation was wrong: it is peanuts; actual tickets are82/83.
+- Preparation is disclosed room previews/direct knife pickup. Two failed bus-input approaches remain parked; the native 28800-jiffy cruising timer and destination arrival remain separate. Matrices retain their levels. Own-edition tests, review, actual windows and final full-suite/build result: [flight checkpoint](checkpoints/20261018-Flight-ManiacZak.md).
+
 ## 18 October: Fate of Atlantis cutscenes from its scripts, with their speech (S7, Indy4)
 
 - **The list.** The shared scan gives 666 triggers and 426 entries (182 scenes). 210 begin from a fresh start (the credits); the eight-worker runs match the single-threaded ones.

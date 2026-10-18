@@ -10,6 +10,8 @@ public sealed record ScummRoomObjectRecord(
 {
     /// <summary>DOS v1/v2 OBCD byte 12 high three bits; separate from the low five walk-Y bits.</summary>
     public byte Preposition { get; init; }
+    /// <summary>DOS v1/v2 OBCD byte 6: native class mask, unrelated to later numbered classes.</summary>
+    public byte V2ClassMask { get; init; }
 }
 
 /// <summary>Reads the local object directory and code headers of a DOS EGA old-v3 room.</summary>

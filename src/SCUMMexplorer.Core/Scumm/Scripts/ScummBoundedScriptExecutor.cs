@@ -330,11 +330,12 @@ public sealed partial class ScummBoundedScriptExecutor
                 (followedActor == 0
                     // Actor 0 is a valid slot of the engine's actor array (derefActor) that is never in a room: following it starts room 0.
                     ? runtime.CurrentRoom is int currentRoom && currentRoom != 0
-                    : runtime.Actors.Contains(followedActor) && runtime.Actors[followedActor].Room is int otherRoom && otherRoom != 0 && otherRoom != runtime.CurrentRoom))
+                    : runtime.Actors.Contains(followedActor) && runtime.ActorRoomForScript(followedActor) is int otherRoom && otherRoom != 0 &&
+                        otherRoom != (runtime.IsV2 ? knownVariables.GetValueOrDefault(ScummVars.Room) : runtime.CurrentRoom)))
                 scriptEvent = scriptEvent with
                 {
                     Kind = ScummScriptEventKind.RoomLoaded, TargetKind = ResourceKind.Room,
-                    TargetId = followedActor == 0 ? 0 : runtime.Actors[followedActor].Room, ResolvedArguments = [followedActor]
+                    TargetId = followedActor == 0 ? 0 : runtime.ActorRoomForScript(followedActor), ResolvedArguments = [followedActor]
                 };
             if (scriptEvent is { TargetId: null, Kind: ScummScriptEventKind.MusicStarted or
                     ScummScriptEventKind.SoundStarted or ScummScriptEventKind.SoundStopped } &&
@@ -2103,7 +2104,7 @@ public sealed partial class ScummBoundedScriptExecutor
         int? value = operation switch
         {
             "getActorWalkBox" => actor.WalkBox,
-            "getActorRoom" => actor.Room,
+            "getActorRoom" => runtime.ActorRoomForScript(number),
             "getActorX" => actor.X,
             // o5_getActorCostume/Elevation; o5_getActorFacing gives newDirToOldDir(facing).
             "getActorCostume" => actor.Look.Costume,
@@ -2140,7 +2141,7 @@ public sealed partial class ScummBoundedScriptExecutor
         }
         answer = value.Value;
         // An actor in the current room of a room loaded as a pseudo room is in that number's room (ScummVM a->_room == _currentRoom == VAR_ROOM).
-        if (operation == "getActorRoom" && value == runtime.CurrentRoom && variables.TryGetValue(ScummVars.Room, out var loadedAs) &&
+        if (!runtime.IsV2 && operation == "getActorRoom" && value == runtime.CurrentRoom && variables.TryGetValue(ScummVars.Room, out var loadedAs) &&
             loadedAs >= 0x80 && runtime.PseudoRooms.GetValueOrDefault(loadedAs) == value)
             answer = loadedAs;
         if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";

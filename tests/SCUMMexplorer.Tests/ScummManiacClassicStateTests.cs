@@ -11,7 +11,7 @@ public sealed class ScummManiacClassicStateTests
         var session=ManiacClassicStateRoute.AcquireKey(Folder);
         var before=session.CaptureInventoryStatus();
         Assert.True(before.CanEdit,before.Refusal);
-        Assert.Equal(new[]{1,3,5},before.Characters.Select(c=>c.ActorId).Order().ToArray());
+        Assert.Equal(Enumerable.Range(1,7),before.Characters.Select(c=>c.ActorId).Order().ToArray());
         Assert.Equal("Dave",before.Characters.Single(c=>c.ActorId==3).Name);
         Assert.Equal("Syd",before.Characters.Single(c=>c.ActorId==1).Name);
         Assert.Equal("Bernard",before.Characters.Single(c=>c.ActorId==5).Name);
@@ -52,7 +52,6 @@ public sealed class ScummManiacClassicStateTests
         Assert.Equal(before.Items.ToArray(),session.CaptureInventoryStatus().Items.ToArray());
         Assert.False(session.ApplyInventoryTransfers(before,[new(54,1)]).Applied); // Room mat is not held.
         Assert.False(session.ApplyInventoryTransfers(before,[new(55,9)]).Applied); // Named NPC is not party.
-        Assert.False(session.ApplyInventoryTransfers(before,[new(55,2)]).Applied); // Unselected kid.
         Assert.False(session.ApplyInventoryTransfers(before,[new(55,1),new(54,1)]).Applied); // Atomic rejection.
         Assert.False(session.ApplyInventoryTransfers(before,[new(55,1),new(55,5)]).Applied); // Duplicate item.
         Assert.Equal(before.Items.ToArray(),session.CaptureInventoryStatus().Items.ToArray());

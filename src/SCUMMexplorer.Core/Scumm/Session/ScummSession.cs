@@ -60,6 +60,7 @@ public abstract partial class ScummSession
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.VerbEntrypoint = ObjectVerbEntrypoint;
         _runtime.ObjectPreposition = ObjectPreposition;
+        _runtime.ObjectClassMask = ObjectClassMask;
         _runtime.SetObjectPreposition = SetObjectPreposition;
         _runtime.CopyV2InventoryHeader = CopyV2InventoryHeader;
         _runtime.SoundRunning = _soundClock.Status;
@@ -789,9 +790,10 @@ public abstract partial class ScummSession
             {
                 _runtime.Camera.Mode = ScummCamera.FollowActor;
                 _runtime.Camera.Follows = ego;
-                if (_runtime.Actors[ego].Room == _runtime.CurrentRoom && _runtime.Actors[ego].X is int x)
+                if (_runtime.Actors[ego].Room == _runtime.CurrentRoom && _runtime.Actors[ego].X is int x &&
+                    _runtime.ActorRoomForScript(ego) == _runtime.GlobalVariables.GetValueOrDefault(ScummVars.Room))
                     SetCamera(x, _runtime.Actors[ego].Estimate, "endCutscene follows ego at x = {0}");
-                else if (_runtime.Actors[ego].Room is int targetRoom)
+                else if (_runtime.ActorRoomForScript(ego) is int targetRoom)
                 {
                     // o2_endCutscene calls actorFollowCamera; its startScene must use the same bounded dispatch as a script load.
                     return HandleEvent(scriptEvent with

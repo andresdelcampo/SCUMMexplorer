@@ -1,6 +1,7 @@
 using System.Windows;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Maniac;
+using SCUMMexplorer.Core.Scumm;
 
 namespace SCUMMexplorer.App;
 
@@ -14,9 +15,16 @@ public partial class MainWindow
     {
         var session = _play ?? throw new InvalidOperationException("There is no live inventory session.");
         var folder = _playFolder;
-        return new(session, () => ReferenceEquals(_play, session) && _playFolder == folder && _game?.FolderPath == folder,
-            () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _game is { } game ? ManiacPreviewText.For(game) : null)
-        { Owner = this, Resources = Resources };
+        var data = _game is { } opened ? ScummDataSources.For(opened) : null;
+        var dialog = new InventoryStatusWindow(session, () => ReferenceEquals(_play, session) && _playFolder == folder && _game?.FolderPath == folder,
+            () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _game is { } game ? ManiacPreviewText.For(game) : null,
+            _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2,
+            character => character.PortraitRoomId is int room && character.PortraitObjectId is int objectId &&
+                data?.ReadObjectImages(room).FirstOrDefault(candidate => candidate.Id == objectId) is { } image
+                    ? CreateBitmap(image.Width, image.Height, image.Pixels, ScummPlayScreen.EgaPalette) : null)
+        { Owner = this };
+        dialog.Resources.MergedDictionaries.Add(Resources);
+        return dialog;
     }
 
     private void ShowInventoryStatus()

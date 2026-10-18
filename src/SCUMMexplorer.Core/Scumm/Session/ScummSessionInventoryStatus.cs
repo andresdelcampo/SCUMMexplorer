@@ -3,19 +3,26 @@ using System.Text.RegularExpressions;
 
 namespace SCUMMexplorer.Core.Scumm;
 
-public sealed record ScummInventoryCharacter(int ActorId, string? Name, string Evidence);
+public sealed record ScummInventoryCharacter(int ActorId, string? Name, string Evidence)
+{
+    public int? PortraitRoomId { get; init; }
+    public int? PortraitObjectId { get; init; }
+}
 public sealed record ScummInventoryItem(int ObjectId, int OwnerId, int Slot, int RetainedRoomId, string? Name);
 public sealed record ScummInventoryTransfer(int ObjectId, int TargetActorId);
+public sealed record ScummInventoryCatalogItem(int ObjectId, int SourceRoomId, string? Name, string Evidence);
 public sealed record ScummInventoryEditResult(bool Applied, string? Refusal, ScummInventoryUndoToken? Undo);
 
 /// <summary>A read-only view and an opaque optimistic edit token; capturing it runs no scripts.</summary>
 public sealed class ScummInventoryStatusSnapshot
 {
     internal ScummInventoryStatusSnapshot(object session, long frame, string signature, int? room, int actor,
-        ScummInventoryCharacter[] characters, ScummInventoryItem[] items, string? refusal)
+        ScummInventoryCharacter[] characters, ScummInventoryItem[] items, string? refusal,
+        ScummInventoryCatalogItem[] catalog, int capacity)
     {
         Session = session; Frame = frame; Signature = signature; RoomId = room; CurrentActorId = actor;
         Characters = Array.AsReadOnly(characters); Items = Array.AsReadOnly(items); Refusal = refusal;
+        Catalog = Array.AsReadOnly(catalog); Capacity = capacity;
     }
     internal object Session { get; }
     internal long Frame { get; }
@@ -24,6 +31,9 @@ public sealed class ScummInventoryStatusSnapshot
     public int CurrentActorId { get; }
     public IReadOnlyList<ScummInventoryCharacter> Characters { get; }
     public IReadOnlyList<ScummInventoryItem> Items { get; }
+    public IReadOnlyList<ScummInventoryCatalogItem> Catalog { get; }
+    public int Capacity { get; }
+    public int FreeSlots => Capacity - Items.Count;
     public string? Refusal { get; }
     public bool CanEdit => Refusal is null;
 }
@@ -37,7 +47,11 @@ public sealed class ScummInventoryUndoToken
     internal long Frame { get; }
     internal string Signature { get; }
     internal (int Object, byte Owner)[] Owners { get; }
+    internal ScummInventoryOriginal[]? Originals { get; init; }
 }
+
+internal sealed record ScummInventoryOriginal(int ObjectId, byte? Owner, byte? State, bool Member,
+    int? Room, byte? Preposition, int Slot);
 
 public abstract partial class ScummSession
 {
@@ -54,7 +68,8 @@ public abstract partial class ScummSession
                 _runtime.InventoryRooms.GetValueOrDefault(x.id), InventoryObjectName(x.id) is { } bytes
                     ? ScummTextDecoder.DecodeGlyphs(bytes).TrimEnd('\0') : null)).ToArray();
         return new(_inventoryStatusIdentity, _inventoryStatusFrame, InventoryStatusSignature(), CurrentRoomId,
-            _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable), characters, items, InventoryEditRefusal(characters));
+            _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable), characters, items, InventoryEditRefusal(characters),
+            InventoryCatalog(), _runtime.InventorySlots.Length);
     }
 
     public ScummInventoryEditResult ApplyInventoryTransfers(ScummInventoryStatusSnapshot snapshot,
@@ -102,7 +117,20 @@ public abstract partial class ScummSession
         if (!ReferenceEquals(token.Session, _inventoryStatusIdentity) || token.Revision != _inventoryEditRevision || token.Frame != _inventoryStatusFrame ||
             token.Signature != InventoryStatusSignature())
             return new(false, "The last change no longer matches this inventory.", null);
-        foreach (var (id, owner) in token.Owners) _runtime.SetObjectOwner(id, owner);
+        if (token.Originals is { } originals)
+        {
+            foreach (var original in originals)
+            {
+                var id = original.ObjectId;
+                if (original.Owner is byte owner) _runtime.SetObjectOwner(id, owner); else _runtime.RemoveObjectOwner(id);
+                if (original.State is byte state) _runtime.SetObjectState(id, state); else _runtime.RemoveObjectState(id);
+                if (original.Member) _runtime.AddInventoryObject(id); else _runtime.RemoveInventoryObject(id);
+                if (original.Room is int room) _runtime.InventoryRooms[id] = room; else _runtime.InventoryRooms.Remove(id);
+                if (original.Preposition is byte prep) _inventoryObjectPrepositions[id] = prep; else _inventoryObjectPrepositions.Remove(id);
+                if (original.Slot < 0) _runtime.RemoveFromInventorySlots(id);
+            }
+        }
+        else foreach (var (id, owner) in token.Owners) _runtime.SetObjectOwner(id, owner);
         _inventoryEditRevision++;
         _visitTrace.Add("Explicit inventory undo: " + string.Join("; ", token.Owners.Select(x =>
             $"object {x.Object}, restored actor {x.Owner}")) + ". No pickup, scene or script was played.");
@@ -161,8 +189,7 @@ public abstract partial class ScummSession
         }
         IEnumerable<(int Id, string Evidence)> candidates;
         if (_inventoryPartyBindings.Length > 0)
-            candidates = _inventoryPartyBindings.Select(b => ((int)_runtime.GlobalVariables.GetValueOrDefault(b.Variable),
-                $"Script {PlayInputScript} +0x{b.Offset:X4}: ego <- {b.Variable}, followed by actorFollowCamera"));
+            candidates = InventoryPartyCandidates();
         else
         {
             var first = _runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.FirstPlayerActor);
@@ -173,7 +200,9 @@ public abstract partial class ScummSession
         }
         return candidates.Where(x => x.Id > 0 && x.Id < 15 && _runtime.Actors.Contains(x.Id))
             .GroupBy(x => x.Id).Select(g => new ScummInventoryCharacter(g.Key,
-                _runtime.ActorNames.GetValueOrDefault(g.Key), g.First().Evidence)).OrderBy(x => x.ActorId).ToArray();
+                _runtime.ActorNames.GetValueOrDefault(g.Key), g.First().Evidence)
+                { PortraitRoomId = _inventoryPartyPictures.GetValueOrDefault(g.Key).Room,
+                  PortraitObjectId = _inventoryPartyPictures.GetValueOrDefault(g.Key).Object }).OrderBy(x => x.ActorId).ToArray();
     }
 
     // Exact relevant state, not a lossy hash. Includes state/class/code-room/slots
@@ -183,8 +212,12 @@ public abstract partial class ScummSession
         Room = CurrentRoomId, Ego = _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable),
         Characters = InventoryCharacters(), Slots = _runtime.InventorySlots,
         Rooms = _runtime.InventoryRooms.OrderBy(x => x.Key),
-        Objects = _runtime.InventorySlots.Where(id => id != 0).Distinct().Order().Select(id => new
+        Objects = _runtime.ObjectOwners.Keys.Concat(_runtime.ObjectStates.Keys).Distinct().Order().Select(id => new
         { Id = id, Owner = _runtime.ObjectOwners.GetValueOrDefault(id), State = _runtime.ObjectStates.GetValueOrDefault(id),
-            Classes = _runtime.ObjectClasses.GetValueOrDefault(id) }), Revision = _inventoryEditRevision
+            HasOwner = _runtime.ObjectOwners.ContainsKey(id), HasState = _runtime.ObjectStates.ContainsKey(id),
+            Classes = _runtime.ObjectClasses.GetValueOrDefault(id) }),
+        Membership = _runtime.Inventory.Order(), Prepositions = _inventoryObjectPrepositions.OrderBy(x => x.Key),
+        RoomPrepositions = _roomObjectPrepositions.OrderBy(x => x.Key.Room).ThenBy(x => x.Key.Object),
+        Revision = _inventoryEditRevision
     });
 }

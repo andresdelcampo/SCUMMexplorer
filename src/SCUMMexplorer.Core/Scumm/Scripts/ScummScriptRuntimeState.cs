@@ -22,6 +22,22 @@ public sealed class ScummScriptRuntimeState
     public bool IsClassicManiac { get; set; }
     /// <summary>Names assigned by reached v1/v2 actorOps, retained as source text.</summary>
     public Dictionary<int, string> ActorNames { get; } = [];
+    private readonly Dictionary<int, (int Logical, int Physical)> _v2ActorRooms = [];
+    /// <summary>Keep the native room number while actor rendering/walking uses the mapped resource.</summary>
+    public void RememberV2ActorRoom(int actor, int? room)
+    {
+        if (!IsV2) return;
+        if (room is not int logical) { _v2ActorRooms.Remove(actor); return; }
+        var physical = logical >= 0x80 && PseudoRooms.TryGetValue(logical, out var mapped) ? mapped : logical;
+        _v2ActorRooms[actor] = (logical, physical);
+    }
+    public int? ActorRoomForScript(int actor)
+    {
+        if (!Actors.Contains(actor)) return actor == 0 ? 0 : null;
+        var physical = Actors[actor].Room;
+        return IsV2 && _v2ActorRooms.TryGetValue(actor, out var room) && room.Physical == physical
+            ? room.Logical : physical;
+    }
     /// <summary>Actor_v2::isPlayer uses the current ego in Maniac v1, otherwise globals 42 and 43 (actor.cpp).</summary>
     public bool IsPlayerActor(int number) => IsV2
         ? IsClassicManiac ? GlobalVariables.GetValueOrDefault(EgoVariable) == number
@@ -32,6 +48,8 @@ public sealed class ScummScriptRuntimeState
     public (int Verb, int Object1, int Object2, int Preposition)? V2DrawnSentence { get; set; }
     /// <summary>Native v1/v2 OBCD preposition access: 255 when the object is nowhere, null on unreadable code.</summary>
     public Func<int, int?>? ObjectPreposition { get; set; }
+    /// <summary>Native v1/v2 OBCD byte 6: -1 when absent, null when code cannot be read.</summary>
+    public Func<int, int?>? ObjectClassMask { get; set; }
     public Func<int, byte, bool>? SetObjectPreposition { get; set; }
     public Action<int>? CopyV2InventoryHeader { get; set; }
     public Action<bool>? V2FreezeScripts { get; set; }

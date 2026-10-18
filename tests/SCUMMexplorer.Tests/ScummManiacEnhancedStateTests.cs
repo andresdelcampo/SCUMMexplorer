@@ -20,7 +20,6 @@ public sealed class ScummManiacEnhancedStateTests
         Assert.False(string.IsNullOrWhiteSpace(key.Name));
         // One valid and one invalid transfer must reject the entire batch.
         Assert.False(session.ApplyInventoryTransfers(view, [new(55, 1), new(54, 5)]).Applied);
-        Assert.False(session.ApplyInventoryTransfers(view, [new(55, 2)]).Applied); // unselected child
         Assert.False(session.ApplyInventoryTransfers(view, [new(55, 9)]).Applied); // NPC
         Assert.False(session.ApplyInventoryTransfers(view, [new(55, 1), new(55, 5)]).Applied);
         Assert.Equal(3, session.Snapshot.ObjectOwners[55]);
@@ -110,8 +109,8 @@ public sealed class ScummManiacEnhancedStateTests
         for (var i = 0; i < 2000 && !session.CaptureInventoryStatus().CanEdit; i++) session.AdvanceFrame();
         var status = session.CaptureInventoryStatus();
         Assert.True(status.CanEdit, status.Refusal);
-        Assert.Equal(new[] { 1, 3, 5 }, status.Characters.Select(x => x.ActorId));
-        Assert.Equal(new[] { "Syd", "Dave", "Bernard" }, status.Characters.Select(x => x.Name));
+        Assert.Equal(Enumerable.Range(1,7), status.Characters.Select(x => x.ActorId));
+        Assert.Equal(new[] { "Syd", "Razor", "Dave", "Michael", "Bernard", "Wendy", "Jeff" }, status.Characters.Select(x => x.Name));
         Assert.All(status.Characters, x => Assert.Contains("Script 4", x.Evidence));
     }
 }
