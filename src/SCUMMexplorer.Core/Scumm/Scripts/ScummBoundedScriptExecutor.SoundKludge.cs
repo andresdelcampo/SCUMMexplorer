@@ -108,7 +108,7 @@ public sealed partial class ScummBoundedScriptExecutor
             else if (command == 0 && runtime?.SoundParameter?.Invoke(sound, Word(2)) is { } parameter)
             {
                 // Player::getParam (param, channel): the session answers the song's position from its timeline (S7 Monkey2, 18 October 2026: Script 76 waits
-                // for beat 10 of sound 176 before LeChuck walks in).
+                // for beat 9 of sound 176 before LeChuck walks in).
                 result = parameter.Value;
                 meaning = $"parameter {Word(2)} of playing sound {sound}";
                 estimate = parameter.Basis;

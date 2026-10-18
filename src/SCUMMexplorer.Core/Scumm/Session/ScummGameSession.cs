@@ -1,4 +1,4 @@
-﻿using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
@@ -242,7 +242,7 @@ public sealed class ScummGameSession : ScummSession
     /// <summary>
     /// A playing v5 song's beat (parameter 7, <c>getBeatIndex</c>: tick / 480 + 1) or tick within the beat (8) as <c>Player::getParam</c> answers it (S7 Monkey2,
     /// 18 October 2026; ScummVM master <c>imuse_player.cpp</c>, read 18 October 2026): the song's tick at the seconds it has played on the session's clock, read
-    /// from its AdLib timeline (the default path; a looping song goes on from its restart point). Monkey Island 2's Script 76 waits for beat 10 of sound 176
+    /// from its AdLib timeline (the default path; a looping song goes on from its restart point). Monkey Island 2's Script 76 waits for beat 9 of sound 176
     /// before LeChuck walks in (+0x0090..+0x00DF). An estimate: the default path, the tick of the last event played, script-armed hooks not counted.
     /// </summary>
     protected override (int Value, string Basis)? SoundParameter(int soundId, int parameter)
