@@ -164,6 +164,8 @@ public partial class MainWindow
                     _sceneSound.StopAll("a room's entry cutscene was started from the list");
                     session.EnterRoomAgain(room);
                 }
+                // The visit that opened the room is the scene here, not a state preview: a talkie speaks its lines from the visit on (S7 Indy4).
+                else if (game.Speech is { } speech) _playSpeech.Attach(speech, session.Messages, _playSpeechBeforeVisit);
                 uncertainties = session.Snapshot.Uncertainties;
             }
             else

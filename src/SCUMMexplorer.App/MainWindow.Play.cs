@@ -32,6 +32,9 @@ public partial class MainWindow
     // S6 Indy4 (17 October 2026): the spoken lines of a talkie, played as the game's texts start and stop them.
     private readonly TalkieSpeechPlayer _playSpeech = new();
 
+    /// <summary>The session's speech events before the last room visit from the list (a cutscene played from the list speaks its entry from there).</summary>
+    private int _playSpeechBeforeVisit;
+
     private bool PlayActive => _playTimer is not null && _play is not null;
 
     // The pause state the play sounds were last given (S6 sound).
@@ -109,6 +112,7 @@ public partial class MainWindow
             // Its first Play screen must retain that live input, not visit the
             // browsed room or reuse the first-visit preview's assumed choices.
             var keepOpening = startingSession && ScummProfile.For(game).EngineVersion <= ScummVersion.V2;
+            _playSpeechBeforeVisit = _play.Messages.SpeechEvents.Count;
             if (!keepOpening && _play.CurrentRoomId != roomId)
             {
                 // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.

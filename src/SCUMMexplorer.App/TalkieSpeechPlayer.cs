@@ -24,12 +24,14 @@ public sealed class TalkieSpeechPlayer
 
     public bool Follows(ScummMessageTable messages) => ReferenceEquals(messages, _messages);
 
-    public void Attach(ScummSpeechBank bank, ScummMessageTable messages)
+    /// <param name="from">The first speech event to play; by default none the session has already recorded. A cutscene started from the list in a room
+    /// opened for it passes the count before that room's visit, so the scene's first line is spoken (S7 Indy4, 18 October 2026).</param>
+    public void Attach(ScummSpeechBank bank, ScummMessageTable messages, int? from = null)
     {
         Stop();
         _bank = bank;
         _messages = messages;
-        _seen = messages.SpeechEvents.Count;
+        _seen = Math.Clamp(from ?? messages.SpeechEvents.Count, 0, messages.SpeechEvents.Count);
     }
 
     public void Detach()
