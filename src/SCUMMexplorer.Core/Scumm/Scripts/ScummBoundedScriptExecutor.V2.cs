@@ -98,6 +98,15 @@ public sealed partial class ScummBoundedScriptExecutor
         ushort Global(string key) => variables.TryGetValue(key, out var value) ? value : (ushort)0;
         switch (source.Operation)
         {
+            // o2_ifClassOfIs tests a mask in OBCD+6; missing code always jumps, including mask zero.
+            case "ifClassOfIs":
+                if (!Read(0, out var classObject) || !Read(1, out var classOperand) ||
+                    runtime.ObjectClassMask?.Invoke(classObject) is not int classMask ||
+                    !TryGetBranchTarget(source.Operands, out var classTarget)) return false;
+                if (classMask < 0 || (classMask & classOperand) != classOperand) branch = classTarget;
+                trace.Add($"v2 object {classObject} header class mask {classMask}: test {classOperand}");
+                handled = true;
+                return true;
             // script_v2.cpp o2_get/setObjPreposition: OBCD+12 high three bits.
             // Header access follows native room/inventory location; it is never guessed from an id.
             case "getObjPreposition":

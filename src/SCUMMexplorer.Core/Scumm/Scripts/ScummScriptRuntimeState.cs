@@ -32,6 +32,8 @@ public sealed class ScummScriptRuntimeState
     public (int Verb, int Object1, int Object2, int Preposition)? V2DrawnSentence { get; set; }
     /// <summary>Native v1/v2 OBCD preposition access: 255 when the object is nowhere, null on unreadable code.</summary>
     public Func<int, int?>? ObjectPreposition { get; set; }
+    /// <summary>Native v1/v2 OBCD byte 6: -1 when absent, null when code cannot be read.</summary>
+    public Func<int, int?>? ObjectClassMask { get; set; }
     public Func<int, byte, bool>? SetObjectPreposition { get; set; }
     public Action<int>? CopyV2InventoryHeader { get; set; }
     public Action<bool>? V2FreezeScripts { get; set; }

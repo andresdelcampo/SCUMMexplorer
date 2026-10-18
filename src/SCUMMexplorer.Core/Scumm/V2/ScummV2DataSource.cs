@@ -72,7 +72,7 @@ public class ScummV2DataSource : IScummDataSource
             records.Add(new(id, i + 1, bytes[code + 7] * 8, (bytes[code + 8] & 127) * 8, bytes[code + 9] * 8,
                 bytes[code + 13] & 248, bytes[code + 10], (byte)((bytes[code + 8] >> 7) * 8), bytes[code + 11] * 8,
                 (bytes[code + 12] & 31) * 8, (byte)(bytes[code + 13] & 7), code, image > 0 && image < code ? image : null)
-                { Preposition = (byte)(bytes[code + 12] >> 5) });
+                { Preposition = (byte)(bytes[code + 12] >> 5), V2ClassMask = bytes[code + 6] });
             var start = code + bytes[code + 14];
             var end = start < bytes.Length ? Array.IndexOf(bytes, (byte)0, start) : -1;
             if (end >= start) names[id] = bytes[start..end];
