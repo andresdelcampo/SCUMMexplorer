@@ -249,7 +249,15 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (sub == 3)
                 {
                     var name = source.Operands.IndexOf("name=", StringComparison.Ordinal);
-                    if (name >= 0) operation = "actorName, " + source.Operands[(name + 5)..];
+                    if (name >= 0 && runtime.Actors.Contains(actor))
+                    {
+                        var names = ScummTextDecoder.DecodeLiterals(source.Operands[(name + 5)..]);
+                        if (names.Count != 1) return false;
+                        runtime.ActorNames[actor] = names[0];
+                        runtime.NotifyNativeMutation("actor-name", actor);
+                        handled = true;
+                        return true;
+                    }
                 }
                 if (operation is null || actor == 0) return false;
                 instruction = source with { Operands = $"0x{actor:X2}, [{operation}]" };
