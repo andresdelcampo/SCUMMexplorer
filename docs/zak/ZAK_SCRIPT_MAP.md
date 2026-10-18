@@ -36,6 +36,10 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
+| Enhanced Script 140 | Room 8 entry reaches the second secret-room scene; delay 240, cutscene, "Meanwhile, back in the secret room^", then Room 16 | decoded | Script 140 +0x0000/+0x0004/+0x0014; S7 scan `8/0/0` | 2026-10-18 |
+| Enhanced Script 39 | Room 3 doorbell Push/Use reaches the baker's response; first line "We're closed, and we're out of fresh bread anyway." | decoded | Object 147 verb 9 +0x0067; Script 39 cutscene +0x0000, first response +0x0070, end +0x015E | 2026-10-18 |
+| Enhanced Script 24 | Shop Buy group is represented by tool kit 34; its verb 17 sets price 45 and starts the purchase cutscene. Other sale objects including nose glasses 40 share this script | decoded | Object 34 verb 17 +0x0026/+0x002A; Script 24 +0x0000..+0x02EE | 2026-10-18 |
+| Enhanced Script 126 | Room 2 entry starts the first secret-room scene. Fresh S7 preview begins but reaches the 6000-frame bound; the S6 genuine route proved its Escape path, not unskipped completion | decoded / play (Explorer only) | Entry +0x0049; Script 126 +0x0004..+0x01CA; S7 census and S6 route record | 2026-10-18 |
 | Enhanced Script 1 | Starts the opening in Room 46, starts Script 127, then ends the opening and starts Script 108 | decoded | Script 1 +0x0058, +0x0078, +0x0533 to +0x053F | 2026-10-17 |
 | Enhanced Script 108 | Names and configures actors; starts Scripts 9 and 19; places actor 1 in Room 1. The post-dream branch runs object 90 verb 1 through the sentence queue, waits, walks actor 1 to script coordinates (21,56), and restores cursor/user input | decoded | Script 108 +0x00DE to +0x0165, +0x0264 to +0x0266, +0x0290 to +0x02EC | 2026-10-17 |
 
