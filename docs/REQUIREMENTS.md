@@ -82,10 +82,10 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
 | **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – |
 | **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ◐ |
-| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ◐ |
-| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ◐ |
-| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | ◐ |
+| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 <!-- support-matrix:end -->
 
 Maniac/Zak edition coverage at the [18 October S9 checkpoint](checkpoints/20261018-S9-ManiacZak.md): classic English Maniac, enhanced Spanish Maniac, classic English Zak and enhanced English Zak only. There is one local copy per family; no additional language, demo or revision within a family was available to establish compatibility. These checks do not raise the existing feature levels.
@@ -94,7 +94,7 @@ The [18 October Maniac Use-with checkpoint](checkpoints/20261018-UseWith-ManiacZ
 
 The [18 October Zak flight-preparation checkpoint](checkpoints/20261018-Flight-ManiacZak.md) checks both supplied editions' native CashCard recovery, reservation Buy/Cancel, ticket guards, boarding and meal-service release after explicit exploration preparation. Object51 is peanuts, not a ticket. Logical airport context is retained; the native cruising timer/destination arrival and an earned bus journey remain separate. Feature levels are unchanged.
 
-The [18 October admin clarification](checkpoints/20261018-Admin-ManiacZak.md) replaces the held-only Status scope with catalog grants and native capacity. All four Maniac/Zak Status cells are rebaselined to Partial under the broader requirement: 49 named items per Maniac edition and 82 per Zak edition are offered, and all seven Maniac recipients have native pictures; unresolved indirect pickup targets, including Zak's letter header (object 139), prevent an exhaustive-coverage claim. Other feature cells are unchanged. Graphical inventory pictures (§12) remain required when further families receive their Status editors.
+The [18 October admin clarification](checkpoints/20261018-Admin-ManiacZak.md) replaces the held-only Status scope with catalog grants and native capacity. The subsequent [catalog completion](checkpoints/20261018-Catalog-ManiacZak.md) establishes all four Maniac/Zak Status cells as Full under that requirement: independent source censuses and retained-code/grant/Undo checks establish 48 named inventory items per Maniac edition and 76 per Zak edition; all seven Maniac recipients have native pictures. Zak's letter139 is a scene container for card27, nest53 is inventory, and shop display headers are not additional items. Other feature cells are unchanged. These are the supplied copies' inventory contracts, not a complete-playthrough claim. Graphical inventory pictures (§12) remain required when further families receive their Status editors.
 
 ✔ works (Full), ◐ partly, – not supported. What each column asks for, at each level:
 

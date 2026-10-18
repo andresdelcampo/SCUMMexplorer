@@ -223,6 +223,7 @@ public sealed class ScummZakEnhancedInventoryCatalogTests
         if (Ready() is not {} session) return;
         var runtime = Runtime(session);
         var original = InventoryState(runtime);
+        var data = ScummDataSources.For(new GameFolderScanner().Scan(Path.Combine(TestGames.Root, "zakE ega en")));
         foreach (var item in session.CaptureInventoryStatus().Catalog)
         {
             var changed = session.ApplyInventoryEdits(session.CaptureInventoryStatus(), [new(item.ObjectId, 2)]);
@@ -230,6 +231,9 @@ public sealed class ScummZakEnhancedInventoryCatalogTests
             var held = Assert.Single(session.CaptureInventoryStatus().Items, i => i.ObjectId == item.ObjectId);
             Assert.Equal(2, held.OwnerId);
             Assert.Equal(item.SourceRoomId, held.RetainedRoomId);
+            var source = data.ReadRoom(item.SourceRoomId);
+            foreach (var verb in data.ReadObjectVerbs(item.SourceRoomId, source.Objects).GetValueOrDefault(item.ObjectId) ?? [])
+                Assert.True(runtime.VerbEntrypoint!(item.ObjectId, verb.VerbId) > 0, $"{item.ObjectId}: verb {verb.VerbId}");
             Assert.True(session.UndoInventoryTransfers(changed.Undo!).Applied);
             Assert.Equal(original, InventoryState(runtime));
         }

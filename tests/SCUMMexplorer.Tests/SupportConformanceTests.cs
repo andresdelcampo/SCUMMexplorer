@@ -67,10 +67,32 @@ public class SupportConformanceTests
         if (support[SupportFeature.Status] != SupportLevel.None && family is
             GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced)
         {
-            var status = ScummGameSession.BootForPlay(game, out _).CaptureInventoryStatus();
+            var inventorySession = ScummGameSession.BootForPlay(game, out _);
+            var status = inventorySession.CaptureInventoryStatus();
             Assert.NotEmpty(status.Characters);
             Assert.Contains(status.Characters, character => !string.IsNullOrWhiteSpace(character.Name));
             Assert.NotEmpty(status.Catalog);
+            if (support[SupportFeature.Status] == SupportLevel.Full)
+            {
+                // Per-fixture counts are independently established by the complete source censuses.
+                var maniac = family is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
+                Assert.Equal(maniac ? 48 : 76, status.Catalog.Count);
+                var bounds = inventorySession.InventoryCatalogNotes.Where(note =>
+                    note.StartsWith("Catalog call-depth bound:", StringComparison.Ordinal) ||
+                    note.StartsWith("Catalog path-state bound:", StringComparison.Ordinal)).ToArray();
+                if (maniac) Assert.Empty(bounds);
+                // Zak's recording/input loop remains explicitly bounded. Own-edition census tests
+                // independently classify its earlier target71 and all later inventory effects.
+                else Assert.All(bounds, note => Assert.StartsWith("Catalog path-state bound: Script 55 +", note));
+                Assert.All(status.Catalog, item => Assert.False(string.IsNullOrWhiteSpace(item.Name)));
+                if (maniac) Assert.DoesNotContain(status.Catalog, item => item.ObjectId == 35);
+                else
+                {
+                    Assert.Contains(status.Catalog, item => item.ObjectId == 53);
+                    Assert.Contains(status.Catalog, item => item.ObjectId == 27);
+                    Assert.DoesNotContain(status.Catalog, item => item.ObjectId == 139 || item.ObjectId is >= 183 and <= 189);
+                }
+            }
             Assert.Equal(status.Catalog.Count, status.Catalog.Select(item => item.ObjectId).Distinct().Count());
             Assert.All(status.Catalog, item => Assert.Contains(game.Rooms, room => room.ResourceId == item.SourceRoomId));
             Assert.True(status.Capacity > 0);
