@@ -3,7 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace SCUMMexplorer.Core.Scumm;
 
-public sealed record ScummInventoryCharacter(int ActorId, string? Name, string Evidence);
+public sealed record ScummInventoryCharacter(int ActorId, string? Name, string Evidence)
+{
+    public int? PortraitRoomId { get; init; }
+    public int? PortraitObjectId { get; init; }
+}
 public sealed record ScummInventoryItem(int ObjectId, int OwnerId, int Slot, int RetainedRoomId, string? Name);
 public sealed record ScummInventoryTransfer(int ObjectId, int TargetActorId);
 public sealed record ScummInventoryCatalogItem(int ObjectId, int SourceRoomId, string? Name, string Evidence);
@@ -185,8 +189,7 @@ public abstract partial class ScummSession
         }
         IEnumerable<(int Id, string Evidence)> candidates;
         if (_inventoryPartyBindings.Length > 0)
-            candidates = _inventoryPartyBindings.Select(b => ((int)_runtime.GlobalVariables.GetValueOrDefault(b.Variable),
-                $"Script {PlayInputScript} +0x{b.Offset:X4}: ego <- {b.Variable}, followed by actorFollowCamera"));
+            candidates = InventoryPartyCandidates();
         else
         {
             var first = _runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.FirstPlayerActor);
@@ -197,7 +200,9 @@ public abstract partial class ScummSession
         }
         return candidates.Where(x => x.Id > 0 && x.Id < 15 && _runtime.Actors.Contains(x.Id))
             .GroupBy(x => x.Id).Select(g => new ScummInventoryCharacter(g.Key,
-                _runtime.ActorNames.GetValueOrDefault(g.Key), g.First().Evidence)).OrderBy(x => x.ActorId).ToArray();
+                _runtime.ActorNames.GetValueOrDefault(g.Key), g.First().Evidence)
+                { PortraitRoomId = _inventoryPartyPictures.GetValueOrDefault(g.Key).Room,
+                  PortraitObjectId = _inventoryPartyPictures.GetValueOrDefault(g.Key).Object }).OrderBy(x => x.ActorId).ToArray();
     }
 
     // Exact relevant state, not a lossy hash. Includes state/class/code-room/slots
