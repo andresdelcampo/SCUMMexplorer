@@ -65,8 +65,6 @@ public sealed class ScummManiacClassicCutsceneTests(ITestOutputHelper output)
         Assert.Equal(room, session.CurrentRoomId);
         var unsupported = session.Snapshot.Uncertainties.Where(line => line.Contains("unsupported v2", StringComparison.Ordinal)).ToArray();
         foreach (var limitation in unsupported) output.WriteLine(limitation);
-        // The doorbell returns to Room 1 and starts Ed's later background movement.
-        // Its closest-object query remains unsupported; this proof claims the scene's begin/end and lines only.
-        Assert.All(unsupported, line => Assert.True(room == 1 && line.Contains("Script 174 +0x0000: unsupported v2 getClosestObjActor", StringComparison.Ordinal), line));
+        Assert.Empty(unsupported);
     }
 }

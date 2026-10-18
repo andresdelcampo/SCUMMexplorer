@@ -6,10 +6,12 @@ namespace SCUMMexplorer.Tests;
 /// <summary>The previously verified native S6 route, shared by S8 tests and its one harness.</summary>
 public static class ManiacClassicStateRoute
 {
-    public static ScummGameSession AcquireKey(string folder)
+    public static ScummGameSession AcquireKey(string folder, ScummScriptObserver? observer = null)
     {
         var game = new GameFolderScanner().Scan(folder);
-        var session = ScummGameSession.BootForPlay(game, out _);
+        var data = ScummDataSources.For(game);
+        var session = observer is null ? ScummGameSession.BootForPlay(game, out _) :
+            new ScummGameSession(game, ((ScummV2DataSource)data).ReadIndexedObjects(), observer: observer, data: data);
         void Frames(int count) { for(var frame=0; frame<count; frame++) session.AdvanceFrame(); }
         void Until(Func<bool> condition)
         {
