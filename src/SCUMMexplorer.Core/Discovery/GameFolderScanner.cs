@@ -29,11 +29,17 @@ public sealed class GameFolderScanner
     private static readonly HashSet<string> SoundExtensions = new(StringComparer.OrdinalIgnoreCase)
         { ".SOU", ".MIDI", ".MID", ".IMS" };
 
+    /// <summary>
+    /// S9 (18 October 2026): the folder of a disc that carries one copy of the game per language (Monkey Island 1 CD: ENGLISH, FRENCH, GERMAN, ITALIAN,
+    /// SPANISH) to read instead of the default (ENGLISH). Null keeps the default; nothing in the app sets it yet.
+    /// </summary>
+    public string? DiscFolder { get; init; }
+
     public GameLibrary Scan(string folderPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(folderPath);
         var fullPath = Path.GetFullPath(folderPath);
-        if (TryScanCd(fullPath) is { } cd) return cd;
+        if (TryScanCd(fullPath, DiscFolder) is { } cd) return cd;
         if (Directory.Exists(fullPath) && TryScanV4RoomFiles(fullPath) is { } roomFiles) return roomFiles;
         if (!Directory.Exists(fullPath))
             throw new DirectoryNotFoundException($"Game folder not found: {fullPath}");
@@ -198,7 +204,7 @@ public sealed class GameFolderScanner
     public static bool IsLoomCd(string fingerprint, int rooms, int costumes, int scripts, int sounds) =>
         string.Equals(fingerprint, LoomCdFingerprint, StringComparison.OrdinalIgnoreCase) || (rooms, costumes, scripts, sounds) == (78, 165, 637, 30);
 
-    private static GameLibrary? TryScanCd(string path)
+    private static GameLibrary? TryScanCd(string path, string? discFolder)
     {
         IGameFileSource source;
         if (File.Exists(path))
@@ -219,7 +225,7 @@ public sealed class GameFolderScanner
         }
         else return null;
         // A v5 game (NAME.000 and NAME.001, perhaps in a language folder of a disc): browsed.
-        if (!ScummV4Archive.IsVga(source) && ScummV5Archive.FindGame(source) is { } v5)
+        if (!ScummV4Archive.IsVga(source) && ScummV5Archive.FindGame(source, discFolder) is { } v5)
             return ScanOtherV4(source, ScummV4Disks.FromArchives(ScummV5Archive.Load(source, v5)), v5);
         if (!ScummV4Archive.IsVga(source)) return null;
 
