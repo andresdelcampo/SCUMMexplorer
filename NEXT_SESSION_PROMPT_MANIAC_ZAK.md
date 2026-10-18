@@ -2,7 +2,7 @@
 
 Scope: ManiacClassic, ManiacEnhanced, ZakClassic, ZakEnhanced only. Another orchestrator owns LOOM, Indy3 and Monkey Island. Do not edit `NEXT_SESSION_PROMPT.md`.
 
-Read `docs/GAME_SUPPORT_INSTRUCTIONS.md` in full, `CLAUDE.md`, `docs/CURRENT_WORK.md`, `docs/checkpoints/20261017-S6-ManiacZak.md`, the retained S5 checkpoint, and the Maniac/Zak trackers before resuming. Follow the checkpoint's verified result and next item; do not infer visual acceptance from zero detector findings or bounded Play routes.
+Read `docs/GAME_SUPPORT_INSTRUCTIONS.md` in full, `CLAUDE.md`, `docs/CURRENT_WORK.md`, `docs/checkpoints/20261018-S7-ManiacZak.md`, retained S5/S6 checkpoints, and the Maniac/Zak trackers before resuming. Follow the checkpoint's verified result and next item; do not infer visual acceptance from zero detector findings, bounded Play routes or a cutscene beginning.
 
 Roadmap: S4b boot and stable first playable room; S5 first-visit objects; S6 verb-based play per REQUIREMENTS §7.1; S7 derived cutscenes; S9 edition checks. S8 is excluded unless requested. Preserve the current classic costume distinction and labelled estimates.
 
@@ -18,4 +18,6 @@ S5 source previews now cover all four families: 221/221 rooms open, 216 without 
 
 S6 now supplies the native v1/v2 interface and actual player startup choices. Read the final S6 checkpoint for each fixture's route, window evidence and matrix levels. The shared port includes native input script 4, sentence/inventory display and hit regions, fonts selected by edition hashes, old walk routing/directions, held-object semantics, and source-backed actor movement offsets. Original-game visual comparisons, darkness/flashlight, untested puzzles and editions remain open. Proposed R-7.19 to R-7.21 remain proposals, not user-confirmed decisions.
 
-Next roadmap work is S7 derived cutscenes and S9 edition checks, with exclusive shared-file ownership and the same merge protocol. Preserve ManiacClassic's accepted costume status and ZakClassic's current derived/estimated distinction; inspect current code rather than copying an older count. Do not infer S7/S9 from successful boots or Play routes. Worktrees remain available; do not remove them without the reparse-point checks above.
+S7 now derives and plays scene lists for all four families: Cutscenes Partial, 27 groups and 6/7 starts for Maniac classic/enhanced; 54 groups and 13 starts for either Zak. Three representative source-attributed scenes complete per family; four window checks agree with the censuses. State-gated triggers get no invented prerequisites. Five Zak starts hit the frame bound, and Classic Maniac's post-doorbell Script 174 remains unsupported. The reviewed native startup helper preserves queued/partial/completed player choices (Proposed R-8.34). Spanish scene labels use an exact executable/font fingerprint; rendered-font fidelity remains open.
+
+Next roadmap work is S9 edition checks, with exclusive shared-file ownership and the same merge protocol. Preserve ManiacClassic's accepted costume status and ZakClassic's current 24 derived/11 estimated distinction. Do not infer edition compatibility from the four reference-fixture successes. S8 and shipped seeds require an explicit request. Worktrees remain available; do not remove them without the reparse-point checks above.

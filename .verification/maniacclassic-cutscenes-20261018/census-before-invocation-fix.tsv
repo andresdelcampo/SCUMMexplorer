@@ -1,0 +1,30 @@
+Scan 59 triggers; 27 groups; 25 static scenes; 2152 ms
+Verbs: 01=Open, 02=Close, 03=Give, 04=Turn on, 05=Turn off, 06=Fix, 07=New kid, 08=Unlock, 09=Push, 0A=Pull, 0B=Use, 0C=Read, 0D=Walk to, 0E=Pick up, 0F=What is
+1/60/03	Room 01 · Give contract	Scene	global script 61;global script 62;global script 119;global script 63	234 instructions	21 texts	8 loads	Oh no! Radioactive steam! Ahheeeeeeee^	Begun=False; frames=600; rooms=; failure=
+1/61/0D	Room 01 · Walk to front door	Scene	global script 148;global script 155	82 instructions	9 texts	2 loads	Well, my dear. Hope you're having fun!  Within minutes it'll all be over.  You'll be hooked up to my machine  getting your pretty brains sucked out.	Begun=False; frames=600; rooms=; failure=
+1/394/09	Room 01 · Push doorbell	Scene	global script 87;global script 88;global script 95;global script 151;global script 97	163 instructions	13 texts	6 loads	Oh, the doorbell!	Begun=True; frames=187; rooms=26; failure=
+4/163/0D	Room 04 · Walk to inner door	Scene	global script 49;global script 99;global script 101	121 instructions	9 texts	3 loads	I hope you rot!	Begun=False; frames=600; rooms=; failure=
+4/214/03	Room 04 · Give badge	Dialogue	global script 157	28 instructions	4 texts	0 loads	You're with the Meteor Police!!  Dr. Fred made me do it!  He forced me to go along with his plan!	Begun=False; frames=600; rooms=; failure=
+5/136/0B	Room 05 · Use phone	Scene	global script 35	29 instructions	3 texts	1 loads	Now who could that be?	Begun=False; frames=600; rooms=43; failure=
+7/85/01	Room 07 · Open microwave oven	Scene	global script 61;global script 62	113 instructions	11 texts	5 loads	Oh no! Radioactive steam! Ahheeeeeeee^	Begun=False; frames=600; rooms=; failure=
+7/89/01	Room 07 · Open refrigerator	Scene	global script 87;global script 88;global script 95;global script 151	156 instructions	12 texts	5 loads	Oh, the doorbell!	Begun=False; frames=600; rooms=; failure=
+8/157/05	Room 08 · Turn off circuit breakers	Scene	global script 47;global script 48;global script 62	130 instructions	18 texts	5 loads	Not again!	Begun=True; frames=909; rooms=31; failure=
+9/219/01	Room 09 · Open wall safe	Scene	global script 142	42 instructions	4 texts	2 loads	Edna^  I'm having trouble with the Zom-B-Matic.  I need to shut down the power.  It'll be off for 5 or 6 minutes.	Begun=False; frames=600; rooms=43; failure=
+10/68/0D	Room 10 · Walk to door	Scene	global script 37	41 instructions	3 texts	1 loads	I got you!	Begun=False; frames=600; rooms=; failure=
+12/457/0D	Room 12 · Walk to stairs	Scene	global script 87;global script 95;global script 151	136 instructions	10 texts	4 loads	Oh, the doorbell!	Begun=False; frames=600; rooms=38; failure=
+15/225/06	Room 15 · Fix wires	Scene	global script 101	44 instructions	1 texts	2 loads	I guess the power's out.	Begun=False; frames=600; rooms=; failure=
+16/340/0B	Room 16 · Use weird edsel	Scene	global script 130;global script 63	212 instructions	14 texts	7 loads	Wheeeee!	Begun=False; frames=600; rooms=; failure=
+17/190/04	Room 17 · Turn on TV	Scene	global script 112	16 instructions	2 texts	1 loads	Hi all you budding writers, musicians,  and game designers!  I'm Mark Eteer and my company will  publish ANYTHING!  Just mail it to the address shown below.	Begun=True; frames=366; rooms=40; failure=
+17/365/0B	Room 17 · Use piano	Dialogue	global script 100	17 instructions	1 texts	0 loads	I have to turn off the Victrola first.	Begun=False; frames=600; rooms=; failure=
+18/442/0B	Room 18 · Use Meteor Mess game	Scene	global script 27	4 instructions	0 texts	1 loads		Begun=False; frames=600; rooms=; failure=
+20/164/04	Room 20 · Turn on mondo stereo	Scene	global script 61	75 instructions	6 texts	3 loads	Oh no! Radioactive steam! Ahheeeeeeee^	Begun=False; frames=600; rooms=; failure=
+21/399/0B	Room 21 · Use radio	Scene	global script 42	36 instructions	7 texts	2 loads	This is the Meteor Police.	Begun=False; frames=600; rooms=; failure=
+24/118/01	Room 24 · Open water faucet	Scene	global script 145;global script 101	83 instructions	8 texts	3 loads	Hey Ed!  The meteor wants to borrow  your hamster and electric cattle prod.	Begun=False; frames=600; rooms=; failure=
+26/35/01	Room 26 · Open piggy bank	Scene	global script 89	34 instructions	1 texts	1 loads	Too bad you weren't on my side!	Begun=True; frames=324; rooms=4; failure=
+28/413/0B	Room 28 · Use really powerful telescope	Scene	global script 23	40 instructions	0 texts	4 loads		Begun=True; frames=78; rooms=34; failure=
+29/66/01	Room 29 · Open water valve	Scene	global script 47;global script 62;global script 61	180 instructions	23 texts	6 loads	Not again!	Begun=False; frames=600; rooms=; failure=
+30/0/00	Room 30 · Entry	Scene	global script 62	38 instructions	5 texts	2 loads	All the kids have died.       The rescue attempt has failed.       Sandy is doomed to zombiehood.	Begun=False; frames=600; rooms=; failure=
+36/124/0D	Room 36 · Walk to door	Scene	global script 140	41 instructions	7 texts	2 loads	Daddy's been acting very strangely ever  since his secret project in the lab^	Begun=False; frames=600; rooms=; failure=
+38/462/0D	Room 38 · Walk to door	Scene	global script 88;global script 89	33 instructions	2 texts	2 loads	I got you! To the dungeon, intruder!	Begun=False; frames=600; rooms=; failure=
+51/176/05	Room 51 · Turn off switch	Scene	global script 126;global script 63	226 instructions	18 texts	5 loads	Oh...what happened?  I feel much better now!  I'm free of this machine's control!	Begun=False; frames=600; rooms=47; failure=
+Runs 27; begun 5; failed 0; frame-bound 0; elapsed 38305 ms

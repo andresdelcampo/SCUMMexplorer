@@ -1,6 +1,6 @@
 # Maniac Mansion (classic v1) support status
 
-Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root) | Last updated: 2026-10-17 | Owner: Maniac/Zak orchestrator
+Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root) | Last updated: 2026-10-18 | Owner: Maniac/Zak orchestrator
 
 | Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -10,12 +10,12 @@ Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root
 | S4b Session | done (bounded assumed-input route) | – | .verification/maniac-v1-adapter-20261017; .verification/ClassicBoot | Native input selects Syd/Bernard and Start; introduction reaches Room 44 with control, stable another 120 frames. Sound lifetime and seeded-route estimates remain explicit. |
 | S5 Objects | source preview implemented; visual acceptance open | Objects ◐ | .verification/maniacclassic-objects-20261017 | All 52 rooms open through the reviewed party recipe; native object flags and live classic actors. Original-game picture comparison was prohibited; six native coin-slot detector findings remain recorded. |
 | S6 Play | done (bounded native route) | Play/Objects Full | .verification/maniacclassic-play-20261017 | Genuine party choices, override skip, walked exit, composed sentence, mat/key pickup, rendered inventory and inventory selection; original-game picture/timing acceptance remains open. |
-| S7 Cutscenes | not started | Cutscenes – | – | |
+| S7 Cutscenes | done (bounded source-derived list) | Cutscenes Partial; parent owns matrix | .verification/maniacclassic-cutscenes-20261018 | 59 triggers/27 groups; six fresh starts begin; three source-attributed proofs and real-window actions. No complete-story or original-game fidelity claim. |
 | S8 State | not started | Status – | – | requested in a run: no |
 | S9 Editions | not started | – | – | |
 
 Blocked on: S5 original-game picture comparison is unperformed because this run prohibits launching ScummVM. Source-level comparisons and real-window captures do not substitute for that evidence.
-Next: retain the S5 original-game visual acceptance distinction; S7 cutscenes and S9 edition checks remain separate, unstarted items. The bounded native S6 route does not establish every party or a complete playthrough.
+Next: S9 edition checks remain separate and unstarted; S8 is opt-in. Retain original-game visual limits and the bounded S7 distinction, including the doorbell continuation query. The selected party and direct scene starts do not establish a complete playthrough.
 Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/2`), not stored in the game files; lights-off colour 11 is not applied.
 
 ## Decision log
@@ -29,8 +29,21 @@ Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/
 | 2026-10-17 | S5 | Can source audit satisfy original-game visual acceptance? | claim completion / separate the implemented preview from missing evidence | Separate: source preview implemented, original-game picture acceptance open; Objects remains Partial and S6 is unstarted | add actual comparison evidence in an explicitly authorized run |
 | 2026-10-17 | S6 | How to check a player choice in a game without Talk to? | invent a dialogue / use the native party menu | The user chooses Syd/Bernard/Start through real input; proposed R-7.21 preserves the game's interface. Sentence, exit, pickup, displayed inventory and override skip remain required | revert the S6 proposal and its dependent route claims together |
 | 2026-10-17 | S6 | Classic and enhanced text fonts differ | reuse later external charsets / use the native built-in tables | Use ScummVM's 8-by-8 font data and the source-defined language substitutions; reviewed resource hashes select language, never folder names | revert the old-interface charset integration; keep the source evidence |
+| 2026-10-18 | S7 | No scenes named by the user | invent catalog entries / choose from the source scan | Three distinct source-scanned responses with observable lines and bounded returns; disclose the fingerprinted startup choices and retain the post-doorbell query gap | revert family S7 enablement and dependent preparation, preserving evidence |
 
 Facts about the game's scripts: [MANIAC_SCRIPT_MAP.md](MANIAC_SCRIPT_MAP.md).
+
+## ManiacClassic and ManiacEnhanced — S7 checkpoint, 18 October 2026
+
+Both editions use the shared source-derived scan with their own native verb names and text. Each has 59 triggers grouped into 27 entries (25 static Scenes, two Dialogue/reactions). After the native direct-action context correction, fresh previews begin six classic entries and seven enhanced entries; 21/20 do not begin within the trial. No census run throws or reaches the 6000-frame end bound. A beginning is not full-story or original-game visual acceptance.
+
+Three selected examples per edition begin and end with source attribution and displayed text: the doorbell, circuit breakers and TV. Classic takes 187/905/366 frames; enhanced 187/888/390. Classic four focused tests pass; enhanced thirteen focused checks including LOOM pass. The parent records final WPF and full-suite results. Classic doorbell and TV playback are verified through the actual room list/global picker, with captures inspected.
+
+The preview factory sends reviewed fingerprinted Syd/Bernard/Start clicks and discloses the assumed party; interactive Play retains the player's choice. Direct object activation binds native active verb/object arguments rather than leaving stale startup arguments. It does not earn the route to the room or invent story prerequisites. Scenes that do not begin remain hidden in Normal mode once known, with their limitation in Advanced. No catalog or seed is authored.
+
+Retained limits: classic doorbell's later movement reaches unsupported Script 174 `getClosestObjActor` after its cutscene returns; classic/enhanced original-picture, darkness/flashlight, walking-metric and perceived timing limits remain. Enhanced native font/title-display differences remain disclosed in its record. S8/S9 were not performed.
+
+Records: [classic S7](../../.verification/maniacclassic-cutscenes-20261018/README.md), [enhanced S7](../../.verification/maniacenhanced-cutscenes-20261018/README.md), [integration checkpoint](../checkpoints/20261018-S7-ManiacZak.md).
 
 ## ManiacEnhanced v2 — S4b checkpoint, 17 October 2026
 

@@ -22,6 +22,7 @@ public abstract partial class ScummSession
 
     /// <summary>The inputs delivered to the input script so far (Advanced trace, R-7.17).</summary>
     public IReadOnlyList<ScummPlayInput> DeliveredInput => _deliveredInput;
+    public bool HasPendingPlayInput => _queuedInput.Count != 0;
     /// <summary>The native input script: fixed script 4 before v3, VAR_VERB_SCRIPT thereafter.</summary>
     public int PlayInputScript => _runtime.IsV2 ? 4 : _runtime.GlobalVariables.GetValueOrDefault(VerbScriptVariable);
 

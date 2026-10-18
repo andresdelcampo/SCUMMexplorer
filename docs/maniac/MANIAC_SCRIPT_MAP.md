@@ -33,6 +33,12 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic 87 | Doorbell response: begins a cutscene, loads Room 26, prints Ed's doorbell/package lines, then restores the previous scene. It continues its own source movement after the cutscene ends. | decoded | Script 87 +0x001F begin, +0x0020 room load, +0x0035/+0x004C lines, +0x00EA end; Room 1 object 394 verb 9 calls it at +0x003D | 2026-10-18 |
+| Classic 47 | Reactor trouble response: the branches distinguish power loss, empty pool and repeated problems; it places Fred and Purple Tentacle in Room 31 and ends its cutscene after their exchange. | decoded | Script 47 +0x0001 begin, +0x0020 room load, +0x0045 power line/+0x007A pool line, +0x0279 end; Room 8 object 157 verb 5 +0x0055 starts Script 12, whose +0x0031 starts 47 | 2026-10-18 |
+| Classic 112 | TV advert: places actor 17 in Room 40 and prints Mark Eteer's publishing offer and stamp reminder; its end restores the previous scene. | decoded | Script 112 +0x0000 begin, +0x0009 room load, +0x0019 offer/+0x00B3 reminder, +0x00D3 end; Room 17 object 190 verb 4 +0x0024 starts it | 2026-10-18 |
+| Enhanced 87 | Edition-local doorbell response: the Room 1 object calls Script 87, which visits Room 26 and returns to Room 1 in the fresh preview (187 frames). | engine | Room 1 object 394 verb 9 +0x003B; Script 87 +0x001F begin/+0x00F5 end; enhanced S7 proof | 2026-10-18 |
+| Enhanced 47 | Edition-local circuit-breaker response: the correct power-off line and Fred/Tentacle exchange run in Room 31, returning to Room 8 (888 frames). | engine | Room 8 object 157 verb 5 +0x004E starts 55/+0x0050 starts 12; Script 47 +0x0001 begin/+0x0047 power line/+0x0288 end; enhanced S7 proof | 2026-10-18 |
+| Enhanced 112 | Edition-local TV advert visits Room 40 and returns to Room 17 (390 frames). | engine | Room 17 object 190 verb 4 +0x0024 starts 112; Script 112 +0x0000 begin/+0x00E1 end; enhanced S7 proof | 2026-10-18 |
 
 ## Rooms
 

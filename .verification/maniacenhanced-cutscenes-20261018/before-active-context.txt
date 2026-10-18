@@ -1,0 +1,31 @@
+planner (one boot and the scan) 3387 ms
+verb words: 0x01 Abrir, 0x02 Cerrar, 0x03 Da, 0x04 Encender, 0x05 Apagar, 0x06 Reparar, 0x07 Chaval, 0x08 Desatranca, 0x09 Empuja, 0x0A Tira, 0x0B Usar, 0x0C Leer, 0x0D Ir a, 0x0E Coger, 0x0F Qu] es
+triggers 59 groups 27 scenes 25
+1/60/0x03 | Room 01 · Da contrato | Scenes | global script 61;global script 62;global script 119;global script 63 | t21 l8 i245 a0 | <Oh, no! <Vapor radioactivo! Aheeeee^ | others[] | run: NOT begun frames 600 rooms [] 2715 ms
+1/61/0x0D | Room 01 · Ir a puerta delantera | Scenes | global script 148;global script 155 | t9 l2 i82 a1 | Bueno, querida. <Espero que disfrutes!  En pocos minutos todo habr= acabado.  Estar=s enganchada a mi m=quina, que  absorber= tus preciosos sesos. | others[] | run: NOT begun frames 600 rooms [] 1919 ms
+1/394/0x09 | Room 01 · Empuja timbre | Scenes | global script 87;global script 88;global script 95;global script 151;global script 97 | t13 l6 i165 a0 | <Oh, el timbre! | others[1/394/0x0B] | run: begun frames 187 rooms [26] 1993 ms
+4/163/0x0D | Room 04 · Ir a puerta interior | Scenes | global script 49;global script 99;global script 101 | t9 l3 i122 a1 | <Espero que te pudras! | others[] | run: NOT begun frames 600 rooms [] 2043 ms
+4/214/0x03 | Room 04 · Da placa | Dialogue | global script 157 | t4 l0 i28 a0 | <<Est=s con la Polic>a Meteoro!!  <El Doctor Fred me oblig| a hacerlo!  <Me oblig| a seguir con su plan! | others[] | run: NOT begun frames 600 rooms [] 1950 ms
+5/136/0x0B | Room 05 · Usar tel]fono | Scenes | global script 35 | t3 l1 i33 a1 | [Y ahora qui]n podr>a ser? | others[] | run: NOT begun frames 600 rooms [43] 2055 ms
+7/85/0x01 | Room 07 · Abrir microondas | Scenes | global script 61;global script 62 | t11 l5 i126 a0 | <Oh, no! <Vapor radioactivo! Aheeeee^ | others[7/87/0x03,5/189/0x03,28/252/0x0D] | run: NOT begun frames 600 rooms [] 1862 ms
+7/89/0x01 | Room 07 · Abrir nevera | Scenes | global script 87;global script 88;global script 95;global script 151 | t12 l5 i158 a0 | <Oh, el timbre! | others[7/89/0x0A] | run: NOT begun frames 600 rooms [] 1822 ms
+8/157/0x05 | Room 08 · Apagar autom=ticos | Scenes | global script 47;global script 48;global script 62 | t18 l5 i143 a0 | <De nuevo no! | others[] | run: begun frames 912 rooms [31] 2018 ms
+9/219/0x01 | Room 09 · Abrir caja fuerte | Scenes | global script 142 | t4 l2 i42 a1 | Edna^  Tengo problemas con el Zombi-Matic.  Tengo que quitar la corriente.  Estar= apagado 5 o 6 minutos. | others[9/219/0x0B] | run: NOT begun frames 600 rooms [43] 2184 ms
+10/68/0x0D | Room 10 · Ir a puerta | Scenes | global script 37 | t3 l1 i41 a1 | <Te tengo! | others[9/217/0x0D,38/461/0x0D] | run: NOT begun frames 600 rooms [] 2221 ms
+12/457/0x0D | Room 12 · Ir a escaleras | Scenes | global script 87;global script 95;global script 151 | t10 l4 i137 a1 | <Oh, el timbre! | others[] | run: NOT begun frames 600 rooms [38] 2106 ms
+15/225/0x06 | Room 15 · Reparar cables | Scenes | global script 101 | t1 l2 i44 a0 | Parece que se ha ido la luz. | others[15/225/0x0B] | run: NOT begun frames 600 rooms [] 2906 ms
+16/340/0x0B | Room 16 · Usar coche raro | Scenes | global script 130;global script 63 | t14 l7 i210 a0 | <Guay! | others[] | run: NOT begun frames 600 rooms [] 2077 ms
+17/190/0x04 | Room 17 · Encender TV | Scenes | global script 112 | t2 l1 i16 a0 | <Hola a todos los futuros escritores,  m}sicos y dise{adores de juegos!  <Soy Mark Eteer y mi compa{>a  publicar= LO QUE SEA!  Env>alo a la direcci|n que se muestra  abajo. | others[17/190/0x0B] | run: begun frames 390 rooms [40] 1997 ms
+17/365/0x0B | Room 17 · Usar piano | Dialogue | global script 100 | t1 l0 i17 a0 | Primero tengo que apagar la Victrola. | others[] | run: NOT begun frames 600 rooms [] 2031 ms
+18/442/0x0B | Room 18 · Usar juego L>o de Meteoritos | Scenes | global script 27 | t0 l1 i4 a0 |  | others[] | run: NOT begun frames 600 rooms [] 2013 ms
+20/164/0x04 | Room 20 · Encender equipo de m}sica | Scenes | global script 61 | t6 l3 i75 a1 | <Oh, no! <Vapor radioactivo! Aheeeee^ | others[3/228/0x04] | run: NOT begun frames 600 rooms [] 2150 ms
+21/399/0x0B | Room 21 · Usar radio | Scenes | global script 42 | t7 l2 i36 a1 | Aqu> la Polic>a Meteoro. | others[] | run: NOT begun frames 600 rooms [] 2160 ms
+24/118/0x01 | Room 24 · Abrir grifo de agua | Scenes | global script 145;global script 101 | t8 l3 i83 a0 | <Oye Ed!  El meteorito quiere que le prestes  tu h=mster y tu bast|n el]ctrico. | others[24/118/0x04] | run: NOT begun frames 600 rooms [] 2718 ms
+26/35/0x01 | Room 26 · Abrir hucha | Scenes | global script 89 | t1 l1 i35 a0 | <Qu] pena que no estuvieras de mi lado! | others[26/35/0x02,26/35/0x06,26/34/0x0E,26/35/0x0E,26/36/0x0E,26/37/0x0E,26/38/0x0E] | run: begun frames 310 rooms [4] 2069 ms
+28/413/0x0B | Room 28 · Usar telescopio muy potente | Scenes | global script 23 | t0 l4 i38 a0 |  | others[] | run: begun frames 78 rooms [34] 1935 ms
+29/66/0x01 | Room 29 · Abrir v=lvula de agua | Scenes | global script 47;global script 62;global script 61 | t23 l6 i193 a0 | <De nuevo no! | others[29/66/0x02,29/66/0x04,29/66/0x05] | run: NOT begun frames 600 rooms [] 2235 ms
+30/0/0x00 | Room 30 · Entry | Scenes | global script 62 | t5 l2 i51 a0 | Todos los chavales han muerto.     El intento de rescate ha fallado.    Sandy ser= ya para siempre un zombi. | others[51/0/0x00,16/151/0x08,2/288/0x09,2/288/0x0B,11/500/0x0B,13/540/0x0B,11/501/0x0C] | run: NOT begun frames 600 rooms [] 2083 ms
+36/124/0x0D | Room 36 · Ir a puerta | Scenes | global script 140 | t6 l2 i41 a1 | Pap= act}a muy raro desde que est= con  su proyecto secreto en el laboratorio^ | others[] | run: NOT begun frames 600 rooms [] 1951 ms
+38/462/0x0D | Room 38 · Ir a puerta | Scenes | global script 88;global script 89 | t2 l2 i33 a1 | <Te tengo! <A la mazmorra, intruso! | others[] | run: NOT begun frames 600 rooms [] 1937 ms
+51/176/0x05 | Room 51 · Apagar interruptor | Scenes | global script 126;global script 63 | t18 l5 i228 a0 | Oh^ [qu] pas|?  <Ahora me siento mucho mejor!  <Estoy libre del control de la m=quina! | others[51/176/0x09,51/176/0x0A,51/176/0x0B] | run: begun frames 749 rooms [30] 2096 ms
+runs 27, begun 6

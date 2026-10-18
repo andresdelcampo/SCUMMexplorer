@@ -8,6 +8,8 @@ For LOOM's script IDs, story state, draft verbs and room examples, see the [LOOM
 
 ScummVM `ScummEngine_v2::checkExecVerbs` and `runInputScript` dispatch through script 4 and the old click/keypress globals, not the later `VAR_VERB_SCRIPT` and local argument contract. Verb/scene clicks use mode 1; sentence area 5 and inventory area 3 use mode 0. The engine supplies the sentence and inventory hit regions and scrolling keys. Scripts still compose and execute the action; the explorer must not interpret a first object click as an automatically completed sentence. Source: `verbs.cpp`, `script.cpp`, read 17 October 2026. Implementation: `ScummSessionPlay`; proposed interface requirements R-7.19 to R-7.21. Game-specific keys and choices belong in the Maniac/Zak script maps.
 
+For v1/v2 scene previews, direct object actions bind `ScummVars.V2.ActiveVerb`, `ActiveObject1` and `ActiveObject2` before object code runs, matching the invocation context of `o2_doSentence` subcommand 1. These engine arguments are distinct from story prerequisites; stale arguments can select another object's response. Native cutscene begins retain their source script and offset for run attribution. Sources: ScummVM `script_v2.cpp`, `script.cpp`, read 18 October 2026. The scan accepts the old dialect's bare literal script calls and `[text "..."]` syntax; old `printEgo` text counting is version-gated to preserve later-engine lists.
+
 ## Engine variables (v3/v4)
 
 The following v3/v4 slots must not be applied to v1/v2; those roles are recorded separately below.

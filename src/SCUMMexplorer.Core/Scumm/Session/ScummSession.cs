@@ -700,6 +700,7 @@ public abstract partial class ScummSession
                 _runtime.CurrentRoom ?? NullRoom, _runtime.Camera.Mode));
             _cutscenes.Push((0, _executing.Count > 0 ? _executing[^1] : null));
             CutscenesBegun++;
+            _visitTrace.Add($"cutscene at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} (native v1/v2 scope)");
             _overrides.Remove(_cutscenes.Count);
             _runtime.SetGlobalVariable(ScummVars.V2.CursorState, 200);
             _runtime.ApplyV2UserState(4 | 2 | 1 | 8);
