@@ -1,0 +1,31 @@
+Preview start assumes the reviewed character-menu clicks selecting Syd, Bernard and Start, then runs the opening to player control. No route to the catalog room was played; an already selected party is preserved.
+triggers=59; groups=27; scenes=25; dialogue=2
+verbs: 1:Abrir, 2:Cerrar, 3:Da, 4:Encender, 5:Apagar, 6:Reparar, 7:Chaval, 8:Desatranca, 9:Empuja, 10:Tira, 11:Usar, 12:Leer, 13:Ir a, 14:Coger, 15:Qué es
+1/60/3: Room 01 · Da contrato | scripts=global script 61;global script 62;global script 119;global script 63 | texts=21 | begun=False frames=600 rooms=[] failure=
+1/61/13: Room 01 · Ir a puerta delantera | scripts=global script 148;global script 155 | texts=9 | begun=False frames=600 rooms=[] failure=
+1/394/9: Room 01 · Empuja timbre | scripts=global script 87;global script 88;global script 95;global script 151;global script 97 | texts=13 | begun=True frames=187 rooms=[26] failure=
+4/163/13: Room 04 · Ir a puerta interior | scripts=global script 49;global script 99;global script 101 | texts=9 | begun=False frames=600 rooms=[] failure=
+4/214/3: Room 04 · Da placa | scripts=global script 157 | texts=4 | begun=False frames=600 rooms=[] failure=
+5/136/11: Room 05 · Usar teléfono | scripts=global script 35 | texts=3 | begun=False frames=600 rooms=[] failure=
+7/85/1: Room 07 · Abrir microondas | scripts=global script 61;global script 62 | texts=11 | begun=False frames=600 rooms=[] failure=
+7/89/1: Room 07 · Abrir nevera | scripts=global script 87;global script 88;global script 95;global script 151 | texts=12 | begun=False frames=600 rooms=[] failure=
+8/157/5: Room 08 · Apagar automáticos | scripts=global script 47;global script 48;global script 62 | texts=18 | begun=True frames=888 rooms=[31] failure=
+9/219/1: Room 09 · Abrir caja fuerte | scripts=global script 142 | texts=4 | begun=False frames=600 rooms=[43] failure=
+10/68/13: Room 10 · Ir a puerta | scripts=global script 37 | texts=3 | begun=False frames=600 rooms=[] failure=
+12/457/13: Room 12 · Ir a escaleras | scripts=global script 87;global script 95;global script 151 | texts=10 | begun=False frames=600 rooms=[38] failure=
+15/225/6: Room 15 · Reparar cables | scripts=global script 101 | texts=1 | begun=False frames=600 rooms=[] failure=
+16/340/11: Room 16 · Usar coche raro | scripts=global script 130;global script 63 | texts=14 | begun=False frames=600 rooms=[] failure=
+17/190/4: Room 17 · Encender TV | scripts=global script 112 | texts=2 | begun=True frames=390 rooms=[40] failure=
+17/365/11: Room 17 · Usar piano | scripts=global script 100 | texts=1 | begun=False frames=600 rooms=[] failure=
+18/442/11: Room 18 · Usar juego Lío de Meteoritos | scripts=global script 27 | texts=0 | begun=False frames=600 rooms=[] failure=
+20/164/4: Room 20 · Encender equipo de música | scripts=global script 61 | texts=6 | begun=False frames=600 rooms=[] failure=
+21/399/11: Room 21 · Usar radio | scripts=global script 42 | texts=7 | begun=False frames=600 rooms=[] failure=
+24/118/1: Room 24 · Abrir grifo de agua | scripts=global script 145;global script 101 | texts=8 | begun=False frames=600 rooms=[] failure=
+26/35/1: Room 26 · Abrir hucha | scripts=global script 89 | texts=1 | begun=True frames=310 rooms=[4] failure=
+28/413/11: Room 28 · Usar telescopio muy potente | scripts=global script 23 | texts=0 | begun=True frames=78 rooms=[34] failure=
+29/66/1: Room 29 · Abrir válvula de agua | scripts=global script 47;global script 62;global script 61 | texts=23 | begun=True frames=943 rooms=[31] failure=
+30/0/0: Room 30 · Entry | scripts=global script 62 | texts=5 | begun=False frames=600 rooms=[] failure=
+36/124/13: Room 36 · Ir a puerta | scripts=global script 140 | texts=6 | begun=False frames=600 rooms=[] failure=
+38/462/13: Room 38 · Ir a puerta | scripts=global script 88;global script 89 | texts=2 | begun=False frames=600 rooms=[] failure=
+51/176/5: Room 51 · Apagar interruptor | scripts=global script 126;global script 63 | texts=18 | begun=True frames=749 rooms=[30] failure=
+TOTAL runs=27; begun=7; failed=0; limit=0
