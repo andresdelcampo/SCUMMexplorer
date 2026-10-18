@@ -10,7 +10,7 @@ Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last
 | S4b Session | done | unchanged | [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md) | Own v1 opening reaches Room 1 in 1804 frames, player control on, no cutscene; stable for 120 more frames. Supersedes the earlier ClassicBoot blocker |
 | S5 Objects | source preview implemented; visual acceptance open | Objects ◐ unchanged | [.verification/zakclassic-objects-20261017](../../.verification/zakclassic-objects-20261017/README.md) | 58 rooms open; Room 44 gap flag retained; original-game comparison not performed |
 | S6 Play | done (bounded native route) | Objects/Play Full | [.verification/zakclassic-play-20261017](../../.verification/zakclassic-play-20261017/README.md) | Three genuine-input tests and real-window route pass; native Buy choice, reached cutscene skip and returned control; S5 visual limits retained |
-| S7 Cutscenes | not started | Cutscenes – | – | |
+| S7 Cutscenes | headless complete; parent window/integration pending | Cutscenes unchanged until parent acceptance, then Partial | [.verification/zakclassic-cutscenes-20261018](../../.verification/zakclassic-cutscenes-20261018/README.md) | 130 triggers, 54 groups, 37 scenes; 13 begin, five hit frame cap; three bounded fresh-start proofs, four tests pass |
 | S8 State | not started | Status – | – | requested in a run: no |
 | S9 Editions | not started | – | – | |
 
@@ -23,6 +23,7 @@ Open uncertainties: see the record (variable actor in Room 38; control flow insi
 | Date | Stage | Open question | Options | Choice and why | How to undo |
 |---|---|---|---|---|---|
 | 2026-10-17 | S5 Classic | Treat source previews as original-game comparison, or alter state to remove the Room 44 detector flag? | claim full acceptance / force a fill / retain limits | retain source state and visual acceptance limits; all 58 rooms open and three object-state tests pass, but native comparison is prohibited and no state fill is justified | complete a later authorized visual comparison; no workaround to remove |
+| 2026-10-18 | S7 Classic | Which scenes prove the unnamed request? | invented catalog / source examples | use independently scanned Room 8 entry, bakery doorbell and shop Buy; retain five capped runs and estimated costume colours | remove family tests/record; no seed or catalog |
 | 2026-10-14 | S2 | Which palette belongs to a costume the scripts hand to an actor? | nearest instruction / last in the span / run the script | last palette instruction of the same actor operand after the costume instruction, before the actor's next costume instruction (the palette persists, ScummVM `setActorCostume` leaves it alone), else the closest one before; no run needed | revert the commit |
 | 2026-10-14 | S2 | Costumes that depend on what ran before | guess one value / leave them out / label | label as `Estimate`, using what the boot script leaves in the actor's palette (R-1.11) | same |
 | 2026-10-14 | S2 | Raise Costumes to ✔? | yes / no | no: 10 costumes are estimates and no comparison with a running ScummVM could be made | one-line commit later |
