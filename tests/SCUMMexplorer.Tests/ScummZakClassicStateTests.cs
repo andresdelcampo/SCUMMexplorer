@@ -13,6 +13,8 @@ public sealed class ScummZakClassicStateTests
         Run(150); Key('w'); Click(50,81); Click(10,145); Run(180);
         Key('d'); Click(55,78); Click(10,145); Run(180);
         Assert.Equal(1,session.Snapshot.ObjectOwners[15]);
+        for(int frame=0;frame<3000 && !session.CaptureInventoryStatus().CanEdit;frame++) session.AdvanceFrame();
+        Assert.True(session.CaptureInventoryStatus().CanEdit,session.CaptureInventoryStatus().Refusal);
         return session;
     }
 

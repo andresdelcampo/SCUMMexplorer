@@ -11,6 +11,11 @@ Frames(150);
 Key('w'); Click(50,81); Click(10,145); Frames(180);
 Key('d'); Click(55,78); Click(10,145); Frames(180);
 if(session.Snapshot.ObjectOwners.GetValueOrDefault(15)!=1) throw new Exception("Phone bill was not genuinely acquired");
+var initialRefusal=session.CaptureInventoryStatus().Refusal;
+var pendingBefore=session.PendingScriptSummary.ToArray();
+int settlingFrames=0;
+while(settlingFrames<3000 && !session.CaptureInventoryStatus().CanEdit) { session.AdvanceFrame(); settlingFrames++; }
+if(!session.CaptureInventoryStatus().CanEdit) throw new Exception(session.CaptureInventoryStatus().Refusal+"; before="+string.Join("|",pendingBefore)+"; after="+string.Join("|",session.PendingScriptSummary));
 var source=ScummDataSources.For(game).GlobalScript(108)!;
 var before=session.CaptureInventoryStatus();
 var moved=session.ApplyInventoryTransfers(before,[new(15,2)]);
@@ -25,6 +30,7 @@ Console.WriteLine(JsonSerializer.Serialize(new {
     LastPlayer=session.Snapshot.KnownGlobalVariables["var[0x02B]"],
     Before=before.Items, After=after.Items, Characters=before.Characters,
     Applied=moved.Applied, Undone=undone.Applied,
+    InitialRefusal=initialRefusal, PendingBefore=pendingBefore, SettlingFrames=settlingFrames,
     ActorSource=source.Instructions.Where(i=>i.Operation=="actorOps" && i.Operands.Contains("name=")).Select(i=>new{i.Offset,i.Operands}),
     ReachedPickup=session.SessionTrace.Where(t=>t.Contains("objects 15 and 0") || t.Contains("objects 92 and 0"))
 },new JsonSerializerOptions{WriteIndented=true}));
