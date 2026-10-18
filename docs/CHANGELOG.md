@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: the other Monkey Island 2 copies (S9, Monkey2)
+
+- **All four other copies pass** (`mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es`, `mi2 talkie es` against `mi2 talkie en`): boot to the campfire, room audit (107 of 110 rooms without a gap, states equal but two patched rooms), the play route with right click, LeChuck's iMUSE beat, the cutscene scan and runs (floppies 190 groups / 97 begin, talkies 260 / 165), and the accents. Record: [monkey2-editions-20261018](../.verification/monkey2-editions-20261018/README.md).
+- **Floppy copy protection (shared Core, small and additive).** The floppy releases ask the recipe copy protection before the full/Lite choice; the boot presses Enter, types the four digits Script 130 itself derived into `var[0x206]` (labelled assumed input, `ScummBootInputPlan.AnswerDigits`), then clicks the full game once it is touchable. Before, the floppies stood at Room 108 until the frame limit.
+- **Cutscene titles** drop the '@' filler the Spanish talkie pads its verb names with (`ScummCutscenePlanner.VerbsOf`).
+- **Tests.** The Monkey2 session, first-visit, play and cutscene tests run over the five copies, with route texts per copy (the two Spanish copies differ: "Mirar a" / "Mirar"); a glyph check per copy. One look through the real window at the Spanish floppy: Spanish verbs, "Mirar a rótulo", dialogue lines with ¿ and ¡. Registry unchanged.
+
 ## 18 October: Monkey Island 2 cutscenes from its scripts, with a song's beat (S7, Monkey2)
 
 - **The list.** The shared scan gives 536 triggers and 260 entries (76 scenes) with the game's verb names after the boot (Open … Walk to); 165 begin from a fresh start; eight-worker runs take 153 s in the harness and 140–174 s in the window on first launch (each run boots MI2 in about 0.9 s).
