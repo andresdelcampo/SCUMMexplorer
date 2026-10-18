@@ -146,6 +146,78 @@ public sealed class ScummZakEnhancedInventoryCatalogTests
     }
 
     [Fact]
+    public void DatCounterBoundCannotConcealAnotherInventoryTarget()
+    {
+        var path = Path.Combine(TestGames.Root, "zakE ega en");
+        if (!Directory.Exists(path)) return;
+        var game = new GameFolderScanner().Scan(path);
+        var data = ScummDataSources.For(game);
+        var globals = data.GlobalScriptIds().ToDictionary(id => id, id => data.GlobalScript(id)!);
+        var rooms = game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).Distinct()
+            .ToDictionary(id => id, data.ReadRoom);
+        var sources = new List<(int? Object, int? Verb, ScummScriptDisassembly Script)>();
+        sources.AddRange(globals.Values.Select(s => ((int?)null, (int?)null, s)));
+        foreach (var (roomId, room) in rooms)
+        {
+            if (data.RoomEntryScript(roomId) is {} entry) sources.Add((null, null, entry));
+            if (data.RoomExitScript(roomId) is {} exit) sources.Add((null, null, exit));
+            var verbs = data.ReadObjectVerbs(roomId, room.Objects);
+            foreach (var obj in room.Objects.GroupBy(o => o.Id).Select(g => g.Last()))
+                foreach (var verb in verbs.GetValueOrDefault(obj.Id) ?? [])
+                    sources.Add((obj.Id, verb.VerbId, data.ReadObjectVerb(roomId, obj, verb.VerbId, out _)));
+        }
+        static int? Number(string text) => text.StartsWith("0x") && int.TryParse(text.AsSpan(2),
+            System.Globalization.NumberStyles.HexNumber, null, out var value) ? value : null;
+        var callers = sources.Where(s => s.Script.Instructions.Any(i => i.Operation is "startScript" or "chainScript" &&
+            Number(i.Operands.Split(',')[0].Trim()) == 55)).ToArray();
+        Assert.Equal(7, callers.Length);
+        Assert.All(callers, c => Assert.Equal(71, c.Object));
+        Assert.Equal(new[] {1,3,4,5,11,12,14}, callers.Select(c => c.Verb!.Value).Order());
+        var dat = globals[55];
+        var direct = dat.Instructions.Where(i => i.Operation == "pickupObject" ||
+            i.Operation == "setState" && i.Operands.EndsWith(", Pickupable")).ToArray();
+        Assert.Equal(new[] {0x52,0x54}, direct.Select(i => i.Offset));
+        Assert.All(direct, i => Assert.StartsWith(ScummVars.V2.ActiveObject1, i.Operands));
+        Assert.Equal(direct, dat.Instructions.Where(i => i.Operands.Contains(ScummVars.V2.ActiveObject1)));
+        Assert.DoesNotContain(dat.Instructions, i => i.Operation.Contains("Indirect") || i.Operation == "setVarRange");
+
+        // Independent structural closure of ALL later calls, including both sides of every
+        // counter/state branch. This does not execute or pretend to finish the DAT loop.
+        var queue = new Queue<(string Label, ScummScriptDisassembly Script, int Active, int After)>();
+        var closure = new HashSet<string>();
+        queue.Enqueue(("G55", dat, 71, 0x54));
+        while (queue.TryDequeue(out var current))
+        {
+            if (!closure.Add(current.Label)) continue;
+            var instructions = current.Script.Instructions.Where(i => i.Offset > current.After).ToArray();
+            Assert.DoesNotContain(instructions, i => i.Operation == "pickupObject" ||
+                i.Operation == "setState" && i.Operands.EndsWith(", Pickupable"));
+            foreach (var instruction in instructions)
+            {
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (instruction.Operation is "startScript" or "chainScript")
+                {
+                    var id = Number(parts[0]); Assert.NotNull(id);
+                    queue.Enqueue(($"G{id}", globals[id.Value], current.Active, -1));
+                }
+                else if (instruction.Operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01")
+                {
+                    var verb = Number(parts[0]); Assert.NotNull(verb);
+                    var id = Number(parts[1]) ?? (parts[1] == ScummVars.V2.ActiveObject1 ? current.Active : (int?)null);
+                    Assert.NotNull(id);
+                    var location = Assert.Single(rooms, r => r.Value.Objects.Any(o => o.Id == id));
+                    var obj = location.Value.Objects.Last(o => o.Id == id);
+                    var nativeVerb = verb == 250 ? 253 : verb.Value;
+                    var next = data.ReadObjectVerb(location.Key, obj, nativeVerb, out _);
+                    queue.Enqueue(($"O{location.Key}/{id}/{nativeVerb}", next,
+                        verb is 250 or 253 or 254 ? current.Active : id.Value, -1));
+                }
+            }
+        }
+        Assert.Equal(new[] {"G3","G19","G44","G55","O7/183/253","O30/492/4","O30/492/253","O33/520/11","O33/521/253"}.Order(), closure.Order());
+    }
+
+    [Fact]
     public void EveryCatalogEntryGrantsAndUndoesWithoutChangingUnrelatedState()
     {
         if (Ready() is not {} session) return;
