@@ -18,4 +18,17 @@ No ScummVM runtime, original game, saves or normal user profile is opened or mod
 
 ## Result
 
-Pending integration commits and exclusive WPF lease. Root owns production changes, support matrix and checkpoint.
+Character API `de2ae49e` and App `afaa564` integrated into the verification worktree. Harness build passes with zero warnings/errors. Two serial Maniac actual-window processes pass:
+
+| Fixture | Source bodies | Items | Result |
+|---|---|---|---|
+| ManiacClassic | Syd 18x70, Dave 18x72, Bernard 22x73 | 48 | PASS, frame 3309 |
+| ManiacEnhanced | Syd 20x74, Dave 22x74, Bernard 22x73 | 48 | PASS, frame 1555 |
+
+For both fixtures, both window sizes report Catalog and Add height 32, and equal bottom coordinates of 247.4133 device-independent pixels. Every source body is checked in the selected recipient choice and dropdown. Apply/Undo, capacity, modal pause/restore and source-state guards pass. Minimum-size Classic layout and Enhanced native three-character dropdown captures were inspected: compact controls align correctly and all displayed people have full bodies.
+
+Zak final logical-catalog integration and its two windows are pending. Root owns production changes, support matrix and checkpoint.
+
+## Retained unsuccessful optional checks
+
+The first build of optional alternate-party support needed a nullable-room `.Value` correction; the next build was clean. Optional Enhanced Razor/Wendy coverage was then attempted without guessing coordinates. Attempt one looked for native menu object names; those object headers did not identify the named portraits. Attempt two followed native party-assignment helper operands, but the verifier still found no matching object before sending any input. Both failed logs are retained locally under `window-maniac-enhanced-alternate` and `window-maniac-enhanced-alternate-source`. Neither is acceptance evidence or a demonstrated product failure. After two approaches, the optional mode was removed. The accepted existing native party selection is unchanged; other playable children's live-window coverage is not claimed here.
