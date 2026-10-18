@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Monkey Island CD lists its cutscenes from its scripts and plays them (S7, MonkeyCd)
+
+- The shared scan reads the CD's v5 resource file (through its disc image) unchanged: 286 triggers, 160 entries (62 scenes), 101 begin from a fresh start; titles use the CD's own verb names after the boot (2 Open … 8 Look at, 0x0A Talk to, 0x0B Walk to); `verb 0x50` and `verb 0x3D` stay raw because the game names neither.
+- Acceptance: `Room 33 · Look at poster` (object 429 verb 8), `Room 37 · Entry` (Script 60) and `Room 19 · Entry` (the ship, local script 200, on to Room 7; it starts its disc track, sound 102). Background derivation: 8 workers, each with its own copy read from the disc image; results identical to one thread; 51 s in the window on first launch. App fix (shared): an entry played from the picker in another room no longer runs the entry twice (the ship played nothing).
+- Registry: MonkeyCd Cutscenes – → ◐. Validation: `ScummMonkeyCdCutsceneTests`; support, cutscene and play tests; LOOM regression; LOOM, Indy3 and Monkey floppy lists byte-identical. Record: [monkeycd-cutscenes-20261017](../.verification/monkeycd-cutscenes-20261017/README.md).
+
 ## 17 October: Monkey Island 2 boots to the campfire and shows its first-visit rooms (S4b, S5, Monkey2)
 
 - The generic session boots `mi2 talkie en` in 3409 frames to Room 4 (the campfire on Scabb Island) with the player in control and nothing unsupported; the one assumed input is a click on "Monkey Island 2" (the full game) in the choice screen (Room 108), through the game's own input script (`ScummBootInputPlan.ClickObject`). No copy protection at boot parameter 0 in this edition.

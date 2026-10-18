@@ -42,6 +42,21 @@ if (args.Length > 2 && args[1] == "prun")
     return;
 }
 
+// CutsceneList <folder> race <n>: n planners built at once, each on its own copy of the game (S7 MonkeyCd, 18 October 2026: the window counted 164
+// steps for a list of 160 entries); prints each planner's trigger and group counts.
+if (args.Length > 2 && args[1] == "race")
+{
+    var counts = new System.Collections.Concurrent.ConcurrentBag<string>();
+    Parallel.For(0, int.Parse(args[2]), new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, i =>
+    {
+        var copy = new GameFolderScanner().Scan(args[0]);
+        var p = new ScummCutscenePlanner(copy);
+        counts.Add($"triggers {p.Triggers.Count} groups {p.Groups.Count} scenes {p.Groups.Count(g => g.IsScene)}");
+    });
+    foreach (var c in counts.GroupBy(c => c)) Console.WriteLine($"{c.Count()} x {c.Key}");
+    return;
+}
+
 // CutsceneList <folder> dump <room> <object> <verb>: the object verb's instructions (Monkey Island floppy S7, 17 October 2026).
 if (args.Length > 4 && args[1] == "dump")
 {
