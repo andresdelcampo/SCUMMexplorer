@@ -12,6 +12,17 @@ foreach (var fixture in new[] { "mmansionE ega es", "mmansion ega en", "zak ega 
 {
     var game = new GameFolderScanner().Scan(Path.Combine(root, fixture));
     var data = ScummDataSources.For(game);
+    if (args.Contains("battery"))
+    {
+        if (!fixture.StartsWith("mmansion")) continue;
+        var session = ScummGameSession.BootForPlay(game, out var indexed);
+        ManiacFirstVisit.Prepare(game, session);
+        report.AppendLine(fixture);
+        report.AppendLine(string.Join("\n", NativeManiacTorch.Activate(game, session)));
+        var litScene = new ScummPlayScreen(game, session, indexed.States).Scene()!;
+        Save(Path.Combine(output, fixture + "-battery.bmp"), litScene.Room.Width, litScene.Room.Height, litScene.ComposeWithActors(), litScene.DisplayPalette());
+        continue;
+    }
     if (args.Contains("torch"))
     {
         var session = ScummGameSession.BootForPlay(game, out var indexed);
@@ -39,6 +50,18 @@ foreach (var fixture in new[] { "mmansionE ega es", "mmansion ega en", "zak ega 
         var torchId = fixture.StartsWith("mmansion") ? 84 : 69;
         var record = data.ReadRoom(torchRoom).Objects.First(r => r.Id == torchId);
         Console.WriteLine(fixture);
+        if (fixture.StartsWith("mmansion"))
+        {
+            var battery = data.ReadRoom(2).Objects.First(r => r.Id == 167);
+            foreach (var item in data.ReadRoom(2).Objects)
+                Console.WriteLine($"ROOM2 {item} NAME={Encoding.ASCII.GetString(data.ReadRoom(2).ObjectNames.GetValueOrDefault(item.Id) ?? [])}");
+            Console.WriteLine(data.GlobalScript(3)?.Format());
+            foreach (var item in data.ReadRoom(2).Objects.Where(r => r.Id is 142))
+                foreach (var verb in data.ReadObjectVerbs(2, [item])[item.Id].DistinctBy(v => v.ScriptOffset))
+                    Console.WriteLine(data.ReadObjectVerb(2, item, verb.VerbId, out _).Format());
+            foreach (var verb in data.ReadObjectVerbs(2, [battery])[167].DistinctBy(v => v.ScriptOffset))
+                Console.WriteLine(data.ReadObjectVerb(2, battery, verb.VerbId, out _).Format());
+        }
         foreach (var verb in data.ReadObjectVerbs(torchRoom, [record])[torchId].DistinctBy(v => v.ScriptOffset))
             Console.WriteLine(data.ReadObjectVerb(torchRoom, record, verb.VerbId, out _).Format());
         continue;
