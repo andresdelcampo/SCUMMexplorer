@@ -6,6 +6,7 @@
 | Fixtures | `D:/Juegos/Lucas/mmansion ega en` (English v1); `D:/Juegos/Lucas/mmansionE ega es` (Spanish v2) |
 | Date / author | 18 October 2026, parent Maniac/Zak orchestrator |
 | Engine prerequisite | `3572a57`, integrated as `01eb536`; independent review `a4e4bad` / `5768d56` |
+| Family acceptance | Classic `2522001` / `2cdbe37`; enhanced `e5b2d7c` / `8ff1de6` |
 | Registry | Unchanged: Play/Objects/Status already Full; no complete-game claim |
 
 ## What was done
@@ -35,5 +36,9 @@ Eight local captures were inspected: each edition's `use-with.png`, `battery-ins
 [Independent baseline/review](../maniac-usewith-review-20261018/README.md), [Classic own-source regressions](../maniacclassic-usewith-20261018/README.md), [enhanced engine/family record](../maniacenhanced-usewith-20261018/README.md). The original failed attempts remain in their earlier records; no failed history was rewritten. The fresh observations establish missing header semantics rather than a guessed input-mode or story-state workaround. Source get/set/copy behavior applies at the version layer, without object/room exceptions. No ScummVM executable ran.
 
 This is native insertion/refusal/beam acceptance after explicit preparation, not a complete played puzzle route, other parties/releases, or original-game picture/timing/listening acceptance. No new requirement proposal, authored catalog, seed, junction or worktree removal. Parent final build/full-suite/matrix and integration results are in the [clean checkpoint](../../docs/checkpoints/20261018-UseWith-ManiacZak.md).
+
+Scoped results before the required full suite: shared preposition/executor plus LOOM safeguards 30/0 failed; Classic family/Play/State/conformance 8/0; enhanced preposition/family 10/0 plus separate conformance 1/0. These overlapping filters are not additive. Regeneration with `SCUMM_UPDATE_SUPPORT_MATRIX=1` executes all three matrix checks successfully. The final solution build has zero warnings/errors. The enhanced record retains two corrected test assumptions and a filter that selected no tests; only the corrected commands that actually executed tests count as acceptance.
+
+Final required full suite on the integrated tree: **1310 passed, 0 failed, 5 skipped (1315 total)**, exit 0, 10m01.84s. All twelve new cases execute. Sound, Indy3 EGA and MT-32 settings use the three specified folders under `D:/Juegos/Lucas`. Local result: `test-results/maniac-usewith-final.trx`; exact command and master/merge/build record are in the linked checkpoint. No extra discovery or census was run.
 
 Facts also recorded in the [game map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker](../../docs/maniac/SUPPORT_STATUS.md), README/REQUIREMENTS notes and dedicated handoff. User checks: the commands above reproduce the bounded result; no subjective recheck requested.
