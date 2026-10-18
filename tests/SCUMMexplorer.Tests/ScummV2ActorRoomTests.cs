@@ -3,6 +3,27 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ActorRoomTests
 {
     [Theory]
+    [InlineData("zak ega en")]
+    [InlineData("zakE ega en")]
+    public void SessionDispatchesAChangeBetweenLogicalRoomsOfTheSamePhysicalResource(string fixture)
+    {
+        // Synthetic engine rule test using a real room reader; not a flight/story preparation.
+        var folder = Path.Combine(TestGames.Root, fixture);
+        if (!Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = (ScummV2DataSource)ScummDataSources.For(game);
+        var session = new ScummGameSession(game, data.ReadIndexedObjects(), data: data, boot: false);
+        session.RunTopLevelScript(Script(("pseudoRoom", "0x08, [0x90, 0x91]"),
+            ("move", "var[0x000], 0x0001")));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 8));
+        session.RunTopLevelScript(Script(("breakHere", ""),
+            ("putActorInRoom", "0x01, 0x91"), ("actorFollowCamera", "0x01")));
+        for (var frame = 0; frame < 10; frame++) session.AdvanceFrame();
+        Assert.Equal(8, session.CurrentRoomId);
+        Assert.Equal(145, session.Snapshot.KnownGlobalVariables[ScummVars.Room]);
+        Assert.Contains(session.SessionTrace, line => line.Contains("entered as pseudo room 145"));
+    }
+    [Theory]
     [InlineData(ScummVersion.V1)]
     [InlineData(ScummVersion.V2)]
     public void NativeRoomSurvivesLeavingItsMappedResourceAndCameraFollowsTheNativeNumber(ScummVersion version)
@@ -61,10 +82,13 @@ public sealed class ScummV2ActorRoomTests
 
     private static ScummBoundedScriptResult Run(ScummScriptRuntimeState runtime, params (string Op, string Args)[] ops)
     {
+        return new ScummBoundedScriptExecutor().Execute(Script(ops), runtime.ObjectStates, [], runtime: runtime,
+            onEvent: (_, _) => "");
+    }
+    private static ScummScriptDisassembly Script(params (string Op, string Args)[] ops)
+    {
         var instructions = ops.Select((op, i) => new ScummScriptInstruction(i, 0, op.Op, op.Args, "00"))
             .Append(new(ops.Length, 0, "stopObjectCode", "", "00")).ToArray();
-        var script = new ScummScriptDisassembly(1, 1, 0, instructions.Length, instructions.Length, instructions, null, null, [], []);
-        return new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime,
-            onEvent: (_, _) => "");
+        return new(1, 1, 0, instructions.Length, instructions.Length, instructions, null, null, [], []);
     }
 }
