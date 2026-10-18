@@ -1,0 +1,7 @@
+{
+  "BrowseRoom": 1,
+  "Scenes": [
+    { "Room": 1, "Object": 394, "Verb": 9, "Trace": "cutscene at Script 87" },
+    { "Room": 17, "Object": 190, "Verb": 4, "Trace": "cutscene at Script 112", "ObserveFrames": 160 }
+  ]
+}

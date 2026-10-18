@@ -93,7 +93,13 @@ internal static class Program
                     ((Action)item.GetType().GetProperty("Play")!.GetValue(item)!).Invoke();
                     for (var n = 0; n < 1200 && !session.SessionTrace.Skip(traceStart).Any(t => t.Contains(scene.Trace, StringComparison.Ordinal)); n++) await Frame();
                     Require(session.CutscenesBegun > begun && session.SessionTrace.Skip(traceStart).Any(t => t.Contains(scene.Trace, StringComparison.Ordinal)), "Selected scene's own cutscene did not begin");
+                    for (var n = 0; n < scene.ObserveFrames; n++) await Frame();
                     for (var n = 0; n < 30 && !session.Messages.OnScreen.Any(); n++) await Frame();
+                    if (scene.Message is { Length: > 0 } expected)
+                    {
+                        for (var n = 0; n < 1200 && !session.Messages.OnScreen.Any(m => m.Text.Contains(expected, StringComparison.Ordinal)); n++) await Frame();
+                        Require(session.Messages.OnScreen.Any(m => m.Text.Contains(expected, StringComparison.Ordinal)), "The selected scene's expected dialogue did not appear");
+                    }
                     Call("ShowPlayFrame"); Call("UpdatePlaybackControls"); await Task.Delay(30);
                     Save($"04-scene-{index + 1}");
                     Log($"Begun {title}: room={session.CurrentRoomId}, frame={Field("_playFrame")}, message={string.Join(" / ", session.Messages.OnScreen.Select(m => m.Text))}");
@@ -113,5 +119,5 @@ internal static class Program
         app.Run(window);
     }
     private sealed record Config(int BrowseRoom, Scene[] Scenes);
-    private sealed record Scene(int Room, int Object, int Verb, string Trace);
+    private sealed record Scene(int Room, int Object, int Verb, string Trace, int ObserveFrames = 0, string? Message = null);
 }
