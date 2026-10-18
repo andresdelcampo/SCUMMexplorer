@@ -21,6 +21,7 @@ internal sealed class ScummInventoryCatalogAnalysis(
         Dictionary<string, int>? incoming = null, int depth = 0)
     {
         if (script is null) return;
+        if (!MayAffectInventory(script, room, [])) return;
         var initial = incoming is null ? new Dictionary<string, int>() : new(incoming);
         if (activeObject is int id && incoming is null) initial[ScummVars.V2.ActiveObject1] = id;
         var label = script.Context ?? $"Script {script.ScriptId}";
@@ -28,22 +29,21 @@ internal sealed class ScummInventoryCatalogAnalysis(
         if (!_calls.Add(key)) return;
         if (depth > 16) { note($"Catalog call-depth bound: {label}."); return; }
         var instructions = script.Instructions.ToDictionary(x => x.Offset);
-        var merged = new Dictionary<int, Dictionary<string, int>>();
+        var inventoryOffsets = InventoryOffsets(script, room);
+        var visited = new HashSet<string>();
         var queue = new Queue<(int Offset, Dictionary<string, int> Values)>();
         queue.Enqueue((script.EntryOffset, initial));
         void Enqueue(int offset, Dictionary<string, int> values) => queue.Enqueue((offset, new(values)));
         while (queue.TryDequeue(out var work))
         {
-            if (!instructions.TryGetValue(work.Offset, out var instruction)) continue;
+            if (!inventoryOffsets.Contains(work.Offset) || !instructions.TryGetValue(work.Offset, out var instruction)) continue;
             var values = work.Values;
-            if (merged.TryGetValue(work.Offset, out var previous))
-            {
-                var common = previous.Where(x => values.TryGetValue(x.Key, out var v) && x.Value == v).ToDictionary();
-                if (common.Count == previous.Count) continue;
-                values = common;
-            }
-            merged[work.Offset] = new(values);
-            int? Read(string value) => Literal(value) ?? (values.TryGetValue(value, out var v) ? v : null);
+            var state = work.Offset + "/" + string.Join(';', values.OrderBy(x => x.Key).Select(x => $"{x.Key}={x.Value}"));
+            if (!visited.Add(state)) continue;
+            // Keep disjoint finite targets at joins. Intersecting bindings here
+            // would erase one branch's item before a shared pickup instruction.
+            if (visited.Count > 16384) { note($"Catalog path-state bound: {label} +0x{work.Offset:X4}; {string.Join(';', values.OrderBy(x=>x.Key).Select(x=>$"{x.Key}={x.Value}"))}."); break; }
+            int? Read(string value) => ReadValue(value, values);
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
             var next = instruction.Offset + instruction.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
             var operation = instruction.Operation;
@@ -56,8 +56,8 @@ internal sealed class ScummInventoryCatalogAnalysis(
                 else if (Read(parts[1]) is int right) condition = operation switch
                 {
                     "isEqual" => left == right, "isNotEqual" => left != right,
-                    "isLess" => (ushort)left < (ushort)right, "isLessEqual" => (ushort)left <= (ushort)right,
-                    "isGreater" => (ushort)left > (ushort)right, "isGreaterEqual" => (ushort)left >= (ushort)right, _ => null
+                    "isLess" => (ushort)right < (ushort)left, "isLessEqual" => (ushort)right <= (ushort)left,
+                    "isGreater" => (ushort)right > (ushort)left, "isGreaterEqual" => (ushort)right >= (ushort)left, _ => null
                 };
                 else if (operation == "ifState" && parts[1] is "Pickupable" or "Unpickupable" &&
                     pickupable?.TryGetValue(left, out var possible) == true && possible is bool flag)
@@ -79,7 +79,7 @@ internal sealed class ScummInventoryCatalogAnalysis(
                 InvalidateWrites(helper, room, values, []);
             }
             if (operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" &&
-                Read(parts[0]) is int verb && Read(parts[1]) is int obj && room is int sourceRoom)
+                Read(parts[0]) is int verb && verb != 254 && Read(parts[1]) is int obj && room is int sourceRoom)
             {
                 var context = new Dictionary<string, int>(values);
                 if (verb is not (250 or 253 or 254))
@@ -98,15 +98,16 @@ internal sealed class ScummInventoryCatalogAnalysis(
             if (operation is "stopObjectCode" or "chainScript" || operation == "stopScript" && Literal(parts[0]) == 0) continue;
             if (operation is "assignVarWordIndirect" or "addIndirect" or "subIndirect")
             {
-                if (Read(parts[0]) is int index) values.Remove($"var[0x{index:X3}]");
+                if (values.TryGetValue(parts[0], out var index)) values.Remove($"var[0x{index:X3}]");
                 else values.Clear();
             }
+            else if (operation == "setBitVar") InvalidateBitWord(parts, values);
             else if (operation == "setVarRange")
                 InvalidateRange(parts, values);
             else if (parts.Length > 0 && parts[0].StartsWith("var[", StringComparison.Ordinal))
             {
                 var destination = parts[0];
-                var current = Read(destination);
+                int? current = values.TryGetValue(destination, out var raw) ? raw : null;
                 int? result = operation switch
                 {
                     "move" when parts.Length == 2 => Read(parts[1]),
@@ -141,6 +142,7 @@ internal sealed class ScummInventoryCatalogAnalysis(
                 else { values.Clear(); return; }
             }
             else if (instruction.Operation == "setVarRange") InvalidateRange(parts, values);
+            else if (instruction.Operation == "setBitVar") InvalidateBitWord(parts, values);
             else if (instruction.Operation is "move" or "increment" or "decrement" or "add" or "subtract" or "multiply" or "divide" or "assignVarByte" ||
                 instruction.Operation.StartsWith("get", StringComparison.Ordinal) || instruction.Operation is "isScriptRunning" or "isSoundRunning")
                 values.Remove(parts[0]);
@@ -148,6 +150,7 @@ internal sealed class ScummInventoryCatalogAnalysis(
                 InvalidateWrites(child, room, values, visited);
             if (instruction.Operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01")
             {
+                if (Literal(parts[0]) == 254) continue;
                 if (Literal(parts[0]) is not int verb || Literal(parts[1]) is not int obj || room is not int sourceRoom)
                 { values.Clear(); return; }
                 if (verb is not (250 or 253 or 254))
@@ -159,6 +162,76 @@ internal sealed class ScummInventoryCatalogAnalysis(
                 InvalidateWrites(objectScript(sourceRoom, obj, verb == 250 ? 253 : verb), room, values, visited);
             }
         }
+    }
+
+    private bool MayAffectInventory(ScummScriptDisassembly? script, int? room, HashSet<string> visited)
+    {
+        if (script is null || !visited.Add((script.Context ?? $"Script {script.ScriptId}") + "/" + script.EntryOffset)) return false;
+        foreach (var instruction in script.Instructions)
+        {
+            var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+            if (instruction.Operation == "pickupObject" || instruction.Operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable") return true;
+            if (instruction.Operation is "startScript" or "chainScript")
+            {
+                if (Literal(parts[0]) is not int id) return true;
+                if (globals.TryGetValue(id, out var child) && MayAffectInventory(child, room, visited)) return true;
+            }
+            if (instruction.Operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01")
+            {
+                if (Literal(parts[0]) == 254) continue; // stopObjectScript, not a handler invocation.
+                if (Literal(parts[0]) is not int verb || Literal(parts[1]) is not int obj) return true;
+                if (MayAffectInventory(objectScript(room ?? -1, obj, verb == 250 ? 253 : verb), room, visited)) return true;
+            }
+        }
+        return false;
+    }
+
+    private HashSet<int> InventoryOffsets(ScummScriptDisassembly script, int? room)
+    {
+        var backwards = new Dictionary<int, List<int>>();
+        var targets = new HashSet<int>();
+        foreach (var instruction in script.Instructions)
+        {
+            var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+            var operation = instruction.Operation;
+            var effect = operation == "pickupObject" || operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable";
+            if (operation is "startScript" or "chainScript")
+                effect |= Literal(parts[0]) is not int id || globals.TryGetValue(id, out var child) && MayAffectInventory(child, room, []);
+            if (operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" && Literal(parts[0]) != 254)
+                effect |= Literal(parts[0]) is not int verb || Literal(parts[1]) is not int obj ||
+                    MayAffectInventory(objectScript(room ?? -1, obj, verb == 250 ? 253 : verb), room, []);
+            if (effect) targets.Add(instruction.Offset);
+            void Edge(int offset)
+            {
+                if (!backwards.TryGetValue(offset, out var incoming)) backwards[offset] = incoming = [];
+                incoming.Add(instruction.Offset);
+            }
+            if (BranchTarget(instruction.Operands) is int target) Edge(target);
+            if (operation is not ("stopObjectCode" or "chainScript" or "jumpRelative") && !(operation == "stopScript" && Literal(parts[0]) == 0))
+                Edge(instruction.Offset + instruction.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length);
+        }
+        var queue = new Queue<int>(targets);
+        while (queue.TryDequeue(out var offset))
+            if (backwards.TryGetValue(offset, out var incoming))
+                foreach (var before in incoming) if (targets.Add(before)) queue.Enqueue(before);
+        return targets;
+    }
+
+    private static int? ReadValue(string operand, Dictionary<string, int> values)
+    {
+        if (Literal(operand) is int literal) return literal;
+        if (!values.TryGetValue(operand, out var value)) return null;
+        // Native v1/v2 readVar aliases words 14..16; result destinations remain raw.
+        return operand is "var[0x00E]" or "var[0x00F]" or "var[0x010]"
+            ? value < 256 && values.TryGetValue($"var[0x{value:X3}]", out var pointed) ? pointed : null
+            : value;
+    }
+
+    private static void InvalidateBitWord(string[] parts, Dictionary<string, int> values)
+    {
+        if (parts.Length >= 3 && ReadValue(parts[0], values) is int start && ReadValue(parts[1], values) is int bit)
+            values.Remove($"var[0x{(start + bit) >> 4:X3}]");
+        else values.Clear();
     }
 
     private static void InvalidateRange(string[] parts, Dictionary<string, int> values)

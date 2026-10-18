@@ -66,15 +66,19 @@ public sealed class ScummInventoryCatalogAnalysisTests
         Assert.Equal(expected, found.Contains(173));
     }
 
-    [Fact]
-    public void V2ComparisonKeepsUnsignedHighBitValues()
+    [Theory]
+    [InlineData("isGreater", 65535, 1, false)]
+    [InlineData("isGreater", 1, 65535, true)]
+    [InlineData("isLess", 65535, 1, true)]
+    [InlineData("isLess", 1, 65535, false)]
+    public void V2ComparisonKeepsUnsignedHighBitValuesAndNativeOperandOrder(string operation, int left, int right, bool expected)
     {
-        var script = Script(92, ("isGreater", "0xFFFF, 0x0001, +2 -> 0x0003"),
+        var script = Script(92, (operation, $"0x{left:X4}, 0x{right:X4}, +2 -> 0x0003"),
             ("pickupObject", "0x00AD"), ("stopObjectCode", ""), ("stopObjectCode", ""));
         var found = new List<int?>();
         new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?>(), (_, _, _) => null,
             (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script);
-        Assert.Equal(new int?[] { 173 }, found);
+        Assert.Equal(expected, found.Contains(173));
     }
 
     [Theory]
@@ -96,6 +100,42 @@ public sealed class ScummInventoryCatalogAnalysisTests
         var found = new List<int?>();
         new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?> { [91] = helper }, (_, _, _) => null,
             (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script, 173, 9);
+        Assert.Contains(173, found);
+    }
+
+    [Fact]
+    public void UnknownBranchJoinRetainsBothFinitePickupTargets()
+    {
+        var script = Script(92, ("equalZero", "var[0x07B], +2 -> 0x0003"),
+            ("move", "var[0x009], 0x00AD"), ("jumpRelative", "+1 -> 0x0004"),
+            ("move", "var[0x009], 0x0315"), ("pickupObject", "var[0x009]"), ("stopObjectCode", ""));
+        var found = new List<int?>();
+        new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?>(), (_, _, _) => null,
+            (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script);
+        Assert.Equal(new int?[] { 173, 789 }, found.Order());
+    }
+
+    [Fact]
+    public void NativeAliasReadUsesPointedWordWhileArithmeticUpdatesRawPointer()
+    {
+        var script = Script(92, ("move", "var[0x07B], 0x00AD"), ("move", "var[0x07C], 0x0315"),
+            ("move", "var[0x00E], 0x007B"), ("pickupObject", "var[0x00E]"), ("increment", "var[0x00E]"),
+            ("pickupObject", "var[0x00E]"), ("stopObjectCode", ""));
+        var found = new List<int?>();
+        new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?>(), (_, _, _) => null,
+            (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script);
+        Assert.Equal(new int?[] { 173, 789 }, found);
+    }
+
+    [Fact]
+    public void BitWriteInvalidatesItsBackingWordBeforeACondition()
+    {
+        var script = Script(92, ("move", "var[0x07B], 0x0023"), ("setBitVar", "0x07B0, 0x00, 0x00"),
+            ("isNotEqual", "var[0x07B], 0x0023, +2 -> 0x0005"), ("pickupObject", "0x00AD"),
+            ("stopObjectCode", ""), ("stopObjectCode", ""));
+        var found = new List<int?>();
+        new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?>(), (_, _, _) => null,
+            (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script);
         Assert.Contains(173, found);
     }
 }
