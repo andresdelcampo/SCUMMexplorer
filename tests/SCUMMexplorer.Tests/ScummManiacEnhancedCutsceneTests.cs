@@ -37,10 +37,27 @@ public sealed class ScummManiacEnhancedCutsceneTests
         Assert.Equal(59, planner.Triggers.Count);
         Assert.Equal(27, planner.Groups.Count);
         Assert.Equal("Abrir", planner.Verbs.WordFor(1));
+        Assert.Equal("Qué es", planner.Verbs.WordFor(15));
+        Assert.Equal("teléfono", Assert.Single(planner.Triggers, t => t.Room == 5 && t.ObjectId == 136 && t.VerbId == 11).ObjectName);
         var bell = Assert.Single(planner.Triggers, t => t.Room == 1 && t.ObjectId == 394 && t.VerbId == 9);
         Assert.Contains("global script 87", bell.Scripts);
         Assert.True(bell.Texts > 0);
         Assert.Contains("timbre", bell.FirstText);
         Assert.Contains("Syd, Bernard", planner.StartNote(bell));
+    }
+
+    [Fact]
+    public void DirectTelevisionActionBindsItsOwnNativeSentenceContext()
+    {
+        var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
+        if (!Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = ManiacCutsceneSetup.NewSession(game);
+        session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 17));
+        session.ActivateObjectVerb(190, 4);
+        Assert.Equal(4, session.Snapshot.KnownGlobalVariables[ScummVars.V2.ActiveVerb]);
+        Assert.Equal(190, session.Snapshot.KnownGlobalVariables[ScummVars.V2.ActiveObject1]);
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables[ScummVars.V2.ActiveObject2]);
+        Assert.NotEqual(0, session.Snapshot.ObjectStates[190] & 8);
     }
 }

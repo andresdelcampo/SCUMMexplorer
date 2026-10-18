@@ -16,7 +16,7 @@ public static class ManiacCutsceneSetup
     }
 
     public static ScummCutscenePlanner Planner(GameLibrary game) =>
-        new(game, () => NewSession(game), PreparationNote);
+        new(game, () => NewSession(game), PreparationNote, ManiacPreviewText.For(game));
 
     /// <summary>Only the source-reviewed startup room can receive assumed inputs. Prepare validates its complete file fingerprint.</summary>
     public static bool PrepareIfNeeded(GameLibrary game, ScummGameSession session)

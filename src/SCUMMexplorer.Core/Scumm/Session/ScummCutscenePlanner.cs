@@ -17,15 +17,18 @@ public sealed class ScummCutscenePlanner
     private readonly ConcurrentDictionary<(int, int, int), ScummCutsceneRunResult> _runs = [];
 
     /// <param name="newSession">A fresh session booted to the first playable room; by default <see cref="ScummGameSession.BootForPlay"/>.</param>
-    public ScummCutscenePlanner(GameLibrary game, Func<ScummGameSession>? newSession = null, string? preparationNote = null)
+    public ScummCutscenePlanner(GameLibrary game, Func<ScummGameSession>? newSession = null, string? preparationNote = null,
+        Func<string, string>? readableText = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         _game = game;
         PreparationNote = preparationNote;
         _newSession = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
         var booted = _newSession();
-        Verbs = VerbsOf(booted);
+        Verbs = VerbsOf(booted, readableText);
         Triggers = ScummCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).ToList(), null, game, Verbs);
+        if (readableText is not null)
+            Triggers = Triggers.Select(t => t with { ObjectName = readableText(t.ObjectName), FirstText = readableText(t.FirstText) }).ToArray();
         Groups = ScummCutsceneIndex.Group(Triggers);
     }
 
@@ -42,7 +45,7 @@ public sealed class ScummCutscenePlanner
     /// The verb words a booted session's verbs give: a text verb's name, decoded, when it is printable text (a name built from escapes, such as the
     /// sentence line, is left out). No verb gets a role: a verb-based game's look, walk-to and use are its scripts' business, not the list's.
     /// </summary>
-    public static ScummCutsceneVerbs VerbsOf(ScummSession session)
+    public static ScummCutsceneVerbs VerbsOf(ScummSession session, Func<string, string>? readableText = null)
     {
         ArgumentNullException.ThrowIfNull(session);
         var words = new Dictionary<int, string>();
@@ -52,7 +55,7 @@ public sealed class ScummCutscenePlanner
             var bytes = ScummTextDecoder.ParseEscaped(verb.Name);
             if (bytes.Length == 0 || bytes.Any(b => b < 0x20 || b > 0x7E)) continue;
             var word = System.Text.Encoding.Latin1.GetString(bytes).Trim();
-            if (word.Length > 0) words[verb.VerbId] = word;
+            if (word.Length > 0) words[verb.VerbId] = readableText?.Invoke(word) ?? word;
         }
         return ScummCutsceneVerbs.None with { Word = verb => words.GetValueOrDefault(verb), NamesSharedCode = true };
     }
