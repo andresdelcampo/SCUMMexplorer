@@ -89,6 +89,9 @@ public abstract partial class ScummSession
         // No inventory callback, pickup, slot removal, object-state write or script runs.
         foreach (var change in changed) _runtime.SetObjectOwner(change.ObjectId, (byte)change.TargetActorId);
         _inventoryEditRevision++;
+        _visitTrace.Add("Explicit inventory choice: " + string.Join("; ", changed.Select((x, i) =>
+            $"object {x.ObjectId}, actor {original[i].Item2} -> actor {x.TargetActorId}")) +
+            ". Explicit exploration ownership edit; no pickup, scene or script was played.");
         return new(true, null, new(_inventoryStatusIdentity, _inventoryEditRevision, _inventoryStatusFrame, InventoryStatusSignature(), original));
     }
 
@@ -101,6 +104,8 @@ public abstract partial class ScummSession
             return new(false, "The last change no longer matches this inventory.", null);
         foreach (var (id, owner) in token.Owners) _runtime.SetObjectOwner(id, owner);
         _inventoryEditRevision++;
+        _visitTrace.Add("Explicit inventory undo: " + string.Join("; ", token.Owners.Select(x =>
+            $"object {x.Object}, restored actor {x.Owner}")) + ". No pickup, scene or script was played.");
         return new(true, null, null);
     }
 
