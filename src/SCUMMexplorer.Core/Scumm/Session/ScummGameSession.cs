@@ -1,4 +1,4 @@
-using SCUMMexplorer.Core.Domain;
+﻿using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
