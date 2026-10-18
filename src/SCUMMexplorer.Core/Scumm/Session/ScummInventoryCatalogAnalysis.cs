@@ -56,8 +56,8 @@ internal sealed class ScummInventoryCatalogAnalysis(
                 else if (Read(parts[1]) is int right) condition = operation switch
                 {
                     "isEqual" => left == right, "isNotEqual" => left != right,
-                    "isLess" => (short)left < (short)right, "isLessEqual" => (short)left <= (short)right,
-                    "isGreater" => (short)left > (short)right, "isGreaterEqual" => (short)left >= (short)right, _ => null
+                    "isLess" => (ushort)left < (ushort)right, "isLessEqual" => (ushort)left <= (ushort)right,
+                    "isGreater" => (ushort)left > (ushort)right, "isGreaterEqual" => (ushort)left >= (ushort)right, _ => null
                 };
                 else if (operation == "ifState" && parts[1] is "Pickupable" or "Unpickupable" &&
                     pickupable?.TryGetValue(left, out var possible) == true && possible is bool flag)
@@ -74,7 +74,10 @@ internal sealed class ScummInventoryCatalogAnalysis(
             if (operation == "pickupObject" || operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable")
                 pickup(script, instruction, Read(parts[0]), room, operation == "setState");
             if (operation is "startScript" or "chainScript" && Read(parts[0]) is int called && globals.TryGetValue(called, out var helper))
+            {
                 Scan(helper, values.GetValueOrDefault(ScummVars.V2.ActiveObject1) is > 0 and var active ? active : null, room, values, depth + 1);
+                InvalidateWrites(helper, room, values, []);
+            }
             if (operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" &&
                 Read(parts[0]) is int verb && Read(parts[1]) is int obj && room is int sourceRoom)
             {
@@ -85,12 +88,22 @@ internal sealed class ScummInventoryCatalogAnalysis(
                     context[ScummVars.V2.ActiveObject1] = obj;
                     if (Read(parts[2]) is int other) context[ScummVars.V2.ActiveObject2] = other;
                 }
-                Scan(objectScript(sourceRoom, obj, verb == 250 ? 253 : verb),
+                var handler = objectScript(sourceRoom, obj, verb == 250 ? 253 : verb);
+                Scan(handler,
                     context.GetValueOrDefault(ScummVars.V2.ActiveObject1) is > 0 and var active ? active : null,
                     room, context, depth + 1);
+                values = context;
+                InvalidateWrites(handler, room, values, []);
             }
             if (operation is "stopObjectCode" or "chainScript" || operation == "stopScript" && Literal(parts[0]) == 0) continue;
-            if (parts.Length > 0 && parts[0].StartsWith("var[", StringComparison.Ordinal))
+            if (operation is "assignVarWordIndirect" or "addIndirect" or "subIndirect")
+            {
+                if (Read(parts[0]) is int index) values.Remove($"var[0x{index:X3}]");
+                else values.Clear();
+            }
+            else if (operation == "setVarRange")
+                InvalidateRange(parts, values);
+            else if (parts.Length > 0 && parts[0].StartsWith("var[", StringComparison.Ordinal))
             {
                 var destination = parts[0];
                 var current = Read(destination);
@@ -114,6 +127,46 @@ internal sealed class ScummInventoryCatalogAnalysis(
             }
             Enqueue(next, values);
         }
+    }
+
+    private void InvalidateWrites(ScummScriptDisassembly? script, int? room, Dictionary<string, int> values, HashSet<string> visited)
+    {
+        if (script is null || !visited.Add((script.Context ?? $"Script {script.ScriptId}") + "/" + script.EntryOffset)) return;
+        foreach (var instruction in script.Instructions)
+        {
+            var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+            if (instruction.Operation is "assignVarWordIndirect" or "addIndirect" or "subIndirect")
+            {
+                if (values.TryGetValue(parts[0], out var index)) values.Remove($"var[0x{index:X3}]");
+                else { values.Clear(); return; }
+            }
+            else if (instruction.Operation == "setVarRange") InvalidateRange(parts, values);
+            else if (instruction.Operation is "move" or "increment" or "decrement" or "add" or "subtract" or "multiply" or "divide" or "assignVarByte" ||
+                instruction.Operation.StartsWith("get", StringComparison.Ordinal) || instruction.Operation is "isScriptRunning" or "isSoundRunning")
+                values.Remove(parts[0]);
+            if (instruction.Operation is "startScript" or "chainScript" && Literal(parts[0]) is int called && globals.TryGetValue(called, out var child))
+                InvalidateWrites(child, room, values, visited);
+            if (instruction.Operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01")
+            {
+                if (Literal(parts[0]) is not int verb || Literal(parts[1]) is not int obj || room is not int sourceRoom)
+                { values.Clear(); return; }
+                if (verb is not (250 or 253 or 254))
+                {
+                    values.Remove(ScummVars.V2.ActiveVerb);
+                    values.Remove(ScummVars.V2.ActiveObject1);
+                    values.Remove(ScummVars.V2.ActiveObject2);
+                }
+                InvalidateWrites(objectScript(sourceRoom, obj, verb == 250 ? 253 : verb), room, values, visited);
+            }
+        }
+    }
+
+    private static void InvalidateRange(string[] parts, Dictionary<string, int> values)
+    {
+        if (parts[0].StartsWith("var[0x", StringComparison.Ordinal) &&
+            int.TryParse(parts[0].AsSpan(6, parts[0].Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var index))
+            for (var n = 0; n < parts.Length - 1; n++) values.Remove($"var[0x{index + n:X3}]");
+        else values.Clear();
     }
 
     private static int? Literal(string value) => value.StartsWith("0x", StringComparison.Ordinal) &&

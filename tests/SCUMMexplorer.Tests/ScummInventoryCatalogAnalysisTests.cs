@@ -65,4 +65,37 @@ public sealed class ScummInventoryCatalogAnalysisTests
         analysis.Scan(script, 173, 9);
         Assert.Equal(expected, found.Contains(173));
     }
+
+    [Fact]
+    public void V2ComparisonKeepsUnsignedHighBitValues()
+    {
+        var script = Script(92, ("isGreater", "0xFFFF, 0x0001, +2 -> 0x0003"),
+            ("pickupObject", "0x00AD"), ("stopObjectCode", ""), ("stopObjectCode", ""));
+        var found = new List<int?>();
+        new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?>(), (_, _, _) => null,
+            (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script);
+        Assert.Equal(new int?[] { 173 }, found);
+    }
+
+    [Theory]
+    [InlineData("helper")]
+    [InlineData("indirect")]
+    [InlineData("range")]
+    public void PotentialWritesCannotLeaveStaleCallerConstants(string mutation)
+    {
+        var helper = Script(91, ("move", "var[0x07B], 0x0000"), ("stopObjectCode", ""));
+        var write = mutation switch
+        {
+            "helper" => ("startScript", "0x005B"),
+            "indirect" => ("assignVarWordIndirect", "var[0x00E], var[0x00F]"),
+            _ => ("setVarRange", "var[0x07B], [0x00]")
+        };
+        var script = Script(92, ("move", "var[0x07B], 0x0023"), ("move", "var[0x00E], 0x007B"), write,
+            ("isNotEqual", "var[0x07B], 0x0023, +2 -> 0x0006"),
+            ("pickupObject", "var[0x009]"), ("stopObjectCode", ""), ("stopObjectCode", ""));
+        var found = new List<int?>();
+        new ScummInventoryCatalogAnalysis(new Dictionary<int, ScummScriptDisassembly?> { [91] = helper }, (_, _, _) => null,
+            (_, _, id, _, _) => found.Add(id), _ => { }).Scan(script, 173, 9);
+        Assert.Contains(173, found);
+    }
 }
