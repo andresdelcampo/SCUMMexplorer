@@ -108,6 +108,8 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 ## Open questions
 
+S8 Enhanced source facts (2026-10-18): Script 108 +0x0182 writes native player range variables 42..43 to 1..4; +0x017D writes the selection range. Script 4 adds switching guards (var C7, object 169 Unlocked, indexed bit 05BE), so player membership does not imply current switchability. Room 1 phone bill 15 verb 14 +0x0025 executes `pickupObject var[0x009]`; the genuine pickup and retained inventory code survive an explicit owner edit and Undo. See the [S8 record](../../.verification/zakenhanced-state-20261018/README.md).
+
 What is not decoded or not verified, and what would settle it.
 
 - The colour derivation ignores a variable actor in the Room 38 entry script and control flow inside a costume/palette span; settling the 10 estimated costumes needs a running session (S4/S6). Zak classic Script 39 and a few entry scripts jump outside their resource.
