@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Family / stage | ManiacClassic, ManiacEnhanced, ZakClassic, ZakEnhanced / Game Status correction |
-| Fixture and edition | `Games/mmansion ega en`, `Games/mmansionE ega es`, `Games/zak ega en`, `Games/zakE ega en` |
+| Fixture and edition | Under `D:/Juegos/Lucas`: `mmansion ega en`, `mmansionE ega es`, `zak ega en`, `zakE ega en`; no Games junction |
 | Date and author | 2026-10-18, character-art agent |
 | Commits | This change; parent records the final integration checkpoint |
 | Registry change | Unchanged: recipient/picture correction within existing Status contract |
