@@ -91,6 +91,42 @@ public sealed class ScummIndy4SessionTests
     }
 
     [Fact]
+    public void TheSpanishTalkieBootsTheSameWayWithoutInput()
+    {
+        // S9 (18 October 2026): the Spanish talkie folder (ATLANTIS.000/.001 and MONSTER.SOU) takes the English disc's path: no protection, no input.
+        if (ScummIndy4PlayTests.Folder("indy4 talkie vga es") is not { } folder) return;
+        var session = Boot(folder, out var game);
+
+        Assert.Equal(GameFamily.Indy4, GameSupport.FamilyOf(game));
+        Assert.NotNull(game.Speech);
+        Assert.False(session.BootReport!.HitFrameLimit);
+        Assert.Equal([68, 0, 4], session.BootReport.RoomsEntered);
+        Assert.True(session.PlayerHasControl);
+        Assert.DoesNotContain(session.SessionTrace, item => item.StartsWith("boot: Player input assumed", StringComparison.Ordinal));
+        AssertNothingUnsupported(session);
+    }
+
+    [Fact]
+    public void TheSpanishFloppysStoneDiskIsAnsweredWithTheArgumentItsOwnRoomCodePasses()
+    {
+        // S9 (18 October 2026): the floppy's Script 1 loads the stone-disk screen (Room 81, +0x06A1) and waits for var[0x1BC] (+0x06AE), which only Room 81
+        // local script 207 sets (+0x005A). Started with local 0 = 0 (Esc, a click elsewhere: local 205 +0x0026, +0x018A) it does nothing (+0x000C jumps to
+        // the end); the room's own submit (local 205 +0x017A) starts it with 1, which reaches the write. The copy's three comparisons there (+0x0040 to
+        // +0x004E) branch by 0, so the submitted wheel is accepted as it stands. R-15.5: a later stage's labelled assumption; nothing else is chosen.
+        if (ScummIndy4PlayTests.Folder("indy4 classic vga es") is not { } folder) return;
+        var session = Boot(folder, out var game);
+
+        Assert.Null(game.Speech);
+        Assert.False(session.BootReport!.HitFrameLimit);
+        Assert.Equal([81, 68, 0, 4], session.BootReport.RoomsEntered);
+        Assert.True(session.PlayerHasControl);
+        Assert.Contains(session.Snapshot.Uncertainties, item => item.StartsWith("Player input assumed: script 001 +0x06AE waits for var[0x1BC], which only Room 81 local script 207 sets (+0x005A)", StringComparison.Ordinal));
+        Assert.Contains(session.Snapshot.Uncertainties, item => item.StartsWith("Player input assumed: starting Room 81 local script 207 with local 0 = 0 did not release the boot; the room's own code also starts it with local 0 = 1 (local 205 +0x017A)", StringComparison.Ordinal));
+        Assert.DoesNotContain(session.SessionTrace, item => item.Contains("quit"));
+        AssertNothingUnsupported(session);
+    }
+
+    [Fact]
     public void SoundKludgeStartsAndStopsSoundsThroughImuseCommandsEightAndNine()
     {
         if (Folder() is not { } folder) return;
