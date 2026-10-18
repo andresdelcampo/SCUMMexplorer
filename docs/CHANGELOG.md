@@ -2,6 +2,17 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17–18 October: play through Monkey Island 2's own interface, with iMUSE music (S6, Monkey2)
+
+- The R-7.18 route runs on `mi2 talkie en` through its own verbs, inventory icons and dialogue lists. From Woodtick (Room 7), where the game goes on to by itself after the campfire, it looks at the sign and skips that cutscene, then picks up the sign (the shovel, shown as its Room 94 icon). It holds Largo's two dialogue lists (input scripts 14 and Room 7's 206), then leaves through the dinky door to Room 8. A right click runs the default verb (`var[0x09C]`). **Objects ✔ and Play ✔** for Monkey2.
+- Shared play additions (also for Indy4):
+  - The play screen draws each v5 object in its current state's image (9b28623).
+  - iMUSE songs in play loop from their loop point on the chosen device's part (`ScummImuseMusic`, `SceneSoundPlayer.Loop`; c3b1c5b).
+- Engine:
+  - A jump hook a script arms for a playing iMUSE song (`setHook` class 0, including a jump to another MIDI track) sets the song's length on the session's clock (4a950b5). Without it, Room 4's cutscene waited for ever.
+  - Text verbs skip the two bytes of codes 9, 10, 12, 13 and 14 (d5af7d3).
+- Validation: `ScummMonkey2PlayTests` (3), `ScummPlayScreenStateImageTests`, `ScummImuseMusicTests`, `V5ImuseLoopTests`; the play, sound, Monkey, Indy, cutscene and conformance filter; the LOOM and Scumm regression; one WPF check through the real window. Record: [monkey2-play-20261017](../.verification/monkey2-play-20261017/README.md).
+
 ## 17 October: Monkey Island 2 boots to the campfire and shows its first-visit rooms (S4b, S5, Monkey2)
 
 - The generic session boots `mi2 talkie en` in 3409 frames to Room 4 (the campfire on Scabb Island) with the player in control and nothing unsupported; the one assumed input is a click on "Monkey Island 2" (the full game) in the choice screen (Room 108), through the game's own input script (`ScummBootInputPlan.ClickObject`). No copy protection at boot parameter 0 in this edition.

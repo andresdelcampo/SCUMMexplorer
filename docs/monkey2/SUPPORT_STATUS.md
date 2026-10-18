@@ -1,6 +1,6 @@
 # Monkey Island 2 support status
 
-Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 en` for the Roland and Sound Blaster data) | Last updated: 17 October 2026 | Owner: S4b/S5 Monkey2 agent
+Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 en` for the Roland and Sound Blaster data) | Last updated: 18 October 2026 | Owner: S6 Monkey2 agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -8,14 +8,14 @@ Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 e
 | S2 Reading | done (before this file) | Costumes, Scripts, Texts | | polish: ~3% of v5 script blocks unresolved |
 | S3 Sound | in progress, **partial** | Sound | [v5-sound-leftovers-20261014](../../.verification/v5-sound-leftovers-20261014/README.md) | listening check listed in the run report: yes; result: pending |
 | S4b Session | **done (17 Oct)** | – (unchanged: S4b changes no cell) | [monkey2-session-20261017](../../.verification/monkey2-session-20261017/README.md) | boots to the campfire (Room 4) in 3409 frames, player in control, unsupported 0, one assumed click (the full game); `ScummMonkey2SessionTests` |
-| S5 Objects | **done (17 Oct)** | Objects (partial, unchanged until S6) | [monkey2-objects-20261017](../../.verification/monkey2-objects-20261017/README.md) | 107 of 110 rooms without a gap (104–106: image-holder rooms), 0 not followed; Rooms 39, 55, 79 pinned (`ScummMonkey2FirstVisitTests`); ScummVM picture comparison not done (user check) |
-| S6 Play | not started | Play | | the script-driven sound hooks wait for this |
+| S5 Objects | **done (17 Oct)** | Objects ✔ (raised with S6's route) | [monkey2-objects-20261017](../../.verification/monkey2-objects-20261017/README.md) | 107 of 110 rooms without a gap (104–106: image-holder rooms), 0 not followed; Rooms 39, 55, 79 pinned (`ScummMonkey2FirstVisitTests`); ScummVM picture comparison not done (user check) |
+| S6 Play | **done (17–18 Oct)** | Play ✔ | [monkey2-play-20261017](../../.verification/monkey2-play-20261017/README.md) | route from Woodtick (Room 7): look + skip, take the shovel, Largo's two dialogue lists, the door to Room 8; right click; iMUSE music in play with loop points; jump hooks followed (`ScummMonkey2PlayTests`) |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | mi2 classic es, mi2 talkie es are local |
 
-Blocked on: S6 for the hooks that wait for a script id (jump hooks with id other than 0, part on/off 50, volume 51, program 52, transposes 49/53), script loop control, markers, `isSoundRunning` and music-timer waits, concurrent-sound special cases (`startSound_internal`: sounds 100, 107, 113, 115, 118).
-Next: S6 (a Play requirement for this verb game; the play screen needs the state images and transparency; the iMUSE player commands and markers soundKludge steers). S4b/S5 done 17 Oct.
+Blocked on: nothing. Still unmodelled (labelled estimates): hooks of classes 1–5 (part on/off, volume, program, transposes), script loop control, markers and the trigger queue, fades (MI2's status ignores a fading player), the music timer, concurrent-sound special cases (`startSound_internal`: sounds 100, 107, 113, 115, 118).
+Next: S7 Cutscenes. S6 done 17–18 Oct; user checks in the S6 record (music in play on Roland/AdLib, the route side by side with ScummVM).
 Open uncertainties: S4b: soundKludge player commands, markers and the trigger queue are answered 0 as labelled estimates; VAR_MUSIC_TIMER is not driven by the iMUSE song; the boot's end (Room 4) not compared with the original. S3: loops are taken at the from-point to the tick (ScummVM: first 250 Hz timer step at or after it); where a looping song stops in the wave (3 minutes) is ours.
 
 ## Decision log
@@ -36,4 +36,9 @@ Open uncertainties: S4b: soundKludge player commands, markers and the trigger qu
 | 2026-10-17 | S5 | First-visit scenes for which v5 games | drop the family term (Indy 4 too, whose S4b runs in parallel); add Monkey2 | add Monkey2: Indy 4's boot is not followed yet here | remove Monkey2 from `HasFirstVisitScenes` |
 | 2026-10-17 | S5 | Rooms 104–106 keep colour-0 rectangles | fill; leave and write down | write down: no background or script of their own (image holders), R-1.9 forbids a fill | – |
 | 2026-10-17 | S5 | Object transparency (Room 55's guests in magenta boxes; not a counted gap) | leave for S6; implement gdi.cpp's transparent codecs | implement now (data: the strip's codec and the room's TRNS), the first visit must look right | revert e75ab60 |
+| 2026-10-17 | S6 | Where the route starts | the campfire (Room 4, where the boot ends); Woodtick (Room 7), where the game goes on by itself | Woodtick: Room 4 local script 204 runs a cutscene at once and chains to Script 93; the campfire has no interaction before it (as MonkeyCd's lookout → dock) | start the route in Room 4 |
+| 2026-10-17 | S6 | The game stayed in Room 4's cutscene for ever (sound 108's status loop after hook 1 was armed) | leave blocked; answer the status as silent (a guess); follow `setHook` class 0 on the song's timeline | follow the hook (ScummVM `maybe_jump`, `jump` with `setTrack`): data-driven, generic for v5, labelled estimate | revert 4a950b5 |
+| 2026-10-17 | S6 | iMUSE looping in play | keep the S3 wave (stops after ~3 minutes); restart from 0; restart from the loop point | the loop point of the device's part (`ScummImuseTimeline.RestartSeconds`) checked every frame, as the song's own jump back | revert c3b1c5b |
+| 2026-10-17 | S6 | Talkie dialogue choices drew code bytes | strip codes in the session; skip them in the charset as `drawString` | the charset (`DrawPlainLine`), as ScummVM | revert d5af7d3 |
+| 2026-10-17 | S6 | Which choices the route takes | any | the first of each list (bribe; "Then who keeps up the law…"): the shortest route to the robbery, and both show a list through a different input script (14, 206) | change the verb ids in the test |
 | 2026-10-17 | S4b/S5 | Reconcile with S4b/S5 Indy4 (merged to master in parallel; same features written twice) | keep both; keep one of each | one of each: Indy4's `SoundKludgeEvent` (start 8, stop 9, stop-all 10/11 as sound events) and its iMUSE AdLib-timeline lifetimes (`ScummGameSession.ImuseLifetime`, with its `ScummSoundClock.Status` labels; Monkey2's ROL fallback dropped); Indy4's `ReadObjectImages(room, states)` (a state with no image of its own draws nothing), its `State` field, sentence wait and `getActorScale`; Monkey2 keeps `ApplySoundKludge` (`VAR_SOUNDRESULT`, -1 for a song not playing, labelled estimates), the transparent strips, the click boot input and the v5 `setPalColor` | re-add the dropped Monkey2 versions from 9c47419, 18bd3d3, cbafbd5, 9e1b0f4 |

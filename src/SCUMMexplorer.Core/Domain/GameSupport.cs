@@ -81,7 +81,8 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.MonkeyFloppy, "**Monkey Island 1** floppy", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
         // S6 MonkeyCd (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummMonkeyCdPlayTests).
         Row_(GameFamily.MonkeyCd, "**Monkey Island 1** CD", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
-        Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
+        // S6 Monkey2 (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummMonkey2PlayTests).
+        Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
         Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
