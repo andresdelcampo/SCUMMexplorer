@@ -237,6 +237,36 @@ public sealed class ScummGameSession : ScummSession
         return result;
     }
 
+    private readonly Dictionary<int, ScummImuseTimeline?> _parameterTimelines = [];
+
+    /// <summary>
+    /// A playing v5 song's beat (parameter 7, <c>getBeatIndex</c>: tick / 480 + 1) or tick within the beat (8) as <c>Player::getParam</c> answers it (S7 Monkey2,
+    /// 18 October 2026; ScummVM master <c>imuse_player.cpp</c>, read 18 October 2026): the song's tick at the seconds it has played on the session's clock, read
+    /// from its AdLib timeline (the default path; a looping song goes on from its restart point). Monkey Island 2's Script 76 waits for beat 10 of sound 176
+    /// before LeChuck walks in (+0x0090..+0x00DF). An estimate: the default path, the tick of the last event played, script-armed hooks not counted.
+    /// </summary>
+    protected override (int Value, string Basis)? SoundParameter(int soundId, int parameter)
+    {
+        if (parameter is not (7 or 8) || SoundPlayedSeconds(soundId) is not double played) return null;
+        if (!_parameterTimelines.TryGetValue(soundId, out var timeline))
+        {
+            try { timeline = _imuse?.Part(soundId, ScummImuseDevice.Adlib) is { } part ? ScummImuseTimeline.Build(ScummImuseSong.Parse(part)) : null; }
+            catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or ArgumentException or IndexOutOfRangeException) { timeline = null; }
+            _parameterTimelines[soundId] = timeline;
+        }
+        if (timeline is null) return null;
+        if (timeline is { EndedOnLoop: true, RestartSeconds: double restart } && timeline.EndSeconds > restart && played > timeline.EndSeconds)
+            played = restart + (played - restart) % (timeline.EndSeconds - restart);
+        long tick = 0;
+        foreach (var item in timeline.Items)
+        {
+            if (item.Seconds > played) break;
+            tick = item.Event.Tick;
+        }
+        var value = parameter == 7 ? (int)(tick / 480) + 1 : (int)(tick % 480);
+        return (value, $"the song's {(parameter == 7 ? "beat" : "tick in the beat")} at {played:0.##} s on its AdLib timeline (default path, the last event played; script-armed hooks not counted)");
+    }
+
     private static ScummSoundLifetime ImuseLifetime(byte[]? part)
     {
         if (part is null) return new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib iMUSE part in the sound block");

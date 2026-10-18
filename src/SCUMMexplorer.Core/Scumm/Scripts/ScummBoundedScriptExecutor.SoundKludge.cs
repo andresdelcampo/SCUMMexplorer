@@ -105,6 +105,14 @@ public sealed partial class ScummBoundedScriptExecutor
                 estimate = statusEstimate;
                 meaning = $"player command {command} for sound {sound}, which is not playing";
             }
+            else if (command == 0 && runtime?.SoundParameter?.Invoke(sound, Word(2)) is { } parameter)
+            {
+                // Player::getParam (param, channel): the session answers the song's position from its timeline (S7 Monkey2, 18 October 2026: Script 76 waits
+                // for beat 10 of sound 176 before LeChuck walks in).
+                result = parameter.Value;
+                meaning = $"parameter {Word(2)} of playing sound {sound}";
+                estimate = parameter.Basis;
+            }
             else if (command is 12 or 20 && runtime?.SoundHook?.Invoke(sound, Word(2), Word(3)) is { } followed)
             {
                 // Player::setHook (class, value, channel); the session's song clock follows a jump hook on the song's own timeline.

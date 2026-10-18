@@ -208,6 +208,12 @@ public sealed class ScummScriptRuntimeState
     /// clock now follows, or null when it does not follow it.
     /// </summary>
     public Func<int, int, int, string?>? SoundHook { get; set; }
+
+    /// <summary>
+    /// A script asked a playing song for one of its parameters (<c>soundKludge</c> player command 0, <c>Player::getParam</c>: sound, parameter; S7 Monkey2,
+    /// 18 October 2026). Returns the value and what it rests on, or null when the session does not follow that parameter.
+    /// </summary>
+    public Func<int, int, (int Value, string Basis)?>? SoundParameter { get; set; }
     /// <summary>drawObject calls since the last room entry or setState, in call order.</summary>
     public List<int> DrawQueue { get; } = [];
     /// <summary>Objects whose state reached <c>setState</c> calls set since the last room entry.</summary>

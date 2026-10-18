@@ -61,6 +61,7 @@ public abstract partial class ScummSession
         _runtime.VerbEntrypoint = ObjectVerbEntrypoint;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.SoundHook = SoundHookArmed;
+        _runtime.SoundParameter = SoundParameter;
         _runtime.OverrideChanged = RecordOverride;
         _runtime.V2FreezeScripts = FreezeV2Scripts;
         _runtime.Actors.CostumeSource = _data.ReadCostume;
@@ -552,6 +553,17 @@ public abstract partial class ScummSession
     protected virtual string? SoundHookArmed(int soundId, int hookClass, int value) => null;
 
     /// <summary>Changes how a playing sound goes on from now (see <see cref="ScummSoundClock.Retime"/>).</summary>
+    /// <summary>A script asked a playing song for a parameter (<see cref="ScummScriptRuntimeState.SoundParameter"/>); null: the generic session does not follow it.</summary>
+    protected virtual (int Value, string Basis)? SoundParameter(int soundId, int parameter) => null;
+
+    /// <summary>How long the sound has played on the session's clock, or null when it is not playing.</summary>
+    protected double? SoundPlayedSeconds(int soundId)
+    {
+        double? played = null;
+        _soundClock.Retime(soundId, (_, seconds) => { played = seconds; return null; });
+        return played;
+    }
+
     protected bool RetimeSound(int soundId, Func<ScummSoundLifetime, double, ScummSoundLifetime?> change) => _soundClock.Retime(soundId, change);
 
     /// <summary>A script stopped one sound (<paramref name="soundId"/>) or every sound (null); the game's session may follow what the engine stops with it.</summary>
