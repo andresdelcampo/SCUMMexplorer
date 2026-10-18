@@ -111,8 +111,10 @@ public partial class MainWindow
     {
         var trigger = group.First;
         if (_game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
+        var visitedForIt = false;
         if (_currentRoomResource?.ResourceId != trigger.Room)
         {
+            visitedForIt = true;
             SelectResourceInTree(room);
             // The room view boots or continues play in the opened room; wait for it (a first boot takes a few seconds).
             for (var wait = 0; wait < 600 && !(PlayActive && _play!.CurrentRoomId == trigger.Room); wait++) await Task.Delay(50);
@@ -125,8 +127,14 @@ public partial class MainWindow
         {
             if (trigger.IsRoomEntry)
             {
-                _sceneSound.StopAll("a room's entry cutscene was started from the list");
-                session.EnterRoomAgain(room);
+                // A room opened for the scene has just run its entry (the play visit, as the fresh-start run does); entering it again would run the
+                // entry a second time from the state the first one left, and an entry that marks its first time (Monkey Island CD's Room 19, the
+                // ship) then plays nothing (S7 MonkeyCd, 18 October 2026). Only a room the player is already in is entered again.
+                if (!visitedForIt || session.CurrentRoomId != trigger.Room)
+                {
+                    _sceneSound.StopAll("a room's entry cutscene was started from the list");
+                    session.EnterRoomAgain(room);
+                }
                 uncertainties = session.Snapshot.Uncertainties;
             }
             else
