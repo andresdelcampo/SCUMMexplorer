@@ -83,6 +83,21 @@ internal static class Program
                     report.Add("Character selection: Game Status hidden");
                 }
                 SelectionHeaderCheck();
+                var alternateNames = args.Length > 4 ? args[4].Split(',', StringSplitOptions.TrimEntries) : [];
+                var alternateSelection = new Queue<ScummRoomObjectRecord>();
+                if (alternateNames.Length > 0)
+                {
+                    Require(maniac && alternateNames.Length == 2, "Alternate selection requires exactly two native Maniac names");
+                    var source = ScummDataSources.For(new GameFolderScanner().Scan(args[0]));
+                    var menu = source.ReadRoom(session.CurrentRoomId);
+                    foreach (var name in alternateNames)
+                    {
+                        var named = menu.ObjectNames.Where(p => ScummTextDecoder.DecodeRawString(p.Value).Replace("@", "", StringComparison.Ordinal).Trim().Equals(name, StringComparison.OrdinalIgnoreCase)).Select(p => p.Key).ToHashSet();
+                        var record = menu.Objects.Single(o => named.Contains(o.Id) && o.Width > 0 && o.Height > 0);
+                        alternateSelection.Enqueue(record);
+                        report.Add($"Alternate native selection {name}: Room {session.CurrentRoomId} object {record.Id}, source box {record.X},{record.Y},{record.Width},{record.Height}");
+                    }
+                }
                 foreach (var step in actions)
                 {
                     switch (step.Op)
@@ -91,9 +106,11 @@ internal static class Program
                             Require(session.ClickScreen(step.X, step.Y, out var why) is not null, "Click refused: " + why);
                             break;
                         case "roomclick":
-                            var screenX = step.X - session.ViewLeft;
+                            var selection = session.CurrentRoomId == 45 && step.Y == 104 && alternateSelection.Count > 0 ? alternateSelection.Dequeue() : null;
+                            var screenX = (selection is null ? step.X : selection.X + selection.Width / 2) - session.ViewLeft;
+                            var roomY = selection is null ? step.Y : selection.Y + selection.Height / 2;
                             Require(screenX is >= 0 and < 320, "Room point is outside the current view");
-                            Require(session.ClickScreen(screenX, step.Y + session.MainScreen.Top, out var roomWhy) is not null, "Room click refused: " + roomWhy);
+                            Require(session.ClickScreen(screenX, roomY + session.MainScreen.Top, out var roomWhy) is not null, "Room click refused: " + roomWhy);
                             break;
                         case "point": session.PointAtScreen((step.X, step.Y)); break;
                         case "text":
@@ -145,6 +162,7 @@ internal static class Program
                 {
                     Require(session.CaptureInventoryStatus().Characters.Count == 3, "The Maniac editor did not restrict recipients to the selected party");
                     Require(session.CaptureInventoryStatus().Characters.All(c => party.Contains(c.ActorId)), "An unselected child is offered");
+                    Require(alternateNames.All(name => session.CaptureInventoryStatus().Characters.Any(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))), "The requested alternate native choices were not in the selected party");
                 }
                 else Require(session.CaptureInventoryStatus().Characters.Count == 4, "The Zak editor did not offer all four source characters");
                 report.Add($"Admin recipient actor {targetActor}; source party={string.Join(',', party)}; selected-party-only={maniac}");
