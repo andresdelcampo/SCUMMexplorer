@@ -8,8 +8,8 @@ public sealed class ScummInventoryAdminTests
 {
     public static TheoryData<string, int, int> Copies => new()
     {
-        { "mmansion ega en", 55, 49 }, { "mmansionE ega es", 55, 49 },
-        { "zak ega en", 15, 82 }, { "zakE ega en", 15, 82 }
+        { "mmansion ega en", 55, 48 }, { "mmansionE ega es", 55, 48 },
+        { "zak ega en", 15, 76 }, { "zakE ega en", 15, 76 }
     };
 
     private static ScummGameSession? Ready(string folder)
@@ -152,3 +152,4 @@ public sealed class ScummInventoryAdminTests
         Assert.Contains(session.Messages.OnScreen, x => x.Text.Contains("1138"));
     }
 }
+
