@@ -122,8 +122,8 @@ public abstract partial class ScummSession
             foreach (var original in originals)
             {
                 var id = original.ObjectId;
-                if (original.Owner is byte owner) _runtime.SetObjectOwner(id, owner); else _runtime.ObjectOwners.Remove(id);
-                if (original.State is byte state) _runtime.SetObjectState(id, state); else _runtime.ObjectStates.Remove(id);
+                if (original.Owner is byte owner) _runtime.SetObjectOwner(id, owner); else _runtime.RemoveObjectOwner(id);
+                if (original.State is byte state) _runtime.SetObjectState(id, state); else _runtime.RemoveObjectState(id);
                 if (original.Member) _runtime.AddInventoryObject(id); else _runtime.RemoveInventoryObject(id);
                 if (original.Room is int room) _runtime.InventoryRooms[id] = room; else _runtime.InventoryRooms.Remove(id);
                 if (original.Preposition is byte prep) _inventoryObjectPrepositions[id] = prep; else _inventoryObjectPrepositions.Remove(id);
