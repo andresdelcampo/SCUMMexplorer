@@ -43,6 +43,27 @@ public sealed class ScummZakClassicFlightTests(ITestOutputHelper output)
         return (game, data, s);
     }
 
+    private static ScummGameSession PreparedTerminal(ScummScriptObserver? observer = null)
+    {
+        var (game, data, s) = PreparedKnife(observer); UseCard(s, data, 26);
+        Assert.Equal(1, s.Snapshot.ObjectOwners[18]);
+        // Explicit airport preview: native logical144 is Miami, backed by physical Room8.
+        // It is not an earned bus journey; the original departure145 is deliberately wrong here.
+        s.VisitRoom(game.Rooms.Single(r => r.ResourceId == 8));
+        Assert.Equal(144, s.Snapshot.KnownGlobalVariables["var[0x004]"]);
+        Until(s, () => s.CutsceneSkippable, 1200); s.PressKey(27); Until(s, () => s.PlayerHasControl, 1200);
+        Assert.Equal(144, s.Snapshot.KnownGlobalVariables["var[0x004]"]);
+        Assert.Equal(8, Assert.Single(s.Actors, actor => actor.Number == 1).Room); // Rendering snapshot uses the mapped room.
+        Verb(s, 11); Click(s, 148, 92 + s.MainScreen.Top); Click(s, 148, 92 + s.MainScreen.Top);
+        Until(s, () => s.CurrentRoomId == 45, 180); Run(s, 40);
+        Assert.Equal(12510, s.Snapshot.KnownGlobalVariables["var[0x03E]"]); // Native refund of initial $260 ticket.
+        Assert.Equal(14, s.Snapshot.ObjectOwners[82]);
+        Assert.Equal(0, s.Snapshot.KnownGlobalVariables["var[0x09B]"]);
+        Click(s, 80, 40 + s.MainScreen.Top); Run(s, 30); // Rendered San Francisco choice663.
+        Assert.Equal(663, s.Snapshot.KnownGlobalVariables["var[0x04F]"]);
+        return s;
+    }
+
     [Fact]
     public void FlightWaitReadsPeanutsWhileBootSuppliesTheSeparateInitialTicket()
     {
@@ -96,5 +117,52 @@ public sealed class ScummZakClassicFlightTests(ITestOutputHelper output)
         Assert.Equal(145, s.Snapshot.KnownGlobalVariables["var[0x09B]"]);
         Assert.Equal(662, s.Snapshot.KnownGlobalVariables["var[0x04F]"]);
         output.WriteLine("Explicit Room8 seeded airport144 rejects initial departure145; ticket/route preserved.");
+    }
+
+    [Fact]
+    public void NativePurchaseBoardsAndMealServiceReleasesTheFlightWait()
+    {
+        if (!Directory.Exists(Folder)) return;
+        var observed = new List<ScummScriptObservation>();
+        var s = PreparedTerminal(new ScummScriptObserver(observed.Add,
+            site => site.Script is 104 or 115 or 116, key => key == "var[0x001]"));
+        Click(s, 80, 108 + s.MainScreen.Top); Run(s, 240); // Native Buy657; no supplied cash/route state.
+        Assert.Equal(8, s.CurrentRoomId); Assert.Equal(1, s.Snapshot.ObjectOwners[82]);
+        Assert.Equal(144, s.Snapshot.KnownGlobalVariables["var[0x09B]"]);
+        Assert.Equal(663, s.Snapshot.KnownGlobalVariables["var[0x04F]"]);
+        Assert.Equal(260, s.Snapshot.KnownGlobalVariables["var[0x052]"]);
+        Assert.Equal(12250, s.Snapshot.KnownGlobalVariables["var[0x03E]"]);
+        Verb(s, 13); Click(s, 20, 60 + s.MainScreen.Top); Run(s, 2500);
+        Assert.Equal(11, s.CurrentRoomId); Assert.True(s.PlayerHasControl); Assert.False(s.InCutscene);
+        Assert.Equal(14, s.Snapshot.ObjectOwners[82]); Assert.Equal(0, s.Snapshot.KnownGlobalVariables["var[0x09B]"]);
+        Assert.Equal(1, s.Snapshot.ObjectOwners[51]);
+        Assert.Contains(observed, o => o.Site is { Script: 115, Stage: "instruction", Offset: 0x7E, Operation: "setOwnerOf" });
+        Assert.Contains(observed, o => o.Site is { Script: 116, Stage: "instruction", Offset: 0x25, Operation: "pickupObject" });
+        Assert.Contains(observed, o => o.Site is { Script: 104, Stage: "instruction", Offset: 0x1CF });
+        Assert.DoesNotContain(s.PendingScriptSummary, line => line.StartsWith("Script 104 "));
+        Assert.DoesNotContain(s.Snapshot.Uncertainties, line => line.Contains("unsupported v2"));
+        output.WriteLine("Native Buy/purchase/departure144; 2500-frame gate bound reaches Room11/control, consumed ticket, served peanuts and passed Script104 guard.");
+    }
+
+    [Fact]
+    public void NativeCancellationRefundsTheOldTicketAndRejectsBoarding()
+    {
+        if (!Directory.Exists(Folder)) return;
+        var s = PreparedTerminal();
+        Click(s, 240, 108 + s.MainScreen.Top); Run(s, 240); // Native Cancel658 after choosing a candidate.
+        Assert.Equal(8, s.CurrentRoomId); Assert.Equal(144, s.Snapshot.KnownGlobalVariables["var[0x004]"]);
+        Assert.Equal(12510, s.Snapshot.KnownGlobalVariables["var[0x03E]"]);
+        Assert.Equal(14, s.Snapshot.ObjectOwners[82]); Assert.Equal(0, s.Snapshot.KnownGlobalVariables["var[0x09B]"]);
+        Assert.Equal(0, s.Snapshot.KnownGlobalVariables["var[0x052]"]);
+        Assert.Equal(663, s.Snapshot.KnownGlobalVariables["var[0x04F]"]); // Native candidate remains; it is not a valid ticket.
+        Verb(s, 13); Click(s, 20, 60 + s.MainScreen.Top);
+        var lines = new HashSet<string>();
+        for (var frame = 0; frame < 120; frame++)
+        { foreach (var m in s.Messages.OnScreen) lines.Add(m.Text); s.AdvanceFrame(); }
+        Assert.Contains(lines, line => line.Contains("I need a ticket first."));
+        Assert.Equal(8, s.CurrentRoomId); Assert.False(s.InCutscene);
+        Assert.Equal(15, s.Snapshot.ObjectOwners[51]);
+        Assert.Equal(12510, s.Snapshot.KnownGlobalVariables["var[0x03E]"]);
+        output.WriteLine("Cancel leaves native candidate663 but no departure/ticket; initial $260 refunded, no fare charged, boarding refused.");
     }
 }

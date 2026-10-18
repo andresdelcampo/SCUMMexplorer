@@ -16,3 +16,11 @@ visit,8
 untilskip,1200
 skip
 control,1200
+verb,11
+center,194
+center,194
+wait,30
+click,80,56
+wait,30
+click,80,124
+wait,240

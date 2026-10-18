@@ -25,6 +25,12 @@ if(args[1]=="actions")
  case "skip":if(s.CutsceneSkippable)s.PressKey(27);else throw new Exception("Not skippable");break;
  case "untilskip":for(int f=0;f<int.Parse(a[1])&&!s.CutsceneSkippable;f++)Run(1);if(!s.CutsceneSkippable)throw new Exception("No skip reached");break;
  case "control":for(int f=0;f<int.Parse(a[1])&&!s.PlayerHasControl;f++)Run(1);if(!s.PlayerHasControl)throw new Exception("No control");break;
+ case "expect-owner":if(s.Snapshot.ObjectOwners[int.Parse(a[1])]!=int.Parse(a[2]))throw new Exception(line);break;
+ case "expect-var":if(s.Snapshot.KnownGlobalVariables[a[1]]!=int.Parse(a[2]))throw new Exception(line);break;
+ case "expect-room":if(s.CurrentRoomId!=int.Parse(a[1]))throw new Exception(line);break;
+ case "expect-control":if(!s.PlayerHasControl)throw new Exception(line);break;
+ case "expect-no-unsupported":if(s.Snapshot.Uncertainties.Any(u=>u.Contains("unsupported v2")))throw new Exception(line);break;
+ default:throw new ArgumentException($"Unknown action {a[0]}");
  }
  Console.WriteLine($"STATE left={s.ViewLeft} room={s.CurrentRoomId} virtual={s.Snapshot.KnownGlobalVariables.GetValueOrDefault(ScummVars.Room)} cut={s.InCutscene} owner18={s.Snapshot.ObjectOwners[18]} ticket={s.Snapshot.ObjectOwners[82]} peanut={s.Snapshot.ObjectOwners[51]} vars={string.Join(';',s.Snapshot.KnownGlobalVariables.Where(v=>v.Key is "var[0x04F]" or "var[0x09B]" or "var[0x052]" or "var[0x03E]"))} sentence={ScummTextDecoder.DecodeGlyphs(s.PlaySentenceGlyphs())}");
  }
@@ -45,7 +51,7 @@ if(args[1]=="run")
 if(args[1]=="room")
 {
  int r=int.Parse(args[2]);var room=data.ReadRoom(r);var tables=data.ReadObjectVerbs(r,room.Objects);
- foreach(var obj in room.Objects){Console.WriteLine($"OBJECT {r}/{obj.Id} '{(room.ObjectNames.TryGetValue(obj.Id,out var n)?ScummTextDecoder.DecodeGlyphs(n):"")}'");
+ foreach(var obj in room.Objects){Console.WriteLine($"OBJECT {r}/{obj.Id} '{(room.ObjectNames.TryGetValue(obj.Id,out var n)?ScummTextDecoder.DecodeGlyphs(n):"")}' rect {obj.X},{obj.Y},{obj.Width},{obj.Height}");
  foreach(var v in tables.GetValueOrDefault(obj.Id,[])){Console.WriteLine($"VERB {v.VerbId}");foreach(var i in data.ReadObjectVerb(r,obj,v.VerbId,out _).Instructions)Console.WriteLine($"+{i.Offset:X4} {i.Operation} {i.Operands}");}}
  return;
 }

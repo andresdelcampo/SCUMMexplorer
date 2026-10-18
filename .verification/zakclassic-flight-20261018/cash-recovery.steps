@@ -12,3 +12,5 @@ inv,26
 obj,106
 sentence
 wait,180
+expect-owner,18,1
+expect-no-unsupported
