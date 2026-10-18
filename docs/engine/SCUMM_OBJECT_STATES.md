@@ -70,6 +70,14 @@ Engine sources: ScummVM `engines/scumm/object.cpp`, `script_v2.cpp`, `room.cpp`,
 - In `28.LFL`, the entry script starts at decoded offset 31,388. Its early loops clear 483–489 and 476–482, then set 490–496 to state 1. Later drawing sequences for 483–489 and 476–482 are interspersed with actor commands and frame breaks. Thus 490–496 are a script-proven coherent early frame, but the stable post-entry view still requires running the remaining sequence. Selecting one image per black area would mix these sequences without evidence that they coexist at the same time.
 - All 76 indexed rooms have embedded entry scripts. The sampled room objects in the global index start at state zero. A room-wide first-visit view therefore requires following script execution and persistent game variables; it cannot be recovered by initializing every object from the index or by filling black pixels.
 
+## DOS SCUMM v1/v2 lighting and actor palette persistence (18 October 2026)
+
+Source: ScummVM `gfx.cpp::drawFlashlight`, `scumm.cpp` v2 constructor/render order, `costume.cpp::ClassicCostumeRenderer::setPalette` / `byleRLEDecode_C64`, and `actor.cpp::Actor::setActorCostume`, read 18 October 2026. [Lighting record](../../.verification/maniacenhanced-fidelity-20261018/README.md) pins fetched source hashes; [palette record](../../.verification/zakclassic-fidelity-20261018/README.md) retains reached contexts. These statements apply to DOS v1/v2, not later renderers.
+
+- Room light bit 2 exposes the composed background/objects; without it the front background is black. Bit 4 restores a pointer-centered flashlight window from that composition. Snap, viewport clipping and asymmetric nibble corner masks follow separate native v1/v2 tables. Default dimensions are 6x4 eight-pixel strips, inherited by v1; reached script instructions can resize them.
+- Room colour mapping precedes lighting. Actors are drawn afterward, with native colour mode bit 8. V1's dark pixel codes use its native colour-11 remap/black; v2 uses gray 8 with the source black/entry-12 behavior. Actor geometry, ownership and story state are not changed by rendering. A full room preview and live Play use the same composition and apply the display palette once.
+- V1 actor costume changes retain every dynamic palette slot. V2 and the existing later old-bundle path retain their identity reset. A costume may therefore appear in multiple native contexts with different colours; a reached context does not turn a global costume card estimate into a universal palette rule.
+
 ## Sources
 
 - [ScummVM old-v3 index and room directory reader](https://github.com/scummvm/scummvm/blob/master/engines/scumm/resource_v3.cpp)

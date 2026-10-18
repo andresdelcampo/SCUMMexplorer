@@ -6,6 +6,8 @@ This map records **Zak McKracken-specific** script roles, variable meanings, ver
 
 Classic v1 (`Games/zak ega en`, DOS EGA, English; now decoded in the distinct v1 dialect established by S4b), initially recorded 14 October 2026. Rows explicitly marked **Enhanced** use `Games/zakE ega en` (DOS v2, English), decoded again on 17 October after the actor palette/name operand correction. Classic rows are preserved separately.
 
+The 14 October palette scan predates corrected v1 instruction/resource bounds. Its rows are historical; the 18 October native-context rows below and their record supersede its counts and unconditional palette claims. The current card table has 24 derived and 11 labelled estimates.
+
 ## Row format (every table below)
 
 Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading` / `play`, R-2.3) | **source** (`Script NN +0xOFFS`, `Room NN local script NN`, `Room NN object NN verb 0xHH`) | **date**. A row without a source is not allowed. Unnamed things keep their raw form.
@@ -36,6 +38,10 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic / Enhanced 104 | Flight sequence waits while object 51 remains room-owned (owner 15). Both fresh Room 11 starts retain that owner/inventory and wait; the engine does not acquire it as a prerequisite shortcut. The relevant offsets were independently decoded in both copies. | engine | Each edition Script 104 +0x01C5 query / +0x01C9 branch back to +0x01C4; [Classic](../../.verification/zakclassic-fidelity-scenes-20261018/README.md), [Enhanced](../../.verification/zakenhanced-fidelity-20261018/README.md) | 2026-10-18 |
+| Classic / Enhanced 78 | Terminal scene alternates game-over and Escape/restart messages. It deliberately loops without automatic Escape; this is not a finite cutscene completion. | engine | Each edition Script 78 +0x01D5/+0x01EF messages, +0x0211 back to +0x01D5; +0x0217 restart behind the override; own-edition fidelity tests | 2026-10-18 |
+| Classic / Enhanced 126 and 96 | Room 2 entry completes in 646 frames; Room 14 object 55 verb 11 completes in 907 after native actor-approach units are corrected. Direct scene previews remain exploration actions. | engine | Own-edition Scripts 126/96; `ScummZakClassicFidelityTests` / `ScummZakEnhancedFidelityTests`; [production results](../../.verification/zak-fidelity-20261018/README.md) | 2026-10-18 |
+| Classic / Enhanced 6 | Selects 9x7 or 3x3 flashlight strips from the edition's own reached state and writes lighting mode. Native flashlight pickup/Switch on reaches mode 12 and 9x7 in each checked copy. | engine | Each edition Script 6 +0x003F/+0x0046/+0x004A; Room 28 object 69 Switch on +0x002A/+0x002C; [lighting evidence](../../.verification/maniacenhanced-fidelity-20261018/README.md) | 2026-10-18 |
 | Enhanced Script 140 | Room 8 entry reaches the second secret-room scene; delay 240, cutscene, "Meanwhile, back in the secret room^", then Room 16 | decoded | Script 140 +0x0000/+0x0004/+0x0014; S7 scan `8/0/0` | 2026-10-18 |
 | Enhanced Script 39 | Room 3 doorbell Push/Use reaches the baker's response; first line "We're closed, and we're out of fresh bread anyway." | decoded | Object 147 verb 9 +0x0067; Script 39 cutscene +0x0000, first response +0x0070, end +0x015E | 2026-10-18 |
 | Enhanced Script 24 | Shop Buy group is represented by tool kit 34; its verb 17 sets price 45 and starts the purchase cutscene. Other sale objects including nose glasses 40 share this script | decoded | Object 34 verb 17 +0x0026/+0x002A; Script 24 +0x0000..+0x02EE | 2026-10-18 |
@@ -94,6 +100,10 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 | Actor / costume | Meaning (look, palette, talk colour, who wears what) | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic boss costume 32 | First assignment is visible with actor 10 palette 0 at native boot frame 52, before the later palette 7 assignment. The global card's labelled estimate 7 does not represent that earlier context. | engine | Script 127 +0x0002 reached from Script 1 +0x0075; later Script 1 costume 31 +0x0104 / palette 7 +0x0108; [palette contexts](../../.verification/zakclassic-fidelity-20261018/README.md) | 2026-10-18 |
+| Classic Room 22 actor 1 / costume 5 | Retains palette 13 from reached initialization. The alternate source branch assigns costume 6 to Annie; it was not forced or claimed reached. | engine | Room 22 entry +0x0010 / alternate +0x0017; Script 108 +0x00EC; native palette regression | 2026-10-18 |
+| Classic actor 5 / costume 13 in Rooms 31 and 41 | Source previews retain palette 0; the prior Script 50 palette 11 instruction was not played. Costume changes preserve the actor palette. | engine | Room 31 entry +0x001B / Room 41 +0x0022; Script 50 +0x001D; reached source previews in palette record | 2026-10-18 |
+| Classic actor 6 / costume 15, costume 7 alternatives | Actor 6 retains initialization palette 6 in Room 42. Costume 7 has actor 3's palette 3 and a dynamic actor 4 palette, so one universal colour is not established. | engine | Room 42 object 628 verb FD +0x0017; Script 108 +0x0114; actor 4 variable palette writers Script 5 +0x000F / Script 108 +0x00FC / Room 26 object 66 fallback +0x003C | 2026-10-18 |
 | Enhanced actors 1 / 2 / 3 / 4 / 7 | Source names: Zak / Annie / Melissa / Leslie / representative | decoded | Script 108 +0x00DE / +0x00E6 / +0x00F0 / +0x00FC / +0x0107 | 2026-10-17 |
 | Enhanced actor 1 costume | 30 during the opening, 1 when Script 108 configures the playable state | decoded | Script 1 +0x0011; Script 108 +0x011A | 2026-10-17 |
 | Palette per actor (constant `actorOps` sub 2): actor 1: 0, 13, 14; 4: 8 (Script 05 +0x1C); 8: 2, 12; 9: 3; 10: 1, 7, 9, 14; 11: 1, 9; 12: 1, 2, 12, 14. Actors 2, 3, 5, 6, 7 never get a palette (they stay 0) | actor palettes | decoded | global and room scripts | 2026-10-14 |
@@ -114,4 +124,4 @@ S8 Enhanced source facts (2026-10-18): Script 108 +0x0182 writes native player r
 
 What is not decoded or not verified, and what would settle it.
 
-- The colour derivation ignores a variable actor in the Room 38 entry script and control flow inside a costume/palette span; settling the 10 estimated costumes needs a running session (S4/S6). Zak classic Script 39 and a few entry scripts jump outside their resource.
+- Eleven costume cards remain estimates (4–9, 12–15, 32); the runtime now preserves native palettes, and card evidence retains variable writers/actor alternatives. The Room 38 variable actor and control flow/call order still prevent a universal static palette claim. Historical Script 39/resource-bound decode findings are separate from the verified native fidelity routes.

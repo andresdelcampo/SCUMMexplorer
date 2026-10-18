@@ -1,5 +1,13 @@
 # Maniac Mansion (classic v1) support status
 
+## Engine fidelity — 18 October 2026 (current)
+
+Classic Script 174's native closest-object/actor query is implemented. The genuine boot/party/key/Push-doorbell route continues another 3000 frames through Ed's outdoor response and return, retaining Dave's key and player control. Source-native query boundaries, ties and approach units have regressions. [Classic record](../../.verification/maniacclassic-fidelity-20261018/README.md).
+
+Both editions now render native room darkness, actor dark colours and flashlight geometry/defaults. Four-family source checks and actual-window comparisons supersede the earlier shown-lit limitation; Maniac Room 5 is black behind native gray actors. The battery prerequisite remains enforced, with its final source-action result in the [lighting record](../../.verification/maniacenhanced-fidelity-20261018/README.md). Direct exploration preparation is not an earned puzzle route. Original-game picture/timing acceptance, walking metric, other parties/puzzles and unavailable same-family releases remain open.
+
+Registry levels are unchanged: bounded Play/Objects/Status already Full, Cutscenes Partial pending a hand-validated catalog. Classic costume acceptance is retained. Decision: implement version rules from source and retain unresolved story state; no automatic battery/party/actor changes, room fills, authored catalog or seed. Revert the linked fidelity commits to undo. [Integration checkpoint](../checkpoints/20261018-Fidelity-ManiacZak.md) records final validation and handoff; dated sections below retain their historical scope.
+
 Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root) | Last updated: 2026-10-18 | Owner: Maniac/Zak orchestrator
 
 | Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
@@ -15,8 +23,8 @@ Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root
 | S9 Editions | available-copy checks done; alternate releases blocked | unchanged | .verification/maniacclassic-editions-20261018 | One English classic copy; identity, native startup/play/scene and edition-boundary regressions pass. Enhanced is a separate family. |
 
 Blocked on: S5 original-game picture comparison is unperformed because this run prohibits launching ScummVM. Source-level comparisons and real-window captures do not substitute for that evidence.
-Next: retain the clean S8 checkpoint; alternate-release S9 comparison requires another copy of the same family. Earlier original-game visual limits, bounded S7 scenes and the doorbell continuation query remain open. The selected party, inventory choices and direct scene starts do not establish a complete playthrough.
-Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/2`), not stored in the game files; lights-off colour 11 is not applied.
+Next: retain the clean fidelity checkpoint. Native inventory Use-with composition for acquired batteries/flashlight remains unresolved after two bounded approaches; distinguish input handling from reached action/story context before any fix. Alternate-release S9 comparison needs another same-family copy. Earlier original-game visual limits and state-gated S7 scenes remain open; no complete playthrough is established.
+Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/2`), not stored in the game files. Native lights-off colour behavior is now implemented; original-game visual comparison is still unperformed.
 
 ## Decision log
 

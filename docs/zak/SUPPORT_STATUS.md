@@ -1,5 +1,15 @@
 # Zak McKracken (classic v1) support status
 
+## Engine fidelity — 18 October 2026 (current, both editions)
+
+Native actor-approach distances now use v1/v2 units. Two of the five formerly capped starts finish in each edition (646 and 907 frames). The other three bounds are classified: the Room 11 entry and object-action previews wait while ticket object 51 remains room-owned; the Room 23 terminal sequence deliberately waits for Escape/restart. The object-action actor wait is fixed before the later ticket wait. No prerequisite owner/flag or automatic Escape is supplied. [Classic scenes](../../.verification/zakclassic-fidelity-scenes-20261018/README.md), [Enhanced scenes](../../.verification/zakenhanced-fidelity-20261018/README.md), [before/after results](../../.verification/zak-fidelity-20261018/README.md).
+
+Both editions render native darkness and moving flashlight beams. Their own pickup/Switch on code selects the reached 9x7 beam; actual-window bitmap/Play checks pass. The visited dark Room 36 is an ending backdrop: these are disclosed exploration rendering checks, not an earned ending. [Lighting record](../../.verification/maniacenhanced-fidelity-20261018/README.md).
+
+Classic costume changes now preserve the reached dynamic palette, correcting three actual room-context mismatches. Card evidence retains variable palette operands/writers and candidate actors. The card table stays **24 derived / 11 labelled estimates**; the early visible boss context is palette 0 before the later 7, and contextual observations are not promoted to a universal card colour. [Palette record](../../.verification/zakclassic-fidelity-20261018/README.md).
+
+Registry levels remain unchanged: Cutscenes Partial without a hand-validated catalog, Classic Costumes Partial while the estimates remain. Decision: correct version rules and expose provenance, preserving real waits and alternate palettes; no state shortcuts or sampled palette promotion. Revert linked fidelity commits to undo. Original-game picture/timing/listening, walking metric, broader puzzle routes, first-visit image/camera findings and missing alternate releases remain. [Integration checkpoint](../checkpoints/20261018-Fidelity-ManiacZak.md) records final validation; dated sections below are historical.
+
 Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last updated: 2026-10-18 | Owner: Maniac/Zak orchestrator
 
 | Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
@@ -14,9 +24,9 @@ Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last
 | S9 Editions | available-copy pass done; alternate editions blocked | unchanged | [S9 record](../../.verification/zakclassic-editions-20261018/README.md) | One English Classic copy; 58 room structures read, profile/text/font contracts and family conformance pass; no cross-edition claim |
 | S8 State | done (bounded inventory editor) | Status Full | [S8 record](../../.verification/zakclassic-state-20261018/README.md) | Own native bill pickup; three tests and actual-window Apply/Undo/Cancel pass. Ordinary player actions block edits; resident special handlers do not. |
 
-Blocked on: the 11 currently estimated costumes (4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 32) need reached actor/palette state or variable operands resolved. This supersedes the older ten-costume list; costumes 1 and 35 now have script evidence, while costume 13 is estimated. No comparison with a running ScummVM was performed.
-Next: retain the S5/S6/S7 limits while progressing S9 editions; re-derive estimated costumes from reached actor state without promoting unresolved colors. S6's bounded native play route is verified; no full-game completion is claimed.
-Open uncertainties: see the record (variable actor in Room 38; control flow inside a costume/palette span ignored).
+Blocked on: the 11 estimated costumes (4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 32) retain context-dependent actors, earlier writers and branch/call-order uncertainty. Native palette preservation and representative reached contexts are verified; they do not establish one universal card palette. No original-game comparison was performed.
+Next: retain the clean fidelity checkpoint. Further scene work needs genuine flight/story preparation; alternate-release S9 checks need another same-family copy. Preserve card estimates and version-specific palette evidence. No full-game completion is claimed.
+Open uncertainties: Room 38 variable actor, control flow/call order, native visual acceptance, and source story prerequisites beyond the bounded routes.
 
 ## Decision log
 

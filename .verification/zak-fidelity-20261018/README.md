@@ -24,6 +24,20 @@ rtk proxy dotnet Exe/SceneCheck/Debug/net10.0/SceneCheck.dll "D:/Juegos/Lucas/za
 rtk proxy dotnet Exe/SceneCheck/Debug/net10.0/SceneCheck.dll "D:/Juegos/Lucas/zakE ega en" runs
 ```
 
+Final integration, same cwd:
+
+```powershell
+rtk proxy git merge master
+$env:SCUMM_UPDATE_SUPPORT_MATRIX="1"
+rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build --no-restore --filter "FullyQualifiedName~SupportMatrixTests" --verbosity quiet
+Remove-Item Env:SCUMM_UPDATE_SUPPORT_MATRIX
+rtk proxy dotnet build SCUMMexplorer.slnx --no-restore -p:NuGetAudit=false --verbosity quiet
+$env:SCUMM_SOUND_TEST_ROOT="D:\Juegos\Lucas\loom ega mt32 en"
+$env:SCUMM_INDY3_EGA_TEST_ROOT="D:\Juegos\Lucas\indy3 ega en"
+$env:SCUMM_MT32_ROM_ROOT="D:\Juegos\Lucas\mt32"
+rtk proxy dotnet test SCUMMexplorer.slnx --no-build --no-restore --verbosity quiet --logger "trx;LogFileName=maniaczak-fidelity-full.trx" --results-directory ".verification/zak-fidelity-20261018/test-results"
+```
+
 The default diagnostic deliberately samples through the unchanged 6000-frame bound; it is not the production completion check. `runs` uses the actual planner and stops at its production completion condition. Full raw logs and decoded script dumps are retained locally and ignored; compact before summaries and exact production results are committed.
 
 ## Results (numbers)
@@ -39,6 +53,8 @@ The default diagnostic deliberately samples through the unchanged 6000-frame bou
 Two of the five formerly capped starts now finish in each edition. One further actor wait is removed but the surrounding flight sequence still waits for a native object-owner change. On the failed enhanced Room 2 approach, actor 12 reached x=47,112 at frame 6000 while actor 7 stayed at x=456; the corrected native distance avoids that runaway. These are source exploration previews, not earned story routes or original-interpreter timings.
 
 Per-family regression results and own-edition source offsets are in the enhanced/classic scene records added by the worker; final solution/matrix/full-suite/window results are in the [checkpoint](../../docs/checkpoints/20261018-Fidelity-ManiacZak.md).
+
+Integrated focused run: **65 passed, zero failed/skipped**, with four-family Play and LOOM EGA/CD safeguards. Solution build: zero warnings/errors. Matrix checks: three passed, levels unchanged. Full suite pending. Read-only independent review found no actionable engine/rendering/App issue; four actual-window lighting checks pass in the linked lighting record. Local reports are `test-results/fidelity-focused.trx` and `test-results/maniaczak-fidelity-full.trx`.
 
 ## Comparison with ScummVM (source files and date; runtime comparison if any)
 

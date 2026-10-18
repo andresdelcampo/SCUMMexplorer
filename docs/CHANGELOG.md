@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: native Maniac/Zak engine fidelity (all four families)
+
+- Classic Maniac continues through Script 174 after a genuine boot-to-doorbell route. Native closest-query edges/ties and v1/v2 actor-approach units are implemented; no actor/room workaround.
+- Native darkness, flashlight geometry/defaults and dark actor palettes are rendered in Play, room previews and thumbnails. Four actual-window bitmap comparisons and both Zak moving beams pass; captures inspected. Version rules preserve later-family behavior.
+- V1 costume changes now retain dynamic palettes. ZakClassic context evidence includes early boss palette 0, later 7, variable writers and alternate actors; the 24-derived/11-estimate card table stays Partial.
+- Two previously capped starts complete per Zak edition (646/907 frames). Three retained caps are classified native ticket-state waits or the terminal Escape/restart loop; no prerequisites/input fabricated. Cutscenes stays Partial. Matrix regeneration passes three checks; final integrated validation is in the [checkpoint](checkpoints/20261018-Fidelity-ManiacZak.md).
+
 ## 18 October: explicit Maniac/Zak inventory status and undo (S8, all four families)
 
 - Game Status shows held inventory across the source-established playable characters, with explicit reassignment, Apply/Cancel and guarded Undo. The window pauses Play and restores its prior state. Status None → Full for this bounded editor; README/REQUIREMENTS matrices regenerated. No new items, puzzle flags, party changes or actor placement edits.
