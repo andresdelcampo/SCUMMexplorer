@@ -34,7 +34,7 @@ Updated 14 October 2026. This is the single plan and session handoff. Completed 
 
 **S4b for MonkeyFloppy done (14 October).** `ScummGameSession` boots the four-disk floppy (`monkey1 ega en`) through the protection, the credits and the opening to Room 33 in 2522 frames with nothing unsupported; the eight-disk Spanish release boots the same way ([record](../.verification/monkey1-session-20261014/README.md), [checkpoint](checkpoints/20261014-S4b-MonkeyFloppy.md), [tracker](monkey1/SUPPORT_STATUS.md)). Proposed R-3.15, R-15.7, R-15.8. Next for the family: S5.
 
-**18 October run** ([checkpoint](checkpoints/20261018-S6-v5-S7-MonkeyCd.md)): Monkey Island 2 and Indy 4 are played (S6; iMUSE music with loops and jump hooks, Indy 4 talkie speech), Monkey Island CD has its cutscene list (S7).
+**18 October run** ([checkpoint](checkpoints/20261018-S6-v5-S7-MonkeyCd.md)): Monkey Island 2 and Indy 4 are played (S6; iMUSE music with loops and jump hooks, Indy 4 talkie speech), Monkey Island CD, Monkey Island 2 and Indy 4 have their cutscene lists (S7).
 
 **17 October run** ([checkpoint](checkpoints/20261017-S7-S9-S4b-MonkeyCd.md)): S7 cutscenes for Indy3 EGA, Indy3 256 colours and Monkey Island floppy (Cutscenes ◐; shared scan in `Core/Scumm/Analysis`), S9 Spanish copies of all three, S4b and S5 for Monkey Island CD (first v5 game), cutscene titles keep their accents.
 
