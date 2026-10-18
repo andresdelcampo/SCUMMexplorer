@@ -109,6 +109,25 @@ public sealed class ScummInventoryAdminTests
     }
 
     [Theory]
+    [InlineData("mmansion ega en",55)]
+    [InlineData("mmansionE ega es",55)]
+    [InlineData("zak ega en",15)]
+    [InlineData("zakE ega en",15)]
+    public void UndoRestoresMissingOwnerAndStateKeysInsteadOfAddingDefaults(string folder, int objectId)
+    {
+        if (Ready(folder) is not {} session) return;
+        var runtime = Runtime(session);
+        runtime.RemoveObjectOwner(objectId); runtime.RemoveObjectState(objectId);
+        var original = Relevant(runtime);
+        var changed = session.ApplyInventoryEdits(session.CaptureInventoryStatus(), [new(objectId, 2)]);
+        Assert.True(changed.Applied, changed.Refusal);
+        Assert.True(session.UndoInventoryTransfers(changed.Undo!).Applied);
+        Assert.Equal(original, Relevant(runtime));
+        Assert.False(runtime.ObjectOwners.ContainsKey(objectId));
+        Assert.False(runtime.ObjectStates.ContainsKey(objectId));
+    }
+
+    [Theory]
     [InlineData("zak ega en")]
     [InlineData("zakE ega en")]
     public void GrantedBillRunsItsRetainedNativeReadCodeAwayFromSourceRoom(string folder)

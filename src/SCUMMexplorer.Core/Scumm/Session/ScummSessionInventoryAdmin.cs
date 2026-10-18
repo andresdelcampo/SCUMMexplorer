@@ -100,7 +100,10 @@ public abstract partial class ScummSession
             _inventoryObjectPrepositions.TryGetValue(x.ObjectId, out var prep) ? prep : null,
             Array.IndexOf(_runtime.InventorySlots, x.ObjectId))).ToArray();
         // All source reads and validation finish before the first write.
-        var headers = grants.ToDictionary(x => x.Key, x => _data.ReadRoom(x.Value.SourceRoomId).Objects.Last(o => o.Id == x.Key));
+        Dictionary<int, ScummRoomObjectRecord> headers;
+        try { headers = grants.ToDictionary(x => x.Key, x => _data.ReadRoom(x.Value.SourceRoomId).Objects.Last(o => o.Id == x.Key)); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException)
+        { return new(false, "An item's retained source code could not be read; no changes were applied.", null); }
         foreach (var edit in changed)
         {
             if (grants.TryGetValue(edit.ObjectId, out var source))
