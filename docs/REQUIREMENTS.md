@@ -412,6 +412,15 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 | R-12.5 | LOOM | Editing is allowed only when the session can be edited (not while a cutscene plays); the staff held/not held and notes edits go through supported session edits (the disclosed off-island staff setup runs the real pickup). The window refreshes every 250 ms while open. | Code |
 | R-12.6 | LOOM | The picker note for pitches: the source raises available pitches to five at Room 13's Use response leading to Room 15 (`Use response` in VGA (the scan finds no doorway for it), `Reached Room 15` in EGA). | Doc |
 
+### 12.1. Inventory status for Maniac Mansion and Zak McKracken
+
+| ID | Tag | Requirement | Basis |
+|---|---|---|---|
+| R-12.7 | ManiacClassic, ManiacEnhanced, ZakClassic, ZakEnhanced | With a live session, `Game Status` opens an inventory window showing the current character and room, and held items across the edition's source-established playable characters. Names come from that copy's data; unresolved identities are not invented. Raw identifiers, source evidence and limitations belong in Advanced. This adds a view across characters beyond the current-character inventory strip. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+| R-12.8 | Same four families | The user can explicitly reassign an item **already present in the native inventory** to a resolved eligible character through supported session edits. The window says these are the user's exploration choices, not played scenes or earned pickups. Edits change only inventory ownership: keep the item's slot, retained room/code, intrinsic state, classes, other items, variables and actors. No new item creation, removal into the world, puzzle-flag editor, actor teleport or costume edit. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+| R-12.9 | Same four families | `Apply` validates the entire pending batch before writing; `Cancel` discards pending changes; `Undo last change` restores the last applied batch only while its original session and relevant state still match. Invalid targets, stale snapshots and cross-session undo are rejected without partial changes. Editing is disabled during boot, cutscenes, movement, dialogue or queued input. The modal inventory window pauses the live Play clock and restores its earlier playback state on close; opening/closing alone never advances or changes game state. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+| R-12.10 | Same four families | Applying or undoing an edit immediately refreshes the inventory view and the native inventory strip without running scripts or fabricating story progress. A concise choice label remains visible; detailed change attribution is Advanced. A source-derived edit/undo round trip and the real-window Apply/Cancel/Undo route must pass for each family before Status is Full. Unresolved edition contracts fail closed. | Proposed (18 Oct 2026, Maniac/Zak S8) |
+
 ## 13. Audio
 
 | ID | Tag | Requirement | Basis |
