@@ -26,6 +26,23 @@ rtk proxy .\Exe\ManiacZakCutsceneWindowCheck\Debug\net10.0-windows\ManiacZakCuts
 
 The other scenarios use the matching fixture, output directory and JSON beside `Program.cs`. Each window uses private profile/cache directories, waits for background derivation, invokes the same room-list/picker actions as the app, checks the selected script's own cutscene trace and captures the rendered window. After confirming the real timer advances, it drives that timer handler deterministically. Physical mouse mapping, perceived timing and original-interpreter fidelity are separate checks. Captures and logs stay local; the driver/configuration and written evidence are committed.
 
+Final integration commands:
+
+```powershell
+rtk git merge master
+rtk proxy dotnet build SCUMMexplorer.slnx -p:NuGetAudit=false --verbosity quiet
+$env:SCUMM_UPDATE_SUPPORT_MATRIX = '1'
+rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build --no-restore --filter FullyQualifiedName~SupportMatrixTests --verbosity quiet
+$env:SCUMM_UPDATE_SUPPORT_MATRIX = $null
+rtk proxy dotnet build SCUMMexplorer.slnx --no-restore -p:NuGetAudit=false --verbosity quiet
+$env:SCUMM_SOUND_TEST_ROOT = 'D:\Juegos\Lucas\loom ega mt32 en'
+$env:SCUMM_INDY3_EGA_TEST_ROOT = 'D:\Juegos\Lucas\indy3 ega en'
+$env:SCUMM_MT32_ROM_ROOT = 'D:\Juegos\Lucas\mt32'
+rtk proxy dotnet test SCUMMexplorer.slnx --no-build --no-restore --verbosity quiet --logger "trx;LogFileName=maniaczak-s7-full.trx" --results-directory ".verification/maniaczak-cutscenes-20261018/test-results"
+```
+
+The new parent worktree initially had no restored test SDK; its first no-restore matrix command executed no tests and is not counted as validation. After restoring/building the solution, the actual three matrix tests passed and regenerated both tables. Current master 19d2e7d was already integrated. The final solution build has zero warnings/errors. Full suite: **1215 passed, zero failed, five skipped** (1220 total, 8m28s), including LOOM and neighboring-family regressions. Report: `test-results/maniaczak-s7-full.trx` in this integration worktree. Built App: `.worktrees/maniaczak-s7/Exe/Debug/SCUMMexplorer.exe`.
+
 ## Results (numbers)
 
 | Family | Triggers | Groups | Static scenes | Begun | Not begun | 6000-frame bounds |
@@ -52,7 +69,7 @@ State-gated starts get no invented prerequisites. Normal mode hides entries whos
 ## User checks (exact steps and where; none if none)
 
 1. Open either Maniac fixture and Room 1. After derivation, use the room's Play Cutscene action for the doorbell. A scene launch from an unanswered menu uses the disclosed preview party; if you begin choosing characters yourself, finish that screen first. In Advanced, open the global picker and play Room 17's TV or Room 8's circuit breaker. Check the matching dialogue, actors, Pause, and Skip when its override is available.
-2. Open either Zak fixture. Use Room 8's Entry scene from its room list, then Advanced global picker Room 3's Push doorbell. Check the secret-room exchange and baker response, Space pause/resume, Escape and sound synchronization.
+2. Open either Zak fixture. Use Room 8's Entry scene from its room list, then Advanced global picker (All playable filter), Room 3's Push doorbell. Check the secret-room exchange and baker response, Space pause/resume, Escape and sound synchronization.
 3. Compare perceived timing, text pacing, PC-speaker/PCjr sound and original-game appearance manually. These are not approval gates for this run.
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)

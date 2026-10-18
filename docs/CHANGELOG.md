@@ -8,6 +8,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Old script-call/text syntax, source-labelled begins and direct-action argument binding are supported. Maniac uses a disclosed, fingerprinted native startup preview while preserving queued/partial/completed player choices. Spanish readable labels follow verified executable glyphs; rendered text is unchanged.
 - State prerequisites are not invented. Classic post-doorbell Script 174, five Zak frame bounds, Spanish rendered-font mismatch and S5/S6 visual/walking limits remain recorded. Proposed R-8.34 is separate; no shipped seed, hand catalog, S8 or S9 work.
 - [Checkpoint](checkpoints/20261018-S7-ManiacZak.md) and [integration evidence](../.verification/maniaczak-cutscenes-20261018/README.md) hold exact counts, source proof links, window commands and final validation.
+- Final validation on current master plus S7: 1215 passed, zero failed, five skipped; build zero warnings/errors; three matrix tests and four real-window checks passed.
 
 ## 17 October: native Maniac Mansion and Zak McKracken Play (S6, all four families)
 
