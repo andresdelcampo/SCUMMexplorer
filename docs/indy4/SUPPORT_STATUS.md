@@ -1,6 +1,6 @@
 # Indiana Jones and the Fate of Atlantis support status
 
-Family: Indy4 | Fixture: `Games/indy4 vga en` (`ATLANTIS.cue`) | Last updated: 18 October 2026 | Owner: S6 Indy4 agent
+Family: Indy4 | Fixture: `Games/indy4 vga en` (`ATLANTIS.cue`) | Last updated: 18 October 2026 | Owner: S7 Indy4 agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -10,12 +10,12 @@ Family: Indy4 | Fixture: `Games/indy4 vga en` (`ATLANTIS.cue`) | Last updated: 1
 | S4b Session | done (17 Oct) | – | [indy4-session-20261017](../../.verification/indy4-session-20261017/README.md) | logo (Room 68), Barnett College (Room 4) with the player in control after 721 frames; unsupported 0; no assumed input |
 | S5 Objects | done (17 Oct); Full with S6 | Objects (Full) | [indy4-objects-20261017](../../.verification/indy4-objects-20261017/README.md) | 96/96 rooms without a gap; Rooms 76, 77, 87 keep a camera-after-walk item; the ten-room comparison with ScummVM is not done |
 | S6 Play | done (18 Oct) | Play (Full) | [indy4-play-20261017](../../.verification/indy4-play-20261017/README.md) | route: prologue click, Esc skip, sentence, take, dialogue line with speech, crates + fire escape cutscene skip to Room 12; spoken lines from MONSTER.SOU in play; current-state images and iMUSE in play from S6 Monkey2 (merged, 8fa733e) |
-| S7 Cutscenes | not started | Cutscenes | | |
+| S7 Cutscenes | done (18 Oct) | Cutscenes (◐) | [indy4-cutscenes-20261018](../../.verification/indy4-cutscenes-20261018/README.md) | 666 triggers, 426 groups (182 scenes), 210 begin from a fresh start; verb names from the state after the game's own skips; acceptance: Room 1 (Smith), Room 11 (the lecture), Room 82 (the diving suit); spoken lines in scenes played from the list |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | indy4 talkie vga es and classic vga es are local; the classic (floppy) release may ask the copy-protection question the talkie skips |
 
 Blocked on: nothing.
-Next: S7 Cutscenes; the user checks of the S6 record.
+Next: S8 State (not requested); the user checks of the S6 and S7 records.
 Open uncertainties: as Monkey Island 2. The CD image has a single data track (`TRACK 1 MODE1/2352` only), so there are no CD audio tracks to list; its music is iMUSE on the devices (456 parts, 226 loop). Session sound lengths are the iMUSE default path (estimates). A magenta line crosses Room 4's picture after the boot (not investigated).
 
 ## Decision log
@@ -37,3 +37,7 @@ Open uncertainties: as Monkey Island 2. The CD image has a single data track (`T
 | 18 Oct | S6 | Talkie line duration | text delay / sample length | sample length after the boot (ScummVM processSfxQueues); the boot keeps text timing so S4b's pinned frames of Indy4 and MI2 talkie stay | move `SpeechJiffies` before `Boot()` |
 | 18 Oct | S6 | Double room entry (Script 21's follow inside endCutscene, then the caller's) | kill the caller as ScummVM / skip a follow into the current room | skip: killing the caller changed MI2's pinned boot (control never came within 5000 frames); logged for the engine owner | `ScummSessionFrames` follow checks |
 | 18 Oct | S6 | `loadString` on a seeded-pick path | skip / store | store: the literal is the instruction's own and the verbs that show it are turned on on the same path | one line in the executor |
+| 18 Oct | S7 | The boot ends before the verbs exist (the credits); titles came out raw (187 of 426) | names from the game's scripts statically / run the game on to its verbs / leave raw | run on: the planner presses Esc whenever the game sets an override until a verb is on (2 skips, 110 frames, New York, Script 19's names); generic, only for a boot that shows no verb, so other games' lists are unchanged; the scenes' runs still start from the boot | `ScummCutscenePlanner.UntilAVerbIsOn` returns null |
+| 18 Oct | S7 | First lines began with stray characters (", I still think…") | decode every operand byte as a space / only code 10's | only code 10's (the talkie voice): every code would change the LOOM, Monkey and Indy 3 lists (text counts, a LOOM CD scene count) | the `speech` flag in `ScummTextDecoder.DecodeLine` |
+| 18 Oct | S7 | Acceptance scenes | the brief's examples (Smith, the fire escape, a later one) / scenes that begin from a fresh start | Room 1 (Smith), Room 11 (the lecture, New York) and Room 82 (the diving suit): the fire escape and Room 10's entry do not begin from the credits (crates, `bit[0x013]`/`var[0x0E0]`); recorded, not forced | change the three ids in `ScummIndy4CutsceneTests` |
+| 18 Oct | S7 | A room-entry scene from the list in a room opened for it: the play visit re-attaches the speech player after the entry ran, so lines started by the visit would not be spoken (read from the code, not observed before the change) | speak from the visit / enter again | speak from the visit: `TalkieSpeechPlayer.Attach(from)` with the count before the play start's visit; the MonkeyCd rule (keep the visit's entry) stays | drop the `else` in `PlayScummCutscene` |

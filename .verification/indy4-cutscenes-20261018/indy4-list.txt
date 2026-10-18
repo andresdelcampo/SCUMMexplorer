@@ -1,0 +1,431 @@
+﻿planner (one boot and the scan) 2080 ms
+verb source: the boot (Room 04) shows no verb; the verb names are those of Room 10 after 2 of the game's own skips (Esc) and 110 frames
+verb words: 0x03 Open, 0x04 Close, 0x05 Give, 0x06 Push, 0x07 Pull, 0x08 Use, 0x09 Look at, 0x0A Walk to, 0x0B Pick up, 0x0C Talk to, 0x35 None, 0x64 Walk, 0x81 in, 0x82 with, 0x83 on, 0x84 to
+triggers 666 groups 426 scenes 182
+1/0/0x00 | Room 01 · Entry | Scenes | Room 1 local script 201;Room 1 local script 203;Room 1 local script 205;Room 1 local script 206;Room 1 local script 200;Room 1 local script 219;Room 1 local script 207;Room 1 local script 208;Room 1 local script 209;Room 1 local script 212;Room 1 local script 210;Room 1 local script 213;Room 1 local script 211 | t63 l0 i1207 a7 | I still think it's a fake. | others[] | run: begun frames 1846 rooms [74,8,9,2,75,10] 1216 ms
+1/16/0x0A | Room 01 · Walk to door | Scenes | Room 1 object 16 verb 0x0A | t0 l0 i212 a1 |  | others[] | run: begun frames 1846 rooms [74,8,9,2,75,10] 648 ms
+1/18/0x09 | Room 01 · Look at shelf | Dialogue | Room 1 object 18 verb 0x09 | t1 l0 i2 a0 | Nothing up here but a few broken pots. | others[] | run: begun frames 1875 rooms [74,8,9,2,75,10] 627 ms
+1/21/0x03 | Room 01 · Open ice box | Dialogue | Room 1 object 21 verb 0x03 | t0 l0 i22 a0 |  | others[] | run: begun frames 1887 rooms [74,8,9,2,75,10] 593 ms
+1/21/0x09 | Room 01 · Look at ice box | Dialogue | Room 1 object 21 verb 0x09 | t0 l0 i8 a0 |  | others[] | run: begun frames 1846 rooms [74,8,9,2,75,10] 630 ms
+1/22/0x08 | Room 01 · Use jar | Dialogue | Room 1 object 22 verb 0x08 | t4 l0 i25 a0 | GLOOP! | others[] | run: begun frames 1846 rooms [74,8,9,2,75,10] 593 ms
+1/22/0x0B | Room 01 · Pick up jar | Dialogue | Room 1 object 22 verb 0x0B | t0 l0 i9 a0 |  | others[] | run: begun frames 1846 rooms [74,8,9,2,75,10] 580 ms
+1/26/0x09 | Room 01 · Look at shelves | Dialogue | Room 1 object 26 verb 0x09 | t0 l0 i18 a0 |  | others[] | run: begun frames 1877 rooms [74,8,9,2,75,10] 607 ms
+2/0/0x00 | Room 02 · Entry | Scenes | Room 2 local script 228;Room 2 local script 207;Room 2 local script 213;Room 2 local script 201;Room 2 local script 217;Room 2 local script 205;Room 2 local script 219;Room 2 local script 200;Room 2 local script 212;Room 2 local script 225;Room 2 local script 211;Room 2 local script 216 | t20 l0 i630 a8 | Where do you think you're going? | others[] | run: NOT begun frames 600 rooms [] 277 ms
+2/31/0x0A | Room 02 · Walk to stairs | Scenes | Room 2 local script 214 | t0 l0 i4 a1 |  | others[] | run: begun frames 0 rooms [] 205 ms
+2/32/0x0A | Room 02 · Walk to stairs | Scenes | Room 2 local script 215 | t0 l0 i2 a1 |  | others[] | run: begun frames 173 rooms [3] 257 ms
+2/33/0x09 | Room 02 · Look at bulletin board | Dialogue | Room 2 object 33 verb 0x09 | t0 l0 i30 a0 |  | others[] | run: begun frames 0 rooms [] 198 ms
+2/36/0x08 | Room 02 · Use automobile | Scenes | Room 2 local script 207;Room 2 local script 213 | t6 l0 i59 a4 | Where do you think you're going? | others[] | run: begun frames 19 rooms [75] 207 ms
+2/36/0x09 | Room 02 · Look at automobile | Dialogue | Room 2 object 36 verb 0x09 | t1 l0 i26 a0 | Well, well-- transportation. | others[] | run: begun frames 2 rooms [] 190 ms
+2/36/0x0A | Room 02 · Walk to automobile | Dialogue | Room 2 local script 203;Room 2 local script 204;Room 2 local script 201;Room 2 local script 217;Room 2 local script 205 | t12 l0 i224 a0 | Indy-- wait! | others[] | run: NOT begun frames 600 rooms [] 273 ms
+3/0/0x00 | Room 03 · Entry | Scenes | Room 3 local script 200;Room 3 local script 207 | t1 l0 i212 a2 | featuring the voices of: | others[] | run: begun frames 172 rooms [] 298 ms
+3/40/0x03 | Room 03 · Open door | Dialogue | global script 62 | t0 l0 i5 a0 |  | others[3/52/0x03,67/914/0x03,67/922/0x03,73/1002/0x03] | run: begun frames 172 rooms [] 304 ms
+3/40/0x04 | Room 03 · Close door | Dialogue | global script 63 | t0 l0 i5 a0 |  | others[3/52/0x04,10/136/0x04,39/434/0x04,67/914/0x04,67/922/0x04,73/1002/0x04] | run: NOT begun frames 600 rooms [] 441 ms
+3/40/0x0A | Room 03 · Walk to door | Scenes | Room 3 local script 207 | t0 l0 i3 a1 |  | others[] | run: NOT begun frames 600 rooms [] 389 ms
+3/44/0x0A | Room 03 · Walk to object 44 | Scenes | Room 3 local script 202;Room 3 local script 207 | t1 l0 i96 a1 | Strange looking thing^  I wonder where Marcus picked it up. | others[3/45/0x0A,3/46/0x0A,3/50/0x0A] | run: NOT begun frames 600 rooms [] 466 ms
+3/51/0x0A | Room 03 · Walk to coal chute | Scenes | Room 3 local script 206 | t1 l0 i7 a1 | What do you know, the gum works! | others[] | run: NOT begun frames 600 rooms [] 411 ms
+3/52/0x08 | Room 03 · Use furnace | Dialogue | Room 3 object 52 verb 0x08;Room 3 local script 205 | t0 l0 i208 a0 |  | others[] | run: NOT begun frames 600 rooms [] 384 ms
+4/0/0x00 | Room 04 · Entry | Scenes | Room 4 local script 206;Room 4 local script 220 | t5 l0 i305 a1 | Alright, Jones^  How are you going to find that  STATUE in all this JUNK? | others[] | run: begun frames 524 rooms [] 362 ms
+4/61/0x0A | Room 04 · Walk to trap door | Scenes | Room 4 local script 200;Room 4 local script 203 | t0 l0 i67 a1 |  | others[] | run: begun frames 230 rooms [5] 266 ms
+4/63/0x0A | Room 04 · Walk to peculiar statue | Dialogue | Room 4 local script 200 | t0 l0 i49 a0 |  | others[] | run: begun frames 230 rooms [5] 253 ms
+4/65/0x09 | Room 04 · Look at urn | Dialogue | Room 4 local script 204 | t6 l0 i38 a0 | I believe it's part of the old Ashkenazy Collection. | others[] | run: NOT begun frames 600 rooms [] 307 ms
+4/66/0x03 | Room 04 · Open chest | Dialogue | Room 4 object 66 verb 0x03 | t0 l0 i10 a0 |  | others[] | run: begun frames 27 rooms [] 192 ms
+4/68/0x0B | Room 04 · Pick up urn | Dialogue | Room 4 local script 202 | t0 l0 i7 a0 |  | others[] | run: NOT begun frames 600 rooms [] 381 ms
+4/69/0x0B | Room 04 · Pick up candlestick | Dialogue | Room 4 local script 205 | t2 l0 i180 a0 | It must be made out of lead. | others[] | run: begun frames 43 rooms [] 250 ms
+4/70/0x0B | Room 04 · Pick up candlestick | Dialogue | Room 4 object 70 verb 0x0B | t0 l0 i7 a0 |  | others[] | run: begun frames 43 rooms [] 220 ms
+5/0/0x00 | Room 05 · Entry | Scenes | Room 5 local script 207;Room 5 local script 200;Room 5 local script 202;global script 125 | t2 l0 i201 a1 | *oof* | others[] | run: begun frames 195 rooms [] 283 ms
+5/77/0x09 | Room 05 · Look at rope | Scenes | Room 5 local script 201 | t0 l0 i44 a1 |  | others[] | run: begun frames 213 rooms [6] 356 ms
+5/79/0x06 | Room 05 · Push totem pole | Dialogue | Room 5 local script 204 | t0 l0 i59 a0 |  | others[5/79/0x07] | run: NOT begun frames 600 rooms [] 450 ms
+5/79/0x08 | Room 05 · Use totem pole | Scenes | Room 5 local script 205;global script 125 | t0 l0 i41 a1 |  | others[] | run: NOT begun frames 600 rooms [] 404 ms
+5/83/0x08 | Room 05 · Use dusty old chest | Dialogue | Room 5 local script 203 | t0 l0 i205 a0 |  | others[] | run: NOT begun frames 600 rooms [] 328 ms
+6/0/0x00 | Room 06 · Entry | Scenes | Room 6 local script 205;Room 6 local script 201;Room 6 local script 204 | t2 l0 i180 a1 | *ow* | others[] | run: begun frames 187 rooms [] 283 ms
+6/91/0x09 | Room 06 · Look at books on statues | Scenes | Room 6 local script 200 | t1 l0 i46 a1 | These books don't look familiar. | others[6/91/0x0A] | run: begun frames 292 rooms [7] 305 ms
+6/95/0x03 | Room 06 · Open tipped-over bookcase | Dialogue | Room 6 object 95 verb 0x03 | t2 l0 i224 a0 | Here it is!  The Lost Dialogue of Plato! | others[] | run: NOT begun frames 600 rooms [] 399 ms
+6/96/0x08 | Room 06 · Use rope | Scenes | Room 6 local script 203 | t0 l0 i21 a1 |  | others[6/103/0x0A] | run: begun frames 268 rooms [5] 266 ms
+6/102/0x08 | Room 06 · Use gum | Dialogue | Room 6 local script 201 | t2 l0 i213 a0 | *ow* | others[] | run: NOT begun frames 600 rooms [] 334 ms
+7/0/0x00 | Room 07 · Entry | Scenes | Room 7 local script 200;Room 7 local script 202 | t3 l0 i179 a1 | *unnh* | others[] | run: begun frames 231 rooms [] 259 ms
+7/113/0x0A | Room 07 · Walk to coal chute | Scenes | Room 7 local script 203 | t0 l0 i4 a1 |  | others[] | run: NOT begun frames 600 rooms [] 341 ms
+7/116/0x09 | Room 07 · Look at cat figurine | Dialogue | Room 7 local script 206 | t7 l0 i177 a0 | Another cat idol^  ^it looks odd. | others[7/117/0x09,7/118/0x09,7/119/0x09,7/116/0x0B,7/117/0x0B,7/118/0x0B,7/119/0x0B] | run: NOT begun frames 600 rooms [] 346 ms
+7/116/0x0A | Room 07 · Walk to cat figurine | Dialogue | Room 7 local script 201 | t2 l0 i77 a0 | PFFFFT! | others[7/117/0x0A,7/118/0x0A,7/119/0x0A] | run: NOT begun frames 600 rooms [] 346 ms
+7/130/0x0A | Room 07 · Walk to pile of books | Dialogue | Room 7 object 130 verb 0x0A;Room 7 local script 204;Room 7 local script 205 | t1 l0 i234 a0 | Missed! | others[] | run: NOT begun frames 600 rooms [] 337 ms
+7/132/0x08 | Room 07 · Use book | Dialogue | Room 7 object 132 verb 0x08 | t0 l0 i9 a0 |  | others[7/132/0x0B] | run: begun frames 247 rooms [] 264 ms
+7/133/0x0B | Room 07 · Pick up book | Dialogue | Room 7 object 133 verb 0x0B | t0 l0 i208 a0 |  | others[] | run: begun frames 263 rooms [] 305 ms
+8/0/0x00 | Room 08 · Entry | Scenes | Room 8 local script 200 | t1 l0 i22 a1 | Good Lord, Indy, the man's some sort of agent from the Third Reich. | others[] | run: begun frames 498 rooms [1,9,2,75,10] 320 ms
+9/0/0x00 | Room 09 · Entry | Scenes | Room 9 local script 200 | t4 l0 i13 a2 | ^an old copy of National Archaeology^  ^and there you are in ICELAND. | others[] | run: begun frames 404 rooms [1,2,75,10] 292 ms
+10/0/0x00 | Room 10 · Entry | Scenes | Room 10 local script 204;Room 10 local script 210;Room 10 local script 209 | t3 l0 i371 a2 | Well, here I am in New York^  ^wondering how Sophia Hapgood got mixed up with Nazi spies. | others[] | run: NOT begun frames 600 rooms [] 507 ms
+10/136/0x03 | Room 10 · Open back door | Scenes | global script 62;Room 10 local script 200;Room 10 local script 204;global script 63;global script 72;global script 57 | t92 l1 i495 a1 | Whaddaya want, pal?  This ain't no ticket office. | others[10/136/0x03] | run: begun frames 69 rooms [4] 244 ms
+10/136/0x0A | Room 10 · Walk to back door | Scenes | Room 10 local script 204 | t0 l0 i25 a1 |  | others[] | run: NOT begun frames 600 rooms [] 466 ms
+10/138/0x08 | Room 10 · Use fire escape | Scenes | Room 10 local script 207 | t0 l0 i60 a1 |  | others[10/138/0x0A] | run: NOT begun frames 600 rooms [] 459 ms
+10/140/0x08 | Room 10 · Use taxi | Scenes | Room 10 object 140 verb 0x08 | t0 l0 i2 a1 |  | others[] | run: begun frames 0 rooms [75] 198 ms
+10/141/0x0B | Room 10 · Pick up newspaper | Dialogue | Room 10 object 141 verb 0x0B | t0 l0 i5 a0 |  | others[] | run: begun frames 2 rooms [] 212 ms
+10/142/0x09 | Room 10 · Look at marquee | Dialogue | Room 10 object 142 verb 0x09 | t1 l0 i2 a0 | Imagine the suckers who actually pay to see Sophia's `Lost World` lectures. | others[] | run: begun frames 0 rooms [] 233 ms
+10/143/0x0C | Room 10 · Talk to ticket taker | Dialogue | Room 10 local script 208 | t5 l0 i14 a0 | There's nobody to talk to. | others[] | run: begun frames 23 rooms [] 216 ms
+10/147/0x08 | Room 10 · Use phone booth | Dialogue | Room 10 local script 213 | t1 l0 i9 a0 | I can't make a call.  I'm out of nickels. | others[] | run: begun frames 5 rooms [] 219 ms
+11/0/0x00 | Room 11 · Entry | Scenes | Room 11 local script 200;Room 11 local script 201;Room 11 local script 203 | t30 l0 i311 a3 | Here, my friends, is ATLANTIS^ | others[] | run: begun frames 516 rooms [4,12] 299 ms
+12/0/0x00 | Room 12 · Entry | Scenes | Room 12 local script 203;Room 12 local script 210;Room 12 local script 204;Room 12 local script 207 | t12 l0 i121 a2 | Hold on! | others[] | run: NOT begun frames 600 rooms [] 526 ms
+12/149/0x06 | Room 12 · Push button | Scenes | Room 12 local script 211 | t1 l0 i51 a1 | There it goes. | others[12/149/0x08] | run: NOT begun frames 600 rooms [] 506 ms
+12/159/0x0A | Room 12 · Walk to stagehand | Scenes | Room 12 local script 203;Room 12 local script 210 | t8 l0 i84 a1 | Hold on! | others[] | run: begun frames 112 rooms [] 246 ms
+12/159/0x0C | Room 12 · Talk to stagehand | Scenes | Room 12 local script 205;global script 11;Room 12 local script 201;Room 12 local script 210;Room 12 local script 203 | t13 l0 i236 a1 | Excuse me^ | others[] | run: begun frames 112 rooms [] 228 ms
+12/159/0x50 | Room 12 · verb 0x50 stagehand | Scenes | Room 12 object 159 verb 0x50;Room 12 local script 203;Room 12 local script 210;Room 12 local script 205;global script 11;Room 12 local script 201 | t16 l0 i251 a1 | Here^ | others[] | run: begun frames 112 rooms [] 216 ms
+13/161/0x08 | Room 13 · Use truck | Scenes | Room 13 local script 201 | t1 l0 i23 a1 | Let's head for the airport. | others[] | run: begun frames 71 rooms [75] 225 ms
+14/0/0x00 | Room 14 · Entry | Scenes | Room 14 local script 201;Room 14 local script 200 | t0 l0 i103 a2 |  | others[] | run: begun frames 6000 rooms [] 836 ms
+14/165/0x0A | Room 14 · Walk to pit | Scenes | Room 14 object 165 verb 0x0A | t0 l0 i4 a1 |  | others[] | run: begun frames 144 rooms [21] 222 ms
+15/0/0x00 | Room 15 · Entry | Scenes | Room 15 local script 201;Room 15 local script 202;Room 15 local script 200 | t8 l0 i106 a4 | That's the second time Kerner's slipped away. | others[] | run: begun frames 597 rooms [10,47] 427 ms
+16/0/0x00 | Room 16 · Entry | Scenes | Room 16 local script 208 | t1 l0 i5 a0 | Ahh, Dr. Jones^  WELCOME TO MY HUMBLE ABODE! | others[] | run: NOT begun frames 600 rooms [] 438 ms
+16/177/0x08 | Room 16 · Use necklace | Dialogue | Room 16 local script 201;Room 16 local script 202 | t4 l0 i464 a0 | NOOOOOOOOO! | others[16/178/0x08] | run: NOT begun frames 600 rooms [] 554 ms
+16/177/0x0B | Room 16 · Pick up necklace | Dialogue | Room 16 object 177 verb 0x0B | t1 l0 i6 a0 | Ouch!  It's too hot! | others[] | run: begun frames 22 rooms [] 357 ms
+16/178/0x0B | Room 16 · Pick up necklace | Dialogue | Room 16 object 178 verb 0x0B | t1 l0 i6 a0 | Ouch!  It's too hot! | others[] | run: begun frames 22 rooms [] 240 ms
+17/0/0x00 | Room 17 · Entry | Scenes | Room 17 local script 205 | t2 l0 i141 a0 | I'll wait down here. | others[] | run: NOT begun frames 600 rooms [] 648 ms
+17/182/0x08 | Room 17 · Use mouth | Scenes | Room 17 object 182 verb 0x08;Room 17 local script 200 | t1 l0 i162 a1 | Shouldn't be here. | others[] | run: NOT begun frames 600 rooms [] 659 ms
+18/0/0x00 | Room 18 · Entry | Scenes | Room 18 local script 205;Room 18 local script 200 | t2 l0 i214 a0 | KREEK! | others[] | run: NOT begun frames 600 rooms [] 461 ms
+18/193/0x08 | Room 18 · Use sentry statue | Dialogue | Room 18 local script 205 | t0 l0 i142 a0 |  | others[18/200/0x08] | run: NOT begun frames 600 rooms [] 347 ms
+18/196/0x08 | Room 18 · Use chain | Dialogue | Room 18 local script 203;Room 18 local script 204;Room 18 local script 202 | t1 l0 i94 a0 | Shouldn't be here. | others[18/197/0x08,18/198/0x08] | run: NOT begun frames 600 rooms [] 338 ms
+18/201/0x08 | Room 18 · Use bronze loop | Dialogue | Room 18 local script 202 | t1 l0 i60 a0 | Shouldn't be here. | others[] | run: NOT begun frames 600 rooms [] 330 ms
+18/205/0x08 | Room 18 · Use statue arm | Dialogue | Room 18 local script 203 | t1 l0 i60 a0 | Shouldn't be here. | others[] | run: NOT begun frames 600 rooms [] 334 ms
+18/206/0x08 | Room 18 · Use statue arm | Dialogue | Room 18 local script 204 | t1 l0 i60 a0 | Shouldn't be here. | others[] | run: NOT begun frames 600 rooms [] 336 ms
+19/0/0x00 | Room 19 · Entry | Scenes | Room 19 local script 200 | t2 l0 i119 a0 | This is his house? | others[] | run: begun frames 272 rooms [] 235 ms
+19/209/0x03 | Room 19 · Open door | Scenes | Room 19 local script 204;Room 19 local script 207;Room 19 local script 206;Room 19 local script 209 | t36 l0 i328 a1 | KNOCK!  KNOCK! | others[] | run: begun frames 316 rooms [] 272 ms
+19/210/0x08 | Room 19 · Use car | Scenes | Room 19 local script 210 | t0 l0 i177 a1 |  | others[] | run: NOT begun frames 600 rooms [75] 308 ms
+20/0/0x00 | Room 20 · Entry | Scenes | Room 20 local script 209;Room 20 local script 201;Room 20 local script 203 | t4 l0 i417 a16 | BANG! | others[] | run: NOT begun frames 600 rooms [] 332 ms
+21/0/0x00 | Room 21 · Entry | Scenes | Room 21 local script 200;Room 21 local script 202 | t1 l0 i230 a1 | That was close. | others[] | run: NOT begun frames 600 rooms [] 269 ms
+21/255/0x0A | Room 21 · Walk to tunnel back to hall | Scenes | Room 21 object 255 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [14] 1038 ms
+21/256/0x0A | Room 21 · Walk to object 256 | Dialogue | Room 21 local script 201 | t0 l0 i4 a0 |  | others[21/257/0x0A] | run: begun frames 107 rooms [] 275 ms
+22/0/0x00 | Room 22 · Entry | Scenes | Room 22 local script 200;Room 22 local script 201 | t8 l0 i132 a0 | Here's your shining city. | others[] | run: NOT begun frames 600 rooms [] 336 ms
+22/260/0x0A | Room 22 · Walk to object 260 | Scenes | Room 22 local script 202 | t2 l0 i8 a1 | Are you coming? | others[22/261/0x0A] | run: NOT begun frames 600 rooms [55] 601 ms
+23/0/0x00 | Room 23 · Entry | Scenes | Room 23 local script 201;global script 166 | t18 l0 i736 a0 | Find anything? | others[] | run: begun frames 116 rooms [] 277 ms
+23/264/0x06 | Room 23 · Push spindle | Scenes | Room 23 object 264 verb 0x06 | t0 l0 i24 a1 |  | others[23/264/0x07,23/264/0x08] | run: begun frames 116 rooms [] 232 ms
+23/264/0x0B | Room 23 · Pick up spindle | Dialogue | Room 23 object 264 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: begun frames 116 rooms [] 321 ms
+23/265/0x08 | Room 23 · Use frog statue | Dialogue | Room 23 local script 204 | t1 l0 i10 a0 | Hmm.  That didn't do anything. | others[] | run: NOT begun frames 600 rooms [] 475 ms
+25/0/0x00 | Room 25 · Entry | Scenes | Room 25 local script 200 | t0 l0 i99 a1 |  | others[] | run: begun frames 175 rooms [96] 232 ms
+26/0/0x00 | Room 26 · Entry | Scenes | Room 26 local script 201 | t1 l0 i222 a2 | Look!  It melted itself right out of the ice! | others[] | run: NOT begun frames 600 rooms [] 663 ms
+26/277/0x07 | Room 26 · Pull ice-obscured object | Dialogue | Room 26 object 277 verb 0x07 | t0 l0 i40 a0 |  | others[26/277/0x0B] | run: NOT begun frames 600 rooms [] 638 ms
+26/277/0x08 | Room 26 · Use ice-obscured object | Scenes | Room 26 local script 200 | t1 l0 i21 a1 | Whoa! | others[26/278/0x08] | run: NOT begun frames 600 rooms [] 627 ms
+27/0/0x00 | Room 27 · Entry | Scenes | Room 27 local script 211 | t2 l0 i36 a0 | Well-- here we are. | others[] | run: NOT begun frames 600 rooms [] 493 ms
+27/282/0x0A | Room 27 · Walk to city streets | Scenes | Room 27 local script 200 | t2 l0 i18 a1 | I better not go in.  The wrong people  might be waiting for me. | others[27/283/0x0A,27/285/0x0A] | run: NOT begun frames 600 rooms [70] 1264 ms
+27/284/0x0A | Room 27 · Walk to main entrance | Scenes | Room 27 object 284 verb 0x0A;Room 27 local script 200 | t2 l0 i20 a2 | I better not go in.  The wrong people  might be waiting for me. | others[] | run: begun frames 54 rooms [] 277 ms
+27/287/0x08 | Room 27 · Use taxi | Scenes | Room 27 object 287 verb 0x08;Room 27 local script 210 | t1 l0 i119 a4 | Wait for me^ | others[] | run: begun frames 23 rooms [75] 336 ms
+28/0/0x00 | Room 28 · Entry | Scenes | Room 28 local script 208;Room 28 local script 204;Room 28 local script 205;Room 28 local script 201;Room 28 local script 209;Room 28 local script 216;Room 28 local script 217;Room 28 local script 210 | t53 l0 i689 a0 | Is that you, Jones? | others[] | run: begun frames 75 rooms [] 287 ms
+28/292/0x03 | Room 28 · Open door | Dialogue | Room 28 local script 216;Room 28 local script 217 | t0 l0 i121 a0 |  | others[] | run: NOT begun frames 600 rooms [] 533 ms
+28/292/0x0A | Room 28 · Walk to door | Dialogue | Room 28 local script 209;Room 28 local script 216;Room 28 local script 217;Room 28 local script 210 | t10 l0 i361 a0 | Sorry, I can't seem to penetrate^  ^the astral veil to reach Nur-Ab-Sal tonight. | others[] | run: begun frames 8 rooms [27] 320 ms
+28/294/0x0B | Room 28 · Pick up stone disk | Dialogue | Room 28 object 294 verb 0x0B | t1 l0 i161 a0 | Hey!  That's mine!  Hands off! | others[] | run: begun frames 75 rooms [] 339 ms
+28/295/0x0B | Room 28 · Pick up bedspread | Dialogue | Room 28 local script 207 | t0 l0 i24 a0 |  | others[] | run: begun frames 80 rooms [] 297 ms
+28/296/0x08 | Room 28 · Use flashlight | Dialogue | Room 28 local script 229 | t16 l0 i341 a0 | Woof woof. | others[] | run: NOT begun frames 600 rooms [] 436 ms
+28/297/0x06 | Room 28 · Push circuit breaker | Dialogue | Room 28 object 297 verb 0x06;Room 28 local script 206 | t1 l0 i50 a0 | Please don't play with the lights. | others[28/297/0x07,28/297/0x08] | run: NOT begun frames 600 rooms [] 409 ms
+29/0/0x00 | Room 29 · Entry | Scenes | Room 29 local script 210 | t2 l0 i70 a0 | A FEW MINUTES LATER^ | others[] | run: NOT begun frames 600 rooms [] 377 ms
+29/302/0x0A | Room 29 · Walk to city streets | Scenes | Room 29 local script 216 | t0 l0 i14 a2 |  | others[29/328/0x0A] | run: begun frames 49 rooms [] 209 ms
+29/305/0x0C | Room 29 · Talk to grocer | Dialogue | global script 95 | t2 l0 i26 a0 | Excuse me. | others[] | run: begun frames 6000 rooms [] 2629 ms
+29/305/0x50 | Room 29 · verb 0x50 grocer | Dialogue | Room 29 local script 222;global script 95 | t12 l0 i128 a0 | Excuse me. | others[29/306/0x50,29/307/0x50] | run: NOT begun frames 600 rooms [] 429 ms
+29/306/0x0C | Room 29 · Talk to knife-thrower | Dialogue | Room 29 local script 205 | t3 l0 i33 a0 | Excuse me? | others[] | run: begun frames 6000 rooms [] 2504 ms
+29/307/0x0C | Room 29 · Talk to beggar | Dialogue | Room 29 local script 206 | t3 l0 i25 a0 | Hello, there^ | others[] | run: begun frames 21 rooms [] 203 ms
+29/308/0x06 | Room 29 · Push Sophia | Dialogue | Room 29 local script 208;global script 11 | t9 l0 i513 a0 | Oof! | others[] | run: begun frames 6000 rooms [] 2383 ms
+29/308/0x0C | Room 29 · Talk to Sophia | Dialogue | global script 96 | t4 l0 i205 a0 | Listen^ | others[] | run: begun frames 22 rooms [] 201 ms
+31/336/0x08 | Room 31 · Use peg | Scenes | Room 31 local script 212 | t12 l0 i452 a1 | Nothing happened. | others[31/337/0x08,31/338/0x08,31/339/0x08,31/340/0x08] | run: NOT begun frames 600 rooms [] 406 ms
+32/0/0x00 | Room 32 · Entry | Scenes | Room 32 local script 215;Room 32 local script 214;Room 32 local script 207;Room 32 local script 206;Room 32 local script 205;Room 32 local script 212;global script 72;global script 57 | t96 l1 i464 a7 | Ouch!  I've seen better landings. | others[] | run: begun frames 44 rooms [] 206 ms
+32/350/0x08 | Room 32 · Use balloon | Scenes | Room 32 local script 216 | t0 l0 i19 a1 |  | others[] | run: begun frames 33 rooms [] 205 ms
+32/372/0x0A | Room 32 · Walk to vast, uncrossable desert | Dialogue | Room 32 local script 209 | t0 l0 i12 a0 |  | others[32/375/0x0A] | run: begun frames 51 rooms [] 223 ms
+33/0/0x00 | Room 33 · Entry | Scenes | Room 33 local script 201;Room 33 local script 202;global script 72;Room 33 local script 206;Room 33 local script 207;Room 33 local script 215 | t13 l0 i277 a3 | KLIK! | others[] | run: NOT begun frames 600 rooms [] 473 ms
+33/376/0x0A | Room 33 · Walk to secret entrance | Scenes | Room 33 local script 205 | t0 l0 i6 a2 |  | others[33/378/0x0A] | run: NOT begun frames 600 rooms [] 537 ms
+33/377/0x06 | Room 33 · Push stone pedestal | Scenes | Room 33 object 377 verb 0x06 | t0 l0 i6 a1 |  | others[33/377/0x07] | run: begun frames 22 rooms [] 208 ms
+33/377/0x08 | Room 33 · Use stone pedestal | Scenes | Room 33 object 377 verb 0x08 | t0 l0 i28 a1 |  | others[] | run: NOT begun frames 600 rooms [] 493 ms
+33/377/0x0B | Room 33 · Pick up stone pedestal | Dialogue | Room 33 object 377 verb 0x0B | t0 l0 i12 a0 |  | others[] | run: NOT begun frames 600 rooms [] 476 ms
+35/0/0x00 | Room 35 · Entry | Scenes | Room 35 local script 204 | t0 l0 i70 a0 |  | others[] | run: NOT begun frames 600 rooms [] 285 ms
+35/388/0x08 | Room 35 · Use fish statue | Dialogue | Room 35 local script 201;Room 35 local script 202 | t2 l0 i70 a0 | SNAP! | others[] | run: NOT begun frames 600 rooms [] 297 ms
+36/408/0x08 | Room 36 · Use funnel | Dialogue | Room 36 local script 200 | t0 l0 i116 a0 |  | others[] | run: NOT begun frames 600 rooms [] 435 ms
+36/409/0x09 | Room 36 · Look at dish | Dialogue | Room 36 object 409 verb 0x09 | t1 l0 i24 a0 | I can't cram any more beads into my pockets! | others[] | run: NOT begun frames 600 rooms [] 431 ms
+36/409/0x0B | Room 36 · Pick up dish | Dialogue | Room 36 object 409 verb 0x0B | t1 l0 i24 a0 | I can't cram any more beads into my pockets! | others[] | run: NOT begun frames 600 rooms [] 536 ms
+37/422/0x08 | Room 37 · Use plaque | Dialogue | Room 37 object 422 verb 0x08;Room 37 local script 200 | t1 l0 i102 a0 | Aha! | others[] | run: NOT begun frames 600 rooms [] 438 ms
+39/0/0x00 | Room 39 · Entry | Scenes | Room 39 local script 202;Room 39 local script 213;Room 39 local script 215;Room 39 local script 211 | t10 l0 i240 a1 | ^the electrical malfunction is worse than we thought, men.  No one's leaving until we make all necessary repairs. | others[] | run: NOT begun frames 600 rooms [] 466 ms
+39/424/0x0A | Room 39 · Walk to forward section | Scenes | Room 39 object 424 verb 0x0A | t0 l0 i10 a1 |  | others[] | run: begun frames 0 rooms [40] 304 ms
+39/425/0x0B | Room 39 · Pick up bread | Dialogue | Room 39 local script 208 | t1 l0 i7 a0 | I'm eating, do you mind? | others[39/427/0x0B] | run: NOT begun frames 600 rooms [] 460 ms
+39/428/0x08 | Room 39 · Use submarine sandwich | Dialogue | Room 39 object 428 verb 0x08;global script 90 | t7 l0 i111 a0 | What are you doing? | others[] | run: begun frames 3 rooms [4] 276 ms
+39/429/0x03 | Room 39 · Open trap door | Dialogue | Room 39 local script 201 | t0 l0 i33 a0 |  | others[39/430/0x03,39/429/0x04,39/430/0x04,39/429/0x06,39/430/0x06,39/429/0x07,39/430/0x07,39/429/0x08,39/430/0x08,39/429/0x09,39/430/0x09,39/429/0x0A,39/430/0x0A,39/429/0x0B,39/430/0x0B,39/429/0x0C,39/430/0x0C] | run: begun frames 6 rooms [] 264 ms
+39/431/0x08 | Room 39 · Use some cold cuts | Dialogue | global script 91 | t0 l0 i27 a0 |  | others[39/432/0x08] | run: NOT begun frames 600 rooms [] 565 ms
+39/433/0x0C | Room 39 · Talk to guard | Dialogue | Room 39 local script 205 | t2 l0 i20 a0 | You! | others[] | run: begun frames 2 rooms [] 304 ms
+39/439/0x06 | Room 39 · Push launch lever | Dialogue | Room 39 object 439 verb 0x06;Room 39 local script 209;Room 39 local script 201 | t4 l0 i197 a0 | Uh-oh. | others[39/439/0x07] | run: begun frames 1 rooms [] 256 ms
+39/442/0x08 | Room 39 · Use battery acid | Dialogue | Room 39 object 442 verb 0x08 | t0 l0 i24 a0 |  | others[] | run: NOT begun frames 600 rooms [] 381 ms
+39/445/0x0A | Room 39 · Walk to forward section | Dialogue | Room 39 object 445 verb 0x0A | t0 l0 i10 a0 |  | others[] | run: begun frames 0 rooms [40] 188 ms
+40/0/0x00 | Room 40 · Entry | Scenes | Room 40 local script 200;Room 40 local script 204;global script 125;Room 40 local script 215;Room 40 local script 221;Room 40 local script 220;global script 57;Room 40 local script 219;Room 40 local script 229;global script 73;Room 40 local script 202 | t118 l1 i894 a3 | The sub's changing course! | others[] | run: NOT begun frames 600 rooms [] 267 ms
+40/446/0x0A | Room 40 · Walk to aft section | Dialogue | Room 40 object 446 verb 0x0A | t0 l0 i7 a0 |  | others[] | run: NOT begun frames 600 rooms [39] 350 ms
+40/448/0x0A | Room 40 · Walk to the head | Dialogue | Room 40 object 448 verb 0x0A | t0 l0 i5 a0 |  | others[] | run: NOT begun frames 600 rooms [] 274 ms
+40/451/0x07 | Room 40 · Pull clothesline | Scenes | Room 40 object 451 verb 0x07 | t1 l0 i25 a1 | BOOM! | others[] | run: NOT begun frames 600 rooms [] 267 ms
+40/452/0x0A | Room 40 · Walk to torpedo tube | Dialogue | Room 40 local script 218;Room 40 local script 210 | t1 l0 i133 a0 | That's better. | others[] | run: NOT begun frames 600 rooms [] 268 ms
+40/454/0x03 | Room 40 · Open lockers | Dialogue | Room 40 object 454 verb 0x03;global script 62 | t1 l0 i23 a0 | I can't let you touch that, sir. | others[] | run: begun frames 4 rooms [] 194 ms
+40/455/0x0B | Room 40 · Pick up stone disk | Dialogue | Room 40 object 455 verb 0x0B | t0 l0 i184 a0 |  | others[] | run: begun frames 0 rooms [] 193 ms
+40/461/0x0B | Room 40 · Pick up oily rag | Dialogue | Room 40 object 461 verb 0x0B | t0 l0 i2 a0 |  | others[] | run: begun frames 0 rooms [] 190 ms
+40/462/0x07 | Room 40 · Pull clothesline | Scenes | Room 40 object 462 verb 0x07 | t1 l0 i43 a1 | BOOM! | others[] | run: NOT begun frames 600 rooms [] 294 ms
+40/462/0x09 | Room 40 · Look at clothesline | Dialogue | Room 40 object 462 verb 0x09 | t0 l0 i6 a0 |  | others[] | run: NOT begun frames 600 rooms [] 283 ms
+40/462/0x0B | Room 40 · Pick up clothesline | Dialogue | Room 40 object 462 verb 0x0B | t0 l0 i12 a0 |  | others[] | run: NOT begun frames 600 rooms [] 286 ms
+40/463/0x06 | Room 40 · Push launch lever | Dialogue | Room 40 object 463 verb 0x06 | t0 l0 i28 a0 |  | others[40/463/0x07] | run: begun frames 2 rooms [] 191 ms
+40/464/0x03 | Room 40 · Open trap door | Dialogue | Room 40 local script 205 | t0 l0 i45 a0 |  | others[40/464/0x04,40/464/0x09,40/464/0x0A] | run: NOT begun frames 600 rooms [] 269 ms
+40/465/0x08 | Room 40 · Use strong box | Dialogue | Room 40 object 465 verb 0x08 | t21 l0 i267 a0 | Try to relax, Herr Doktor. | others[] | run: NOT begun frames 600 rooms [] 266 ms
+41/0/0x00 | Room 41 · Entry | Scenes | Room 41 local script 209;Room 41 local script 216;Room 41 local script 201;Room 41 local script 211;Room 41 local script 213;Room 41 local script 225;Room 41 local script 227 | t37 l0 i780 a1 | I can't go down there like this^  Those Nazis will kill me! | others[] | run: begun frames 24 rooms [4] 196 ms
+41/472/0x0A | Room 41 · Walk to sub interior | Scenes | Room 41 local script 211;global script 125;Room 41 local script 204;Room 41 local script 217;global script 57 | t93 l1 i427 a0 | Don't push your luck, sir. | others[] | run: begun frames 24 rooms [4] 199 ms
+41/478/0x09 | Room 41 · Look at lower deck | Dialogue | Room 41 local script 205 | t3 l0 i20 a0 | The entire crew must be down there. | others[] | run: begun frames 0 rooms [] 187 ms
+41/478/0x0A | Room 41 · Walk to lower deck | Scenes | Room 41 local script 206;global script 125 | t1 l0 i68 a1 | I've got a bad feeling about this^ | others[] | run: begun frames 564 rooms [4] 356 ms
+41/479/0x06 | Room 41 · Push big lever | Scenes | Room 41 local script 215 | t1 l0 i2 a1 | I better not play with these controls^  ^who knows what they might do? | others[41/479/0x07,41/479/0x08,41/482/0x08,41/482/0x0C] | run: begun frames 0 rooms [] 187 ms
+41/480/0x03 | Room 41 · Open hatch | Scenes | Room 41 local script 224;global script 72;Room 41 local script 211 | t12 l1 i237 a1 | Halt! | others[] | run: begun frames 548 rooms [4] 356 ms
+41/480/0x04 | Room 41 · Close hatch | Dialogue | Room 41 local script 204 | t0 l0 i12 a0 |  | others[] | run: begun frames 548 rooms [4] 351 ms
+41/481/0x08 | Room 41 · Use sailor's uniform | Dialogue | Room 41 object 481 verb 0x08 | t0 l0 i14 a0 |  | others[] | run: begun frames 548 rooms [4] 352 ms
+41/484/0x09 | Room 41 · Look at stern | Scenes | Room 41 object 484 verb 0x09 | t0 l0 i3 a1 |  | others[41/484/0x0A] | run: NOT begun frames 600 rooms [33] 469 ms
+41/485/0x09 | Room 41 · Look at bow | Dialogue | Room 41 object 485 verb 0x09 | t0 l0 i3 a0 |  | others[41/485/0x0A] | run: begun frames 0 rooms [] 207 ms
+41/486/0x08 | Room 41 · Use ladder | Dialogue | Room 41 local script 210;global script 125 | t0 l0 i150 a0 |  | others[41/486/0x0A] | run: begun frames 24 rooms [4] 209 ms
+42/0/0x00 | Room 42 · Entry | Scenes | Room 42 local script 204;Room 42 local script 200 | t22 l0 i190 a0 | Avast, you lubbers.  We've arrived. | others[] | run: begun frames 234 rooms [] 283 ms
+42/491/0x08 | Room 42 · Use punctured diving suit | Dialogue | Room 42 local script 209 | t0 l0 i196 a0 |  | others[] | run: NOT begun frames 600 rooms [] 572 ms
+42/491/0x09 | Room 42 · Look at punctured diving suit | Dialogue | Room 42 object 491 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: NOT begun frames 600 rooms [] 594 ms
+42/496/0x08 | Room 42 · Use air-hose | Dialogue | Room 42 object 496 verb 0x08 | t0 l0 i25 a0 |  | others[] | run: NOT begun frames 600 rooms [] 557 ms
+42/497/0x08 | Room 42 · Use hoist | Scenes | Room 42 local script 207 | t7 l0 i109 a2 | Watch that hook! | others[] | run: NOT begun frames 600 rooms [] 533 ms
+42/500/0x0C | Room 42 · Talk to Indy in diving suit | Dialogue | Room 42 local script 211 | t2 l0 i8 a0 | Can you hear me okay? | others[] | run: begun frames 270 rooms [] 277 ms
+43/0/0x00 | Room 43 · Entry | Scenes | Room 43 local script 207;Room 43 local script 206;Room 43 local script 201 | t0 l0 i101 a0 |  | others[] | run: NOT begun frames 600 rooms [] 397 ms
+43/501/0x08 | Room 43 · Use surveyor's instrument | Dialogue | Room 43 object 501 verb 0x08 | t0 l0 i6 a0 |  | others[] | run: begun frames 23 rooms [] 195 ms
+43/501/0x0B | Room 43 · Pick up surveyor's instrument | Dialogue | Room 43 object 501 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: NOT begun frames 600 rooms [] 399 ms
+43/518/0x08 | Room 43 · Use X marks the spot | Dialogue | Room 43 local script 210 | t0 l0 i205 a0 |  | others[43/519/0x08,43/520/0x08] | run: NOT begun frames 600 rooms [] 395 ms
+43/522/0x09 | Room 43 · Look at tall horns | Dialogue | Room 43 object 522 verb 0x09 | t0 l0 i4 a0 |  | others[] | run: begun frames 28 rooms [] 193 ms
+44/0/0x00 | Room 44 · Entry | Scenes | Room 44 local script 203 | t0 l0 i4 a0 |  | others[] | run: NOT begun frames 600 rooms [] 311 ms
+45/534/0x06 | Room 45 · Push slot | Dialogue | Room 45 local script 216;Room 45 local script 212;Room 45 local script 211 | t6 l0 i365 a0 | This lever won't move! | others[45/535/0x06,45/536/0x06,45/534/0x07,45/535/0x07,45/536/0x07,45/534/0x08,45/535/0x08,45/536/0x08,45/534/0x0B,45/535/0x0B,45/536/0x0B] | run: begun frames 22 rooms [] 218 ms
+46/547/0x0A | Room 46 · Walk to gate | Scenes | Room 46 local script 215 | t0 l0 i33 a6 |  | others[] | run: NOT begun frames 600 rooms [] 327 ms
+46/548/0x0A | Room 46 · Walk to gate | Scenes | Room 46 local script 216 | t0 l0 i34 a6 |  | others[] | run: NOT begun frames 600 rooms [] 320 ms
+46/553/0x0A | Room 46 · Walk to archway | Scenes | Room 46 local script 217 | t0 l0 i4 a1 |  | others[] | run: begun frames 3 rooms [18] 196 ms
+46/555/0x03 | Room 46 · Open large fishhead | Dialogue | Room 46 object 555 verb 0x03 | t8 l0 i139 a0 | It doesn't seem to open. | others[46/555/0x04,46/555/0x05,46/555/0x06,46/555/0x07,46/555/0x08,46/555/0x0C] | run: begun frames 27 rooms [] 200 ms
+46/555/0x09 | Room 46 · Look at large fishhead | Dialogue | Room 46 object 555 verb 0x09 | t0 l0 i26 a0 |  | others[] | run: begun frames 24 rooms [] 200 ms
+46/557/0x03 | Room 46 · Open ornate fish head | Dialogue | Room 46 object 557 verb 0x03 | t8 l0 i139 a0 | It doesn't seem to open. | others[46/557/0x04,46/557/0x05,46/557/0x06,46/557/0x07,46/557/0x08,46/557/0x0C] | run: begun frames 27 rooms [] 201 ms
+46/557/0x09 | Room 46 · Look at ornate fish head | Dialogue | Room 46 object 557 verb 0x09 | t0 l0 i26 a0 |  | others[] | run: begun frames 24 rooms [] 199 ms
+46/559/0x03 | Room 46 · Open ornate fish head | Dialogue | Room 46 object 559 verb 0x03 | t8 l0 i139 a0 | It doesn't seem to open. | others[46/559/0x04,46/559/0x05,46/559/0x06,46/559/0x07,46/559/0x08,46/559/0x0C] | run: begun frames 27 rooms [] 203 ms
+46/559/0x09 | Room 46 · Look at ornate fish head | Dialogue | Room 46 object 559 verb 0x09 | t0 l0 i26 a0 |  | others[] | run: begun frames 24 rooms [] 200 ms
+46/569/0x0A | Room 46 · Walk to canal | Dialogue | Room 46 local script 203 | t0 l0 i340 a0 |  | others[] | run: begun frames 34 rooms [] 237 ms
+46/570/0x0A | Room 46 · Walk to docking bay | Dialogue | Room 46 local script 205 | t0 l0 i366 a0 |  | others[] | run: NOT begun frames 600 rooms [] 411 ms
+46/571/0x08 | Room 46 · Use spindle | Dialogue | Room 46 local script 213 | t0 l0 i165 a0 |  | others[] | run: NOT begun frames 600 rooms [] 357 ms
+46/572/0x08 | Room 46 · Use spindle | Dialogue | Room 46 local script 214 | t0 l0 i145 a0 |  | others[] | run: NOT begun frames 600 rooms [] 357 ms
+46/573/0x0A | Room 46 · Walk to doorway | Scenes | Room 46 object 573 verb 0x0A | t1 l0 i7 a1 | I'm not going back there.  I'll wait for you here. | others[] | run: NOT begun frames 600 rooms [88] 718 ms
+46/575/0x08 | Room 46 · Use crab-like raft | Dialogue | Room 46 local script 204 | t0 l0 i295 a0 |  | others[46/575/0x0A] | run: NOT begun frames 600 rooms [] 324 ms
+46/576/0x08 | Room 46 · Use octopus | Dialogue | Room 46 local script 222 | t9 l0 i392 a0 | Urrp. | others[46/576/0x50] | run: begun frames 113 rooms [] 224 ms
+46/579/0x08 | Room 46 · Use crab mouth | Dialogue | Room 46 local script 224 | t1 l0 i345 a0 | Whoa^ | others[] | run: NOT begun frames 600 rooms [] 358 ms
+48/0/0x00 | Room 48 · Entry | Scenes | Room 48 local script 201;Room 48 local script 205;Room 48 local script 202;Room 48 local script 213;Room 48 local script 218 | t9 l0 i196 a0 | *struggle*  *strain*  It sure feels good to be out of that diving suit. | others[] | run: NOT begun frames 600 rooms [] 313 ms
+48/583/0x0B | Room 48 · Pick up ladder | Dialogue | Room 48 local script 208 | t5 l0 i302 a0 | Get your hands off me, Jones! | others[] | run: NOT begun frames 600 rooms [] 307 ms
+48/584/0x08 | Room 48 · Use broken stairway | Dialogue | Room 48 local script 204;Room 48 local script 210 | t0 l0 i245 a0 |  | others[48/584/0x09,48/584/0x0A,48/584/0x0B] | run: begun frames 71 rooms [] 210 ms
+48/586/0x08 | Room 48 · Use light wand | Dialogue | Room 48 local script 203 | t0 l0 i23 a0 |  | others[] | run: NOT begun frames 600 rooms [] 308 ms
+48/587/0x08 | Room 48 · Use sentry statue | Dialogue | Room 48 local script 216 | t0 l0 i231 a0 |  | others[] | run: NOT begun frames 600 rooms [] 306 ms
+48/589/0x06 | Room 48 · Push stone thing | Scenes | Room 48 object 589 verb 0x06 | t0 l0 i24 a1 |  | others[48/589/0x07,48/589/0x08] | run: NOT begun frames 600 rooms [] 317 ms
+48/589/0x09 | Room 48 · Look at stone thing | Scenes | Room 48 object 589 verb 0x09 | t0 l0 i6 a1 |  | others[] | run: begun frames 36 rooms [] 210 ms
+48/589/0x0B | Room 48 · Pick up stone thing | Dialogue | Room 48 object 589 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: begun frames 4 rooms [] 199 ms
+49/0/0x00 | Room 49 · Entry | Scenes | Room 49 local script 213;Room 49 local script 207;Room 49 local script 212 | t16 l0 i230 a1 | Oh no you don't!  I've had enough! | others[] | run: NOT begun frames 600 rooms [] 390 ms
+49/591/0x0B | Room 49 · Pick up very large basket | Dialogue | Room 49 local script 202;Room 49 local script 205 | t10 l0 i51 a0 | Excuse me, you can't take that! | others[] | run: NOT begun frames 600 rooms [] 385 ms
+49/592/0x0A | Room 49 · Walk to salvage boat | Dialogue | Room 49 object 592 verb 0x0A | t5 l0 i22 a0 | A beauty of a boat. | others[] | run: begun frames 23 rooms [] 205 ms
+49/594/0x03 | Room 49 · Open crate | Dialogue | Room 49 local script 203;Room 49 local script 205 | t8 l0 i57 a0 | Pardon me^ | others[] | run: NOT begun frames 600 rooms [] 392 ms
+49/594/0x04 | Room 49 · Close crate | Dialogue | Room 49 object 594 verb 0x04;Room 49 local script 203;Room 49 local script 205 | t8 l0 i62 a0 | Pardon me^ | others[] | run: NOT begun frames 600 rooms [] 383 ms
+49/595/0x0B | Room 49 · Pick up fish net | Dialogue | Room 49 object 595 verb 0x0B | t0 l0 i50 a0 |  | others[] | run: begun frames 23 rooms [] 215 ms
+49/596/0x0A | Room 49 · Walk to path away from dock | Scenes | Room 49 local script 211 | t2 l0 i16 a1 | HEY! | others[] | run: begun frames 184 rooms [63] 260 ms
+50/0/0x00 | Room 50 · Entry | Scenes | Room 50 local script 216;global script 11;Room 50 local script 212;global script 189;global script 182;global script 72;global script 57;Room 50 local script 215;global script 187;Room 50 local script 202;Room 50 local script 211 | t110 l1 i483 a3 | This must have been the bead that attracted the orichalcum detector. | others[] | run: NOT begun frames 600 rooms [] 283 ms
+50/621/0x09 | Room 50 · Look at some bones | Dialogue | Room 50 local script 213 | t0 l0 i49 a0 |  | others[50/622/0x09,50/623/0x09,50/624/0x09,50/621/0x0A,50/622/0x0A,50/623/0x0A,50/624/0x0A,50/621/0x0B,50/622/0x0B,50/623/0x0B] | run: NOT begun frames 600 rooms [] 289 ms
+50/626/0x08 | Room 50 · Use stone outcropping | Dialogue | Room 50 local script 208 | t0 l0 i351 a0 |  | others[] | run: NOT begun frames 600 rooms [] 310 ms
+50/636/0x09 | Room 50 · Look at doorway | Dialogue | Room 50 object 636 verb 0x09 | t0 l0 i7 a0 |  | others[] | run: NOT begun frames 600 rooms [] 285 ms
+50/637/0x0B | Room 50 · Pick up statue head | Dialogue | Room 50 object 637 verb 0x0B;Room 50 local script 212 | t3 l0 i248 a0 | So, the legend of a LABYRINTH hidden under the ruins of Knossos is TRUE.  The legend of Atlantis isn't any MORE far-fetched^      ^maybe it's true too. | others[] | run: begun frames 2 rooms [] 315 ms
+50/638/0x0B | Room 50 · Pick up statue head | Dialogue | Room 50 object 638 verb 0x0B;Room 50 local script 212 | t3 l0 i247 a0 | So, the legend of a LABYRINTH hidden under the ruins of Knossos is TRUE.  The legend of Atlantis isn't any MORE far-fetched^      ^maybe it's true too. | others[] | run: begun frames 1 rooms [] 236 ms
+50/639/0x0B | Room 50 · Pick up statue head | Dialogue | Room 50 object 639 verb 0x0B;Room 50 local script 212 | t3 l0 i248 a0 | So, the legend of a LABYRINTH hidden under the ruins of Knossos is TRUE.  The legend of Atlantis isn't any MORE far-fetched^      ^maybe it's true too. | others[] | run: begun frames 2 rooms [] 287 ms
+50/640/0x06 | Room 50 · Push pulley | Dialogue | Room 50 local script 207 | t2 l0 i24 a0 | What do you think you're doing? | others[50/640/0x07,50/640/0x08] | run: NOT begun frames 600 rooms [] 406 ms
+50/641/0x08 | Room 50 · Use shelf | Dialogue | Room 50 object 641 verb 0x08;Room 50 local script 212 | t3 l0 i269 a0 | So, the legend of a LABYRINTH hidden under the ruins of Knossos is TRUE.  The legend of Atlantis isn't any MORE far-fetched^      ^maybe it's true too. | others[] | run: NOT begun frames 600 rooms [] 392 ms
+50/643/0x06 | Room 50 · Push slab | Scenes | Room 50 local script 203;global script 185;global script 182;global script 72;Room 50 local script 202;Room 50 local script 211 | t22 l0 i286 a2 | Scratch one Nazi. | others[50/643/0x07,50/643/0x08] | run: begun frames 53 rooms [] 266 ms
+50/646/0x08 | Room 50 · Use pit | Dialogue | global script 121 | t5 l0 i328 a0 | Thanks^ | others[51/691/0x08,51/692/0x08,51/693/0x08,51/694/0x08] | run: NOT begun frames 600 rooms [] 441 ms
+50/646/0x0C | Room 50 · Talk to pit | Dialogue | global script 120 | t1 l0 i2 a0 | Hello, below. | others[51/692/0x0C,51/693/0x0C,51/694/0x0C] | run: NOT begun frames 600 rooms [] 430 ms
+50/647/0x08 | Room 50 · Use wall | Dialogue | Room 50 object 647 verb 0x08 | t0 l0 i53 a0 |  | others[] | run: NOT begun frames 600 rooms [] 427 ms
+50/651/0x08 | Room 50 · Use hatch | Dialogue | Room 50 local script 209 | t1 l0 i118 a0 | Whew. | others[] | run: NOT begun frames 600 rooms [] 417 ms
+50/652/0x0A | Room 50 · Walk to hole | Scenes | Room 50 local script 214 | t0 l0 i14 a1 |  | others[] | run: begun frames 50 rooms [59] 316 ms
+51/0/0x00 | Room 51 · Entry | Scenes | Room 51 local script 205;global script 186;global script 182;global script 72;global script 57;global script 191;global script 188;global script 190 | t119 l1 i668 a6 | Sophia, don't come in here! | others[] | run: begun frames 24 rooms [] 326 ms
+51/689/0x08 | Room 51 · Use statue head in the next room | Scenes | Room 51 object 689 verb 0x08;Room 51 local script 202 | t1 l0 i353 a1 | Stay away from the door! | others[] | run: NOT begun frames 600 rooms [] 495 ms
+51/690/0x06 | Room 51 · Push hanging column of rock | Dialogue | Room 51 local script 200 | t3 l0 i81 a0 | POP! | others[] | run: begun frames 103 rooms [] 355 ms
+51/691/0x0C | Room 51 · Talk to pit | Dialogue | Room 51 object 691 verb 0x0C;global script 120 | t2 l0 i19 a0 | ^hello^ | others[] | run: begun frames 45 rooms [] 323 ms
+51/695/0x08 | Room 51 · Use wall | Dialogue | Room 51 object 695 verb 0x08 | t0 l0 i95 a0 |  | others[] | run: NOT begun frames 600 rooms [] 497 ms
+51/697/0x08 | Room 51 · Use boulder | Scenes | Room 51 object 697 verb 0x08;global script 124 | t4 l1 i260 a0 | Well, that shattered my rock wedge^ | others[] | run: NOT begun frames 600 rooms [] 331 ms
+51/698/0x0B | Room 51 · Pick up stalactite | Dialogue | Room 51 object 698 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: begun frames 28 rooms [] 232 ms
+52/0/0x00 | Room 52 · Entry | Scenes | Room 52 local script 200;Room 52 local script 201 | t7 l0 i204 a0 | I always thought Mr. Otis invented the elevator. | others[] | run: NOT begun frames 600 rooms [] 327 ms
+52/699/0x09 | Room 52 · Look at Professor Sternhart | Dialogue | Room 52 local script 205 | t5 l0 i41 a0 | How awful. | others[] | run: begun frames 119 rooms [] 233 ms
+52/702/0x08 | Room 52 · Use hard rubber comb | Dialogue | Room 52 object 702 verb 0x08 | t1 l0 i38 a0 | The comb's charged with static electricity. | others[] | run: NOT begun frames 600 rooms [] 402 ms
+52/705/0x08 | Room 52 · Use waterfall | Dialogue | Room 52 object 705 verb 0x08 | t1 l0 i7 a0 | The clay jar is full of water. | others[] | run: NOT begun frames 600 rooms [] 424 ms
+52/705/0x09 | Room 52 · Look at waterfall | Dialogue | Room 52 object 705 verb 0x09 | t0 l0 i4 a0 |  | others[] | run: begun frames 88 rooms [] 248 ms
+52/706/0x08 | Room 52 · Use chain | Scenes | Room 52 local script 203 | t6 l0 i79 a1 | Hold on, Jones! | others[] | run: begun frames 164 rooms [61] 291 ms
+52/709/0x09 | Room 52 · Look at note | Dialogue | Room 52 object 709 verb 0x09 | t5 l0 i28 a0 | `I am convinced the Map Room is  somewhere among the upper chambers.`  `I believe that static electricity  will respond to orichalcum^`  `^but since I'm trapped down here,  I'm not sure I have all the pieces  for a makeshift detector or not.` | others[] | run: begun frames 52 rooms [] 271 ms
+53/715/0x08 | Room 53 · Use mouth | Scenes | Room 53 local script 200 | t0 l0 i123 a1 |  | others[] | run: NOT begun frames 600 rooms [] 399 ms
+54/718/0x08 | Room 54 · Use boulder | Dialogue | Room 54 local script 200 | t5 l0 i220 a0 | THUNK! | others[] | run: NOT begun frames 600 rooms [] 422 ms
+55/0/0x00 | Room 55 · Entry | Scenes | Room 55 local script 216;Room 55 local script 211;Room 55 local script 200;Room 55 local script 204;Room 55 local script 215 | t6 l0 i601 a0 | Aren't you coming? | others[] | run: NOT begun frames 600 rooms [] 483 ms
+55/720/0x0A | Room 55 · Walk to object 720 | Dialogue | Room 55 object 720 verb 0x0A | t0 l0 i128 a0 |  | others[] | run: begun frames 13 rooms [] 265 ms
+55/721/0x0A | Room 55 · Walk to object 721 | Dialogue | Room 55 object 721 verb 0x0A | t0 l0 i82 a0 |  | others[] | run: begun frames 13 rooms [] 271 ms
+55/722/0x0A | Room 55 · Walk to object 722 | Dialogue | Room 55 object 722 verb 0x0A | t0 l0 i82 a0 |  | others[] | run: begun frames 13 rooms [] 260 ms
+55/723/0x0A | Room 55 · Walk to object 723 | Dialogue | Room 55 object 723 verb 0x0A | t0 l0 i84 a0 |  | others[] | run: begun frames 13 rooms [] 271 ms
+55/724/0x0A | Room 55 · Walk to object 724 | Scenes | Room 55 object 724 verb 0x0A | t0 l0 i62 a1 |  | others[] | run: begun frames 21 rooms [] 252 ms
+55/725/0x0A | Room 55 · Walk to object 725 | Scenes | Room 55 object 725 verb 0x0A | t2 l0 i16 a1 | Are you coming? | others[] | run: NOT begun frames 600 rooms [21] 411 ms
+55/726/0x0A | Room 55 · Walk to object 726 | Dialogue | Room 55 object 726 verb 0x0A | t0 l0 i88 a0 |  | others[] | run: begun frames 29 rooms [] 324 ms
+55/727/0x0A | Room 55 · Walk to object 727 | Dialogue | Room 55 object 727 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 72 rooms [] 330 ms
+55/728/0x0A | Room 55 · Walk to object 728 | Dialogue | Room 55 object 728 verb 0x0A | t1 l0 i86 a0 | Hey! | others[] | run: begun frames 44 rooms [] 280 ms
+55/729/0x0A | Room 55 · Walk to object 729 | Dialogue | Room 55 object 729 verb 0x0A | t1 l0 i1 a0 | I can't climb back up,  the passage is too steep! | others[] | run: begun frames 34 rooms [] 205 ms
+55/730/0x0A | Room 55 · Walk to object 730 | Dialogue | Room 55 object 730 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 13 rooms [] 291 ms
+55/731/0x0A | Room 55 · Walk to object 731 | Dialogue | Room 55 object 731 verb 0x0A | t0 l0 i94 a0 |  | others[] | run: begun frames 32 rooms [] 307 ms
+55/732/0x0A | Room 55 · Walk to object 732 | Dialogue | Room 55 object 732 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 13 rooms [] 301 ms
+55/733/0x0A | Room 55 · Walk to object 733 | Dialogue | Room 55 object 733 verb 0x0A | t1 l0 i86 a0 | Whoooa! | others[] | run: begun frames 46 rooms [] 322 ms
+55/734/0x0A | Room 55 · Walk to object 734 | Scenes | Room 55 object 734 verb 0x0A | t0 l0 i64 a1 |  | others[] | run: begun frames 6 rooms [] 297 ms
+55/735/0x0A | Room 55 · Walk to object 735 | Dialogue | Room 55 object 735 verb 0x0A | t1 l0 i1 a0 | I can't climb back up,  the passage is too steep! | others[] | run: begun frames 34 rooms [] 330 ms
+55/736/0x0A | Room 55 · Walk to object 736 | Dialogue | Room 55 object 736 verb 0x0A | t1 l0 i87 a0 | Oh no^ | others[] | run: begun frames 33 rooms [] 325 ms
+55/737/0x0A | Room 55 · Walk to object 737 | Dialogue | Room 55 object 737 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 29 rooms [] 304 ms
+55/738/0x0A | Room 55 · Walk to object 738 | Dialogue | Room 55 object 738 verb 0x0A | t0 l0 i82 a0 |  | others[] | run: begun frames 13 rooms [] 233 ms
+55/739/0x0A | Room 55 · Walk to object 739 | Dialogue | Room 55 object 739 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 13 rooms [] 203 ms
+55/740/0x0A | Room 55 · Walk to object 740 | Dialogue | Room 55 object 740 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 13 rooms [] 210 ms
+55/741/0x0A | Room 55 · Walk to object 741 | Dialogue | Room 55 object 741 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 13 rooms [] 194 ms
+55/742/0x0A | Room 55 · Walk to object 742 | Dialogue | Room 55 object 742 verb 0x0A | t0 l0 i80 a0 |  | others[] | run: begun frames 13 rooms [] 195 ms
+55/743/0x0A | Room 55 · Walk to object 743 | Dialogue | Room 55 object 743 verb 0x0A | t0 l0 i82 a0 |  | others[] | run: begun frames 13 rooms [] 196 ms
+55/783/0x0A | Room 55 · Walk to object 783 | Dialogue | Room 55 object 783 verb 0x0A | t1 l0 i86 a0 | Ahhh! | others[] | run: begun frames 45 rooms [] 209 ms
+55/784/0x0A | Room 55 · Walk to object 784 | Dialogue | Room 55 object 784 verb 0x0A | t1 l0 i86 a0 | Whoops! | others[] | run: begun frames 26 rooms [] 203 ms
+56/794/0x08 | Room 56 · Use statue mouth | Scenes | Room 56 local script 200;Room 56 local script 201 | t3 l0 i269 a1 | SNAP! | others[] | run: NOT begun frames 600 rooms [] 269 ms
+57/0/0x00 | Room 57 · Entry | Scenes | Room 57 local script 200 | t2 l0 i287 a0 | Whoa! | others[] | run: NOT begun frames 600 rooms [] 266 ms
+57/800/0x09 | Room 57 · Look at statue head | Dialogue | Room 57 local script 201;Room 57 local script 200 | t2 l0 i153 a0 | Whoa! | others[57/801/0x09,57/802/0x09,57/800/0x0A,57/801/0x0A,57/802/0x0A,57/800/0x0B,57/801/0x0B,57/802/0x0B] | run: NOT begun frames 600 rooms [] 274 ms
+57/803/0x08 | Room 57 · Use shelf | Dialogue | Room 57 object 803 verb 0x08;Room 57 local script 200 | t2 l0 i311 a0 | Whoa! | others[] | run: NOT begun frames 600 rooms [] 276 ms
+59/0/0x00 | Room 59 · Entry | Scenes | Room 59 local script 202;Room 59 local script 200;Room 59 local script 207 | t7 l0 i312 a1 | *grunt* | others[] | run: NOT begun frames 600 rooms [] 345 ms
+59/811/0x0A | Room 59 · Walk to door | Scenes | Room 59 local script 204 | t0 l0 i9 a1 |  | others[59/812/0x0A,59/813/0x0A,59/814/0x0A,59/815/0x0A,59/826/0x0A] | run: NOT begun frames 600 rooms [] 348 ms
+59/817/0x06 | Room 59 · Push spindle | Scenes | Room 59 object 817 verb 0x06 | t0 l0 i24 a1 |  | others[59/817/0x07,59/817/0x08] | run: begun frames 29 rooms [] 258 ms
+59/817/0x0B | Room 59 · Pick up spindle | Dialogue | Room 59 object 817 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: begun frames 25 rooms [] 232 ms
+60/830/0x0B | Room 60 · Pick up gold box | Dialogue | Room 60 object 830 verb 0x0B | t2 l0 i52 a0 | There's an orichalcum bead underneath it!  ^I'll take that too. | others[] | run: NOT begun frames 600 rooms [] 306 ms
+60/831/0x08 | Room 60 · Use chock | Dialogue | Room 60 local script 201;Room 60 local script 202 | t1 l0 i53 a0 | There!  The counterweight is free! | others[] | run: NOT begun frames 600 rooms [] 343 ms
+61/0/0x00 | Room 61 · Entry | Scenes | Room 61 local script 205;Room 61 local script 202 | t13 l0 i107 a1 | Oof!  Argh!  Ouch! | others[] | run: NOT begun frames 600 rooms [] 348 ms
+61/836/0x08 | Room 61 · Use statue head | Dialogue | Room 61 local script 204 | t1 l0 i266 a0 | Get behind me, Sophia! | others[] | run: NOT begun frames 600 rooms [] 430 ms
+62/0/0x00 | Room 62 · Entry | Scenes | Room 62 local script 206 | t29 l0 i776 a1 | bts:  % | others[] | run: begun frames 1549 rooms [2] 994 ms
+63/0/0x00 | Room 63 · Entry | Scenes | Room 63 local script 200 | t0 l0 i28 a1 |  | others[] | run: NOT begun frames 600 rooms [] 455 ms
+64/0/0x00 | Room 64 · Entry | Scenes | Room 64 local script 209;Room 64 local script 210;Room 64 local script 201 | t11 l0 i164 a1 | There you are! | others[] | run: NOT begun frames 600 rooms [] 455 ms
+64/856/0x0A | Room 64 · Walk to exit | Scenes | Room 64 local script 208 | t4 l0 i209 a1 | Wait one minute! | others[] | run: NOT begun frames 600 rooms [29] 631 ms
+64/858/0x0C | Room 64 · Talk to servant | Dialogue | Room 64 local script 202;Room 64 local script 207 | t6 l0 i149 a0 | Excuse me^ | others[] | run: begun frames 24 rooms [] 311 ms
+64/863/0x09 | Room 64 · Look at mask | Dialogue | global script 159 | t2 l0 i86 a0 | That `ghost` was Nur-Ab-Sal. | others[] | run: begun frames 47 rooms [] 316 ms
+65/0/0x00 | Room 65 · Entry | Scenes | Room 65 local script 203;global script 72;Room 65 local script 206;Room 65 local script 207;Room 65 local script 213;Room 65 local script 214 | t26 l0 i233 a0 | *creak* | others[] | run: NOT begun frames 600 rooms [] 423 ms
+65/867/0x08 | Room 65 · Use hanging crockery | Dialogue | Room 65 local script 201;Room 65 local script 206 | t9 l0 i208 a0 | Thank you for saving me from that infidel!  What's your name? | others[] | run: NOT begun frames 600 rooms [] 399 ms
+65/868/0x08 | Room 65 · Use hanging cloth | Dialogue | Room 65 local script 208 | t10 l0 i242 a0 | The stick broke, but I got the map! | others[] | run: NOT begun frames 600 rooms [] 555 ms
+65/874/0x08 | Room 65 · Use camel | Scenes | Room 65 local script 210 | t2 l0 i18 a1 | Map or no map^  ^you'll never find the dig site! | others[] | run: begun frames 0 rooms [20] 282 ms
+65/875/0x03 | Room 65 · Open closet door | Dialogue | Room 65 local script 215 | t2 l0 i33 a0 | Thank you, Dr. Jones. | others[] | run: NOT begun frames 600 rooms [] 366 ms
+65/875/0x04 | Room 65 · Close closet door | Dialogue | Room 65 local script 209 | t9 l0 i81 a0 | You can't do this! | others[] | run: NOT begun frames 600 rooms [] 437 ms
+66/0/0x00 | Room 66 · Entry | Scenes | Room 66 local script 212;Room 66 local script 202;Room 66 local script 208 | t1 l0 i70 a1 | The rudder's locked! | others[] | run: NOT begun frames 600 rooms [] 834 ms
+66/887/0x06 | Room 66 · Push steering wheel | Dialogue | Room 66 local script 202;Room 66 local script 212 | t1 l0 i43 a0 | The rudder's locked! | others[66/887/0x07] | run: begun frames 15 rooms [] 268 ms
+66/888/0x06 | Room 66 · Push depth lever | Dialogue | Room 66 local script 212 | t0 l0 i41 a0 |  | others[66/888/0x07] | run: NOT begun frames 600 rooms [] 772 ms
+66/890/0x06 | Room 66 · Push speed lever | Scenes | Room 66 local script 212;Room 66 local script 208 | t0 l0 i68 a1 |  | others[66/890/0x07] | run: NOT begun frames 600 rooms [] 858 ms
+67/0/0x00 | Room 67 · Entry | Scenes | Room 67 local script 202;Room 67 local script 216;Room 67 local script 204;Room 67 local script 208;global script 125;Room 67 local script 206;global script 57;Room 67 local script 210;Room 67 local script 209;Room 67 local script 213;global script 72 | t109 l1 i688 a1 | Look what we found^  ^an abandoned dig site! | others[] | run: NOT begun frames 600 rooms [] 502 ms
+67/920/0x08 | Room 67 · Use truck | Scenes | Room 67 local script 201 | t2 l0 i117 a1 | I guess there's nothing left for me to do here, so^  ^what's this, a telegram? | others[] | run: begun frames 459 rooms [75] 389 ms
+67/924/0x08 | Room 67 · Use spark plugs | Dialogue | Room 67 local script 218 | t3 l0 i232 a0 | Whoa!  What a spark! | others[] | run: NOT begun frames 600 rooms [] 395 ms
+67/924/0x0B | Room 67 · Pick up spark plugs | Dialogue | Room 67 object 924 verb 0x0B | t0 l0 i17 a0 |  | others[] | run: NOT begun frames 600 rooms [] 399 ms
+67/925/0x08 | Room 67 · Use Gun-Toting Nazi | Scenes | Room 67 local script 212;Room 67 local script 213;global script 72 | t4 l0 i137 a1 | While we're standing here, let me show you a magic trick I learned. | others[] | run: NOT begun frames 600 rooms [] 338 ms
+67/925/0x0C | Room 67 · Talk to Gun-Toting Nazi | Scenes | Room 67 local script 211;Room 67 local script 206;global script 57;Room 67 local script 210 | t96 l1 i300 a0 | Listen^ | others[] | run: begun frames 14 rooms [] 216 ms
+67/926/0x09 | Room 67 · Look at piece of paper | Dialogue | global script 173 | t32 l0 i106 a0 | `Avenue de la Vache and Rue Bearnaise.` | others[] | run: begun frames 14 rooms [] 223 ms
+67/926/0x0B | Room 67 · Pick up piece of paper | Dialogue | Room 67 object 926 verb 0x0B | t2 l0 i15 a0 | `Achtung Kerner:  Trap is set in Monte Carlo for Trottier STOP`  `Bait is seance with Madame Sophia STOP`  `Need you here soonest STOP` | others[] | run: NOT begun frames 600 rooms [] 336 ms
+67/927/0x08 | Room 67 · Use rope ladder | Scenes | Room 67 local script 214;global script 125 | t0 l0 i53 a1 |  | others[67/932/0x08,67/932/0x0A] | run: NOT begun frames 600 rooms [] 347 ms
+67/928/0x0C | Room 67 · Talk to hole | Dialogue | Room 67 local script 215 | t5 l0 i16 a0 | Sophia? | others[] | run: NOT begun frames 600 rooms [] 409 ms
+67/930/0x0B | Room 67 · Pick up table | Dialogue | Room 67 object 930 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: begun frames 22 rooms [] 229 ms
+69/0/0x00 | Room 69 · Entry | Scenes | Room 69 local script 201;Room 69 local script 202 | t2 l0 i254 a3 | I ought to be featured  in Modern Mechanix for this. | others[] | run: NOT begun frames 600 rooms [] 274 ms
+69/943/0x08 | Room 69 · Use vent | Scenes | Room 69 object 943 verb 0x08;Room 69 local script 201 | t1 l0 i236 a3 | I ought to be featured  in Modern Mechanix for this. | others[] | run: NOT begun frames 600 rooms [] 310 ms
+69/946/0x0B | Room 69 · Pick up tire repair kit | Dialogue | Room 69 object 946 verb 0x0B | t0 l0 i7 a0 |  | others[] | run: begun frames 4 rooms [] 200 ms
+71/0/0x00 | Room 71 · Entry | Scenes | Room 71 local script 200 | t2 l0 i38 a0 | That crazy American! | others[] | run: begun frames 70 rooms [] 256 ms
+71/961/0x09 | Room 71 · Look at street sign | Dialogue | Room 71 local script 211 | t34 l0 i103 a0 | I'm at the corner of^ | others[71/962/0x09] | run: begun frames 111 rooms [] 240 ms
+71/963/0x03 | Room 71 · Open drain | Dialogue | Room 71 object 963 verb 0x03;Room 71 local script 204 | t2 l0 i237 a0 | I got it! | others[] | run: begun frames 73 rooms [] 218 ms
+71/963/0x09 | Room 71 · Look at drain | Dialogue | Room 71 object 963 verb 0x09 | t0 l0 i6 a0 |  | others[] | run: begun frames 73 rooms [] 221 ms
+71/964/0x03 | Room 71 · Open drain | Dialogue | Room 71 object 964 verb 0x03;Room 71 local script 204 | t2 l0 i237 a0 | I got it! | others[] | run: begun frames 73 rooms [] 263 ms
+71/964/0x09 | Room 71 · Look at drain | Dialogue | Room 71 object 964 verb 0x09 | t0 l0 i6 a0 |  | others[] | run: begun frames 73 rooms [] 216 ms
+71/968/0x0A | Room 71 · Walk to street | Scenes | Room 71 local script 208 | t2 l0 i9 a1 | I just can't leave him lying like that. | others[71/969/0x0A] | run: NOT begun frames 600 rooms [70] 900 ms
+72/0/0x00 | Room 72 · Entry | Scenes | Room 72 local script 200;Room 72 local script 205;Room 72 local script 201;Room 72 local script 202 | t4 l0 i104 a0 | Sophia?  Where are you? | others[] | run: NOT begun frames 600 rooms [] 306 ms
+72/974/0x0A | Room 72 · Walk to door | Scenes | Room 72 object 974 verb 0x0A;Room 72 local script 205 | t1 l0 i47 a1 | I don't think I should leave without the Sunstone. | others[] | run: NOT begun frames 600 rooms [] 310 ms
+72/978/0x08 | Room 72 · Use rock wall | Scenes | Room 72 object 978 verb 0x08 | t1 l0 i56 a1 | You know^  ^I think one of the rocks is starting to move. | others[] | run: NOT begun frames 600 rooms [] 308 ms
+72/980/0x09 | Room 72 · Look at stone pointer | Dialogue | Room 72 object 980 verb 0x09 | t4 l0 i14 a0 | Sophia, take a look at this! | others[] | run: begun frames 66 rooms [] 205 ms
+72/982/0x0A | Room 72 · Walk to door | Scenes | Room 72 object 982 verb 0x0A | t2 l0 i11 a2 | If you think I'm going back into that labyrinth again, you're nuts. | others[] | run: NOT begun frames 600 rooms [] 306 ms
+72/985/0x03 | Room 72 · Open entrenching tool | Dialogue | Room 72 local script 203 | t5 l0 i23 a0 | Hey^  ^there's a NOTE wedged in here^ | others[] | run: NOT begun frames 600 rooms [] 313 ms
+72/985/0x08 | Room 72 · Use entrenching tool | Scenes | Room 72 local script 207 | t1 l0 i68 a1 | Got to get this door unblocked! | others[] | run: NOT begun frames 600 rooms [] 320 ms
+72/987/0x0A | Room 72 · Walk to labyrinth exit | Scenes | Room 72 local script 206 | t4 l0 i29 a1 | Let's move on! | others[] | run: begun frames 107 rooms [] 271 ms
+72/988/0x03 | Room 72 · Open door | Dialogue | Room 72 object 988 verb 0x03;Room 72 local script 205 | t0 l0 i72 a0 |  | others[] | run: begun frames 90 rooms [] 225 ms
+72/988/0x04 | Room 72 · Close door | Dialogue | Room 72 object 988 verb 0x04 | t0 l0 i25 a0 |  | others[] | run: begun frames 14 rooms [] 201 ms
+72/990/0x07 | Room 72 · Pull carved sign | Dialogue | Room 72 local script 205 | t0 l0 i42 a0 |  | others[72/985/0x0B,72/990/0x0B] | run: NOT begun frames 600 rooms [] 371 ms
+72/992/0x06 | Room 72 · Push peg | Scenes | Room 72 object 992 verb 0x06 | t0 l0 i12 a1 |  | others[72/992/0x07,72/992/0x08] | run: NOT begun frames 600 rooms [] 374 ms
+72/992/0x0B | Room 72 · Pick up peg | Dialogue | Room 72 object 992 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: NOT begun frames 600 rooms [] 314 ms
+73/0/0x00 | Room 73 · Entry | Scenes | Room 73 local script 204;Room 73 local script 200;Room 73 local script 209;Room 73 local script 211;Room 73 local script 207;global script 11 | t24 l0 i411 a4 | That was close! | others[] | run: NOT begun frames 600 rooms [] 355 ms
+73/993/0x08 | Room 73 · Use ladder | Scenes | Room 73 local script 209;Room 73 local script 200 | t6 l0 i45 a4 | Don't forget the Sunstone, Indy! | others[73/993/0x0A] | run: NOT begun frames 600 rooms [] 394 ms
+73/997/0x0A | Room 73 · Walk to door | Scenes | Room 73 local script 209;Room 73 local script 200;Room 73 local script 218 | t7 l0 i50 a5 | Don't forget the Sunstone, Indy! | others[] | run: begun frames 55 rooms [] 200 ms
+73/998/0x08 | Room 73 · Use crumbling rock wall | Dialogue | Room 73 local script 217 | t0 l0 i60 a0 |  | others[] | run: NOT begun frames 600 rooms [] 369 ms
+73/1002/0x08 | Room 73 · Use metal thing | Dialogue | Room 73 local script 206 | t0 l0 i167 a0 |  | others[] | run: NOT begun frames 600 rooms [] 349 ms
+73/1004/0x06 | Room 73 · Push wall | Dialogue | Room 73 object 1004 verb 0x06 | t2 l0 i31 a0 | Well now, here's something the Nazis missed. | others[] | run: NOT begun frames 600 rooms [] 361 ms
+73/1006/0x06 | Room 73 · Push Sunstone | Scenes | Room 73 object 1006 verb 0x06 | t0 l0 i6 a1 |  | others[73/1006/0x07,73/1006/0x08] | run: NOT begun frames 600 rooms [] 389 ms
+73/1006/0x09 | Room 73 · Look at Sunstone | Scenes | Room 73 object 1006 verb 0x09 | t0 l0 i6 a1 |  | others[] | run: begun frames 36 rooms [] 231 ms
+73/1006/0x0B | Room 73 · Pick up Sunstone | Dialogue | Room 73 object 1006 verb 0x0B | t0 l0 i6 a0 |  | others[] | run: begun frames 4 rooms [] 213 ms
+73/1009/0x08 | Room 73 · Use metal cap | Dialogue | Room 73 local script 205 | t0 l0 i9 a0 |  | others[] | run: NOT begun frames 600 rooms [] 356 ms
+73/1010/0x06 | Room 73 · Push little metal thing | Dialogue | Room 73 object 1010 verb 0x06;Room 73 local script 204 | t0 l0 i225 a0 |  | others[73/1010/0x07,73/1010/0x08] | run: begun frames 53 rooms [] 221 ms
+73/1012/0x08 | Room 73 · Use amber fish on a string | Dialogue | global script 87 | t2 l0 i584 a0 | I can't do that now! | others[] | run: begun frames 56 rooms [] 209 ms
+73/1014/0x09 | Room 73 · Look at long, tubular thing | Dialogue | Room 73 object 1014 verb 0x09 | t1 l0 i2 a0 | It's either a hose or a sleeping snake. | others[] | run: begun frames 51 rooms [] 238 ms
+74/0/0x00 | Room 74 · Entry | Scenes | Room 74 local script 200 | t5 l0 i70 a5 | What are you waiting for?  Let's open it. | others[] | run: begun frames 0 rooms [] 241 ms
+75/0/0x00 | Room 75 · Entry | Scenes | Room 75 local script 200 | t1 l0 i387 a4 | Shouldn't be here. | others[] | run: NOT begun frames 600 rooms [] 543 ms
+75/1026/0x0A | Room 75 · Walk to Monte Carlo | Scenes | Room 75 local script 206 | t0 l0 i79 a3 |  | others[75/1029/0x0A] | run: NOT begun frames 600 rooms [27] 1275 ms
+76/0/0x00 | Room 76 · Entry | Scenes | Room 76 local script 205;Room 76 local script 200;Room 76 local script 211 | t27 l0 i335 a1 | Wait for me, old bean. | others[] | run: NOT begun frames 600 rooms [] 397 ms
+76/1035/0x08 | Room 76 · Use truck | Scenes | Room 76 object 1035 verb 0x08 | t1 l0 i6 a1 | Let's find the airport. | others[] | run: begun frames 22 rooms [75] 258 ms
+76/1036/0x08 | Room 76 · Use dark jungle path | Dialogue | Room 76 local script 216;Room 76 local script 204;Room 76 local script 227 | t1 l0 i83 a0 | That critter's too far away. | others[] | run: NOT begun frames 600 rooms [] 415 ms
+76/1037/0x08 | Room 76 · Use dark jungle path | Dialogue | Room 76 local script 204;Room 76 local script 227;Room 76 local script 222 | t1 l0 i132 a0 | That critter's too far away. | others[76/1038/0x08,76/1040/0x08,76/1041/0x08] | run: NOT begun frames 600 rooms [] 370 ms
+76/1039/0x08 | Room 76 · Use dark jungle path | Dialogue | Room 76 local script 217;Room 76 local script 204;Room 76 local script 227 | t1 l0 i327 a0 | That critter's too far away. | others[] | run: NOT begun frames 600 rooms [] 319 ms
+76/1042/0x08 | Room 76 · Use entrance to the jungle | Dialogue | Room 76 local script 207 | t1 l0 i47 a0 | Boy, this jungle sure is confusing. | others[76/1043/0x08,76/1036/0x0A,76/1037/0x0A,76/1038/0x0A,76/1039/0x0A,76/1040/0x0A,76/1041/0x0A,76/1042/0x0A,76/1043/0x0A] | run: NOT begun frames 600 rooms [] 323 ms
+76/1045/0x08 | Room 76 · Use tree | Dialogue | Room 76 local script 208;Room 76 local script 210 | t7 l0 i142 a0 | Wow.  Some bridge. | others[76/1045/0x0A] | run: begun frames 6 rooms [] 223 ms
+76/1047/0x08 | Room 76 · Use giant anaconda | Dialogue | Room 76 local script 228 | t1 l0 i73 a0 | That doesn't seem to work. | others[] | run: NOT begun frames 600 rooms [] 330 ms
+76/1047/0x0A | Room 76 · Walk to giant anaconda | Dialogue | Room 76 object 1047 verb 0x0A | t0 l0 i185 a0 |  | others[] | run: begun frames 43 rooms [] 206 ms
+76/1048/0x0A | Room 76 · Walk to path around jungle | Dialogue | Room 76 local script 219 | t0 l0 i49 a0 |  | others[] | run: begun frames 23 rooms [] 202 ms
+76/1049/0x09 | Room 76 · Look at temple | Dialogue | Room 76 object 1049 verb 0x09 | t1 l0 i4 a0 | ^a monument to the genius of the Mayans^ | others[] | run: begun frames 31 rooms [] 223 ms
+76/1049/0x0A | Room 76 · Walk to temple | Scenes | Room 76 local script 220 | t1 l0 i24 a1 | Hold up there, friend. | others[] | run: NOT begun frames 600 rooms [] 339 ms
+76/1050/0x03 | Room 76 · Open kerosene lamp | Dialogue | Room 76 local script 201 | t3 l0 i19 a0 | So you took my lamp, eh? | others[76/1050/0x04,76/1050/0x08,76/1050/0x09] | run: NOT begun frames 600 rooms [] 331 ms
+76/1050/0x0B | Room 76 · Pick up kerosene lamp | Dialogue | Room 76 object 1050 verb 0x0B | t1 l0 i11 a0 | Sorry, old chum^  ^that lamp's part of my shop.  I can't let you have that. | others[] | run: NOT begun frames 600 rooms [] 425 ms
+76/1051/0x0A | Room 76 · Walk to path around jungle | Dialogue | Room 76 local script 225 | t0 l0 i225 a0 |  | others[] | run: begun frames 22 rooms [] 303 ms
+77/0/0x00 | Room 77 · Entry | Scenes | Room 77 local script 205 | t1 l0 i18 a0 | Excuse me, won't you? | others[] | run: NOT begun frames 600 rooms [] 575 ms
+77/1053/0x08 | Room 77 · Use animal head | Dialogue | Room 77 object 1053 verb 0x08 | t2 l0 i173 a0 | It fits perfectly.  Now it looks kind of like an elephant! | others[] | run: NOT begun frames 600 rooms [] 556 ms
+77/1053/0x09 | Room 77 · Look at animal head | Dialogue | Room 77 object 1053 verb 0x09 | t2 l0 i6 a0 | It's the primitive image of an elephant. | others[] | run: NOT begun frames 600 rooms [] 525 ms
+77/1054/0x07 | Room 77 · Pull elephant's nose | Dialogue | Room 77 object 1054 verb 0x07;Room 77 local script 200 | t9 l0 i243 a0 | KLIK! | others[] | run: NOT begun frames 600 rooms [] 433 ms
+77/1055/0x09 | Room 77 · Look at ornamental stone disk | Dialogue | Room 77 local script 200 | t6 l0 i162 a0 | Bless my soul!  The tomb of an Atlantean King! | others[77/1052/0x0A,77/1055/0x0B] | run: begun frames 235 rooms [] 346 ms
+77/1056/0x07 | Room 77 · Pull spiral design | Dialogue | Room 77 object 1056 verb 0x07 | t2 l0 i39 a0 | Now I got it! | others[77/1056/0x0B] | run: begun frames 32 rooms [] 299 ms
+77/1056/0x08 | Room 77 · Use spiral design | Dialogue | Room 77 object 1056 verb 0x08;Room 77 local script 201 | t4 l0 i24 a0 | Remarkable! | others[] | run: NOT begun frames 600 rooms [] 408 ms
+77/1057/0x06 | Room 77 · Push elephant's nose | Dialogue | Room 77 object 1057 verb 0x06 | t0 l0 i10 a0 |  | others[] | run: NOT begun frames 600 rooms [] 378 ms
+77/1063/0x0B | Room 77 · Pick up shiny bead | Dialogue | Room 77 local script 207 | t1 l0 i13 a0 | Too bad for Sternhart, he missed the orichalcum bead. | others[] | run: begun frames 42 rooms [] 208 ms
+78/0/0x00 | Room 78 · Entry | Scenes | Room 78 local script 205;Room 78 local script 200 | t3 l0 i53 a0 | I think I've lost the servant! | others[] | run: NOT begun frames 600 rooms [] 519 ms
+78/1064/0x0A | Room 78 · Walk to market | Scenes | Room 78 local script 207 | t0 l0 i1 a2 |  | others[78/1070/0x0A] | run: NOT begun frames 600 rooms [] 518 ms
+79/0/0x00 | Room 79 · Entry | Scenes | Room 79 local script 207 | t1 l0 i28 a3 | AHHHHHHHHHH! | others[] | run: NOT begun frames 600 rooms [] 325 ms
+79/1073/0x0B | Room 79 · Pick up medallion | Scenes | Room 79 local script 206 | t0 l1 i24 a0 |  | others[79/1078/0x0B] | run: NOT begun frames 600 rooms [] 323 ms
+80/0/0x00 | Room 80 · Entry | Scenes | Room 80 local script 200 | t7 l0 i36 a0 | Stop! | others[] | run: NOT begun frames 600 rooms [] 267 ms
+80/1086/0x0A | Room 80 · Walk to stairs | Scenes | Room 80 local script 206 | t1 l0 i9 a2 | What, no ride?  Hurry back soon, perhaps! | others[] | run: NOT begun frames 600 rooms [29] 421 ms
+80/1087/0x08 | Room 80 · Use hydrogen-filled balloon | Dialogue | Room 80 local script 205;Room 80 local script 200 | t10 l0 i206 a0 | Time's up! | others[80/1087/0x0A] | run: NOT begun frames 600 rooms [] 276 ms
+80/1087/0x09 | Room 80 · Look at hydrogen-filled balloon | Dialogue | Room 80 object 1087 verb 0x09;Room 80 local script 205;Room 80 local script 200 | t11 l0 i212 a0 | It's a fine example of Algerian know-how. | others[] | run: begun frames 77 rooms [] 213 ms
+80/1088/0x0C | Room 80 · Talk to balloon man | Dialogue | Room 80 local script 201;Room 80 local script 200 | t12 l0 i54 a0 | Excuse me^ | others[] | run: begun frames 17 rooms [] 195 ms
+80/1088/0x50 | Room 80 · verb 0x50 balloon man | Dialogue | Room 80 local script 202;Room 80 local script 200 | t12 l0 i87 a0 | Will this do? | others[] | run: begun frames 0 rooms [] 206 ms
+80/1089/0x08 | Room 80 · Use rope | Scenes | Room 80 local script 209 | t1 l0 i233 a1 | WE'RE FREE! | others[] | run: NOT begun frames 600 rooms [] 273 ms
+82/0/0x00 | Room 82 · Entry | Scenes | Room 82 local script 201;Room 82 local script 202;global script 57;Room 82 local script 205 | t85 l1 i332 a3 | Oh boy^  I've got maybe three  minutes of air in my suit^  ^better start hiking^ | others[] | run: begun frames 161 rooms [42] 235 ms
+85/1123/0x0A | Room 85 · Walk to hallway | Scenes | Room 85 object 1123 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [87] 6479 ms
+85/1124/0x0A | Room 85 · Walk to hallway | Scenes | Room 85 object 1124 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [86] 7436 ms
+85/1125/0x0A | Room 85 · Walk to hallway | Scenes | Room 85 object 1125 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 667 rooms [86,93] 1118 ms
+86/1132/0x0A | Room 86 · Walk to hallway | Scenes | Room 86 object 1132 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [85] 6432 ms
+86/1133/0x0A | Room 86 · Walk to hallway | Scenes | Room 86 object 1133 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [85] 6561 ms
+86/1134/0x0A | Room 86 · Walk to hallway | Scenes | Room 86 object 1134 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [88] 6453 ms
+87/1143/0x0A | Room 87 · Walk to hallway | Scenes | Room 87 object 1143 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [85] 6143 ms
+87/1144/0x0A | Room 87 · Walk to hallway | Scenes | Room 87 object 1144 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 6000 rooms [88] 6208 ms
+88/1150/0x0A | Room 88 · Walk to hallway | Scenes | Room 88 object 1150 verb 0x0A | t0 l0 i5 a1 |  | others[] | run: begun frames 6000 rooms [87] 5900 ms
+88/1151/0x0A | Room 88 · Walk to hallway | Scenes | Room 88 object 1151 verb 0x0A | t0 l0 i5 a1 |  | others[] | run: begun frames 6000 rooms [86] 5543 ms
+88/1152/0x0A | Room 88 · Walk to hallway | Scenes | Room 88 object 1152 verb 0x0A | t0 l0 i5 a1 |  | others[] | run: begun frames 6000 rooms [86] 5257 ms
+88/1153/0x0A | Room 88 · Walk to canal | Scenes | Room 88 object 1153 verb 0x0A | t0 l0 i2 a1 |  | others[] | run: NOT begun frames 600 rooms [46] 1213 ms
+88/1154/0x0A | Room 88 · Walk to ? | Scenes | Room 88 object 1154 verb 0x0A | t0 l0 i2 a2 |  | others[] | run: NOT begun frames 600 rooms [35] 570 ms
+88/1155/0x0A | Room 88 · Walk to ? | Scenes | Room 88 object 1155 verb 0x0A | t0 l0 i2 a1 |  | others[] | run: NOT begun frames 600 rooms [97] 2019 ms
+88/1156/0x0A | Room 88 · Walk to ? | Scenes | Room 88 object 1156 verb 0x0A | t0 l0 i2 a1 |  | others[] | run: NOT begun frames 600 rooms [] 880 ms
+88/1157/0x0A | Room 88 · Walk to ? | Scenes | Room 88 object 1157 verb 0x0A | t0 l0 i2 a1 |  | others[] | run: NOT begun frames 600 rooms [93] 671 ms
+91/0/0x00 | Room 91 · Entry | Scenes | Room 91 local script 200 | t1 l0 i468 a1 | Can you pilot a sub? | others[] | run: NOT begun frames 600 rooms [] 391 ms
+92/0/0x00 | Room 92 · Entry | Scenes | Room 92 local script 201 | t0 l0 i52 a0 |  | others[] | run: NOT begun frames 600 rooms [] 867 ms
+92/1181/0x03 | Room 92 · Open grate | Dialogue | Room 92 object 1181 verb 0x03 | t0 l0 i22 a0 |  | others[92/1181/0x07] | run: NOT begun frames 600 rooms [] 876 ms
+92/1181/0x04 | Room 92 · Close grate | Dialogue | Room 92 object 1181 verb 0x04 | t0 l0 i14 a0 |  | others[92/1181/0x06] | run: NOT begun frames 600 rooms [] 694 ms
+92/1181/0x0A | Room 92 · Walk to grate | Scenes | Room 92 local script 200 | t0 l0 i33 a1 |  | others[92/1196/0x0A] | run: NOT begun frames 600 rooms [] 617 ms
+92/1191/0x08 | Room 92 · Use eel sculpture | Dialogue | Room 92 local script 207;global script 152 | t2 l0 i245 a0 | Hmmm^that's not the way to catch crabs. | others[] | run: NOT begun frames 600 rooms [] 599 ms
+92/1191/0x09 | Room 92 · Look at eel sculpture | Dialogue | Room 92 object 1191 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: begun frames 33 rooms [] 220 ms
+92/1194/0x03 | Room 92 · Open cupboard | Dialogue | Room 92 object 1194 verb 0x03 | t0 l0 i12 a0 |  | others[] | run: NOT begun frames 600 rooms [] 852 ms
+92/1194/0x04 | Room 92 · Close cupboard | Dialogue | Room 92 object 1194 verb 0x04 | t0 l0 i17 a0 |  | others[] | run: begun frames 15 rooms [] 286 ms
+92/1194/0x09 | Room 92 · Look at cupboard | Scenes | Room 92 object 1194 verb 0x09 | t1 l0 i2 a1 | What's this^? | others[] | run: NOT begun frames 600 rooms [] 830 ms
+92/1195/0x08 | Room 92 · Use pool | Dialogue | Room 92 local script 207 | t1 l0 i134 a0 | Hmmm^that's not the way to catch crabs. | others[] | run: NOT begun frames 600 rooms [] 763 ms
+92/1196/0x03 | Room 92 · Open grate | Dialogue | Room 92 object 1196 verb 0x03 | t0 l0 i20 a0 |  | others[92/1196/0x07] | run: NOT begun frames 600 rooms [] 617 ms
+92/1196/0x04 | Room 92 · Close grate | Dialogue | Room 92 object 1196 verb 0x04 | t0 l0 i13 a0 |  | others[92/1196/0x06] | run: NOT begun frames 600 rooms [] 591 ms
+93/0/0x00 | Room 93 · Entry | Scenes | Room 93 local script 200;global script 72;global script 57 | t98 l1 i485 a1 | You must be Indiana Jones.  Looks like your adventure is over. | others[] | run: NOT begun frames 600 rooms [] 281 ms
+93/1208/0x0B | Room 93 · Pick up rib cage | Dialogue | Room 93 object 1208 verb 0x0B | t0 l0 i7 a0 |  | others[] | run: begun frames 23 rooms [] 196 ms
+93/1209/0x08 | Room 93 · Use hole | Dialogue | Room 93 object 1209 verb 0x08 | t0 l0 i33 a0 |  | others[] | run: NOT begun frames 600 rooms [] 270 ms
+93/1211/0x09 | Room 93 · Look at ladder | Dialogue | Room 93 object 1211 verb 0x09 | t0 l0 i26 a0 |  | others[] | run: begun frames 21 rooms [] 195 ms
+93/1211/0x0B | Room 93 · Pick up ladder | Dialogue | Room 93 object 1211 verb 0x0B | t0 l0 i177 a0 |  | others[] | run: begun frames 19 rooms [] 194 ms
+94/0/0x00 | Room 94 · Entry | Scenes | Room 94 local script 210;Room 94 local script 203;Room 94 local script 205;Room 94 local script 204 | t6 l0 i366 a1 | Hurry! | others[] | run: NOT begun frames 600 rooms [] 648 ms
+94/1217/0x0A | Room 94 · Walk to door | Scenes | Room 94 local script 207 | t2 l0 i12 a1 | Coming? | others[] | run: begun frames 27 rooms [16] 253 ms
+95/0/0x00 | Room 95 · Entry | Scenes | Room 95 local script 201;Room 95 local script 208 | t3 l0 i255 a5 | Too high! | others[] | run: begun frames 6000 rooms [] 1802 ms
+97/0/0x00 | Room 97 · Entry | Scenes | Room 97 local script 202;global script 72 | t9 l0 i130 a0 | You, there!  Halt! | others[] | run: NOT begun frames 600 rooms [] 663 ms
+97/1246/0x08 | Room 97 · Use sentry statue | Dialogue | Room 97 local script 213;Room 97 local script 205 | t3 l0 i260 a0 | I can't reach it from here. | others[] | run: NOT begun frames 600 rooms [] 659 ms
+97/1247/0x0A | Room 97 · Walk to door | Scenes | Room 97 local script 207 | t2 l0 i9 a3 | JONES!  Don't you DARE leave me here, you^  ^you^  ^troglodyte! | others[] | run: NOT begun frames 600 rooms [88] 801 ms
+97/1254/0x03 | Room 97 · Open cage | Dialogue | Room 97 object 1254 verb 0x03;Room 97 local script 208;Room 97 local script 210;Room 97 local script 209;Room 97 local script 212 | t3 l0 i131 a0 | Are you sure this is safe? | others[97/1254/0x0B] | run: begun frames 43 rooms [] 225 ms
+97/1254/0x08 | Room 97 · Use cage | Dialogue | Room 97 object 1254 verb 0x08;Room 97 local script 212;Room 97 local script 206 | t15 l0 i352 a0 | There! | others[] | run: NOT begun frames 600 rooms [] 694 ms
+97/1255/0x50 | Room 97 · verb 0x50 Sophia | Dialogue | Room 97 object 1255 verb 0x50 | t2 l0 i19 a0 | What am I supposed to do with this? | others[] | run: NOT begun frames 600 rooms [] 888 ms
+runs 426, begun 210

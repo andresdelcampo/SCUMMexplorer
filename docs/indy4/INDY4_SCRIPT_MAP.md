@@ -54,6 +54,10 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 | 5 | the second room of the credits; local 214 waits on `var[0x0D1]` under an override: Esc skips the credits, sets up the statue rooms, `var[0x020]` = 4, loads Room 1 | decoded, play | Room 5 local 214 +0x000D to +0x0095 | 18 Oct 2026 |
 | 1 | Smith's scene (local 200, cutscene), then Room 10 | play | Room 1 entry, local 200, 220 | 18 Oct 2026 |
 | 10 | New York: marquee 142, newspaper 141 (Pick up), ticket taker 143 (Talk to: local 208, the lines "But--" to "Um--"), back door 136 (Biff's conversation), crates 145/146 and 137/139, fire escape 138 (class 6 blocks it; Use chains to local 207, a cutscene with an override, then Room 12) | decoded, play | Room 10 objects, local 207, 208 | 18 Oct 2026 |
+| 1 | Smith's scene (S7): the entry's scene, first spoken line "I still think it's a fake."; from a fresh start (the credits) it begins and goes on through Rooms 74, 8, 9, 2, 75 to New York (10), the credits around it | decoded, play (cutscene run) | Room 1 entry, locals 200 to 213 | 18 Oct 2026 |
+| 11 | Sophia's lecture in New York (S7): local 200 is a cutscene from +0x0000 ("Here, my friends, is ATLANTIS…") to `endCutscene` +0x03CE, then `loadRoom` 12 at +0x03CF (backstage: locals 204, 210, 203 open cutscenes of their own) | decoded, play (cutscene run) | Room 11 local 200 +0x0000 to +0x03CF | 18 Oct 2026 |
+| 82 | the diving suit (S7): local 201 is a cutscene from +0x0000 ("Oh boy… I've got maybe three minutes of air in my suit…") to +0x01F3, then `loadRoom` 42 at +0x01F4 (local 200's cutscene +0x002B to +0x04C2, "Avast, you lubbers.  We've arrived."), then back to Room 82 local 202 | decoded, play (cutscene run) | Room 82 local 201, Room 42 local 200 | 18 Oct 2026 |
+| 10 (S7) | the fire escape's climb (Use, local 207) and the street's entry ("Well, here I am in New York…") do not begin from a fresh start: the climb needs the crates pushed (class 6), the entry's scene depends on `bit[0x013]`, `bit[0x04F]` and `var[0x0E0]` (+0x004E to +0x00F3), which the credits do not set | decoded, play (cutscene run) | Room 10 entry +0x002B to +0x0128, object 138 verb 0x08 | 18 Oct 2026 |
 | 28 | local 208 waits for the sentence script (`o5_wait` sub-opcode 4) after a `doSentence` | decoded | Room 28 local 208 +0x00F5 | 17 Oct 2026 |
 
 ## Verbs and the input chain
@@ -65,6 +69,7 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 | Script 19 | verb sets: 1 saves verbs, 2 restores the full interface (verbs 3 to 0x0B, sentence 0x64 "Walk"), 5 creates the dialogue verbs 0x78 to 0x80 (rows 145 up, keys 1 to 9, names: bullet + code 7 of strings 0x29 to 0x31) | decoded, play | Script 19 +0x0030, +0x0134 | 18 Oct 2026 |
 | verbs | 5 Give, 3 Open, 4 Close, 0x0B Pick up, 0x0C Talk to, 9 Look at, 8 Use, 6 Push, 7 Pull, 0x0A Walk to; inventory 0x65 to 0x6E (icons from Room 98), arrows 0x6F/0x70 | play | Script 19, Script 10 | 18 Oct 2026 |
 | Script 17 | dialogue input: the chosen line (`local[1]`) is said through code 5 of the verb (+0x00D9), `var[0x0A5]` holds it | decoded, play | Script 17 +0x007F to +0x00EC | 18 Oct 2026 |
+| skips to the verbs (S7) | from the play boot, Esc takes Room 4 local 221's override, then Room 1's (Smith's scene); New York (Room 10) follows with Script 19's verbs on after 110 frames: the cutscene list's titles take the verb names from there (`ScummCutscenePlanner.UntilAVerbIsOn`); 0x35 is named "None"; verb 0x50 is never named | play | `CutsceneList skip` | 18 Oct 2026 |
 | Script 4 / Script 2 | full-interface input and sentence scripts | play | route | 18 Oct 2026 |
 
 ## Objects and classes

@@ -2,6 +2,14 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Fate of Atlantis cutscenes from its scripts, with their speech (S7, Indy4)
+
+- **The list.** The shared scan gives 666 triggers and 426 entries (182 scenes). 210 begin from a fresh start (the credits); the eight-worker runs match the single-threaded ones.
+- **Verb names after the credits (shared).** The play boot shows no verb, so `ScummCutscenePlanner` runs such a boot on with the game's own Esc skips until a verb is on: two skips, New York, Script 19's names. Titles read "Use fire escape", "Talk to ticket taker"; only `verb 0x50` keeps its number (4 entries, 187 before).
+- **Spoken first lines (shared).** `ScummTextDecoder.DecodeLine` reads code 10's operands (the voice's offset and size) as spaces, so first texts no longer start with stray characters. Only code 10 changed, and the LOOM, Indy3 and Monkey lists stay byte-identical.
+- **Speech in scenes from the list (shared App).** A room-entry scene played in a room opened for it speaks its lines from the visit (`TalkieSpeechPlayer.Attach(from)`).
+- **Registry.** Indy4 Cutscenes is ◐; the matrix is regenerated. `ScummIndy4CutsceneTests` (3) covers Smith's scene (Room 1), Sophia's lecture (Room 11, then backstage) and the diving suit (Room 82, then Room 42) from a fresh start, plus the lecture's spoken line. Window check, decisions and uncertainties: [record](../.verification/indy4-cutscenes-20261018/README.md).
+
 ## 18 October: Fate of Atlantis plays through its own interface, with its spoken lines (S6, Indy4)
 
 - **The route.** The acceptance route of R-7.18 runs from Barnett College (`ScummIndy4PlayTests`):

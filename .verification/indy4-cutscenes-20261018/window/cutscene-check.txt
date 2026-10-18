@@ -1,0 +1,41 @@
+Play started in Room 4 7,9 s after opening; playback bar Visible; room button Visible; scan note Visible: "Looking for the scenes that happen in each room… The first launch takes a while; the result is kept for the next one."
+   t=0 s: scan 0 of 0, play room 4, frame 1
+   t=10 s: scan 5 of 426, play room 4, frame 90
+   t=20 s: scan 29 of 426, play room 4, frame 179
+   t=30 s: scan 52 of 426, play room 4, frame 268
+   t=40 s: scan 74 of 426, play room 4, frame 357
+   t=50 s: scan 112 of 426, play room 4, frame 446
+   t=60 s: scan 171 of 426, play room 4, frame 533
+   t=70 s: scan 209 of 426, play room 4, frame 618
+   t=80 s: scan 267 of 426, play room 4, frame 705
+   t=90 s: scan 323 of 426, play room 4, frame 790
+   t=100 s: scan 362 of 426, play room 4, frame 873
+   t=110 s: scan 387 of 426, play room 4, frame 957
+   t=120 s: scan 402 of 426, play room 4, frame 1043
+   t=130 s: scan 411 of 426, play room 4, frame 1131
+   t=140 s: scan 412 of 426, play room 4, frame 1219
+   t=150 s: scan 413 of 426, play room 4, frame 1309
+   t=160 s: scan 415 of 426, play room 4, frame 1398
+   t=170 s: scan 416 of 426, play room 4, frame 1486
+   t=180 s: scan 422 of 426, play room 4, frame 1576
+background runs done after 185 s (from play start; 193 s from opening): True; scan 426 of 426; play is in Room 4
+planner: 666 triggers, 426 groups, 182 scenes, 210 begun; verb source: the boot (Room 04) shows no verb; the verb names are those of Room 10 after 2 of the game's own skips (Esc) and 110 frames
+picker entries (Normal mode): 210; first five: Room 01 · Entry | Room 01 · Walk to door | Room 01 · Look at shelf | Room 01 · Open ice box | Room 01 · Look at ice box
+played "Room 11 · Entry" from the picker: room 11, cutscenes begun 2 -> 3, in cutscene True; on screen "Here, my friends, is ATLANTIS^ "; active sounds [41]; Skip enabled True; status "Playing Room 11 · Entry from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+   6 s later: room 11, in cutscene True, on screen "^as it might have appeared
+in its heyday^  "
+-- speech player since "Room 11 · Entry"
+   play 3421904/18: 140 jiffies
+   play 3447876/14: 143 jiffies
+-- scene sound log since "Room 11 · Entry" (device AdLib)
+   frame 1600 196388 ms start 41 effect (AdLib) | Room 11 entry script +0x0013 startSound 0x29
+   frame 1600 196461 ms opened 41 effect (AdLib) | audio True, duration 73,293 s; Room 11 entry script +0x0013 startSound 0x29
+played "Room 82 · Entry" from the picker: room 82, cutscenes begun 3 -> 4, in cutscene True; on screen "Hey-- what happened?"; active sounds [41]; Skip enabled False; status "Playing Room 82 · Entry from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+   6 s later: room 82, in cutscene True, on screen "^Atlantis is right below me!"
+-- speech player since "Room 82 · Entry"
+   stop
+   play 118345322/18: 138 jiffies
+   play 118370886/14: 107 jiffies
+-- scene sound log since "Room 82 · Entry" (device AdLib)
+   frame 1638 200670 ms stop all   | play was left
+frames played by the window: 1722
