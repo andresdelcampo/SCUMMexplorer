@@ -9,7 +9,8 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <param name="Offset">The instruction's offset in its script.</param>
 /// <param name="Actor">The actor number, or null when the script takes it from a variable.</param>
 /// <param name="Value">The costume number or C64 colour number, or null when the script takes it from a variable.</param>
-public sealed record ScummV1ActorSetting(string Source, int Offset, int? Actor, int? Value, bool IsCostume, string ActorOperand = "", bool InBootScript = false);
+public sealed record ScummV1ActorSetting(string Source, int Offset, int? Actor, int? Value, bool IsCostume, string ActorOperand = "", bool InBootScript = false,
+    string ValueOperand = "");
 
 /// <summary>Where the colours of a classic v1 costume came from.</summary>
 public enum ScummV1ColorBasis
@@ -102,7 +103,7 @@ public sealed class ScummV1ActorColors
                 var actor = TryConstant(match.Groups[1].Value);
                 var value = TryConstant(match.Groups[2].Value);
                 if (actor is null || value is null) unresolved++;
-                settings.Add(new ScummV1ActorSetting(source, instruction.Offset, actor, value, match.Groups[3].Value == "04", match.Groups[1].Value, boot));
+                settings.Add(new ScummV1ActorSetting(source, instruction.Offset, actor, value, match.Groups[3].Value == "04", match.Groups[1].Value, boot, match.Groups[2].Value));
             }
         }
 
@@ -183,13 +184,21 @@ public sealed class ScummV1ActorColors
         }
 
         // Undecided: the palette in effect depends on what ran before. Use a palette value the scripts give one of the actors that wear it, if any (still an estimate).
-        var actors = _settings.Where(s => s.IsCostume && s.Value == costume && s.Actor is not null).Select(s => s.Actor!.Value).Append(costume).Distinct();
+        var actors = _settings.Where(s => s.IsCostume && s.Value == costume && s.Actor is not null).Select(s => s.Actor!.Value)
+            .Concat(costume >= 0 && costume < ActorCount ? [costume] : Array.Empty<int>()).Distinct().ToArray();
+        var contextEvidence = string.Join("; ", actors.Select(actor =>
+        {
+            var constants = string.Join(", ", PaletteValuesOf(actor));
+            var variables = _settings.Where(s => !s.IsCostume && s.Actor == actor && s.Value is null)
+                .Select(s => $"{s.ValueOperand} at {s.Source} @{s.Offset:X4}");
+            return $"actor {actor}: constants [{constants}], variable writes [{string.Join("; ", variables)}]";
+        }));
         foreach (var actor in actors)
             if (PaletteValuesOf(actor) is { Count: > 0 } values)
             {
                 var value = BootPalette(actor) ?? values[0];
                 return new ScummV1CostumeColor(costume, EstimateSkin, value, ScummV1ColorBasis.Estimate,
-                    $"the palette in effect for actor {actor} when it wears this costume depends on the run; {value} is {(BootPalette(actor) is null ? "the first value the scripts set for" : "what the boot script leaves in")} that actor's palette", 0);
+                    $"the palette in effect for actor {actor} when it wears this costume depends on the run; {value} is {(BootPalette(actor) is null ? "the first value the scripts set for" : "what the boot script leaves in")} that actor's palette; possible writes ({contextEvidence}) are not proof of this costume's reached colours", 0);
             }
         return new ScummV1CostumeColor(costume, EstimateSkin, EstimateSuit, ScummV1ColorBasis.Estimate, "no script decides the colours of this costume", 0);
     }
