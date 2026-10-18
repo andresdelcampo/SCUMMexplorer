@@ -31,14 +31,55 @@ if (args.Length > 2 && args[1] == "prun")
 {
     var clock = System.Diagnostics.Stopwatch.StartNew();
     var copies = new ThreadLocal<GameLibrary>(() => new GameFolderScanner().Scan(args[0]));
-    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _));
+    // Since the cutscene snapshot (18 October 2026) the runs start from a pool of boots, each of its own copy of the game, as the App does;
+    // "prun <workers> boot" boots for every run on the worker's own copy, as before.
+    var cpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
+    var planner = args.Length > 3 && args[3] == "boot"
+        ? new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _), start: ScummCutsceneStart.BootPerRun)
+        : new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(new GameFolderScanner().Scan(args[0]), out _), start: ScummCutsceneStart.SnapshotPerWorker);
     Parallel.ForEach(planner.Groups, new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g => planner.Run(g.First));
-    Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}");
+    Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}; " +
+                      $"CPU {(System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime - cpu).TotalSeconds:0} s; boots {planner.PoolBoots?.ToString() ?? "one per run"}");
     foreach (var g in planner.Groups)
     {
         var r = planner.Run(g.First);
         Console.WriteLine($"{g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2} | run: {(r.Begun ? "begun" : "NOT begun")} frames {r.Frames} rooms [{string.Join(",", r.RoomsEntered)}]");
     }
+    return;
+}
+
+// CutsceneList <folder> snap: the cost of a boot, of keeping its snapshot and of one copy (cutscene snapshot, 18 October 2026).
+if (args.Length > 1 && args[1] == "snap")
+{
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    var booted = ScummGameSession.BootForPlay(game, out _);
+    var boot = clock.ElapsedMilliseconds; clock.Restart();
+    var snapshot = ScummBootSnapshot.Of(booted);
+    var keep = clock.ElapsedMilliseconds; clock.Restart();
+    for (var i = 0; i < 20; i++) snapshot.Start();
+    Console.WriteLine($"boot {boot} ms, snapshot {keep} ms, copy {clock.ElapsedMilliseconds / 20.0:0.0} ms (mean of 20)");
+    return;
+}
+
+// CutsceneList <folder> bench <n>: n entries spread over the list, each run once after its own boot and once from a copy of one boot, alternately
+// on one thread, with the time of each part (cutscene snapshot, 18 October 2026: the machine is shared, so both kinds are timed side by side).
+if (args.Length > 2 && args[1] == "bench")
+{
+    var booting = new ScummCutscenePlanner(game, start: ScummCutsceneStart.BootPerRun);
+    var copying = new ScummCutscenePlanner(new GameFolderScanner().Scan(args[0]));
+    var step = Math.Max(1, booting.Groups.Count / int.Parse(args[2]));
+    long bootRuns = 0, copyRuns = 0, boots = 0, copies = 0;
+    var clock = new System.Diagnostics.Stopwatch();
+    var snapshot = ScummBootSnapshot.Of(ScummGameSession.BootForPlay(game, out _));
+    foreach (var g in booting.Groups.Where((_, i) => i % step == 0))
+    {
+        clock.Restart(); ScummGameSession.BootForPlay(game, out _); boots += clock.ElapsedMilliseconds;
+        clock.Restart(); snapshot.Start(); copies += clock.ElapsedMilliseconds;
+        clock.Restart(); var a = booting.Run(g.First); bootRuns += clock.ElapsedMilliseconds;
+        clock.Restart(); var b = copying.Run(copying.Groups.First(c => c.First.Room == g.First.Room && c.First.ObjectId == g.First.ObjectId && c.First.VerbId == g.First.VerbId).First); copyRuns += clock.ElapsedMilliseconds;
+        if (a != b && !(a.Begun == b.Begun && a.Frames == b.Frames && a.RoomsEntered.SequenceEqual(b.RoomsEntered))) Console.WriteLine($"DIFFERENT {g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2}");
+    }
+    Console.WriteLine($"{booting.Groups.Count / step} entries: runs with their own boot {bootRuns} ms, runs from a copy {copyRuns} ms; a boot alone {boots} ms, a copy alone {copies} ms");
     return;
 }
 
@@ -166,7 +207,9 @@ if (args.Length > 4 && args[1] == "probe")
 if (args.Length > 1 && args[1] == "scan")
 {
     var clock = System.Diagnostics.Stopwatch.StartNew();
-    var planner = new ScummCutscenePlanner(game);
+    // The Maniac Mansion families start from the reviewed character menu, as the App's planner does (cutscene snapshot, 18 October 2026).
+    var planner = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced
+        ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game) : new ScummCutscenePlanner(game);
     Console.WriteLine($"planner (one boot and the scan) {clock.ElapsedMilliseconds} ms");
     if (planner.VerbSource is { } verbSource) Console.WriteLine("verb source: " + verbSource);
     Console.WriteLine($"verb words: {string.Join(", ", Enumerable.Range(0, 256).Select(v => (v, w: planner.Verbs.Word!(v))).Where(p => p.w is not null).Select(p => $"0x{p.v:X2} {p.w}"))}");
