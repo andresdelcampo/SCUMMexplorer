@@ -10,11 +10,14 @@ public sealed class ScummV2Charset : IScummTextCharset
     private readonly IScummTextCharset _font;
     private readonly int _engineVersion;
 
-    public ScummV2Charset(int engineVersion = 2, string language = "en", bool demo = false)
+    public ScummV2Charset(int engineVersion = 2, string language = "en", bool demo = false,
+        ReadOnlyMemory<byte> nativeFont = default)
     {
         if (engineVersion is not (1 or 2)) throw new ArgumentOutOfRangeException(nameof(engineVersion));
         _engineVersion = engineVersion;
-        var glyphs = English.ToArray();
+        if (!nativeFont.IsEmpty && nativeFont.Length != 128 * 8)
+            throw new ArgumentException("A native v1/v2 font has 128 eight-row glyphs.", nameof(nativeFont));
+        var glyphs = nativeFont.IsEmpty ? English.ToArray() : nativeFont.ToArray();
         var replacements = language.ToLowerInvariant() switch
         {
             "es" or "spanish" or "de" or "german" => Spanish,
@@ -22,8 +25,9 @@ public sealed class ScummV2Charset : IScummTextCharset
             "it" or "italian" => Italian,
             _ => engineVersion == 1 && !demo ? new byte[] { 39, 2 } : []
         };
-        for (var i = 0; i < replacements.Length; i += 2)
-            Array.Copy(Special, replacements[i + 1] * 8, glyphs, replacements[i] * 8, 8);
+        if (nativeFont.IsEmpty)
+            for (var i = 0; i < replacements.Length; i += 2)
+                Array.Copy(Special, replacements[i + 1] * 8, glyphs, replacements[i] * 8, 8);
         // The v2 renderer inherits v3's one-bit drawing. Supply its built-in
         // font through the existing validated renderer, with fixed widths.
         var resource = new byte[8 + 128 + glyphs.Length];
