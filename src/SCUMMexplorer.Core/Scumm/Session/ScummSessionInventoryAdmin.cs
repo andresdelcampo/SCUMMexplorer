@@ -5,6 +5,56 @@ namespace SCUMMexplorer.Core.Scumm;
 public abstract partial class ScummSession
 {
     private ScummInventoryCatalogItem[]? _inventoryCatalog;
+    private readonly List<string> _inventoryCatalogNotes = [];
+    /// <summary>Source-review detail for Advanced/evidence; never gameplay prerequisites.</summary>
+    public IReadOnlyList<string> InventoryCatalogNotes
+    {
+        get { InventoryCatalog(); return _inventoryCatalogNotes.AsReadOnly(); }
+    }
+    private (int Id, string Evidence)[]? _inventorySelectableParty;
+    private readonly Dictionary<int, (int? Room, int? Object)> _inventoryPartyPictures = [];
+
+    private IEnumerable<(int Id, string Evidence)> InventoryPartyCandidates()
+    {
+        var current = _inventoryPartyBindings!.Select(b => ((int)_runtime.GlobalVariables.GetValueOrDefault(b.Variable),
+            $"Script {PlayInputScript} +0x{b.Offset:X4}: ego <- {b.Variable}, followed by actorFollowCamera"));
+        if (_inventorySelectableParty is not null) return current.Concat(_inventorySelectableParty);
+        var bindings = _inventoryPartyBindings!.Select(x => x.Variable).ToHashSet();
+        var result = new List<(int, string)>();
+        var helpers = new List<(int Script, string Argument)>();
+        foreach (var id in _data.GlobalScriptIds())
+            foreach (var instruction in _data.GlobalScript(id)?.Instructions ?? [])
+            {
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (instruction.Operation != "move" || parts.Length != 2 || !bindings.Contains(parts[0])) continue;
+                if (InventoryLiteral(parts[1]) is int actor)
+                    result.Add((actor, $"Script {id} +0x{instruction.Offset:X4}: native party assignment {instruction.Operands}"));
+                else if (!bindings.Contains(parts[1])) helpers.Add((id, parts[1]));
+            }
+        foreach (var room in _game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).Distinct())
+        {
+            var data = _data.ReadRoom(room);
+            var tables = _data.ReadObjectVerbs(room, data.Objects);
+            foreach (var obj in data.Objects.GroupBy(x => x.Id).Select(g => g.Last()))
+                foreach (var verb in tables.GetValueOrDefault(obj.Id) ?? [])
+                {
+                    var script = _data.ReadObjectVerb(room, obj, verb.VerbId, out _);
+                    foreach (var helper in helpers.Where(h => script.Instructions.Any(i =>
+                        i.Operation is "startScript" or "chainScript" && InventoryLiteral(i.Operands.Split(',')[0].Trim()) == h.Script)))
+                        foreach (var instruction in script.Instructions.Where(i => i.Operation == "move"))
+                        {
+                            var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                            if (parts.Length == 2 && parts[0] == helper.Argument && InventoryLiteral(parts[1]) is int actor)
+                            {
+                                result.Add((actor, $"Room {room} Object {obj.Id} +0x{instruction.Offset:X4}: native party selection through Script {helper.Script}; Script {PlayInputScript} ego switch"));
+                                _inventoryPartyPictures.TryAdd(actor, (room, obj.Id));
+                            }
+                        }
+                }
+        }
+        _inventorySelectableParty = result.Where(x => x.Item1 is > 0 and < 15).Distinct().ToArray();
+        return current.Concat(_inventorySelectableParty);
+    }
 
     /// <summary>Explicit admin choices. Grants use native inventory storage but run no acquisition or story scripts.</summary>
     public ScummInventoryEditResult ApplyInventoryEdits(ScummInventoryStatusSnapshot snapshot,
@@ -84,10 +134,11 @@ public abstract partial class ScummSession
         var locations = rooms.SelectMany(r => r.Value.Objects.Select(o => (Room: r.Key, Object: o)))
             .GroupBy(x => x.Object.Id).ToDictionary(g => g.Key, g => g.ToArray());
         var candidates = new Dictionary<int, (int? Room, string Evidence)>();
+        var pickupRooms = new Dictionary<int, HashSet<int>>();
         foreach (var item in indexed.States.Where(x => (x.Value & 1) != 0))
             candidates[item.Key] = (null, "Index: native v1/v2 Pickupable flag");
         var globals = _data.GlobalScriptIds().ToDictionary(id => id, id => _data.GlobalScript(id));
-        var visited = new HashSet<(int Script, int? Object)>();
+        var visited = new HashSet<(int Script, int? Object, int? Room)>();
         void Scan(ScummScriptDisassembly? script, int? objectId = null, int? room = null, int depth = 0)
         {
             if (script is null || depth > 16) return;
@@ -107,11 +158,26 @@ public abstract partial class ScummSession
             {
                 var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
                 if (instruction.Operation == "pickupObject" || instruction.Operation == "setState" && parts.Length > 1 && parts[1] == "Pickupable")
-                    foreach (var id in Values(parts[0]).Where(locations.ContainsKey))
+                {
+                    var targets = Values(parts[0]);
+                    if (targets.Count == 0)
+                    {
+                        var note = $"Indirect target: {script.Context ?? $"Script {script.ScriptId}"} +0x{instruction.Offset:X4}: {instruction.Operation} {parts[0]}";
+                        if (!_inventoryCatalogNotes.Contains(note)) _inventoryCatalogNotes.Add(note);
+                    }
+                    foreach (var id in targets.Where(locations.ContainsKey))
+                    {
+                        if (id == objectId && room is int sourceRoom)
+                        {
+                            if (!pickupRooms.TryGetValue(id, out var sources)) pickupRooms[id] = sources = [];
+                            sources.Add(sourceRoom);
+                        }
                         candidates[id] = (id == objectId ? room : candidates.GetValueOrDefault(id).Room,
                             $"{script.Context ?? $"Script {script.ScriptId}"} +0x{instruction.Offset:X4}: {instruction.Operation} {parts[0]}");
+                    }
+                }
                 if (instruction.Operation is "startScript" or "chainScript" && InventoryLiteral(parts[0]) is int called &&
-                    visited.Add((called, objectId)) && globals.TryGetValue(called, out var helper)) Scan(helper, objectId, room, depth + 1);
+                    visited.Add((called, objectId, room)) && globals.TryGetValue(called, out var helper)) Scan(helper, objectId, room, depth + 1);
             }
         }
         foreach (var script in globals.Values) Scan(script);
@@ -122,10 +188,23 @@ public abstract partial class ScummSession
             var verbs = _data.ReadObjectVerbs(entry.Key, entry.Value.Objects);
             foreach (var record in entry.Value.Objects.GroupBy(o => o.Id).Select(g => g.Last()))
                 foreach (var verb in verbs.GetValueOrDefault(record.Id) ?? [])
-                    Scan(_data.ReadObjectVerb(entry.Key, record, verb.VerbId, out _), record.Id, entry.Key);
+                    // FA/FD/FE are resident/special object handlers. Their object is not
+                    // the sentence's ActiveObject1; retain only explicit source targets.
+                    Scan(_data.ReadObjectVerb(entry.Key, record, verb.VerbId, out _),
+                        verb.VerbId is 250 or 253 or 254 ? null : record.Id, entry.Key);
         }
+        foreach (var candidate in candidates)
+        {
+            if (!locations.TryGetValue(candidate.Key, out var sources))
+                _inventoryCatalogNotes.Add($"Excluded {candidate.Key}: pickup metadata has no indexed object code.");
+            else if (pickupRooms.TryGetValue(candidate.Key, out var picked) && picked.Count > 1 ||
+                !candidate.Value.Room.HasValue && sources.Select(x => x.Room).Distinct().Count() > 1)
+                _inventoryCatalogNotes.Add($"Excluded {candidate.Key}: more than one source room ({string.Join(',', sources.Select(x => x.Room).Distinct())}).");
+        }
+        _inventoryCatalogNotes.Add($"Source candidates: {candidates.Count}; object-code locations: {locations.Count}.");
         return _inventoryCatalog = candidates.Where(x => locations.ContainsKey(x.Key))
-            .Where(x => x.Value.Room.HasValue || locations[x.Key].Length == 1)
+            .Where(x => !pickupRooms.TryGetValue(x.Key, out var sources) || sources.Count == 1)
+            .Where(x => x.Value.Room.HasValue || locations[x.Key].Select(l => l.Room).Distinct().Count() == 1)
             .Select(x =>
             {
                 var room = x.Value.Room ?? locations[x.Key][0].Room;
