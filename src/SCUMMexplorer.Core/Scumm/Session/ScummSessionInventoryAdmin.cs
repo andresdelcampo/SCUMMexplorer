@@ -11,51 +11,20 @@ public abstract partial class ScummSession
     {
         get { InventoryCatalog(); return _inventoryCatalogNotes.AsReadOnly(); }
     }
-    private (int Id, string Evidence)[]? _inventorySelectableParty;
-    private readonly Dictionary<int, (int? Room, int? Object)> _inventoryPartyPictures = [];
+    private bool _inventoryPartyEstablished;
 
     private IEnumerable<(int Id, string Evidence)> InventoryPartyCandidates()
     {
         var current = _inventoryPartyBindings!.Select(b => ((int)_runtime.GlobalVariables.GetValueOrDefault(b.Variable),
-            $"Script {PlayInputScript} +0x{b.Offset:X4}: ego <- {b.Variable}, followed by actorFollowCamera"));
-        if (_inventorySelectableParty is not null) return current.Concat(_inventorySelectableParty);
-        var bindings = _inventoryPartyBindings!.Select(x => x.Variable).ToHashSet();
-        var result = new List<(int, string)>();
-        var helpers = new List<(int Script, string Argument)>();
-        foreach (var id in _data.GlobalScriptIds())
-            foreach (var instruction in _data.GlobalScript(id)?.Instructions ?? [])
-            {
-                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
-                if (instruction.Operation != "move" || parts.Length != 2 || !bindings.Contains(parts[0])) continue;
-                if (InventoryLiteral(parts[1]) is int actor)
-                    result.Add((actor, $"Script {id} +0x{instruction.Offset:X4}: native party assignment {instruction.Operands}"));
-                else if (!bindings.Contains(parts[1])) helpers.Add((id, parts[1]));
-            }
-        foreach (var room in _game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).Distinct())
-        {
-            var data = _data.ReadRoom(room);
-            var tables = _data.ReadObjectVerbs(room, data.Objects);
-            foreach (var obj in data.Objects.GroupBy(x => x.Id).Select(g => g.Last()))
-                foreach (var verb in tables.GetValueOrDefault(obj.Id) ?? [])
-                {
-                    var script = _data.ReadObjectVerb(room, obj, verb.VerbId, out _);
-                    foreach (var helper in helpers.Where(h => script.Instructions.Any(i =>
-                        i.Operation is "startScript" or "chainScript" && InventoryLiteral(i.Operands.Split(',')[0].Trim()) == h.Script)))
-                        foreach (var instruction in script.Instructions.Where(i => i.Operation == "move"))
-                        {
-                            var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
-                            if (parts.Length == 2 && parts[0] == helper.Argument && InventoryLiteral(parts[1]) is int actor)
-                            {
-                                result.Add((actor, $"Room {room} Object {obj.Id} +0x{instruction.Offset:X4}: native party selection through Script {helper.Script}; Script {PlayInputScript} ego switch"));
-                                _inventoryPartyPictures.TryAdd(actor, (room, obj.Id));
-                            }
-                        }
-                }
-        }
-        _inventorySelectableParty = result.Where(x => x.Item1 is > 0 and < 15).Distinct().ToArray();
-        return current.Concat(_inventorySelectableParty);
+            $"Script {PlayInputScript} +0x{b.Offset:X4}: ego <- {b.Variable}, followed by actorFollowCamera")).ToArray();
+        // Filling the menu slots is not Start: the native startup subsequently
+        // places every chosen actor. Remember that commitment, so later hiding
+        // or removing a party member does not make the other recipients vanish.
+        if (!_inventoryPartyEstablished)
+            _inventoryPartyEstablished = current.Length > 0 && current.Select(x => x.Item1).Distinct().Count() == current.Length &&
+                current.All(x => _runtime.Actors.Contains(x.Item1) && _runtime.Actors[x.Item1].Room is > 0);
+        return _inventoryPartyEstablished ? current : [];
     }
-
     /// <summary>Explicit admin choices. Grants use native inventory storage but run no acquisition or story scripts.</summary>
     public ScummInventoryEditResult ApplyInventoryEdits(ScummInventoryStatusSnapshot snapshot,
         IReadOnlyList<ScummInventoryTransfer> edits)
@@ -231,4 +200,5 @@ public abstract partial class ScummSession
     private static int? InventoryLiteral(string operand) => operand.StartsWith("0x", StringComparison.Ordinal) &&
         int.TryParse(operand.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var number) ? number : null;
 }
+
 

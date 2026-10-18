@@ -11,7 +11,7 @@ public sealed class ScummManiacClassicStateTests
         var session=ManiacClassicStateRoute.AcquireKey(Folder);
         var before=session.CaptureInventoryStatus();
         Assert.True(before.CanEdit,before.Refusal);
-        Assert.Equal(Enumerable.Range(1,7),before.Characters.Select(c=>c.ActorId).Order().ToArray());
+        Assert.Equal(new[] { 1, 3, 5 },before.Characters.Select(c=>c.ActorId).Order().ToArray());
         Assert.Equal("Dave",before.Characters.Single(c=>c.ActorId==3).Name);
         Assert.Equal("Syd",before.Characters.Single(c=>c.ActorId==1).Name);
         Assert.Equal("Bernard",before.Characters.Single(c=>c.ActorId==5).Name);
@@ -76,3 +76,4 @@ public sealed class ScummManiacClassicStateTests
         Assert.Equal(3,session.Snapshot.ObjectOwners[55]);
     }
 }
+

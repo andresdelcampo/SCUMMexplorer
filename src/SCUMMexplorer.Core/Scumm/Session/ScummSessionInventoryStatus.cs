@@ -60,6 +60,9 @@ public abstract partial class ScummSession
     private readonly object _inventoryStatusIdentity = new();
     private (string Variable, int Offset)[]? _inventoryPartyBindings;
 
+    /// <summary>Recipient identities are available only after native party selection commits.</summary>
+    public bool InventoryCharactersAvailable => InventoryCharacters().Length > 0;
+
     public ScummInventoryStatusSnapshot CaptureInventoryStatus()
     {
         var characters = InventoryCharacters();
@@ -200,9 +203,7 @@ public abstract partial class ScummSession
         }
         return candidates.Where(x => x.Id > 0 && x.Id < 15 && _runtime.Actors.Contains(x.Id))
             .GroupBy(x => x.Id).Select(g => new ScummInventoryCharacter(g.Key,
-                _runtime.ActorNames.GetValueOrDefault(g.Key), g.First().Evidence)
-                { PortraitRoomId = _inventoryPartyPictures.GetValueOrDefault(g.Key).Room,
-                  PortraitObjectId = _inventoryPartyPictures.GetValueOrDefault(g.Key).Object }).OrderBy(x => x.ActorId).ToArray();
+                _runtime.ActorNames.GetValueOrDefault(g.Key), g.First().Evidence)).OrderBy(x => x.ActorId).ToArray();
     }
 
     // Exact relevant state, not a lossy hash. Includes state/class/code-room/slots

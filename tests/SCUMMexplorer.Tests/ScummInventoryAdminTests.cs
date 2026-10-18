@@ -50,8 +50,8 @@ public sealed class ScummInventoryAdminTests
         var item = Assert.Single(view.Catalog, x => x.ObjectId == objectId);
         Assert.Equal(1, item.SourceRoomId);
         Assert.DoesNotContain(view.Items, x => x.ObjectId == objectId);
-        if (folder.StartsWith("mmansion")) Assert.Equal(Enumerable.Range(1, 7), view.Characters.Select(x => x.ActorId));
-        var recipient = 2;
+        if (folder.StartsWith("mmansion")) Assert.Equal(new[] { 1, 3, 5 }, view.Characters.Select(x => x.ActorId));
+        var recipient = view.Characters.First(c => c.ActorId != view.CurrentActorId).ActorId;
         var result = session.ApplyInventoryEdits(view, [new(objectId, recipient)]);
         Assert.True(result.Applied, result.Refusal);
         var held = Assert.Single(session.CaptureInventoryStatus().Items, x => x.ObjectId == objectId);
@@ -72,6 +72,7 @@ public sealed class ScummInventoryAdminTests
         if (Ready(folder) is not {} session) return;
         var runtime = Runtime(session);
         var initial = session.CaptureInventoryStatus();
+        var recipient = initial.Characters.First(c => c.ActorId != initial.CurrentActorId).ActorId;
         var grant = session.ApplyInventoryEdits(initial, [new(objectId, initial.CurrentActorId)]);
         Assert.True(grant.Applied, grant.Refusal);
         for (int slot = 0; slot < runtime.InventorySlots.Length; slot++)
@@ -80,11 +81,11 @@ public sealed class ScummInventoryAdminTests
         Assert.Equal(0, view.FreeSlots);
         var unheld = view.Catalog.First(x => !string.IsNullOrWhiteSpace(x.Name) && !runtime.InventorySlots.Contains(x.ObjectId));
         var before = Relevant(runtime);
-        var failed = session.ApplyInventoryEdits(view, [new(objectId, 2), new(unheld.ObjectId, 2)]);
+        var failed = session.ApplyInventoryEdits(view, [new(objectId, recipient), new(unheld.ObjectId, recipient)]);
         Assert.False(failed.Applied);
         Assert.Contains("full", failed.Refusal);
         Assert.Equal(before, Relevant(runtime));
-        var moved = session.ApplyInventoryEdits(view, [new(objectId, 2)]);
+        var moved = session.ApplyInventoryEdits(view, [new(objectId, recipient)]);
         Assert.True(moved.Applied, moved.Refusal);
         Assert.True(session.UndoInventoryTransfers(moved.Undo!).Applied);
         Assert.Equal(before, Relevant(runtime));
@@ -98,14 +99,14 @@ public sealed class ScummInventoryAdminTests
         var view = session.CaptureInventoryStatus();
         var before = Relevant(runtime);
         Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 9)]).Applied);
-        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 2), new(99999, 2)]).Applied);
-        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 2), new(objectId, 1)]).Applied);
+        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 1), new(99999, 2)]).Applied);
+        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 1), new(objectId, 1)]).Applied);
         Assert.Equal(before, Relevant(runtime));
         runtime.ObjectStates[objectId] ^= 4;
-        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 2)]).Applied);
+        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 1)]).Applied);
         view = session.CaptureInventoryStatus();
         session.AdvanceFrame();
-        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 2)]).Applied);
+        Assert.False(session.ApplyInventoryEdits(view, [new(objectId, 1)]).Applied);
     }
 
     [Theory]
@@ -119,7 +120,7 @@ public sealed class ScummInventoryAdminTests
         var runtime = Runtime(session);
         runtime.RemoveObjectOwner(objectId); runtime.RemoveObjectState(objectId);
         var original = Relevant(runtime);
-        var changed = session.ApplyInventoryEdits(session.CaptureInventoryStatus(), [new(objectId, 2)]);
+        var changed = session.ApplyInventoryEdits(session.CaptureInventoryStatus(), [new(objectId, 1)]);
         Assert.True(changed.Applied, changed.Refusal);
         Assert.True(session.UndoInventoryTransfers(changed.Undo!).Applied);
         Assert.Equal(original, Relevant(runtime));
@@ -152,4 +153,5 @@ public sealed class ScummInventoryAdminTests
         Assert.Contains(session.Messages.OnScreen, x => x.Text.Contains("1138"));
     }
 }
+
 
