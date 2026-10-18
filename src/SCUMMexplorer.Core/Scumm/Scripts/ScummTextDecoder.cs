@@ -49,6 +49,7 @@ public static class ScummTextDecoder
         var output = new StringBuilder(escaped.Length);
         var control = 0; // bytes of a text control still to come: its code, then its operands
         var operands = false;
+        var speech = false;
         for (var i = 0; i < escaped.Length; i++)
         {
             int? value = null;
@@ -61,9 +62,12 @@ public static class ScummTextDecoder
             if (control > 0)
             {
                 // The code decides whether two operand bytes follow (ScummVM convertMessageToString, v3).
-                if (!operands && value is int code) { operands = code is not (1 or 2 or 3 or 8); control = operands ? 2 : 0; }
+                if (!operands && value is int code) { operands = code is not (1 or 2 or 3 or 8); control = operands ? 2 : 0; speech = code == 10; }
                 else control--;
-                output.Append(value is null ? escaped[i] : ' ');
+                // A speech control's operands (code 10, the talk sound: Monkey Island 2's talkie lines start with four of them) are offsets whose bytes are
+                // often letters, so they become spaces as escaped ones do (S7 Monkey2, 18 October 2026). Other codes keep their printable operand bytes as
+                // before, so the lists of the games without speech controls are unchanged.
+                output.Append(value is null && !speech ? escaped[i] : ' ');
                 continue;
             }
             if (value is not int b) { output.Append(escaped[i]); continue; }
