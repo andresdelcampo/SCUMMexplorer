@@ -7,6 +7,7 @@
 | SCUMM version(s) and script dialect | classic v1 (`ScummScriptDialect.V1`), enhanced v2 (`V2`) |
 | Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
 | Script map | [ZAK_SCRIPT_MAP.md](ZAK_SCRIPT_MAP.md) |
+| Inventory state evidence | [Classic](../../.verification/zakclassic-state-20261018/README.md), [Enhanced](../../.verification/zakenhanced-state-20261018/README.md), [integration checkpoint](../checkpoints/20261018-S8-ManiacZak.md) |
 | Other notes | none |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |
 

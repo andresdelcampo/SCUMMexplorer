@@ -28,6 +28,14 @@ For a game with no game-specific session (Indiana Jones and the Last Crusade EGA
 - **A room the game only loads under pseudo room numbers** (see [pseudo rooms](SCUMM_SCRIPT_MAP.md)) is visited under the number a decoded `loadRoomWithEgo` into it uses (arrivals from the room's own code, which lead from one pseudo room to another, count only when no other exists); without such an arrival, under one of the numbers the game's `pseudoRoom` instructions give it (seeded, labelled). Visited under its own number its entry script would draw none of its layouts.
 - An arrival from the room's own code is never the first visit when another arrival exists (a first visit comes from elsewhere).
 
+## v1/v2 held inventory and explicit status choices (S8, 18 October 2026)
+
+Native `object.cpp::putOwner` stores ownership separately; `script_v2.cpp::o2_actorOps` suboperation 3 retains an actor name. Reached names are now retained by the v1/v2 executor. In the status reader, native input-script assignments to ego followed by `actorFollowCamera` establish selected-party variable bindings. Where no such bindings exist, the source-written engine player range supplies candidates. Own-edition facts belong in the Maniac/Zak script maps; an unresolved identity is not guessed.
+
+Native `script_v2.cpp::o2_doSentence` distinguishes ordinary object slots from special (`0xFD`) and background/special (`0xFA`) handlers. A resident special handler can loop while the player has control; it is not by itself an unfinished player action. The status guard rejects executing code, input/sentence work, ordinary foreground object slots, queued input, movement, dialogue and cutscenes. Source reviewed 18 October 2026; the slot-lifecycle regression and retained failed all-slot guard are in the [S8 record](../../.verification/maniaczak-state-20261018/README.md).
+
+Proposed R-12.7–R-12.10 define the explicit editor policy: change only an already-held item's owner among source-established playable characters, preserving its native slot and retained room/code, state/classes, other items, actors and words. This is the owner-table component, not a native Give, pickup, inventory callback or puzzle outcome. It never supplies hidden scene prerequisites. Apply/Undo are attributed as choices; session identity, frame generation, exact relevant signature and revision protect atomic batches and conservative undo. A playback frame invalidates undo, so the window pauses Play while open. No item creation or arbitrary flag/state editor is included.
+
 ## Historical old-v3 format evidence
 
 The following byte offsets, object IDs and counts belong to the supplied Spanish EGA audits of 27 September. They remain source evidence for that edition, not a fresh English/VGA inventory.
