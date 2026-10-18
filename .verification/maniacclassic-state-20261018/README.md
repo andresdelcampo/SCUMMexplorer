@@ -5,7 +5,7 @@
 | Family / stage | ManiacClassic / S8 |
 | Fixture and edition | `D:/Juegos/Lucas/mmansion ega en`, English classic v1 |
 | Date and author | 2026-10-18, Codex ManiacClassic worker |
-| Commits | Family evidence commit; shared API 30b2ccd; proposed requirements R-12.7–R-12.10 in d3103ed; App integrated by parent |
+| Commits | Family evidence 099722d; shared API 30b2ccd with provenance e25aca2 and running-action guard 2d74a55; proposed requirements R-12.7–R-12.10 in d3103ed; App integrated by parent |
 | Registry change | Parent owns the final bounded Status claim and generated matrix |
 
 ## What was done
@@ -32,6 +32,8 @@ rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-
 Regressions compare all variables, object states/classes, other owners and structurally serialized actors, plus unchanged room and scene count. Cancel-by-discard changes nothing. Room item 54, named NPC 9, unselected kid 2, a mixed valid/invalid batch, duplicate-item batch, stale view, reused undo, boot menu and pending input are refused. Missing names are excluded from eligible recipients by the shared API; this is a code guard, not an additional tested classic release.
 
 Initial test result was two passed/one failed: record equality compared nested actor array references rather than content. The invariant was corrected to structural serialization; the complete three-test set then passed, including added class/slot/atomic-batch assertions. No corresponding engine behavior was changed. The Core owner checks shared LOOM regressions; parent owns final full-suite and real-window evidence.
+
+All three classic tests passed again after each shared follow-up: explicit edit attribution and refusal while native player-action scripts still run. The native acquisition endpoint needed no change. Apply/Undo provenance does not increment the scene counter or claim script execution.
 
 ## Comparison with ScummVM (source files and date; runtime comparison if any)
 

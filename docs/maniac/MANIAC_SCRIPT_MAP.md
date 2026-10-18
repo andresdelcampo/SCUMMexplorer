@@ -28,6 +28,8 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Name | Meaning | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic party references `var[0x02F]`, `var[0x030]`, `var[0x031]` | Boot selects Dave in the first slot; the native menu fills the other two from the player's choices. The input script copies these live values into ego for the three kid-selection slots. They identify the current party, not every named actor. | decoded | Script 1 +0x0195; Script 114 +0x0033/+0x003C; Script 4 +0x00DC/+0x00EF/+0x0102 followed by `actorFollowCamera` | 2026-10-18 |
+| Enhanced party references | This edition's actor-switch input also reads the live selected-party variables; derive their bindings from its own instructions. | decoded | Enhanced Script 4 +0x00D7/+0x00EC/+0x0101 moves ego from `var[0x02F]`/`var[0x030]`/`var[0x031]`, each followed by `actorFollowCamera`; [enhanced S8 record](../../.verification/maniacenhanced-state-20261018/README.md) | 2026-10-18 |
 
 ## Global scripts
 
@@ -80,6 +82,8 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 | The only costume instruction in the global and room scripts sets costume 0 on actor `var[0x060]` | an actor is hidden | decoded | Script 61 +0x010E | 2026-10-14 |
 | Each actor's start costume is its own number; colours are `v1MMActorPalatte1/2[actor]` | costume to colour rule | engine | ScummVM `costume.cpp` | 2026-10-14 |
 | Classic Script 1 actor names and sounds | Genuine boot code, not a data table: initializes ego 3, then names actors beginning with Syd and Razor. The earlier few-instruction decode was superseded by the v1/v2 adapter. Script 0's role is not established here. | decoded | Classic Script 1 +0x0008, +0x0019, +0x0021, +0x0025, +0x002F | 2026-10-17 |
+| Classic selected-party names | On the verified Syd/Bernard route, the current party is Dave, Syd and Bernard. Actor names are executed script data; other named actors include NPCs and must not become editable inventory recipients merely because they have names. | decoded | Script 1 actorOps names: Syd +0x0019, Dave +0x0033, Bernard +0x0050, Dr Fred +0x0092; party references above; [S8 source extraction](../../.verification/maniacclassic-state-20261018/source.txt) | 2026-10-18 |
+| Enhanced selected-party names | The verified current party has edition-executed names Syd, Dave and Bernard. | decoded | Enhanced Script 1 names Syd +0x001D, Dave +0x0047, Bernard +0x0079; [enhanced S8 record](../../.verification/maniacenhanced-state-20261018/README.md) | 2026-10-18 |
 
 ## Sounds and music
 
