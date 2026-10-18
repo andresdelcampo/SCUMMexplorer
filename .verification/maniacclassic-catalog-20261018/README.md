@@ -5,7 +5,7 @@
 | Family / stage | ManiacClassic / inventory catalog completion following admin S8 clarification |
 | Fixture and edition | `Games/mmansion ega en` (content-detected DOS classic English, SCUMM v1) |
 | Date and author | 2026-10-18, ManiacClassic catalog worker |
-| Commits | Shared catalog milestone `b09d6bd` (local cherry-pick `094bdfe6`); Classic evidence/test commit reported to orchestrator |
+| Commits | Shared catalog milestones `b09d6bd`, `59173d0`, `0c54de8` (final parent integration `e8d70a4f`); Classic acceptance `85e286f` |
 | Registry change | Parent owns registry/matrices; source inventory completeness is established for the supplied copy, subject to integrated grant/UI acceptance |
 
 ## What was done
@@ -22,6 +22,7 @@ Cwd `.worktrees/maniacclassic-catalog`:
 rtk proxy dotnet run --project .verification/maniacclassic-catalog-20261018/Probe/Probe.csproj -p:NuGetAudit=false --verbosity quiet
 rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj -p:NuGetAudit=false --filter "FullyQualifiedName~ScummManiacClassicCatalogTests&FullyQualifiedName!~CompleteCatalog" --verbosity normal
 rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore -p:NuGetAudit=false --filter FullyQualifiedName~ScummManiacClassicCatalogTests --verbosity quiet
+rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore -p:NuGetAudit=false --filter "FullyQualifiedName~ScummManiacClassicCatalogTests|FullyQualifiedName~ScummInventoryCatalogAnalysisTests" --verbosity quiet
 ```
 
 ## Results (numbers)
@@ -34,6 +35,7 @@ rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-
 - Native source execution from the +0x0039 discriminator guard picks up 34/36/37/38 with the other-callers' zero discriminator and skips 35 with its caller-set value. All five reach stop with no unresolved instruction.
 - Initial focused run: **six tests passed**, zero failures/skips; build zero warnings/errors.
 - After integrating the shared catalog analyzer: **seven tests passed**, zero failures/skips, five seconds of test cases. The source-derived catalog contains exactly **48 named items**. A single admin batch grants all 48 to unselected character 7; every retained verb entrypoint matches its own resource, and Undo restores inventory slots, retained rooms, owners, states, inventory membership, globals and actors exactly. No source pickup/story code runs for the grants.
+- Final correction `0c54de8`: **26 combined Classic/synthetic cases passed**, zero failures/skips, four seconds of test cases. All seven Classic cases are included. The final source probe still measures **48 items, 1,089 complete blocks, zero decode issues, 49 pickup sites and no positive or negative Pickupable writers**. There are **no Catalog path-state or call-depth bound diagnostics** for ManiacClassic. The writer-summary text `unbound-only writer: False` is not a bound diagnostic.
 
 ## Comparison with ScummVM (source files and date; runtime comparison if any)
 
@@ -45,7 +47,9 @@ The first harness build used a four-level relative project reference where three
 
 The former generic Script 116 "indirect target" note describes a parameterized helper template. Complete callers and immutable native Pickupable metadata close this copy's inventory coverage; it is not evidence for an arbitrary additional object. The bank is an actual catalog false positive rather than a newly missing item. All other previous gameplay/audio/visual/edition uncertainties remain outside this bounded inventory census.
 
-Read-only shared-analyzer review found signed casts in generic v1/v2 relational comparisons, contrary to the existing native unsigned executor rule. The exclusive Core owner was notified to add a correction/regression; parent owns that integration. Potential helper/indirect mutation invalidation was also raised as a generic review point. In this Classic helper, return writes cannot affect a later pickup in its eight object callers: they stop immediately after the call, or jump to a stop. Neither review point changes the independently executed native guard or the 48-item source census.
+Independent shared-analyzer review found defects in intermediate source: signed/reversed relational comparisons, lost finite targets at control-flow joins, native alias reads, backing-word bit writes and FE being treated as a handler invocation. A temporary independent finite-join regression failed against `59173d0`, as expected from the reported defect. The exclusive Core owner incorporated that regression and fixed these points in `0c54de8`; the temporary duplicate test was removed from this worker's tree. Native conditional polarity, retained FA/FD context, raw result destinations and conservative helper/range/indirect invalidation were reviewed again on the final source. **Final source accepted for this catalog scope**; no unresolved Classic inventory contract or analyzer-bound diagnostic remains.
+
+The native rules were also checked directly against [ScummVM's script_v2.cpp](https://raw.githubusercontent.com/scummvm/scummvm/master/engines/scumm/script_v2.cpp), reviewed 18 October 2026: alias reads at lines 440–442, bit backing-word mutation at 581–592, FE stop versus FA/FD handler dispatch at 929–969, and reversed unsigned relational operands at 1314–1335. This does not claim a general proof for every possible future v1/v2 program.
 
 ## User checks (exact steps and where; none if none)
 
