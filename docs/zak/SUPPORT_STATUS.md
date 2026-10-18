@@ -13,6 +13,7 @@ Family: ZakClassic | Fixture: D:/Juegos/Lucas/zak ega en (TestGames.Root) | Last
 | S7 Cutscenes | done (bounded source-derived list) | Cutscenes Partial | [.verification/zakclassic-cutscenes-20261018](../../.verification/zakclassic-cutscenes-20261018/README.md) | 130 triggers, 54 groups, 37 scenes; 13 begin, five hit frame cap; three bounded fresh-start proofs, four tests pass |
 | S8 State | not started | Status – | – | requested in a run: no |
 | S9 Editions | available-copy pass done; alternate editions blocked | unchanged | [S9 record](../../.verification/zakclassic-editions-20261018/README.md) | One English Classic copy; 58 room structures read, profile/text/font contracts and family conformance pass; no cross-edition claim |
+| S8 State | Core bounded pass done; parent UI acceptance pending | unchanged here | [S8 record](../../.verification/zakclassic-state-20261018/README.md) | Own native bill pickup, Zak-to-Annie Apply/Undo, unchanged-state and refusal checks; three tests pass |
 
 Blocked on: the 11 currently estimated costumes (4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 32) need reached actor/palette state or variable operands resolved. This supersedes the older ten-costume list; costumes 1 and 35 now have script evidence, while costume 13 is estimated. No comparison with a running ScummVM was performed.
 Next: retain the S5/S6/S7 limits while progressing S9 editions; re-derive estimated costumes from reached actor state without promoting unresolved colors. S6's bounded native play route is verified; no full-game completion is claimed.

@@ -108,6 +108,8 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 ## Open questions
 
+S8 Classic source facts (2026-10-18): own Script 108 names Zak/Annie/Melissa/Leslie at +0x009C/+0x00A4/+0x00AE/+0x00BA; names NPC 7 representative at +0x00C5; sets selection range at +0x0140 and native player range variables 42..43 to 1..4 at +0x0145. Own phone bill 15 verb 14 +0x0025 performs native pickup. Independent Classic tests prove acquired bill transfer 1→2→1, unchanged state, refusal guards and native Read after Undo. See the [Classic S8 record](../../.verification/zakclassic-state-20261018/README.md).
+
 S8 Enhanced source facts (2026-10-18): Script 108 +0x0182 writes native player range variables 42..43 to 1..4; +0x017D writes the selection range. Script 4 adds switching guards (var C7, object 169 Unlocked, indexed bit 05BE), so player membership does not imply current switchability. Room 1 phone bill 15 verb 14 +0x0025 executes `pickupObject var[0x009]`; the genuine pickup and retained inventory code survive an explicit owner edit and Undo. See the [S8 record](../../.verification/zakenhanced-state-20261018/README.md).
 
 What is not decoded or not verified, and what would settle it.
