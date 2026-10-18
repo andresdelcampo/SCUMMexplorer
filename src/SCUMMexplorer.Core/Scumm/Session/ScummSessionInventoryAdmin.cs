@@ -107,6 +107,7 @@ public abstract partial class ScummSession
             .GroupBy(x => x.Object.Id).ToDictionary(g => g.Key, g => g.ToArray());
         var candidates = new Dictionary<int, (int? Room, string Evidence)>();
         var pickupRooms = new Dictionary<int, HashSet<int>>();
+        var sourceEffectTargets = new HashSet<int>();
         foreach (var item in indexed.States.Where(x => (x.Value & 1) != 0))
             candidates[item.Key] = (null, "Index: native v1/v2 Pickupable flag");
         var globals = _data.GlobalScriptIds().ToDictionary(id => id, id => _data.GlobalScript(id));
@@ -164,6 +165,7 @@ public abstract partial class ScummSession
                 return;
             }
             if (!locations.ContainsKey(target)) return;
+            sourceEffectTargets.Add(target);
             // A known source room is useful only when it actually contains the
             // target's code, not merely its resident proxy/helper handler.
             int? sourceRoom = room is int r && locations[target].Any(x => x.Room == r) ? r : null;
@@ -185,7 +187,7 @@ public abstract partial class ScummSession
                 _inventoryCatalogNotes.Add($"Excluded {candidate.Key}: more than one source room ({string.Join(',', sources.Select(x => x.Room).Distinct())}).");
         }
         _inventoryCatalogNotes.Add($"Source candidates: {candidates.Count}; object-code locations: {locations.Count}.");
-        return _inventoryCatalog = candidates.Where(x => locations.ContainsKey(x.Key))
+        var catalog = candidates.Where(x => locations.ContainsKey(x.Key))
             .Where(x => !pickupRooms.TryGetValue(x.Key, out var sources) || sources.Count == 1)
             .Where(x => x.Value.Room.HasValue || locations[x.Key].Select(l => l.Room).Distinct().Count() == 1)
             .Select(x =>
@@ -195,6 +197,24 @@ public abstract partial class ScummSession
                     ? ScummTextDecoder.DecodeGlyphs(bytes).TrimEnd('\0', '@', ' ') : null;
                 return new ScummInventoryCatalogItem(x.Key, room, name, x.Value.Evidence);
             }).OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ThenBy(x => x.ObjectId).ToArray();
+        bool KnownEmptyObjectVerb(int room, int id, int verb)
+        {
+            var records = rooms.GetValueOrDefault(room)?.Objects.Where(o => o.Id == id).ToArray() ?? [];
+            if (records.Length == 0 && locations.TryGetValue(id, out var found) && found.Select(x => x.Room).Distinct().Count() == 1)
+            { room = found[0].Room; records = [found.Last().Object]; }
+            if (records.Length == 0) return false;
+            var verbs = _data.ReadObjectVerbs(room, records).GetValueOrDefault(id) ?? [];
+            return !verbs.Any(x => x.VerbId == verb || x.VerbId == 255);
+        }
+        var retainedCode = catalog.ToDictionary(x => x.ObjectId, x =>
+            (_data.ReadObjectVerbs(x.SourceRoomId, rooms[x.SourceRoomId].Objects.Where(o => o.Id == x.ObjectId).ToArray())
+                .GetValueOrDefault(x.ObjectId) ?? []).Any(v => v.VerbId != 14 &&
+                    ObjectScript(x.SourceRoomId, x.ObjectId, v.VerbId) is { Instructions.Count: > 0 }));
+        var aliases = ScummInventoryCatalogIdentity.FindSceneAliases(catalog, sourceEffectTargets, globals,
+            ObjectScript, KnownEmptyObjectVerb, id => retainedCode.GetValueOrDefault(id), Note);
+        foreach (var alias in aliases.OrderBy(x => x.Key))
+            Note($"Scene alias {alias.Key} returns retained inventory item {alias.Value}; excluded as an additional catalog item.");
+        return _inventoryCatalog = catalog.Where(x => !aliases.ContainsKey(x.ObjectId)).ToArray();
     }
 
     private static int? InventoryLiteral(string operand) => operand.StartsWith("0x", StringComparison.Ordinal) &&

@@ -9,7 +9,7 @@ public sealed class ScummInventoryAdminTests
     public static TheoryData<string, int, int> Copies => new()
     {
         { "mmansion ega en", 55, 48 }, { "mmansionE ega es", 55, 48 },
-        { "zak ega en", 15, 76 }, { "zakE ega en", 15, 76 }
+        { "zak ega en", 15, 70 }, { "zakE ega en", 15, 70 }
     };
 
     private static ScummGameSession? Ready(string folder)
