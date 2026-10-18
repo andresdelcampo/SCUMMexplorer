@@ -1,5 +1,49 @@
 [
  {
+  "game": "Unknown",
+  "label": "English, Maniac Mansion classic",
+  "demo": false,
+  "lflFiles": 53,
+  "files": {
+   "01.LFL": "ffefcb6e305cd3d3b4b157945166e636f82ec0b25b6e8bf57eec4bd6bfb7d3d6",
+   "02.LFL": "2480929cf10c7074e5e9100c84132c005d1dd6faf2812c9b753d5c2bc0aa5bf4",
+   "03.LFL": "34161639acbb5423180f1b8af5edaf15af04c790ec6fd5d05b7e0cb1387afe03"
+  }
+ },
+ {
+  "game": "Unknown",
+  "label": "Spanish, Maniac Mansion enhanced",
+  "demo": false,
+  "lflFiles": 54,
+  "files": {
+   "01.LFL": "1d8dadf35f71229e6c4611ab31bc8ce7da18017232b14d7ddede267ec8acca4f",
+   "02.LFL": "9efda60dcc34ab534e7d2ef46d06dc2f9e23b7056c70e8eb852f82961c9a0bd2",
+   "03.LFL": "da800786baab0357cbd5af8eab54274fa1afd6da923016226ee68ea547adad6e"
+  }
+ },
+ {
+  "game": "Unknown",
+  "label": "English, Zak McKracken classic",
+  "demo": false,
+  "lflFiles": 59,
+  "files": {
+   "01.LFL": "22808df117328c3e1cf21b123fe650b1ac1d8a547ccbbc149f5129e28851c5e8",
+   "02.LFL": "65d573b6a17fd4192343d3cbf2b239b55e73b944c519cd2109ca8ae2b0a6221e",
+   "03.LFL": "7448dcb71eada81edf820d138c4616b8a8d55bc06d169a776a157f08c41c8527"
+  }
+ },
+ {
+  "game": "Unknown",
+  "label": "English, Zak McKracken enhanced",
+  "demo": false,
+  "lflFiles": 59,
+  "files": {
+   "01.LFL": "ffa009420a4f62414e62550d484b597db8776187743d941a91547eec3921f8b7",
+   "02.LFL": "7a493d6fb446e908ce93a550c46b506d3b1c6e4b3b0d70e96ad8c02f04b230e5",
+   "03.LFL": "e52be0ed288abb8236ea2f08bd1fc7041a1a5b31aa64f02cf716a0ebb08a7a1c"
+  }
+ },
+ {
   "game": "Loom",
   "label": "English, Roland upgrade",
   "demo": false,

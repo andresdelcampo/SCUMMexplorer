@@ -8,6 +8,22 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Acceptance: `Room 33 · Look at poster` (object 429 verb 8), `Room 37 · Entry` (Script 60) and `Room 19 · Entry` (the ship, local script 200, on to Room 7; it starts its disc track, sound 102). Background derivation: 8 workers, each with its own copy read from the disc image; results identical to one thread; 51 s in the window on first launch. App fix (shared): an entry played from the picker in another room no longer runs the entry twice (the ship played nothing).
 - Registry: MonkeyCd Cutscenes – → ◐. Validation: `ScummMonkeyCdCutsceneTests`; support, cutscene and play tests; LOOM regression; LOOM, Indy3 and Monkey floppy lists byte-identical. Record: [monkeycd-cutscenes-20261017](../.verification/monkeycd-cutscenes-20261017/README.md).
 
+## 18 October: script-derived Maniac Mansion and Zak McKracken cutscenes (S7, all four families)
+
+- Cutscenes None to Partial for ManiacClassic, ManiacEnhanced, ZakClassic and ZakEnhanced. Three source-attributed fresh-start examples per family complete; room-list and global-picker actions pass in four actual windows. Maniac lists 27 groups (6/7 starts); Zak 54 (13 per edition, five bounded runs).
+- Old script-call/text syntax, source-labelled begins and direct-action argument binding are supported. Maniac uses a disclosed, fingerprinted native startup preview while preserving queued/partial/completed player choices. Spanish readable labels follow verified executable glyphs; rendered text is unchanged.
+- State prerequisites are not invented. Classic post-doorbell Script 174, five Zak frame bounds, Spanish rendered-font mismatch and S5/S6 visual/walking limits remain recorded. Proposed R-8.34 is separate; no shipped seed, hand catalog, S8 or S9 work.
+- [Checkpoint](checkpoints/20261018-S7-ManiacZak.md) and [integration evidence](../.verification/maniaczak-cutscenes-20261018/README.md) hold exact counts, source proof links, window commands and final validation.
+- Final validation on current master plus S7: 1215 passed, zero failed, five skipped; build zero warnings/errors; three matrix tests and four real-window checks passed.
+
+## 17 October: native Maniac Mansion and Zak McKracken Play (S6, all four families)
+
+- Classic/enhanced Maniac and Zak now use native v1/v2 verbs, sentence, inventory, cursor and DOS fonts. Input goes through script 4; first Play keeps Maniac's party menu. Held objects retain their code and owner position, and inventory scrolling resets when the actor or inventory changes.
+- Native box routing, direction remapping, player-actor identity and actor draw offsets support the checked routes. Both Maniac routes select the party, skip the opening, walk out and take/select the key. Both Zak routes take the phone bill, skip the reached alien scene, walk to the shop, choose Buy and finish its CashCard refusal with control restored.
+- Four real-window routes pass; Objects and Play become Full and both generated matrices are updated. This is bounded route support, not a complete playthrough or original-interpreter picture comparison. S5 visual findings, native darkness/flashlight, the generic closest-point walking approximation and untested editions remain disclosed. Proposed R-7.19 to R-7.21 are retained separately.
+- Parallel work used four family worktrees with one shared-engine owner. Concurrent master changes were retained. Build/full-suite evidence and exact window commands are in the [checkpoint](checkpoints/20261017-S6-ManiacZak.md) and [integration record](../.verification/maniaczak-play-20261017/README.md).
+- Final merged validation: build zero warnings/errors; 1197 tests passed, zero failed, five skipped; three matrix tests and four real-window routes passed.
+
 ## 17 October: Monkey Island 2 boots to the campfire and shows its first-visit rooms (S4b, S5, Monkey2)
 
 - The generic session boots `mi2 talkie en` in 3409 frames to Room 4 (the campfire on Scabb Island) with the player in control and nothing unsupported; the one assumed input is a click on "Monkey Island 2" (the full game) in the choice screen (Room 108), through the game's own input script (`ScummBootInputPlan.ClickObject`). No copy protection at boot parameter 0 in this edition.

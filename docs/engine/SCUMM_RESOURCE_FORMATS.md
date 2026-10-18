@@ -2,6 +2,12 @@
 
 Version scope is stated on every item. Everything here was checked against ScummVM's `engines/scumm` (resource, room, gfx, costume and palette sources) and against the local game data on 11 October 2026; pictures were checked in the real window (`.verification/generic-v4/README.md`). **Rooms, depth masks, costumes, sounds and the stored objects (v4, v5; for v1/v2 the object pictures, below) are read** for these games: their scripts and actors are not, so nothing here says what a script does (see [the script reference](SCUMM_SCRIPT_MAP.md) for the scope).
 
+## DOS v1/v2 built-in text and box routing (17 October 2026)
+
+The DOS v1/v2 charset is an engine-supplied 8 by 8 bitmap font, not a later `CHAR` resource. ScummVM `charset-fontdata.cpp` and `CharsetRendererV2` provide the base glyphs, inventory arrows and language-dependent replacements in ASCII slots. `ScummV2Charset` retains those slots; the reviewed fixture language is identified by resource hashes in `Discovery/known-editions.json`, never folder names. An unrecognised edition does not establish its language. Source and attribution are in `THIRD_PARTY_NOTICES.md`; the S6 record separates source drawing from original-game comparison.
+
+The old room box table has eight-byte boxes followed by a routing matrix: one row-offset byte per box, then the rows. The lookup uses `boxCount + matrix[from] + to`, interpreting the result as a signed byte (`-1` is unreachable). Coordinates use eight-pixel x and two-pixel y units; path arithmetic must use those units before returning pixels. Sources: ScummVM `room.cpp`, `boxes.cpp`, `actor.cpp`, read 17 October 2026; implementation `ScummWalkBoxReader.ReadV2` / `ScummActors.V2`.
+
 ## Index and container layouts
 
 | Layout | Games seen | Files | Index | Code |

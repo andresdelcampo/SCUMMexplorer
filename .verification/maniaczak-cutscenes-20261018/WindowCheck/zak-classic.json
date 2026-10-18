@@ -1,0 +1,7 @@
+{
+  "BrowseRoom": 8,
+  "Scenes": [
+    { "Room": 8, "Object": 0, "Verb": 0, "Trace": "cutscene at Script 140 +0x0004", "Message": "Meanwhile" },
+    { "Room": 3, "Object": 147, "Verb": 9, "Trace": "cutscene at Script 39 +0x0000", "Message": "We're closed" }
+  ]
+}

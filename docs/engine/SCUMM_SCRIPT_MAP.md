@@ -1,8 +1,14 @@
 # SCUMM script reference
 
-This reference separates engine-defined variables and script behavior from the meanings a game assigns to scripts, variables, bits and verbs. Its scope is DOS SCUMM v3 and v4, with narrower version and format limits stated below. A shared opcode handler does not make every operand or behavior identical across versions.
+This reference separates engine-defined variables and script behavior from the meanings a game assigns to scripts, variables, bits and verbs. Version and format limits are stated per section, including the separate DOS v1/v2 contract. A shared opcode handler does not make every operand or behavior identical across versions.
 
 For LOOM's script IDs, story state, draft verbs and room examples, see the [LOOM script map](../loom/LOOM_SCRIPT_MAP.md). Its EGA numeric tables are edition-specific evidence; CD/VGA uses SCUMM v4 and must be decoded independently.
+
+## SCUMM v1/v2 live input (17 October 2026)
+
+ScummVM `ScummEngine_v2::checkExecVerbs` and `runInputScript` dispatch through script 4 and the old click/keypress globals, not the later `VAR_VERB_SCRIPT` and local argument contract. Verb/scene clicks use mode 1; sentence area 5 and inventory area 3 use mode 0. The engine supplies the sentence and inventory hit regions and scrolling keys. Scripts still compose and execute the action; the explorer must not interpret a first object click as an automatically completed sentence. Source: `verbs.cpp`, `script.cpp`, read 17 October 2026. Implementation: `ScummSessionPlay`; proposed interface requirements R-7.19 to R-7.21. Game-specific keys and choices belong in the Maniac/Zak script maps.
+
+For v1/v2 scene previews, direct object actions bind `ScummVars.V2.ActiveVerb`, `ActiveObject1` and `ActiveObject2` before object code runs, matching the invocation context of `o2_doSentence` subcommand 1. These engine arguments are distinct from story prerequisites; stale arguments can select another object's response. Native cutscene begins retain their source script and offset for run attribution. Sources: ScummVM `script_v2.cpp`, `script.cpp`, read 18 October 2026. The scan accepts the old dialect's bare literal script calls and `[text "..."]` syntax; old `printEgo` text counting is version-gated to preserve later-engine lists.
 
 ## Engine variables (v3/v4)
 

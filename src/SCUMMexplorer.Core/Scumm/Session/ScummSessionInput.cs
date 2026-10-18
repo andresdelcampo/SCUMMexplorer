@@ -398,6 +398,14 @@ public abstract partial class ScummSession
         try
         {
             script = _data.ReadObjectVerb(_currentRoom.ResourceId!.Value, record, verbId, out _);
+            if (_runtime.IsV2 && verbId is not (250 or 253 or 254))
+            {
+                // o2_doSentence sub1 binds the active invocation before runObjectScript.
+                // Direct exploration bypasses walking/input, but must not reuse another object's context.
+                _runtime.SetGlobalVariable(ScummVars.V2.ActiveVerb, checked((ushort)verbId));
+                _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject1, checked((ushort)objectId));
+                _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, 0);
+            }
             run = RunScript(script, _currentObjects, 0, null, 0);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)

@@ -1,0 +1,7 @@
+Initial unchanged production planner,18October2026:
+planner (one boot and the scan)1978ms
+verb words: empty
+triggers0 groups0 scenes0
+
+Command: rtk proxy dotnet run --project .verification/maniacenhanced-cutscenes-20261018/Census/Census.csproj -- "D:\Juegos\Lucas\mmansionE ega es" scan
+The original harness was copied from the Indy3 CutsceneList model before the final family harness replaced it.

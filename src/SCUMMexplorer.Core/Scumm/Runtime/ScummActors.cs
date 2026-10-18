@@ -572,7 +572,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         (actor.DestX, actor.DestY, actor.DestBox, actor.DestDir) = (endX, endY, endBox, direction);
         actor.Point3 = null;
         actor.CurBox = actor.WalkBox ?? ScummWalkBoxSet.InvalidBox;
-        actor.Moving = (actor.Moving & MoveInLeg) | MoveNewLeg;
+        actor.Moving = _v2Animations ? (actor.Moving & ~MoveLastLeg) | MoveInLeg | MoveNewLeg : (actor.Moving & MoveInLeg) | MoveNewLeg;
         // When every box of the room routes to the end box (or the actor ignores boxes), the
         // walk ends there wherever it started, so on arrival an estimate about the start
         // (an assumed arrival, a seeded pick) no longer applies to the position.
@@ -601,7 +601,8 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
                 actor.Moving = 0;
                 continue;
             }
-            if (_useV4Walking) WalkActorV4(actor, place);
+            if (_v2Animations) WalkActorV2(actor, place);
+            else if (_useV4Walking) WalkActorV4(actor, place);
             else WalkActor(actor, place);
             moved.Add(actor.Number);
         }
@@ -958,8 +959,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
     /// <summary><c>Actor::adjustXYToBeInBox</c> with the actor's last valid point (null when that point matters and is unknown).</summary>
     private static BoxAdjustment? AdjustXY(Actor actor, int x, int y, Placement place)
     {
-        var isPlayer = place.Classes is not null && place.Classes.TryGetValue(actor.Number, out var bits) &&
-                       ScummObjectClasses.Has(bits, PlayerClass);
+        var isPlayer = place.IsPlayer(actor.Number);
         var result = place.Boxes!.Adjust(x, y, isPlayer, actor.LastValidX ?? 0, actor.LastValidY ?? 0);
         // The last valid point comes back only when no box was within reach.
         if (result.Box == ScummWalkBoxSet.InvalidBox && actor.LastValidX is null) return null;
@@ -972,7 +972,11 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
 
     /// <summary>The room the actor calls are made in: its number, its walk boxes, and class bits for <c>isPlayer</c>.</summary>
     public readonly record struct Placement(int? CurrentRoom, ScummWalkBoxSet? Boxes, string? BoxesUnknown,
-        IReadOnlyDictionary<int, uint>? Classes);
+        IReadOnlyDictionary<int, uint>? Classes, Func<int, bool>? PlayerPredicate = null)
+    {
+        public bool IsPlayer(int number) => PlayerPredicate?.Invoke(number) ??
+            (Classes is not null && Classes.TryGetValue(number, out var bits) && ScummObjectClasses.Has(bits, PlayerClass));
+    }
 
     private sealed class Actor(int number)
     {
@@ -1008,6 +1012,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public int DestY { get; set; }
         public int DestDir { get; set; }
         public int CurBox { get; set; }
+        public int V2WalkFacing { get; set; }
         public ScummBoxPoint Next { get; set; }
         public ScummBoxPoint LegStart { get; set; }
         public ScummBoxPoint? Point3 { get; set; }

@@ -5,7 +5,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// Games set the rest; a later engine version with another numbering would get its own table chosen by <see cref="ScummProfile"/>.
 /// These numbers are ScummVM's <c>setupScummVars</c> (vars.cpp, checked 14 October 2026) for version 3 (the old bundle: LOOM and Indiana Jones and
 /// the Last Crusade EGA) and version 4, where the base table is the same; version 4 only adds 27, 39 and 50 to 53, version 5 adds 56 to 72.
-/// Version 2 and version 1 number them differently (<c>ScummEngine_v2::setupScummVars</c>) and need their own table (S4b of those families).
+/// Version 2 and version 1 number them differently (<c>ScummEngine_v2::setupScummVars</c>); their separate table is <see cref="V2"/>.
 /// One engine tick the DOS v3 games add besides the timers of this table: <c>scummLoop</c> also adds the frame's jiffies to variables 39 to 41 of
 /// Indiana Jones and the Last Crusade (every non-Macintosh Indy3 and the FM-Towns Zak), see <see cref="ScummProfile.ExtraTimerVariables"/>.
 /// </summary>
@@ -41,6 +41,9 @@ public static class ScummVars
         public const string Keypress = "var[0x027]";
         public const string CutsceneExitKey = "var[0x028]";
         public const string TalkActor = "var[0x029]";
+        // Actor_v2::isPlayer, actor.cpp (17 October 2026); classic Maniac uses Ego instead.
+        public const string FirstPlayerActor = "var[0x02A]";
+        public const string LastPlayerActor = "var[0x02B]";
     }
     /// <summary><c>VAR_RESULT</c>: where <c>getActor*</c>-style opcodes leave their answer.</summary>
     public const string Result = "var[0x000]";
