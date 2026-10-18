@@ -1,0 +1,27 @@
+Play started: room 4, image visible Visible, cursor system pointer hidden, room view Collapsed, Normal-mode note "", tooltip none; the scene sound player follows it: True; device AdLib
+Room 7 after 324 window frames; Guybrush at (696, 53)
+verbs drawn: 0x01 (0,152) image 955, 0x04 (5,155), 0x02 (3,171), 0x03 (3,187), 0x09 (45,155), 0x08 (45,171), 0x0A (47,187), 0x07 (112,155), 0x05 (106,171), 0x06 (111,187), 0xC8 (160,152) image 990, 0xC9 (200,152) image 989, 0xCA (240,152) image 995, 0xCB (280,152) image 991, 0xCC (160,176) image 992, 0xCD (200,176) image 993, 0xCE (240,176) image 994, 0xCF (280,176) image 996, 0xD0 (144,152) image 957, 0xD1 (144,176) image 957, 0x64 (136,145)
+click on Look at: runInputScript(1, 8, 1) click on verb 0x08 at screen (46, 172)
+pointer on the sign: sentence line "Look at sign"
+click on the sign: runInputScript(2, 0, 1) click in the room at screen (272, 28), room (736, 28)
+cutscene True, skippable True, messages [`Welcome to Woodtick`]
+Esc through the window's key handler: taken True; cutscene False
+click on Pick up: runInputScript(1, 9, 1) click on verb 0x09 at screen (46, 156)
+click on the sign: runInputScript(2, 0, 1) click in the room at screen (272, 28), room (736, 28)
+inventory [45, 49, 50, 51, 52, 53, 54, 55, 56]; slots 0xC8 image 992, 0xC9 image 993, 0xCA image 994, 0xCB image 996, 0xCC image 911, 0xCD image 956, 0xCE image 956, 0xCF image 956
+right click on the sign through the window: runInputScript(2, 0, 2); messages [`Welcome to Woodtick`]
+click in the room to the west: runInputScript(2, 0, 1) click in the room at screen (10, 66), room (474, 66)
+dialogue: input script 14, choices 0x78, 0x79, 0x7A, 0x7B
+click on the first choice: runInputScript(1, 120, 1) click on verb 0x78 at screen (1, 146)
+after the choice: messages [Is this some sort of bribe situation?]
+frames played by the window: 587
+-- scene sound log (device AdLib)
+   frame 216 39733 ms preview start 169 effect (AdLib) | Estimated preview route: Script 93 +0x0014 startSound 0xA9
+   frame 216 40094 ms opened 169 effect (AdLib) | audio True, duration 10,299 s; Estimated preview route: Script 93 +0x0014 startSound 0xA9
+   frame 310 50126 ms stop 169  | Estimated preview route: Script 93 +0x004C stopSound 0xA9
+   frame 310 53840 ms preview start 107 effect (AdLib) | Estimated preview route: Room 04 entry script +0x006D startSound 0x6B
+   frame 310 53956 ms opened 107 effect (AdLib) | audio True, duration 233,57 s; Estimated preview route: Room 04 entry script +0x006D startSound 0x6B
+   frame 374 61126 ms preview start 6 effect (AdLib) | Estimated preview route: Room 07 Object 46 Verb 0x09 +0x0010 startSound 0x06
+   frame 374 61204 ms opened 6 effect (AdLib) | audio True, duration 5,9 s; Estimated preview route: Room 07 Object 46 Verb 0x09 +0x0010 startSound 0x06
+   frame 468 75058 ms preview start 151 effect (AdLib) | Estimated preview route: Room 07 local script 203 +0x0075 startSound 0x97
+   frame 468 75141 ms opened 151 effect (AdLib) | audio True, duration 190,492 s; Estimated preview route: Room 07 local script 203 +0x0075 startSound 0x97

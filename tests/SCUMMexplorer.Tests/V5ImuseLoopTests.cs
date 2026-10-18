@@ -88,6 +88,63 @@ public sealed class V5ImuseLoopTests
     }
 
     [Fact]
+    public void ASongThatLoopsForEverGoesOnFromThePassAfterItsPreviousJump()
+    {
+        // S6 Monkey2: play repeats the rendered wave from RestartSeconds once it reaches EndSeconds. Loop for ever from beat 5 back to beat 2: every pass takes
+        // 1.5 s, so the pass after the second-to-last jump is the one that follows the last.
+        var song = ScummImuseSong.Parse(Part([
+            .. SetUp(0, 0),
+            .. Loop(0, 1000, 2, 0, 5, 0),
+            .. Event(960, 0x90, 60, 100),
+            .. Event(480, 0x80, 60, 0),
+            .. Event(960, 0xFF, 0x2F, 0x00)]));
+        var timeline = ScummImuseTimeline.Build(song);
+        Assert.Equal(timeline.JumpBackSeconds[^2], timeline.RestartSeconds!.Value, 6);
+        Assert.Equal(1.5, timeline.EndSeconds - timeline.RestartSeconds.Value, 6);
+        // A song that ends has no restart point.
+        Assert.Null(ScummImuseTimeline.Build(CountedLoop()).RestartSeconds);
+    }
+
+    [Fact]
+    public void ALongSongThatJumpsBackOnceGoesOnFromWhereItFirstPlayedTheTarget()
+    {
+        // The always-taken hook at the end (tick 1920 + 200 s of rests) jumps back to beat 2 (tick 480, 0.5 s): the restart is the target's first playing second.
+        var song = ScummImuseSong.Parse(Part([
+            .. SetUp(0, 0),
+            .. Event(960, 0x90, 60, 100),
+            .. Event(240, 0x80, 60, 0),
+            .. Event(960 * 200, 0x90, 62, 100),
+            .. Event(240, 0x80, 62, 0),
+            .. Hook(0, 0, 2, 0),
+            .. Event(0, 0xFF, 0x2F, 0x00)]));
+        var timeline = ScummImuseTimeline.Build(song);
+        Assert.True(timeline.EndedOnLoop);
+        Assert.Single(timeline.JumpBackSeconds);
+        Assert.Equal(0.5, timeline.RestartSeconds!.Value, 6);
+    }
+
+    [Fact]
+    public void AnArmedJumpHookIsTakenFromTheSecondItWasArmedAndCanEndTheSong()
+    {
+        // S6 Monkey2 (Player::setHook class 0, maybe_jump): the song loops on its always-taken hook at beat 5 (back to beat 2); a hook with id 1 at beat 4
+        // jumps past the loop to beat 6, where the track ends. Unarmed, the song loops; armed at 10 s, the next id-1 marker after 10 s takes the jump.
+        byte[] HookWithId(int delta, int id, int beat) => Sysex(delta, [0x7D, 48, 0, .. Nibbles([(byte)id, 0, 0, 0, (byte)beat, 0, 0])]);
+        var song = ScummImuseSong.Parse(Part([
+            .. SetUp(0, 0),
+            .. HookWithId(1440, 1, 6),     // tick 1440 (1.5 s): to beat 6 (tick 2400) when hook 1 is armed
+            .. Hook(480, 0, 2, 0),         // tick 1920: back to beat 2 (tick 480), always
+            .. Event(480, 0x90, 60, 100),  // tick 2400: only after the hook-1 jump
+            .. Event(480, 0xFF, 0x2F, 0x00)]));
+        Assert.True(ScummImuseTimeline.Build(song).EndedOnLoop);
+        var hooked = ScummImuseTimeline.BuildWithHook(song, 1, 10);
+        Assert.False(hooked.EndedOnLoop);
+        // Each pass from tick 480 to 1920 takes 1.5 s; the first id-1 marker at or after 10 s is at 10.5 s (passes at 1.5, 3, 4.5, ... 10.5); the jump lands at
+        // tick 2400 and the track ends half a second later.
+        Assert.Equal(11.0, hooked.EndSeconds, 6);
+        Assert.Contains(hooked.Items, item => !item.Synthetic && item.Event.Command == 0x9);
+    }
+
+    [Fact]
     public void ALoopTheDriverRefusesIsIgnored()
     {
         // to-beat 4, from-beat 5: to-beat + 1 >= from-beat, so setLoop returns false and the song plays through once.

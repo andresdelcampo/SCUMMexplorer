@@ -22,6 +22,8 @@ public sealed class ScummV5DataSource : IScummDataSource
     private readonly Dictionary<int, IReadOnlyList<ScummV5Script>> _roomScripts = [];
     private readonly Dictionary<int, BrowsedObjects> _objects = [];
     private readonly Dictionary<int, IReadOnlyList<ScummV5ObjectVerb>> _verbs = [];
+    // Every stored state image of a room's objects, decoded once (S6 Monkey2: play picks an image by state every frame).
+    private readonly Dictionary<int, IReadOnlyList<ScummV4ObjectImage>> _stateImages = [];
 
     public ScummV5DataSource(ScummV5Archive archive, ScummScriptDialect dialect)
     {
@@ -91,7 +93,10 @@ public sealed class ScummV5DataSource : IScummDataSource
     public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room, IReadOnlyDictionary<int, byte>? states)
     {
         var result = new List<RoomObjectImage>();
-        foreach (var group in Read(() => _archive.ReadObjectImages(room)).GroupBy(image => image.Id))
+        IReadOnlyList<ScummV4ObjectImage> stored;
+        lock (_stateImages)
+            if (!_stateImages.TryGetValue(room, out stored!)) _stateImages[room] = stored = Read(() => _archive.ReadObjectImages(room));
+        foreach (var group in stored.GroupBy(image => image.Id))
         {
             var state = states is not null && states.TryGetValue(group.Key, out var known) ? known : 0;
             var image = state > 0 ? group.FirstOrDefault(i => i.State == state) : group.OrderBy(i => i.State).First();

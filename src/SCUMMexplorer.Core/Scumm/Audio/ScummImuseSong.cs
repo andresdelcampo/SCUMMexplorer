@@ -47,7 +47,13 @@ public sealed class ScummImuseSong
         return seconds + (tick - last) * micros / 1e6 / TicksPerQuarter;
     }
 
-    public static ScummImuseSong Parse(ReadOnlySpan<byte> part)
+    public static ScummImuseSong Parse(ReadOnlySpan<byte> part) => Parse(part, 0);
+
+    /// <summary>
+    /// One track of the song's MIDI file (format 2 holds independent tracks; a hook can jump to another, ScummVM <c>Player::jump</c> <c>setTrack</c>, S6 Monkey2):
+    /// <paramref name="track"/> counts the <c>MTrk</c> chunks from 0. Throws when the file has no such track.
+    /// </summary>
+    public static ScummImuseSong Parse(ReadOnlySpan<byte> part, int track)
     {
         var p = 0;
         // The MDhd block (tag, big-endian body size, 8 bytes) comes before the MIDI file.
@@ -62,6 +68,11 @@ public sealed class ScummImuseSong
         var division = BinaryPrimitives.ReadUInt16BigEndian(part[(p + 12)..]);
         if (division == 0 || (division & 0x8000) != 0) throw new InvalidDataException("The MIDI file's timing is not in ticks per quarter note.");
         p += 8 + headerLength;
+        for (var skipped = 0; skipped < track; skipped++)
+        {
+            if (p + 8 > part.Length || !part.Slice(p, 4).SequenceEqual("MTrk"u8)) throw new InvalidDataException($"The MIDI file has no track {track}.");
+            p += 8 + BinaryPrimitives.ReadInt32BigEndian(part[(p + 4)..]);
+        }
         if (p + 8 > part.Length || !part.Slice(p, 4).SequenceEqual("MTrk"u8)) throw new InvalidDataException("The MIDI file has no track.");
         var end = Math.Min(part.Length, p + 8 + BinaryPrimitives.ReadInt32BigEndian(part[(p + 4)..]));
         p += 8;

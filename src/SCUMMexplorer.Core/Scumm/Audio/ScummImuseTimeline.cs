@@ -35,6 +35,14 @@ public sealed class ScummImuseTimeline
     /// <summary>The seconds, in playing time, at which each jump back happened; the pass that follows begins at its target.</summary>
     public IReadOnlyList<double> JumpBackSeconds { get; }
 
+    /// <summary>
+    /// For a song whose unrolling stopped at a jump back (<see cref="EndedOnLoop"/>): the second of the rendered song from which the game would play on after
+    /// <see cref="EndSeconds"/>, so a player that goes back there when it reaches <see cref="EndSeconds"/> keeps the song looping as the game does until a
+    /// script stops it (S6 Monkey2, 17 October 2026). It is the previous jump back when that one went to the same target (the pass after it is the one that
+    /// follows), else the first time the position played the target. Null for a song that ends. An estimate: hooks and loops that scripts arm are not followed.
+    /// </summary>
+    public double? RestartSeconds { get; private init; }
+
     private ScummImuseTimeline(List<ScummImuseTimelineItem> items, double end, int jumpsBack, bool endedOnLoop, List<double> jumps)
     {
         Items = items;
@@ -44,11 +52,33 @@ public sealed class ScummImuseTimeline
         JumpBackSeconds = jumps;
     }
 
-    public static ScummImuseTimeline Build(ScummImuseSong song, double minLoopSeconds = MinLoopSeconds, double maxSeconds = MaxSeconds)
+    public static ScummImuseTimeline Build(ScummImuseSong song, double minLoopSeconds = MinLoopSeconds, double maxSeconds = MaxSeconds) =>
+        Build(song, minLoopSeconds, maxSeconds, 0, 0);
+
+    /// <summary>
+    /// The song with a jump hook a script armed while it played (S6 Monkey2, 17 October 2026; ScummVM master read 17 October 2026: <c>soundKludge</c>
+    /// [0x10C, sound, 0, value] is <c>Player::setHook</c> class 0, <c>HookDatas::set</c> puts the value in <c>_jump[0]</c>; the sysex 0x7D 48 jumps when its id
+    /// is 0 or equals <c>_jump[0]</c>, and an id below 0x80 is used up when taken, <c>Player::maybe_jump</c>). From <paramref name="armedAtSeconds"/> of playing
+    /// time on, the hook markers with id <paramref name="hookValue"/> are taken too; the unrolling limits count from that second.
+    /// </summary>
+    /// <remarks>
+    /// A taken hook that names another track of the file (<paramref name="track"/> gives it) ends the unrolling there: the song goes on in that track from the
+    /// target and plays it on its default path; the timeline then holds the events up to the jump, <see cref="SwitchedToTrack"/> names the track, and
+    /// <see cref="EndSeconds"/> adds that track's rest (a looping track makes the whole song loop: <see cref="EndedOnLoop"/>).
+    /// </remarks>
+    public static ScummImuseTimeline BuildWithHook(ScummImuseSong song, int hookValue, double armedAtSeconds, Func<int, ScummImuseSong?>? track = null) =>
+        Build(song, armedAtSeconds + MinLoopSeconds, armedAtSeconds + MaxSeconds, hookValue, armedAtSeconds, track);
+
+    /// <summary>The track a taken hook switched to (<see cref="BuildWithHook"/>), or null.</summary>
+    public int? SwitchedToTrack { get; private init; }
+
+    private static ScummImuseTimeline Build(ScummImuseSong song, double minLoopSeconds, double maxSeconds, int hookValue, double armedAtSeconds,
+        Func<int, ScummImuseSong?>? trackOf = null)
     {
         var events = song.Events;
         var items = new List<ScummImuseTimelineItem>(events.Count);
         var jumps = new List<double>();
+        var targets = new List<long>();
         var index = 0;
         long position = 0;     // the song tick the player is at
         double playBase = 0;   // playing seconds at song tick `baseTick`
@@ -75,6 +105,7 @@ public sealed class ScummImuseTimeline
             {
                 jumpsBack++;
                 jumps.Add(seconds);
+                targets.Add(target);
                 if (seconds >= minLoopSeconds) { endedOnLoop = true; return true; }
             }
             playBase = seconds;
@@ -109,7 +140,24 @@ public sealed class ScummImuseTimeline
                 case 48 when e.Data.Length > 3:
                 {
                     var buf = ScummImuseSong.Decode(e.Data.AsSpan(3), 9);
-                    if (buf.Length < 7 || buf[0] != 0) break; // only the always-taken hook
+                    if (buf.Length < 7) break;
+                    if (buf[0] != 0)
+                    {
+                        // A hook with an id jumps only when a script armed that id (BuildWithHook); one below 0x80 is used up by the jump.
+                        if (hookValue == 0 || buf[0] != hookValue || Playing(e.Tick) < armedAtSeconds) break;
+                        if (hookValue < 0x80) hookValue = 0;
+                        var toTrack = BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(1));
+                        if (toTrack != 0 && trackOf?.Invoke(toTrack) is { } other)
+                        {
+                            // Player::jump: setTrack, then jumpToTick in that track; the rest of the song is that track from the target.
+                            var at = Playing(e.Tick);
+                            var otherTarget = (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * TicksPerBeat + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
+                            var rest = Build(other);
+                            var tail = Math.Max(0, rest.EndSeconds - other.SecondsAt(Math.Min(otherTarget, other.Ticks)));
+                            jumps.Add(at);
+                            return new ScummImuseTimeline(items, at + tail, jumpsBack, rest.EndedOnLoop, jumps) { SwitchedToTrack = toTrack };
+                        }
+                    }
                     var target = (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * TicksPerBeat + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
                     if (target > song.Ticks) break; // jumpToTick fails past the end of the track
                     if (Jump(e.Tick, target)) { index = events.Count; }
@@ -137,6 +185,15 @@ public sealed class ScummImuseTimeline
         if (endedOnLoop) end = jumps[^1];
         else if (index >= events.Count && guard < 2_000_000) end = Playing(Math.Max(song.Ticks, position));
         else end = maxSeconds;
-        return new ScummImuseTimeline(items, end, jumpsBack, endedOnLoop, jumps);
+        double? restart = null;
+        if (endedOnLoop)
+        {
+            var target = targets[^1];
+            if (jumps.Count >= 2 && targets[^2] == target) restart = jumps[^2];
+            else if (items.FindIndex(item => !item.Synthetic && item.Event.Tick >= target) is var at and >= 0 && items[at] is var first)
+                restart = Math.Max(0, first.Seconds - (song.SecondsAt(first.Event.Tick) - song.SecondsAt(target)));
+            else restart = 0;
+        }
+        return new ScummImuseTimeline(items, end, jumpsBack, endedOnLoop, jumps) { RestartSeconds = restart };
     }
 }

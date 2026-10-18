@@ -97,6 +97,16 @@ Sources: ScummVM [verb operations](https://github.com/scummvm/scummvm/blob/maste
 - **Cursor:** `ScummEngine_v5::resetCursors` cursor 0 (the cross-hair, hotspot 8, 7) in colours 15, 15, 7, 8 (`default_cursor_colors`), animated every two frames; no DOS-specific branch. Monkey Island CD never changes it (no `cursorImage`/`cursorHotspot` in its global scripts).
 - **CD tracks** (`sound.cpp` `triggerSound`, `soundcd.cpp`): a `SOUN` block of chunk type 2 starts `playCDTrackFromSoundID`; `stopSound` calls `stopCDSound` first. The iMuse "stop all sounds on a new music" workaround is only for `GID_MONKEY_VGA`/`GID_MONKEY_EGA`, not the CD release.
 
+### iMUSE hooks and text-verb codes (v5, S6 Monkey2; ScummVM master read 17 October 2026)
+
+| Fact | Source | Evidence |
+|---|---|---|
+| `soundKludge [0x100 + 12 or 20, sound, class, value, chan]` is `Player::setHook(class, value, chan)`; class 0 is the jump hook (`HookDatas::set`: a new value goes to `_jump[0]`, the old one to `_jump[1]`); hooks are cleared when the sound starts | `imuse/imuse.cpp` `doCommand_internal`, `imuse_internal.h` | engine |
+| A sysex 0x7D 48 (hook jump: id, track, beat, tick as nibble pairs) jumps when its id is 0 or equals `_jump[0]`; an id 1..0x7F is used up (`_jump[0] = _jump[1]`); the jump may change track (`setTrack`), then `jumpToTick((beat - 1) * 480 + tick)` | `imuse/sysex_scumm.cpp` case 48, `imuse_player.cpp` `maybe_jump`, `jump` | engine |
+| Param 1 command 13 is a volume fade (`addParameterFader`), not a status; param 0 command 13 is `getSoundStatus_internal` (1 playing, 2 queued, 0 not), which in MI2 only ignores a player fading out | `imuse/imuse.cpp` | engine |
+| The explorer follows an armed jump hook on the song's AdLib timeline (`ScummImuseTimeline.BuildWithHook`, `ScummSoundClock.Retime`); other hook classes, markers and fades are not followed (labelled estimates) | `ScummGameSession.SoundHookArmed` | explorer |
+| `drawString` skips the two bytes after codes 9, 10, 13, 14 (12 sets the colour from them); text verbs drawn in play do the same (`ScummV4Charset.DrawPlainLine`) | `string.cpp` | engine |
+
 ## Messages and charset (DOS v3)
 
 - `print` selects text slots: actor `0xFE` uses drawn-string slot 1, `0xFD` debug slot 2, `0xFC` dialog slot 3, others talk slot 0. `0xFF` is a system line. v1–v3 retain position, height and color defaults, but not centering. Initial defaults are position (0, 0), height 0, color 15 and right edge 319.

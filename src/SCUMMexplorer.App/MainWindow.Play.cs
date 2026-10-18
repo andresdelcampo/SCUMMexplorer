@@ -27,6 +27,8 @@ public partial class MainWindow
     private WriteableBitmap? _playBitmap;
     // The play game's sounds that play a track of its disc (null for a game without them).
     private ScummCdAudioTracks? _playCdTracks;
+    // The play game's iMUSE songs (v5: Monkey Island 2, Fate of Atlantis), for where a looping song goes on (null for a game without them).
+    private ScummImuseMusic? _playImuse;
     // S6 Indy4 (17 October 2026): the spoken lines of a talkie, played as the game's texts start and stop them.
     private readonly TalkieSpeechPlayer _playSpeech = new();
 
@@ -57,6 +59,26 @@ public partial class MainWindow
         return (wave, music);
     }
 
+    /// <summary>
+    /// Where a sound the play session started goes on until a script stops it (S6 Monkey2, 17 October 2026): a CD track with loop count 0xFF from its beginning;
+    /// an iMUSE song (v5) through the S3 player of the chosen device from the loop point of that device's part (<see cref="ScummImuseMusic.Loop"/>, an estimate:
+    /// the markers, hooks and player commands that scripts send to a playing song are not followed). Null: the sound ends by itself.
+    /// </summary>
+    private SceneSoundPlayer.Loop? PlaySoundLoop(int soundId, SceneSoundPlayer.SoundMode mode)
+    {
+        if (_playCdTracks is { } cd && cd.Plays(soundId)) return cd.LoopsForever(soundId) ? new SceneSoundPlayer.Loop(TimeSpan.Zero, null) : null;
+        if (_playImuse is not { } imuse || PlayImuseDevice(mode) is not { } device) return null;
+        return imuse.Loop(soundId, device) is { } loop ? new SceneSoundPlayer.Loop(TimeSpan.FromSeconds(loop.RestartSeconds), TimeSpan.FromSeconds(loop.EndSeconds)) : null;
+    }
+
+    private static ScummImuseDevice? PlayImuseDevice(SceneSoundPlayer.SoundMode mode) => mode switch
+    {
+        SceneSoundPlayer.SoundMode.Roland => ScummImuseDevice.Roland,
+        SceneSoundPlayer.SoundMode.Adlib => ScummImuseDevice.Adlib,
+        SceneSoundPlayer.SoundMode.PcSpeaker => ScummImuseDevice.Speaker,
+        _ => null
+    };
+
     /// <summary>Starts (or continues) play in the room the user opened: the session boots once per game; another room is visited from its state (state preview).</summary>
     private async Task StartPlayAsync(GameResource resource, CancellationToken token)
     {
@@ -74,11 +96,13 @@ public partial class MainWindow
                 _playScreen = new ScummPlayScreen(game, session, objects!.States);
                 _playFolder = game.FolderPath;
                 _playCdTracks = ScummCdAudioTracks.For(game);
+                _playImuse = ScummImuseMusic.For(game);
             }
             if (token.IsCancellationRequested) return;
             // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
-            // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd).
-            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, _playCdTracks is { } loops ? loops.LoopsForever : null);
+            // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd); an iMUSE song that jumps back
+            // goes on from its loop point (S6 Monkey2).
+            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, PlaySoundLoop);
             if (game.Speech is { } speech && !_playSpeech.Follows(_play.Messages)) _playSpeech.Attach(speech, _play.Messages);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
             // The old engine's opening can wait on the player's party choice.

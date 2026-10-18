@@ -139,8 +139,10 @@ public sealed class ScummV4Charset : IScummTextCharset
             if (glyph == 0) break;
             if (glyph is 0xFF or 0xFE)
             {
-                // drawString: codes 9, 10, 12, 13 and 14 carry two operand bytes (S6 Indy4, 17 October 2026: a dialogue line's speech codes, code 10).
-                if (++index < glyphs.Count && glyphs[index] is 9 or 10 or 12 or 13 or 14) index += 2;
+                // drawString (string.cpp, ScummVM master read 17 October 2026): codes 9, 10, 13 and 14 carry two bytes that draw nothing (12, the colour, too);
+                // Monkey Island 2's talkie dialogue choices start with code 10 and end with code 9 (S6 Monkey2).
+                var code = index + 1 < glyphs.Count ? glyphs[index + 1] : 0;
+                index += code is 9 or 10 or 12 or 13 or 14 ? 3 : 1;
                 continue;
             }
             if (glyph == '@') continue;

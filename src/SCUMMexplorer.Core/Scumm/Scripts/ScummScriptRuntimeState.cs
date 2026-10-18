@@ -202,6 +202,12 @@ public sealed class ScummScriptRuntimeState
     public HashSet<int> ActiveSounds { get; } = [];
     /// <summary>Native resource-clock status, with unresolved/seeded route certainty; null outside a session.</summary>
     public Func<int, (bool Running, string? Estimate)>? SoundRunning { get; set; }
+
+    /// <summary>
+    /// A script armed a hook of a playing song (<c>soundKludge</c> player command 12 or 20: sound, class, value; S6 Monkey2). Returns what the session's sound
+    /// clock now follows, or null when it does not follow it.
+    /// </summary>
+    public Func<int, int, int, string?>? SoundHook { get; set; }
     /// <summary>drawObject calls since the last room entry or setState, in call order.</summary>
     public List<int> DrawQueue { get; } = [];
     /// <summary>Objects whose state reached <c>setState</c> calls set since the last room entry.</summary>

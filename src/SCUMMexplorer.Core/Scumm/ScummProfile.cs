@@ -224,8 +224,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
             // S6 MonkeyCd and Maniac/Zak (17 October 2026): native version-specific input and presentation.
+            // S6 Monkey2 (17 October 2026): Monkey Island 2 plays through its own verbs and inventory icons on version 5.
             PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
-                or GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced
+                or GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced or GameFamily.Monkey2
                 // S6 Indy4 (17 October 2026): Fate of Atlantis plays through its own verbs, sentence line, icon inventory and dialogue lines on version 5.
                 || GameSupport.FamilyOf(game) == GameFamily.Indy4,
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],

@@ -105,6 +105,13 @@ public sealed partial class ScummBoundedScriptExecutor
                 estimate = statusEstimate;
                 meaning = $"player command {command} for sound {sound}, which is not playing";
             }
+            else if (command is 12 or 20 && runtime?.SoundHook?.Invoke(sound, Word(2), Word(3)) is { } followed)
+            {
+                // Player::setHook (class, value, channel); the session's song clock follows a jump hook on the song's own timeline.
+                result = 0;
+                meaning = $"hook class {Word(2)} value {Word(3)} for playing sound {sound}: {followed}";
+                estimate = "the song's length follows the armed jump hook on its AdLib timeline; markers and other player commands are not followed";
+            }
             else
             {
                 result = 0;

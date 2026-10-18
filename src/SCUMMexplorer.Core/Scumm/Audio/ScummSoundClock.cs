@@ -118,6 +118,18 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
         return low;
     }
 
+    /// <summary>
+    /// Changes how a playing sound goes on from now (S6 Monkey2: a jump hook a script armed for a playing iMUSE song). <paramref name="change"/> gets the
+    /// lifetime and the seconds the sound has played and returns the new lifetime, counted from the sound's start, or null to keep it. False when the sound is not playing.
+    /// </summary>
+    public bool Retime(int id, Func<ScummSoundLifetime, double, ScummSoundLifetime?> change)
+    {
+        if (!_voices.TryGetValue(id, out var voice)) return false;
+        if (change(voice.Lifetime, (_jiffies - voice.Started) / 60.0) is not { } lifetime) return false;
+        _voices[id] = voice with { Lifetime = lifetime };
+        return true;
+    }
+
     public (bool Running, string? Estimate) Status(int id)
     {
         if (id == 0) return (false, null);

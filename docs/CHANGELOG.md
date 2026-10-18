@@ -14,6 +14,17 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - **Speech.** Talkie text codes start spoken lines from `MONSTER.SOU`. After the boot, a line stays until its sample ends (ScummVM `processSfxQueues`). The play window speaks them (`TalkieSpeechPlayer`).
 - **Shared fixes, each from ScummVM.** Code 7 strings in prints and in verb names said through code 5 (v5); `loadString` on a seeded-pick path; a dialogue line's speech codes no longer draw as glyphs; a deferred camera follow does not enter the current room twice.
 - **Registry.** Indy4 Objects and Play are ✔, and the matrix is regenerated. Real-window check, decisions and uncertainties: [record](../.verification/indy4-play-20261017/README.md). Current-state object images and iMUSE music in play wait for S6 Monkey2's shared additions.
+## 17–18 October: play through Monkey Island 2's own interface, with iMUSE music (S6, Monkey2)
+
+- The R-7.18 route runs on `mi2 talkie en` through its own verbs, inventory icons and dialogue lists. From Woodtick (Room 7), where the game goes on to by itself after the campfire, it looks at the sign and skips that cutscene, then picks up the sign (the shovel, shown as its Room 94 icon). It holds Largo's two dialogue lists (input scripts 14 and Room 7's 206), then leaves through the dinky door to Room 8. A right click runs the default verb (`var[0x09C]`). **Objects ✔ and Play ✔** for Monkey2.
+- Shared play additions (also for Indy4):
+  - The play screen draws each v5 object in its current state's image (9b28623).
+  - iMUSE songs in play loop from their loop point on the chosen device's part (`ScummImuseMusic`, `SceneSoundPlayer.Loop`; c3b1c5b).
+- Engine:
+  - A jump hook a script arms for a playing iMUSE song (`setHook` class 0, including a jump to another MIDI track) sets the song's length on the session's clock (4a950b5). Without it, Room 4's cutscene waited for ever.
+  - Text verbs skip the two bytes of codes 9, 10, 12, 13 and 14 (d5af7d3).
+- Validation: `ScummMonkey2PlayTests` (3), `ScummPlayScreenStateImageTests`, `ScummImuseMusicTests`, `V5ImuseLoopTests`; the play, sound, Monkey, Indy, cutscene and conformance filter; the LOOM and Scumm regression; one WPF check through the real window. Record: [monkey2-play-20261017](../.verification/monkey2-play-20261017/README.md).
+
 ## 18 October: native Maniac/Zak engine fidelity (all four families)
 
 - Classic Maniac continues through Script 174 after a genuine boot-to-doorbell route. Native closest-query edges/ties and v1/v2 actor-approach units are implemented; no actor/room workaround.
@@ -980,7 +991,6 @@ After `9b5fdc3`, the user requested a new continuation prompt and working rules 
 | `b3ee09e` | Executed object/actor native mutation notifications,including identical/attempted no-op writes;palette lifetime separate | [native](../.verification/archive/runtime-calls-20261002/native-validation.md) |
 | Final preservation | Core501/focused175;13 exact packets/legacy chronologies/completion records;76 original terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push/promotion;71.49% literal-site coverage unchanged | [validation](../.verification/archive/runtime-calls-20261002/validation.md) |
 
-
 ## 2 October: implicit chronology, native lifetimes and observed resumption chains
 
 | Change | Result | Record |
@@ -990,7 +1000,6 @@ After `9b5fdc3`, the user requested a new continuation prompt and working rules 
 | `9593435` | Fully observed bounded yield/begin/end continuity for resumed terminals; original invocation checks and completion limits intact | [terminal](../.verification/archive/runtime-continuity-20261002/terminal-validation.md) |
 | Final preservation | Core460;13 exact packets/chronologies/completion records;76 own-child matches/separate own-invocation terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;3 source challenge expressions/17 actual steps;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/archive/runtime-continuity-20261002/validation.md) |
 
-
 ## 2 October: selected native dependencies and observation boundaries
 
 | Change | Result | Record |
@@ -999,7 +1008,6 @@ After `9b5fdc3`, the user requested a new continuation prompt and working rules 
 | Source/causal boundaries `133b4d4` | Resource/parent/stage confirmation; own-invocation/parent termination; no callee-local argument binding or resumed continuity inference | [boundaries](../.verification/archive/runtime-dependencies-20261002/boundary-validation.md) |
 | Final preservation | Core401;13 exact packets/chronologies;76 own-child matches/separate terminal observations;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/archive/runtime-dependencies-20261002/validation.md) |
 
-
 ## 2 October: access/lineage evidence and fresh preservation
 
 | Change | Result | Record |
@@ -1007,7 +1015,6 @@ After `9b5fdc3`, the user requested a new continuation prompt and working rules 
 | Copied access and lineage | Numeric operands, same-value runtime notifications, observed arithmetic/index/arguments; explicit unresolved/raw external/native-state/callee limits and all estimates retained | [validation](../.verification/archive/runtime-access-20261002/validation.md) |
 | Independent completion precision | All13 whole packets/prior chronologies exact;76 own-literal-child zero waits and76 separate terminal observations; primary3036/4552→4553→4556→4557 unchanged;090 unresolved | [access evidence](../.verification/archive/runtime-access-20261002/access-summary.json) |
 | Fresh checks | Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push/promotion | [checks](../.verification/archive/runtime-access-20261002/check-summary.json) |
-
 
 ## 2 October: observed arithmetic/index lineage and separate writer termination
 
