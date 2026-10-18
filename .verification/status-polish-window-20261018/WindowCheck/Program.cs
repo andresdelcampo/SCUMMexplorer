@@ -283,6 +283,12 @@ internal static class Program
                                     Require(names.Distinct(StringComparer.CurrentCultureIgnoreCase).Count() == names.Length, "Real separate homonyms have indistinguishable labels");
                                     Require(names.Any(n => n.EndsWith(" (1)", StringComparison.Ordinal)) && names.Any(n => n.EndsWith(" (2)", StringComparison.Ordinal)), "Separate homonyms lack stable ordinals");
                                     Require(!names.Any(n => n.Contains("Object ", StringComparison.Ordinal) || System.Text.RegularExpressions.Regex.IsMatch(n, @"\((?:139|429|431|471|535|536|537)\)")), "Normal catalog exposes raw identifiers");
+                                    catalog.SelectedItem = choices.First(c => ((string)c.GetType().GetProperty("Name")!.GetValue(c)!).EndsWith(" (1)", StringComparison.Ordinal));
+                                    catalog.IsDropDownOpen = true;
+                                    await Task.Delay(80);
+                                    var catalogPopup = (System.Windows.Controls.Primitives.Popup)catalog.Template.FindName("PART_Popup", catalog);
+                                    Save("status-logical-items-dropdown", (FrameworkElement)catalogPopup.Child);
+                                    catalog.IsDropDownOpen = false;
                                     report.Add("Zak logical items: aliases collapsed; independent homonyms uniquely named with ordinals");
                                 }
                                 var search = (TextBox)dialog.FindName("ItemSearch");
