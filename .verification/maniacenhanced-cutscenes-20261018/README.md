@@ -60,7 +60,7 @@ Catalog room visits are disclosed state previews; they do not prove a walked sto
 
 ## User checks (exact steps and where; none if none)
 
-Open this enhanced Spanish edition. In Advanced, open Play Cutscene and choose `Room 17 Â· Encender TV`; observe the advertisement inRoom 40 (first message 47 frames after launch). From Room 1 use Play Cutscene and choose `Empuja timbre`; observe the Room 26 reaction. Room 8 `Apagar automÃ¡ticos` should show the power-off complaint, not the pool-empty branch. Timing, sound synchronization and original-game visual comparison remain user checks; no agent execution of ScummVM occurred.
+Open this enhanced Spanish edition. In Advanced, open Play Cutscene and choose `Room 17 · Encender TV`; observe the advertisement in Room 40 (first message 47 frames after launch). From Room 1 use Play Cutscene and choose `Empuja timbre`; observe the Room 26 reaction. Room 8 `Apagar automáticos` should show the power-off complaint, not the pool-empty branch. Timing, sound synchronization and original-game visual comparison remain user checks; no agent execution of ScummVM occurred.
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
