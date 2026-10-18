@@ -2,6 +2,18 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Fate of Atlantis plays through its own interface, with its spoken lines (S6, Indy4)
+
+- **The route.** The acceptance route of R-7.18 runs from Barnett College (`ScummIndy4PlayTests`):
+  - a click in the playable credits (Script 78);
+  - the game's own Esc skip (Room 5 local 214's override);
+  - "Look at marquee" in New York;
+  - "Pick up newspaper", which gets an inventory icon from Room 98;
+  - a dialogue with the ticket taker: lines as verbs 0x78 up, and Indy says the chosen line with its voice;
+  - three crate pushes and "Use fire escape", whose climb cutscene Esc skips into Room 12.
+- **Speech.** Talkie text codes start spoken lines from `MONSTER.SOU`. After the boot, a line stays until its sample ends (ScummVM `processSfxQueues`). The play window speaks them (`TalkieSpeechPlayer`).
+- **Shared fixes, each from ScummVM.** Code 7 strings in prints and in verb names said through code 5 (v5); `loadString` on a seeded-pick path; a dialogue line's speech codes no longer draw as glyphs; a deferred camera follow does not enter the current room twice.
+- **Registry.** Indy4 Objects and Play are ✔, and the matrix is regenerated. Real-window check, decisions and uncertainties: [record](../.verification/indy4-play-20261017/README.md). Current-state object images and iMUSE music in play wait for S6 Monkey2's shared additions.
 ## 18 October: native Maniac/Zak engine fidelity (all four families)
 
 - Classic Maniac continues through Script 174 after a genuine boot-to-doorbell route. Native closest-query edges/ties and v1/v2 actor-approach units are implemented; no actor/room workaround.
