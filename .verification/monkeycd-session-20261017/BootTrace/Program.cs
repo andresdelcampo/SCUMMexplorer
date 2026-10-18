@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -9,10 +9,18 @@ using SCUMMexplorer.Core.Discovery;
 // over the v5 data source and writes the boot trace, the pending scripts, the operations reported as not applied, the unsupported list and a
 // picture of the room the boot ends in. Nothing here edits session state.
 // Usage: BootTrace dump <folder> g:<script> | e:<room> | x:<room> | l:<room>:<local> | find:TEXT  (disassembly through the v5 data source)
+// S9 (18 October 2026): a folder argument "path|SPANISH" reads the disc's language folder (GameFolderScanner.DiscFolder).
+// Usage: BootTrace files <folder>  (S9, 18 October 2026: every file of the disc's ISO 9660 track, with its length)
+if (args[0] == "files")
+{
+    var disc = SCUMMexplorer.Core.Scumm.DiscImage.Open(SCUMMexplorer.Core.Scumm.DiscImage.FindImageIn(args[1])!);
+    foreach (var file in disc.ListFiles()) Console.WriteLine($"{file.Name} {file.Length}");
+    return;
+}
 if (args[0] == "cd")
 {
     // BootTrace cd <folder>: the sounds that start a CD track (ScummV5Archive.ReadCdTrackSounds) and the disc's audio tracks.
-    var cdGame = new GameFolderScanner().Scan(args[1]);
+    var cdGame = ScanArg(args[1]);
     foreach (var archive in cdGame.V4Disks!.Disks.OfType<ScummV5Archive>())
         foreach (var s in archive.ReadCdTrackSounds()) Console.WriteLine(s);
     foreach (var r in cdGame.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId >= GameLibrary.CdTrackIdBase)) Console.WriteLine($"{r.ResourceId} {r.Name} {r.Description}");
@@ -20,7 +28,7 @@ if (args[0] == "cd")
 }
 if (args[0] == "dump")
 {
-    var dumpGame = new GameFolderScanner().Scan(args[1]);
+    var dumpGame = ScanArg(args[1]);
     var source = (ScummV5DataSource)ScummDataSources.For(dumpGame);
     foreach (var spec in args.Skip(2))
     {
@@ -62,7 +70,7 @@ var folder = args[0];
 var output = args[1];
 var extraFrames = args.Length > 2 ? int.Parse(args[2]) : 0;
 Directory.CreateDirectory(output);
-var game = new GameFolderScanner().Scan(folder);
+var game = ScanArg(folder);
 var data = (ScummV5DataSource)ScummDataSources.For(game);
 var watch = System.Diagnostics.Stopwatch.StartNew();
 var session = new ScummGameSession(game, data.ReadIndexedObjects(), 0, null, data);
@@ -136,3 +144,5 @@ if (session.CurrentRoomId is int roomId && game.Rooms.FirstOrDefault(room => roo
 Console.WriteLine(string.Join(Environment.NewLine, lines.Take(5)));
 Console.WriteLine($"unsupported: {unsupported.Length}");
 foreach (var item in unsupported.Take(30)) Console.WriteLine("  " + (item.Length > 300 ? item[..300] : item));
+
+static GameLibrary ScanArg(string arg) => arg.Split('|') is [var path, var disc] ? new GameFolderScanner { DiscFolder = disc }.Scan(path) : new GameFolderScanner().Scan(arg);

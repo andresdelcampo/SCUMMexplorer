@@ -16,7 +16,8 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
     /// <summary>The English four-disk 256-colour reference (<c>en</c>) or the Spanish eight-disk 16-colour release (<c>es</c>, S9 of 17 October 2026).</summary>
     private static string? Folder(string release = "en")
     {
-        var path = Path.Combine(TestGames.Root, $"monkey1 ega {release}");
+        // S9 (18 October 2026): "vga es" is the Spanish four-disk 256-colour floppy (Games/monkey1 vga es), a MonkeyFloppy copy, not the CD.
+        var path = Path.Combine(TestGames.Root, release.Contains(' ') ? $"monkey1 {release}" : $"monkey1 ega {release}");
         return File.Exists(Path.Combine(path, "DISK01.LEC")) ? path : null;
     }
 
@@ -33,6 +34,9 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
             "Walk to", "Look at", "Look at poster", "Re-elect Governor Marley.", "Talk to important-looking pirates",
             ["I want to be a fireman.", "I mean to kill you all!", "I want to be a pirate."], "I'll just be running along now.", "chicken"),
         ["es"] = new(["Abrir", "Cerrar", "Empujar", "Tirar", "Ir a", "Coger", "Hablar a", "Dar", "Usar", "Mirar", "Encender", "Apagar"],
+            "Ir a", "Mirar", "Mirar poster", "Re-eliga a la Gobernadora Marley.", "Hablar a piratas importantes",
+            ["Quiero ser bombero.", "¡Os voy a matar a todos!", "Quiero ser un pirata."], "Pues yo me largo.", "pollo"),
+        ["vga es"] = new(["Abrir", "Cerrar", "Empujar", "Tirar", "Ir a", "Coger", "Hablar a", "Dar", "Usar", "Mirar", "Encender", "Apagar"],
             "Ir a", "Mirar", "Mirar poster", "Re-eliga a la Gobernadora Marley.", "Hablar a piratas importantes",
             ["Quiero ser bombero.", "¡Os voy a matar a todos!", "Quiero ser un pirata."], "Pues yo me largo.", "pollo")
     };
@@ -133,6 +137,7 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
     [Theory]
     [InlineData("en")]
     [InlineData("es")]
+    [InlineData("vga es")]
     public void TheAcceptanceRouteFromTheDockRunsThroughTheGamesOwnInterface(string release)
     {
         if (Folder(release) is not { } folder) return;
@@ -326,6 +331,7 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
     [Theory]
     [InlineData("en")]
     [InlineData("es")]
+    [InlineData("vga es")]
     public void ARightClickOnAnObjectRunsItsDefaultVerb(string release)
     {
         // R-7.16 (Rule, 16 Oct): from version 4 a right click reaches the input script as the click with mode 2 (ScummVM checkExecVerbs). Monkey's
@@ -403,6 +409,7 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
     [Theory]
     [InlineData("en")]
     [InlineData("es")]
+    [InlineData("vga es")]
     public void EveryTextByteAboveAsciiHasAGlyphInTheCopysCharsets(string release)
     {
         if (Folder(release) is not { } folder) return;
@@ -449,6 +456,6 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
             // 0xFA has no glyph in charset 1 of either copy (English 35 uses, Spanish 18): a fact of the game, not of an edition.
             Assert.Empty(missing.Except(["FA"]));
         }
-        if (release == "es") Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
+        if (release.EndsWith("es", StringComparison.Ordinal)) Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
     }
 }

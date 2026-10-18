@@ -147,6 +147,28 @@ public sealed class ScummMonkeyFloppySessionTests
     }
 
     [Fact]
+    public void TheSpanishFourDiskVgaReleaseNeedsOnlyEnterBecauseItsQuizDoesNotWait()
+    {
+        // S9 (18 October 2026): Games/monkey1 vga es is the Spanish four-disk 256-colour floppy (MonkeyFloppy, not the CD). Its script 152 differs from the
+        // English floppy's in two instructions: the digit wait compares var[0x069] with 0xFF00 (English 0xFFFF), so the quiz reads its four digits without
+        // a key, and the check compares var[0x10A] with itself (English var[0x0B3]), so it is accepted. Only the "press ENTER" key is assumed.
+        var path = Path.Combine(TestGames.Root, "monkey1 vga es");
+        if (!File.Exists(Path.Combine(path, "DISK04.LEC"))) return;
+
+        var session = Boot(path, out var game);
+
+        Assert.Equal(GameFamily.MonkeyFloppy, GameSupport.FamilyOf(game));
+        Assert.Equal(4, ((ScummV4DiskSetDataSource)ScummDataSources.For(game)).DiskCount);
+        Assert.False(session.BootReport!.HitFrameLimit);
+        Assert.Equal([90, 0, 10, 0, 0, 38, 96, 33], session.BootReport.RoomsEntered);
+        string[] unsupported = ["not modeled", "could not", "disassembly stops", "undecoded", "cannot", "needs a session", "unknown", "depends on"];
+        Assert.DoesNotContain(session.Snapshot.Uncertainties, item => unsupported.Any(item.Contains) && !item.Contains("seeded pick"));
+        Assert.Single(session.SessionTrace, item => item.StartsWith("key: ", StringComparison.Ordinal));
+        Assert.DoesNotContain(session.SessionTrace, item => item.StartsWith("boot: Player input assumed: the digits of var[0x10A]", StringComparison.Ordinal));
+        Assert.DoesNotContain(session.SessionTrace, item => item.Contains("quit"));
+    }
+
+    [Fact]
     public void VersionFourReadsOneValueForAnActorsScale()
     {
         // o5_actorOps case 17 (script_v5.cpp): version 4 reads one value for both scales, later versions two. Raw sub-opcode 0x13 is case 17 through

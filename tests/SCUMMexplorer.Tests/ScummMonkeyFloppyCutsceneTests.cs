@@ -118,11 +118,14 @@ public sealed class ScummMonkeyFloppyCutsceneTests(ITestOutputHelper output)
     /// <c>.verification/monkey1-editions-20261017</c>); its titles and lines are its own, with the accents its texts hold (CP437 glyph codes, decoded by
     /// <see cref="ScummTextDecoder"/> since the same day). The poster's span starts at +0x00D9 there (English +0x00CF): its lines are longer.
     /// </summary>
-    [Fact]
-    public void TheSpanishReleaseListsTheSameScenesWithItsOwnAccentedTexts()
+    // S9 (18 October 2026): the Spanish four-disk 256-colour floppy (<c>Games/monkey1 vga es</c>, record <c>.verification/monkeycd-editions-20261018</c>) too.
+    [Theory]
+    [InlineData("monkey1 ega es", "DISK08.LEC")]
+    [InlineData("monkey1 vga es", "DISK04.LEC")]
+    public void TheSpanishReleaseListsTheSameScenesWithItsOwnAccentedTexts(string copy, string lastDisk)
     {
-        var folder = Path.Combine(TestGames.Root, "monkey1 ega es");
-        if (!File.Exists(Path.Combine(folder, "DISK08.LEC"))) return;
+        var folder = Path.Combine(TestGames.Root, copy);
+        if (!File.Exists(Path.Combine(folder, lastDisk))) return;
         var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
         output.WriteLine($"{planner.Triggers.Count} triggers, {planner.Groups.Count} groups, {planner.Groups.Count(g => g.IsScene)} scenes");
         Assert.Equal("Mirar", planner.Verbs.WordFor(0x09));
