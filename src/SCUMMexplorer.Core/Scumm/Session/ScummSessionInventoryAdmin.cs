@@ -203,13 +203,15 @@ public abstract partial class ScummSession
             if (records.Length == 0 && locations.TryGetValue(id, out var found) && found.Select(x => x.Room).Distinct().Count() == 1)
             { room = found[0].Room; records = [found.Last().Object]; }
             if (records.Length == 0) return false;
-            var verbs = _data.ReadObjectVerbs(room, records).GetValueOrDefault(id) ?? [];
-            return !verbs.Any(x => x.VerbId == verb || x.VerbId == 255);
+            return _data.ReadObjectVerbs(room, records).TryGetValue(id, out var verbs) &&
+                !verbs.Any(x => x.VerbId == verb || x.VerbId == 255);
         }
         var retainedCode = catalog.ToDictionary(x => x.ObjectId, x =>
             (_data.ReadObjectVerbs(x.SourceRoomId, rooms[x.SourceRoomId].Objects.Where(o => o.Id == x.ObjectId).ToArray())
                 .GetValueOrDefault(x.ObjectId) ?? []).Any(v => v.VerbId != 14 &&
-                    ObjectScript(x.SourceRoomId, x.ObjectId, v.VerbId) is { Instructions.Count: > 0 }));
+                    ObjectScript(x.SourceRoomId, x.ObjectId, v.VerbId) is
+                        { Instructions.Count: > 0, HasCompleteControlFlow: true, DecodeNote: null } script &&
+                    script.Issues is not { Count: > 0 }));
         var aliases = ScummInventoryCatalogIdentity.FindSceneAliases(catalog, sourceEffectTargets, globals,
             ObjectScript, KnownEmptyObjectVerb, id => retainedCode.GetValueOrDefault(id), Note);
         foreach (var alias in aliases.OrderBy(x => x.Key))
