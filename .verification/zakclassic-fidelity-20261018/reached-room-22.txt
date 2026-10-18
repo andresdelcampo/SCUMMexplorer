@@ -1,0 +1,48 @@
+﻿STATE-PREVIEW room=22: selected without playing prerequisites; observation only, not a normal-route proof
+REACHED seq=1 script=1 context= offset=0011 actor=1 costume=30 palette=0 operation=0x01, 0x1E, sub=0x04 estimated=False
+REACHED seq=2 script=1 context= offset=0015 actor=1 costume=30 palette=0 operation=0x01, 0x00, sub=0x02 estimated=False
+REACHED seq=6 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=7 script=127 context= offset=0002 actor=10 costume=32 palette=0 operation=0x0A, 0x20, sub=0x04 estimated=False
+REACHED seq=9 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=11 script=1 context= offset=0104 actor=10 costume=31 palette=0 operation=0x0A, 0x1F, sub=0x04 estimated=False
+REACHED seq=12 script=1 context= offset=0108 actor=10 costume=31 palette=7 operation=0x0A, 0x07, sub=0x02 estimated=False
+REACHED seq=13 script=1 context= offset=010C actor=1 costume=30 palette=14 operation=0x01, 0x0E, sub=0x02 estimated=False
+REACHED seq=14 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=15 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=16 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=17 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=19 script=5 context= offset=000F actor=4 costume=4 palette=0 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=22 script=108 context= offset=007C actor=8 costume=26 palette=0 operation=0x08, 0x1A, sub=0x04 estimated=False
+REACHED seq=23 script=108 context= offset=0080 actor=8 costume=26 palette=12 operation=0x08, 0x0C, sub=0x02 estimated=False
+REACHED seq=26 script=108 context= offset=008C actor=9 costume=11 palette=0 operation=0x09, 0x0B, sub=0x04 estimated=False
+REACHED seq=27 script=108 context= offset=0090 actor=9 costume=11 palette=3 operation=0x09, 0x03, sub=0x02 estimated=False
+REACHED seq=35 script=108 context= offset=00D8 actor=1 costume=1 palette=14 operation=0x01, 0x01, sub=0x04 estimated=False
+REACHED seq=36 script=108 context= offset=00DC actor=2 costume=2 palette=0 operation=0x02, 0x02, sub=0x04 estimated=False
+REACHED seq=37 script=108 context= offset=00E0 actor=3 costume=0 palette=0 operation=0x03, 0x00, sub=0x04 estimated=False
+REACHED seq=38 script=108 context= offset=00E4 actor=4 costume=0 palette=0 operation=0x04, 0x00, sub=0x04 estimated=False
+REACHED seq=39 script=108 context= offset=00E8 actor=7 costume=28 palette=0 operation=0x07, 0x1C, sub=0x04 estimated=False
+REACHED seq=40 script=108 context= offset=00EC actor=1 costume=1 palette=13 operation=0x01, 0x0D, sub=0x02 estimated=False
+REACHED seq=41 script=108 context= offset=00F0 actor=2 costume=2 palette=4 operation=0x02, 0x04, sub=0x02 estimated=False
+REACHED seq=42 script=108 context= offset=00F4 actor=3 costume=0 palette=3 operation=0x03, 0x03, sub=0x02 estimated=False
+REACHED seq=43 script=108 context= offset=00FC actor=4 costume=0 palette=7 operation=0x04, var[0x0C4], sub=0x02 estimated=False
+REACHED seq=44 script=108 context= offset=0100 actor=7 costume=28 palette=7 operation=0x07, 0x07, sub=0x02 estimated=False
+REACHED seq=49 script=108 context= offset=0114 actor=6 costume=6 palette=6 operation=0x06, 0x06, sub=0x02 estimated=False
+REACHED seq=55 script=5 context= offset=000F actor=4 costume=0 palette=7 operation=0x04, var[0x0C4], sub=0x02 estimated=True
+REACHED seq=56 script=5 context= offset=001C actor=4 costume=0 palette=8 operation=0x04, 0x08, sub=0x02 estimated=True
+REACHED seq=57 script=22 context=Room 22 / Entry script offset=0010 actor=1 costume=5 palette=13 operation=0x01, 0x05, sub=0x04 estimated=True
+REACHED seq=59 script=5 context= offset=000F actor=4 costume=0 palette=7 operation=0x04, var[0x0C4], sub=0x02 estimated=True
+REACHED seq=60 script=5 context= offset=001C actor=4 costume=0 palette=8 operation=0x04, 0x08, sub=0x02 estimated=True
+PASS all reached native actor palettes match the copied source-operation timeline
+BOOT frames=1784 capped=False room=22 control=True cutscene=False
+BOOT-ACTOR actor=1 costume=5 palette=13 room=22 visible=True paletteEstimate=
+BOOT-ACTOR actor=2 costume=2 palette=4 room=6 visible=False paletteEstimate=
+BOOT-ACTOR actor=3 costume=0 palette=3 room=26 visible=False paletteEstimate=
+BOOT-ACTOR actor=4 costume=0 palette=8 room=26 visible=False paletteEstimate=actor 4's actorOps at +0x001C follows a seeded pick
+BOOT-ACTOR actor=5 costume=5 palette=0 room=0 visible=False paletteEstimate=
+BOOT-ACTOR actor=6 costume=6 palette=6 room=0 visible=False paletteEstimate=
+BOOT-ACTOR actor=7 costume=28 palette=7 room=4 visible=False paletteEstimate=
+BOOT-ACTOR actor=8 costume=26 palette=12 room=18 visible=False paletteEstimate=
+BOOT-ACTOR actor=9 costume=11 palette=3 room=0 visible=False paletteEstimate=
+BOOT-ACTOR actor=10 costume=31 palette=7 room=0 visible=False paletteEstimate=
+BOOT-ACTOR actor=11 costume=11 palette=0 room=0 visible=False paletteEstimate=
+BOOT-ACTOR actor=12 costume=12 palette=0 room=0 visible=False paletteEstimate=

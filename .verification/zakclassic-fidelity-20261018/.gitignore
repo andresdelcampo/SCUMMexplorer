@@ -4,3 +4,12 @@ reached.jsonl
 reached-room-*-diagnostic.txt
 reached-room-26.txt
 test-results/
+!before-table.txt
+!after-table.txt
+!reached.txt
+!reached-boss.txt
+!reached-room-20.txt
+!reached-room-22.txt
+!reached-room-31.txt
+!reached-room-41.txt
+!reached-room-42.txt

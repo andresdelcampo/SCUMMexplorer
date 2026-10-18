@@ -1,0 +1,1 @@
+﻿PASS native reached boss assignment: frames=52 actor=10 costume=32 palette=0 room=46 visible=True; global card remains labelled estimate7
