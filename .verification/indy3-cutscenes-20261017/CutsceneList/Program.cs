@@ -57,6 +57,23 @@ if (args.Length > 2 && args[1] == "race")
     return;
 }
 
+// CutsceneList <folder> skip: the boot, then Esc whenever the game allows a skip, until a verb is on (S7 Indy4, 18 October 2026: whether the game's own
+// skips from the boot reach the full verb interface the titles need).
+if (args.Length > 1 && args[1] == "skip")
+{
+    var session = ScummGameSession.BootForPlay(game, out _);
+    Console.WriteLine($"boot: room {session.CurrentRoomId}, verbs on {session.Verbs.Count(v => v.Mode == 1)}, skippable {session.CutsceneSkippable}");
+    var frame = 0; var presses = 0;
+    for (; frame < 6000 && !(session.Verbs.Any(v => v.Mode == 1) && session.UserInputOn && !session.InCutscene); frame++)
+    {
+        if (session.CutsceneSkippable) { session.PressKey(0x1B); presses++; Console.WriteLine($"frame {frame}: Esc in room {session.CurrentRoomId}"); }
+        session.AdvanceFrame();
+    }
+    Console.WriteLine($"end: frame {frame}, room {session.CurrentRoomId}, Esc {presses}, verbs on {session.Verbs.Count(v => v.Mode == 1)}");
+    Console.WriteLine($"verb words: {string.Join(", ", Enumerable.Range(0, 256).Select(v => (v, w: ScummCutscenePlanner.VerbsOf(session).Word!(v))).Where(p => p.w is not null).Select(p => $"0x{p.v:X2} {p.w}"))}");
+    return;
+}
+
 // CutsceneList <folder> dump <room> <object> <verb>: the object verb's instructions (Monkey Island floppy S7, 17 October 2026).
 if (args.Length > 4 && args[1] == "dump")
 {
@@ -108,6 +125,7 @@ if (args.Length > 1 && args[1] == "scan")
     var clock = System.Diagnostics.Stopwatch.StartNew();
     var planner = new ScummCutscenePlanner(game);
     Console.WriteLine($"planner (one boot and the scan) {clock.ElapsedMilliseconds} ms");
+    if (planner.VerbSource is { } verbSource) Console.WriteLine("verb source: " + verbSource);
     Console.WriteLine($"verb words: {string.Join(", ", Enumerable.Range(0, 256).Select(v => (v, w: planner.Verbs.Word!(v))).Where(p => p.w is not null).Select(p => $"0x{p.v:X2} {p.w}"))}");
     var groups = planner.Groups;
     Console.WriteLine($"triggers {planner.Triggers.Count} groups {groups.Count} scenes {groups.Count(g => g.IsScene)}");
