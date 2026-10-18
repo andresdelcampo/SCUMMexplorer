@@ -45,7 +45,7 @@ rtk proxy dotnet build .verification/maniaczak-editions-20261018/WindowCheck/Man
 rtk proxy Exe/ManiacZakEditionWindowCheck/Debug/net10.0-windows/ManiacZakEditionWindowCheck.exe "D:\Juegos\Lucas\mmansionE ega es" ".verification/maniaczak-editions-20261018/window-enhanced-native-font" ".verification/maniaczak-editions-20261018/WindowCheck/enhanced-native-font.json"
 ```
 
-Build zero warnings/errors; window result PASS. Private captures/logs are retained but ignored. Final matrix/build/full-suite results pending.
+Build zero warnings/errors; window result PASS. Private captures/logs are retained but ignored. Final solution build: **zero warnings/errors**. Matrix regeneration/check: **three passed**, no feature-level changes. Full suite with all three external settings: **1227 passed, zero failed, five skipped**, 1232 total, duration 8m24s. Report: `test-results/maniaczak-s9-full.trx` (retained locally, ignored). `git merge master` was up to date at `f6d8f0b`; final integration uses fast-forward only. Family/shared commit IDs are in the checkpoint.
 
 ## Comparison with ScummVM (source files and date; runtime comparison if any)
 

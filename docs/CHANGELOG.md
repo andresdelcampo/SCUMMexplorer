@@ -8,6 +8,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - The supplied enhanced Spanish executable provides its actual font through a reviewed descriptor and source-backed decoding. All 128 text slots pass (127 drawable glyphs and the existing marker suppression), correcting 11 localized glyphs; real-window TV text displays `músicos y diseñadores`. Missing/unreviewed executables retain the previous fallback. The rejected raw-slice attempt was reverted and its failed evidence retained. No font/executable asset is shipped.
 - Two obsolete v1/v2 detection notes and Maniac's documented classic dialect are corrected. Independent review found no actionable issue. Existing original-game visual/timing, darkness/flashlight, walking, Classic Maniac Script 174 and Zak estimate/frame-bound limits remain open; no ScummVM executable, S8, catalog or seed work.
 - [Checkpoint](checkpoints/20261018-S9-ManiacZak.md) and [integration record](../.verification/maniaczak-editions-20261018/README.md) link family records, exact commands and final validation.
+- Final validation: 1227 passed, zero failed, five skipped; solution build zero warnings/errors; three matrix checks and the targeted real-window font check pass.
 
 ## 18 October: Monkey Island CD lists its cutscenes from its scripts and plays them (S7, MonkeyCd)
 

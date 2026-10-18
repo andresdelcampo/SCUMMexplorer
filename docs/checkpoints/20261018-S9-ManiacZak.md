@@ -23,7 +23,11 @@ All four available-copy items have bounded checks and evidence; additional-relea
 
 Shared corrections are small and additive: two obsolete v1/v2 scanner notes now describe resource directories actually read; an optional native-font descriptor decodes only the fingerprinted Spanish executable, validates the decoded font and supplies it to v1/v2 drawing. Other or missing executables retain the previous fallback. No game font/executable is committed. Independent read-only review reports no actionable issue. The Maniac README's stale classic dialect was corrected to V1.
 
-The targeted window harness reuses the real S7 room/picker callbacks with a private profile. Enhanced TV Room 17 reaches Script 112 in Room 40 and displays `músicos y diseñadores` correctly; capture inspected, unchanged 7-begun census. This is Explorer integration evidence, not original-game observation. Final build/suite and commit IDs pending.
+The targeted window harness reuses the real S7 room/picker callbacks with a private profile. Enhanced TV Room 17 reaches Script 112 in Room 40 and displays `músicos y diseñadores` correctly; capture inspected, unchanged 7-begun census. This is Explorer integration evidence, not original-game observation.
+
+Integrated family commits: ManiacClassic `c77f792`; ManiacEnhanced decoder/test `ab99c97`, final glyph evidence `59b0c52`; ZakEnhanced `e22106f` and record correction `c8ff89e`; ZakClassic `265c507`. Shared rendering hookup `80587b6`, scanner text `274a098`, coverage notes `bfbf142`, coordinated Maniac tracker `79a9774`; integration evidence `965be68`.
+
+Final validation against master `f6d8f0b`: `git merge master` already up to date; solution build **zero warnings/errors**; generated matrix **three passed**; full suite **1227 passed, zero failed, five skipped** (1232 total, 8m24s). The required external sound, Indy3 EGA and MT-32 settings are recorded in the [integration evidence](../../.verification/maniaczak-editions-20261018/README.md). TRX is retained locally at `.worktrees/maniaczak-s9/.verification/maniaczak-editions-20261018/test-results/maniaczak-s9-full.trx`. Final integration is fast-forward only; worktrees are retained and no game/profile data was removed.
 
 ## Not done and why
 
