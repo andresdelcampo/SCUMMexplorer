@@ -25,17 +25,15 @@
         </StackPanel>
         <Grid Grid.Row="1" Margin="0,0,0,18">
             <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="All game items" Margin="0,0,0,5"/>
-                <TextBox x:Name="ItemSearch" TextChanged="ItemSearch_TextChanged" ToolTip="Find an item" AutomationProperties.Name="Find an item" Margin="0,0,0,5"
-                         Background="#1B2833" Foreground="#E7E0D2" BorderBrush="#4A5962" Padding="8,5"/>
-                <ComboBox x:Name="CatalogItems" SelectionChanged="CatalogItems_SelectionChanged" MinHeight="44"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                <TextBlock Text="Give to" Margin="0,0,0,5"/>
-                <ComboBox x:Name="GrantRecipient" SelectionChanged="CatalogItems_SelectionChanged" MinHeight="72" MaxDropDownHeight="520"/>
-            </StackPanel>
-            <Button Grid.Column="2" x:Name="AddItemButton" Content="Add item" Click="AddItem_Click" VerticalAlignment="Bottom" Padding="16,10"/>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <TextBlock Text="All game items" Margin="0,0,10,5"/>
+            <TextBox Grid.Row="1" x:Name="ItemSearch" TextChanged="ItemSearch_TextChanged" ToolTip="Find an item" AutomationProperties.Name="Find an item"
+                     Height="28" VerticalAlignment="Top" Margin="0,0,10,6" Background="#1B2833" Foreground="#E7E0D2" BorderBrush="#4A5962" Padding="8,3"/>
+            <ComboBox Grid.Row="2" x:Name="CatalogItems" SelectionChanged="CatalogItems_SelectionChanged" Height="32" VerticalAlignment="Bottom" Margin="0,0,10,0"/>
+            <TextBlock Grid.Column="1" Text="Give to" Margin="0,0,10,5"/>
+            <ComboBox Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" x:Name="GrantRecipient" SelectionChanged="CatalogItems_SelectionChanged"
+                      Height="72" VerticalAlignment="Bottom" Margin="0,0,10,0" MaxDropDownHeight="520"/>
+            <Button Grid.Row="2" Grid.Column="2" x:Name="AddItemButton" Content="Add item" Click="AddItem_Click" Height="32" VerticalAlignment="Bottom" Padding="16,4"/>
         </Grid>
         <Grid Grid.Row="2" Background="#273642" Margin="0,0,0,1">
             <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
