@@ -1,6 +1,6 @@
 # Independent Zak flight source review
 
-18 October 2026. Scope: supplied English DOS v1 `D:/Juegos/Lucas/zak ega en` and v2 `D:/Juegos/Lucas/zakE ega en`; native flight choices, ticket state and retained Script 104 wait. Source decoding only unless explicitly described otherwise. No ScummVM executable, game/profile mutation or shared production edit.
+18 October 2026. Scope: supplied English DOS v1 `D:/Juegos/Lucas/zak ega en` and v2 `D:/Juegos/Lucas/zakE ega en`; native flight choices, ticket state and retained Script 104 wait. Source decoding and explicitly described session diagnostics. No ScummVM executable, game/profile mutation or shared production edit.
 
 ## Findings supplied to the workers
 
@@ -26,7 +26,15 @@ rtk proxy dotnet Exe/SourceCheck/Debug/net10.0/SourceCheck.dll "D:/Juegos/Lucas/
 rtk proxy dotnet Exe/SourceCheck/Debug/net10.0/SourceCheck.dll "D:/Juegos/Lucas/zakE ega en" names ticket cash credit airport terminal
 ```
 
-Both harness builds passed, zero warnings/errors. The retained `SceneCheck ... one 11 0 0` diagnostic also showed why a raw fresh preview is not an earned boarding route: original opening slots remained pending, ego was still in Room 1, and by frame 1000 the session was back in Room 1 while Script 104 waited. That run was diagnostic and is not a completed scene or gameplay acceptance. Workers validate from the settled native opening and actual ticket choice. No arbitrary owner, currency, destination or actor edits are an acceptable correction.
+Both harness builds passed, zero warnings/errors. A later diagnostic compile initially used a nonexistent inventory snapshot property, corrected to `CurrentActorId` before its successful run.
+
+The retained `SceneCheck ... one 11 0 0` diagnostic showed ego still in Room 1 after the Room 11 preview began; at frame 1000 the session was back in Room 1 while Script 104 waited. My initial message inferred that pending Scripts 06/09 proved the opening had not finished. **That inference was wrong:** those are persistent lighting/interface and periodic world-state loops. Their existence is not evidence of an unfinished opening.
+
+An explicit `SourceCheck "<fixture>" boot` control in both editions establishes the narrower cause. Native boot ends with control true, cutscene false, Room 1 and ego 1 in Room 1; Classic takes 1784 frames, enhanced 1808, neither hits its boot limit. `EnterRoomAgain(11)` begins the room's scripts without a literal `loadRoomWithEgo` arrival; ego remains in Room 1. Script 104's `actorFollowCamera` then follows ego to its actual Room 1, with trace continuation at +01C0. This is an unprepared direct preview under the existing no-arrival policy, not a demonstrated planner startup scheduling defect. Script 115's actual boarding uses `putActorInRoom`, `putActor` and `actorFollowCamera`, and therefore establishes state the literal-arrival preview lacks. These diagnostic runs are not completed scenes or gameplay acceptance. No arbitrary owner, currency, destination or actor edits are an acceptable correction.
+
+## Native class lookup found on the preparation path
+
+The Classic worker's source-correct knife/plastic-card route reaches a second omission: native `ifClassOfIs` is not the later engine's class-number-list operation. Official [ScummVM `script_v2.cpp`](https://raw.githubusercontent.com/scummvm/scummvm/master/engines/scumm/script_v2.cpp), `o2_ifClassOfIs` lines 1035–1047, read 18 October, looks up the loaded or held object code, reads raw OBCD byte 6 and tests `(byte & mask) == mask`. A missing header jumps unconditionally. The shared owner was informed before any production edit; it must preserve these current-room/held-code and missing-object semantics and keep the opcode in its v2 partial. This is independent of fabricated CashCard or ticket state.
 
 Original-game pictures, perceived timing, listening, a continuous earned airport approach and other destinations remain distinct from prepared Core/WPF checks. No registry level is raised by this source-only review.
 

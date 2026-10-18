@@ -2,9 +2,22 @@ using System.Text;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Scumm;
 
-// Read-only source inspection; no session or game state is created or changed.
+// Source inspection and explicitly selected native-session diagnostics; game files are never changed.
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
+if (args[1] == "boot")
+{
+    var session = ScummGameSession.BootForPlay(game, out _);
+    var ego = session.CaptureInventoryStatus().CurrentActorId;
+    void Show(string stage) => Console.WriteLine($"{stage}: boot={session.BootReport}, room={session.CurrentRoomId}, control={session.PlayerHasControl}, cutscene={session.InCutscene}, ego={ego}, egoRoom={session.Actors.Single(a=>a.Number==ego).Room}");
+    Show("boot");
+    session.EnterRoomAgain(game.Rooms.Single(r=>r.ResourceId==11));
+    Show("preview");
+    for (var f=0; f<1000; f++) session.AdvanceFrame();
+    Show("preview+1000");
+    foreach (var line in session.SessionTrace.Where(t=>t.Contains("arrival",StringComparison.OrdinalIgnoreCase)||t.Contains("follow",StringComparison.OrdinalIgnoreCase)).TakeLast(12)) Console.WriteLine(line);
+    return;
+}
 if (args[1] == "names")
 {
     foreach (var resource in game.Rooms)
