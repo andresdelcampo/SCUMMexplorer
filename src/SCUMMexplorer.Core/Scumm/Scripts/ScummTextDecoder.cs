@@ -64,9 +64,9 @@ public static class ScummTextDecoder
                 // The code decides whether two operand bytes follow (ScummVM convertMessageToString, v3).
                 if (!operands && value is int code) { operands = code is not (1 or 2 or 3 or 8); control = operands ? 2 : 0; speech = code == 10; }
                 else control--;
-                // A speech control's operands (code 10, the talk sound: Monkey Island 2's talkie lines start with four of them) are offsets whose bytes are
-                // often letters, so they become spaces as escaped ones do (S7 Monkey2, 18 October 2026). Other codes keep their printable operand bytes as
-                // before, so the lists of the games without speech controls are unchanged.
+                // A talkie's code 10 carries the voice's offset and size as operand bytes (ScummVM handleNextCharsetCode case 10); they are data, not
+                // glyphs, even when the literal shows one as a printable character (Indy 4: "\xFF\x0A,\x8E…" drew a ',' before the line; S7 Indy4,
+                // 18 October 2026). Other codes keep their old reading, so the lists of LOOM, Indy 3 and Monkey Island stay as they were.
                 output.Append(value is null && !speech ? escaped[i] : ' ');
                 continue;
             }

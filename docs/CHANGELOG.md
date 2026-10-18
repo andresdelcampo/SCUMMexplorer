@@ -2,6 +2,20 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Fate of Atlantis cutscenes from its scripts, with their speech (S7, Indy4)
+
+- **The list.** The shared scan gives 666 triggers and 426 entries (182 scenes). 210 begin from a fresh start (the credits); the eight-worker runs match the single-threaded ones.
+- **Verb names after the credits (shared).** The play boot shows no verb, so `ScummCutscenePlanner` runs such a boot on with the game's own Esc skips until a verb is on: two skips, New York, Script 19's names. Titles read "Use fire escape", "Talk to ticket taker"; only `verb 0x50` keeps its number (4 entries, 187 before).
+- **Spoken first lines (shared).** `ScummTextDecoder.DecodeLine` reads code 10's operands (the voice's offset and size) as spaces, so first texts no longer start with stray characters. Only code 10 changed, and the LOOM, Indy3 and Monkey lists stay byte-identical.
+- **Speech in scenes from the list (shared App).** A room-entry scene played in a room opened for it speaks its lines from the visit (`TalkieSpeechPlayer.Attach(from)`).
+- **Registry.** Indy4 Cutscenes is ◐; the matrix is regenerated. `ScummIndy4CutsceneTests` (3) covers Smith's scene (Room 1), Sophia's lecture (Room 11, then backstage) and the diving suit (Room 82, then Room 42) from a fresh start, plus the lecture's spoken line. Window check, decisions and uncertainties: [record](../.verification/indy4-cutscenes-20261018/README.md).
+
+## 18 October: native Maniac battery/flashlight Use-with, both editions
+
+- Native object-header prepositions now work for v1/v2 room and retained inventory code. Classic's automatic sentence preposition and enhanced's explicit opcode both use the source bits; pickup preserves a changed header. No object-specific engine exception or input-mode assignment.
+- Both supplied Maniac editions compose their own two-object sentence, insert and consume the batteries through native inventory input, and switch on the flashlight. Wrong-target and missing-battery checks preserve the native prerequisite. Preparation is a labelled exploration action, not an earned story route.
+- Support levels remain unchanged. Own-edition tests, independent review, actual-window evidence and final suite/build results: [Use-with checkpoint](checkpoints/20261018-UseWith-ManiacZak.md). Original-game visual/timing comparison, walking approximation, other puzzles/parties and alternate same-family releases remain open.
+
 ## 18 October: Fate of Atlantis plays through its own interface, with its spoken lines (S6, Indy4)
 
 - **The route.** The acceptance route of R-7.18 runs from Barnett College (`ScummIndy4PlayTests`):

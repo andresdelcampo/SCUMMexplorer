@@ -86,7 +86,8 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         // S7 Monkey2 (18 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummMonkey2CutsceneTests).
         Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Indy4 (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy4PlayTests), spoken lines in play.
-        Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
+        // S7 Indy4 (18 October 2026): Cutscenes ◐, the list derived from the scripts and playable with its speech (ScummIndy4CutsceneTests).
+        Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Maniac/Zak (17 October 2026): native bounded routes and real-window checks; visual limits in the checkpoint.
         // S7 (18 October): script-derived lists with fresh-run proofs and window playback; Partial, not a hand-validated catalog.
         // S8 (18 October): explicit held-inventory choices, guarded atomic Apply/Undo; no puzzle flags or new items.

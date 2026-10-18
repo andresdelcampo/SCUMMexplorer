@@ -30,6 +30,10 @@ public sealed class ScummScriptRuntimeState
     public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
     public int V2UserState { get; private set; }
     public (int Verb, int Object1, int Object2, int Preposition)? V2DrawnSentence { get; set; }
+    /// <summary>Native v1/v2 OBCD preposition access: 255 when the object is nowhere, null on unreadable code.</summary>
+    public Func<int, int?>? ObjectPreposition { get; set; }
+    public Func<int, byte, bool>? SetObjectPreposition { get; set; }
+    public Action<int>? CopyV2InventoryHeader { get; set; }
     public Action<bool>? V2FreezeScripts { get; set; }
     /// <summary>script_v2.cpp setUserState, scumm.h USERSTATE flags (17 October 2026).</summary>
     public void ApplyV2UserState(int state)
