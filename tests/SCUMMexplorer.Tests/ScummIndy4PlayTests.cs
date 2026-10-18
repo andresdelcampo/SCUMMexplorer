@@ -10,11 +10,35 @@ namespace SCUMMexplorer.Tests;
 /// </summary>
 public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
 {
-    private static string? Folder()
+    private static string? Folder() => Folder("indy4 vga en");
+
+    // S9 (18 October 2026): the reference talkie CD image, the Spanish talkie folder and the Spanish floppy folder; null when the copy is absent.
+    internal static string? Folder(string copy)
     {
-        var path = Path.Combine(TestGames.Root, "indy4 vga en");
-        return File.Exists(Path.Combine(path, "ATLANTIS.cue")) ? path : null;
+        var path = Path.Combine(TestGames.Root, copy);
+        return File.Exists(Path.Combine(path, "ATLANTIS.cue")) || File.Exists(Path.Combine(path, "ATLANTIS.000")) ? path : null;
     }
+
+    /// <summary>
+    /// What the route reads per copy (S9, 18 October 2026): the texts are the copy's own data, never chosen by language; the speech offsets are the copy's own
+    /// speech codes (the Spanish talkie's lines carry the English talkie's offsets: its MONSTER.SOU speaks English); the floppy has no speech codes.
+    /// </summary>
+    internal sealed record RouteTexts(string Statue, string[] Verbs, string Walk, string LookAt, string LookAtMarquee, string Marquee, string PickUpNewspaper,
+        string TalkToTicketTaker, string[] Choices, string Answer, string PushCrate, string UseFireEscape, string Opening,
+        int? OpeningSpeech, int? ChoiceSpeech, int RoomFiveSkip, int StatueClick, char LookKey = 'l');
+
+    internal static RouteTexts TextsOf(string copy) => copy switch
+    {
+        "indy4 vga en" => new("peculiar statue", ["Give", "Open", "Close", "Pick up", "Talk to", "Look at", "Use", "Push", "Pull"], "Walk", "Look at", "Look at marquee",
+            "Imagine the suckers", "Pick up newspaper", "Talk to ticket taker", ["But--", "Now wait--", "Hold on--", "Um--"], "No seats", "Push crate",
+            "Use fire escape", "Alright, Jones", 0x0507BB6E, 0x040B3E4B, 0x000F, 0x0061),
+        "indy4 talkie vga es" => new("estatua rara", ["Dar", "Abrir", "Cerrar", "Coger", "Hablar", "Mirar", "Usar", "Empujar", "Tirar"], "Ir a", "Mirar", "Mirar luminoso",
+            "Imagina quién paga", "Coger periódico", "Hablar taquillera", ["Pero^", "Espere^", "Alto^", "Mmm^"], "No quedan butacas", "Empujar cajón",
+            "Usar salida de incendios", "Bien, Jones", 0x0507BB6E, 0x040B3E4B, 0x000F, 0x0061, 'm'),
+        _ => new("estatua rara", ["Dar", "Abrir", "Cerrar", "Coger", "Hablar", "Mirar", "Usar", "Empujar", "Tirar"], "Ir a", "Mirar", "Mirar luminoso",
+            "Imagina quién paga", "Coger periódico", "Hablar con taquillera", ["Pero^", "Espere^", "Alto^", "Mmm^"], "No quedan butacas", "Empujar cajón",
+            "Usar salida de incendios", "Bien, Jones", null, null, 0x000F, 0x0061, 'm'),
+    };
 
     // Script 19 (local[0] 2) and the boot's verbOps: the verbs of the full interface.
     private const int Open = 0x03, Give = 0x05, Use = 0x08, LookAt = 0x09, WalkTo = 0x0A, PickUp = 0x0B, TalkTo = 0x0C, Sentence = 0x64;
@@ -126,10 +150,14 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
     /// on verbs 0x78 up, input script 17; the route picks 0x78, which Indy says with its spoken line. (6) Leave the room: push the crates (145, 137, 139), "Use" the
     /// fire escape (138); Room 10 local 207 is a cutscene with an override: Esc skips the climb and Room 12 follows.
     /// </summary>
-    [Fact]
-    public void TheAcceptanceRouteFromBarnettCollegeRunsThroughTheGamesOwnInterface()
+    [Theory]
+    [InlineData("indy4 vga en")]
+    [InlineData("indy4 talkie vga es")]
+    [InlineData("indy4 classic vga es")]
+    public void TheAcceptanceRouteFromBarnettCollegeRunsThroughTheGamesOwnInterface(string copy)
     {
-        if (Folder() is not { } folder) return;
+        if (Folder(copy) is not { } folder) return;
+        var texts = TextsOf(copy);
         var game = new GameFolderScanner().Scan(folder);
         Assert.True(ScummProfile.For(game).PlaysThroughVerbs);
         Assert.True(ScummProfile.For(game).RightClickReachesGame);
@@ -143,15 +171,20 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         Assert.Equal(78, play.Var(ScummVars.VerbScript));
         Assert.DoesNotContain(session.Verbs, verb => verb.Mode == 1);
         // Marcus' first line (Room 4 local 206 +0x011C) carries its spoken line: offset 0x0507BB6E in MONSTER.SOU. The boot keeps the text's timing (no length).
-        var marcus = session.Messages.SpeechEvents.First();
-        Assert.Equal((0x0507BB6E, 14, false, (int?)null), (marcus.Offset, marcus.Length, marcus.IsStop, marcus.DurationJiffies));
+        Assert.Contains(session.Messages.Log, message => message.Text.Contains(texts.Opening, StringComparison.Ordinal));
+        if (texts.OpeningSpeech is { } opening)
+        {
+            var marcus = session.Messages.SpeechEvents.First();
+            Assert.Equal((opening, 14, false, (int?)null), (marcus.Offset, marcus.Length, marcus.IsStop, marcus.DurationJiffies));
+        }
+        else Assert.Empty(session.Messages.SpeechEvents);
 
         // (1) The prologue's click: Script 79 names the object under the pointer, Script 78 +0x0061 runs object 63's verb 0x0A, and Indy goes on to Room 5.
         play.Hover(80, 92);
-        Assert.Contains(session.Messages.OnScreen, message => message.Text.Contains("peculiar statue", StringComparison.Ordinal));
+        Assert.Contains(session.Messages.OnScreen, message => message.Text.Contains(texts.Statue, StringComparison.Ordinal));
         play.ClickRoom(80, 92);
         Assert.True(play.RunUntil(() => session.CurrentRoomId == 5 && play.Idle, 1500), "the statue leads to Room 5");
-        Assert.Contains(session.SessionTrace, line => line.StartsWith("Script 78 +0x0061: startObject runs object 63 verb 0x0A", StringComparison.Ordinal));
+        Assert.Contains(session.SessionTrace, line => line.StartsWith($"Script 78 +0x{texts.StatueClick:X4}: startObject runs object 63 verb 0x0A", StringComparison.Ordinal));
         play.Log("room 5");
         // Room 5 is entered once: Script 21's actorFollowCamera (run nested from endCutscene at Room 4 local 200 +0x0092) starts the scene; the caller's own follow
         // at +0x0093 then finds Indy in the current room (setCameraFollows starts a scene only for an actor elsewhere).
@@ -160,29 +193,29 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         // (2) Skip: Esc takes Room 5 local 214's override; the full interface (Script 19 with 2) comes up in Room 10.
         Assert.True(session.CutsceneSkippable);
         session.PressKey(0x1B);
-        Assert.Contains(session.SessionTrace, line => line.StartsWith("abortCutscene: Room 05 local script 214 continues at its skip jump +0x000F", StringComparison.Ordinal));
+        Assert.Contains(session.SessionTrace, line => line.StartsWith($"abortCutscene: Room 05 local script 214 continues at its skip jump +0x{texts.RoomFiveSkip:X4}", StringComparison.Ordinal));
         Assert.True(play.RunUntil(() => play.Idle && session.CurrentRoomId == 10 && session.Verbs.Any(v => v.VerbId == Open && v.Mode == 1), 3000), "New York");
         play.Log("new york");
         Assert.Equal(4, play.Var(ScummVars.VerbScript));
         Assert.Equal((0, 144), session.MainScreen);
-        Assert.Equal(["Give", "Open", "Close", "Pick up", "Talk to", "Look at", "Use", "Push", "Pull"],
+        Assert.Equal(texts.Verbs,
             new[] { Give, Open, 4, PickUp, TalkTo, LookAt, Use, 6, 7 }.Select(play.Glyphs).ToArray());
-        Assert.Equal("Walk", play.Sentence);
+        Assert.Equal(texts.Walk, play.Sentence);
 
         // (3) Compose and run a sentence: "Look at" + the marquee (object 142); sentence Script 2 runs verb 9.
         play.ClickVerb(LookAt);
-        Assert.Equal("Look at", play.Sentence);
+        Assert.Equal(texts.LookAt, play.Sentence);
         play.Hover(116, 16);
-        Assert.Equal("Look at marquee", play.Sentence);
+        Assert.Equal(texts.LookAtMarquee, play.Sentence);
         play.ClickRoom(116, 16);
-        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(m => m.Actor == 1 && Clean(m.Text).StartsWith("Imagine the suckers", StringComparison.Ordinal)), 900), "Indy reads the marquee");
+        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(m => m.Actor == 1 && Clean(m.Text).StartsWith(texts.Marquee, StringComparison.Ordinal)), 900), "Indy reads the marquee");
         Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x09 with objects 142", StringComparison.Ordinal));
         Assert.True(play.RunUntil(() => play.Idle && session.Messages.Talk is null, 1500));
 
         // (4) Take an object: "Pick up" the newspaper (141). Script 10 gives the second inventory slot (verb 0x66; 0x65 holds the magazine, object 23) its icon.
         play.ClickVerb(PickUp);
         play.Hover(168, 80);
-        Assert.Equal("Pick up newspaper", play.Sentence);
+        Assert.Equal(texts.PickUpNewspaper, play.Sentence);
         play.ClickRoom(168, 80);
         Assert.True(play.RunUntil(() => session.Snapshot.Inventory.Contains(141), 1500), "the newspaper reaches the inventory");
         play.Run(5);
@@ -197,18 +230,18 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         // verbs 0x78 up, whose names are code 7 of those strings; Script 17 is the input script.
         play.ClickVerb(TalkTo);
         play.Hover(116, 48);
-        Assert.Equal("Talk to ticket taker", play.Sentence);
+        Assert.Equal(texts.TalkToTicketTaker, play.Sentence);
         play.ClickRoom(116, 48);
         Assert.True(play.RunUntil(() => play.Var(ScummVars.VerbScript) == 17 && session.UserInputOn && session.Verbs.Any(v => v.VerbId == 0x78 && v.Mode == 1), 3000), "the choices");
         play.Log("choices");
-        Assert.Equal(["But--", "Now wait--", "Hold on--", "Um--"], new[] { 0x78, 0x79, 0x7A, 0x7B }.Select(id => Clean(play.Glyphs(id))).ToArray());
+        Assert.Equal(texts.Choices, new[] { 0x78, 0x79, 0x7A, 0x7B }.Select(id => Clean(play.Glyphs(id))).ToArray());
         Assert.Equal(4, session.PlayVerbArea().Items.Count(item => item.VerbId is >= 0x78 and <= 0x7B && item.IsText && item.Width > 0 && item.Y >= 144));
         var spoken = session.Messages.SpeechEvents.Count;
         play.ClickVerb(0x78);
         // Script 17 +0x00D9 prints the chosen verb's name (code 5): Indy says the line, and its speech codes start the spoken line (0x040B3E4B).
-        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(m => m.Actor == 1 && m.Text.EndsWith("But--", StringComparison.Ordinal)), 300), "Indy says the choice");
-        Assert.Contains(session.Messages.SpeechEvents.Skip(spoken), e => e is { Offset: 0x040B3E4B, IsStop: false, DurationJiffies: > 0 });
-        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(m => m.Actor != 1 && Clean(m.Text).StartsWith("No seats", StringComparison.Ordinal)), 900), "the ticket taker answers");
+        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(m => m.Actor == 1 && m.Text.EndsWith(texts.Choices[0], StringComparison.Ordinal)), 300), "Indy says the choice");
+        if (texts.ChoiceSpeech is { } said) Assert.Contains(session.Messages.SpeechEvents.Skip(spoken), e => e.Offset == said && e is { IsStop: false, DurationJiffies: > 0 });
+        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(m => m.Actor != 1 && Clean(m.Text).StartsWith(texts.Answer, StringComparison.Ordinal)), 900), "the ticket taker answers");
         Assert.True(play.RunUntil(() => play.Idle && play.Var(ScummVars.VerbScript) == 4, 1500), "the conversation ends");
 
         // (6) Leave the room: the crates (Room 10 objects 145, then 137 and 139, verb 6) clear the fire escape's class 6 (object 139 verb 6 +0x0118), and "Use" on
@@ -218,7 +251,7 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
             play.BringIntoView(x, y);
             play.ClickVerb(6);
             play.Hover(x, y);
-            Assert.Equal("Push crate", play.Sentence);
+            Assert.Equal(texts.PushCrate, play.Sentence);
             play.ClickRoom(x, y);
             Assert.True(play.RunUntil(() => play.Idle && !session.EgoMoving && session.Messages.Talk is null, 900));
             play.Run(10);
@@ -227,7 +260,7 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         play.BringIntoView(536, 32);
         play.ClickVerb(Use);
         play.Hover(536, 32);
-        Assert.Equal("Use fire escape", play.Sentence);
+        Assert.Equal(texts.UseFireEscape, play.Sentence);
         play.ClickRoom(536, 32);
         Assert.True(play.RunUntil(() => session.InCutscene && session.CutsceneSkippable, 900), "the climb is a cutscene with an override");
         play.Log("climbing");
@@ -247,10 +280,13 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         Assert.Equal(12, screen.RoomId);
     }
 
-    [Fact]
-    public void TheMainMenuKeyIsNotDeliveredAndAVerbsKeyIsItsClick()
+    [Theory]
+    [InlineData("indy4 vga en")]
+    [InlineData("indy4 talkie vga es")]
+    [InlineData("indy4 classic vga es")]
+    public void TheMainMenuKeyIsNotDeliveredAndAVerbsKeyIsItsClick(string copy)
     {
-        if (Folder() is not { } folder) return;
+        if (Folder(copy) is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = ScummGameSession.BootForPlay(game, out _);
         session.PressKey(0x1B);
@@ -260,23 +296,25 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         var menu = session.Snapshot.KnownGlobalVariables[ScummVars.MainMenuKey];
         output.WriteLine($"VAR_MAINMENU_KEY = {menu}");
         if (menu != 0) Assert.Null(session.PressPlayKey(menu, out _));
-        // Script 19's verbs carry their keys ('l' for Look at, verb 9).
+        // Script 19's verbs carry their keys ('l' for Look at, verb 9; 'm' for Mirar in the Spanish copies).
         var keyed = session.Verbs.Single(verb => verb.VerbId == LookAt);
-        Assert.Equal('l', keyed.Key);
+        Assert.Equal(TextsOf(copy).LookKey, keyed.Key);
         var input = session.PressPlayKey(keyed.Key, out _);
         Assert.Equal((ScummSession.VerbClickArea, LookAt, 1), (input!.Area, input.Value, input.Mode));
     }
 
-    [Fact]
-    public void ATalkiesLineLastsAsLongAsItsSpokenSample()
+    [Theory]
+    [InlineData("indy4 vga en")]
+    [InlineData("indy4 talkie vga es")]
+    public void ATalkiesLineLastsAsLongAsItsSpokenSample(string copy)
     {
-        if (Folder() is not { } folder) return;
+        if (Folder(copy) is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
         // Marcus' line (Room 4 local 206 +0x011C) is sample 0x0507BB6E: its voice file's samples over its rate give 215 jiffies.
-        var wave = game.Speech!.ReadWave(0x0507BB6E, 14);
+        var wave = game.Speech!.ReadWave(TextsOf(copy).OpeningSpeech!.Value, 14);
         Assert.Equal(215, (int)Math.Ceiling((wave.Length - 44) / 2.0 * 60 / BitConverter.ToInt32(wave, 24)));
         var session = ScummGameSession.BootForPlay(game, out _);
-        Assert.Contains(session.Messages.Log, message => message.Text.Contains("Alright, Jones", StringComparison.Ordinal));
+        Assert.Contains(session.Messages.Log, message => message.Text.Contains(TextsOf(copy).Opening, StringComparison.Ordinal));
         Assert.NotNull(session.Messages.SpeechJiffies);
         // After the boot, a line waits for its sample (processSfxQueues: finished && _talkDelay == 0). Skip the prologue: Smith's scene in Room 1 speaks.
         session.PressKey(0x1B);
@@ -290,5 +328,35 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         var line = session.Messages.SpeechEvents.Last(e => !e.IsStop && e.DurationJiffies is not null);
         var sample = game.Speech.ReadWave(line.Offset, line.Length);
         Assert.Equal((int)Math.Ceiling((sample.Length - 44) / 2.0 * 60 / BitConverter.ToInt32(sample, 24)), line.DurationJiffies);
+    }
+
+    /// <summary>
+    /// S9 accents (18 October 2026): every byte from 0x80 up that a copy's texts hold has a glyph in each charset the play screen reads (the copy's CHAR
+    /// blocks). The Spanish copies write their accents and inverted marks as CP437 codes, drawn as the data holds them (no table).
+    /// </summary>
+    [Theory]
+    [InlineData("indy4 vga en")]
+    [InlineData("indy4 talkie vga es")]
+    [InlineData("indy4 classic vga es")]
+    public void EveryTextByteAboveAsciiHasAGlyphInTheCopysCharsets(string copy)
+    {
+        if (Folder(copy) is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = ScummGameSession.BootForPlay(game, out _);
+        var found = ScummCopyTextBytes.Collect(game);
+        output.WriteLine($"{copy}: text bytes from 0x80: {ScummCopyTextBytes.Describe(found)}");
+        var charsets = Enumerable.Range(0, 8).Select(n => (n, charset: session.PlayCharset(n))).Where(p => p.charset is not null).ToArray();
+        Assert.NotEmpty(charsets);
+        foreach (var (n, charset) in charsets)
+            output.WriteLine($"charset {n}: no glyph for [{string.Join(" ", found.Keys.Where(code => charset!.CharWidth(code) == 0).Order().Select(code => code.ToString("X2")))}]");
+        // The Spanish texts write ü é á í ó ú ñ Ñ ¿ ¡ (0x81, 0x82, 0xA0 to 0xA5, 0xA8, 0xAD) hundreds of times; charsets 1 to 3 draw all of them and charset 4
+        // all but Ñ (data). The other bytes from 0x80 occur a few times in every copy, English too, in strings that are not shown as text and have no glyph
+        // in any charset; charset 5 (the talkie copies only) has no accented glyph.
+        if (copy == "indy4 vga en") return;
+        byte[] accents = [0x81, 0x82, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA8, 0xAD];
+        Assert.All(accents, code => Assert.True(found.GetValueOrDefault(code) > 0, $"0x{code:X2} is written"));
+        foreach (var (n, charset) in charsets.Where(p => p.n is >= 1 and <= 3))
+            Assert.All(accents, code => Assert.True(charset!.CharWidth(code) > 0, $"charset {n} 0x{code:X2}"));
+        Assert.All(accents.Where(code => code != 0xA5), code => Assert.True(charsets.Single(p => p.n == 4).charset!.CharWidth(code) > 0, $"charset 4 0x{code:X2}"));
     }
 }
