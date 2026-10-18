@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: complete admin inventory catalogs, Maniac/Zak
+
+- Own-edition source censuses establish 48 inventory items per Maniac edition and 76 per Zak edition. Zak nest53 is added; seven shop display headers and Maniac's bank35 are removed as false positives. Letter139 is a scene container; native Read/Pickup gives card27.
+- Generic source flow preserves finite alternate targets, caller arguments and special-handler identities, with native comparison/alias/mutation semantics. Explicit Zak recording-loop bounds have independent finite inventory-coverage proofs. No room/item engine exception or earned prerequisite is introduced.
+- All-item grant/retained-verb/exact-Undo and native capacity/stale checks support Status Full for all four families. Four sequential windows retain all seven Maniac recipient pictures and correct catalog choices. Both generated matrices follow only those four cell changes.
+- Final solution build zero warnings/errors; three matrix checks; required full suite **1,422 passed, zero failed, five skipped**, all **65 new cases passed**. Five sequential window processes pass, with 46 captures and 13 visual inspections; source-analysis limits remain explicit. [Checkpoint](checkpoints/20261018-Catalog-ManiacZak.md), [integration evidence](../.verification/maniaczak-catalog-20261018/README.md).
+
 ## 18 October: admin Game Status clarification and shared playback controls, Maniac/Zak
 
 - Requirements now permit explicit unearned inventory grants, pictured Maniac recipients and future native icons for graphical inventory games. The old held-only restriction is superseded; grants never silently complete unrelated puzzles/conversations.
