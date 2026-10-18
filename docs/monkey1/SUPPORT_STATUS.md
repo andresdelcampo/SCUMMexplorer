@@ -1,6 +1,6 @@
 # Monkey Island 1 CD support status
 
-Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 17 October 2026 | Owner: S6 MonkeyCd agent
+Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 18 October 2026 | Owner: S7 MonkeyCd agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -10,12 +10,12 @@ Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island
 | S4b Session | **done (17 Oct)** | – (unchanged: S4b changes no cell) | [monkeycd-session-20261017](../../.verification/monkeycd-session-20261017/README.md) | boots to the lookout (Room 38) in 1573 frames, player in control, unsupported 0; left alone it goes on to Room 96 and the dock (Room 33); `ScummMonkeyCdSessionTests` |
 | S5 Objects | **done (17 Oct), three rooms written down** | Objects ✔ with S6 (17 Oct) | [monkeycd-objects-20261017](../../.verification/monkeycd-objects-20261017/README.md) | 82 of 83 rooms run without a gap; Room 99 cannot run, Rooms 88 and 89 not followed; ten-room ScummVM picture comparison not done (user check) |
 | S6 Play | **done (17 Oct)** | Play ✔, Objects ✔ | [monkeycd-play-20261017](../../.verification/monkeycd-play-20261017/README.md) | R-7.18 route from the dock (poster sentence, its cutscene skipped, door to the SCUMM Bar, the pirates' dialogue, the rubber chicken in Room 29) passes headless (`ScummMonkeyCdPlayTests`) and in the real window; music plays from the disc's tracks in play; Rooms 88, 89, 99 not needed by the route |
-| S7 Cutscenes | not started | Cutscenes | | |
+| S7 Cutscenes | **done (18 Oct)** | Cutscenes – → ◐ | [monkeycd-cutscenes-20261017](../../.verification/monkeycd-cutscenes-20261017/README.md) | 286 triggers, 160 entries (62 scenes), 101 begin from a fresh start; titles with the CD's own verbs (raw `verb 0x50`, `verb 0x3D` only where the game names none); the poster (Room 33 object 429 verb 8), Room 37's and Room 19's entries accepted (`ScummMonkeyCdCutsceneTests`); Room 19's scene starts its disc track (sound 102) |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | the disc also carries ENGLISH, FRENCH, GERMAN, ITALIAN, SPANISH data folders |
 
 Blocked on: nothing.
-Next: S7 Cutscenes (the shared planner, as for the floppy); the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); the user's listening and timing check of play (see the S6 record).
+Next: the user's S7 checks (record, user checks); the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); the user's listening and timing check of play (see the S6 record).
 Open uncertainties: disc track 21 (16 s) is started by no sound and stays unnamed; six `startSound` operands are variables (script 101 `var[100]`, script 162 `local[4]`, room 75 local script 205 `local[0]`), which sound they start needs running scripts.
 
 ## Decision log
@@ -37,6 +37,8 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 | 2026-10-17 | S6 | Code 7 (string) in a verb name: Script 12 puts string 49 (" ") between verb and object | leave it out (the sentence reads "Look atposter"); model `convertStringMessage` | modelled for the play verb names only: version 3 reads the string number from a variable, 4 and 5 take it literally (ScummVM); messages are unchanged | drop `PlayStringText` from `VerbGlyphs` |
 | 2026-10-17 | S6 | `cursorCommand charsetColors` (Script 22: charset 6 gets 0, 6, 2) was ignored | keep the file's colour map; apply the script's entries | applied per charset (`ScummScriptRuntimeState.CharsetColors`, `ScummV4Charset.WithColors`): the verbs' value-2 pixels take colour 2 as ScummVM's `_charsetData`. This also reaches the floppy's verbs where its scripts use the command | remove the executor branch |
 | 2026-10-17 | S6 | How a CD-track sound plays in play | through the device renderer (no card part: silent); the disc's audio | the disc's stretch for the sound (start to end frame, finite loops repeated, 0xFF tracks restarted when they end), whatever the device, as the room's music panel plays the tracks; effects (sounds 2, 3) keep the device renderer | drop the CD branch of `RenderPlaySound` || 2026-10-17 | S4b | Untouchable class of `o5_pickupObject` | 24 (the small-header number the hit test uses); 32 (ScummVM `kObjectClassUntouchable` without translation) | 32 for the v5 form, as ScummVM; the hit test's class number for v5 is an S5/S6 item (step 4 of S5: read the class bits from the source) | change the constant in `TryApplyPickupObject` |
+| 2026-10-18 | S7 | Whether the CD needs its own reader per background worker: the v5 resource file is decoded into memory (read-only arrays), so one copy could be shared | (a) keep the rule the floppy introduced (a game with `V4Disks`/`V4Archive` gets one copy per worker, read from the disc image); (b) share the one copy for v5 | (a): no code change, the brief asks for own copies, and the cost is small (eight copies of about 9 MB; reading a copy, booting and scanning take 1.5 s together); 8 workers give the same 160 results as one thread | share the copy by testing for `ScummV5Archive` in `StartPlayCutsceneDerivation` |
+| 2026-10-18 | S7 | Playing a room's entry from the picker while play is elsewhere ran the entry twice (the play visit, then `EnterRoomAgain` before any frame); the CD's ship (Room 19) then played nothing | (a) keep the visit's entry when the room was opened for the scene; (b) skip the visit and enter directly; (c) leave it | (a): the smallest change in the shared play code, it matches the headless fresh-start run (`EnterRoomAgain` from another room is a `VisitRoom`), and the floppy's window check still passes; a room the player is in is still entered again | restore the unconditional `EnterRoomAgain` in `PlayCutscene` (`MainWindow.PlayCutscenes.cs`) |
 
 
 ---

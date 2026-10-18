@@ -205,3 +205,17 @@ Rows of this section come from the **CD release** only (`Games/monkey1 vga en`: 
 | Room 28 (SCUMM Bar) | 315 door (to Room 33, through Script 120), 322 important-looking pirates (Talk to: the three trials) | decoded | route | 2026-10-17 |
 | Room 35 and Room 29 | 444 door of Room 35 (to Room 29); 377 rubber chicken of Room 29 (Pick up) | decoded | route | 2026-10-17 |
 | Untouchable | class 32 (`kObjectClassUntouchable` without translation: the CD has no small header); a picked-up object gets it | engine | object.cpp `getClass`; `o5_pickupObject` | 2026-10-17 |
+
+### Global scripts (CD)
+
+| Script | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| 60 | Room 37's arrival scene, as on the floppy: two cutscenes, "Hey!  I don't like visitors!  Who are you?"; started by Room 37's entry with Script 25 and local script 201; begins from a fresh start (73 frames). The entry starts sound 98 (an iMuse sound of the resource file, not a disc track) | decoded (scan), run (S7) | Room 37 entry +0x0000; Script 60 | 2026-10-18 |
+
+### Rooms (CD)
+
+| Room | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| 33 (cutscenes, S7) | the poster's first Look at (object 429 verb 8) is the room's scene in the list (`Room 33 · Look at poster`): `cutscene [0x0002]` +0x00CF, `beginOverride` +0x00D4, `printEgo` +0x00D9 "Re-elect Governor Marley.", `endCutscene` +0x0134; begins from a fresh start (74 frames; ends at frame 62 of the probe) | run (S7 headless run, window) | Room 33 object 429 verb 0x08 | 2026-10-18 |
+| 19 | the ship's deck (Part II): the entry's local script 200 is a cutscene with local 206 (13 lines, "First of all^") that goes on to Room 7; local script 200 starts sound 102 at +0x0009, a disc track; begins from a fresh start (624 frames) | run (S7 headless run, window) | Room 19 entry; Room 19 local scripts 200, 206 | 2026-10-18 |
+| 61, 25, 28, 31, 36, 57 (verb 0x50) | the code an inventory object reaches when given or used on the Sword Master (61/744), the friendly natives (25/292), the important-looking pirates (28/322), the prisoner (31/405), the poodles (36/467), the troll (57/655); verb 0x50 has no name in the CD's verb script, so its titles keep the number (as the floppy). Room 7's chest (77) has verb 0x3D, likewise unnamed | decoded (scan) | Script 22 (verb names); the objects' `VERB` blocks | 2026-10-18 |

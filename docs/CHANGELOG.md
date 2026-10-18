@@ -13,6 +13,12 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
   - Text verbs skip the two bytes of codes 9, 10, 12, 13 and 14 (d5af7d3).
 - Validation: `ScummMonkey2PlayTests` (3), `ScummPlayScreenStateImageTests`, `ScummImuseMusicTests`, `V5ImuseLoopTests`; the play, sound, Monkey, Indy, cutscene and conformance filter; the LOOM and Scumm regression; one WPF check through the real window. Record: [monkey2-play-20261017](../.verification/monkey2-play-20261017/README.md).
 
+## 18 October: Monkey Island CD lists its cutscenes from its scripts and plays them (S7, MonkeyCd)
+
+- The shared scan reads the CD's v5 resource file (through its disc image) unchanged: 286 triggers, 160 entries (62 scenes), 101 begin from a fresh start; titles use the CD's own verb names after the boot (2 Open … 8 Look at, 0x0A Talk to, 0x0B Walk to); `verb 0x50` and `verb 0x3D` stay raw because the game names neither.
+- Acceptance: `Room 33 · Look at poster` (object 429 verb 8), `Room 37 · Entry` (Script 60) and `Room 19 · Entry` (the ship, local script 200, on to Room 7; it starts its disc track, sound 102). Background derivation: 8 workers, each with its own copy read from the disc image; results identical to one thread; 51 s in the window on first launch. App fix (shared): an entry played from the picker in another room no longer runs the entry twice (the ship played nothing).
+- Registry: MonkeyCd Cutscenes – → ◐. Validation: `ScummMonkeyCdCutsceneTests`; support, cutscene and play tests; LOOM regression; LOOM, Indy3 and Monkey floppy lists byte-identical. Record: [monkeycd-cutscenes-20261017](../.verification/monkeycd-cutscenes-20261017/README.md).
+
 ## 18 October: script-derived Maniac Mansion and Zak McKracken cutscenes (S7, all four families)
 
 - Cutscenes None to Partial for ManiacClassic, ManiacEnhanced, ZakClassic and ZakEnhanced. Three source-attributed fresh-start examples per family complete; room-list and global-picker actions pass in four actual windows. Maniac lists 27 groups (6/7 starts); Zak 54 (13 per edition, five bounded runs).
