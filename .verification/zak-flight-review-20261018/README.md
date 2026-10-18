@@ -40,4 +40,6 @@ Original-game pictures, perceived timing, listening, a continuous earned airport
 
 ## Result review
 
-Pending the workers' finished route, negative tests and any source-backed shared correction.
+Reviewed shared correction `07d9eb1` against the official v2 routine. No actionable issue: raw mask metadata is additive, its reader takes byte 6, the executor stays in the V2 partial and implements **masked equality**, not whole-byte equality. The callback reuses the current-room/retained-inventory header locator; byte 6 is immutable, so reading the retained room's original decoded record is correct. An absent header jumps even for zero mask. An unreadable header remains unresolved, rather than becoming fabricated absence or success. No room, game, language or script-offset exception was introduced.
+
+Read all nine new mask tests, including a proper-subset success (`0x83 & 0x81`), partial-mask failure (`0x01 & 0x03`), zero-mask success, missing-header zero-mask failure and unreadable-header stop. Later-engine class tables are deliberately irrelevant. Parent runs the integrated regressions; this independent record does not add their counts to its own harness builds. The family workers separately validate the reached held-knife path and ticket guards; final review of their complete routes remains pending.
