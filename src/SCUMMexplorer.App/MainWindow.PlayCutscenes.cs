@@ -19,6 +19,7 @@ public partial class MainWindow
     private Dictionary<string, int[]>? _playSavedRoomLists;
     private bool _playRoomListsDone;
     private int _playControlsFrame;
+    private bool _playControlsInCutscene;
 
     /// <summary>The open game lists its cutscenes from its scripts and plays them in the play screen.</summary>
     private bool PlayCutscenes => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
@@ -200,15 +201,7 @@ public partial class MainWindow
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         InteractButton.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
         AdvanceFrameButton.IsEnabled = false;
-        PlaybackPauseButton.IsEnabled = active;
-        PlaybackPauseButton.Content = _playPaused ? "▶ Play" : "⏸ Pause";
-        var inCutscene = active && _play!.InCutscene;
-        var skippable = inCutscene && _play!.CutsceneSkippable;
-        SkipCutsceneButton.IsEnabled = skippable;
-        SkipCutsceneButton.ToolTip = !inCutscene ? "No cutscene is playing."
-            : skippable ? "Skip the cutscene (Escape): the script that set the override goes on at its skip point."
-            : "The cutscene has not set its skip point yet, so Escape would do nothing now, as in the game.";
-        SkipLineButton.IsEnabled = active && _play!.Messages.HaveMsg != 0;
+        UpdatePlayTransportControls();
         var canStart = PlayCanStartCutscene;
         CutsceneMenuButton.IsEnabled = active && canStart && _playPlanner is not null;
         CutsceneMenuButton.Content = "Play Cutscene";
@@ -226,9 +219,40 @@ public partial class MainWindow
         CutsceneScanProgress.Visibility = active && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    /// <summary>The bar follows the play frames (Skip turns on at the override point), a few times a second.</summary>
+    // Native transport state is cheap and must follow every frame: a cutscene's
+    // override can appear or disappear between room-list refreshes.
+    private void UpdatePlayTransportControls()
+    {
+        var active = PlayActive;
+        UpdateSoundDeviceControls();
+        PlaybackPauseButton.IsEnabled = active;
+        PlaybackPauseButton.Content = _playPaused ? "▶ Play" : "⏸ Pause";
+        PlaybackPauseButton.ToolTip = "Pause or resume the game, including walking, dialogue and cutscenes (Space).";
+        var inCutscene = active && _play!.InCutscene;
+        var skippable = inCutscene && _play!.CutsceneSkippable;
+        SkipCutsceneButton.IsEnabled = skippable;
+        SkipCutsceneButton.ToolTip = !inCutscene ? "No cutscene is playing."
+            : skippable ? "Skip the cutscene (Escape): the script that set the override goes on at its skip point."
+            : "The cutscene has not set its skip point yet, so Escape would do nothing now, as in the game.";
+        SkipLineButton.IsEnabled = active && _play!.Messages.HaveMsg != 0;
+    }
+
+    private void SkipPlayCutscene()
+    {
+        if (!PlayActive || !_play!.CutsceneSkippable) return;
+        _play.PressKey(0x1B);
+        _playPaused = false; // As in LOOM, Skip continues from the native skip point.
+        UpdatePlaybackControls();
+    }
+
+    /// <summary>Transport follows every frame; the derived room list refreshes a few times a second.</summary>
     private void RefreshPlayControlsOnFrame()
     {
-        if (++_playControlsFrame % 12 == 0 && PlayCutscenes) UpdatePlayCutsceneControls();
+        if (!PlayCutscenes) return;
+        UpdatePlayTransportControls();
+        var inCutscene = _play?.InCutscene == true;
+        var changed = inCutscene != _playControlsInCutscene;
+        _playControlsInCutscene = inCutscene;
+        if (changed || ++_playControlsFrame % 12 == 0) UpdatePlayCutsceneControls();
     }
 }

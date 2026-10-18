@@ -1016,10 +1016,24 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateSoundDeviceVisibility()
     {
-        var show = _game is not null && (_session is not null || IsAdvancedMode);
+        var show = _game is { } game && (IsAdvancedMode || GameSupport.For(game) is { LiveSession: true, Cutscenes: true, Audio: true });
         var disc = _game is { V4Archive.Disc.AudioStartSector: not null };
         SoundModeCombo.Visibility = show && !disc ? Visibility.Visible : Visibility.Collapsed;
         CdSoundCombo.Visibility = show && disc ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    // The device belongs to whichever live session is on screen. A scene keeps its
+    // driver until it ends, including in a game played through its verbs.
+    private bool SoundDeviceLocked => PlayActive ? _play!.InCutscene : SessionInScene;
+
+    private void UpdateSoundDeviceControls()
+    {
+        var locked = SoundDeviceLocked;
+        SoundModeCombo.IsEnabled = !locked;
+        CdSoundCombo.IsEnabled = !locked;
+        RoomSoundsButton.IsEnabled = !locked;
+        SoundModeCombo.ToolTip = locked ? "The sound device can be changed when the scene is over." : SoundModeToolTip;
+        AdlibGainPanel.IsEnabled = !locked;
     }
 
     private bool IsAdvancedMode => AdvancedModeToggle.IsChecked == true;
@@ -3452,7 +3466,7 @@ public partial class MainWindow : Window
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || SoundModeCombo.SelectedIndex < 0) return;
-        if (SessionInScene)
+        if (SoundDeviceLocked)
         {
             SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
             return;
@@ -3470,6 +3484,7 @@ public partial class MainWindow : Window
         StartSoundDurations();
         // The game's scripts read the sound card when they choose a sound, so the new device applies from the next one on.
         if (_session is not null) _session.SoundCard = SoundCard;
+        UpdatePlaySoundCard();
         if (!_soundModeFallback) SaveViewOptions();
         if (surface == AudioSurface.Resource && selected is not null)
             await ShowAudio(selected, preserveFormat: true);
@@ -4486,13 +4501,13 @@ public partial class MainWindow : Window
     private void SkipCutscene_Click(object sender, RoutedEventArgs e)
     {
         // S7: during play, Skip is Esc: abortCutscene from the override point only (R-7.16).
-        if (PlayActive) { if (_play!.CutsceneSkippable) _play.PressKey(0x1B); PlayScreenImage.Focus(); return; }
+        if (PlayActive) { SkipPlayCutscene(); PlayScreenImage.Focus(); return; }
         SkipCutscene();
     }
 
     private void SkipLine_Click(object sender, RoutedEventArgs e)
     {
-        if (PlayActive) { _play!.SkipMessage(); PlayScreenImage.Focus(); return; }
+        if (PlayActive) { _play!.SkipMessage(); UpdatePlaybackControls(); PlayScreenImage.Focus(); return; }
         SkipTalk("the Skip line button, same as '.'");
     }
 
@@ -4533,6 +4548,7 @@ public partial class MainWindow : Window
     private void UpdatePlaybackControls()
     {
         UpdateGameStatusButton(); // Inspection is available during playback too; editing stays guarded.
+        UpdateSoundDeviceControls();
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         // S7: a game played through its verbs has its own bar (MainWindow.PlayCutscenes.cs).
         if (PlayCutscenes) { UpdatePlayCutsceneControls(); return; }
@@ -4541,11 +4557,6 @@ public partial class MainWindow : Window
         // Step plays one frame of a paused scene; with nothing paused there is nothing to step.
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
-        SoundModeCombo.IsEnabled = !SessionInScene;
-        CdSoundCombo.IsEnabled = !SessionInScene;
-        RoomSoundsButton.IsEnabled = !SessionInScene;
-        SoundModeCombo.ToolTip = SessionInScene ? "The sound device can be changed when the scene is over." : SoundModeToolTip;
-        AdlibGainPanel.IsEnabled = !SessionInScene;
         PlaybackPauseButton.IsEnabled = active && _playback is not null && (_playbackPaused || PlaybackHasActivity);
         PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
         SkipLineButton.IsEnabled = active && !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
