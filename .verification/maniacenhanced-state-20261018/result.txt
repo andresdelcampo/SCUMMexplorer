@@ -1,0 +1,35 @@
+Native route: 1553 frames, room 1, actor 3, inputs 12
+CHARACTER 1 Syd: Script 4 +0x00EC: ego <- var[0x030], followed by actorFollowCamera
+CHARACTER 3 Dave: Script 4 +0x00D7: ego <- var[0x02F], followed by actorFollowCamera
+CHARACTER 5 Bernard: Script 4 +0x0101: ego <- var[0x031], followed by actorFollowCamera
+ITEM ScummInventoryItem { ObjectId = 55, OwnerId = 3, Slot = 0, RetainedRoomId = 1, Name = llave }
+Explicit inventory choice: object 55, actor 3 -> actor 1. Explicit exploration ownership edit; no pickup, scene or script was played.
+Explicit inventory undo: object 55, restored actor 3. No pickup, scene or script was played.
+PASS: key55 owner3->1->3; slot/retainedroom/name unchanged; all words/states/classes/actors unchanged.
+SOURCE Script1 +0008: move var[0x000], 0x0003
+SOURCE Script1 +001D: actorOps 0x01, var[0x000], sub=0x03, name="Syd"
+SOURCE Script1 +0031: actorOps 0x02, var[0x000], sub=0x03, name="Razor"
+SOURCE Script1 +0047: actorOps 0x03, var[0x000], sub=0x03, name="Dave"
+SOURCE Script1 +0061: actorOps 0x04, var[0x000], sub=0x03, name="Michael"
+SOURCE Script1 +0079: actorOps 0x05, var[0x000], sub=0x03, name="Bernard"
+SOURCE Script1 +0091: actorOps 0x06, var[0x000], sub=0x03, name="Wendy"
+SOURCE Script1 +00A7: actorOps 0x07, var[0x000], sub=0x03, name="Jeff"
+SOURCE Script1 +00BC: actorOps 0x08, var[0x000], sub=0x03, name=""
+SOURCE Script1 +00CD: actorOps 0x17, var[0x000], sub=0x03, name="Sandy"
+SOURCE Script1 +00E3: actorOps 0x09, var[0x000], sub=0x03, name="Doctor Fred"
+SOURCE Script1 +00FF: actorOps 0x0A, var[0x000], sub=0x03, name="Enfermera Edna"
+SOURCE Script1 +011E: actorOps 0x0B, var[0x000], sub=0x03, name="Ed el raro"
+SOURCE Script1 +0139: actorOps 0x0C, var[0x000], sub=0x03, name="Primo Muerto Ted"
+SOURCE Script1 +015A: actorOps 0x0D, var[0x000], sub=0x03, name="Tent=culo P}rpura"
+SOURCE Script1 +017C: actorOps 0x0E, var[0x000], sub=0x03, name="Tent=culo Verde"
+SOURCE Script1 +019C: actorOps 0x0F, var[0x000], sub=0x03, name=""
+SOURCE Script1 +01AD: actorOps 0x10, var[0x000], sub=0x03, name="Meteorito"
+SOURCE Script1 +01C7: actorOps 0x11, var[0x000], sub=0x03, name=""
+SOURCE Script1 +01D8: actorOps 0x12, var[0x000], sub=0x03, name=""
+SOURCE Script1 +01E9: actorOps 0x13, var[0x000], sub=0x03, name="Planta"
+SOURCE Script1 +0200: actorOps 0x14, var[0x000], sub=0x03, name=""
+SOURCE Script1 +020D: actorOps 0x15, var[0x000], sub=0x03, name=""
+SOURCE Script1 +021A: actorOps 0x16, var[0x000], sub=0x03, name=""
+SOURCE Script4 +00D7: move var[0x000], var[0x02F]
+SOURCE Script4 +00EC: move var[0x000], var[0x030]
+SOURCE Script4 +0101: move var[0x000], var[0x031]
