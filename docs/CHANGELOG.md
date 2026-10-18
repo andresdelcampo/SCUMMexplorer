@@ -9,6 +9,12 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - **Cutscene titles** drop the '@' filler the Spanish talkie pads its verb names with (`ScummCutscenePlanner.VerbsOf`).
 - **Tests.** The Monkey2 session, first-visit, play and cutscene tests run over the five copies, with route texts per copy (the two Spanish copies differ: "Mirar a" / "Mirar"); a glyph check per copy. One look through the real window at the Spanish floppy: Spanish verbs, "Mirar a rótulo", dialogue lines with ¿ and ¡. Registry unchanged.
 
+## 18 October: Game Status pictures, party and logical item choices, Maniac/Zak
+
+- Maniac waits for native Start and offers the selected three kids. Every Maniac/Zak recipient uses a native full-body sprite; private frame initialization supplies off-room Zak characters without changing live state.
+- Zak's previous 76 indexed candidates included six source-proven scene aliases. Both editions now offer 70 logical inventory items. Separate cards, shards, helmets, tickets and tokens retain distinct choices with stable numbered labels. No name-based merging or room/item ID exception is added.
+- Item, recipient and Add controls are compact and bottom aligned. Admin grants, native capacity, atomic Undo and modal pause remain. Requirements record the user's clarification; all four Status cells remain Full. [Checkpoint](checkpoints/20261018-StatusPolish-ManiacZak.md).
+
 ## 18 October: Monkey Island 2 cutscenes from its scripts, with a song's beat (S7, Monkey2)
 
 - **The list.** The shared scan gives 536 triggers and 260 entries (76 scenes) with the game's verb names after the boot (Open … Walk to); 165 begin from a fresh start; eight-worker runs take 153 s in the harness and 140–174 s in the window on first launch (each run boots MI2 in about 0.9 s).

@@ -69,14 +69,24 @@ public class SupportConformanceTests
         {
             var inventorySession = ScummGameSession.BootForPlay(game, out _);
             var status = inventorySession.CaptureInventoryStatus();
-            Assert.NotEmpty(status.Characters);
-            Assert.Contains(status.Characters, character => !string.IsNullOrWhiteSpace(character.Name));
+            var maniac = family is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
+            if (maniac)
+            {
+                Assert.Empty(status.Characters); // The player has not selected/started the party yet.
+                Assert.False(inventorySession.InventoryCharactersAvailable);
+                Assert.False(status.CanEdit);
+            }
+            else
+            {
+                Assert.True(inventorySession.InventoryCharactersAvailable);
+                Assert.Equal(4, status.Characters.Count);
+                Assert.All(status.Characters, character => Assert.False(string.IsNullOrWhiteSpace(character.Name)));
+            }
             Assert.NotEmpty(status.Catalog);
             if (support[SupportFeature.Status] == SupportLevel.Full)
             {
                 // Per-fixture counts are independently established by the complete source censuses.
-                var maniac = family is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
-                Assert.Equal(maniac ? 48 : 76, status.Catalog.Count);
+                Assert.Equal(maniac ? 48 : 70, status.Catalog.Count);
                 var bounds = inventorySession.InventoryCatalogNotes.Where(note =>
                     note.StartsWith("Catalog call-depth bound:", StringComparison.Ordinal) ||
                     note.StartsWith("Catalog path-state bound:", StringComparison.Ordinal)).ToArray();
@@ -91,6 +101,7 @@ public class SupportConformanceTests
                     Assert.Contains(status.Catalog, item => item.ObjectId == 53);
                     Assert.Contains(status.Catalog, item => item.ObjectId == 27);
                     Assert.DoesNotContain(status.Catalog, item => item.ObjectId == 139 || item.ObjectId is >= 183 and <= 189);
+                    Assert.DoesNotContain(status.Catalog, item => new[] {429,431,471,535,536,537}.Contains(item.ObjectId));
                 }
             }
             Assert.Equal(status.Catalog.Count, status.Catalog.Select(item => item.ObjectId).Distinct().Count());

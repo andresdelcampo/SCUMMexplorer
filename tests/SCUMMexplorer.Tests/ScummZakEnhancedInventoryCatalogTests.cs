@@ -58,7 +58,7 @@ public sealed class ScummZakEnhancedInventoryCatalogTests
         var pickup = data.ReadObjectVerb(13, room.Objects.Last(o => o.Id == 274), 253, out _);
         Assert.Contains(pickup.Instructions, i => i.Offset == 0x13 && i.Operation == "pickupObject" && i.Operands == ScummVars.V2.ActiveObject1);
         var catalog = session.CaptureInventoryStatus().Catalog;
-        Assert.Equal(76, catalog.Count);
+        Assert.Equal(70, catalog.Count);
         Assert.Contains(catalog, i => i.ObjectId == 53 && i.SourceRoomId == 13 && i.Name == "abandoned bird nest");
         foreach (var header in new[] {117,139,183,184,185,186,187,188,189,274,275,276,298,307,358,607,632})
             Assert.DoesNotContain(catalog, i => i.ObjectId == header);

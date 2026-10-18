@@ -98,9 +98,9 @@ public sealed class ScummManiacEnhancedCatalogTests
         var expected = fixture.Data.ReadIndexedObjects().States.Where(pair => (pair.Value & 1) != 0)
             .Select(pair => pair.Key).Where(codeIds.Contains).Order();
         Assert.Equal(expected, view.Catalog.Select(item => item.ObjectId).Order());
-        Assert.False(session.ApplyInventoryEdits(view, [new(55, 2), new(35, 2)]).Applied);
+        Assert.False(session.ApplyInventoryEdits(view, [new(55, 5), new(35, 5)]).Applied);
         Assert.Equal(before, NativeState());
-        var applied = session.ApplyInventoryEdits(view, view.Catalog.Select(item => new ScummInventoryTransfer(item.ObjectId, 2)).ToArray());
+        var applied = session.ApplyInventoryEdits(view, view.Catalog.Select(item => new ScummInventoryTransfer(item.ObjectId, 5)).ToArray());
         Assert.True(applied.Applied, applied.Refusal);
         Assert.Equal(48, session.CaptureInventoryStatus().Items.Count);
         foreach (var item in view.Catalog)
@@ -115,3 +115,4 @@ public sealed class ScummManiacEnhancedCatalogTests
         Assert.Equal(before, NativeState());
     }
 }
+
