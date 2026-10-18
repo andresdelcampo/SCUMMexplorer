@@ -82,7 +82,8 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         // S6 MonkeyCd (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummMonkeyCdPlayTests).
         Row_(GameFamily.MonkeyCd, "**Monkey Island 1** CD", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
         Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
-        Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
+        // S6 Indy4 (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy4PlayTests), spoken lines in play.
+        Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
         // S6 Maniac/Zak (17 October 2026): native bounded routes and real-window checks; visual limits in the checkpoint.
         Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
         Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
