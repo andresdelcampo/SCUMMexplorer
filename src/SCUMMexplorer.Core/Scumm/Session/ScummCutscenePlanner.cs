@@ -25,6 +25,7 @@ public sealed class ScummCutscenePlanner
         PreparationNote = preparationNote;
         _newSession = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
         var booted = _newSession();
+        VerbSource = UntilAVerbIsOn(booted);
         Verbs = VerbsOf(booted, readableText);
         Triggers = ScummCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).ToList(), null, game, Verbs);
         if (readableText is not null)
@@ -34,6 +35,38 @@ public sealed class ScummCutscenePlanner
 
     /// <summary>The game's verbs as the titles name them: every text verb the boot left, by the name its script gave it (<c>verbOps name</c>).</summary>
     public ScummCutsceneVerbs Verbs { get; }
+
+    /// <summary>
+    /// Where the verb names came from: null when the boot itself shows the game's verbs; otherwise what the game's own skips did to reach them
+    /// (<see cref="UntilAVerbIsOn"/>).
+    /// </summary>
+    public string? VerbSource { get; }
+
+    /// <summary>The frames the planner lets the game run after the boot to reach its verbs (Indy 4: 110).</summary>
+    public const int VerbFrameLimit = 6000;
+
+    /// <summary>
+    /// A boot that ends before the game shows any verb (Indiana Jones and the Fate of Atlantis: the playable credits, Script 78 as the input script, no
+    /// verb on; Script 19 builds the full interface only when the credits end) leaves the titles without the game's verb names. Such a session is run on,
+    /// pressing Esc each time the game itself allows a skip (an override is set: <see cref="ScummSession.CutsceneSkippable"/>), until a verb is on, the
+    /// player has control and no cutscene is open, within <see cref="VerbFrameLimit"/> frames. The session is the planner's own (it serves only for the
+    /// names); the scenes' runs still start from the boot. A boot that shows a verb is left as it is (null). S7 Indy4, 18 October 2026.
+    /// </summary>
+    public static string? UntilAVerbIsOn(ScummGameSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        if (session.Verbs.Any(verb => verb.Mode == 1)) return null;
+        var from = session.CurrentRoomId;
+        int frame = 0, skips = 0;
+        for (; frame < VerbFrameLimit && !(session.Verbs.Any(verb => verb.Mode == 1) && session.UserInputOn && !session.InCutscene); frame++)
+        {
+            if (session.CutsceneSkippable) { session.PressKey(0x1B); skips++; }
+            session.AdvanceFrame();
+        }
+        return session.Verbs.Any(verb => verb.Mode == 1)
+            ? $"the boot (Room {from:00}) shows no verb; the verb names are those of Room {session.CurrentRoomId:00} after {skips} of the game's own skips (Esc) and {frame} frames"
+            : $"the boot (Room {from:00}) shows no verb, and none came within {frame} frames and {skips} skips; titles keep verb numbers";
+    }
 
     public string? PreparationNote { get; }
 

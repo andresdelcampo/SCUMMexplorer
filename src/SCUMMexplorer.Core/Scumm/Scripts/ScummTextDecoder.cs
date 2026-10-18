@@ -49,6 +49,7 @@ public static class ScummTextDecoder
         var output = new StringBuilder(escaped.Length);
         var control = 0; // bytes of a text control still to come: its code, then its operands
         var operands = false;
+        var speech = false;
         for (var i = 0; i < escaped.Length; i++)
         {
             int? value = null;
@@ -61,9 +62,12 @@ public static class ScummTextDecoder
             if (control > 0)
             {
                 // The code decides whether two operand bytes follow (ScummVM convertMessageToString, v3).
-                if (!operands && value is int code) { operands = code is not (1 or 2 or 3 or 8); control = operands ? 2 : 0; }
+                if (!operands && value is int code) { operands = code is not (1 or 2 or 3 or 8); control = operands ? 2 : 0; speech = code == 10; }
                 else control--;
-                output.Append(value is null ? escaped[i] : ' ');
+                // A talkie's code 10 carries the voice's offset and size as operand bytes (ScummVM handleNextCharsetCode case 10); they are data, not
+                // glyphs, even when the literal shows one as a printable character (Indy 4: "\xFF\x0A,\x8E…" drew a ',' before the line; S7 Indy4,
+                // 18 October 2026). Other codes keep their old reading, so the lists of LOOM, Indy 3 and Monkey Island stay as they were.
+                output.Append(value is null && !speech ? escaped[i] : ' ');
                 continue;
             }
             if (value is not int b) { output.Append(escaped[i]); continue; }
