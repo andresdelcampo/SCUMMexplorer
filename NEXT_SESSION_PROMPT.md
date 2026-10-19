@@ -1,9 +1,9 @@
 # Next session: orchestrator brief
 
-You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261018-S6-v5-S7-MonkeyCd.md` is the last run). Everything below is only what those do not say.
+You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261019-S9-v5-snapshot-languages.md` is the last run). Everything below is only what those do not say.
 
-## State (18 October)
-- Played through their own verbs (Objects ✔, Play ✔), with sound during play and script-derived cutscene lists (Cutscenes ◐): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Spanish copies of all three checked (S9). Monkey Island CD (disc music), Monkey Island 2 and Indy 4 (iMUSE music in play with loops, jump hooks and beat; Indy 4 talkie speech) are played too (Objects ✔, Play ✔), and every played game has a script-derived cutscene list (Cutscenes ◐). Suite on master: 1430 (1425 passed, 5 skipped, 0 failed).
+## State (19 October)
+- Played through their own verbs (Objects ✔, Play ✔), with sound during play and script-derived cutscene lists (Cutscenes ◐): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Spanish copies of all three checked (S9). Monkey Island CD (disc music), Monkey Island 2 and Indy 4 (iMUSE music in play with loops, jump hooks and beat; Indy 4 talkie speech) are played too (Objects ✔, Play ✔), and every played game has a script-derived cutscene list (Cutscenes ◐). Spanish and other copies of every played game checked (S9). Cutscene lists derive from one booted snapshot per game. Monkey Island 1 CD offers its five languages (R-3.16).
 - A separate orchestrator may be running Maniac Mansion and Zak McKracken (v1/v2) on its own (`NEXT_SESSION_PROMPT_MANIAC_ZAK.md`, checkpoints `*-ManiacZak.md`): leave those families to it; merge master before fast-forwarding, and retry if master moved.
 - **R-7.16** (right click) is confirmed: right click goes to the game only where its interface uses it (`ScummProfile.RightClickReachesGame`: verb-based and engine version 4 or later, today Monkey Island floppy); elsewhere it is the Interact menu. The rest of R-7.7 to R-7.18 is still `Proposed`.
 
@@ -23,8 +23,9 @@ When answered, change those rows' Basis to `Rule (confirmed by the user <date>)`
 - The agents cannot hear or see the real window and cannot drive ScummVM: collect those checks for the user in the checkpoint.
 
 ## Suggested next runs (pick with the user, or take the first if they say "keep going")
-- Cutscene derivation speed for v5 (MI2 about 2.5 min, Indy 4 about 3 min on first launch: a shared booted snapshot per game); MI2 talkie speech in play and scenes.
-- `S9` for the other copies: `mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es`, `mi2 talkie es`, `indy4 classic vga es`, `indy4 talkie vga es`, `monkey1 vga es`.
+- `S9` for the Monkey Island 1 CD's French, German and Italian folders.
+- Cutscene derivation: the script executor's per-run allocations (MI2 70 s, Indy 4 129 s on first launch); the server-GC offer (user's call).
+- Indy 4's playable credits draw lines on top of one another (Room 4); MI2 talkie speech in play and scenes.
 - Open from S6: Indy 4's first inventory slot (the magazine) draws no icon; mouth sync; the room change that ScummVM's `killScriptsAndResources` ends a calling script with (broke Monkey 2's boot when tried); iMUSE hook classes other than 0, markers, fades.
 - `S9` for the other copies: `mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es`, `mi2 talkie es`, `indy4 classic vga es`, `indy4 talkie vga es`, `monkey1 vga es`.
 - MonkeyCd Rooms 88, 89, 99; cutscene start setups for entries that begin nothing from a fresh start (R-8.33); the `printEgo` first-text offer.
