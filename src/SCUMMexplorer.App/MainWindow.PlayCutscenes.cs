@@ -151,15 +151,22 @@ public partial class MainWindow
     {
         var trigger = group.First;
         if (_game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
+        var launch = ++_cutsceneLaunchGeneration;
+        _introPreparing = false;
         if (!PreparePlayCutsceneStartup(game)) return;
         var visitedForIt = false;
         if (_currentRoomResource?.ResourceId != trigger.Room)
         {
             visitedForIt = true;
-            SelectResourceInTree(room);
+            SelectRoomWithIntent(room, RoomOpenKind.Cutscene);
             // The room view boots or continues play in the opened room; wait for it (a first boot takes a few seconds).
-            for (var wait = 0; wait < 600 && !(PlayActive && (_play!.CurrentRoomId == trigger.Room || UsesManiacCutsceneSetup(game) && _play.CurrentRoomId == 45)); wait++) await Task.Delay(50);
+            for (var wait = 0; wait < 600 && !(PlayActive && (_play!.CurrentRoomId == trigger.Room || UsesManiacCutsceneSetup(game) && _play.CurrentRoomId == 45)); wait++)
+            {
+                if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_game, game)) return;
+                await Task.Delay(50);
+            }
         }
+        if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_game, game)) return;
         if (!PlayActive || _play is not { } session) return;
         if (!PreparePlayCutsceneStartup(game)) return;
         _playPaused = false;

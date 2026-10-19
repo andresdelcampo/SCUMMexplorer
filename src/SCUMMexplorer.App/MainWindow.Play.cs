@@ -19,6 +19,7 @@ public partial class MainWindow
 {
     private ScummGameSession? _play;
     private ScummPlayScreen? _playScreen;
+    private IReadOnlyDictionary<int, byte> _playIndexedStates = new Dictionary<int, byte>();
     /// <summary>The <see cref="GameLibrary.Key"/> (folder, and language when the game holds several) of the game the play session runs.</summary>
     private string? _playFolder;
     private DispatcherTimer? _playTimer;
@@ -84,10 +85,13 @@ public partial class MainWindow
     };
 
     /// <summary>Starts (or continues) play in the room the user opened: the session boots once per game; another room is visited from its state (state preview).</summary>
-    private async Task StartPlayAsync(GameResource resource, CancellationToken token)
+    private Task StartPlayAsync(GameResource resource, CancellationToken token) => StartPlayCoreAsync(resource, token, RoomOpenKind.Catalog);
+
+    private async Task StartPlayCoreAsync(GameResource resource, CancellationToken token, RoomOpenKind navigationKind)
     {
         if (_game is not { } game || resource.ResourceId is not int roomId) return;
-        var startingSession = _play is null || _playFolder != game.Key;
+        var launch = _cutsceneLaunchGeneration;
+        bool CurrentRequest() => !token.IsCancellationRequested && ReferenceEquals(_game, game) && launch == _cutsceneLaunchGeneration;
         try
         {
             if (_play is null || _playFolder != game.Key)
@@ -95,27 +99,45 @@ public partial class MainWindow
                 StopPlay();
                 ScummIndexedObjectSnapshot? objects = null;
                 var session = await Task.Run(() => ScummGameSession.BootForPlay(game, out objects), token);
-                if (token.IsCancellationRequested) return;
+                if (!CurrentRequest()) return;
                 _play = session;
                 UpdatePlaySoundCard();
-                _playScreen = new ScummPlayScreen(game, session, objects!.States);
+                _playIndexedStates = objects!.States;
+                _playScreen = new ScummPlayScreen(game, session, _playIndexedStates);
                 _playFolder = game.Key;
                 _playCdTracks = ScummCdAudioTracks.For(game);
                 _playImuse = ScummImuseMusic.For(game);
             }
-            if (token.IsCancellationRequested) return;
+            if (!CurrentRequest()) return;
+            if (navigationKind == RoomOpenKind.Catalog)
+            {
+                var source = _play;
+                var prepared = await Task.Run(() => source.PrepareManualRoom(resource, cancellationToken: token), token);
+                if (!CurrentRequest()) return;
+                if (prepared.Session is not ScummGameSession ready)
+                {
+                    _catalogPreviewOnly = true;
+                    if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason;
+                    StopPlay();
+                    return;
+                }
+                _play = ready;
+                _playScreen = new ScummPlayScreen(game, ready, _playIndexedStates);
+            }
+            _catalogPreviewOnly = false;
+            UpdatePlaySoundCard();
             // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
             // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd); an iMUSE song that jumps back
             // goes on from its loop point (S6 Monkey2).
-            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, PlaySoundLoop);
-            if (game.Speech is { } speech && !_playSpeech.Follows(_play.Messages)) _playSpeech.Attach(speech, _play.Messages);
+            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, PlaySoundLoop,
+                replayReachedEvents: navigationKind == RoomOpenKind.Intro);
+            if (game.Speech is { } speech && !_playSpeech.Follows(_play.Messages))
+                _playSpeech.Attach(speech, _play.Messages, navigationKind == RoomOpenKind.Intro ? 0 : _play.Messages.SpeechEvents.Count);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
-            // The old engine's opening can wait on the player's party choice.
-            // Its first Play screen must retain that live input, not visit the
-            // browsed room or reuse the first-visit preview's assumed choices.
-            var keepOpening = startingSession && ScummProfile.For(game).EngineVersion <= ScummVersion.V2;
+            // Explicit intro playback keeps the native opening and player choices.
+            // Catalog navigation has already prepared a quiet preview on a detached session.
             _playSpeechBeforeVisit = _play.Messages.SpeechEvents.Count;
-            if (!keepOpening && _play.CurrentRoomId != roomId)
+            if (navigationKind != RoomOpenKind.Catalog && _play.CurrentRoomId != roomId)
             {
                 // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.
                 _sceneSound.StopAll("another room was picked from the list during play");
@@ -124,12 +146,15 @@ public partial class MainWindow
                 if (game.Speech is { } visitSpeech) _playSpeech.Attach(visitSpeech, _play.Messages);
             }
         }
+        catch (OperationCanceledException) { return; }
         catch (Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or InvalidOperationException or NotSupportedException)
         {
+            if (!CurrentRequest()) return;
             StopPlay();
             if (IsAdvancedMode) StatusText.ToolTip = $"Play could not start: {ex.Message}";
             return;
         }
+        if (!CurrentRequest()) return;
         _playPaused = false;
         _playTimer ??= new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
         _playTimer.Tick -= PlayTimer_Tick;

@@ -105,7 +105,7 @@ public sealed class SceneSoundPlayer
     /// <param name="loops">Sounds that go on until a script stops them, and from where (<see cref="Loop"/>: a CD track with loop count 0xFF, S6 MonkeyCd;
     /// an iMUSE song that jumps back, S6 Monkey2), for the device that plays them; null: none.</param>
     public void Attach(GameLibrary game, ScummSession session, Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? render = null,
-        Func<int, SoundMode, Loop?>? loops = null)
+        Func<int, SoundMode, Loop?>? loops = null, bool replayReachedEvents = false)
     {
         StopAll("session replaced");
         _loops = loops;
@@ -116,7 +116,7 @@ public sealed class SceneSoundPlayer
             _render = render;
         }
         _session = session;
-        _seen = session.SoundEvents.Count;
+        _seen = replayReachedEvents ? 0 : session.SoundEvents.Count;
         _frames = 0;
     }
 

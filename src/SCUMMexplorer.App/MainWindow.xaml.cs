@@ -405,6 +405,10 @@ public partial class MainWindow : Window
 
     private void ShowGame(GameLibrary game)
     {
+        _cutsceneLaunchGeneration++;
+        _catalogPreviewOnly = false;
+        _introPreparing = false;
+        UpdateGameIntroButton();
         Interlocked.Increment(ref _relationshipBuildGeneration);
         _relationshipIndex = null;
         _selectedResource = null;
@@ -1041,7 +1045,8 @@ public partial class MainWindow : Window
         // Paint the wait text now, before the blocking work below. A synchronous render pass keeps the body running as one call:
         // playback enters rooms through this handler and relies on that (it sets _playbackEnteringRoom around the call).
         Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
-        await ResourceTree_SelectedItemChangedCore(sender, e);
+        _roomOpenTask = ResourceTree_SelectedItemChangedCore(sender, e);
+        await _roomOpenTask;
     }
 
     private int _busyCount;
@@ -1097,8 +1102,21 @@ public partial class MainWindow : Window
 
     private async Task ResourceTree_SelectedItemChangedCore(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
+        var navigationKind = _playbackEnteringRoom ? RoomOpenKind.Native : _roomOpenKind;
+        if (navigationKind == RoomOpenKind.Catalog)
+        {
+            _cutsceneLaunchGeneration++;
+            _introPreparing = false;
+            StopPlay();
+            _gameClickTimer?.Stop();
+            _pendingGameClick = null;
+            if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } && _session is not null && SessionModeToggle.IsChecked == true)
+                _catalogPreviewOnly = true;
+            _sceneSound.StopAll("manual catalog navigation cancels the previous scene");
+            _cdVoice.Stop();
+        }
         // Opening another view stops the playback clock, unless the playback itself entered the room.
-        if (!_playbackEnteringRoom)
+        if (!_playbackEnteringRoom && navigationKind == RoomOpenKind.Catalog)
         {
             var leavingPreview = _playback is { Preview: true };
             if (SessionInScene) _sceneSound.StopAll("the cutscene was left from the catalog");
@@ -1386,7 +1404,7 @@ public partial class MainWindow : Window
                 StatusText.ToolTip = "Room background read from the game's own data.";
                 // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
                 if (browsedScene is not null && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
-                    await StartPlayAsync(resource, token);
+                    await StartPlayCoreAsync(resource, token, navigationKind);
                 return;
             }
             var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
@@ -1411,7 +1429,26 @@ public partial class MainWindow : Window
             _roomObjectNames = cdRoom is null ? LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords)
                 : cdRoom.ObjectNames.ToDictionary(pair => pair.Key, pair => System.Text.Encoding.Latin1.GetString(pair.Value));
             _objects = objects;
-            ApplyRoomState(resource, objectRecords, objects, visit: true);
+            _catalogPreviewOnly = false;
+            if (navigationKind == RoomOpenKind.Catalog && _session is { } manualSource && SessionModeToggle.IsChecked == true)
+            {
+                _catalogPreviewOnly = true; // no idle frame may mutate the source while its detached preparation is copied
+                var prepared = await Task.Run(() => manualSource.PrepareManualRoom(resource, cancellationToken: token), token);
+                if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
+                if (prepared.Session is LoomExplorationSession ready)
+                {
+                    _session = ready;
+                    _catalogPreviewOnly = false;
+                    if (_pendingCatalogPreparation is { } preparation) ready.RecordCatalogPreparation(preparation);
+                }
+                else
+                {
+                    _catalogPreviewOnly = true;
+                    if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason;
+                }
+                _pendingCatalogPreparation = null;
+            }
+            ApplyRoomState(resource, objectRecords, objects, visit: navigationKind != RoomOpenKind.Catalog);
             UpdateRoomNavigationActions(resource);
             RefreshRoomPreview();
             RoomDisplayLayout.Visibility = Visibility.Visible;
@@ -1427,7 +1464,7 @@ public partial class MainWindow : Window
             StatusText.ToolTip = $"{room.Width} × {room.Height} · {objectRecords.Count} object records · {objects.Count} images";
             // A catalog visit can start scripts which yield before their music/arrival work.
             // Use the ordinary bounded clock once the room is visible, without inventing input.
-            if (GameClickActive && !_playbackEnteringRoom && _playback is null && _session?.Snapshot.PendingScripts > 0)
+            if (navigationKind != RoomOpenKind.Catalog && GameClickActive && !_playbackEnteringRoom && _playback is null && _session?.Snapshot.PendingScripts > 0)
                 StartPlayback("Catalog arrival frames (arrival assumed)", null, resource, doorways: null, leftRoom: false);
         }
         catch (OperationCanceledException) { }
@@ -1484,7 +1521,7 @@ public partial class MainWindow : Window
         _estimatedObjectIds = new HashSet<int>();
         RoomEntryEventButtons.Children.Clear();
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
-        if (SessionModeToggle.IsChecked == true && _session is not null)
+        if (SessionModeToggle.IsChecked == true && _session is not null && !_catalogPreviewOnly)
         {
             if (visit) FollowSessionSound();
             if (visit) _issueBaseline = _session.Snapshot.Uncertainties.Count;
@@ -1700,7 +1737,7 @@ public partial class MainWindow : Window
 
     private void AdvanceOneFrame()
     {
-        if (_session is null || _currentRoomResource is not { } room || _currentRoom is null) return;
+        if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } room || _currentRoom is null) return;
         FollowSessionSound();
         var snapshot = _session.AdvanceFrame();
         UpdateSessionSound();
@@ -1711,7 +1748,7 @@ public partial class MainWindow : Window
         {
             StatusText.Text = "You step into another scene.";
             StatusText.ToolTip = $"Room {reached:00} · " + (_session.LastAction?.Evidence ?? "");
-            SelectResourceInTree(targetRoom);
+            SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
             return;
         }
         ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
@@ -1741,7 +1778,7 @@ public partial class MainWindow : Window
             return false;
         StatusText.Text = "You step into another scene.";
         StatusText.ToolTip = $"Room {reached:00} · " + (_session.LastAction?.Evidence ?? "");
-        SelectResourceInTree(targetRoom);
+        SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
         return true;
     }
 
@@ -1858,7 +1895,7 @@ public partial class MainWindow : Window
 
     private bool ActivateObjectVerb(ScummRoomObjectRecord record, ScummObjectVerbEntry verb, bool play = false)
     {
-        if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
+        if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         FollowSessionSound();
         // A verb run from the interaction menu has no scene start of its own, so the speakers its lines need (an actor who is not in the
         // room shows nothing) are placed as the catalog's start setup does: only the derived actor placements, never a pickup or a scene.
@@ -1877,7 +1914,7 @@ public partial class MainWindow : Window
             _game.Rooms.FirstOrDefault(item => item.ResourceId == targetId) is { } targetRoom &&
             targetRoom != sourceRoom)
         {
-            SelectResourceInTree(targetRoom);
+            SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
             return true;
         }
         ApplyRoomState(sourceRoom, _currentRoomObjectRecords, _objects, visit: false);
@@ -3690,6 +3727,7 @@ public partial class MainWindow : Window
 
     private void ObjectButton_Click(object sender, RoutedEventArgs e)
     {
+        if (_catalogPreviewOnly) return;
         if (sender is not Button { Tag: int id }) return;
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
@@ -4066,7 +4104,7 @@ public partial class MainWindow : Window
     /// <summary>LOOM on EGA or on CD: the click path (scripts 005-007) is the same; what reads EGA-only files stays on <c>GameId.Loom</c>.</summary>
     private bool IsLoomGame => _game?.Id is GameId.Loom or GameId.LoomVga;
 
-    private bool GameClickActive => SessionModeToggle.IsChecked == true && _session is not null;
+    private bool GameClickActive => SessionModeToggle.IsChecked == true && _session is not null && !_catalogPreviewOnly;
 
     // The game's click: a single click waits for the system double-click time before it is sent.
     private DispatcherTimer? _gameClickTimer;
@@ -4114,7 +4152,7 @@ public partial class MainWindow : Window
     private bool SendInputToGame(Func<ScummObjectActionResult> send, string what,
         IReadOnlyList<ScummRoomObjectRecord>? doorways = null)
     {
-        if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
+        if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         if (_playbackPaused)
         {
             StatusText.Text = $"{what} not sent: the scene is paused. Play (or space) goes on.";
@@ -4170,6 +4208,7 @@ public partial class MainWindow : Window
 
     private void HandleRoomPoint(int x, int y, bool doubleClick = false)
     {
+        if (_catalogPreviewOnly) return;
         _lastDoorwayFallback = null;
         _lastDoorwayHeld = null;
         if (SessionModeToggle.IsChecked == true && _session is not null && _session.WaitingForSkillClick)
@@ -4297,6 +4336,7 @@ public partial class MainWindow : Window
     private void StartPlayback(string what, ScummObjectActionResult? action, GameResource sourceRoom,
         IReadOnlyList<ScummRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null, int? sentencesBefore = null)
     {
+        _catalogPreviewOnly = false;
         _playback = new Playback
         {
             What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom, Preview = preview, ExpectedCutscene = expectedCutscene,
@@ -4422,7 +4462,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void SkipCutscene()
     {
-        if (!SessionInScene || _session is not { } session || _currentRoomResource is not { } room) return;
+        if (_catalogPreviewOnly || !SessionInScene || _session is not { } session || _currentRoomResource is not { } room) return;
         var skippable = session.CutsceneSkippable;
         var action = session.PressKey(0x1B);
         if (skippable) _replaySequence = null; // A skipped prelude no longer establishes the audited next stage.
@@ -4451,6 +4491,7 @@ public partial class MainWindow : Window
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
+        UpdateGameIntroButton();
         UpdateGameStatusButton(); // Inspection is available during playback too; editing stays guarded.
         UpdateSoundDeviceControls();
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
@@ -4593,7 +4634,7 @@ public partial class MainWindow : Window
         if (_game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom) return;
         StatusText.Text = "You step into another scene.";
         StatusText.ToolTip = $"Room {reached:00} · " + (_session?.LastAction?.Evidence ?? "");
-        SelectResourceInTree(targetRoom);
+        SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
     }
 
     private void FollowSessionSound()
@@ -4677,7 +4718,7 @@ public partial class MainWindow : Window
         StatusText.Text = "You step into another scene.";
         StatusText.ToolTip = $"Room {target.ResourceId:00} · " + (_session?.LastAction?.Evidence ?? "");
         _playbackEnteringRoom = true;
-        try { SelectResourceInTree(target); }
+        try { SelectRoomWithIntent(target, RoomOpenKind.Native); }
         finally { _playbackEnteringRoom = false; }
     }
 
