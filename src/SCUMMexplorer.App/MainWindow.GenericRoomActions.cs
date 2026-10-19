@@ -204,6 +204,18 @@ public partial class MainWindow
         foreach (var button in _genericActionButtons) button.IsEnabled = GenericRoomActionCanStart;
     }
 
+    // A native hotspot row selects its object; choosing a verb remains an explicit action.
+    private void SelectGenericInteractTarget(int objectId)
+    {
+        if (_genericActionsHost?.Children.OfType<Expander>().FirstOrDefault() is not { } expander) return;
+        var first = _genericActionButtons.FirstOrDefault(b => b.Tag is GenericSourceAction a && a.Object == objectId);
+        if (first is null) return;
+        expander.IsExpanded = true;
+        expander.UpdateLayout();
+        first.BringIntoView();
+        first.Focus();
+    }
+
     private async void RunGenericRoomAction(GenericSourceAction action)
     {
         if (!GenericRoomActionCanStart || _game is not { } game || _genericActionsRoom is not int roomId ||
