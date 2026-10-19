@@ -131,7 +131,7 @@ public partial class MainWindow : Window
         if (!string.IsNullOrWhiteSpace(release))
             Title = $"SCUMMexplorer · {release}";
         Loaded += (_, _) => ReopenLastFolder();
-        Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); _costumeColorCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
+        Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); _costumeColorCancellation?.Cancel(); StopRoomPan(); ResetGameAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -288,6 +288,7 @@ public partial class MainWindow : Window
 
     private void OpenGameFolder(string folder)
     {
+        ResetGameAudio();
         _roomCardCancellation?.Cancel();
         _roomCardBackgroundsReady.TrySetResult(false);
         _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -1410,6 +1411,7 @@ public partial class MainWindow : Window
                 // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
                 if (browsedScene is not null && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
                     await StartPlayCoreAsync(resource, token, navigationKind);
+                if (!token.IsCancellationRequested && ReferenceEquals(_game, previewGame)) UpdateRoomMusicActions();
                 return;
             }
             var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
@@ -5861,6 +5863,7 @@ public partial class MainWindow : Window
 
     private async void UpdateRoomMusicActions()
     {
+        if (TryUpdateGenericRoomSounds()) return;
         var generation = ++_roomMusicUpdateGeneration;
         // Called again while the room stays (a scene plays, the view refreshes): hiding the music panel and the Sounds button until the list is
         // rebuilt made them blink and the row of buttons shake, so they stay as they are and are replaced when the list is ready.
@@ -6036,6 +6039,7 @@ public partial class MainWindow : Window
 
     private void RoomSounds_Click(object sender, RoutedEventArgs e)
     {
+        if (TryShowGenericRoomSounds()) return;
         if (_game?.Id == GameId.LoomVga) { CdRoomSounds_Click(); return; }
         if (_roomSoundChoices.Count == 0 || SessionInScene) return;
         var entries = new List<(string Label, string? Tip, Action Run)>();

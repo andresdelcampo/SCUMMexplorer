@@ -222,9 +222,12 @@ public partial class MainWindow
             // Follow a native load without re-entering it through catalog preparation.
             _currentRoomResource = nativeRoom;
             _lastViewedRoomResource = nativeRoom;
+            _selectedResource = nativeRoom;
             _followingPlayRoom = true;
             try { SelectResourceInTree(nativeRoom); }
             finally { _followingPlayRoom = false; }
+            RoomCardList.Children.OfType<System.Windows.Controls.Button>()
+                .FirstOrDefault(card => Equals(card.Tag, nativeRoom))?.BringIntoView();
         }
         _playBitmap ??= new WriteableBitmap(ScummPlayFrame.Width, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
         _playBitmap.WritePixels(new Int32Rect(0, 0, ScummPlayFrame.Width, ScummPlayFrame.Height), frame.Pixels, ScummPlayFrame.Width * 4, 0);
@@ -236,15 +239,27 @@ public partial class MainWindow
                                       (_play.DeliveredInput.LastOrDefault() is { } last ? $"last input runInputScript({last.Area}, {last.Value}, {last.Mode}): {last.Description}" : "no input yet") +
                                       (_playPaused ? " · paused" : "");
         else PlayScreenImage.ToolTip = null;
+        TryUpdateGenericRoomSounds();
     }
 
     // The image's point as a game screen point (0..319, 0..199).
     private (int X, int Y)? PlayPoint(MouseEventArgs e)
     {
-        if (PlayScreenImage.ActualWidth <= 0 || PlayScreenImage.ActualHeight <= 0) return null;
-        var position = e.GetPosition(PlayScreenImage);
-        var x = (int)(position.X / PlayScreenImage.ActualWidth * ScummPlayFrame.Width);
-        var y = (int)(position.Y / PlayScreenImage.ActualHeight * ScummPlayFrame.Height);
+        return PlayPointAt(e.GetPosition(PlayScreenImage), PlayScreenImage.ActualWidth, PlayScreenImage.ActualHeight);
+    }
+
+    // Match Image.Stretch=Uniform, including the unused bands around the native screen.
+    private static (int X, int Y)? PlayPointAt(Point position, double width, double height)
+    {
+        if (width <= 0 || height <= 0) return null;
+        var scale = Math.Min(width / ScummPlayFrame.Width, height / ScummPlayFrame.Height);
+        var offsetX = (width - ScummPlayFrame.Width * scale) / 2;
+        var offsetY = (height - ScummPlayFrame.Height * scale) / 2;
+        var nativeX = (position.X - offsetX) / scale;
+        var nativeY = (position.Y - offsetY) / scale;
+        if (nativeX < 0 || nativeY < 0) return null;
+        var x = (int)nativeX;
+        var y = (int)nativeY;
         return x is >= 0 and < ScummPlayFrame.Width && y is >= 0 and < ScummPlayFrame.Height ? (x, y) : null;
     }
 
