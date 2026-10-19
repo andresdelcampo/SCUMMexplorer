@@ -423,7 +423,7 @@ public sealed class ScummGameSession : ScummSession
     private int ActorFromPosition(int x, int y)
     {
         if (_currentRoom?.ResourceId is not int room || _roomSize is not { } size) return 0;
-        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostume, classes: _runtime.ObjectClasses, engineVersion: (int)_runtime.EngineVersion);
+        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostumeOnce, classes: _runtime.ObjectClasses, engineVersion: (int)_runtime.EngineVersion);
         foreach (var actor in layer.Actors.OrderBy(item => item.Number))
         {
             if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;
@@ -431,6 +431,19 @@ public sealed class ScummGameSession : ScummSession
             if (x / 8 >= bounds.Left / 8 && x / 8 <= (bounds.Right - 1) / 8 && y >= bounds.Top && y <= bounds.Bottom) return actor.Number;
         }
         return 0;
+    }
+
+    private readonly Dictionary<int, ScummCostume?> _drawnCostumes = [];
+
+    /// <summary>
+    /// A costume read for <see cref="ActorFromPosition"/>, kept after its first read (a costume is read-only data; the animation state is the actor's).
+    /// Cutscene snapshot (19 October 2026): Indy 4's interface script asks getActorFromPos every frame, and reading the costumes again each time was most
+    /// of the 4 MB a frame allocated. A read that fails still throws, as before, and is not kept.
+    /// </summary>
+    private ScummCostume? ReadCostumeOnce(int id)
+    {
+        if (_drawnCostumes.TryGetValue(id, out var known)) return known;
+        return _drawnCostumes[id] = ReadCostume(id);
     }
 
     /// <summary>Everything the picture of the current room needs, at this frame (the live play view composes it every frame).</summary>

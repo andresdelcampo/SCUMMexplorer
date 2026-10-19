@@ -86,6 +86,57 @@ if (args.Length > 2 && args[1] == "bench")
     return;
 }
 
+// CutsceneList <folder> rooms <workers> <room>...: the groups of the named rooms, on that many workers from a pool of boots, with the time of each
+// run, the process's CPU time and the garbage collector's pauses (cutscene snapshot, 19 October 2026: whether long runs gain from running together).
+if (args.Length > 3 && args[1] == "rooms")
+{
+    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(new GameFolderScanner().Scan(args[0]), out _), start: ScummCutsceneStart.SnapshotPerWorker);
+    var only = args.Skip(3).Select(int.Parse).ToHashSet();
+    var groups = planner.Groups.Where(g => only.Contains(g.First.Room)).ToList();
+    var cpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
+    var pause = GC.GetTotalPauseDuration();
+    var gen2 = GC.CollectionCount(2);
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    var times = new System.Collections.Concurrent.ConcurrentBag<string>();
+    Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering),
+        new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g =>
+        {
+            var one = System.Diagnostics.Stopwatch.StartNew();
+            var r = planner.Run(g.First);
+            times.Add($"{g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2} frames {r.Frames} {one.ElapsedMilliseconds} ms");
+        });
+    Console.WriteLine($"{groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms; CPU {(System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime - cpu).TotalSeconds:0.0} s; " +
+                      $"GC pauses {(GC.GetTotalPauseDuration() - pause).TotalSeconds:0.0} s, gen2 {GC.CollectionCount(2) - gen2}, server GC {System.Runtime.GCSettings.IsServerGC}, allocated {GC.GetTotalAllocatedBytes() / 1048576} MB");
+    foreach (var t in times.Order()) Console.WriteLine(t);
+    return;
+}
+
+// CutsceneList <folder> alloc <room> <object> <verb> <frames>: the bytes one run's frames allocate, by what the run asks the session each frame
+// (cutscene snapshot, 19 October 2026: Indy 4's long runs allocated about 16 GB each).
+if (args.Length > 5 && args[1] == "alloc")
+{
+    var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    var session = ScummGameSession.BootForPlay(game, out _);
+    var roomInfo = game.Rooms.First(r => r.ResourceId == room);
+    if (obj == 0) session.EnterRoomAgain(roomInfo); else { session.VisitRoom(roomInfo); session.ActivateObjectVerb(obj, verb); }
+    long snapshotBytes = 0, frame = 0, begun = 0, inCutscene = 0, haveMsg = 0, trace = 0;
+    long Bytes() => GC.GetAllocatedBytesForCurrentThread();
+    using var ticks = new AllocationTicks();
+    for (var i = 0; i < int.Parse(args[5]); i++)
+    {
+        var at = Bytes(); _ = session.CutscenesBegun; begun += Bytes() - at;
+        at = Bytes(); _ = session.InCutscene; inCutscene += Bytes() - at;
+        at = Bytes(); _ = session.Messages.HaveMsg; haveMsg += Bytes() - at;
+        at = Bytes(); _ = session.SessionTrace.Count; trace += Bytes() - at;
+        at = Bytes(); session.AdvanceFrame(); frame += Bytes() - at;
+        at = Bytes(); _ = session.Snapshot; snapshotBytes += Bytes() - at;
+    }
+    Console.WriteLine($"per frame: AdvanceFrame {frame / int.Parse(args[5])} B, CutscenesBegun {begun / int.Parse(args[5])} B, InCutscene {inCutscene / int.Parse(args[5])} B, " +
+                      $"Messages.HaveMsg {haveMsg / int.Parse(args[5])} B, SessionTrace.Count {trace / int.Parse(args[5])} B, the Snapshot property alone {snapshotBytes / int.Parse(args[5])} B; uncertainties {session.Snapshot.Uncertainties.Count}, variables {session.Snapshot.KnownGlobalVariables.Count}; trace lines {session.SessionTrace.Count}");
+    foreach (var (type, bytes) in ticks.Top(15)) Console.WriteLine($"   {bytes / 1048576.0,9:0.0} MB sampled  {type}");
+    return;
+}
+
 // CutsceneList <folder> race <n>: n planners built at once, each on its own copy of the game (S7 MonkeyCd, 18 October 2026: the window counted 164
 // steps for a list of 160 entries); prints each planner's trigger and group counts.
 if (args.Length > 2 && args[1] == "race")
@@ -235,4 +286,26 @@ if (args.Length > 1 && args[1] == "scan")
         Console.WriteLine(line);
     }
     if (run) Console.WriteLine($"runs {ran}, begun {begun}");
+}
+
+/// <summary>The runtime's allocation ticks (one about every 100 KB allocated), summed by allocated type: which types a run's frames allocate.</summary>
+sealed class AllocationTicks : System.Diagnostics.Tracing.EventListener
+{
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, long> _bytes = new();
+
+    protected override void OnEventSourceCreated(System.Diagnostics.Tracing.EventSource source)
+    {
+        if (source.Name == "Microsoft-Windows-DotNETRuntime")
+            EnableEvents(source, System.Diagnostics.Tracing.EventLevel.Verbose, (System.Diagnostics.Tracing.EventKeywords)0x1);
+    }
+
+    protected override void OnEventWritten(System.Diagnostics.Tracing.EventWrittenEventArgs e)
+    {
+        if (e.EventName?.StartsWith("GCAllocationTick", StringComparison.Ordinal) != true || e.Payload is null) return;
+        var type = e.PayloadNames!.IndexOf("TypeName") is >= 0 and var t ? e.Payload[t]?.ToString() ?? "?" : "?";
+        var amount = e.PayloadNames.IndexOf("AllocationAmount64") is >= 0 and var a ? Convert.ToInt64(e.Payload[a]) : 100_000;
+        _bytes.AddOrUpdate(type, amount, (_, sum) => sum + amount);
+    }
+
+    public IEnumerable<(string Type, long Bytes)> Top(int count) => _bytes.OrderByDescending(p => p.Value).Take(count).Select(p => (p.Key, p.Value));
 }
