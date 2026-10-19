@@ -12,7 +12,7 @@ public sealed class ScummZakEnhancedFidelityTests(ITestOutputHelper output)
 
     [Theory]
     [InlineData(2, 0, 0, 646)]
-    [InlineData(14, 55, 11, 907)]
+    [InlineData(14, 55, 11, 905)] // Native row-search walking shortens this approach by two frames.
     public void CorrectNativeActorApproachLetsFormerlyCappedSceneFinish(int room, int obj, int verb, int expectedFrames)
     {
         if (Planner.Value is not { } planner) return;

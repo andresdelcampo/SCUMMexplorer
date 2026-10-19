@@ -549,7 +549,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         }
         else
         {
-            if (actor.DestBox is int destination && place.Boxes!.Contains(destination, endX, endY))
+            if (!_v2Animations && actor.DestBox is int destination && place.Boxes!.Contains(destination, endX, endY))
                 endBox = destination;
             else
             {

@@ -44,10 +44,14 @@ public sealed partial class ScummV5Archive : IBrowsableArchive
     /// The game on a folder or disc: every <c>X.000</c> with an <c>X.001</c> beside it whose index parses is a candidate, and the one with the most rooms wins (a full game over its
     /// demos); on a tie an <c>ENGLISH</c> folder, then the first. Null when there is none.
     /// </summary>
-    public static ScummV5Game? FindGame(IGameFileSource source)
+    /// <param name="source">The folder or disc.</param>
+    /// <param name="folder">S9 (18 October 2026): a disc folder to read the game from (Monkey Island 1 CD carries ENGLISH, FRENCH, GERMAN, ITALIAN and SPANISH,
+    /// each with its own NAME.000/.001); null keeps the default choice (the most rooms, ENGLISH on a tie).</param>
+    public static ScummV5Game? FindGame(IGameFileSource source, string? folder = null)
     {
         ScummV5Game? best = null;
-        foreach (var name in source.FileNames.Where(n => n.EndsWith(".000", StringComparison.OrdinalIgnoreCase)))
+        foreach (var name in source.FileNames.Where(n => n.EndsWith(".000", StringComparison.OrdinalIgnoreCase) &&
+                                                         (folder is null || n.StartsWith(folder + "/", StringComparison.OrdinalIgnoreCase))))
         {
             var stem = name[..^4];
             if (!source.Exists(stem + ".001")) continue;

@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Scumm;
 
-// Usage: Indy4PlayWindowCheck <Indy 4 talkie folder (ATLANTIS.cue)> <output folder>
+// Usage: Indy4PlayWindowCheck <Indy 4 folder (ATLANTIS.cue, or ATLANTIS.000/.001 for the Spanish talkie and floppy folders, S9 18 October 2026)> <output folder>
 // S6 Indy4 (17 October 2026), copied from .verification/monkeycd-play-20261017/PlayWindowCheck: opens the real MainWindow on Fate of Atlantis (talkie CD) with a
 // private profile (SCUMM_EXPLORER_PROFILE_ROOT in the output folder), selects Room 4 (Barnett College, where the boot ends) and lets the window's play timer run.
 // Esc through the window's key handler skips the playable credits; in New York (Room 10) "Look at" + the marquee, then "Talk to" + the ticket taker and the
@@ -51,7 +51,18 @@ internal static class Program
                 for (var n = 0; n < 900 && Field("_playTimer") is null; n++) await Task.Delay(100);
                 var session = (ScummGameSession?)Field("_play") ?? throw new Exception("play did not start in Room 4");
                 var image = (Image)window.FindName("PlayScreenImage");
-                string Glyphs(int id) => ScummTextDecoder.DecodeGlyphs(session.VerbGlyphs(session.Verbs.Single(v => v.VerbId == id)).Where(b => b is >= 0x20 and < 0x7F)).Trim();
+                // S9 (18 October 2026): CP437 accents kept; an escape (0xFF/0xFE) and its code draw nothing, codes 9, 10, 12, 13 and 14 skip two operand bytes.
+                string Glyphs(int id)
+                {
+                    var glyphs = session.VerbGlyphs(session.Verbs.Single(v => v.VerbId == id));
+                    var shown = new List<byte>();
+                    for (var i = 0; i < glyphs.Count; i++)
+                    {
+                        if (glyphs[i] is 0xFF or 0xFE) { if (++i < glyphs.Count && glyphs[i] is 9 or 10 or 12 or 13 or 14) i += 2; continue; }
+                        if (glyphs[i] is >= 0x20 and not 0x7F) shown.Add(glyphs[i]);
+                    }
+                    return ScummTextDecoder.DecodeGlyphs(shown).Trim();
+                }
                 string Sentence() => Glyphs(0x64);
                 report.Add($"Play started: room {session.CurrentRoomId}, image visible {image.Visibility}, cursor {(image.Cursor == Cursors.None ? "system pointer hidden" : "system pointer")}, " +
                            $"Normal-mode note \"{((TextBlock)window.FindName("ObjectsNote")).Text}\", tooltip {(image.ToolTip is null ? "none" : "shown")}; speech player follows it: {speech.Follows(session.Messages)}");
@@ -75,7 +86,7 @@ internal static class Program
                 }
                 var look = session.PlayVerbArea().Items.Single(entry => entry.VerbId == 0x09);
                 await Click(look.X + 2, look.Y + 2, "click on Look at");
-                for (var n = 0; n < 40 && !Sentence().EndsWith("marquee", StringComparison.Ordinal); n++) { session.PointAtScreen((116 - session.ViewLeft, 16 + 0)); await Task.Delay(100); }
+                for (var n = 0; n < 40 && Sentence() == Glyphs(0x09); n++) { session.PointAtScreen((116 - session.ViewLeft, 16 + 0)); await Task.Delay(100); }
                 report.Add($"pointer on the marquee: sentence line \"{Sentence()}\"");
                 Save("play-02-sentence.png");
                 await Click(116 - session.ViewLeft, 16, "click on the marquee");
@@ -84,7 +95,7 @@ internal static class Program
                 for (var n = 0; n < 300 && !(session.UserInputOn && !session.InCutscene && session.Messages.Talk is null); n++) await Task.Delay(100);
                 var talk = session.PlayVerbArea().Items.Single(entry => entry.VerbId == 0x0C);
                 await Click(talk.X + 2, talk.Y + 2, "click on Talk to");
-                for (var n = 0; n < 40 && !Sentence().EndsWith("taker", StringComparison.Ordinal); n++) { session.PointAtScreen((116 - session.ViewLeft, 48)); await Task.Delay(100); }
+                for (var n = 0; n < 40 && Sentence() == Glyphs(0x0C); n++) { session.PointAtScreen((116 - session.ViewLeft, 48)); await Task.Delay(100); }
                 await Click(116 - session.ViewLeft, 48, "click on the ticket taker");
                 for (var n = 0; n < 300 && !(session.UserInputOn && session.Verbs.Any(v => v.VerbId == 0x78 && v.Mode == 1)); n++) await Task.Delay(100);
                 report.Add($"dialogue lines: {string.Join(", ", session.PlayVerbArea().Items.Where(v => v.VerbId is >= 0x78 and <= 0x80 && v.Width > 0).Select(v => $"0x{v.VerbId:X2} \"{Glyphs(v.VerbId)}\" ({v.X},{v.Y})"))}");

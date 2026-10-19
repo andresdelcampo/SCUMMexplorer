@@ -184,6 +184,10 @@ Evidence: engine. Sources: ScummVM [`script_v2.cpp`](https://github.com/scummvm/
 
 Decoded instructions, engine interpretations, source readings, observed execution and explorer preview assumptions are different evidence categories. Catalog arrivals, seeded randomness, synthetic input timing and direct story edits retain their labels. Dated LOOM session mappings and validation remain in the [game map](../loom/LOOM_SCRIPT_MAP.md#historical-session-mapping-september-baseline).
 
+### Variable destinations for ego scene loads (19 October 2026)
+
+`o2_loadRoomWithEgo` and `o5_loadRoomWithEgo` read the room through `getVarOrDirectByte`. A known variable room therefore binds the scene event's target at execution, as well as its resolved object/walk arguments. An unknown room remains unresolved; a room derived from an estimate retains conditional provenance. Literal room values and signed walk coordinates keep their existing behavior. Sources: ScummVM `script_v2.cpp` and `script_v5.cpp`, read 19 October 2026; [eight boundary cases and native Zak arrival](../../.verification/zak-arrival-20261019/README.md). This small binding correction does not refactor existing nested/end-of-frame scene-dispatch ordering or establish original-interpreter timing equivalence.
+
 ### SCUMM v5 talkie speech, dialogue strings and camera follow (18 October 2026)
 
 - **Spoken lines.** A text's code 10 comes as four `0xFF 0x0A` pairs. Bytes 0, 1, 4 and 5 after the first code are the sample's offset in `MONSTER.SOU`; bytes 8, 9, 12 and 13 are the size of its `VCTL` block. `talkSound(offset, size, talkie)` starts the line, and the buffer moves on 14 bytes (`handleNextCharsetCode`).

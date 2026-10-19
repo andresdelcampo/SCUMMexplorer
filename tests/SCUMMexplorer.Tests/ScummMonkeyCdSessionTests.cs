@@ -30,6 +30,25 @@ public sealed class ScummMonkeyCdSessionTests
         Assert.DoesNotContain(session.Snapshot.Uncertainties, item => Unsupported.Any(item.Contains) && !item.Contains("seeded pick"));
 
     [Fact]
+    public void TheDiscsSpanishFolderBootsTheSameWay()
+    {
+        // S9 (18 October 2026): the disc carries ENGLISH, FRENCH, GERMAN, ITALIAN and SPANISH folders, each with its own MONKEY.000/.001; the scanner reads
+        // ENGLISH unless GameFolderScanner.DiscFolder names another. The SPANISH copy boots through the same rooms with nothing unsupported and no input.
+        if (Folder() is not { } folder) return;
+        var game = new GameFolderScanner { DiscFolder = "SPANISH" }.Scan(folder);
+        var data = (ScummV5DataSource)ScummDataSources.For(game);
+        var session = new ScummGameSession(game, data.ReadIndexedObjects(), 0, null, data);
+
+        Assert.Equal(GameFamily.MonkeyCd, GameSupport.FamilyOf(game));
+        Assert.False(session.BootReport!.HitFrameLimit);
+        Assert.Equal([0, 10, 0, 0, 38], session.BootReport.RoomsEntered);
+        Assert.True(session.PlayerHasControl);
+        Assert.DoesNotContain(session.SessionTrace, item => item.StartsWith("boot: Player input assumed", StringComparison.Ordinal));
+        AssertNothingUnsupported(session);
+        Assert.NotNull(data.GlobalScript(1));
+    }
+
+    [Fact]
     public void TheProfileGivesTheV5DialectEngineVariablesAndTheV5Source()
     {
         if (Folder() is not { } folder) return;

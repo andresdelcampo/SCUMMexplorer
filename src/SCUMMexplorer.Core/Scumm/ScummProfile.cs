@@ -16,8 +16,10 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <paramref name="ClickObject"/> (S4b Monkey2, 17 October 2026): the boot waits for a click on a screen of choices instead (Monkey Island 2's "Monkey Island 2"
 /// or "Monkey 2 Lite"); the session clicks the middle of that object's box through the game's input script, as a player would. Edition data: the object of
 /// the choice the explorer takes (§4.5: the full game).
+/// <paramref name="AnswerDigits"/> (S9 Monkey2, 18 October 2026): the number of digits the question reads, so an answer below 1000 is typed with its leading
+/// zeros (Monkey Island 2 floppy Script 130 +0x015C starts its place value at 1000: four digits). 0 types the number as it is.
 /// </remarks>
-public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13, int? ClickObject = null);
+public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13, int? ClickObject = null, int AnswerDigits = 0);
 
 public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Dialect)
 {
@@ -206,7 +208,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]")
                 // Monkey Island 2 (S4b, 17 October 2026): Script 130 +0x034A waits for the choice between "Monkey Island 2" (object 1156, Script 131 +0x0067:
                 // bit[0x237] = 0, "Regular Mode") and "Monkey 2 Lite" (object 1157); the explorer takes the full game (§4.5), labelled as assumed input.
-                : GameSupport.FamilyOf(game) == GameFamily.Monkey2 ? new ScummBootInputPlan(null, ClickObject: 0x484)
+                // S9 Monkey2 (18 October 2026): the floppy releases first ask the recipe copy protection (Script 128 "PRESS ENTER", then Script 130 keeps the
+                // expected four digits in var[0x206] at +0x0134 before it waits); the talkie skips it and never writes var[0x206].
+                : GameSupport.FamilyOf(game) == GameFamily.Monkey2 ? new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4)
                 : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
             BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd

@@ -5,7 +5,8 @@ using SCUMMexplorer.Core.Scumm;
 
 // CutsceneList <folder> loom: every scanned LOOM trigger group (EGA or CD) with its title, category and scan fields, one line each.
 // Used before and after the S7 move of the scan to Core/Scumm (17 October 2026): the two outputs must be identical.
-var game = new GameFolderScanner().Scan(args[0]);
+// S9 MonkeyCd (18 October 2026): "path|SPANISH" reads one language folder of a multi-language disc (GameFolderScanner.DiscFolder).
+var game = ScanArg(args[0]);
 var data = ScummDataSources.For(game);
 var rooms = game.Rooms.Select(r => r.ResourceId!.Value).ToList();
 if (args.Length > 1 && args[1] == "loom")
@@ -30,7 +31,7 @@ if (args.Length > 1 && args[1] == "loom")
 if (args.Length > 2 && args[1] == "prun")
 {
     var clock = System.Diagnostics.Stopwatch.StartNew();
-    var copies = new ThreadLocal<GameLibrary>(() => new GameFolderScanner().Scan(args[0]));
+    var copies = new ThreadLocal<GameLibrary>(() => ScanArg(args[0]));
     // Since the cutscene snapshot (18 October 2026) the runs start from a pool of boots, each of its own copy of the game, as the App does;
     // "prun <workers> boot" boots for every run on the worker's own copy, as before.
     var cpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
@@ -41,7 +42,7 @@ if (args.Length > 2 && args[1] == "prun")
     ScummCutscenePlanner PooledPlanner()
     {
         GameLibrary? first = game;
-        return new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(Interlocked.Exchange(ref first, null) ?? new GameFolderScanner().Scan(args[0]), out _),
+        return new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(Interlocked.Exchange(ref first, null) ?? ScanArg(args[0]), out _),
             start: ScummCutsceneStart.SnapshotPerWorker);
     }
     // As the App since 19 October 2026: entries handed out one at a time ("boot": the list's default fixed ranges, as before).
@@ -76,7 +77,7 @@ if (args.Length > 1 && args[1] == "snap")
 if (args.Length > 2 && args[1] == "bench")
 {
     var booting = new ScummCutscenePlanner(game, start: ScummCutsceneStart.BootPerRun);
-    var copying = new ScummCutscenePlanner(new GameFolderScanner().Scan(args[0]));
+    var copying = new ScummCutscenePlanner(ScanArg(args[0]));
     var step = Math.Max(1, booting.Groups.Count / int.Parse(args[2]));
     long bootRuns = 0, copyRuns = 0, boots = 0, copies = 0;
     var clock = new System.Diagnostics.Stopwatch();
@@ -97,7 +98,7 @@ if (args.Length > 2 && args[1] == "bench")
 // run, the process's CPU time and the garbage collector's pauses (cutscene snapshot, 19 October 2026: whether long runs gain from running together).
 if (args.Length > 3 && args[1] == "rooms")
 {
-    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(new GameFolderScanner().Scan(args[0]), out _), start: ScummCutsceneStart.SnapshotPerWorker);
+    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(ScanArg(args[0]), out _), start: ScummCutsceneStart.SnapshotPerWorker);
     var only = args.Skip(3).Select(int.Parse).ToHashSet();
     var groups = planner.Groups.Where(g => only.Contains(g.First.Room)).ToList();
     var cpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
@@ -151,7 +152,7 @@ if (args.Length > 2 && args[1] == "race")
     var counts = new System.Collections.Concurrent.ConcurrentBag<string>();
     Parallel.For(0, int.Parse(args[2]), new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, i =>
     {
-        var copy = new GameFolderScanner().Scan(args[0]);
+        var copy = ScanArg(args[0]);
         var p = new ScummCutscenePlanner(copy);
         counts.Add($"triggers {p.Triggers.Count} groups {p.Groups.Count} scenes {p.Groups.Count(g => g.IsScene)}");
     });
@@ -294,6 +295,8 @@ if (args.Length > 1 && args[1] == "scan")
     }
     if (run) Console.WriteLine($"runs {ran}, begun {begun}");
 }
+
+static GameLibrary ScanArg(string arg) => arg.Split('|') is [var path, var disc] ? new GameFolderScanner { DiscFolder = disc }.Scan(path) : new GameFolderScanner().Scan(arg);
 
 /// <summary>The runtime's allocation ticks (one about every 100 KB allocated), summed by allocated type: which types a run's frames allocate.</summary>
 sealed class AllocationTicks : System.Diagnostics.Tracing.EventListener

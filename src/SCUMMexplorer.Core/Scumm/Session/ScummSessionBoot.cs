@@ -57,7 +57,7 @@ public abstract partial class ScummSession
             if (_pending.Any(item => item.ScriptNumber is int number && prepared.Chain.Contains(number) && !item.Frame.Stopped)) return null;
         }
         _uncertainties.Add(input.Note);
-        var (answer, answerNote) = chain is null ? ((ushort)0, null) : DeriveAcceptedAnswer(room, input.LocalScript);
+        var (answer, answerNote) = chain is null ? NextStartArgument(room, input.LocalScript) : DeriveAcceptedAnswer(room, input.LocalScript);
         if (answerNote is not null) _uncertainties.Add(answerNote);
         _visitTrace.Add($"boot: starts Room {_currentRoom.ResourceId:00} local script {input.LocalScript} as the player's answer would");
         _dispatchScope++;
@@ -75,6 +75,25 @@ public abstract partial class ScummSession
     }
 
     private readonly HashSet<int> _answerPrepared = [];
+    private readonly Dictionary<(int Room, int Script), int> _answerAttempts = [];
+    private readonly Dictionary<(int Room, int Script), List<(ushort Value, string Site)>> _answerArguments = [];
+
+    /// <summary>
+    /// Local 0 for an answering script that needs no computed answer: 0 (the engine's start) first; when that did not release the boot,
+    /// the next nonzero first argument the room's own code passes when it starts the script (S9 Indy4, 18 October 2026: the Spanish floppy's
+    /// Room 81 starts local script 207 with 0 for Esc and a click elsewhere, and with 1 for the submit; only 1 reaches the write the boot waits on).
+    /// </summary>
+    private (ushort Answer, string? Note) NextStartArgument(int room, int script)
+    {
+        var attempt = _answerAttempts.GetValueOrDefault((room, script));
+        _answerAttempts[(room, script)] = attempt + 1;
+        var others = _answerArguments.GetValueOrDefault((room, script)) ?? [];
+        var choices = others.Where(item => item.Value != 0).GroupBy(item => item.Value).Select(group => group.First()).ToList();
+        if (attempt == 0 || choices.Count == 0) return (0, null);
+        var (value, site) = choices[(attempt - 1) % choices.Count];
+        return (value, $"Player input assumed: starting Room {room:00} local script {script} with local 0 = 0 did not release the boot; the room's own code also " +
+                       $"starts it with local 0 = {value} ({site}), so the preview starts it so. Which answer that stands for was not simulated.");
+    }
     private readonly Dictionary<(int Room, int Script), AnswerPreparation?> _preparationCache = [];
 
     protected sealed record AnswerPreparation(ScummRoomObjectRecord Object, ScummObjectVerbEntry Verb, IReadOnlyList<int> Chain, IReadOnlyList<string> Comparands);
@@ -192,6 +211,7 @@ public abstract partial class ScummSession
     {
         var setters = new List<(int Local, int Offset)>();
         var starters = new List<string>();
+        var startArguments = new List<(int Target, ushort Value, string Site)>();
         for (var local = _globalScriptCount; local < 256; local++)
         {
             ScummScriptDisassembly? script;
@@ -202,12 +222,20 @@ public abstract partial class ScummSession
             {
                 if (IsSettingNonZero(item, bit, isBit)) setters.Add((local, item.Offset));
                 if (item.Operation == "startScript" && item.Operands.StartsWith("0x", StringComparison.Ordinal))
+                {
                     starters.Add($"local {local} +0x{item.Offset:X4}:{Convert.ToInt32(item.Operands[..4], 16)}");
+                    // The first argument when it is a literal ("0xCF, [0x0001]"): local 0 of the started script.
+                    var open = item.Operands.IndexOf('[');
+                    if (open > 0 && item.Operands.Length > open + 7 && item.Operands.AsSpan(open + 1, 2).SequenceEqual("0x") &&
+                        ushort.TryParse(item.Operands.AsSpan(open + 3, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var argument))
+                        startArguments.Add((Convert.ToInt32(item.Operands[..4], 16), argument, $"local {local} +0x{item.Offset:X4}"));
+                }
             }
         }
         // Several instructions of one script may set it (a right answer and the last wrong one); more than one script is ambiguous.
         if (setters.Select(item => item.Local).Distinct().Count() != 1) return null;
         var (setter, setOffset) = setters[0];
+        _answerArguments[(room, setter)] = startArguments.Where(item => item.Target == setter).Select(item => (item.Value, item.Site)).ToList();
         var startedBy = starters.Where(item => int.Parse(item[(item.LastIndexOf(':') + 1)..], CultureInfo.InvariantCulture) == setter)
             .Select(item => item[..item.LastIndexOf(':')]).ToList();
         // The room's objects start answers too (a click on an answer is an object's verb code).

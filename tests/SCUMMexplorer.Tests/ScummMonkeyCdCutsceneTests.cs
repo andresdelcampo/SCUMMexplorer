@@ -57,6 +57,29 @@ public sealed class ScummMonkeyCdCutsceneTests(ITestOutputHelper output)
         Assert.StartsWith("First of all", ship.First.FirstText, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// S9 (18 October 2026): the disc's SPANISH folder (<c>GameFolderScanner.DiscFolder</c>) lists the same triggers, entries, keys, scripts and groups as
+    /// ENGLISH, titled with its own verbs and names; the poster's scene begins from a fresh start. Record: <c>.verification/monkeycd-editions-20261018/README.md</c>.
+    /// </summary>
+    [Fact]
+    public void TheDiscsSpanishFolderListsTheSameScenesWithItsOwnTexts()
+    {
+        if (Folder() is not { } folder) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner { DiscFolder = "SPANISH" }.Scan(folder));
+        output.WriteLine($"{planner.Triggers.Count} triggers, {planner.Groups.Count} groups, {planner.Groups.Count(g => g.IsScene)} scenes");
+        Assert.Equal("Mirar", planner.Verbs.WordFor(LookAt));
+        Assert.Equal("Room 33 · Mirar cartel", ScummCutsceneTitles.Title(GroupOf(planner, 33, 429, LookAt).First));
+        if (Planner.Value is { } english)
+        {
+            static string Key(ScummCutsceneGroup g) => $"{g.First.Room}/{g.First.ObjectId}/{g.First.VerbId} {g.IsScene} {string.Join(";", g.First.Scripts)} " +
+                                                        string.Join(",", g.Others.Select(o => $"{o.Room}/{o.ObjectId}/{o.VerbId}"));
+            Assert.Equal(english.Triggers.Count, planner.Triggers.Count);
+            Assert.Equal(english.Groups.Select(Key), planner.Groups.Select(Key));
+        }
+        var poster = planner.Run(GroupOf(planner, 33, 429, LookAt).First);
+        Assert.True(poster.Begun, poster.Failure);
+    }
+
     [Fact]
     public void ThreeScenesBeginFromAFreshStart()
     {

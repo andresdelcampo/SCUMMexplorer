@@ -488,8 +488,13 @@ public sealed class ScummGameSession : ScummSession
     private int PressBootKeys(ScummBootInputPlan plan)
     {
         // A screen of choices (S4b Monkey2): a click in the middle of the chosen object's box, delivered to the game's input script like a player's.
-        if (plan.ClickObject is int clicked && _currentObjects.FirstOrDefault(item => item.Id == clicked) is { } choice)
+        // S9 Monkey2 (18 October 2026): only once the game has made the choice touchable (Script 130 +0x02DC clears class 32); before that, a floppy
+        // release asks its copy protection first and the stall is answered with keys below.
+        if (_bootChoiceClicked) return 0;
+        if (plan.ClickObject is int clicked && _currentObjects.FirstOrDefault(item => item.Id == clicked) is { } choice
+            && !(_runtime.ObjectClasses.TryGetValue(clicked, out var classes) && ScummObjectClasses.Has(classes, _runtime.UntouchableClass)))
         {
+            _bootChoiceClicked = true;
             var (x, y) = _runtime.ObjectPositions.TryGetValue(clicked, out var moved) ? (moved.X, moved.Y) : (choice.X, choice.Y);
             var screen = (X: x + choice.Width / 2 - ViewLeft, Y: y + choice.Height / 2 + _runtime.MainScreen.Top);
             PointAtScreen(screen);
@@ -498,10 +503,10 @@ public sealed class ScummGameSession : ScummSession
                             $"after the boot stood still {BootStallFrames} frames{(input is null ? $"; not delivered: {refused}" : "")}");
             return 1;
         }
-        // A plan that answers with a click presses no key: a later stall (a long delay, music) is not a question.
-        if (plan.ClickObject is not null) return 0;
         var answer = plan.AnswerVariable is null ? 0 : _runtime.GlobalVariables.GetValueOrDefault(plan.AnswerVariable);
-        var keys = answer != 0 ? answer.ToString(System.Globalization.CultureInfo.InvariantCulture).Select(digit => (int)digit).ToArray() : [plan.ContinueKey];
+        // A plan that answers with a click and has no question waiting presses no key only when it has no answer variable (the earlier rule).
+        if (plan.ClickObject is not null && plan.AnswerVariable is null) return 0;
+        var keys = answer != 0 ? answer.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(plan.AnswerDigits, '0').Select(digit => (int)digit).ToArray() : [plan.ContinueKey];
         _visitTrace.Add($"boot: Player input assumed: {(answer != 0 ? $"the digits of {plan.AnswerVariable} = {answer}, the answer the game's own script derived" : $"key {DescribeKey(plan.ContinueKey)}")} " +
                         "after the boot stood still " + BootStallFrames + " frames");
         foreach (var key in keys) _bootKeys.Enqueue(key);
@@ -510,6 +515,7 @@ public sealed class ScummGameSession : ScummSession
 
     // One key per frame: a game's input script keeps the last key in a variable that its waiting script reads on its next turn.
     private readonly Queue<int> _bootKeys = new();
+    private bool _bootChoiceClicked;
 
     /// <summary>What the boot did: the frames it ran and why it stopped.</summary>
     public ScummBootReport? BootReport { get; private set; }
@@ -537,7 +543,11 @@ public sealed class ScummGameSession : ScummSession
             AdvanceFrame();
             frames++;
             // A boot that waits for the player (a key, a typed answer) changes nothing for a long time: answer it as a player would, through the game's input script.
-            var state = $"{_currentRoom?.ResourceId}|{string.Join(",", _pending.Select(item => $"{item.ScriptNumber}:{item.Offset}"))}";
+            // S9 Monkey2 (18 October 2026): once the game has written the answer of a fixed-length question, the question is waiting even while a script
+            // keeps blinking its input field (floppy Script 136 loops on a delay): the stall then counts the room and the scripts running, not their offsets.
+            var answerWaits = _bootInput is { AnswerDigits: > 0, AnswerVariable: { } answerVariable } && !_bootChoiceClicked
+                && _runtime.GlobalVariables.GetValueOrDefault(answerVariable) != 0;
+            var state = $"{_currentRoom?.ResourceId}|{string.Join(",", _pending.Select(item => answerWaits ? $"{item.ScriptNumber}" : $"{item.ScriptNumber}:{item.Offset}"))}";
             stalled = state == lastState && _bootKeys.Count == 0 ? stalled + 1 : 0;
             lastState = state;
             if (_bootInput is not null && stalled >= BootStallFrames && keysPressed < MaxBootKeys)

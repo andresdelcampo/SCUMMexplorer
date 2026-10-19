@@ -113,7 +113,8 @@ public sealed class ScummCutscenePlanner
         foreach (var verb in session.Verbs)
         {
             if (verb.Name is null || verb.ImageObject is not null || words.ContainsKey(verb.VerbId)) continue;
-            var bytes = ScummTextDecoder.ParseEscaped(verb.Name);
+            // '@' is a filler the charset draws as nothing (S9 Monkey2: the Spanish talkie pads every verb name with it).
+            var bytes = ScummTextDecoder.ParseEscaped(verb.Name).Where(b => b != (byte)'@').ToArray();
             if (bytes.Length == 0 || bytes.Any(b => b < 0x20 || b > 0x7E)) continue;
             var word = System.Text.Encoding.Latin1.GetString(bytes).Trim();
             if (word.Length > 0) words[verb.VerbId] = readableText?.Invoke(word) ?? word;

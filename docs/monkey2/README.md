@@ -14,5 +14,5 @@
 
 | Edition / release | Local folder | Differences that matter (opening, scripts, text, graphics, audio) | Checked in S9 |
 |---|---|---|---|
-| Floppy (MT-32, Sound Blaster) | `mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es` | no speech | no |
-| Talkie | `mi2 talkie en`, `mi2 talkie es` | `MONSTER.SOU` speech | no |
+| Floppy (MT-32, Sound Blaster; English and Spanish) | `mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es` | no speech; the boot asks the recipe copy protection (Script 128/130, answer in `var[0x206]`); 450 cutscene triggers, 190 groups; the Spanish interface says "Mirar a" in the sentence line | yes, 18 Oct ([record](../../.verification/monkey2-editions-20261018/README.md)) |
+| Talkie (fan "Talkie CD 0.2 beta" patch; English reference, Spanish) | `mi2 talkie en`, `mi2 talkie es` | `MONSTER.SOU` speech codes in the texts; no copy protection at boot parameter 0; many descriptions wrapped in cutscenes (536 triggers, 260 groups); Rooms 45 and 50 patched; the Spanish copy pads names with '@' | yes, 18 Oct (Spanish; English is the reference) |
