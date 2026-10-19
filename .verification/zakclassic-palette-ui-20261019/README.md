@@ -45,3 +45,19 @@ The initial harness also demanded that changing costume 32's suit must change it
 ## Comparison and user checks
 
 This checks the actual Explorer window against its independent source-state context and direct Core decoding. The engine-source comparison is in the [core context record](../zakclassic-palette-core-20261019/README.md) and [Mars source record](../zakclassic-mars-palettes-20261019/README.md). ScummVM was not executed. No original-interpreter appearance, full Mars route, timing or listening acceptance is claimed. No user action is required to finish these bounded window checks; remaining original-runtime acceptance stays in the parent's checkpoint.
+
+## 19 October 2026: post-language-merge acceptance
+
+The parent requested one bounded ZakClassic actual-window regression after merging shared language-choice/load-path changes. Integration source **`1432a725`** was merged into this worktree as **`c90295fc`**, preserving all earlier evidence. The existing harness was rebuilt unchanged; no product source or test suite was modified/run for this item. Before launch, window/process inspection found no other verification WPF process. The parent granted an exclusive lease; only this one private-profile process ran.
+
+```powershell
+rtk git merge 1432a725
+rtk proxy dotnet build .verification/zakclassic-palette-ui-20261019/WindowCheck/ZakPaletteWindowCheck.csproj -p:NuGetAudit=false --verbosity quiet
+rtk proxy dotnet Exe/ZakPaletteWindowCheck/Debug/net10.0-windows/ZakPaletteWindowCheck.dll "D:\Juegos\Lucas\zak ega en" .verification/zakclassic-palette-ui-20261019/window-zak-classic-language-merge zak 1
+```
+
+Build: **zero warnings/errors**, **12.01 seconds**. The actual-window process **exited zero / PASS**, with **15 new captures** in `window-zak-classic-language-merge`; the preceding three accepted packets and separate failed packet remain intact. Both costumes retain the same source colours, direct Core pixel/dimension/count agreement, default restoration, plain selected/open Normal labels and Advanced provenance. Cancellation preserves the latest selection; both compact 900×640 layouts pass. Costume 32 correctly retains equal pixels for the unused suit channel; costume 13 correctly changes its used channel. No assertion or cap was changed.
+
+The native session stayed exactly at **frame 3**, with unchanged snapshot, actors, messages and delivered input. The cold/cancelled context load took **88.80 seconds**, with **1,357 dispatcher heartbeat ticks** and a largest observed gap of **253 ms**. These measured stages are the recorded cost; no total process-time or performance guarantee is inferred.
+
+Four relevant new captures were visually inspected: `costume-32-normal-dropdown.png`, `costume-13-alternate-normal-900x640.png`, `costume-32-alternate-advanced.png` and `costume-13-alternate-advanced.png`. The displayed chooser contains plain labels; the compact layout fits; source/opening and room-preview caveats remain Advanced only. The lease was released immediately after successful process completion; no harness window remains active. Private profile/cache only, no native state assignment, ScummVM execution or user/other-agent application interference. Parent owns shared records, full-suite validation and master promotion.
