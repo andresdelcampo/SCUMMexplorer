@@ -1298,10 +1298,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        var previewGame = _game!;
         try
         {
             // The CD game's rooms come out of DISK01.LEC (no per-room file); the others read their LFL file.
             var bytes = isCd || browseArchive is not null ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
+            await PrepareRoomArtworkAsync(previewGame, token);
+            if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
             LoomCdScene? cdScene = null;
             if (isCd && _session is null)
             {
@@ -1313,6 +1316,7 @@ public partial class MainWindow : Window
             ScummRoomScene? browsedScene = null;
             if (_game is { } sceneGame && ScummProfile.For(sceneGame).HasFirstVisitScenes && resource.ResourceId is int sceneRoomId)
                 browsedScene = await Task.Run(() => ReadFirstVisit(sceneGame, sceneRoomId), token);
+            if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
             _browsedScene = browsedScene;
             var room = browsedScene?.Room ?? cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
                 : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
@@ -1326,6 +1330,7 @@ public partial class MainWindow : Window
                 try { browsedObjects = await Task.Run(() => browseArchive.ReadBrowsedObjects(resource.ResourceId!.Value), token); }
                 catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException or ArgumentOutOfRangeException or IndexOutOfRangeException) { }
             }
+            if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
             _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null ? browseArchive.ReadWalkBoxes(resource.ResourceId!.Value) : enhancedV2 ? TryReadOlderWalkBoxes(bytes) : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
@@ -1491,7 +1496,7 @@ public partial class MainWindow : Window
                 snapshot = _session.Snapshot;
             }
             if (visit && _game?.Id == GameId.LoomVga && _cdVoice.Follows(_session)) _cdVoice.SkipPending();
-            var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? ScummSceneDrawBatches.Empty : EnsureSceneBatches();
+            var sceneBatches = _sceneBatches ?? ScummSceneDrawBatches.Empty;
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
                 _indexedStates, sceneBatches, estimateArtwork: _game?.Id != GameId.LoomVga);
             _objectSelection = initialized.Selection;
@@ -1588,21 +1593,9 @@ public partial class MainWindow : Window
     private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images,
         IReadOnlyCollection<int>? statesSetByCode = null)
     {
-        EnsureSceneBatches();
         _artworkEstimates = FillArtworkGaps(_objectSelection, resource, images, statesSetByCode,
             _sceneBatches ?? ScummSceneDrawBatches.Empty);
         _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
-    }
-
-    private ScummSceneDrawBatches EnsureSceneBatches()
-    {
-        if (_sceneBatches is not null) return _sceneBatches;
-        try { _sceneBatches = _game is null ? ScummSceneDrawBatches.Empty : DrawBatchesAsync(_game).GetAwaiter().GetResult(); }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
-        {
-            _sceneBatches = ScummSceneDrawBatches.Empty;
-        }
-        return _sceneBatches;
     }
 
     private static (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates) CreateSessionRoomSelection(

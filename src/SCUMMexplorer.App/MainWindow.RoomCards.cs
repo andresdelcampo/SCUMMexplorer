@@ -34,6 +34,18 @@ public partial class MainWindow
     private bool IsCurrentRoomCardLoad(GameLibrary game, int generation, CancellationToken token) =>
         !token.IsCancellationRequested && generation == _roomCardGeneration && ReferenceEquals(_game, game);
 
+    private async Task PrepareRoomArtworkAsync(GameLibrary game, CancellationToken token)
+    {
+        if (game is not { Id: GameId.Loom, Version: ScummVersion.V3 } || _sceneBatches is not null) return;
+        ScummSceneDrawBatches batches;
+        try { batches = await DrawBatchesAsync(game).WaitAsync(token); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        { batches = ScummSceneDrawBatches.Empty; }
+        token.ThrowIfCancellationRequested();
+        if (!ReferenceEquals(_game, game)) throw new OperationCanceledException();
+        _sceneBatches = batches;
+    }
+
     private async Task<bool> PublishRoomCardAsync(GameLibrary game, GameResource resource,
         BitmapSource? bitmap, RoomCardPreviewStage stage, string? failure, int generation, CancellationToken token)
     {
