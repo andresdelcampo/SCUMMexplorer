@@ -103,6 +103,82 @@ public sealed class ScummInventoryItemContextTests
     }
 
     [Theory]
+    [InlineData("missing", false)]
+    [InlineData("null resource", false)]
+    [InlineData("incomplete prefix", false)]
+    [InlineData("recursive", false)]
+    [InlineData("nested missing", false)]
+    [InlineData("dynamic", false)]
+    [InlineData("missing object", false)]
+    [InlineData("incomplete object", false)]
+    [InlineData("unknown other", false)]
+    [InlineData("deep owner", false)]
+    [InlineData("complete", true)]
+    public void ConditionalContextRequiresACompleteResolvedCalledClosure(string scenario, bool expected)
+    {
+        var globals = new Dictionary<int, ScummScriptDisassembly?>();
+        var helper = Script(91, ("move", "var[0x099], 0x0001"), ("stopObjectCode", ""));
+        if (scenario is "incomplete prefix" or "incomplete object")
+            helper = Script(91, ("setOwnerOf", "0x0065, 0x01"), ("stopObjectCode", "")) with { DecodeNote = "unknown tail after a partial owner write" };
+        if (scenario == "recursive") helper = Script(91, ("startScript", "0x5B"), ("stopObjectCode", ""));
+        if (scenario == "nested missing") helper = Script(91, ("startScript", "0x5C"), ("stopObjectCode", ""));
+        if (scenario == "deep owner")
+        {
+            for(var id=92;id<111;id++)globals[id]=Script(id,("startScript",$"0x{id+1:X2}"),("stopObjectCode",""));
+            globals[111]=Script(111,("setOwnerOf","0x0065, 0x01"),("stopObjectCode",""));
+            helper=Script(91,("startScript","0x5C"),("stopObjectCode",""));
+        }
+        if (scenario != "missing") globals[91] = scenario == "null resource" ? null : helper;
+        var call = scenario switch
+        {
+            "dynamic" => ("startScript", "var[0x099]"),
+            "missing object" or "incomplete object" => ("doSentence", "0xFD, 0x03E8, 0x0000, sub=0x01"),
+            "unknown other" => ("doSentence", "0x0B, 0x03E8, var[0x099], sub=0x01"),
+            _ => ("startScript", "0x5B")
+        };
+        var script = Script(90,
+            ("isEqual", "var[0x071], 0x0001, +1 -> 0x0002"), ("move", "var[0x070], 0x0065"),
+            ("isEqual", "var[0x071], 0x0002, +1 -> 0x0004"), ("move", "var[0x070], 0x0066"),
+            call, ("setOwnerOf", "var[0x070], var[0x071]"), ("stopObjectCode", ""));
+        var found = ScummInventoryItemContexts.Infer([new(101, 1, "record", ""), new(102, 2, "record", "")],
+            [(script, null, 1)], globals, (_, _, _) => scenario is "incomplete object" or "unknown other" ? helper : null, new HashSet<int> { 1, 2 });
+        Assert.Equal(expected ? 2 : 0, found.Count);
+    }
+
+    [Fact]
+    public void AFixedLiteralRecipientCannotUseASymbolicItemAfterAnUnresolvedHelper()
+    {
+        var script = Script(90, ("move", "var[0x070], 0x0065"), ("startScript", "0x5B"),
+            ("setOwnerOf", "var[0x070], 0x01"), ("move", "var[0x070], 0x0066"),
+            ("setOwnerOf", "var[0x070], 0x02"), ("stopObjectCode", ""));
+        Assert.Empty(Infer(script));
+    }
+
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("incomplete prefix")]
+    [InlineData("recursive")]
+    [InlineData("nested missing")]
+    public void OwnerClosureBarriersLeaveCallbackNullInventoryScansUnchanged(string scenario)
+    {
+        var globals = new Dictionary<int, ScummScriptDisassembly?>();
+        if (scenario == "incomplete prefix") globals[91] = Script(91, ("setOwnerOf", "0x0065, 0x01"), ("stopObjectCode", "")) with { DecodeNote = "unknown tail" };
+        if (scenario == "recursive") globals[91] = Script(91, ("startScript", "0x5B"), ("stopObjectCode", ""));
+        if (scenario == "nested missing") globals[91] = Script(91, ("startScript", "0x5C"), ("stopObjectCode", ""));
+        var script = Script(90, ("move", "var[0x070], 0x0065"), ("startScript", "0x5B"),
+            ("setOwnerOf", "var[0x070], 0x01"), ("pickupObject", "var[0x070]"), ("stopObjectCode", ""));
+        var defaults = new List<int?>(); var defaultNotes = new List<string>();
+        new ScummInventoryCatalogAnalysis(globals, (_, _, _) => null, (_, _, id, _, _) => defaults.Add(id), defaultNotes.Add).Scan(script);
+        Assert.Equal(new int?[] { 101 }, defaults);
+        Assert.DoesNotContain(defaultNotes, x => x.StartsWith("Unresolved owner-flow:"));
+        var ownerEvents = new List<int?>(); var observedPickups = new List<int?>(); var notes = new List<string>();
+        new ScummInventoryCatalogAnalysis(globals, (_, _, _) => null, (_, _, id, _, _) => observedPickups.Add(id), notes.Add,
+            ownerWrite: (_, _, id, _) => ownerEvents.Add(id)).Scan(script);
+        Assert.Empty(ownerEvents); Assert.Empty(observedPickups);
+        Assert.Contains(notes, x => x.StartsWith("Unresolved owner-flow:"));
+    }
+
+    [Theory]
     [InlineData("zak ega en")]
     [InlineData("zakE ega en")]
     public void OwnEditionSuppliesTenMeaningfulQualifiersAndLeavesShardsNeutral(string folder)

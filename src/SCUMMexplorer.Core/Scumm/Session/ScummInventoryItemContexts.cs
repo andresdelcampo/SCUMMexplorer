@@ -72,7 +72,8 @@ internal static class ScummInventoryItemContexts
                         if (root.Object is int active && argument != ScummVars.V2.ActiveObject1)
                             incoming[ScummVars.V2.ActiveObject1] = active;
                         var analysis = new ScummInventoryCatalogAnalysis(globals, objectScript, (_, _, _, _, _) => { },
-                            note => { if (note.StartsWith("Catalog path-state bound:") || note.StartsWith("Catalog call-depth bound:")) unresolved.Add(actor); },
+                            note => { if (note.StartsWith("Catalog path-state bound:") || note.StartsWith("Catalog call-depth bound:") ||
+                                note.StartsWith("Unresolved owner-flow:")) unresolved.Add(actor); },
                             ownerWrite: (current, instruction, item, person) =>
                             {
                                 if (!ReferenceEquals(current, script) || instruction.Offset != site.Offset) return;
