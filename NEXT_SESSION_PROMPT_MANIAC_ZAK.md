@@ -8,6 +8,8 @@ Current validation: **1,657 passed, zero failed, five expected skips**, all 46 n
 
 Documentation now uses [REQUIREMENTS](docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries) for current Maniac/Zak acceptance, with no separate support-status trackers. CHANGELOG keeps roughly the latest two days; older entries are in its optional archive. Do not read the whole changelog/archive at startup or recreate the deleted trackers. Earlier handoff paragraphs below are dated history, not instructions to restore them.
 
+Clean master fast-forwarded from `ea89e1ef` to `3cc640e4`; the normal `Exe/Debug/SCUMMexplorer.exe` was rebuilt from the root checkout with zero warnings/errors, 8.05 seconds. Only the final record follows; parent verifies matching clean root/integration heads after promoting it. No user application was stopped. Stop at this checkpoint.
+
 Next bounded work, only on request: trace the artifact-deposit/character-switch chain for native Mars access before verifying the other protagonists' transformation and helmet colour contexts. Keep the source/preview/earned distinctions, retained failures and two-approach stop rule. Original-runtime comparisons remain unavailable under the no-run instruction; alternate same-family releases are still missing; catalogs/seeds remain opt-in. Stop at the clean palette checkpoint; no automatic next item. Never edit the shared `NEXT_SESSION_PROMPT.md`.
 
 ## Preceding dated handoff: labels and resumed fidelity
