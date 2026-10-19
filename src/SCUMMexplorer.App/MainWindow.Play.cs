@@ -185,6 +185,7 @@ public partial class MainWindow
         if (_play is not null && _sceneSound.Follows(_play)) _sceneSound.StopAll("play was left");
         _playSpeech.Detach();
         PlayScreenImage.Visibility = Visibility.Collapsed;
+        ClearPlayOverlays();
         PlayScreenImage.Cursor = null;
         RoomDisplayGroup.Visibility = Visibility.Visible;
         UpdateGameStatusButton();
@@ -228,6 +229,7 @@ public partial class MainWindow
             finally { _followingPlayRoom = false; }
             RoomCardList.Children.OfType<System.Windows.Controls.Button>()
                 .FirstOrDefault(card => Equals(card.Tag, nativeRoom))?.BringIntoView();
+            RefreshPlayRoomActions();
         }
         _playBitmap ??= new WriteableBitmap(ScummPlayFrame.Width, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
         _playBitmap.WritePixels(new Int32Rect(0, 0, ScummPlayFrame.Width, ScummPlayFrame.Height), frame.Pixels, ScummPlayFrame.Width * 4, 0);
@@ -240,6 +242,7 @@ public partial class MainWindow
                                       (_playPaused ? " · paused" : "");
         else PlayScreenImage.ToolTip = null;
         TryUpdateGenericRoomSounds();
+        RefreshPlayOverlays(frame);
     }
 
     // The image's point as a game screen point (0..319, 0..199).
@@ -267,12 +270,14 @@ public partial class MainWindow
     {
         if (!PlayActive) return;
         _play!.PointAtScreen(PlayPoint(e));
+        UpdatePlayOverlayHover(PlayPoint(e));
         if (_playPaused) ShowPlayFrame();
     }
 
     private void PlayScreenImage_MouseLeave(object sender, MouseEventArgs e)
     {
         if (PlayActive) _play!.PointAtScreen(null);
+        UpdatePlayOverlayHover(null);
     }
 
     // R-7.10: one press, one click, delivered at the next frame.

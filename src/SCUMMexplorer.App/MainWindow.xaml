@@ -563,6 +563,7 @@
                                                 ToolTip="Music and sound effects this room's scripts may start. Pick one to hear it; the game does not necessarily play all of them."/>
                                         </StackPanel>
                                     </WrapPanel>
+                                    <StackPanel x:Name="GenericRoomActionsHost" Visibility="Collapsed"/>
                                     <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520"/>
                                     <TextBlock x:Name="CutsceneScanNote" Visibility="Collapsed" Foreground="#B78442" FontSize="11.5" FontStyle="Italic" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520" Margin="0,2,0,0"
                                                Text="Looking for the scenes that happen in each room…&#10;The first launch takes a while; the result is kept for the next one."/>
@@ -703,6 +704,7 @@
                     </StackPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
                         <StackPanel>
+                            <StackPanel x:Name="GenericRoomSourceHost" Visibility="Collapsed"/>
                             <Expander x:Name="RoomNavigationPanel" Style="{StaticResource PanelSection}" Visibility="Collapsed" IsExpanded="True">
                                 <Expander.Header>
                                     <TextBlock x:Name="RoomNavigationHeader" Text="DOORWAYS" Style="{StaticResource PanelHeading}"/>

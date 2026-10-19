@@ -126,6 +126,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        InitializeGenericRoomActions(GenericRoomActionsHost, GenericRoomSourceHost);
         var release = System.Reflection.CustomAttributeExtensions
             .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(MainWindow).Assembly)?.InformationalVersion?.Split('+')[0];
         if (!string.IsNullOrWhiteSpace(release))
@@ -1026,6 +1027,8 @@ public partial class MainWindow : Window
         ObjectVerbButtons.Visibility = Visibility.Visible;
         UpdateConnectionsButton();
         UpdateCostumeColorVisibility();
+        RefreshPlayRoomActions();
+        RefreshPlayOverlays();
     }
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1411,7 +1414,12 @@ public partial class MainWindow : Window
                 // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
                 if (browsedScene is not null && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
                     await StartPlayCoreAsync(resource, token, navigationKind);
-                if (!token.IsCancellationRequested && ReferenceEquals(_game, previewGame)) UpdateRoomMusicActions();
+                if (!token.IsCancellationRequested && ReferenceEquals(_game, previewGame))
+                {
+                    UpdateRoomMusicActions();
+                    RefreshPlayRoomActions();
+                    RefreshPlayOverlays();
+                }
                 return;
             }
             var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
@@ -3751,13 +3759,18 @@ public partial class MainWindow : Window
         else SelectObject(id);
     }
 
-    private void RoomMaskToggle_Changed(object sender, RoutedEventArgs e) => RefreshRoomPreview();
+    private void RoomMaskToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        RefreshRoomPreview();
+        RefreshPlayOverlays();
+    }
 
     private void WalkBoxToggle_Changed(object sender, RoutedEventArgs e)
     {
         if (WalkBoxOverlay is null) return;
         RefreshWalkBoxOverlay();
         WalkBoxOverlay.Dispatcher.BeginInvoke(RefreshWalkBoxOverlay, DispatcherPriority.Loaded);
+        RefreshPlayOverlays();
     }
 
     private void WalkBoxOverlay_SizeChanged(object sender, SizeChangedEventArgs e) => RefreshWalkBoxOverlay();
@@ -3919,6 +3932,7 @@ public partial class MainWindow : Window
         _hoveredDoorwayIds = [];
         RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never ? Visibility.Visible : Visibility.Collapsed;
         RoomNavigationOverlay.Dispatcher.BeginInvoke(RefreshRoomNavigationOverlay, DispatcherPriority.Loaded);
+        RefreshPlayOverlays();
     }
 
     private void ObjectAreaMode_Changed(object sender, RoutedEventArgs e)
@@ -3926,6 +3940,7 @@ public partial class MainWindow : Window
         if (!_viewOptionsReady || HotspotHighlightOverlay is null) return;
         SaveViewOptions();
         ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : _highlightedHotspot);
+        RefreshPlayOverlays();
     }
 
     /// <summary>On-hover doorways: the doorway boxes under the pointer are the only ones drawn.</summary>
