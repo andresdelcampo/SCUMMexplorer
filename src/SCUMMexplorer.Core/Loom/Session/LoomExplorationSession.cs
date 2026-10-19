@@ -344,6 +344,17 @@ public sealed partial class LoomExplorationSession : ScummSession
         _visitTrace.Add(description);
     }
 
+    protected override void ManualNavigationBegan()
+    {
+        _playingBoot = false;
+        _cdIntro = false;
+    }
+
+    protected override ScummSessionSnapshot VisitManualRoomCore(GameResource room) =>
+        _currentRoom?.ResourceId == room.ResourceId
+            ? EnterRoom(room, "Room selected again manually; native entry state was prepared offscreen (exploration preview).")
+            : VisitRoom(room, preserveStaffLevel: true);
+
     public ScummSessionSnapshot VisitRoom(GameResource room, ScummObjectActionResult? reachedAction = null, bool preserveStaffLevel = false)
     {
         ArgumentNullException.ThrowIfNull(room);

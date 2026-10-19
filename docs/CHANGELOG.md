@@ -2,6 +2,13 @@
 
 Recent changes: 18–19 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 17 October](archive/CHANGELOG_THROUGH_2026-10-17.md) are an optional historical archive, not startup reading. At a checkpoint, retain roughly the latest two calendar days here and archive older entries with their links.
 
+## 19 October: stable selectors and deliberate cutscenes (all games)
+
+- Refined the background-first feature: only LOOM EGA fills selector artwork after background loading. Other cards retain their plain backgrounds on cold and warm loads; native first-visit preparation and complete caching still run upfront.
+- Manual catalog navigation cancels the departing scene, queued continuation and audio even without native Skip. Entry playback belongs to native doorway travel or explicit scene launches. Game loading no longer starts the intro; established opening actions remain in Room 01 or a Normal-mode Play Game Intro button, with Play Demo Preview for demos. Requirements R-8.5a–c and R-7.20 preserve native startup choices.
+- Private-profile windows verify Maniac's real party selection, intro restart and no-override telescope cancellation; LOOM's gap filling and existing intro deduplication; and explicit demo playback/cancellation. Monkey CD's native roomless intro reaches control without supplied answers; its selected doorway route remains unproved. Unresolved manual starts stay static, with no invented story flags or input.
+- Required full suite: **1,684 passed, zero failed, five expected skips**, including all 12 new policy cases. Final solution build zero warnings/errors; support levels are unchanged. Retained failed approaches, precise window coverage, regenerated matrices and clean promotion: [checkpoint](checkpoints/20261019-ManualRooms-ManiacZak.md).
+
 ## 19 October: Monkey Island 1 CD S9 for the FRENCH, GERMAN and ITALIAN folders
 
 - The disc's FRENCH, GERMAN and ITALIAN folders each pass boot (rooms 0, 10, 0, 0, 38, unsupported 0), the room audit (82 of 83, every per-room column equal to ENGLISH), the R-7.18 route and right click with their own texts, disc music ids, the cutscene scan (286 triggers, 160 entries, 62 scenes, equal per entry; 101 of 160 begin, equal per entry) and accents (charsets 1, 2 and 6 draw é è ê à ç ô û, ä ö ü ß, à è é ì ò ù). One look per language through the real window's language list passes. No code changed; the registry level stays.

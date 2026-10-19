@@ -34,6 +34,9 @@ public partial class MainWindow
     private bool IsCurrentRoomCardLoad(GameLibrary game, int generation, CancellationToken token) =>
         !token.IsCancellationRequested && generation == _roomCardGeneration && ReferenceEquals(_game, game);
 
+    private static bool UsesInitializedRoomCards(GameLibrary game) =>
+        game is { Id: GameId.Loom, Version: ScummVersion.V3 };
+
     private async Task PrepareRoomArtworkAsync(GameLibrary game, CancellationToken token)
     {
         if (game is not { Id: GameId.Loom, Version: ScummVersion.V3 } || _sceneBatches is not null) return;
@@ -55,6 +58,9 @@ public partial class MainWindow
         {
             if (!IsCurrentRoomCardLoad(game, generation, token)) return;
             current = true;
+            // Only LOOM EGA needs native detail filling in the selector. Other games keep
+            // their plain backgrounds while the same native work/cache prepares room opening.
+            if (stage == RoomCardPreviewStage.InitialState && !UsesInitializedRoomCards(game)) return;
             if (bitmap is not null) SetRoomCardThumbnail(resource, bitmap, stage);
             else SetRoomCardFailure(resource, failure ?? "Room preview unavailable.");
         }, DispatcherPriority.Background, token);

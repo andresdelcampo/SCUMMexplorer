@@ -1,0 +1,3 @@
+Cold ZakClassic: 2 stable cards; fill=False; full initialized cache differs from background in 2; native preparation complete; 1325 plain-card observations
+Warm ZakClassic: 2 stable cards; fill=False; full initialized cache differs from background in 2; native preparation complete; 1147 plain-card observations
+PASS

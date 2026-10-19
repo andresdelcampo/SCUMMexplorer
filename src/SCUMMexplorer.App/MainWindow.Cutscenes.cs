@@ -128,7 +128,8 @@ public partial class MainWindow
     /// <summary>Plays a LOOM demo's preview: a fresh session whose director script runs, on the playback clock, until another room is opened.</summary>
     private void PlayDemoPreview()
     {
-        if (_game is not { IsDemo: true } || _indexedObjectSnapshot is null || !CanStartCutscene) return;
+        if (_game is not { IsDemo: true } || _indexedObjectSnapshot is null || !CanStartCutscene && !_catalogPreviewOnly) return;
+        _catalogPreviewOnly = false;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, demoPreview: true);
         _sceneSound.Attach(_game, _session);
@@ -154,7 +155,8 @@ public partial class MainWindow
     /// <summary>Plays the CD game's intro: a fresh session whose script 001 starts from the beginning, the frames on the playback clock, the voice and overture from the disc.</summary>
     private void PlayCdIntro()
     {
-        if (_game is not { Id: GameId.LoomVga, V4Archive: { } vga } || !CanStartCutscene) return;
+        if (_game is not { Id: GameId.LoomVga, V4Archive: { } vga } || !CanStartCutscene && !_catalogPreviewOnly) return;
+        _catalogPreviewOnly = false;
         StopScenePlayback();
         _cdVoice.Stop();
         _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
@@ -483,7 +485,8 @@ public partial class MainWindow
     /// </summary>
     private void PlayOpening()
     {
-        if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene) return;
+        if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene && !_catalogPreviewOnly) return;
+        _catalogPreviewOnly = false;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, stopAtOpening: true, soundCard: SoundCard);
         _sceneSound.Attach(_game, _session);
