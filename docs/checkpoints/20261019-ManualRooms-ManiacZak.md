@@ -38,4 +38,8 @@ Optional review in the refreshed normal executable: open a game and confirm it r
 
 ## Cost and next run
 
-Three independent workers plus parent integration, with exclusive serial WPF ownership. Retained first-attempt failures led to the two App corrections above; later manual-start bounds remain disclosed rather than relaxed. Stop at this checkpoint; do not begin another feature automatically. Clean promotion and normal executable refresh are recorded below after completion.
+Three independent workers plus parent integration, with exclusive serial WPF ownership. Retained first-attempt failures led to the two App corrections above; later manual-start bounds remain disclosed rather than relaxed. Stop at this checkpoint; do not begin another feature automatically.
+
+## Clean promotion
+
+Master stayed clean at `fb3da87b` throughout validation; the final integration merge reported already up to date. Fast-forwarded master to `143196d7` without rewriting history, preserving the concurrent Monkey CD edition work. Rebuilt the normal `Exe/Debug/SCUMMexplorer.exe` from the root checkout: zero warnings/errors, 7.42 seconds. No user application was stopped. Final product source remains `98abc9b`, with Core/tests unchanged from `273cc39`; only this promotion record follows. Parent verifies matching clean master/integration heads after its final fast-forward. No automatic next item.
