@@ -77,7 +77,7 @@ Every stage uses the same template: **Goal, Anchors, Prerequisites, Steps, Accep
   1. Run the scanner (`GameFolderScanner.Scan`) on the folder. Add the family to `GameFamily`, its published title to `KnownGameTitles` and its mapping to `GameSupport.FamilyOf` if missing. Detection is by file bytes and indexes, never names or sizes (R-3.1).
   2. Add the family row to `GameSupport.Families` with **only the levels the code already delivers**; add its fixture folder to `SupportConformanceTests.Fixtures`; run the support tests with `SCUMM_UPDATE_SUPPORT_MATRIX=1` so the README and REQUIREMENTS tables follow.
   3. Write or extend the format notes in [`engine/SCUMM_RESOURCE_FORMATS.md`](engine/SCUMM_RESOURCE_FORMATS.md) (layout, room picture codec, costume, sound), labelled with the SCUMM version they apply to.
-  4. Create `docs/<game>/` from the templates (§7): `README.md`, `SUPPORT_STATUS.md` and `<GAME>_SCRIPT_MAP.md`, the last holding the script ids, variables, verbs and rooms found, each with evidence, source and date (R-9.20). Engine rules go in `docs/engine/`, game facts in the script map, never mixed.
+  4. Create `docs/<game>/` from the templates (§7): `README.md` and `<GAME>_SCRIPT_MAP.md`, the latter holding the script ids, variables, verbs and rooms found, each with evidence, source and date (R-9.20). Current support and acceptance limits belong in REQUIREMENTS; do not create a separate support-status tracker. Engine rules go in `docs/engine/`, game facts in the script map, never mixed.
   5. List the **edition differences** that could matter (languages, floppy/CD/talkie, EGA/VGA, demos) with the local copies of each; mark which will be checked in S9.
 - **Acceptance.** `SupportConformanceTests` passes for the family (recognised; rooms, costumes, sounds, scripts and texts exist for every level above None); the baseline record exists.
 - **Do not.** Claim a level the test cannot show; use a folder name or file size to identify a game; leave an unrecognised game titled with its folder name in the matrix (it belongs in `OtherBrowsed`).
@@ -131,7 +131,7 @@ Every stage uses the same template: **Goal, Anchors, Prerequisites, Steps, Accep
   3. Paint order, `drawObject` queue, `setState` and parent-state rules are the shared ones (R-6.4). A room that still shows a gap after a correct run: look for the missing script behaviour; do **not** add a room-specific fill. Where the data genuinely does not decide, pick at random and label the pick (R-1.4).
   4. Apply R-6.14/R-6.15 equivalents: objects at off-scene positions and untouchable (class) objects are not hotspots; read the family's class bits from its source.
   5. Remove the stored-object box mode's limitation note once real state exists; stored boxes remain as the Advanced list.
-- **Acceptance.** (a) Every room opens without a gap (run the room audit harness for the family, `RoomAudit`-style); (b) a **sample of at least ten rooms**, chosen to include the most script-heavy ones, compared by picture with the bundled ScummVM at the first visit, with differences listed in the record; (c) a unit test that pins the settled object states for three named rooms. The Objects cell moves to ✔ only together with S6 (REQUIREMENTS §3.1 defines ✔ as state **and** click responses); until then the tracker records "S5 done" and the cell stays ◐.
+- **Acceptance.** (a) Every room opens without a gap (run the room audit harness for the family, `RoomAudit`-style); (b) a **sample of at least ten rooms**, chosen to include the most script-heavy ones, compared by picture with the bundled ScummVM at the first visit, with differences listed in the record; (c) a unit test that pins the settled object states for three named rooms. The Objects cell moves to ✔ only together with S6 (REQUIREMENTS §3.1 defines ✔ as state **and** click responses); until then the checkpoint records "S5 done" and the cell stays ◐.
 - **Do not.** Initialise states from the index and call it first-visit; fill gaps by pixels; invent a state a room does not reach.
 
 ### S6. Play
@@ -164,7 +164,7 @@ Every stage uses the same template: **Goal, Anchors, Prerequisites, Steps, Accep
 - **Goal.** The other releases of a family (languages, floppy/CD/talkie, demos, patched versions) behave as the reference one.
 - **Anchors.** R-14.2 to R-14.4, R-3.9, R-3.3.
 - **Steps.** After a stage is done on the reference copy of the family, list the plausible differences the stage can meet (opening/detection, format/scripts, text/fonts, graphics, audio), take the relevant checks from `.verification/editions-20261005`, and run them only on the copies where the difference is plausible. Derive per-edition numbering from the edition's own scripts (R-14.2). A genuine difference gets an isolated, documented branch **in data**; a language never selects code.
-- **Acceptance.** A table in the record: edition × check × result. An edition that fails keeps its registry level and gets a note in the tracker.
+- **Acceptance.** A table in the record: edition × check × result. An edition that fails keeps its registry level and gets a note in REQUIREMENTS' current acceptance limits.
 
 ## 4. Procedures common to all stages
 
@@ -172,10 +172,10 @@ Every stage uses the same template: **Goal, Anchors, Prerequisites, Steps, Accep
 
 Each finished stage leaves, in this order:
 
-1. **Registry**: the level changed in `GameSupport.Families` (or an explicit "unchanged, because …" in the tracker); tables regenerated with `SCUMM_UPDATE_SUPPORT_MATRIX=1`.
+1. **Registry**: the level changed in `GameSupport.Families` (or an explicit "unchanged, because …" in the checkpoint); tables regenerated with `SCUMM_UPDATE_SUPPORT_MATRIX=1`.
 2. **Test**: the conformance test extended (or a unit test) so the claim fails if false. A level without a test is not raised.
 3. **Evidence**: `.verification/<game>-<stage>-<yyyymmdd>/README.md` in the [evidence format](templates/EVIDENCE_RECORD.md), with: what was run (commands via RTK), the fixture folder and edition, the numbers, the comparison with ScummVM, the list of differences and **uncertainties kept as written** (failed evidence is kept, R-2.4). Large captures are not committed.
-4. **Docs**, only in the places of §7: the game's script map and the engine files (facts with evidence, source and date); the evidence record; a `docs/CHANGELOG.md` entry; the family's tracker updated; `docs/CURRENT_WORK.md` if the plan changed.
+4. **Docs**, only in the places of §7: the game's script map and the engine files (facts with evidence, source and date); the evidence record; a recent `docs/CHANGELOG.md` entry; REQUIREMENTS' current acceptance limits updated; `docs/CURRENT_WORK.md` if the plan changed.
 5. **Requirements**: if the stage found that a requirement is wrong or missing, a proposed row (not a silent edit) and a mention to the user.
 6. **One commit**: explicit paths, message ends with the attribution line, `Games/` untouched.
 
@@ -188,12 +188,12 @@ Run the unit tests whose names match the change, the conformance test for the fa
 - **One family per agent; one stage at a time.** The agent owns `docs/<game>/`, `.verification/<game>-*`, its fixture row and its `GameSupport.Families` row.
 - **Shared files** (`GameSupport.cs`, `SupportConformanceTests.cs`, `KnownGameTitles.cs`, README and REQUIREMENTS tables, `ScummVars`, the executor, shared readers) are edited in **small, separate commits** that touch only what the stage needs. The README and REQUIREMENTS tables are generated: on a merge conflict, take either side and re-run the tests with `SCUMM_UPDATE_SUPPORT_MATRIX=1`.
 - **Engine-wide changes** (S4a, executor opcodes, `ScummVars`, new `IScummDataSource` members) are announced in `CURRENT_WORK.md` before starting; two agents never edit the same engine file at once. An agent that needs a change in shared engine code for its game writes the need down and waits for the owner, unless the change is additive and small.
-- **Handoff**: the family's tracker (§6) is the handoff. It says the last stage done, the next, what is blocked and on whom.
+- **Handoff**: `CURRENT_WORK.md` and the latest relevant checkpoint give the last stage done, the next, what is blocked and on whom; current support limits live in REQUIREMENTS (§6).
 - **Asking the user**: agents do not ask; they decide by §4.5 and log. Questions, proposals and user-only checks (listening, timing) go in the checkpoint (§4.7).
 
 ### 4.4 Stopping rules (hard stops only)
 
-An agent stops **the item it is on** (not the whole run), writes the reason in its tracker under *Blocked on*, and moves to the next item when:
+An agent stops **the item it is on** (not the whole run), writes the reason in its checkpoint under *Not done and why*, and moves to the next item when:
 
 1. a step would **contradict an existing requirement** (a missing requirement is not a contradiction: use §4.5);
 2. the only fix would be a **room- or game-specific rule in shared code**, a forced state, or a pixel fill (R-1.9);
@@ -205,7 +205,7 @@ Everything else is decided, not asked (§4.5).
 
 ### 4.5 Deciding without asking
 
-Where this file or REQUIREMENTS does not decide, the agent decides and writes a **decision-log entry** in the family's tracker (what was open, the options, the choice, why, how to undo). Preferences, in order: (1) what the existing requirements already say for LOOM, extended to the new game; (2) what ScummVM does; (3) the smaller, more reversible change; (4) the choice that shows the user less technical text in Normal mode. Where the data does not decide a visible state, pick at random and label the pick (R-1.4).
+Where this file or REQUIREMENTS does not decide, the agent decides and records **Decisions made** in the checkpoint (what was open, the options, the choice, why, how to undo). Lasting acceptance rules belong in REQUIREMENTS and completed changes in the recent changelog. Preferences, in order: (1) what the existing requirements already say for LOOM, extended to the new game; (2) what ScummVM does; (3) the smaller, more reversible change; (4) the choice that shows the user less technical text in Normal mode. Where the data does not decide a visible state, pick at random and label the pick (R-1.4).
 
 A **new requirement** is written into REQUIREMENTS.md in the proper section with `Basis` = `Proposed (<date>, <family>)`, in its own commit. Proposed rows are binding on the agents that follow, like any other row, until the user rejects or edits them at a checkpoint; a rejection is handled in the next run by reverting the dependent commits.
 
@@ -213,7 +213,7 @@ A **new requirement** is written into REQUIREMENTS.md in the proper section with
 
 The user starts a run with a request like *"Run stage S2 for all pending families, budget about X"*. The orchestrator (the main Claude session) then:
 
-1. **Plan the run.** Read this file, `CURRENT_WORK.md` and every family's tracker; list the (family, stage) items that are pending and whose prerequisites are met; drop items without a fixture; order them by §2 (S4a first and alone). Estimate the cost per item from the previous checkpoints (the first run has none: start with the smallest family) and cut the list to the budget. Write the plan at the top of a new `docs/checkpoints/<yyyymmdd>-<stage>.md`.
+1. **Plan the run.** Read this file, `CURRENT_WORK.md`, relevant REQUIREMENTS sections and the latest checkpoint for the assigned families; list the (family, stage) items that are pending and whose prerequisites are met; drop items without a fixture; order them by §2 (S4a first and alone). Neither the whole changelog nor its archive is required reading. Estimate the cost per item from the previous checkpoints (the first run has none: start with the smallest family) and cut the list to the budget. Write the plan at the top of a new `docs/checkpoints/<yyyymmdd>-<stage>.md`.
 2. **One agent per item**, each in its own git worktree (`isolation: "worktree"`), started in the same message when the items are independent. S4a, and any item that changes shared engine files (§4.3), run alone or in a fixed order, never in parallel with each other.
 3. **Give each agent the brief of Appendix A** and nothing more: the family, the stage, the fixture path, the budget for the item, and the instruction to read this file and the REQUIREMENTS sections it names.
 4. **Integrate as each agent returns**, not at the end: review its diff against §4.1 (registry, test, record, docs, one commit) and the stopping rules; run the family's conformance test and, if shared code changed, the LOOM regression of §4.2; fast-forward the worktree branch into `master` (R-16.6); regenerate the matrix tables if they conflict. An agent whose result fails review gets one correction round, then is logged as blocked.
@@ -221,7 +221,7 @@ The user starts a run with a request like *"Run stage S2 for all pending familie
 
 ### 4.7 Checkpoints and budget
 
-A run always ends at a **clean checkpoint**: everything finished is merged into `master` with the tests green, nothing is half-done in the working tree, and unfinished items are recorded in their trackers as *not started* or *blocked* with the reason. Budget rules:
+A run always ends at a **clean checkpoint**: everything finished is merged into `master` with the tests green, nothing is half-done in the working tree, and unfinished items are recorded in the checkpoint as *not started* or *blocked* with the reason; REQUIREMENTS keeps the current acceptance limits. Budget rules:
 
 - Each item has a cap (set by the orchestrator from the plan). An agent that reaches the cap stops at its next clean point (a commit that leaves the tree green), records the state and returns. Never leave an uncommitted partial refactor at the end of a run; S4a in particular proceeds in small green commits so any prefix is a valid checkpoint.
 - Before spawning each new item the orchestrator checks the remaining budget and does not start an item it cannot finish; it stops early at a checkpoint instead.
@@ -243,28 +243,30 @@ All under `engines/scumm` of ScummVM (fetch the version you read and note the da
 | Boot, variables | `scumm.cpp`, `vars.cpp` |
 | Sound | `sound.cpp`, `players/player_v2.cpp` (PC speaker/PCjr), `players/player_v3m.cpp`, `imuse/`; the AdLib/OPL driver is in ScummVM's `audio/adlib.cpp`, outside `engines/scumm` |
 
-## 6. Per-family tracker
+## 6. Current support and dated history
 
-Copy [templates/SUPPORT_STATUS.md](templates/SUPPORT_STATUS.md) to `docs/<game>/SUPPORT_STATUS.md` at the family's S1 and update it in the commit of every stage. It holds the stage states, what is blocked, the next step and the **decision log**, and nothing else: facts about the game's scripts go in the script map (§7).
+REQUIREMENTS and its generated matrix hold current support and acceptance limits. Checkpoints hold run plans, decisions, blockers and handoff; the recent CHANGELOG records completed changes. Do not create or recreate separate `SUPPORT_STATUS.md` trackers. Maniac/Zak's trackers were consolidated on 19 October; any remaining legacy tracker is retired by its family's owner, preserving unique current limits in REQUIREMENTS and dated decisions in the existing history. Script facts stay in the script map (§7).
+
+Keep roughly the latest two calendar days active in CHANGELOG. Move older dated entries to a dated file under `docs/archive/`, preserving their links, and leave one archive link in the active file. The archive is optional historical reference, never routine startup reading; use targeted date/topic searches only when needed.
 
 ## 7. Where things are written (the documentation layout)
 
-Every game has the same files in the same places, so any agent can take over from another. **Do not create other files or other headings for these facts.** If something fits no row of this table, put it in the tracker's *Open uncertainties* and tell the orchestrator; do not invent a new document.
+Every game has the same files in the same places, so any agent can take over from another. **Do not create other files or other headings for these facts.** Put current acceptance uncertainty in REQUIREMENTS and run-specific uncertainty in the checkpoint; do not invent another tracker.
 
 | What | Where | Format |
 |---|---|---|
 | Index of a game: families, fixtures, editions, links | `docs/<game>/README.md` | [templates/GAME_README.md](templates/GAME_README.md) |
-| Stage states, blockers, next step, **decision log** | `docs/<game>/SUPPORT_STATUS.md` | [templates/SUPPORT_STATUS.md](templates/SUPPORT_STATUS.md) |
+| Current support and acceptance limits; run-specific stages, blockers, next step and decisions | `docs/REQUIREMENTS.md`; the latest checkpoint and `CURRENT_WORK.md` for handoff | Existing family coverage section; checkpoint §4.7 |
 | **Facts about the game's scripts**: boot, hooks, variables, bits, global/room scripts, verbs, objects and classes, actors and costumes, sounds | `docs/<game>/<GAME>_SCRIPT_MAP.md` (GAME in capitals) | [templates/SCRIPT_MAP.md](templates/SCRIPT_MAP.md): fixed headings, one table per heading, every row has an evidence level, a source and a date |
 | A further game-specific topic that really needs its own document (for example `LOOM_CUTSCENE_DISCOVERY.md`, `INDY3_CONVERSATIONS_PLAN.md`) | `docs/<game>/<GAME>_<TOPIC>.md`, listed in the game's README | free, but it must start with scope, edition and date |
 | **Engine facts** true of a SCUMM version, not of one game: variable slots, opcode dialects, boot sequence, object states, resource and sound formats | `docs/engine/`: [SCUMM_SCRIPT_MAP.md](engine/SCUMM_SCRIPT_MAP.md) (variables and opcode rules), [SCUMM_BOOT_SEQUENCE.md](engine/SCUMM_BOOT_SEQUENCE.md) (one section per SCUMM version), [SCUMM_RESOURCE_FORMATS.md](engine/SCUMM_RESOURCE_FORMATS.md), [SCUMM_OBJECT_STATES.md](engine/SCUMM_OBJECT_STATES.md) | add a **section per SCUMM version** to the existing file; each statement carries its version and its ScummVM source file and date |
 | Evidence of a finished stage: commands, numbers, comparison, uncertainties | `.verification/<game>-<stage>-<yyyymmdd>/README.md`, with the harness code beside it | [templates/EVIDENCE_RECORD.md](templates/EVIDENCE_RECORD.md) |
 | Plan and result of one orchestrated run | `docs/checkpoints/<yyyymmdd>-<stage>.md` | §4.7 |
-| Finished work, one entry per stage | `docs/CHANGELOG.md` | dated heading `## <day month>: <what> (<stage>, <family>)`, then bullets; link the record |
+| Finished work, one entry per stage | `docs/CHANGELOG.md` (roughly two recent days); older entries in `docs/archive/` | dated heading `## <day month>: <what> (<stage>, <family>)`, then bullets; link the record; archive is optional reading |
 | What the app must do | `docs/REQUIREMENTS.md` | rows with ids; new rows are `Proposed` (§4.5) |
 
 Rules:
-1. **Decoded facts live once**, in the script map or the engine file; trackers, records and changelog entries *link* to them and never copy tables.
+1. **Decoded facts live once**, in the script map or the engine file; requirements coverage, records and changelog entries *link* to them and never copy tables.
 2. **Game-specific vs engine:** a fact about how SCUMM v`N` works goes in `docs/engine/`; a fact about what *this game* puts in a variable or script goes in its script map. A game's use of an engine variable is a row under "Engine variables as this game uses them".
 3. **Folder names:** `docs/<game>/` is lower case without spaces and one per *game*, not per edition or family (`maniac` covers classic and enhanced; `monkey1` covers floppy and CD). Editions go in the README's edition table.
 4. **Evidence levels** are the four of R-2.3. A row without a source is not written.
@@ -273,4 +275,4 @@ Rules:
 
 ## Appendix A. The brief for an agent
 
-> You work on **family `<GameFamily>`**, **stage `<Sx>`**, fixture `Games/<folder>`, in your own worktree. Read `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the whole file; section 3 for your stage and section 4 for the procedures) and the REQUIREMENTS sections it cites. Follow the stage playbook exactly. You have the standing authorization of section 0.4: do not ask for approval; decide by section 4.5 and log decisions in `docs/<game>/SUPPORT_STATUS.md`. Write documentation only in the places and formats of section 7 (copy the templates in `docs/templates/`); do not create other documents. Stop an item only under the hard stops of section 4.4. Item cap: `<budget>`; at the cap, stop at your next green commit. Deliver: the registry level (or an explicit "unchanged because"), the conformance/unit test, the record under `.verification/<game>-<stage>-<date>/`, doc updates, and one commit with explicit paths ending with the attribution line. Run only the tests your change needs plus the regression of section 4.2 if you touched shared code. Never touch `Games/`, the user's profile, or the running applications. Finish with a short report: what changed, numbers, decisions, blocked items, proposed requirements, user checks.
+> You work on **family `<GameFamily>`**, **stage `<Sx>`**, fixture `Games/<folder>`, in your own worktree. Read `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the whole file; section 3 for your stage and section 4 for the procedures) and the REQUIREMENTS sections it cites. Follow the stage playbook exactly. You have the standing authorization of section 0.4: do not ask for approval; decide by section 4.5 and record decisions in the run checkpoint and current acceptance limits in REQUIREMENTS. Write documentation only in the places and formats of section 7 (copy the templates in `docs/templates/`); do not create other documents. Stop an item only under the hard stops of section 4.4. Item cap: `<budget>`; at the cap, stop at your next green commit. Deliver: the registry level (or an explicit "unchanged because"), the conformance/unit test, the record under `.verification/<game>-<stage>-<date>/`, doc updates, and one commit with explicit paths ending with the attribution line. Run only the tests your change needs plus the regression of section 4.2 if you touched shared code. Never touch `Games/`, the user's profile, or the running applications. Finish with a short report: what changed, numbers, decisions, blocked items, proposed requirements, user checks.
