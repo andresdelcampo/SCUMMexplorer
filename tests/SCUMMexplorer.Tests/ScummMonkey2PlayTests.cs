@@ -332,7 +332,7 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
         // Charsets 1, 2, 4 and 5 draw every accent of every copy; the rare 0x83 â (1 to 5 uses), 0x89 ë (2 to 4, Spanish) and 0x92 Æ (2, talkie patch only) lack a
         // glyph in some of them, and charsets 3, 6 and 7 lack most accents in every copy, English and Spanish alike: facts of the game's fonts (drawn as nothing,
         // width 0, as the original reads the width table), not of an edition.
-        Assert.Empty(lacking.Where(item => item[0] is '1' or '2' or '4' or '5' && item[2..] is not ("83" or "89" or "92")));
+        Assert.DoesNotContain(lacking, item => item[0] is '1' or '2' or '4' or '5' && item[2..] is not ("83" or "89" or "92"));
         if (copy.EndsWith(" es", StringComparison.Ordinal)) Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
     }
 
