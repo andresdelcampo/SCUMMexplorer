@@ -62,6 +62,7 @@ public sealed class ScummV1ActorColors
 
     private readonly ScummV1Game _game;
     private readonly List<ScummV1ActorSetting> _settings;
+    private ScummV1PaletteContexts? _contexts;
 
     private ScummV1ActorColors(ScummV1Game game, List<ScummV1ActorSetting> settings, int unresolved)
     {
@@ -79,6 +80,17 @@ public sealed class ScummV1ActorColors
     /// <summary>The number of actors the engine creates (ScummVM <c>_numActors</c>: 25 for Maniac Mansion, 13 for Zak McKracken).</summary>
     public int ActorCount => _game == ScummV1Game.ManiacMansion ? 25 : 13;
 
+    /// <summary>Whether this reader can derive additional display-only source colour contexts.</summary>
+    public bool SupportsContexts => _contexts is not null;
+
+    /// <summary>
+    /// Display-only colour contexts from this copy's source and independent native execution.
+    /// Room entries are labelled state previews, never earned routes or global costume colours.
+    /// Work is bounded, cancellable between source operations and cached only after completion.
+    /// </summary>
+    public IReadOnlyList<ScummV1CostumeColorContext> ContextsOf(int costume, CancellationToken cancellationToken = default) =>
+        _contexts?.ForCostume(costume, cancellationToken) ?? [];
+
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, ScummV1ActorColors> Cache = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>The colours of a classic v1 game, read once per folder; null for any other game.</summary>
@@ -91,10 +103,12 @@ public sealed class ScummV1ActorColors
         var gameKind = game.V1Game ?? throw new ArgumentException("Not a classic v1 game.", nameof(game));
         var reader = new ScummScriptReader(ScummScriptDialect.V1);
         var settings = new List<ScummV1ActorSetting>();
+        var sources = new List<(ScummScriptDisassembly Script, string Source, int? Room)>();
         var unresolved = 0;
 
-        void Scan(ScummScriptDisassembly disassembly, string source, bool boot = false)
+        void Scan(ScummScriptDisassembly disassembly, string source, bool boot = false, int? room = null)
         {
+            sources.Add((disassembly, source, room));
             foreach (var instruction in disassembly.Instructions)
             {
                 if (instruction.Operation != "actorOps") continue;
@@ -123,11 +137,14 @@ public sealed class ScummV1ActorColors
             catch (IOException) { continue; }
             foreach (var source in ScummOldScripts.ReadRoomScripts(plain, room.ResourceId!.Value))
             {
-                try { Scan(reader.DecodeCode(source.Code, source.ObjectId ?? room.ResourceId.Value, source.Container, source.Offset, source.StartOffset), source.Label); }
+                try { Scan(reader.DecodeCode(source.Code, source.ObjectId ?? room.ResourceId.Value, source.Container, source.Offset, source.StartOffset), source.Label, room: room.ResourceId); }
                 catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { }
             }
         }
-        return new ScummV1ActorColors(gameKind, settings, unresolved);
+        var result = new ScummV1ActorColors(gameKind, settings, unresolved);
+        // Maniac's accepted actor-number tables do not need speculative alternate source previews.
+        if (gameKind == ScummV1Game.ZakMcKracken) result._contexts = new ScummV1PaletteContexts(game, sources);
+        return result;
     }
 
     private static int? TryConstant(string operand) =>
