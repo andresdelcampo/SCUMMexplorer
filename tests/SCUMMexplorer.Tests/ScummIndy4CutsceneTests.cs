@@ -74,6 +74,40 @@ public sealed class ScummIndy4CutsceneTests(ITestOutputHelper output)
         Assert.Contains(42, planner.Run(GroupOf(planner, 82, 0, 0).First).RoomsEntered);
     }
 
+    /// <summary>
+    /// S9 (18 October 2026): the Spanish talkie folder and the Spanish floppy list the same 666 triggers, 426 entries and 182 scenes as the English disc,
+    /// titled with their own verb and object names and first lines (CP437 accents and inverted marks), and the three acceptance scenes begin from a fresh
+    /// start in each. The floppy's list differs from the disc's in three entries' data (Room 2's entry chains to local 228, not 227; Room 4's to 220, not
+    /// 216; Room 72's object is 985, not 984). Record: <c>.verification/indy4-editions-20261018/README.md</c>.
+    /// </summary>
+    [Theory]
+    [InlineData("indy4 talkie vga es")]
+    [InlineData("indy4 classic vga es")]
+    public void TheSpanishCopiesListTheSameScenesWithTheirOwnTexts(string copy)
+    {
+        if (ScummIndy4PlayTests.Folder(copy) is not { } folder) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        output.WriteLine($"{planner.Triggers.Count} triggers, {planner.Groups.Count} groups, {planner.Groups.Count(g => g.IsScene)} scenes; {planner.VerbSource}");
+
+        Assert.Equal((666, 426, 182), (planner.Triggers.Count, planner.Groups.Count, planner.Groups.Count(g => g.IsScene)));
+        Assert.Equal(["Abrir", "Cerrar", "Dar", "Empujar", "Tirar", "Usar", "Mirar", "Ir a", "Coger", "Hablar"],
+            Enumerable.Range(3, 10).Select(verb => planner.Verbs.WordFor(verb)).ToArray());
+        Assert.Equal("Room 10 · Usar salida de incendios", ScummCutsceneTitles.Title(GroupOf(planner, 10, 138, 0x08).First));
+        Assert.Equal("Room 10 · Mirar luminoso", ScummCutsceneTitles.Title(GroupOf(planner, 10, 142, 0x09).First));
+        Assert.Equal("Room 10 · Abrir puerta trasera", ScummCutsceneTitles.Title(GroupOf(planner, 10, 136, 0x03).First));
+        Assert.Equal("Sigo pensando que es falsa.", GroupOf(planner, 1, 0, 0).First.FirstText);
+        Assert.StartsWith("Amigos, aquí está la ATLANTIDA", GroupOf(planner, 11, 0, 0).First.FirstText, StringComparison.Ordinal);
+        Assert.StartsWith("¿Qué quieres, tío?", GroupOf(planner, 10, 136, 0x03).First.FirstText, StringComparison.Ordinal);
+
+        foreach (var (room, objectId, verb) in new[] { (1, 0, 0), (11, 0, 0), (82, 0, 0) })
+        {
+            var run = planner.Run(GroupOf(planner, room, objectId, verb).First);
+            Assert.True(run.Begun, $"Room {room}: {run.Failure}");
+        }
+        Assert.Contains(12, planner.Run(GroupOf(planner, 11, 0, 0).First).RoomsEntered);
+        Assert.Contains(42, planner.Run(GroupOf(planner, 82, 0, 0).First).RoomsEntered);
+    }
+
     [Fact]
     public void TheLecturePlaysWithItsSpokenLines()
     {

@@ -12,7 +12,8 @@ var folder = args[0];
 var output = args[1];
 var only = args.Skip(2).Select(int.Parse).ToHashSet();
 Directory.CreateDirectory(output);
-var game = new GameFolderScanner().Scan(folder);
+// S9 (18 October 2026): "path|SPANISH" reads the disc's language folder (GameFolderScanner.DiscFolder).
+var game = folder.Split('|') is [var discPath, var discFolder] ? new GameFolderScanner { DiscFolder = discFolder }.Scan(discPath) : new GameFolderScanner().Scan(folder);
 var rooms = game.Rooms.Where(r => r.ResourceId.HasValue && (only.Count == 0 || only.Contains(r.ResourceId.Value))).Select(r => r.ResourceId!.Value).OrderBy(i => i).ToArray();
 var lines = new ConcurrentDictionary<int, (string Report, string Row, int Gaps, bool Failed)>();
 string[] unsupported = ["unsupported", "not modeled", "could not", "disassembly stops", "undecoded", "cannot", "needs a session", "unknown", "depends on"];

@@ -20,6 +20,24 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         return File.Exists(Path.Combine(path, "The_Secret_of_Monkey_Island.cue")) ? path : null;
     }
 
+    /// <summary>The disc read from one of its language folders (S9, 18 October 2026): null is the default (ENGLISH), "SPANISH" the disc's Spanish copy.</summary>
+    internal static GameLibrary Scan(string folder, string? disc) => new GameFolderScanner { DiscFolder = disc }.Scan(folder);
+
+    /// <summary>
+    /// The route's texts per copy (S9, 18 October 2026): the disc's SPANISH folder goes through the same ids, positions and branches; its texts are its own data.
+    /// Record: <c>.verification/monkeycd-editions-20261018/README.md</c>.
+    /// </summary>
+    internal sealed record RouteTexts(string[] Verbs, string WalkTo, string LookAt, string LookAtPoster, string PosterLine, string TalkToPirates,
+        string[] Choices, string Trials, string Leave, string PickUpChicken);
+
+    internal static RouteTexts TextsOf(string? disc) => disc is null
+        ? new(["Give", "Pick up", "Use", "Open", "Look at", "Talk to", "Close", "Push", "Pull"], "Walk to", "Look at", "Look at poster", "Re-elect Governor Marley.",
+            "Talk to important-looking pirates", ["I want to be a fireman.", "I mean to kill you all!", "I want to be a pirate."], "three trials",
+            "I'll just be running along now.", "Pick up chicken")
+        : new(["Dar", "Coger", "Usar", "Abrir", "Mirar", "Hablar a", "Cerrar", "Empujar", "Tirar"], "Caminar a", "Mirar", "Mirar cartel", "Re-eliga a la Gobernadora Marley.",
+            "Hablar a piratas importantes", ["Quiero ser bombero.", "¡Os voy a matar a todos!", "Quiero ser un pirata."], "tres pruebas",
+            "Pues yo me largo.", "Coger pollo");
+
     private const int Open = 0x02, Give = 0x04, LookAt = 0x08, PickUp = 0x09, TalkTo = 0x0A;
 
     private sealed class Player(ScummGameSession session, ITestOutputHelper output)
@@ -108,9 +126,9 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
     }
 
     /// <summary>The play boot (<see cref="ScummGameSession.BootForPlay"/>, the window's path), then the frames the game plays alone from the lookout to the dock.</summary>
-    private Player AtTheDock(string folder, out GameLibrary game)
+    private Player AtTheDock(string folder, out GameLibrary game, string? disc = null)
     {
-        game = new GameFolderScanner().Scan(folder);
+        game = Scan(folder, disc);
         var play = new Player(ScummGameSession.BootForPlay(game, out var objects), output);
         Assert.NotEmpty(objects.States);
         var session = play.Session;
@@ -124,11 +142,14 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         return play;
     }
 
-    [Fact]
-    public void TheAcceptanceRouteFromTheDockRunsThroughTheGamesOwnInterface()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("SPANISH")]
+    public void TheAcceptanceRouteFromTheDockRunsThroughTheGamesOwnInterface(string? disc)
     {
         if (Folder() is not { } folder) return;
-        var play = AtTheDock(folder, out var game);
+        var texts = TextsOf(disc);
+        var play = AtTheDock(folder, out var game, disc);
         var session = play.Session;
         Assert.True(ScummProfile.For(game).PlaysThroughVerbs);
         Assert.Equal(32, ScummProfile.For(game).UntouchableClass);
@@ -140,27 +161,27 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         Assert.Equal((1, 1), (play.Var(ScummVars.CursorState), play.Var(ScummVars.UserPut)));
         var area = session.PlayVerbArea();
         foreach (var item in area.Items) output.WriteLine($"verb 0x{item.VerbId:X2} mode {item.Mode} at ({item.X},{item.Y}) {item.Width}x{item.Height} \"{play.Glyphs(item.VerbId)}\"");
-        Assert.Equal(["Give", "Pick up", "Use", "Open", "Look at", "Talk to", "Close", "Push", "Pull"],
+        Assert.Equal(texts.Verbs,
             new[] { Give, PickUp, 7, Open, LookAt, TalkTo, 3, 5, 6 }.Select(play.Glyphs).ToArray());
         Assert.Equal(9, area.Items.Count(item => item.IsText && item.Mode == 1 && item.VerbId is >= 2 and <= 0x0A && item.Width > 0));
-        Assert.Equal("Walk to", play.Sentence);
+        Assert.Equal(texts.WalkTo, play.Sentence);
         Assert.Equal(4, play.Var(ScummVars.VerbScript));
         Assert.Contains(area.Pixels, pixel => pixel != 0);
 
         // (1) Compose a sentence: "Look at" (verb 8), then the pointer over the poster (object 429): Script 23 finds it and Script 12 names the line, with string 49
         // (" ", stringOps loadString) between verb and object through code 7 (convertStringMessage).
         play.ClickVerb(LookAt);
-        Assert.Equal("Look at", play.Sentence);
+        Assert.Equal(texts.LookAt, play.Sentence);
         play.Hover(268, 104);
         play.Log("pointer on the poster");
-        Assert.Equal("Look at poster", play.Sentence);
+        Assert.Equal(texts.LookAtPoster, play.Sentence);
         play.ClickRoom(268, 104);
         Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x08 with objects 429", StringComparison.Ordinal));
 
         // (5) The poster's first look is a cutscene with an override (Room 33 object 429 verb 8 +0x00CF..+0x0134): Esc skips it.
         Assert.True(play.RunUntil(() => session.InCutscene && session.CutsceneSkippable, 900), "the poster's cutscene reaches its override");
         play.Log("poster cutscene");
-        Assert.Contains(session.Messages.OnScreen, message => message.Text.StartsWith("Re-elect Governor Marley.", StringComparison.Ordinal));
+        Assert.Contains(session.Messages.OnScreen, message => message.Text.StartsWith(texts.PosterLine, StringComparison.Ordinal));
         session.PressKey(0x1B);
         Assert.True(play.RunUntil(() => play.Idle, 600), "the skipped cutscene ends");
         play.Log("cutscene skipped");
@@ -185,17 +206,17 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         play.BringIntoView(428, 104);
         play.ClickVerb(TalkTo);
         play.Hover(428, 104);
-        Assert.Equal("Talk to important-looking pirates", play.Sentence);
+        Assert.Equal(texts.TalkToPirates, play.Sentence);
         play.ClickRoom(428, 104);
         Assert.True(play.RunUntil(() => play.Var(ScummVars.VerbScript) == 14 && session.UserInputOn && session.Verbs.Any(v => v.VerbId == 0x78 && v.Mode == 1), 3000),
             "the dialogue offers its choices");
         play.Log("choices");
         Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x0A with objects 322", StringComparison.Ordinal));
         // The conversation installs Script 14 as the input script and offers its lines as verbs 0x78 up, one text row each (rows 145 to 161, as the script places them).
-        Assert.Equal(["I want to be a fireman.", "I mean to kill you all!", "I want to be a pirate."], new[] { 0x78, 0x79, 0x7A }.Select(play.Glyphs).ToArray());
+        Assert.Equal(texts.Choices, new[] { 0x78, 0x79, 0x7A }.Select(play.Glyphs).ToArray());
         Assert.Equal(3, session.PlayVerbArea().Items.Count(item => item.VerbId is >= 0x78 and <= 0x7A && item.IsText && item.Width > 0 && item.Y >= 145));
         play.ClickVerb(0x7A);
-        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Actor == 1 && message.Text.StartsWith("I want to be a pirate.", StringComparison.Ordinal)), 300),
+        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Actor == 1 && message.Text.StartsWith(texts.Choices[2], StringComparison.Ordinal)), 300),
             "the ego says the choice");
         Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Actor != 1 && message.Text.Length > 1), 900), "the pirates answer");
         var said = new List<string>();
@@ -205,8 +226,8 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
             return session.Verbs.Any(verb => verb.VerbId == 0x7F && verb.Mode == 1) && session.UserInputOn && play.Var(ScummVars.VerbScript) == 14;
         }, 6000), "the conversation goes on to its next choices");
         foreach (var line in said) output.WriteLine("said: " + line);
-        Assert.Contains(said, line => line.Contains("three trials", StringComparison.OrdinalIgnoreCase));
-        Assert.Equal("I'll just be running along now.", play.Glyphs(0x7F));
+        Assert.Contains(said, line => line.Contains(texts.Trials, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(texts.Leave, play.Glyphs(0x7F));
         play.ClickVerb(0x7F);
         Assert.True(play.RunUntil(() => play.Idle && play.Var(ScummVars.VerbScript) != 14, 1500), "the conversation ends");
         play.Log("conversation over");
@@ -239,7 +260,7 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         play.BringIntoView(248, 116);
         play.ClickVerb(PickUp);
         play.Hover(248, 116);
-        Assert.Equal("Pick up chicken", play.Sentence);
+        Assert.Equal(texts.PickUpChicken, play.Sentence);
         play.ClickRoom(248, 116);
         Assert.True(play.RunUntil(() => session.Snapshot.Inventory.Contains(377), 1500), "the chicken reaches the inventory");
         play.Run(5);
@@ -260,7 +281,7 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         Assert.All(session.DeliveredInput, input => Assert.Equal(1, input.Mode));
         foreach (var item in session.SoundEvents)
             output.WriteLine($"sound: seq {item.Sequence} room {item.RoomId} {item.Event.Kind} {item.Event.TargetId} {item.Event.SourceLabel} +0x{item.Event.Offset:X4} {item.Event.Operation} {item.Event.Certainty} {item.Event.Executed}");
-        AssertRouteSounds(session, game);
+        AssertRouteSounds(session, game, disc is null);
 
         // The play screen: the room from the camera, the verb screen below row 144 and the version 5 cross-hair (cursor 0 of resetCursors, hotspot 8, 7) at the pointer.
         var screen = new ScummPlayScreen(game, session, ((ScummV5DataSource)ScummDataSources.For(game)).ReadIndexedObjects().States).Compose(0);
@@ -276,11 +297,11 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
     /// S6 sound (17 October 2026): the route's sound commands, and which of them play a track of the disc (ScummVM <c>playCDTrackFromSoundID</c>): the music is CD
     /// audio, the door sounds are the game's own iMuse sounds (no CD track).
     /// </summary>
-    private static void AssertRouteSounds(ScummSession session, GameLibrary game)
+    private static void AssertRouteSounds(ScummSession session, GameLibrary game, bool offsets = true)
     {
         var events = session.SoundEvents;
         bool Has(ScummScriptEventKind kind, int id, string source, int offset) => events.Any(item => item.Event.Kind == kind && item.Event.TargetId == id &&
-            item.Event.SourceLabel == source && item.Event.Offset == offset && item.Event.Executed);
+            item.Event.SourceLabel == source && (!offsets || item.Event.Offset == offset) && item.Event.Executed);
         var cd = ScummCdAudioTracks.For(game)!;
         // Boot: the credits (Script 152 +0x0049, sound 110, CD track 17), the lookout (Room 38 local script 203 +0x000E, sound 108: track 17 from frame 7173),
         // the title (Room 96 local script 200 +0x0027, sound 104, track 6, stopped at +0x0033).
@@ -313,18 +334,21 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         Assert.Contains(wave.Skip(44 + 2352 * 75).Take(2352 * 75), b => b != 0);
     }
 
-    [Fact]
-    public void ARightClickOnAnObjectRunsItsDefaultVerb()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("SPANISH")]
+    public void ARightClickOnAnObjectRunsItsDefaultVerb(string? disc)
     {
         // R-7.16 (Rule, 16 Oct): from version 4 a right click reaches the input script as the click with mode 2 (ScummVM checkExecVerbs). The CD's Script 4 reads it
         // like the floppy's, with its own variable: +0x0000 equalZero bit[0x223], +0x0005 isEqual local[0x002], 2, +0x000C equalZero var[0x06E], +0x0011 notEqualZero
         // var[0x0B6], +0x0016 move var[0x06B] = var[0x0B6] (the hovered object's default verb; the poster's is 8, "Look at"); then doSentence runs it.
         if (Folder() is not { } folder) return;
-        var play = AtTheDock(folder, out var game);
+        var texts = TextsOf(disc);
+        var play = AtTheDock(folder, out var game, disc);
         var session = play.Session;
         Assert.True(ScummProfile.For(game).RightClickReachesGame);
         Assert.Equal(0, play.Var("bit[0x223]"));
-        Assert.Equal("Walk to", play.Sentence);
+        Assert.Equal(texts.WalkTo, play.Sentence);
 
         play.Hover(268, 104);
         Assert.Equal(LookAt, play.Var("var[0x0B6]"));
@@ -334,7 +358,7 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         play.Run(2);
         play.Log("after the right click");
         Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x08 with objects 429", StringComparison.Ordinal));
-        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Text.StartsWith("Re-elect Governor Marley.", StringComparison.Ordinal)), 900),
+        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Text.StartsWith(texts.PosterLine, StringComparison.Ordinal)), 900),
             "the poster is looked at");
         Assert.Equal(2, Assert.Single(session.DeliveredInput).Mode);
     }
@@ -384,5 +408,27 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         output.WriteLine($"charset 6 map: file [{string.Join(",", file.ColorMap)}], play [{string.Join(",", played.ColorMap)}]");
         Assert.Equal(2, played.ColorMap[1]);
         Assert.Equal(file.ColorMap.Skip(2), played.ColorMap.Skip(2));
+    }
+
+    /// <summary>S9 accents (18 October 2026): as the Indy4 test of the same name, for the disc's ENGLISH (null) and SPANISH folders.</summary>
+    [Theory]
+    [InlineData(null)]
+    [InlineData("SPANISH")]
+    public void EveryTextByteAboveAsciiHasAGlyphInTheCopysCharsets(string? disc)
+    {
+        if (Folder() is not { } folder) return;
+        var game = Scan(folder, disc);
+        var session = ScummGameSession.BootForPlay(game, out _);
+        var found = ScummCopyTextBytes.Collect(game);
+        output.WriteLine($"{disc ?? "ENGLISH"}: text bytes from 0x80: {ScummCopyTextBytes.Describe(found)}");
+        var charsets = Enumerable.Range(0, 8).Select(n => (n, charset: session.PlayCharset(n))).Where(p => p.charset is not null).ToArray();
+        Assert.NotEmpty(charsets);
+        foreach (var (n, charset) in charsets)
+            output.WriteLine($"charset {n}: no glyph for [{string.Join(" ", found.Keys.Where(code => charset!.CharWidth(code) == 0).Order().Select(code => code.ToString("X2")))}]");
+        // Charsets 1 (dialogue lines) and 2 (room messages) draw every accent the SPANISH folder writes (0x82 é, 0x88 ê, 0x8A è, 0xA0 to 0xA5, 0xA8 ¿, 0xAD ¡);
+        // 0xFA has no glyph in charset 1 of either folder (as on the floppy). Charsets 3 and 6 (the verbs) lack some Spanish glyphs: data, not used for them here.
+        foreach (var number in new[] { 1, 2 })
+            Assert.DoesNotContain(found.Keys, code => code != 0xFA && session.PlayCharset(number)!.CharWidth(code) == 0);
+        if (disc is not null) Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
     }
 }

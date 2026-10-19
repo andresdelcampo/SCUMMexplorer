@@ -1,11 +1,12 @@
-﻿using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Loom;
 using SCUMMexplorer.Core.Scumm;
 
 // CutsceneList <folder> loom: every scanned LOOM trigger group (EGA or CD) with its title, category and scan fields, one line each.
 // Used before and after the S7 move of the scan to Core/Scumm (17 October 2026): the two outputs must be identical.
-var game = new GameFolderScanner().Scan(args[0]);
+// S9 MonkeyCd (18 October 2026): "path|SPANISH" reads one language folder of a multi-language disc (GameFolderScanner.DiscFolder).
+var game = ScanArg(args[0]);
 var data = ScummDataSources.For(game);
 var rooms = game.Rooms.Select(r => r.ResourceId!.Value).ToList();
 if (args.Length > 1 && args[1] == "loom")
@@ -30,7 +31,7 @@ if (args.Length > 1 && args[1] == "loom")
 if (args.Length > 2 && args[1] == "prun")
 {
     var clock = System.Diagnostics.Stopwatch.StartNew();
-    var copies = new ThreadLocal<GameLibrary>(() => new GameFolderScanner().Scan(args[0]));
+    var copies = new ThreadLocal<GameLibrary>(() => ScanArg(args[0]));
     var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _));
     Parallel.ForEach(planner.Groups, new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g => planner.Run(g.First));
     Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}");
@@ -49,7 +50,7 @@ if (args.Length > 2 && args[1] == "race")
     var counts = new System.Collections.Concurrent.ConcurrentBag<string>();
     Parallel.For(0, int.Parse(args[2]), new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, i =>
     {
-        var copy = new GameFolderScanner().Scan(args[0]);
+        var copy = ScanArg(args[0]);
         var p = new ScummCutscenePlanner(copy);
         counts.Add($"triggers {p.Triggers.Count} groups {p.Groups.Count} scenes {p.Groups.Count(g => g.IsScene)}");
     });
@@ -190,3 +191,5 @@ if (args.Length > 1 && args[1] == "scan")
     }
     if (run) Console.WriteLine($"runs {ran}, begun {begun}");
 }
+
+static GameLibrary ScanArg(string arg) => arg.Split('|') is [var path, var disc] ? new GameFolderScanner { DiscFolder = disc }.Scan(path) : new GameFolderScanner().Scan(arg);

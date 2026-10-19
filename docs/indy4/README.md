@@ -14,5 +14,5 @@
 
 | Edition / release | Local folder | Differences that matter (opening, scripts, text, graphics, audio) | Checked in S9 |
 |---|---|---|---|
-| Floppy / classic | `indy4 classic vga es` | no speech | no |
-| Talkie / CD | `indy4 vga en`, `indy4 talkie vga es` | `MONSTER.SOU` speech; the CD image has one data track and no audio tracks | no |
+| Floppy / classic | `indy4 classic vga es` | Spanish; no speech; the stone-disk copy-protection screen (Room 81) before the logo; a few script and object numbers differ from the talkie's | yes (18 Oct, [record](../../.verification/indy4-editions-20261018/README.md)) |
+| Talkie / CD | `indy4 vga en`, `indy4 talkie vga es` | `MONSTER.SOU` speech; the CD image has one data track and no audio tracks; the Spanish folder has Spanish texts over the English voices (same offsets) | yes (18 Oct, reference and Spanish) |
