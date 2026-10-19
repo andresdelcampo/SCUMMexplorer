@@ -24,7 +24,8 @@ public partial class MainWindow
     /// <summary>The open game lists its cutscenes from its scripts and plays them in the play screen.</summary>
     private bool PlayCutscenes => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
 
-    private bool PlayCanStartCutscene => PlayActive && !_play!.InCutscene;
+    private bool PlayCanStartCutscene => PlayCutscenes && !_introPreparing && !_genericActionStarting &&
+        (_playFolder != _game?.Key || _play is not { InCutscene: true } && _play is not { BootRunning: true });
 
     private static bool UsesManiacCutsceneSetup(GameLibrary game) =>
         GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
@@ -112,7 +113,16 @@ public partial class MainWindow
     private static string PlayCutsceneKey(ScummCutscene trigger) => $"{trigger.Room},{trigger.ObjectId},{trigger.VerbId}";
 
     private bool PlayCutscenePlaysIn(ScummCutscenePlanner planner, ScummCutsceneGroup group, int room) =>
-        planner.PlaysIn(group, room) || _playSavedRoomLists is { } saved && saved.TryGetValue(PlayCutsceneKey(group.First), out var rooms) && rooms.Contains(room);
+        planner.PlaysIn(group, room) || _playSavedRoomLists is { } saved && saved.TryGetValue(PlayCutsceneKey(group.First), out var rooms) && rooms.Contains(room) ||
+        IsAdvancedMode && new[] { group.First }.Concat(group.Others).Any(t => t.LeadsTo.Contains(room) || (t.LoadTargets?.Contains(room) ?? false));
+
+    // Titles stay readable in both modes; raw verb/object provenance belongs in the
+    // entry's Advanced note. An unknown native word never becomes a made-up action.
+    private static string GenericCutsceneTitle(ScummCutscene trigger) => ScummCutsceneTitles.Title(trigger with
+    {
+        ObjectName = trigger.ObjectName.Length > 0 ? trigger.ObjectName : "Unnamed object",
+        Verbs = trigger.Roles with { Word = id => trigger.Roles.Word?.Invoke(id) is { Length: > 0 } word ? word : "Action" }
+    });
 
     /// <summary>The list's entries (all, or those that play out in <paramref name="room"/>). The room's list waits for the scan (no entries until then).</summary>
     private List<(string Id, CutscenePickerItem Item)> PlayCutsceneItems(int? room = null)
@@ -123,9 +133,9 @@ public partial class MainWindow
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { return []; }
         // R-1.13: in Normal mode a scene whose fresh-start run began no cutscene is not offered (nothing would play); Advanced lists it with its note.
         return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value))
-            .Where(group => IsAdvancedMode || !planner.TryGetRun(group.First, out var run) || run.Begun)
+            .Where(group => IsAdvancedMode || planner.TryGetRun(group.First, out var run) && run.Begun)
             .Select(group => ($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", new CutscenePickerItem(
-                PickerVerbTitle(ScummCutsceneTitles.Title(group.First), group.First.IsRoomEntry ? 0 : group.First.VerbId) +
+                GenericCutsceneTitle(group.First) +
                 (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
                 group.IsScene ? "Scenes" : "Dialogue and reactions", PlayCutsceneNote(planner, group), () => PlayScummCutscene(group)))).ToList();
     }
@@ -153,15 +163,16 @@ public partial class MainWindow
     private async void PlayScummCutscene(ScummCutsceneGroup group)
     {
         var trigger = group.First;
-        if (_game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
+        if (!PlayCanStartCutscene || _game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
         var launch = ++_cutsceneLaunchGeneration;
         _introPreparing = false;
         if (!PreparePlayCutsceneStartup(game)) return;
         var visitedForIt = false;
-        if (_currentRoomResource?.ResourceId != trigger.Room)
+        if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room)
         {
             visitedForIt = true;
-            SelectRoomWithIntent(room, RoomOpenKind.Cutscene);
+            SelectRoomWithIntent(room, RoomOpenKind.Cutscene, reloadSelected: true);
+            if (_roomOpenTask is { } opening) await opening;
             // The room view boots or continues play in the opened room; wait for it (a first boot takes a few seconds).
             for (var wait = 0; wait < 600 && !(PlayActive && (_play!.CurrentRoomId == trigger.Room || UsesManiacCutsceneSetup(game) && _play.CurrentRoomId == 45)); wait++)
             {
@@ -173,7 +184,7 @@ public partial class MainWindow
         if (!PlayActive || _play is not { } session) return;
         if (!PreparePlayCutsceneStartup(game)) return;
         _playPaused = false;
-        var title = PickerVerbTitle(ScummCutsceneTitles.Title(trigger), trigger.IsRoomEntry ? 0 : trigger.VerbId);
+        var title = GenericCutsceneTitle(trigger);
         IReadOnlyList<string> uncertainties;
         try
         {
@@ -220,25 +231,26 @@ public partial class MainWindow
     private void UpdatePlayCutsceneControls()
     {
         var active = PlayActive;
-        PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
-        InteractButton.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
+        InteractButton.Visibility = Visibility.Collapsed; // Generic Interact has its own source-driven expander.
         AdvanceFrameButton.IsEnabled = false;
         UpdatePlayTransportControls();
         var canStart = PlayCanStartCutscene;
-        CutsceneMenuButton.IsEnabled = active && canStart && _playPlanner is not null;
+        CutsceneMenuButton.IsEnabled = canStart && _playPlanner is not null;
         CutsceneMenuButton.Content = "Play Cutscene";
         CutsceneMenuButton.ToolTip = canStart ? "Choose a cutscene from anywhere in the game." : "A cutscene is playing. Let it finish or skip it before starting another.";
         var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
+        var shown = _currentRoomResource is not null;
         var computing = _playPlanner is not null && !_playRoomListsDone && _playSavedRoomLists is null;
         var listing = computing && roomChoices.Count == 0;
-        RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.IsEnabled = active && canStart && !listing;
+        PlaybackBar.Visibility = active || shown && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
+        RoomCutsceneButton.Visibility = shown && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
+        RoomCutsceneButton.IsEnabled = shown && canStart && roomChoices.Count > 0;
         RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
         RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)."
             : !canStart ? "A cutscene is playing. Let it finish or skip it before starting another."
             : roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
-        CutsceneScanNote.Visibility = active && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
-        CutsceneScanProgress.Visibility = active && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
+        CutsceneScanNote.Visibility = shown && IsAdvancedMode && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
+        CutsceneScanProgress.Visibility = shown && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
     }
 
     // Native transport state is cheap and must follow every frame: a cutscene's
@@ -257,6 +269,7 @@ public partial class MainWindow
             : skippable ? "Skip the cutscene (Escape): the script that set the override goes on at its skip point."
             : "The cutscene has not set its skip point yet, so Escape would do nothing now, as in the game.";
         SkipLineButton.IsEnabled = active && _play!.Messages.HaveMsg != 0;
+        UpdateGenericRoomActionAvailability();
     }
 
     private void SkipPlayCutscene()
