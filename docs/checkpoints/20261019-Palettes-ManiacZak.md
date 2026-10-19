@@ -12,11 +12,19 @@ Merge master inside integration, keep both orchestrators, regenerate README/REQU
 
 ## Done
 
-Pending source investigation and implementation.
+Three isolated worker items are integrated: transformation source/native-preview tests `eb3d62cd` (worker `f351538`), Mars source/native-opening tests `0b993b53` (worker `831110c`), and the display-only context provider `97bd82ae` (worker `6b0fe2c`). Eight transformation and five Mars cases pass; the provider has 33 dedicated cases, including fifteen added after independent review found an indirect-operand tracing error. Source conditions live in the [Zak script map](../zak/ZAK_SCRIPT_MAP.md); reproducible commands/results and retained failures live in the [transformation](../../.verification/zakclassic-transform-palettes-20261019/README.md), [Mars](../../.verification/zakclassic-mars-palettes-20261019/README.md) and [provider](../../.verification/zakclassic-palette-core-20261019/README.md) records.
+
+The provider exposes conditional local source pairs, native opening operations and independent native room previews as separate evidence types. It uses the existing runtime, not a new script interpreter or a production table of reviewed sample IDs. Native operand resolution preserves all three indirect slots 14–16, unknown bindings and independent estimate flags. Opening states may be off-room; every room preview remains an estimate. Only completed results are cached. Seven of the eleven requested estimate cards gain contextual colour records; this does not imply seven new visible palette differences or universal colours. **All 35 global colour decisions remain unchanged: 24 derived / 11 labelled estimates; Costumes stays Partial.**
+
+Parent added a costume-detail colour selector (`166f6b2`), preserving the previous default and rendering only the selected preview. Work runs asynchronously with progress, cancellation, stale-request guards and window-close cancellation; Advanced contains source/proof/estimate details. Classic Maniac's accepted palettes and enhanced rendering are gated out of the added chooser. An actual-window failure exposed a themed dropdown's record-string fallback; `96dfb06` fixes it with explicit plain labels. No palette value was changed to satisfy that failure.
+
+Both concurrent master updates have been merged, preserving the other orchestrator's Monkey2 and Indy4/MonkeyCd work (`77588bdf`, then `8f454be3`). Regenerated README/REQUIREMENTS matrices pass all three checks. Current complete solution build: zero warnings/errors, 6.27 seconds. The matrix-triggered test rebuild retains one pre-existing xUnit2029 warning in the imported Monkey2 test; no other-family test is edited to silence it. Actual-window acceptance and the required final full suite follow below.
 
 ## Not done and why
 
-To be recorded; original-runtime comparison remains unavailable under the no-run instruction and alternate same-family data remain missing.
+The native Mars selector route did not unlock after two distinct bounded attempts (normal F3, then disclosed item/room preparation with native Use and another F3). That blocker is stopped with both packets retained; no story flag, actor, palette, costume or owner was assigned. Conditional Mars clothing/random domains and source costume assignments are established, but a native arrival/Mars playthrough is not. Other protagonists' transformation branches, earned animal-control prerequisites and the prior water scene that establishes its actor's palette remain unplayed. Object-verb bird evidence is explicitly an exploration action.
+
+Four requested cards have no new provider context; all eleven remain globally unresolved. A transient source state, a prepared room preview and an original-game appearance are different claims. Original-runtime comparison remains unavailable under the no-ScummVM-run instruction; alternate same-family copies are still missing. Cutscenes remain Partial without a hand-validated catalog; no catalog/seed or unrelated-family feature work is performed.
 
 ## Decisions made
 
@@ -30,7 +38,11 @@ R-5.4a proposes a source-derived costume colour selector: preserve the existing 
 
 ## User checks
 
-Parent owns one serialized real-window harness for the integrated visible change, using private profile/cache. No original-runtime observation is claimed.
+Three serial actual-window processes pass: ZakClassic's colour selector plus Classic Maniac and ZakEnhanced gallery regressions. The accepted packet has 17 captures; six were inspected by the parent and eight by the worker (overlapping sets). Every stored pose is compared pixel-for-pixel and by dimensions against direct Core decoding, including default restoration, selected/open plain labels, Normal/Advanced separation, cold cancellation/stale-result guards and 900×640 layouts. Native snapshots, actors, messages, inputs and frame counters stay unchanged. All windows exited zero and the exclusive WPF lease is released. Reproduction: [actual-window evidence](../../.verification/zakclassic-palette-ui-20261019/README.md), integrated `bf74687c` (worker `19a75c16`).
+
+The first failed packet's four captures/report are retained separately. Its record-string label leak is fixed; its demand that the head costume's unused suit channel change pixels was disproved by direct native decoding. Final acceptance preserves that genuine equality and still requires the dolphin costume's 548 actual changed pixels. No palette, image, state or provenance guard was altered to hide a mismatch.
+
+The final cold/cancelled lookup took 127.57 seconds under parallel work, while the dispatcher delivered 1,958 heartbeat ticks with a largest observed gap of 390 ms. This is a responsive asynchronous observation, not a speed guarantee. Existing source/frame caps are unchanged. No new user-only check is required for this bounded feature; original-game appearance/timing/listening acceptance remains outside this run under the standing no-run instruction.
 
 ## Offers
 
@@ -38,8 +50,12 @@ No automatic catalogs, seeds or unrelated-family work.
 
 ## Cost
 
-Three independent worker items plus parent integration; exact tests, harness results and remaining blockers follow.
+Three independent worker worktrees plus parent integration and a separate serial WPF acceptance item. Transformation packet: 18 passed (eight new plus existing guards), 34 seconds; one conformance check passed. Mars packet: five passed, five seconds. Provider packets: 29 and 49 passed, with a frozen 32 fast-case recheck; these overlap and are not additive. The final full suite must confirm all 46 new cases (eight transformation, five Mars, 33 provider) over the merged source. Three final actual-window processes pass; harness build zero warnings/errors, 11.95 seconds. Cold native derivation costs are explicit in the linked evidence rather than hidden behind a synchronous UI operation.
 
 ## Next run
 
-Stop at this checkpoint and record exact remaining work after the final result.
+Stop at this clean checkpoint; no automatic next item. Suggested bounded request: “Trace the artifact-deposit and character-switch prerequisite chain for native ZakClassic Mars access, distinguish input mistakes from source gates, then verify the other protagonists' transformation/helmet palette contexts without assigning prerequisites. Keep the coordination rules and stop at a clean checkpoint.” Preserve both failed selector preparations; do not repeat standalone F3 or mistake decoded random domains for reached colours. Original-runtime comparison and additional-copy compatibility still need a changed instruction or supplied data respectively.
+
+## Final integration
+
+Production source frozen at `fb226f83` (App `96dfb06`, provider `97bd82ae`, with both concurrent master updates). Later changes contain evidence/records only. Master was `8f454be3` at full-suite start. Required sound/Indy3 EGA/MT-32 roots are set under D:/Juegos/Lucas. [Exact commands and final counters](../../.verification/zakclassic-palettes-final-20261019/README.md) will record the completed suite, clean fast-forward and normal executable refresh.

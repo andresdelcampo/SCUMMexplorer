@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 19 October: transformation and Mars palette contexts (S2 follow-up, ZakClassic)
+
+- Traced indirect transformation costumes, retained animal palettes and the distinction between stored and current Mars clothing colours. Two blocked native character-switch preparations are retained without a prerequisite shortcut.
+- Costume details offer display-only colour choices from separately attributed source/opening/room-preview contexts. The existing default is preserved; seven estimate cards gain contextual records while all eleven global estimates and Costumes Partial remain. Source conditions and estimates are Advanced.
+- Asynchronous progress, cancellation, stale-request guards and window-close cancellation keep context discovery separate from the live game. Actual-window review fixed a plain-label fallback and preserved genuine unused artwork-channel equality. Three final windows pass with native pixel/state checks; Classic Maniac and enhanced Zak are unchanged.
+- Both concurrent master updates are preserved; matrices regenerated, solution build zero warnings/errors. Full-suite counters, clean promotion and remaining boundaries: [checkpoint](checkpoints/20261019-Palettes-ManiacZak.md).
+
 ## 19 October: source item qualifiers and resumed fidelity (Maniac/Zak)
 
 - Zak's repeated CashCards, helmets, tickets and tokens use native character qualifiers inferred from each copy's scripts. Shards keep neutral fallback. Current ownership stays separate, and qualifiers survive admin transfers/Undo; catalogs remain 70 items. No character-name or object-ID label table is added.
