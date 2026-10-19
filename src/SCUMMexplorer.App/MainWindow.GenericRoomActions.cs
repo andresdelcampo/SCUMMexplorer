@@ -16,10 +16,12 @@ public partial class MainWindow
     private int? _genericActionsRoom;
     private bool _genericActionsAdvanced;
     private bool _genericActionStarting;
+    private int _genericNamesFrame;
+    private Func<string, string>? _genericReadable;
     private readonly List<Button> _genericActionButtons = [];
     private readonly List<(string Label, ScummScriptDisassembly Code)> _genericRoomScripts = [];
     private readonly List<GenericSourceAction> _genericSourceActions = [];
-    private sealed record GenericSourceAction(int Object, int Verb, string Title, ScummScriptDisassembly? Code, string Source, bool Executable);
+    private sealed record GenericSourceAction(int Object, int Verb, string Title, string Target, ScummScriptDisassembly? Code, string Source, bool Executable);
 
     private bool GenericRoomActions => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs;
 
@@ -62,7 +64,8 @@ public partial class MainWindow
             _genericSourceActions.Clear();
             ReadGenericRoomActions(game, roomId);
         }
-        if (changed || _genericActionsAdvanced != IsAdvancedMode || _genericActionsHost.Children.Count == 0)
+        var namesChanged = RefreshGenericRoomActionWords();
+        if (changed || namesChanged || _genericActionsAdvanced != IsAdvancedMode || _genericActionsHost.Children.Count == 0)
         {
             _genericActionsAdvanced = IsAdvancedMode;
             BuildGenericRoomActions();
@@ -81,10 +84,8 @@ public partial class MainWindow
             var data = ScummDataSources.For(sourceGame);
             var stored = data.ReadRoom(room);
             var verbs = data.ReadObjectVerbs(room, stored.Objects);
-            var readable = ManiacPreviewText.For(game);
-            string Text(string text) => (readable?.Invoke(text) ?? text).Replace("@", "", StringComparison.Ordinal).Trim();
-            var words = _playFolder == game.Key && _play is not null ? ScummCutscenePlanner.VerbsOf(_play, Text)
-                : _playPlanner is { IsValueCreated: true } lazy ? lazy.Value.Verbs : ScummCutsceneVerbs.None;
+            _genericReadable = ManiacPreviewText.For(game);
+            string Text(string text) => (_genericReadable?.Invoke(text) ?? text).Replace("@", "", StringComparison.Ordinal).Trim();
             void Add(string label, Func<ScummScriptDisassembly?> read)
             {
                 try { if (read() is { } code) _genericRoomScripts.Add((label, code)); }
@@ -103,8 +104,7 @@ public partial class MainWindow
                     string? failure = null;
                     try { code = data.ReadObjectVerb(room, record, verb.VerbId, out _); }
                     catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { failure = ex.Message; }
-                    var word = words.Word?.Invoke(verb.VerbId);
-                    var title = $"{(string.IsNullOrWhiteSpace(word) ? "Action" : Text(word))} · {target}";
+                    var title = $"Action · {target}";
                     // Initialization/default table entries are source plumbing, not user verbs.
                     // Their complete code remains inspectable in Advanced.
                     var executable = verb.VerbId < 250 && code is { UndecodedOffset: null } &&
@@ -112,7 +112,7 @@ public partial class MainWindow
                     var source = $"Room {room:00}, object {record.Id}, verb 0x{verb.VerbId:X2}; " +
                         (code is not null ? $"entry +0x{code.EntryOffset:X4}. Direct exploration action; no sentence is composed and the actor does not walk to the object."
                             : "Source unavailable: " + failure);
-                    _genericSourceActions.Add(new(record.Id, verb.VerbId, title, code, source, executable));
+                    _genericSourceActions.Add(new(record.Id, verb.VerbId, title, target, code, source, executable));
                 }
             }
         }
@@ -122,6 +122,26 @@ public partial class MainWindow
             _genericSourceActions.Clear();
             if (IsAdvancedMode) _genericSourceHost!.Children.Add(new TextBlock { Text = "Room source unavailable: " + ex.Message, TextWrapping = TextWrapping.Wrap });
         }
+    }
+
+    // Native interface verbs can arrive after the room's source has been cached.
+    // Resolve only these small display words again, never the room/scripts/geometry.
+    private bool RefreshGenericRoomActionWords()
+    {
+        var words = _playFolder == _game?.Key && _play is { PlayerHasControl: true } session && session.CurrentRoomId == _genericActionsRoom
+            ? ScummCutscenePlanner.VerbsOf(session, _genericReadable)
+            : _playPlanner is { IsValueCreated: true } lazy ? lazy.Value.Verbs : ScummCutsceneVerbs.None;
+        var changed = false;
+        for (var index = 0; index < _genericSourceActions.Count; index++)
+        {
+            var action = _genericSourceActions[index];
+            var word = words.Word?.Invoke(action.Verb);
+            var title = $"{(string.IsNullOrWhiteSpace(word) ? "Action" : word.Trim())} · {action.Target}";
+            if (title == action.Title) continue;
+            _genericSourceActions[index] = action with { Title = title };
+            changed = true;
+        }
+        return changed;
     }
 
     private void BuildGenericRoomActions()
@@ -202,6 +222,8 @@ public partial class MainWindow
 
     private void UpdateGenericRoomActionAvailability()
     {
+        if (++_genericNamesFrame % 12 == 0 && _genericActionsHost is not null && GenericRoomActions &&
+            _genericActionsRoom is not null && RefreshGenericRoomActionWords()) BuildGenericRoomActions();
         foreach (var button in _genericActionButtons) button.IsEnabled = GenericRoomActionCanStart;
     }
 
