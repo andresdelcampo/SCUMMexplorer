@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.IO;
 using System.Windows;
+using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Scumm;
 
@@ -99,6 +100,8 @@ public partial class MainWindow
     /// <summary>Static possible starts: room entry/exit/local/object code and literal calls; no invented runtime variables.</summary>
     private static Dictionary<int, string> ScanGenericRoomSounds(GameLibrary game, int roomId)
     {
+        // Archive readers own seekable streams; background work must not share those of live Play.
+        if (game.V4Archive is not null || game.V4Disks is not null) game = GameFolderScanner.Reopen(game);
         var data = ScummDataSources.For(game);
         var found = new Dictionary<int, List<string>>();
         var cache = new Dictionary<int, ScummScriptDisassembly?>();
@@ -158,7 +161,8 @@ public partial class MainWindow
         foreach (var record in records)
             foreach (var verb in verbs.GetValueOrDefault(record.Id) ?? [])
                 Root(() => data.ReadObjectVerb(roomId, record, verb.VerbId, out _), $"Room {roomId:00} object {record.Id} verb {verb.VerbId}");
-        return found.ToDictionary(c => c.Key, c => string.Join(Environment.NewLine, c.Value.Distinct()));
+        return found.ToDictionary(c => c.Key, c => string.Join(Environment.NewLine, c.Value.Distinct()) +
+            Environment.NewLine + "Possible static starts; literal child-script calls followed to depth 4. Variable targets and deeper calls remain unresolved.");
     }
 
     private bool TryShowGenericRoomSounds()
