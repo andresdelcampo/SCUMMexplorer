@@ -14,16 +14,7 @@ The catalog now exposes `Context: ScummInventoryItemContext?` with `ActorId`, nu
 
 The new source analyzer reuses the existing bounded inventory-flow analysis. Its optional owner-write callback resolves both target and recipient from the same source state. Callback-null behavior remains unchanged. Literal native recipient writes establish fixed source associations; recipient-dependent selection establishes distinct per-character inventory records. The latter is accepted only when compared native player arguments select unambiguous different members of the same name group. Unknown writes, missing source, incomplete decode, ambiguous assignments and bounded dynamic paths do not establish that mapping. Only completely and uniquely distinguished same-name groups receive qualifiers; a lone handoff is insufficient.
 
-Both copies independently produce these ten qualifiers:
-
-| Native group | Source character association |
-|---|---|
-| CashCard18 /32 /75 | Zak / Annie / Leslie, from each native Give response's literal return recipient |
-| helmet65 /66 | Melissa / Leslie, from Script81's native initial allocations/owner assignments |
-| ticket82 /83 | Zak / Annie, from Script58's separate native ticket-record assignments |
-| token61 /62 /63 | Zak / Melissa / Leslie, from Script145's recipient argument selecting a distinct token-count inventory record before +0085 `setOwnerOf` |
-
-These names in the table are observed outputs of each copy's native actor-name table, not production labels. Ticket qualifiers identify source ticket records; they do not assert a fixed destination or prohibit changing the held owner. Token qualifiers identify the game's per-character count records, not arbitrary individual coins. Both shard33 and shard56 keep neutral fallback: one scripted Zak handoff does not establish a distinct two-character role for the halves. The six previously excluded scene aliases remain excluded and the logical roster stays70. See the preceding [identity evidence](../zak-item-identities-20261018/README.md) for those source identities.
+Both copies independently produce ten qualifiers across CashCards, helmets, tickets and token records. The canonical source/actor associations are recorded once in the [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), under Objects and classes. Observed labels such as `CashCard (Annie)` use each copy's native actor-name table, not production strings. Ticket qualifiers identify source ticket records; they do not assert a fixed destination or prohibit changing the held owner. Token qualifiers identify the game's per-character count records, not arbitrary individual coins. Both shards keep neutral fallback because no distinct two-character role is established. The six previously excluded scene aliases remain excluded and the logical roster stays 70. See the preceding [identity evidence](../zak-item-identities-20261018/README.md) for that audit.
 
 No gameplay bytecode runs to produce labels. No runtime owner, variable, actor, slot or story flag is edited by the analysis or snapshot resolution. Tests deliberately reassign all ten contextual items to other characters and verify that source qualifiers stay unchanged, then Undo the exact inventory/unrelated state. The analyzer has no item/room/actor-ID label table and no hardcoded character names. Synthetic shifted actor/item IDs exercise the same mechanism.
 

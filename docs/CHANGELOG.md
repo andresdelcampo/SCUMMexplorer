@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 19 October: source item qualifiers and resumed fidelity (Maniac/Zak)
+
+- Zak's repeated CashCards, helmets, tickets and tokens use native character qualifiers inferred from each copy's scripts. Shards keep neutral fallback. Current ownership stays separate, and qualifiers survive admin transfers/Undo; catalogs remain 70 items. No character-name or object-ID label table is added.
+- Native flight cruising expires normally and automatically disembarks at the purchased airport. The shared executor now binds a known variable room to the scene event target while preserving unknown/estimated provenance. Both source boundaries and real-window routes pass without timer edits or extra arrival input.
+- V1/v2 walking uses the native row search, metric, box priority and destination recalculation. Four-family source-reference coordinates and native routes pass. Both Zak copies also complete a source-supported paid bus segment after disclosed preparation.
+- Requirements/support notes and source attribution are updated. Levels stay unchanged; Classic Zak's 11 palette estimates, original-runtime comparisons and unavailable same-family editions remain. [Checkpoint](checkpoints/20261019-LabelsFidelity-ManiacZak.md).
+
 ## 18 October: Game Status pictures, party and logical item choices, Maniac/Zak
 
 - Maniac waits for native Start and offers the selected three kids. Every Maniac/Zak recipient uses a native full-body sprite; private frame initialization supplies off-room Zak characters without changing live state.

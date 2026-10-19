@@ -4,9 +4,9 @@ Fixtures: `D:/Juegos/Lucas/zak ega en` and `D:/Juegos/Lucas/zakE ega en`, indepe
 
 ## Scope and result
 
-Knife pickup and CashCard recovery retain the explicitly disclosed Room2/Room1 exploration preparation. Room3 is also an explicit street preview. From there, ordinary native floor walking, a cleared sentence and source-supported knife/bus Use wake the driver. CashCard/reader Use charges the native8-unit fare and the game's own bus script reaches physicalRoom8/logical145 with control. This establishes the paid bus segment, not an earned whole-game journey to every prerequisite.
+Knife pickup and CashCard recovery retain the explicitly disclosed Room2/Room1 exploration preparation. Room3 is also an explicit street preview. From there, ordinary native floor walking, a cleared sentence and source-supported knife/bus Use wake the driver. CashCard/reader Use charges the native 8-unit fare and the game's own bus script reaches physical Room 8/logical 145 with control. This establishes the paid bus segment, not an earned whole-game journey to every prerequisite.
 
-Both independent console probes pass with the same observed checkpoints: awake driver at frame1335, charged fare at1374 (12250→12242), airport control at1425. The ticket, knife and card identities are preserved. Four new regression cases cover native payment/arrival and an unrelated-tool reader refusal in each edition. They pass in the combined48-case new-feature run (zero failed/skipped,1m55s). Decoded source anchors live in [the Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md); this evidence records execution and its limits.
+Both independent console probes pass with the same observed checkpoints: awake driver at frame 1335, charged fare at 1374 (12250→12242), airport control at 1425. The ticket, knife and card identities are preserved. Four new regression cases cover native payment/arrival and an unrelated-tool reader refusal in each edition. They pass in the combined 48-case new-feature run (zero failed/skipped,1m55s). Decoded source anchors live in [the Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md); this evidence records execution and its limits.
 
 ## Reproduction
 
