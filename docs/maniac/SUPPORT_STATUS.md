@@ -1,5 +1,9 @@
 # Maniac Mansion (classic v1) support status
 
+## Native walking fidelity — 19 October 2026 (current)
+
+Both supplied Maniac editions now use the v1/v2 row search, distance metric, descending box priority and native destination recalculation. The source-reference census matches every sampled aligned grid point and declared object approach; both native Play routes and actual Game Status windows pass after integration. Enhanced's previously projected camera endpoint changes 352→336; its native mat/key route still succeeds. All support levels remain unchanged, including the user's accepted Classic costume status. This is engine-source/Explorer evidence; original-runtime picture/timing, other parties/puzzles and additional same-family copies remain separate. [Walking evidence](../../.verification/maniaczak-walking-20261019/README.md), [current checkpoint](../checkpoints/20261019-LabelsFidelity-ManiacZak.md).
+
 ## Game Status presentation — 18 October 2026 (current)
 
 The user's selected-party clarification supersedes the earlier seven-recipient UI. Game Status becomes available after native Start, when all three chosen kids have been placed, and offers only those three. Selection portraits are replaced by native full-body costume frames for every recipient. Appearance decoding uses detached state and does not switch the hero, move actors or change story flags. The 48-item admin catalog, native capacity and atomic Apply/Undo remain. Item, recipient and Add controls are compact and bottom aligned. Status stays **Full**; no other support cell changes. [Status checkpoint](../checkpoints/20261018-StatusPolish-ManiacZak.md), [character evidence](../../.verification/status-character-art-20261018/README.md), [window checks](../../.verification/status-polish-window-20261018/README.md).

@@ -10,7 +10,12 @@ public sealed record ScummInventoryCharacter(int ActorId, string? Name, string E
 }
 public sealed record ScummInventoryItem(int ObjectId, int OwnerId, int Slot, int RetainedRoomId, string? Name);
 public sealed record ScummInventoryTransfer(int ObjectId, int TargetActorId);
-public sealed record ScummInventoryCatalogItem(int ObjectId, int SourceRoomId, string? Name, string Evidence);
+/// <summary>A source-established character association, not the item's current owner or a transfer restriction.</summary>
+public sealed record ScummInventoryItemContext(int ActorId, string? Text, string Evidence);
+public sealed record ScummInventoryCatalogItem(int ObjectId, int SourceRoomId, string? Name, string Evidence)
+{
+    public ScummInventoryItemContext? Context { get; init; }
+}
 public sealed record ScummInventoryEditResult(bool Applied, string? Refusal, ScummInventoryUndoToken? Undo);
 
 /// <summary>A read-only view and an opaque optimistic edit token; capturing it runs no scripts.</summary>
@@ -72,7 +77,9 @@ public abstract partial class ScummSession
                     ? ScummTextDecoder.DecodeGlyphs(bytes).TrimEnd('\0') : null)).ToArray();
         return new(_inventoryStatusIdentity, _inventoryStatusFrame, InventoryStatusSignature(), CurrentRoomId,
             _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable), characters, items, InventoryEditRefusal(characters),
-            InventoryCatalog(), _runtime.InventorySlots.Length);
+            InventoryCatalog().Select(item => item.Context is { } context
+                ? item with { Context = context with { Text = _runtime.ActorNames.GetValueOrDefault(context.ActorId) } }
+                : item).ToArray(), _runtime.InventorySlots.Length);
     }
 
     public ScummInventoryEditResult ApplyInventoryTransfers(ScummInventoryStatusSnapshot snapshot,

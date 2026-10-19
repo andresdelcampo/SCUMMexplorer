@@ -2,6 +2,14 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 19 October: source item qualifiers and resumed fidelity (Maniac/Zak)
+
+- Zak's repeated CashCards, helmets, tickets and tokens use native character qualifiers inferred from each copy's scripts. Shards keep neutral fallback. Current ownership stays separate, and qualifiers survive admin transfers/Undo; catalogs remain 70 items. No character-name or object-ID label table is added.
+- Native flight cruising expires normally and automatically disembarks at the purchased airport. The shared executor now binds a known variable room to the scene event target while preserving unknown/estimated provenance. Both source boundaries and real-window routes pass without timer edits or extra arrival input.
+- V1/v2 walking uses the native row search, metric, box priority and destination recalculation. Four-family source-reference coordinates and native routes pass. Both Zak copies also complete a source-supported paid bus segment after disclosed preparation.
+- Requirements/support notes and source attribution are updated. Levels stay unchanged; Classic Zak's 11 palette estimates, original-runtime comparisons and unavailable same-family editions remain. [Checkpoint](checkpoints/20261019-LabelsFidelity-ManiacZak.md).
+- Final solution build: zero warnings/errors; three regenerated-matrix checks; full suite **1538 passed, zero failed, five expected skips**, all 64 new cases passed. Six serial actual-window routes pass. Final clean integration and normal executable refresh are recorded at the checkpoint.
+
 ## 18 October: the other Monkey Island 2 copies (S9, Monkey2)
 
 - **All four other copies pass** (`mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es`, `mi2 talkie es` against `mi2 talkie en`): boot to the campfire, room audit (107 of 110 rooms without a gap, states equal but two patched rooms), the play route with right click, LeChuck's iMUSE beat, the cutscene scan and runs (floppies 190 groups / 97 begin, talkies 260 / 165), and the accents. Record: [monkey2-editions-20261018](../.verification/monkey2-editions-20261018/README.md).

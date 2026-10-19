@@ -13,6 +13,12 @@ old walk-box routing, and native Play interface behavior adapt ScummVM's
 `boxes.cpp`, `verbs.cpp`, `script.cpp`, `input.cpp`, and `cursor.cpp`
 (read 17 October 2026). Copyright the ScummVM contributors; GPL-3.0-or-later.
 
+The v1/v2 target-adjustment helper in
+`src/SCUMMexplorer.Core/Scumm/Runtime/ScummV2WalkBoxGeometry.cs` adapts
+`checkXYInBoxBounds` and `Actor_v2::adjustXYToBeInBox` from the same
+[`actor.cpp`](https://github.com/scummvm/scummvm/blob/master/engines/scumm/actor.cpp)
+(read 19 October 2026). Copyright the ScummVM contributors; GPL-3.0-or-later.
+
 The DOS v1/v2 built-in charset and language replacement tables in
 `src/SCUMMexplorer.Core/Scumm/V2/ScummV2Charset.cs` adapt
 [charset-fontdata.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/charset-fontdata.cpp)

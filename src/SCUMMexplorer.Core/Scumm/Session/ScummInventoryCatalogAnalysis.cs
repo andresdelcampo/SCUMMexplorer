@@ -13,21 +13,38 @@ internal sealed class ScummInventoryCatalogAnalysis(
     Func<int, int, int, ScummScriptDisassembly?> objectScript,
     Action<ScummScriptDisassembly, ScummScriptInstruction, int?, int?, bool> pickup,
     Action<string> note,
-    IReadOnlyDictionary<int, bool?>? pickupable = null)
+    IReadOnlyDictionary<int, bool?>? pickupable = null,
+    Action<ScummScriptDisassembly, ScummScriptInstruction, int?, int?>? ownerWrite = null)
 {
     private readonly HashSet<string> _calls = [];
+    private int _ownerFlowFailures;
+
+    private void UnresolvedOwnerFlow(string detail)
+    {
+        _ownerFlowFailures++;
+        note("Unresolved owner-flow: " + detail);
+    }
+
+    private static bool CompleteOwnerSource(ScummScriptDisassembly? script) => script is
+        { HasCompleteControlFlow: true, DecodeNote: null } && script.Issues is not { Count: > 0 };
 
     public void Scan(ScummScriptDisassembly? script, int? activeObject = null, int? room = null,
         Dictionary<string, int>? incoming = null, int depth = 0)
     {
         if (script is null) return;
+        if (ownerWrite is not null && !CompleteOwnerSource(script))
+        { UnresolvedOwnerFlow($"{script.Context ?? $"Script {script.ScriptId}"} has incomplete source."); return; }
         if (!MayAffectInventory(script, room, [])) return;
         var initial = incoming is null ? new Dictionary<string, int>() : new(incoming);
         if (activeObject is int id && incoming is null) initial[ScummVars.V2.ActiveObject1] = id;
         var label = script.Context ?? $"Script {script.ScriptId}";
         var key = label + "/" + room + "/" + string.Join(';', initial.OrderBy(x => x.Key).Select(x => $"{x.Key}={x.Value}"));
-        if (!_calls.Add(key)) return;
-        if (depth > 16) { note($"Catalog call-depth bound: {label}."); return; }
+        if (!_calls.Add(key))
+        {
+            if (ownerWrite is not null) UnresolvedOwnerFlow($"{label} repeats a source-call context.");
+            return;
+        }
+        if (depth > 16) { note($"Catalog call-depth bound: {label}."); if (ownerWrite is not null) UnresolvedOwnerFlow($"{label}: call-depth bound."); return; }
         var instructions = script.Instructions.ToDictionary(x => x.Offset);
         var inventoryOffsets = InventoryOffsets(script, room);
         var visited = new HashSet<string>();
@@ -42,7 +59,7 @@ internal sealed class ScummInventoryCatalogAnalysis(
             if (!visited.Add(state)) continue;
             // Keep disjoint finite targets at joins. Intersecting bindings here
             // would erase one branch's item before a shared pickup instruction.
-            if (visited.Count > 16384) { note($"Catalog path-state bound: {label} +0x{work.Offset:X4}; {string.Join(';', values.OrderBy(x=>x.Key).Select(x=>$"{x.Key}={x.Value}"))}."); break; }
+            if (visited.Count > 16384) { note($"Catalog path-state bound: {label} +0x{work.Offset:X4}; {string.Join(';', values.OrderBy(x=>x.Key).Select(x=>$"{x.Key}={x.Value}"))}."); if (ownerWrite is not null) UnresolvedOwnerFlow($"{label}: path-state bound."); break; }
             int? Read(string value) => ReadValue(value, values);
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
             var next = instruction.Offset + instruction.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
@@ -73,11 +90,26 @@ internal sealed class ScummInventoryCatalogAnalysis(
             }
             if (operation == "pickupObject" || operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable")
                 pickup(script, instruction, Read(parts[0]), room, operation == "setState");
-            if (operation is "startScript" or "chainScript" && Read(parts[0]) is int called && globals.TryGetValue(called, out var helper))
+            if (operation == "setOwnerOf" && parts.Length == 2)
+                ownerWrite?.Invoke(script, instruction, Read(parts[0]), Read(parts[1]));
+            if (operation is "startScript" or "chainScript")
             {
-                Scan(helper, values.GetValueOrDefault(ScummVars.V2.ActiveObject1) is > 0 and var active ? active : null, room, values, depth + 1);
-                InvalidateWrites(helper, room, values, []);
+                var called = Read(parts[0]);
+                var helper = called is int number ? globals.GetValueOrDefault(number) : null;
+                if (ownerWrite is not null && !CompleteOwnerSource(helper))
+                { UnresolvedOwnerFlow($"{label} +0x{instruction.Offset:X4}: unresolved global call {parts[0]}."); continue; }
+                if (called is int known && globals.ContainsKey(known))
+                {
+                    var failures = _ownerFlowFailures;
+                    Scan(helper, values.GetValueOrDefault(ScummVars.V2.ActiveObject1) is > 0 and var active ? active : null, room, values, depth + 1);
+                    if (ownerWrite is not null && _ownerFlowFailures != failures) continue;
+                    InvalidateWrites(helper, room, values, []);
+                }
             }
+            if (ownerWrite is not null && operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" &&
+                Read(parts[0]) != 254 && (Read(parts[0]) is null || Read(parts[1]) is null || room is null ||
+                    Read(parts[0]) is not (250 or 253) && Read(parts[2]) is null))
+            { UnresolvedOwnerFlow($"{label} +0x{instruction.Offset:X4}: unresolved object-call context."); continue; }
             if (operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" &&
                 Read(parts[0]) is int verb && verb != 254 && Read(parts[1]) is int obj && room is int sourceRoom)
             {
@@ -89,9 +121,13 @@ internal sealed class ScummInventoryCatalogAnalysis(
                     if (Read(parts[2]) is int other) context[ScummVars.V2.ActiveObject2] = other;
                 }
                 var handler = objectScript(sourceRoom, obj, verb == 250 ? 253 : verb);
+                if (ownerWrite is not null && !CompleteOwnerSource(handler))
+                { UnresolvedOwnerFlow($"{label} +0x{instruction.Offset:X4}: unresolved object call {obj}/{verb}."); continue; }
+                var failures = _ownerFlowFailures;
                 Scan(handler,
                     context.GetValueOrDefault(ScummVars.V2.ActiveObject1) is > 0 and var active ? active : null,
                     room, context, depth + 1);
+                if (ownerWrite is not null && _ownerFlowFailures != failures) continue;
                 values = context;
                 InvalidateWrites(handler, room, values, []);
             }
@@ -166,14 +202,18 @@ internal sealed class ScummInventoryCatalogAnalysis(
 
     private bool MayAffectInventory(ScummScriptDisassembly? script, int? room, HashSet<string> visited)
     {
+        if (ownerWrite is not null && !CompleteOwnerSource(script)) return true;
+        if (ownerWrite is not null && script is not null && visited.Contains((script.Context ?? $"Script {script.ScriptId}") + "/" + script.EntryOffset)) return true;
         if (script is null || !visited.Add((script.Context ?? $"Script {script.ScriptId}") + "/" + script.EntryOffset)) return false;
         foreach (var instruction in script.Instructions)
         {
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
-            if (instruction.Operation == "pickupObject" || instruction.Operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable") return true;
+            if (instruction.Operation == "pickupObject" || ownerWrite is not null && instruction.Operation == "setOwnerOf" ||
+                instruction.Operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable") return true;
             if (instruction.Operation is "startScript" or "chainScript")
             {
                 if (Literal(parts[0]) is not int id) return true;
+                if (ownerWrite is not null && !globals.ContainsKey(id)) return true;
                 if (globals.TryGetValue(id, out var child) && MayAffectInventory(child, room, visited)) return true;
             }
             if (instruction.Operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01")
@@ -194,9 +234,13 @@ internal sealed class ScummInventoryCatalogAnalysis(
         {
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
             var operation = instruction.Operation;
-            var effect = operation == "pickupObject" || operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable";
+            var effect = operation == "pickupObject" || ownerWrite is not null && operation == "setOwnerOf" ||
+                operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable";
             if (operation is "startScript" or "chainScript")
+            {
                 effect |= Literal(parts[0]) is not int id || globals.TryGetValue(id, out var child) && MayAffectInventory(child, room, []);
+                if (ownerWrite is not null && Literal(parts[0]) is int called && !globals.ContainsKey(called)) effect = true;
+            }
             if (operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" && Literal(parts[0]) != 254)
                 effect |= Literal(parts[0]) is not int verb || Literal(parts[1]) is not int obj ||
                     MayAffectInventory(objectScript(room ?? -1, obj, verb == 250 ? 253 : verb), room, []);

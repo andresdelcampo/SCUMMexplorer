@@ -216,7 +216,11 @@ public abstract partial class ScummSession
             ObjectScript, KnownEmptyObjectVerb, id => retainedCode.GetValueOrDefault(id), Note);
         foreach (var alias in aliases.OrderBy(x => x.Key))
             Note($"Scene alias {alias.Key} returns retained inventory item {alias.Value}; excluded as an additional catalog item.");
-        return _inventoryCatalog = catalog.Where(x => !aliases.ContainsKey(x.ObjectId)).ToArray();
+        var logical = catalog.Where(x => !aliases.ContainsKey(x.ObjectId)).ToArray();
+        var contexts = ScummInventoryItemContexts.Infer(logical, roots, globals, ObjectScript,
+            InventoryCharacters().Select(x => x.ActorId).ToHashSet());
+        return _inventoryCatalog = logical.Select(item => contexts.TryGetValue(item.ObjectId, out var context)
+            ? item with { Context = context } : item).ToArray();
     }
 
     private static int? InventoryLiteral(string operand) => operand.StartsWith("0x", StringComparison.Ordinal) &&

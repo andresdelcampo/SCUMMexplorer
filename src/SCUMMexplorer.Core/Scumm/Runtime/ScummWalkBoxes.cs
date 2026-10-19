@@ -138,6 +138,7 @@ public sealed class ScummWalkBoxSet
     /// </summary>
     public BoxAdjustment Adjust(int x, int y, bool isPlayer, int lastValidX, int lastValidY)
     {
+        if (UsesV2Matrix) return ScummV2WalkBoxGeometry.Adjust(this, x, y, isPlayer, lastValidX, lastValidY);
         int[] thresholds = [30, 80, 0];
         var resultX = lastValidX;
         var resultY = lastValidY;
@@ -207,11 +208,7 @@ public sealed class ScummWalkBoxSet
 
     internal static (int Distance, int X, int Y) ClosestPointV2(ScummWalkBox box, int x, int y)
     {
-        ScummBoxPoint Native(ScummBoxPoint p) => new(p.X >> 3, p.Y >> 1);
-        var native = box with { UpperLeft = Native(box.UpperLeft), UpperRight = Native(box.UpperRight),
-            LowerLeft = Native(box.LowerLeft), LowerRight = Native(box.LowerRight) };
-        var (distance, px, py) = ClosestPointOnBox(native, x >> 3, y >> 1);
-        return (distance, px * 8, py * 2);
+        return ScummV2WalkBoxGeometry.ClosestPoint(box, x, y);
     }
 
     public static (int Distance, int X, int Y) ClosestPointOnBox(ScummWalkBox box, int x, int y)
