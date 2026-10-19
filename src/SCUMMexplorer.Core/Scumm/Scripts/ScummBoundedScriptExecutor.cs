@@ -98,6 +98,37 @@ public sealed partial class ScummBoundedScriptExecutor
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ScummScriptDisassembly, PreparedInstructions> PreparedV3Up = new();
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ScummScriptDisassembly, PreparedInstructions> PreparedV2 = new();
 
+    /// <summary>
+    /// The run's variables as the v1/v2 preparation of an instruction sees them, recording each key it writes or removes with whether it existed and
+    /// its value before the first write. Reads and writes go to the run's own dictionary.
+    /// </summary>
+    private sealed class WriteRecordingVariables(Dictionary<string, ushort> inner) : IDictionary<string, ushort>
+    {
+        public Dictionary<string, (bool Existed, ushort Old)> Written { get; } = new(StringComparer.Ordinal);
+
+        private void Note(string key)
+        {
+            if (!Written.ContainsKey(key)) Written[key] = inner.TryGetValue(key, out var old) ? (true, old) : (false, (ushort)0);
+        }
+
+        public ushort this[string key] { get => inner[key]; set { Note(key); inner[key] = value; } }
+        public ICollection<string> Keys => inner.Keys;
+        public ICollection<ushort> Values => inner.Values;
+        public int Count => inner.Count;
+        public bool IsReadOnly => false;
+        public void Add(string key, ushort value) { Note(key); inner.Add(key, value); }
+        public void Add(KeyValuePair<string, ushort> item) => Add(item.Key, item.Value);
+        public void Clear() { foreach (var key in inner.Keys) Note(key); inner.Clear(); }
+        public bool Contains(KeyValuePair<string, ushort> item) => ((ICollection<KeyValuePair<string, ushort>>)inner).Contains(item);
+        public bool ContainsKey(string key) => inner.ContainsKey(key);
+        public void CopyTo(KeyValuePair<string, ushort>[] array, int arrayIndex) => ((ICollection<KeyValuePair<string, ushort>>)inner).CopyTo(array, arrayIndex);
+        public IEnumerator<KeyValuePair<string, ushort>> GetEnumerator() => inner.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => inner.GetEnumerator();
+        public bool Remove(string key) { Note(key); return inner.Remove(key); }
+        public bool Remove(KeyValuePair<string, ushort> item) { Note(item.Key); return ((ICollection<KeyValuePair<string, ushort>>)inner).Remove(item); }
+        public bool TryGetValue(string key, out ushort value) => inner.TryGetValue(key, out value);
+    }
+
     private static PreparedInstructions Prepare(ScummScriptDisassembly script, bool v2) => (v2 ? PreparedV2 : PreparedV3Up).GetValue(script, item =>
     {
         var instructions = NormalizeMatrixOps(v2 ? ExpandV2Overrides(item.Instructions) : item.Instructions);
@@ -117,9 +148,13 @@ public sealed partial class ScummBoundedScriptExecutor
     /// (such as <c>chainScript</c>, which starts another script in its place).
     /// </summary>
     public const string StopAfterEvent = "\u0001stop-after-event";
-    private static readonly Regex VariablePattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\]$", RegexOptions.Compiled);
+    // One instance of each pattern per thread (executor allocation speed-up, 19 October 2026): a Regex hands its one cached matcher to one caller at a time,
+    // so eight cutscene workers matching operands through the same instance took turns on it and built new matchers; eight workers then spent about four
+    // times the CPU of one for the same runs. The patterns and their results are unchanged.
+    [ThreadStatic] private static Regex? _variablePattern, _indexedPattern, _walkToPattern, _expressionTokens, _sourceExpressionTokens;
+    private static Regex VariablePattern => _variablePattern ??= new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\]$", RegexOptions.Compiled);
     // readVar/writeVar with the 0x2000 flag: base plus a literal or the value of another variable.
-    private static readonly Regex IndexedPattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\+(.+)\]$", RegexOptions.Compiled);
+    private static Regex IndexedPattern => _indexedPattern ??= new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\+(.+)\]$", RegexOptions.Compiled);
 
     public ScummBoundedScriptResult Execute(
         ScummScriptDisassembly script,
@@ -205,7 +240,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 barrier: observation.Call is null ? "initialization has no observed dispatch; no caller transfer inferred" : null);
         }
         ScummObservedCall? dispatched = null;
-        Dictionary<string, ushort>? v2Before = null;
+        WriteRecordingVariables? v2Writes = null;
 
         while (indexByOffset.TryGetValue(pc, out var instructionIndex))
         {
@@ -243,16 +278,18 @@ public sealed partial class ScummBoundedScriptExecutor
                 // conservatively keep the remainder of this bounded run conditional after any estimated read.
                 if (instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
                     .Any(operand => OperandIsEstimated(operand, estimated, knownVariables))) onEstimatedPath = true;
-                v2Before ??= new Dictionary<string, ushort>(knownVariables.Count, StringComparer.Ordinal);
-                v2Before.Clear();
-                foreach (var (key, value) in knownVariables) v2Before.Add(key, value);
-                if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace, onEstimatedPath,
+                // The preparation's writes are recorded (key, and the value before the first write) instead of copying every variable before each
+                // instruction; the variables it changed are then found in the dictionary's own order, as a comparison with a full copy found them.
+                v2Writes ??= new WriteRecordingVariables(knownVariables);
+                v2Writes.Written.Clear();
+                if (!PrepareV2Instruction(instruction, v2Writes, states, runtime, roomObjects, trace, onEstimatedPath,
                     out instruction, out var handled, out var branch, out var problem))
                 {
                     unresolved = $"{problem} at +0x{pc:X4}";
                     break;
                 }
-                foreach (var value in knownVariables.Where(pair => !v2Before.TryGetValue(pair.Key, out var old) || old != pair.Value))
+                if (v2Writes.Written.Count > 0)
+                foreach (var value in knownVariables.Where(pair => v2Writes.Written.TryGetValue(pair.Key, out var write) && (!write.Existed || write.Old != pair.Value)))
                 {
                     MarkEstimated(estimated, value.Key, onEstimatedPath);
                     runtime.NotifyGlobalMutation(value.Key);
@@ -1742,7 +1779,7 @@ public sealed partial class ScummBoundedScriptExecutor
     /// <summary>ScummVM <c>OF_OWNER_ROOM</c>: the object lies in a room, not in an inventory.</summary>
     private const int RoomOwner = 0x0F;
 
-    private static readonly Regex WalkToPattern = new(@"walkTo=\((-?\d+), (-?\d+)\)", RegexOptions.Compiled);
+    private static Regex WalkToPattern => _walkToPattern ??= new(@"walkTo=\((-?\d+), (-?\d+)\)", RegexOptions.Compiled);
 
     /// <summary>
     /// The index of the <c>[</c> that opens an instruction's trailing argument list
@@ -2334,7 +2371,7 @@ public sealed partial class ScummBoundedScriptExecutor
               // From version 4 the bit variables are stored apart (readVar/writeVar), so an expression may write one (Monkey Island 2 Room 33 local script 206 +0x0084).
               variables.ContainsKey(SeparateBitStorage) && TryNormalizeKey(instruction.Operands[..separator], variables, out destination))) return false;
         string body = instruction.Operands[(separator + 3)..^1];
-        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[(?:[^\[\]]|\[[^\]]*\])+\]|0x[0-9A-Fa-f]+|[+*/-]");
+        var tokens = (_expressionTokens ??= new(@"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[(?:[^\[\]]|\[[^\]]*\])+\]|0x[0-9A-Fa-f]+|[+*/-]")).Matches(body);
         if (tokens.Count is 0 or > 4096) return false;
         int end = 0;
         foreach (Match token in tokens)
@@ -2539,7 +2576,7 @@ public sealed partial class ScummBoundedScriptExecutor
             var body = text[(separator + 3)..^1];
             // Nested random operands are pre-instruction copies only. Their write and implicit
             // scratch read happen within the instruction; the access barrier remains below.
-            var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+            var tokens = (_sourceExpressionTokens ??= new(@"getRandomNr\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]")).Matches(body);
             if (tokens.Count is 0 or > 4096) return [];
             var end = 0;
             foreach (Match token in tokens)

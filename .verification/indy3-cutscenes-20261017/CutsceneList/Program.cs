@@ -143,6 +143,10 @@ if (args.Length > 5 && args[1] == "alloc")
     }
     Console.WriteLine($"per frame: AdvanceFrame {frame / int.Parse(args[5])} B, CutscenesBegun {begun / int.Parse(args[5])} B, InCutscene {inCutscene / int.Parse(args[5])} B, " +
                       $"Messages.HaveMsg {haveMsg / int.Parse(args[5])} B, SessionTrace.Count {trace / int.Parse(args[5])} B, the Snapshot property alone {snapshotBytes / int.Parse(args[5])} B; uncertainties {session.Snapshot.Uncertainties.Count}, variables {session.Snapshot.KnownGlobalVariables.Count}; trace lines {session.SessionTrace.Count}");
+    // Then the same number of frames again, timed, without the per-question measurement (19 October 2026).
+    var timed = System.Diagnostics.Stopwatch.StartNew();
+    for (var i = 0; i < int.Parse(args[5]); i++) { if (step) session.StepFrame(); else session.AdvanceFrame(); }
+    Console.WriteLine($"{args[5]} more frames: {timed.Elapsed.TotalMilliseconds:0} ms");
     foreach (var (type, bytes) in ticks.Top(15)) Console.WriteLine($"   {bytes / 1048576.0,9:0.0} MB sampled  {type}");
     return;
 }
