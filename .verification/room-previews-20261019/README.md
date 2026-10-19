@@ -76,3 +76,20 @@ Initial scaffolding compilation found an inaccessible internal `LoomReplayCatalo
 The second LOOM initialized screenshot also showed a transient unfilled main Room56 image while the selector card was correctly filled. Main-room pixel equivalence is outside this selector packet's assertions; the observation and captures were sent to the parent for source review. The selector's exact background/native/cache/stability assertions remain independent of that main-room observation.
 
 All supplied families have exact plain-background coverage. Full native/click/cache checks are limited to the listed representative batches; untested full-family native runs, other editions' full scans, normal file-dialog startup, and timing under other hardware/load remain unclaimed. The parent owns product changes, broad tests, shared documentation and master promotion.
+
+## Final async room-opening acceptance — 19 October 2026
+
+Parent App fix **`4421f0d`**, merged here as `e806344529ba224d608689cbf955a931fd189c50`, awaits LOOM draw-batch analysis before room setup and removes synchronous `EnsureSceneBatches` waits. Core and tests were unchanged. The same harness/assertions were rebuilt against this source: **0 warnings, 0 errors, 11.80 seconds**. Only read-only LOOM live-session diagnostics were added. The preceding failure and diagnostic packets remain untouched.
+
+After an empty verification-window process inventory, the parent granted a fresh exclusive lease. These two actual-window processes ran serially, with separate private profile/cache directories and actual sound mode None:
+
+```powershell
+rtk git merge 4421f0d
+rtk proxy dotnet build .verification/room-previews-20261019/WindowCheck/RoomPreviewsWindowCheck.csproj -p:NuGetAudit=false --verbosity quiet
+rtk proxy .\Exe\RoomPreviewsWindowCheck\Debug\net10.0-windows\RoomPreviewsWindowCheck.exe batch 'D:\Juegos\Lucas\loom ega mt32 en' '.verification\room-previews-20261019\window-loom-ega-async-final' '56,58'
+rtk proxy .\Exe\RoomPreviewsWindowCheck\Debug\net10.0-windows\RoomPreviewsWindowCheck.exe batch 'D:\Juegos\Lucas\zak ega en' '.verification\room-previews-20261019\window-zak-classic-async-final' '1,5,7' actions
+```
+
+Final LOOM: **PASS**, cold **4.39 seconds**, **137 heartbeat ticks**, maximum gap **2,065 ms**; the early click returns in **18 ms**, versus the retained preceding 2,679 ms synchronous dispatch. Background ordering, exact native/cache pixels, no stage downgrade, and warm completion assertions are unchanged. Three new captures are retained; the initialized capture was inspected and both the selected Room56 and canonical selector now show the filled face/mouth. The read-only current exploration snapshot at that capture was `SessionModeToggle=True`, Room56, `IsFaithful=False`, `PendingScripts=2`, object780/783 states both0. This records the live session's state without claiming equivalence to detached canonical first-visit state or assigning either to match. Remaining heartbeat cost includes real room setup; the measurement is not a universal latency guarantee.
+
+Final ZakClassic: **PASS**; early click **15 ms**, **1,068 heartbeat ticks**, maximum gap **82 ms**, cold **18.60 seconds**. Its actual native drawer action preserves the initialized card; new-library warm native prewarm and partial ZakEnhanced cancellation/switch to ManiacEnhanced both pass unchanged assertions. Five new captures are retained, and the final replacement-game isolation capture was inspected. Together the two final packets add **8 captures** (**36 total**, including the original failures), with **7 captures inspected** across the complete packet. A final process inventory was empty and the exclusive WPF lease was released. No all-family census or other native family batch was repeated for this App-only fix.

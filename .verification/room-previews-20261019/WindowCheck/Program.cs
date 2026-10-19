@@ -204,6 +204,11 @@ internal static class Program
                 Require(observations > 0 && greatestGap < TimeSpan.FromSeconds(3), "Dispatcher was unresponsive during two-phase work");
                 Save("all-initial-states");
                 Log($"Cold {GameSupport.FamilyOf(game)} rooms[{string.Join(',', ids)}]: all backgrounds before native cards; exact plain pixels; stable cache; {observations} heartbeat ticks, max gap{greatestGap.TotalMilliseconds:F0}ms; elapsed{time.Elapsed.TotalSeconds:F2}s");
+                if (game is { Id: GameId.Loom, Version: ScummVersion.V3 } && Field("_session") is LoomExplorationSession liveLoom)
+                {
+                    var snapshot = liveLoom.Snapshot;
+                    Log($"LOOM live-view diagnostic (not canonical card state): SessionModeToggle={((System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle")).IsChecked}; room={snapshot.RoomId}; IsFaithful={snapshot.IsFaithful}; PendingScripts={snapshot.PendingScripts}; state780={snapshot.ObjectStates.GetValueOrDefault(780)}; state783={snapshot.ObjectStates.GetValueOrDefault(783)}");
+                }
                 foreach (var room in rooms)
                 {
                     Call("SelectResourceInTree", room); await Task.Delay(100);
