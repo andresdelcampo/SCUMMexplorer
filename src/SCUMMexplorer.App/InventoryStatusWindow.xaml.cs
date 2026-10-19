@@ -41,8 +41,15 @@ public partial class InventoryStatusWindow : Window
         foreach (var group in _snapshot.Catalog.GroupBy(item => DisplayName(item.Name ?? $"Object {item.ObjectId}"), StringComparer.CurrentCultureIgnoreCase))
         {
             var variants = group.OrderBy(item => item.ObjectId).ToArray();
+            var qualified = variants.Select(item => variants.Length > 1 && item.Context?.Text is { } context &&
+                !string.IsNullOrWhiteSpace(DisplayName(context)) ? $"{group.Key} ({DisplayName(context)})" : group.Key).ToArray();
             for (var index = 0; index < variants.Length; index++)
-                names[variants[index].ObjectId] = variants.Length == 1 ? group.Key : $"{group.Key} ({index + 1})";
+            {
+                var label = qualified[index];
+                var collisions = qualified.Count(name => string.Equals(name, label, StringComparison.CurrentCultureIgnoreCase));
+                names[variants[index].ObjectId] = variants.Length == 1 || label != group.Key && collisions == 1
+                    ? label : $"{label} ({index + 1})";
+            }
         }
         return names;
     }
@@ -67,6 +74,8 @@ public partial class InventoryStatusWindow : Window
         AdvancedEvidence.Text = string.Join("\n", _snapshot.Characters.Select(c => c.Evidence).Distinct()) +
             "\n" + string.Join("\n", _portraitEvidence.Values) +
             "\n" + string.Join("\n", _session.InventoryCatalogNotes) +
+            "\n" + string.Join("\n", _snapshot.Catalog.Where(item => item.Context is not null).Select(item =>
+                $"Object {item.ObjectId}: source association actor {item.Context!.ActorId}: {item.Context!.Evidence}")) +
             (_snapshot.Refusal is { } refusal ? "\n" + refusal : "") + "\n" +
             string.Join("\n", _session.SessionTrace.Where(line => line.StartsWith("Explicit inventory ", StringComparison.Ordinal)).TakeLast(5));
         UpdateButtons();
