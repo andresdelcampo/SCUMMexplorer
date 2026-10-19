@@ -1,0 +1,3 @@
+Cold ManiacEnhanced: 1 stable cards; fill=False; full initialized cache differs from background in 1; native preparation complete; 220 plain-card observations
+Warm ManiacEnhanced: 1 stable cards; fill=False; full initialized cache differs from background in 1; native preparation complete; 119 plain-card observations
+PASS

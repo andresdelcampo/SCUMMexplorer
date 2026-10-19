@@ -60,6 +60,14 @@ internal static class Program
                 [game.FolderPath, rooms.Select(r => r.ResourceId!.Value), game.Language]);
         var panel = (Panel)window.FindName("RoomCardList");
         IEnumerable<Button> Cards() => panel.Children.OfType<Button>();
+        void Capture(string name)
+        {
+            window.UpdateLayout();
+            var image = new RenderTargetBitmap((int)Math.Ceiling(window.ActualWidth), (int)Math.Ceiling(window.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+            image.Render(window);
+            var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(image));
+            using var file = File.Create(Path.Combine(output, name + ".png")); encoder.Save(file);
+        }
         string Card(GameResource room) => Cards().Single(b => Equals(b.Tag, room)).Content is Image { Source: BitmapSource image } ? Hash(image) : "placeholder";
         IDictionary Stages() => (IDictionary)Field("_roomCardStages")!;
         bool NativePrepared(GameLibrary game, int room)
@@ -145,6 +153,7 @@ internal static class Program
                         Require(Card(room) == expected, "Selection replaced canonical selector pixels");
                     }
                     Require(nativeDifferences > 0, "Batch does not distinguish plain cards from cached native artwork");
+                    Capture(pass == 0 ? "cold-completed-selected" : "warm-completed-selected");
                     Log($"{(pass == 0 ? "Cold" : "Warm")} {GameSupport.FamilyOf(game)}: {rooms.Length} stable cards; fill={fill}; full initialized cache differs from background in {nativeDifferences}; native preparation complete; {observed} plain-card observations");
                 }
                 Log("PASS");
