@@ -237,6 +237,7 @@ public partial class MainWindow
             try
             {
                 var groups = ScummCutsceneIndex.Group(planner.Value.Triggers);
+                if (!ReferenceEquals(_cdSetupPlanner, planner)) return;
                 // The EGA game boots in about a second per trial (the CD's session starts past its intro in milliseconds), so one fresh run per scene
                 // settles every scene a fresh start begins, and the room lists are usable as soon as those are done. The planner's long trials for the
                 // scenes a fresh start does not begin follow; until a scene's setup is derived its note says it is still being checked.

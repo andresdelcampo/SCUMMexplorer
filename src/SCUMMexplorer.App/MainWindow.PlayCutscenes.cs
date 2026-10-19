@@ -82,6 +82,7 @@ public partial class MainWindow
             try
             {
                 var groups = planner.Value.Groups;
+                if (!ReferenceEquals(_playPlanner, planner)) return;
                 _scanTotal = groups.Count;
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) UpdatePlaybackControls(); });
                 // Each run starts from a copy of a boot (ScummBootSnapshot, 18 October 2026), not from a boot of its own (Monkey Island 2 booted 260 times

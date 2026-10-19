@@ -288,6 +288,16 @@ public partial class MainWindow : Window
 
     private void OpenGameFolder(string folder)
     {
+        _roomCardCancellation?.Cancel();
+        _roomCardBackgroundsReady.TrySetResult(false);
+        _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _cdSetupPlanner = null;
+        _cdSavedRoomLists = null;
+        _playPlanner = null;
+        _playSavedRoomLists = null;
+        _playRoomListsDone = false;
+        _cdRoomListsDone = false;
+        _scanDone = _scanTotal = 0;
         StopPlay();
         _play = null;
         _playFolder = null;
@@ -310,7 +320,6 @@ public partial class MainWindow : Window
         _verbReader = new ScummObjectVerbReader(ScummProfile.For(game).Dialect);
         _sceneBatches = null;
         _drawBatchesTask = null;
-        if (game is { Id: GameId.Loom, Version: ScummVersion.V3 }) _ = DrawBatchesAsync(game); // the first room needs them
         _doorwayFinder = null;
         _indexedObjectSnapshot = indexedSnapshot;
         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
@@ -349,8 +358,6 @@ public partial class MainWindow : Window
         var cdIndexed = game is { Id: GameId.LoomVga, V4Archive: { } vga } ? vga.ReadIndexedObjects() : null;
         _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
         _cdCutsceneGroups = null;
-        StartCdSetupDerivation(game);
-        StartPlayCutsceneDerivation(game);
         if (cdIndexed is not null) _indexedStates = cdIndexed.States;
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
@@ -363,6 +370,8 @@ public partial class MainWindow : Window
         catch (InvalidDataException error) { _cdCharset = null; _charsetError = $"charset 2 could not be read: {error.Message}"; }
         _actorCostumes.Clear();
         ShowGame(game);
+        _ = StartRoomBackgroundFollowupsAsync(game, _roomCardBackgroundsReady.Task, _roomCardsMayUseCache,
+            _roomCardGeneration, _roomCardCancellation!.Token);
         StartRelationshipIndexBuild(game);
         try
         {
@@ -548,6 +557,7 @@ public partial class MainWindow : Window
         var cancellation = new CancellationTokenSource();
         _roomCardCancellation = cancellation;
         var generation = ++_roomCardGeneration;
+        _roomCardStages.Clear();
         var rooms = game.Scenes.ToArray();
         var indexedSnapshot = _indexedObjectSnapshot is null ? null : new ScummIndexedObjectSnapshot(
             _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
@@ -589,71 +599,8 @@ public partial class MainWindow : Window
             RoomCardList.Children.Add(button);
         }
 
-        // Reopening the last game reuses the saved thumbnails; opening with the button, or a missing or stale
-        // cache, rebuilds them with the asynchronous loader and saves each one.
-        var cached = _roomCardsMayUseCache
-            ? RoomThumbnailCache.TryLoad(game.FolderPath, rooms.Select(room => room.ResourceId ?? -1), game.Language) : null;
-        if (cached is not null)
-        {
-            foreach (var roomResource in rooms)
-                if (cached.TryGetValue(roomResource.ResourceId ?? -1, out var thumbnail)) SetRoomCardThumbnail(roomResource, thumbnail);
-            return;
-        }
-        RoomThumbnailCache.Begin(game.FolderPath, game.Language);
-        _ = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
+        _roomCardLoadTask = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
             generation, cancellation.Token);
-    }
-
-    private async Task LoadRoomCardThumbnailsAsync(GameLibrary game, IReadOnlyList<GameResource> rooms,
-        ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
-        int generation, CancellationToken cancellationToken)
-    {
-        var sceneBatches = ScummSceneDrawBatches.Empty;
-        if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
-        {
-            try
-            {
-                sceneBatches = await DrawBatchesAsync(game).WaitAsync(cancellationToken);
-            }
-            catch (OperationCanceledException) { return; }
-            catch (Exception)
-            {
-                sceneBatches = ScummSceneDrawBatches.Empty;
-            }
-        }
-
-        foreach (var roomResource in rooms)
-        {
-            if (cancellationToken.IsCancellationRequested) return;
-            BitmapSource? bitmap = null;
-            string? failure = null;
-            try
-            {
-                bitmap = await Task.Run(() => RenderRoomCardThumbnail(game, roomResource,
-                    indexedSnapshot, indexedStates, sceneBatches, cancellationToken), cancellationToken);
-            }
-            catch (OperationCanceledException) { return; }
-            catch (Exception ex)
-            {
-                failure = ex.Message;
-            }
-
-            if (cancellationToken.IsCancellationRequested) return;
-            if (bitmap is not null && roomResource.ResourceId is int savedId && generation == _roomCardGeneration)
-                RoomThumbnailCache.Save(game.FolderPath, savedId, bitmap, game.Language);
-            try
-            {
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    if (cancellationToken.IsCancellationRequested || generation != _roomCardGeneration ||
-                        !ReferenceEquals(_game, game)) return;
-                    if (bitmap is not null) SetRoomCardThumbnail(roomResource, bitmap);
-                    else SetRoomCardFailure(roomResource, failure ?? "Room preview unavailable.");
-                }, DispatcherPriority.Background);
-            }
-            catch (Exception) when (cancellationToken.IsCancellationRequested || Dispatcher.HasShutdownStarted) { return; }
-            catch (Exception) { return; }
-        }
     }
 
     private Task<ScummSceneDrawBatches>? _drawBatchesTask;
@@ -936,21 +883,8 @@ public partial class MainWindow : Window
         ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (game is { Id: GameId.LoomVga, V4Archive: { } vga })
-        {
-            // First-visit state: the room's entry script run in a fresh session; the plain background where that cannot run.
-            try
-            {
-                var cdScene = LoomCdRoomScene.FirstVisit(game, roomResource.ResourceId!.Value);
-                return CreateRoomCardBitmap(cdScene.Room, cdScene.Compose(), cdScene.CameraX,
-                    cdScene.ShadowPalette is { } shadow ? DisplayPalette(cdScene.Room, shadow) : cdScene.Room.Palette);
-            }
-            catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException)
-            {
-                var cdRoom = vga.DecodeRoom(roomResource.ResourceId!.Value);
-                return CreateRoomCardBitmap(cdRoom, cdRoom.Pixels.ToArray(), 0);
-            }
-        }
+        if (game is { Id: GameId.LoomVga, V4Archive: not null })
+            return RenderLoomCdRoomCard(game, roomResource.ResourceId!.Value, cancellationToken);
         // First visit of a game the generic session boots (R-5.3, R-6.12a): the room as the session leaves it, with its actors; the plain background where that cannot run.
         if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
             ReadFirstVisit(game, firstVisitRoom) is { } firstVisit)
@@ -970,23 +904,11 @@ public partial class MainWindow : Window
         var decoder = new ScummV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
         if (game.Id != GameId.Loom) return CreateRoomCardBitmap(room, DecodeBrowsedOldV3Room(game, room, bytes).Pixels.ToArray(), 0, room.Palette);
-        var pixels = room.Pixels.ToArray();
-        var cameraX = 0;
-        IReadOnlyList<uint> palette = room.Palette;
         if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
-        {
-            var records = new ScummRoomObjectDirectory().Decode(bytes);
-            var objects = new ScummRoomObjects().Decode(bytes);
-            var session = new LoomExplorationSession(game, indexedSnapshot);
-            var snapshot = session.VisitRoom(roomResource);
-            var initialized = CreateSessionRoomSelection(roomResource, room, records, objects,
-                snapshot, indexedStates, sceneBatches);
-            pixels = initialized.Selection.Compose(room);
-            cameraX = session.CameraX ?? 0;
-            palette = DisplayPalette(room, session.ShadowPalette);
-        }
+            return RenderLoomEgaRoomCard(game, roomResource, room, bytes, indexedSnapshot,
+                indexedStates, sceneBatches, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
-        return CreateRoomCardBitmap(room, pixels, cameraX, palette);
+        return CreateRoomCardBitmap(room, room.Pixels.ToArray(), 0, room.Palette);
     }
 
     private static Image CreateRoomCardImage(BitmapSource source, string name)
@@ -1441,7 +1363,6 @@ public partial class MainWindow : Window
                 UpdateRoomNavigationActions(resource);
                 RefreshRoomPreview();
                 UpdateActorLayer();
-                UpdateCurrentRoomCardThumbnail();
                 RoomDisplayLayout.Visibility = Visibility.Visible;
                 // The view starts where the entry script left the camera (room 4's Bobbin stands at x 580).
                 if (cdScene is not null) _pendingCameraX = cdScene.CameraX;
@@ -1488,7 +1409,6 @@ public partial class MainWindow : Window
             ApplyRoomState(resource, objectRecords, objects, visit: true);
             UpdateRoomNavigationActions(resource);
             RefreshRoomPreview();
-            UpdateCurrentRoomCardThumbnail();
             RoomDisplayLayout.Visibility = Visibility.Visible;
             UpdateRoomViewportLayout();
             StatusText.HorizontalAlignment = HorizontalAlignment.Center;
@@ -1723,26 +1643,13 @@ public partial class MainWindow : Window
         return cropped;
     }
 
-    private void UpdateCurrentRoomCardThumbnail()
+    private void SetRoomCardThumbnail(GameResource resource, BitmapSource bitmap, RoomCardPreviewStage stage)
     {
-        if (_currentRoom is not { } room || _currentRoomResource is not { } resource) return;
-        var cameraX = SessionModeToggle.IsChecked == true && _session is not null
-            ? _session.CameraX ?? 0
-            : _pendingCameraX ?? 0;
-        SetRoomCardThumbnail(resource, CreateRoomCardBitmap(room, ComposeRoomPreview(room), cameraX, DisplayPalette(room)));
-    }
-
-    private void SetRoomCardThumbnail(GameResource resource, BitmapSource bitmap)
-    {
-        if (Equals(_currentRoomResource, resource) && _currentRoom is { } liveRoom)
-        {
-            var liveCameraX = SessionModeToggle.IsChecked == true && _session is not null
-                ? _session.CameraX ?? 0
-                : _pendingCameraX ?? 0;
-            bitmap = CreateRoomCardBitmap(liveRoom, ComposeRoomPreview(liveRoom), liveCameraX, DisplayPalette(liveRoom));
-        }
+        // A selection/live-room refresh must never replace canonical first-visit artwork.
+        if (_roomCardStages.TryGetValue(resource, out var previous) && previous > stage) return;
         var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
         if (card is null) return;
+        _roomCardStages[resource] = stage;
         if (card.Content is Image preview) preview.Source = bitmap;
         else card.Content = CreateRoomCardImage(bitmap, LoomResourceNames.Label(_glossary, resource));
         card.ToolTip = $"Open {LoomResourceNames.Label(_glossary, resource)}";
