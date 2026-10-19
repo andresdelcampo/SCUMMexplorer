@@ -249,7 +249,7 @@ public partial class MainWindow
         RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)."
             : !canStart ? "A cutscene is playing. Let it finish or skip it before starting another."
             : roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
-        CutsceneScanNote.Visibility = shown && IsAdvancedMode && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
+        CutsceneScanNote.Visibility = shown && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
         CutsceneScanProgress.Visibility = shown && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
     }
 

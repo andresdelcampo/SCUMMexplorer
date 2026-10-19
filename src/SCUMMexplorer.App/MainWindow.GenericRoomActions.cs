@@ -74,7 +74,11 @@ public partial class MainWindow
     {
         try
         {
-            var data = ScummDataSources.For(game);
+            // Archive/disk readers own seek positions; background scene derivation and
+            // live playback must not share this inspection reader.
+            var sourceGame = game.V4Archive is not null || game.V4Disks is not null
+                ? SCUMMexplorer.Core.Discovery.GameFolderScanner.Reopen(game) : game;
+            var data = ScummDataSources.For(sourceGame);
             var stored = data.ReadRoom(room);
             var verbs = data.ReadObjectVerbs(room, stored.Objects);
             var readable = ManiacPreviewText.For(game);
@@ -126,11 +130,15 @@ public partial class MainWindow
         _genericSourceHost!.Children.Clear();
         _genericActionButtons.Clear();
         var choices = new StackPanel();
+        var totals = _genericSourceActions.Where(a => a.Executable).GroupBy(a => a.Title).ToDictionary(g => g.Key, g => g.Count());
+        var ordinal = new Dictionary<string, int>();
         foreach (var action in _genericSourceActions.Where(a => a.Executable))
         {
+            var index = ordinal[action.Title] = ordinal.GetValueOrDefault(action.Title) + 1;
+            var title = totals[action.Title] > 1 ? $"{action.Title} ({index})" : action.Title;
             var button = new Button
             {
-                Content = new TextBlock { Text = action.Title, TextWrapping = TextWrapping.Wrap },
+                Content = new TextBlock { Text = title, TextWrapping = TextWrapping.Wrap },
                 HorizontalContentAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 2, 0, 2),
                 Padding = new Thickness(8, 5, 8, 5), ToolTip = IsAdvancedMode ? action.Source : null,
                 Tag = action
@@ -157,7 +165,7 @@ public partial class MainWindow
         {
             var content = new StackPanel();
             content.Children.Add(new TextBlock { Text = action.Source, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 4) });
-            if (action.Code is { } code) content.Children.Add(GenericSourceCode("Source code", code));
+            if (action.Code is { } code) content.Children.Add(GenericSourceCode("Raw disassembly", code));
             _genericSourceHost.Children.Add(new Expander { Header = $"{action.Title} · object {action.Object} / verb 0x{action.Verb:X2}", Content = content });
         }
         _genericSourceHost.Children.Add(new TextBlock { Text = "RELATIONSHIPS · POSSIBLE SOURCE OUTCOMES", Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, 12, 0, 4), TextWrapping = TextWrapping.Wrap });
@@ -188,7 +196,7 @@ public partial class MainWindow
     }
 
     private bool GenericRoomActionCanStart => GenericRoomActions && !_genericActionStarting && !_introPreparing &&
-        _game is { } game && _playFolder == game.Key && _play is { InCutscene: false, BootRunning: false } &&
+        _game is { } game && _playFolder == game.Key && _play is { PlayerHasControl: true, BootRunning: false } &&
         (ScummProfile.For(game).EngineVersion > ScummVersion.V2 || _play.InventoryCharactersAvailable);
 
     private void UpdateGenericRoomActionAvailability()
@@ -214,7 +222,7 @@ public partial class MainWindow
                 if (_roomOpenTask is { } opening) await opening;
             }
             if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration || _currentRoomResource?.ResourceId != roomId ||
-                !PlayActive || _play is not { InCutscene: false } session || session.CurrentRoomId != roomId) return;
+                !PlayActive || _play is not { PlayerHasControl: true } session || session.CurrentRoomId != roomId) return;
             var result = session.ActivateObjectVerb(action.Object, action.Verb);
             _playPaused = false;
             ShowPlayFrame();
