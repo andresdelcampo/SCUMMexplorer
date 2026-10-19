@@ -428,7 +428,7 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         // Charsets 1 (dialogue lines) and 2 (room messages) draw every accent the SPANISH folder writes (0x82 é, 0x88 ê, 0x8A è, 0xA0 to 0xA5, 0xA8 ¿, 0xAD ¡);
         // 0xFA has no glyph in charset 1 of either folder (as on the floppy). Charsets 3 and 6 (the verbs) lack some Spanish glyphs: data, not used for them here.
         foreach (var number in new[] { 1, 2 })
-            Assert.Empty(found.Keys.Where(code => code != 0xFA && session.PlayCharset(number)!.CharWidth(code) == 0));
+            Assert.DoesNotContain(found.Keys, code => code != 0xFA && session.PlayCharset(number)!.CharWidth(code) == 0);
         if (disc is not null) Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
     }
 }
