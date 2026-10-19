@@ -1,4 +1,4 @@
-﻿using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
@@ -369,6 +369,13 @@ public sealed class ScummGameSession : ScummSession
     }
 
     /// <summary>
+    /// <see cref="ScummSession.AdvanceFrame"/> for a caller that does not read the frame's snapshot (the cutscene runs, the planner's verb search):
+    /// the same frame, without copying the session's states, variables and lists into a snapshot nobody reads. This session adds no per-frame work
+    /// of its own, so the two are the same frame.
+    /// </summary>
+    public void StepFrame() => StepOneFrame();
+
+    /// <summary>
     /// Plays frames until the room has settled and says how it ended (S5): no cutscene, message or movement and no change in object states,
     /// positions, draw order or actors for <paramref name="quietFrames"/> frames; or the room was left (a script loaded another room); or the
     /// frame limit was reached (ambient scripts that never rest). The state of the room is the last one captured while the room was current.
@@ -385,7 +392,7 @@ public sealed class ScummGameSession : ScummSession
         var quiet = 0;
         for (var frame = 1; frame <= frameLimit; frame++)
         {
-            AdvanceFrame();
+            StepOneFrame();
             if (_currentRoom?.ResourceId != room) return new(capture, ScummSettleOutcome.RoomLeft, frame, _currentRoom?.ResourceId);
             var now = ObjectValues();
             foreach (var (id, value) in now)
@@ -423,7 +430,10 @@ public sealed class ScummGameSession : ScummSession
     private int ActorFromPosition(int x, int y)
     {
         if (_currentRoom?.ResourceId is not int room || _roomSize is not { } size) return 0;
-        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostumeOnce, classes: _runtime.ObjectClasses, engineVersion: (int)_runtime.EngineVersion);
+        var area = size.Width * size.Height;
+        if (_hitPixels?.Length != area) { _hitPixels = new byte[area]; _hitCoverage = new bool[area]; }
+        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostumeOnce, classes: _runtime.ObjectClasses, engineVersion: (int)_runtime.EngineVersion,
+            pixelBuffer: _hitPixels, coverageBuffer: _hitCoverage);
         foreach (var actor in layer.Actors.OrderBy(item => item.Number))
         {
             if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;
@@ -432,6 +442,11 @@ public sealed class ScummGameSession : ScummSession
         }
         return 0;
     }
+
+    // The drawing ActorFromPosition reads and drops at once: one per thread, reused while the room's size stays (executor allocation speed-up,
+    // 19 October 2026: two room-sized arrays a call, and Indy 4's interface script calls it every frame). Not part of the session's state.
+    [ThreadStatic] private static byte[]? _hitPixels;
+    [ThreadStatic] private static bool[]? _hitCoverage;
 
     private readonly Dictionary<int, ScummCostume?> _drawnCostumes = [];
 
@@ -540,7 +555,7 @@ public sealed class ScummGameSession : ScummSession
         while (frames < BootFrameLimit && (BootGoesOn || untilControl && !PlayerHasControl && _pending.Count > 0))
         {
             if (_bootKeys.Count > 0) PressKey(_bootKeys.Dequeue());
-            AdvanceFrame();
+            StepOneFrame();
             frames++;
             // A boot that waits for the player (a key, a typed answer) changes nothing for a long time: answer it as a player would, through the game's input script.
             // S9 Monkey2 (18 October 2026): once the game has written the answer of a fixed-length question, the question is waiting even while a script

@@ -119,11 +119,13 @@ if (args.Length > 3 && args[1] == "rooms")
     return;
 }
 
-// CutsceneList <folder> alloc <room> <object> <verb> <frames>: the bytes one run's frames allocate, by what the run asks the session each frame
+// CutsceneList <folder> alloc <room> <object> <verb> <frames> [advance]: the bytes one run's frames allocate, by what the run asks the session each frame
 // (cutscene snapshot, 19 October 2026: Indy 4's long runs allocated about 16 GB each).
 if (args.Length > 5 && args[1] == "alloc")
 {
     var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    // A sixth argument "advance" measures AdvanceFrame (its snapshot included); by default the frame the cutscene runs play (StepFrame, 19 October 2026).
+    var step = !(args.Length > 6 && args[6] == "advance");
     var session = ScummGameSession.BootForPlay(game, out _);
     var roomInfo = game.Rooms.First(r => r.ResourceId == room);
     if (obj == 0) session.EnterRoomAgain(roomInfo); else { session.VisitRoom(roomInfo); session.ActivateObjectVerb(obj, verb); }
@@ -136,7 +138,7 @@ if (args.Length > 5 && args[1] == "alloc")
         at = Bytes(); _ = session.InCutscene; inCutscene += Bytes() - at;
         at = Bytes(); _ = session.Messages.HaveMsg; haveMsg += Bytes() - at;
         at = Bytes(); _ = session.SessionTrace.Count; trace += Bytes() - at;
-        at = Bytes(); session.AdvanceFrame(); frame += Bytes() - at;
+        at = Bytes(); if (step) session.StepFrame(); else session.AdvanceFrame(); frame += Bytes() - at;
         at = Bytes(); _ = session.Snapshot; snapshotBytes += Bytes() - at;
     }
     Console.WriteLine($"per frame: AdvanceFrame {frame / int.Parse(args[5])} B, CutscenesBegun {begun / int.Parse(args[5])} B, InCutscene {inCutscene / int.Parse(args[5])} B, " +
@@ -181,6 +183,8 @@ if (args.Length > 1 && args[1] == "skip")
 if (args.Length > 4 && args[1] == "dump")
 {
     var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    // A sixth argument "advance" measures AdvanceFrame (its snapshot included); by default the frame the cutscene runs play (StepFrame, 19 October 2026).
+    var step = !(args.Length > 6 && args[6] == "advance");
     var roomData = data.ReadRoom(room);
     var script = data.ReadObjectVerb(room, roomData.Objects.First(o => o.Id == obj), verb, out _)!;
     foreach (var i in script.Instructions) Console.WriteLine($"+0x{i.Offset:X4} {i.Operation} {i.Operands}");
@@ -220,6 +224,8 @@ if (args.Length > 2 && args[1] == "find")
 if (args.Length > 5 && args[1] == "tail")
 {
     var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    // A sixth argument "advance" measures AdvanceFrame (its snapshot included); by default the frame the cutscene runs play (StepFrame, 19 October 2026).
+    var step = !(args.Length > 6 && args[6] == "advance");
     var session = ScummGameSession.BootForPlay(game, out _);
     var roomInfo = game.Rooms.First(r => r.ResourceId == room);
     if (obj == 0) session.EnterRoomAgain(roomInfo); else { session.VisitRoom(roomInfo); session.ActivateObjectVerb(obj, verb); }
@@ -243,6 +249,8 @@ if (args.Length > 3 && args[1] == "local")
 if (args.Length > 4 && args[1] == "probe")
 {
     var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    // A sixth argument "advance" measures AdvanceFrame (its snapshot included); by default the frame the cutscene runs play (StepFrame, 19 October 2026).
+    var step = !(args.Length > 6 && args[6] == "advance");
     var session = ScummGameSession.BootForPlay(game, out _);
     var roomInfo = game.Rooms.First(r => r.ResourceId == room);
     if (obj == 0) { var at = session.SessionTrace.Count; session.EnterRoomAgain(roomInfo); Print(at, "entry"); }

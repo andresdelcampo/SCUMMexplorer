@@ -59,7 +59,7 @@ public static class ScummCutsceneRun
                 }
                 if (begun && !session.InCutscene && session.Messages.HaveMsg == 0) break;
                 if (!begun && frame >= TrialFrames) break;
-                session.AdvanceFrame();
+                session.StepFrame();
             }
             return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame);
         }

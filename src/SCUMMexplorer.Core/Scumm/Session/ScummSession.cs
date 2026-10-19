@@ -314,7 +314,7 @@ public abstract partial class ScummSession
         }
         if (!exit) { LastEntryScript = script; LastEntryRun = null; }
         if (script is null) return;
-        var result = RunScript(script, _currentObjects, 0, null, 0, pathEstimated: pathEstimated);
+        var result = RunScript(script, _currentObjects, 0, null, 0, pathEstimated: pathEstimated, keepState: !exit);
         if (!exit) LastEntryRun = result;
     }
 
@@ -460,7 +460,7 @@ public abstract partial class ScummSession
         IReadOnlyList<ScummRoomObjectRecord> objects, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth, int? scriptNumber = null,
         IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
-        ScriptFrame? frame = null)
+        ScriptFrame? frame = null, bool keepState = false)
     {
         if (startOffset == 0) startOffset = script.EntryOffset;
         if (depth >= MaxNestedScripts)
@@ -507,7 +507,9 @@ public abstract partial class ScummSession
                 },
                 estimatedLocals: estimatedLocals, pathEstimated: pathEstimated,
                 observation: _observer is null ? null : new(_observer, frame.ObservationSlot, frame.ObservationParent,
-                    frame.ObservationCall, frame.ObservationRan));
+                    frame.ObservationCall, frame.ObservationRan),
+                // Only a run the session keeps (LastEntryRun, LastAction) needs the states and positions as they were when it ended.
+                snapshotState: keepState);
             frame.ObservationRan = true;
         }
         finally

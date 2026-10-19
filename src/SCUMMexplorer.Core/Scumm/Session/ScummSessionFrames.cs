@@ -70,6 +70,13 @@ public abstract partial class ScummSession
 
     protected ScummSessionSnapshot AdvanceOneFrame()
     {
+        StepOneFrame();
+        return Snapshot;
+    }
+
+    /// <summary>One frame of <see cref="AdvanceOneFrame"/> without building the snapshot (a headless run that never reads it: the cutscene derivation).</summary>
+    protected void StepOneFrame()
+    {
         _inventoryStatusFrame++;
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
@@ -126,12 +133,12 @@ public abstract partial class ScummSession
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
             IsExecutedRoomLoad(item) &&
             !_dispatchedLoads.Contains(item));
-        if (roomLoad is null || _currentRoom is null) return Snapshot;
+        if (roomLoad is null || _currentRoom is null) return;
         var target = roomLoad.TargetId is int id ? IndexedRoom(id) : null;
         if (target is null)
         {
             _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
-            return Snapshot;
+            return;
         }
         // S6 Indy4 (17 October 2026): setCameraFollows starts a scene only for an actor outside the current room. Room 04 local 200's endCutscene runs Script 21,
         // whose own actorFollowCamera (dispatched in this frame) has already entered Room 05; the caller's follow at +0x0093 then finds Indy there.
@@ -139,10 +146,9 @@ public abstract partial class ScummSession
             (!_runtime.IsV2 || roomLoad.TargetId == _runtime.GlobalVariables.GetValueOrDefault(ScummVars.Room)))
         {
             _visitTrace.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4}: actorFollowCamera finds the actor in Room {target.ResourceId:00} already; no second startScene");
-            return Snapshot;
+            return;
         }
         EnterReachedLoad(roomLoad, target, null, "after a frame advance");
-        return Snapshot;
     }
 
     /// <summary>

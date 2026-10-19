@@ -81,6 +81,30 @@ public sealed partial class ScummBoundedScriptExecutor
 
     private const int DefaultInstructionLimit = 4096;
 
+    /// <summary>The keys of the 26 locals every run starts with (the same strings for every run).</summary>
+    private static readonly string[] LocalKeys = Enumerable.Range(0, 26).Select(index => $"local[0x{index:X3}]").ToArray();
+
+    /// <summary>
+    /// The variable dictionaries of runs whose result does not keep them (<c>snapshotState: false</c>), for the next run on this thread. A run's
+    /// dictionary starts as a copy of every global (hundreds of entries), and a session runs a few dozen scripts a frame; reusing the dictionary
+    /// fills the same entries in the same order (so its enumeration order is that of a new copy) without a new allocation. Runs nest (an event's
+    /// child runs inside its parent), so this is a stack. Executor allocation speed-up, 19 October 2026.
+    /// </summary>
+    [ThreadStatic] private static Stack<Dictionary<string, ushort>>? _variablePool;
+
+    /// <summary>A script's instructions as a run reads them (matrix operations normalised, v1/v2 overrides expanded) with the index of each
+    /// offset: the same for every run of the same disassembly, so they are made once per disassembly and mode.</summary>
+    private sealed record PreparedInstructions(IReadOnlyList<ScummScriptInstruction> Instructions, Dictionary<int, int> IndexByOffset);
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ScummScriptDisassembly, PreparedInstructions> PreparedV3Up = new();
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ScummScriptDisassembly, PreparedInstructions> PreparedV2 = new();
+
+    private static PreparedInstructions Prepare(ScummScriptDisassembly script, bool v2) => (v2 ? PreparedV2 : PreparedV3Up).GetValue(script, item =>
+    {
+        var instructions = NormalizeMatrixOps(v2 ? ExpandV2Overrides(item.Instructions) : item.Instructions);
+        return new PreparedInstructions(instructions, instructions.Select((instruction, index) => (instruction.Offset, index))
+            .ToDictionary(pair => pair.Offset, pair => pair.index));
+    });
+
     /// <summary>
     /// Returned by an event handler that applies the event itself (such as a
     /// room load that a global script survives): the run pauses right after the
@@ -108,7 +132,8 @@ public sealed partial class ScummBoundedScriptExecutor
         Func<ScummScriptEvent, ScummScriptRuntimeState, string?>? onEvent = null,
         IReadOnlyCollection<string>? estimatedLocals = null,
         bool pathEstimated = false,
-        ScummScriptObservationContext? observation = null)
+        ScummScriptObservationContext? observation = null,
+        bool snapshotState = true)
     {
         ArgumentNullException.ThrowIfNull(script);
         ArgumentNullException.ThrowIfNull(initialObjectStates);
@@ -120,13 +145,21 @@ public sealed partial class ScummBoundedScriptExecutor
         var positions = runtime?.ObjectPositions ?? new Dictionary<int, RoomObjectPosition>();
         foreach (var item in roomObjects)
             positions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
-        var knownVariables = runtime is null
+        // A run whose result does not keep its variables (and that no observer sees) borrows a dictionary; it goes back at the end.
+        var pooled = observation is null && runtime is not null && !snapshotState;
+        Dictionary<string, ushort> knownVariables;
+        if (pooled && _variablePool is { Count: > 0 } pool)
+        {
+            knownVariables = pool.Pop();
+            foreach (var (key, value) in runtime!.GlobalVariables) knownVariables.Add(key, value);
+        }
+        else knownVariables = runtime is null
             ? new Dictionary<string, ushort>(StringComparer.Ordinal)
             : new Dictionary<string, ushort>(runtime.GlobalVariables, StringComparer.Ordinal);
         if (runtime?.IsV2 == true) knownVariables[V2IndirectReads] = 1;
         for (var index = 0; index < 26; index++)
         {
-            var key = $"local[0x{index:X3}]";
+            var key = LocalKeys[index];
             knownVariables[key] = initialLocals is not null && initialLocals.TryGetValue(key, out var value)
                 ? value : (ushort)0;
         }
@@ -141,9 +174,7 @@ public sealed partial class ScummBoundedScriptExecutor
         if (estimatedLocals is not null) estimated.UnionWith(estimatedLocals);
         var onEstimatedPath = pathEstimated;
         var picks = new List<ScummRandomPick>();
-        var instructions = NormalizeMatrixOps(runtime is { IsV2: true } ? ExpandV2Overrides(script.Instructions) : script.Instructions);
-        var indexByOffset = instructions.Select((instruction, index) => (instruction.Offset, index))
-            .ToDictionary(item => item.Offset, item => item.index);
+        var (instructions, indexByOffset) = Prepare(script, runtime is { IsV2: true });
         var pc = startOffset;
         var visited = 0;
         var reachedStop = false;
@@ -174,6 +205,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 barrier: observation.Call is null ? "initialization has no observed dispatch; no caller transfer inferred" : null);
         }
         ScummObservedCall? dispatched = null;
+        Dictionary<string, ushort>? v2Before = null;
 
         while (indexByOffset.TryGetValue(pc, out var instructionIndex))
         {
@@ -211,14 +243,16 @@ public sealed partial class ScummBoundedScriptExecutor
                 // conservatively keep the remainder of this bounded run conditional after any estimated read.
                 if (instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
                     .Any(operand => OperandIsEstimated(operand, estimated, knownVariables))) onEstimatedPath = true;
-                var before = new Dictionary<string, ushort>(knownVariables);
+                v2Before ??= new Dictionary<string, ushort>(knownVariables.Count, StringComparer.Ordinal);
+                v2Before.Clear();
+                foreach (var (key, value) in knownVariables) v2Before.Add(key, value);
                 if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace, onEstimatedPath,
                     out instruction, out var handled, out var branch, out var problem))
                 {
                     unresolved = $"{problem} at +0x{pc:X4}";
                     break;
                 }
-                foreach (var value in knownVariables.Where(pair => !before.TryGetValue(pair.Key, out var old) || old != pair.Value))
+                foreach (var value in knownVariables.Where(pair => !v2Before.TryGetValue(pair.Key, out var old) || old != pair.Value))
                 {
                     MarkEstimated(estimated, value.Key, onEstimatedPath);
                     runtime.NotifyGlobalMutation(value.Key);
@@ -1539,8 +1573,23 @@ public sealed partial class ScummBoundedScriptExecutor
         if (dispatched is not null)
             observation!.Observer.CallBoundary("caller-ended", dispatched, observation.Slot, observation.ParentSlot, observationRun,
                 CallSite("end", pc), [], onEstimatedPath, endSequence, resumeOffset, reachedStop, unresolved);
-        return new ScummBoundedScriptResult(new Dictionary<int, byte>(states),
-            new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
+        // The variables are this run's own dictionary, and without a runtime the states and positions are too: nothing changes them after the
+        // return, so the result keeps them. A runtime's states and positions go on changing; they are copied unless the caller drops them.
+        var keepCopies = runtime is not null && snapshotState;
+        IReadOnlyDictionary<string, ushort> resultVariables = knownVariables;
+        if (pooled)
+        {
+            // The caller of such a run reads only the locals of a run that pauses (to resume it); the dictionary goes back to the pool.
+            var locals = new Dictionary<string, ushort>(StringComparer.Ordinal);
+            if (resumeOffset is not null)
+                foreach (var (key, value) in knownVariables)
+                    if (key.StartsWith("local[", StringComparison.Ordinal)) locals.Add(key, value);
+            resultVariables = locals;
+            knownVariables.Clear();
+            (_variablePool ??= new()).Push(knownVariables);
+        }
+        return new ScummBoundedScriptResult(keepCopies ? new Dictionary<int, byte>(states) : states,
+            keepCopies ? new Dictionary<int, RoomObjectPosition>(positions) : positions, resultVariables,
             trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),
             picks, estimated.Where(key => !IsGlobalKey(key)).ToArray(), onEstimatedPath, delayJiffies, delayEstimate);
     }
@@ -2388,9 +2437,10 @@ public sealed partial class ScummBoundedScriptExecutor
 
     private static void CopyEstimatedGlobals(IEnumerable<string> source, HashSet<string> destination)
     {
-        var globals = source.Where(IsGlobalKey).ToArray();
+        // The source is the run's own set and the destination the runtime's: never the same set, so no copy is needed between them.
         destination.Clear();
-        destination.UnionWith(globals);
+        foreach (var key in source)
+            if (IsGlobalKey(key)) destination.Add(key);
     }
 
     // Observations use the executor's operand resolver without changing a value, path or decision.

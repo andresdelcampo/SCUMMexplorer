@@ -406,7 +406,7 @@ public abstract partial class ScummSession
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject1, checked((ushort)objectId));
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, 0);
             }
-            run = RunScript(script, _currentObjects, 0, null, 0);
+            run = RunScript(script, _currentObjects, 0, null, 0, keepState: true);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {

@@ -55,11 +55,14 @@ public static class ScummActorRenderer
 
     public static ScummActorLayer Render(IEnumerable<ScummActorSnapshot> actors, int currentRoom, int width, int height,
         Func<int, ScummCostume?> costumes, byte[]? depthMask = null, ScummWalkBoxSet? boxes = null,
-        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null, int engineVersion = 3, int lights = 11)
+        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null, int engineVersion = 3, int lights = 11,
+        byte[]? pixelBuffer = null, bool[]? coverageBuffer = null)
     {
-        var pixels = new byte[width * height];
+        // A caller that reads the layer at once and drops it (a hit test) may lend its own buffers of the room's size; they start as new ones would.
+        var pixels = pixelBuffer?.Length == width * height ? pixelBuffer : new byte[width * height];
         Array.Fill(pixels, Transparent);
-        var coverage = new bool[width * height];
+        var coverage = coverageBuffer?.Length == width * height ? coverageBuffer : new bool[width * height];
+        if (ReferenceEquals(coverage, coverageBuffer)) Array.Clear(coverage);
         var drawn = new List<ScummDrawnActor>();
         var skipped = new List<string>();
         foreach (var actor in SortForDrawing(actors, currentRoom))

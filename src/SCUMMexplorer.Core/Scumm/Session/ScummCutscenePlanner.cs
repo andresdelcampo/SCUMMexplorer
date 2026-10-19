@@ -89,7 +89,7 @@ public sealed class ScummCutscenePlanner
         for (; frame < VerbFrameLimit && !(session.Verbs.Any(verb => verb.Mode == 1) && session.UserInputOn && !session.InCutscene); frame++)
         {
             if (session.CutsceneSkippable) { session.PressKey(0x1B); skips++; }
-            session.AdvanceFrame();
+            session.StepFrame();
         }
         return session.Verbs.Any(verb => verb.Mode == 1)
             ? $"the boot (Room {from:00}) shows no verb; the verb names are those of Room {session.CurrentRoomId:00} after {skips} of the game's own skips (Esc) and {frame} frames"
