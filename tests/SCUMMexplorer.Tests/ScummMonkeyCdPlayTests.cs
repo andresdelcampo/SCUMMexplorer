@@ -30,13 +30,27 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
     internal sealed record RouteTexts(string[] Verbs, string WalkTo, string LookAt, string LookAtPoster, string PosterLine, string TalkToPirates,
         string[] Choices, string Trials, string Leave, string PickUpChicken);
 
-    internal static RouteTexts TextsOf(string? disc) => disc is null
-        ? new(["Give", "Pick up", "Use", "Open", "Look at", "Talk to", "Close", "Push", "Pull"], "Walk to", "Look at", "Look at poster", "Re-elect Governor Marley.",
+    /// <remarks>S9 of 19 October 2026 added FRENCH, GERMAN and ITALIAN (record <c>.verification/monkeycd-editions-20261019/README.md</c>); every text is the
+    /// copy's own, read from a probe run of this route. Italian "Parla" takes no preposition and German "Rede mit" a nominative: the copies' own sentence lines.</remarks>
+    internal static RouteTexts TextsOf(string? disc) => disc switch
+    {
+        null => new(["Give", "Pick up", "Use", "Open", "Look at", "Talk to", "Close", "Push", "Pull"], "Walk to", "Look at", "Look at poster", "Re-elect Governor Marley.",
             "Talk to important-looking pirates", ["I want to be a fireman.", "I mean to kill you all!", "I want to be a pirate."], "three trials",
-            "I'll just be running along now.", "Pick up chicken")
-        : new(["Dar", "Coger", "Usar", "Abrir", "Mirar", "Hablar a", "Cerrar", "Empujar", "Tirar"], "Caminar a", "Mirar", "Mirar cartel", "Re-eliga a la Gobernadora Marley.",
+            "I'll just be running along now.", "Pick up chicken"),
+        "SPANISH" => new(["Dar", "Coger", "Usar", "Abrir", "Mirar", "Hablar a", "Cerrar", "Empujar", "Tirar"], "Caminar a", "Mirar", "Mirar cartel", "Re-eliga a la Gobernadora Marley.",
             "Hablar a piratas importantes", ["Quiero ser bombero.", "¡Os voy a matar a todos!", "Quiero ser un pirata."], "tres pruebas",
-            "Pues yo me largo.", "Coger pollo");
+            "Pues yo me largo.", "Coger pollo"),
+        "FRENCH" => new(["Donne", "Prends", "Utilise", "Ouvre", "Regarde", "Parle", "Ferme", "Pousse", "Tire"], "Marchez", "Regarde", "Regarde affiche",
+            "Réélisez le Gouverneur Marley.", "Parle conseil des pirates", ["Je veux devenir pompier.", "Je veux tous vous tuer!", "Je veux devenir pirate."],
+            "trois épreuves", "Bon et bien je dois y aller maintenant.", "Prends poulet"),
+        "GERMAN" => new(["Gebe", "Nimm", "Benutze", "Öffne", "Schau", "Rede", "Schließe", "Drücke", "Ziehe"], "Gehe zu", "Schau an", "Schau an Plakat",
+            "Wählen Sie Gouverneurin Marley:", "Rede mit schrecklich wichtige Piraten",
+            ["Ich will Feuerwehrmann werden.", "Ich werde euch alle töten!", "Ich will Pirat werden."], "Drei Prüfungen", "Ich geh dann mal wieder.", "Nimm Huhn"),
+        "ITALIAN" => new(["Dai", "Prendi", "Usa", "Apri", "Esamina", "Parla", "Chiudi", "Premi", "Tira"], "Vai", "Esamina", "Esamina il manifesto",
+            "Rieleggete il Governatore Marley.", "Parla i pirati dall'aspetto importante",
+            ["Voglio diventare un pompiere.", "Vi ammazzerò tutti!", "Voglio diventare un pirata."], "tre prove", "Beh, sarà meglio che vada via adesso.", "Prendi il pollo"),
+        _ => throw new ArgumentOutOfRangeException(nameof(disc), disc, "no route texts for this copy"),
+    };
 
     private const int Open = 0x02, Give = 0x04, LookAt = 0x08, PickUp = 0x09, TalkTo = 0x0A;
 
@@ -145,6 +159,9 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
     [Theory]
     [InlineData(null)]
     [InlineData("SPANISH")]
+    [InlineData("FRENCH")]
+    [InlineData("GERMAN")]
+    [InlineData("ITALIAN")]
     public void TheAcceptanceRouteFromTheDockRunsThroughTheGamesOwnInterface(string? disc)
     {
         if (Folder() is not { } folder) return;
@@ -337,6 +354,9 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
     [Theory]
     [InlineData(null)]
     [InlineData("SPANISH")]
+    [InlineData("FRENCH")]
+    [InlineData("GERMAN")]
+    [InlineData("ITALIAN")]
     public void ARightClickOnAnObjectRunsItsDefaultVerb(string? disc)
     {
         // R-7.16 (Rule, 16 Oct): from version 4 a right click reaches the input script as the click with mode 2 (ScummVM checkExecVerbs). The CD's Script 4 reads it
@@ -414,6 +434,9 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
     [Theory]
     [InlineData(null)]
     [InlineData("SPANISH")]
+    [InlineData("FRENCH")]
+    [InlineData("GERMAN")]
+    [InlineData("ITALIAN")]
     public void EveryTextByteAboveAsciiHasAGlyphInTheCopysCharsets(string? disc)
     {
         if (Folder() is not { } folder) return;
@@ -429,6 +452,18 @@ public sealed class ScummMonkeyCdPlayTests(ITestOutputHelper output)
         // 0xFA has no glyph in charset 1 of either folder (as on the floppy). Charsets 3 and 6 (the verbs) lack some Spanish glyphs: data, not used for them here.
         foreach (var number in new[] { 1, 2 })
             Assert.DoesNotContain(found.Keys, code => code != 0xFA && session.PlayCharset(number)!.CharWidth(code) == 0);
-        if (disc is not null) Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
+        if (disc == "SPANISH") Assert.True(found.ContainsKey(0xA4) && found.ContainsKey(0xA8) && found.ContainsKey(0xAD), "the Spanish texts write ñ, ¿ and ¡");
+        // S9 of 19 October 2026: the language's own letters (CP437 codes, as the copy writes them) and the charsets that draw each.
+        var letters = disc switch { "FRENCH" => "éèêàçôû", "GERMAN" => "äöüßÄÖÜ", "ITALIAN" => "àèéìòù", _ => "" };
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        var cp437 = System.Text.Encoding.GetEncoding(437);
+        foreach (var letter in letters)
+        {
+            var code = cp437.GetBytes(letter.ToString())[0];
+            output.WriteLine($"{letter} 0x{code:X2}: written {found.ContainsKey(code)}, drawn by charsets [{string.Join(",", charsets.Where(p => p.charset!.CharWidth(code) > 0).Select(p => p.n))}]");
+            // Written by the copy, and drawn by the dialogue (1), message (2) and verb (6) charsets; charset 3 lacks most accents in every folder (the font's own fact).
+            Assert.True(found.ContainsKey(code), $"{letter} is written");
+            foreach (var number in new[] { 1, 2, 6 }) Assert.True(session.PlayCharset(number)!.CharWidth(code) > 0, $"{letter} in charset {number}");
+        }
     }
 }

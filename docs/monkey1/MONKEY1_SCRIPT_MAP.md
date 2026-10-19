@@ -196,6 +196,7 @@ Rows of this section come from the **CD release** only (`Games/monkey1 vga en`: 
 | Room 28 local script 202 | the SCUMM Bar's input script (`VAR_VERB_SCRIPT` = 202 in the bar; the floppy keeps Script 4) | decoded | route trace | 2026-10-17 |
 | Script 14 | the dialogue's input script; its lines are verbs 0x78 up drawn with charset 1 at rows 145 to 185 | decoded | route | 2026-10-17 |
 | Script 12 (sentence line) | verb 0x64 named "verb (code 5 of `var[0x06B]`) + string 49 (code 7, " " from `stringOps loadString 0x31`) + object (code 6)", colour 6 while composing, 3 after a run (Script 4 +0x0438) | decoded | Script 12 +0x0000 to +0x00DD | 2026-10-17 |
+| Script 12 *(disc's GERMAN folder)* | string 49 is " an " for verb 8 (+0x0055) and " mit " for verb 0x0A (+0x0067), " " for the other verbs: the sentence line reads "Schau an Plakat", "Rede mit …" while the verb buttons (Script 22 +0x0080) read "Schau", "Rede"; ENGLISH, FRENCH, ITALIAN and SPANISH load " " for every verb | decoded | GERMAN Script 12 +0x0055, +0x0067; [S9 record](../../.verification/monkeycd-editions-20261019/README.md) | 2026-10-19 |
 | Script 9 (inventory) | eight slots per page from `var[0x076]`; each slot gets an icon: the object's verb 0x5B (started with `startObject`) leaves the icon's object number in `var[0x178]`, else 0x407; `verbOps assignObject icon, 99` takes it from Room 99 (the rubber chicken's icon is object 961); arrows 0x404/0x405 on, 0x409 dim | decoded | Script 9 +0x0000 to +0x0133 | 2026-10-17 |
 
 ### Objects and classes (CD)

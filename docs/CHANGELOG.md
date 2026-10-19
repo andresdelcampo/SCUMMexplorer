@@ -2,6 +2,11 @@
 
 Recent changes: 18–19 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 17 October](archive/CHANGELOG_THROUGH_2026-10-17.md) are an optional historical archive, not startup reading. At a checkpoint, retain roughly the latest two calendar days here and archive older entries with their links.
 
+## 19 October: Monkey Island 1 CD S9 for the FRENCH, GERMAN and ITALIAN folders
+
+- The disc's FRENCH, GERMAN and ITALIAN folders each pass boot (rooms 0, 10, 0, 0, 38, unsupported 0), the room audit (82 of 83, every per-room column equal to ENGLISH), the R-7.18 route and right click with their own texts, disc music ids, the cutscene scan (286 triggers, 160 entries, 62 scenes, equal per entry; 101 of 160 begin, equal per entry) and accents (charsets 1, 2 and 6 draw é è ê à ç ô û, ä ö ü ß, à è é ì ò ù). One look per language through the real window's language list passes. No code changed; the registry level stays.
+- Differences are data: each copy's texts (`RouteTexts` per copy folder), German Script 12's sentence words " an "/" mit " (script map row), charset 3's missing accents. Tests: `ScummMonkeyCd*` theories over every folder (93 passed with the language-choice, support and architecture tests). Record: [monkeycd-editions-20261019](../.verification/monkeycd-editions-20261019/README.md).
+
 ## 19 October: background-first room previews (all games)
 
 - Every room selector receives plain backgrounds before native first-visit details are prepared on background workers. Native initialization remains upfront even when the background already looks complete; heavier scene scans start after the backgrounds. Requirements R-5.1/R-5.2 and new R-5.3b record the requested order.

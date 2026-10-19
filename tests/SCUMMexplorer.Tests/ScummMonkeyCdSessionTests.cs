@@ -29,13 +29,17 @@ public sealed class ScummMonkeyCdSessionTests
     private static void AssertNothingUnsupported(ScummGameSession session) =>
         Assert.DoesNotContain(session.Snapshot.Uncertainties, item => Unsupported.Any(item.Contains) && !item.Contains("seeded pick"));
 
-    [Fact]
-    public void TheDiscsSpanishFolderBootsTheSameWay()
+    [Theory]
+    [InlineData("SPANISH")]
+    [InlineData("FRENCH")]
+    [InlineData("GERMAN")]
+    [InlineData("ITALIAN")]
+    public void TheDiscsOtherLanguageFoldersBootTheSameWay(string disc)
     {
         // S9 (18 October 2026): the disc carries ENGLISH, FRENCH, GERMAN, ITALIAN and SPANISH folders, each with its own MONKEY.000/.001; the scanner reads
-        // ENGLISH unless GameFolderScanner.DiscFolder names another. The SPANISH copy boots through the same rooms with nothing unsupported and no input.
+        // ENGLISH unless GameFolderScanner.DiscFolder names another. Each other copy (SPANISH 18 October, FRENCH, GERMAN and ITALIAN 19 October) boots through the same rooms with nothing unsupported and no input.
         if (Folder() is not { } folder) return;
-        var game = new GameFolderScanner { DiscFolder = "SPANISH" }.Scan(folder);
+        var game = new GameFolderScanner { DiscFolder = disc }.Scan(folder);
         var data = (ScummV5DataSource)ScummDataSources.For(game);
         var session = new ScummGameSession(game, data.ReadIndexedObjects(), 0, null, data);
 
