@@ -53,7 +53,7 @@ public sealed class ScummEgoArrivalIndex
     public static ScummEgoArrivalIndex For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        return Cache.GetOrAdd($"{game.FolderPath}|{game.Title}", _ => Build(game));
+        return Cache.GetOrAdd($"{game.Key}|{game.Title}", _ => Build(game));
     }
 
     private static ScummEgoArrivalIndex Build(GameLibrary game)

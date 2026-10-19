@@ -19,7 +19,7 @@ internal static class RoomThumbnailCache
         ? custom
         : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SCUMMexplorer", "room-cache");
 
-    private static string Directory(string gameFolder)
+    private static string Directory(string gameFolder, string? language)
     {
         var key = Path.GetFullPath(gameFolder).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).ToUpperInvariant();
         return Path.Combine(Root, Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key)))[..16]);
@@ -37,11 +37,11 @@ internal static class RoomThumbnailCache
     private static string RoomFile(string directory, int roomId) => Path.Combine(directory, $"room-{roomId:00}.png");
 
     /// <summary>Empties the game's cache and stamps it, ready for <see cref="Save"/>.</summary>
-    public static void Begin(string gameFolder)
+    public static void Begin(string gameFolder, string? language = null)
     {
         try
         {
-            var directory = Directory(gameFolder);
+            var directory = Directory(gameFolder, language);
             if (System.IO.Directory.Exists(directory)) System.IO.Directory.Delete(directory, recursive: true);
             System.IO.Directory.CreateDirectory(directory);
             File.WriteAllText(Path.Combine(directory, "stamp.txt"), Stamp(gameFolder));
@@ -49,11 +49,11 @@ internal static class RoomThumbnailCache
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
 
-    public static void Save(string gameFolder, int roomId, BitmapSource bitmap)
+    public static void Save(string gameFolder, int roomId, BitmapSource bitmap, string? language = null)
     {
         try
         {
-            var directory = Directory(gameFolder);
+            var directory = Directory(gameFolder, language);
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bitmap));
             using var stream = File.Create(RoomFile(directory, roomId));
@@ -63,11 +63,11 @@ internal static class RoomThumbnailCache
     }
 
     /// <summary>Every requested room's thumbnail, or null when the cache is missing, stale or incomplete.</summary>
-    public static IReadOnlyDictionary<int, BitmapSource>? TryLoad(string gameFolder, IEnumerable<int> roomIds)
+    public static IReadOnlyDictionary<int, BitmapSource>? TryLoad(string gameFolder, IEnumerable<int> roomIds, string? language = null)
     {
         try
         {
-            var directory = Directory(gameFolder);
+            var directory = Directory(gameFolder, language);
             var stampFile = Path.Combine(directory, "stamp.txt");
             if (!File.Exists(stampFile) || File.ReadAllText(stampFile) != Stamp(gameFolder)) return null;
             var result = new Dictionary<int, BitmapSource>();
