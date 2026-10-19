@@ -3,28 +3,56 @@ using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
+/// <summary>Where a cutscene run's fresh start comes from (<see cref="ScummCutscenePlanner"/>).</summary>
+public enum ScummCutsceneStart
+{
+    /// <summary>A copy of one boot, shared by every thread (the game's readers may be read from several threads).</summary>
+    SharedSnapshot,
+    /// <summary>
+    /// A copy of one of several boots, one per run going on at the same time (<see cref="ScummBootSnapshotPool"/>): for a disk or archive game whose
+    /// session factory reads its own copy of the game at each call, so no reader is used by two runs at once.
+    /// </summary>
+    SnapshotPerWorker,
+    /// <summary>A boot for every run.</summary>
+    BootPerRun,
+}
+
 /// <summary>
 /// The cutscene list of a game played through the generic session (S7, 17 October 2026; first games: Indiana Jones and the Last Crusade, EGA and
 /// 256 colours): the triggers the engine's scan finds in the game's scripts (<see cref="ScummCutsceneIndex"/>), titled with the game's own verb names
 /// (read from its verbs after the boot, as its scripts create them), grouped as LOOM's are, and for each group a headless run from a fresh start
 /// (<see cref="ScummCutsceneRun"/>) that says whether that start begins the cutscene and which rooms it plays out in. Thread-safe for one derivation
-/// at a time per trigger; the runs build their own sessions.
+/// at a time per trigger; each run gets its own session, a copy of one boot (<see cref="ScummBootSnapshot"/>).
 /// </summary>
 public sealed class ScummCutscenePlanner
 {
+    // Cutscene snapshot (18 October 2026): the runs start from copies of one boot, not from a boot each (Monkey Island 2: 260 boots of about 0.9 s).
+
     private readonly GameLibrary _game;
     private readonly Func<ScummGameSession> _newSession;
+    private readonly ScummBootSnapshotPool? _pool;
     private readonly ConcurrentDictionary<(int, int, int), ScummCutsceneRunResult> _runs = [];
 
     /// <param name="newSession">A fresh session booted to the first playable room; by default <see cref="ScummGameSession.BootForPlay"/>.</param>
+    /// <param name="start">
+    /// How each run gets its fresh start: by default a copy of one boot (<see cref="ScummBootSnapshot"/>; the boot is <paramref name="newSession"/>'s
+    /// first call); <see cref="ScummCutsceneStart.SnapshotPerWorker"/> when each call of <paramref name="newSession"/> reads its own copy of the game;
+    /// <see cref="ScummCutsceneStart.BootPerRun"/> calls it for every run, as before 18 October 2026.
+    /// </param>
     public ScummCutscenePlanner(GameLibrary game, Func<ScummGameSession>? newSession = null, string? preparationNote = null,
-        Func<string, string>? readableText = null)
+        Func<string, string>? readableText = null, ScummCutsceneStart start = ScummCutsceneStart.SharedSnapshot)
     {
         ArgumentNullException.ThrowIfNull(game);
         _game = game;
         PreparationNote = preparationNote;
-        _newSession = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
-        var booted = _newSession();
+        var boot = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
+        _newSession = start switch
+        {
+            ScummCutsceneStart.SharedSnapshot => ScummBootSnapshot.Shared(boot),
+            _ => boot,
+        };
+        if (start == ScummCutsceneStart.SnapshotPerWorker) _pool = new ScummBootSnapshotPool(boot);
+        var booted = _pool is null ? _newSession() : _pool.Use(fresh => fresh());
         VerbSource = UntilAVerbIsOn(booted);
         Verbs = VerbsOf(booted, readableText);
         Triggers = ScummCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).ToList(), null, game, Verbs);
@@ -98,7 +126,11 @@ public sealed class ScummCutscenePlanner
 
     /// <summary>Runs the trigger from a fresh start (once; cached).</summary>
     public ScummCutsceneRunResult Run(ScummCutscene trigger) =>
-        _runs.GetOrAdd(Key(trigger), _ => ScummCutsceneRun.Run(_game, _newSession, trigger));
+        _runs.GetOrAdd(Key(trigger), _ => _pool is null ? ScummCutsceneRun.Run(_game, _newSession, trigger)
+            : _pool.Use(fresh => ScummCutsceneRun.Run(_game, fresh, trigger)));
+
+    /// <summary>With <see cref="ScummCutsceneStart.SnapshotPerWorker"/>, the boots the pool made so far (at most one per run going on at once); else null.</summary>
+    public int? PoolBoots => _pool?.Boots;
 
     /// <summary>The run when it is done already (so a caller on the UI thread can ask without waiting).</summary>
     public bool TryGetRun(ScummCutscene trigger, out ScummCutsceneRunResult run) => _runs.TryGetValue(Key(trigger), out run!);
