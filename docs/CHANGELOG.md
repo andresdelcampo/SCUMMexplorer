@@ -2,6 +2,14 @@
 
 Recent changes: 18–19 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 17 October](archive/CHANGELOG_THROUGH_2026-10-17.md) are an optional historical archive, not startup reading. At a checkpoint, retain roughly the latest two calendar days here and archive older entries with their links.
 
+## 19 October: background-first room previews (all games)
+
+- Every room selector receives plain backgrounds before native first-visit details are prepared on background workers. Native initialization remains upfront even when the background already looks complete; heavier scene scans start after the backgrounds. Requirements R-5.1/R-5.2 and new R-5.3b record the requested order.
+- Completed selector artwork stays independent of current-room play, fixing characters disappearing after selection. LOOM previews include native actor layers and retain gap-filling, masks and camera framing. Early LOOM selection awaits analysis asynchronously.
+- A source/build/language-specific cache commits one complete batch atomically at the end. Cancellation, stale game switches and failed writes preserve the preceding complete cache; warm display still performs native prewarming.
+- All 1,002 plain backgrounds across 14 families match source decoders. Eight representative native window batches pass cold/warm ordering, exact pixels, actor preservation and isolation checks; cache and LOOM actor harnesses pass. Support levels remain unchanged. Full regression, retained failures, bounds and clean promotion are recorded at the [checkpoint](checkpoints/20261019-RoomPreviews.md).
+- Final required suite: **1,657 passed, zero failed, five expected skips**; final solution build zero warnings/errors and three regenerated-matrix checks pass. The normal executable is refreshed at clean promotion.
+
 ## 19 October: consolidate Maniac/Zak support notes and keep recent history
 
 - Current Maniac/Zak acceptance limits now live in [REQUIREMENTS](REQUIREMENTS.md#maniac-and-zak-support-boundaries), with completed work in this changelog and its dated evidence. The two redundant support-status trackers are removed; 39 affected Markdown files now link to the existing requirements section. Other families remain with their owners.
