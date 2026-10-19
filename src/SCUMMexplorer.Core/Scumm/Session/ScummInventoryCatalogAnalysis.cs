@@ -13,7 +13,8 @@ internal sealed class ScummInventoryCatalogAnalysis(
     Func<int, int, int, ScummScriptDisassembly?> objectScript,
     Action<ScummScriptDisassembly, ScummScriptInstruction, int?, int?, bool> pickup,
     Action<string> note,
-    IReadOnlyDictionary<int, bool?>? pickupable = null)
+    IReadOnlyDictionary<int, bool?>? pickupable = null,
+    Action<ScummScriptDisassembly, ScummScriptInstruction, int?, int?>? ownerWrite = null)
 {
     private readonly HashSet<string> _calls = [];
 
@@ -73,6 +74,8 @@ internal sealed class ScummInventoryCatalogAnalysis(
             }
             if (operation == "pickupObject" || operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable")
                 pickup(script, instruction, Read(parts[0]), room, operation == "setState");
+            if (operation == "setOwnerOf" && parts.Length == 2)
+                ownerWrite?.Invoke(script, instruction, Read(parts[0]), Read(parts[1]));
             if (operation is "startScript" or "chainScript" && Read(parts[0]) is int called && globals.TryGetValue(called, out var helper))
             {
                 Scan(helper, values.GetValueOrDefault(ScummVars.V2.ActiveObject1) is > 0 and var active ? active : null, room, values, depth + 1);
@@ -170,7 +173,8 @@ internal sealed class ScummInventoryCatalogAnalysis(
         foreach (var instruction in script.Instructions)
         {
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
-            if (instruction.Operation == "pickupObject" || instruction.Operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable") return true;
+            if (instruction.Operation == "pickupObject" || ownerWrite is not null && instruction.Operation == "setOwnerOf" ||
+                instruction.Operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable") return true;
             if (instruction.Operation is "startScript" or "chainScript")
             {
                 if (Literal(parts[0]) is not int id) return true;
@@ -194,7 +198,8 @@ internal sealed class ScummInventoryCatalogAnalysis(
         {
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
             var operation = instruction.Operation;
-            var effect = operation == "pickupObject" || operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable";
+            var effect = operation == "pickupObject" || ownerWrite is not null && operation == "setOwnerOf" ||
+                operation == "setState" && parts.Length > 1 && parts[1] is "Pickupable" or "Unpickupable";
             if (operation is "startScript" or "chainScript")
                 effect |= Literal(parts[0]) is not int id || globals.TryGetValue(id, out var child) && MayAffectInventory(child, room, []);
             if (operation == "doSentence" && parts.Length == 4 && parts[3] == "sub=0x01" && Literal(parts[0]) != 254)
