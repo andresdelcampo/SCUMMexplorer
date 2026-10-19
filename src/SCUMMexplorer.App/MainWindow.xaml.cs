@@ -1029,6 +1029,7 @@ public partial class MainWindow : Window
         UpdateCostumeColorVisibility();
         RefreshPlayRoomActions();
         RefreshPlayOverlays();
+        RefreshPlayOverlayLists(SelectGenericInteractTarget);
     }
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1419,6 +1420,7 @@ public partial class MainWindow : Window
                     UpdateRoomMusicActions();
                     RefreshPlayRoomActions();
                     RefreshPlayOverlays();
+                    RefreshPlayOverlayLists(SelectGenericInteractTarget);
                 }
                 return;
             }

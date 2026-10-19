@@ -243,6 +243,7 @@ public partial class MainWindow
         else PlayScreenImage.ToolTip = null;
         TryUpdateGenericRoomSounds();
         RefreshPlayOverlays(frame);
+        RefreshPlayOverlayLists(SelectGenericInteractTarget);
     }
 
     // The image's point as a game screen point (0..319, 0..199).
