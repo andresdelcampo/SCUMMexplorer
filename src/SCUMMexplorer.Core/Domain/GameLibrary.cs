@@ -72,6 +72,18 @@ public sealed record GameLibrary(
     /// <summary>The spoken lines of a talkie game (<c>MONSTER.SOU</c>), when the game has them; null for every other game.</summary>
     public ScummSpeechBank? Speech { get; init; }
 
+    /// <summary>
+    /// 19 October 2026: the languages the game's data holds, when it holds more than one (Monkey Island 1 CD: one folder per language on the disc); empty otherwise.
+    /// Detected from the data only; <see cref="Language"/> says which one this library reads.
+    /// </summary>
+    public IReadOnlyList<GameLanguage> Languages { get; init; } = [];
+
+    /// <summary>The key of the language this library reads (one of <see cref="Languages"/>), or null when the game holds one language.</summary>
+    public string? Language { get; init; }
+
+    /// <summary>What identifies this data set: the folder, and the language when the game holds several. Caches and play sessions are keyed by it.</summary>
+    public string Key => Language is null ? FolderPath : FolderPath + "|" + Language;
+
     /// <summary>The resource number of CD audio track <c>n</c> is <c>CdTrackIdBase + n</c>.</summary>
     public const int CdTrackIdBase = 2000;
 
@@ -86,3 +98,9 @@ public sealed record GameLibrary(
 
     public IEnumerable<GameResource> Rooms =>Resources.Where(r => r.Kind == ResourceKind.Room);
 }
+
+/// <summary>
+/// One language of a game whose data holds several (19 October 2026): <see cref="Key"/> names the data set to read (the disc folder, for Monkey Island 1 CD
+/// <c>SPANISH</c>) and <see cref="Label"/> is how the data names it, for the user ("Spanish").
+/// </summary>
+public sealed record GameLanguage(string Key, string Label);

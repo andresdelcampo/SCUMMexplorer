@@ -50,21 +50,46 @@ public sealed partial class ScummV5Archive : IBrowsableArchive
     public static ScummV5Game? FindGame(IGameFileSource source, string? folder = null)
     {
         ScummV5Game? best = null;
-        foreach (var name in source.FileNames.Where(n => n.EndsWith(".000", StringComparison.OrdinalIgnoreCase) &&
-                                                         (folder is null || n.StartsWith(folder + "/", StringComparison.OrdinalIgnoreCase))))
+        foreach (var candidate in FindGames(source).Where(g => folder is null || g.Stem.StartsWith(folder + "/", StringComparison.OrdinalIgnoreCase)))
+            if (best is null || candidate.RoomCount > best.RoomCount ||
+                candidate.RoomCount == best.RoomCount && candidate.Stem.Contains("ENGLISH", StringComparison.OrdinalIgnoreCase) && !best.Stem.Contains("ENGLISH", StringComparison.OrdinalIgnoreCase))
+                best = candidate;
+        return best;
+    }
+
+    /// <summary>Every <c>X.000</c> of the folder or disc with an <c>X.001</c> beside it whose index parses and lists rooms, in the source's file order.</summary>
+    public static IReadOnlyList<ScummV5Game> FindGames(IGameFileSource source)
+    {
+        var found = new List<ScummV5Game>();
+        foreach (var name in source.FileNames.Where(n => n.EndsWith(".000", StringComparison.OrdinalIgnoreCase)))
         {
             var stem = name[..^4];
             if (!source.Exists(stem + ".001")) continue;
             int rooms;
             try { rooms = CountRooms(Decode(source.ReadAllBytes(name))); }
             catch (Exception ex) when (ex is InvalidDataException or IOException or ArgumentException) { continue; }
-            if (rooms <= 0) continue;
-            var candidate = new ScummV5Game(stem, rooms);
-            if (best is null || rooms > best.RoomCount ||
-                rooms == best.RoomCount && stem.Contains("ENGLISH", StringComparison.OrdinalIgnoreCase) && !best.Stem.Contains("ENGLISH", StringComparison.OrdinalIgnoreCase))
-                best = candidate;
+            if (rooms > 0) found.Add(new ScummV5Game(stem, rooms));
         }
-        return best;
+        return found;
+    }
+
+    /// <summary>The folder of a game's stem (<c>SPANISH</c> for <c>SPANISH/MONKEY</c>), or null when the files sit at the top of the source.</summary>
+    public static string? FolderOf(ScummV5Game game) => game.Stem.LastIndexOf('/') is var slash and > 0 ? game.Stem[..slash] : null;
+
+    /// <summary>
+    /// 19 October 2026: the folders of a disc that each carry a copy of the same full game (Monkey Island 1 CD: ENGLISH, FRENCH, GERMAN, ITALIAN, SPANISH, each with
+    /// its own <c>MONKEY.000/.001</c>): the candidates whose index lists as many rooms as the default game's and whose files have the same name, in different folders.
+    /// Fewer than two such folders (a demo beside the game, a game at the top of a folder) is no choice: empty.
+    /// </summary>
+    public static IReadOnlyList<string> FindGameFolders(IGameFileSource source)
+    {
+        var games = FindGames(source);
+        var best = FindGame(source);
+        if (best is null) return [];
+        var name = Path.GetFileName(best.Stem);
+        var folders = games.Where(g => g.RoomCount == best.RoomCount && Path.GetFileName(g.Stem).Equals(name, StringComparison.OrdinalIgnoreCase))
+            .Select(FolderOf).OfType<string>().Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        return folders.Count > 1 ? folders : [];
     }
 
     public static ScummV5Archive Load(IGameFileSource source, ScummV5Game game)

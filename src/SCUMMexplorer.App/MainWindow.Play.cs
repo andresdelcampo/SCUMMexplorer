@@ -19,6 +19,7 @@ public partial class MainWindow
 {
     private ScummGameSession? _play;
     private ScummPlayScreen? _playScreen;
+    /// <summary>The <see cref="GameLibrary.Key"/> (folder, and language when the game holds several) of the game the play session runs.</summary>
     private string? _playFolder;
     private DispatcherTimer? _playTimer;
     private bool _playPaused;
@@ -86,10 +87,10 @@ public partial class MainWindow
     private async Task StartPlayAsync(GameResource resource, CancellationToken token)
     {
         if (_game is not { } game || resource.ResourceId is not int roomId) return;
-        var startingSession = _play is null || _playFolder != game.FolderPath;
+        var startingSession = _play is null || _playFolder != game.Key;
         try
         {
-            if (_play is null || _playFolder != game.FolderPath)
+            if (_play is null || _playFolder != game.Key)
             {
                 StopPlay();
                 ScummIndexedObjectSnapshot? objects = null;
@@ -98,7 +99,7 @@ public partial class MainWindow
                 _play = session;
                 UpdatePlaySoundCard();
                 _playScreen = new ScummPlayScreen(game, session, objects!.States);
-                _playFolder = game.FolderPath;
+                _playFolder = game.Key;
                 _playCdTracks = ScummCdAudioTracks.For(game);
                 _playImuse = ScummImuseMusic.For(game);
             }

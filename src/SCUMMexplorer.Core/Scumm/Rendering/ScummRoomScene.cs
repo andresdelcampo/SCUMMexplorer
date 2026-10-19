@@ -115,7 +115,7 @@ public static class ScummRoomFirstVisit
     /// (the plain background is shown instead; the app says so in Advanced only).
     /// </summary>
     public static ScummRoomScene? Cached(GameLibrary game, int roomId) =>
-        Scenes.GetOrAdd($"{game.FolderPath}|{roomId}", _ => new Lazy<ScummRoomScene?>(() =>
+        Scenes.GetOrAdd($"{game.Key}|{roomId}", _ => new Lazy<ScummRoomScene?>(() =>
         {
             try { return Run(game, roomId); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or NotSupportedException) { return null; }

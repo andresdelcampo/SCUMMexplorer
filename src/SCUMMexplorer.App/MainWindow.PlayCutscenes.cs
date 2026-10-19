@@ -56,14 +56,14 @@ public partial class MainWindow
         _playSavedRoomLists = null;
         _playRoomListsDone = false;
         if (!PlayCutscenes) return;
-        _playSavedRoomLists = _roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath) : null;
+        _playSavedRoomLists = _roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath, game.Language) : null;
         // A game read from one archive or disk set shares its reader between sessions, so the scan and each background worker read from their own
         // copy of the game (their own reader), never the play session's: Monkey Island floppy, 164 runs, 109 s on one thread, 36 s on eight
         // (17 October 2026; more workers were slower), and a scan through the play session's reader while it played lost 11 groups. A file-per-room
         // game shares the one copy, as before. Since the cutscene snapshot (18 October 2026) a disk or archive game's runs start from a pool of boots,
         // each of its own copy and used by one run at a time (ScummBootSnapshotPool: at most one boot per worker); a file-per-room game boots once.
         var ownReader = game.V4Archive is not null || game.V4Disks is not null;
-        GameLibrary Copy() => new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(game.FolderPath);
+        GameLibrary Copy() => SCUMMexplorer.Core.Discovery.GameFolderScanner.Reopen(game); // same folder and language (R-3.16)
         var planner = new Lazy<ScummCutscenePlanner>(() =>
         {
             if (!ownReader) return NewPlayCutscenePlanner(game);
@@ -94,7 +94,7 @@ public partial class MainWindow
                     planner.Value.Run(group.First);
                     CountScanStep(planner);
                 });
-                CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
+                CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists(), game.Language);
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) { _playRoomListsDone = true; UpdatePlaybackControls(); } });
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException)

@@ -7,7 +7,14 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Traced indirect transformation costumes, retained animal palettes and the distinction between stored and current Mars clothing colours. Two blocked native character-switch preparations are retained without a prerequisite shortcut.
 - Costume details offer display-only colour choices from separately attributed source/opening/room-preview contexts. The existing default is preserved; seven estimate cards gain contextual records while all eleven global estimates and Costumes Partial remain. Source conditions and estimates are Advanced.
 - Asynchronous progress, cancellation, stale-request guards and window-close cancellation keep context discovery separate from the live game. Actual-window review fixed a plain-label fallback and preserved genuine unused artwork-channel equality. Three final windows pass with native pixel/state checks; Classic Maniac and enhanced Zak are unchanged.
-- All three concurrent master updates are preserved; matrices regenerated, solution build zero warnings/errors. Full-suite counters, clean promotion and remaining boundaries: [checkpoint](checkpoints/20261019-Palettes-ManiacZak.md).
+- All concurrent master updates are preserved; matrices regenerated, solution build zero warnings/errors. Full-suite counters, clean promotion and remaining boundaries: [checkpoint](checkpoints/20261019-Palettes-ManiacZak.md).
+
+## 19 October: choosing the language of a game that holds several (R-3.16)
+
+- Requirement R-3.16 (Rule, confirmed by the user 19 Oct). A survey of every local game by its own data found one game with several languages: the Monkey Island 1 CD (`ENGLISH`, `FRENCH`, `GERMAN`, `ITALIAN`, `SPANISH`, each `MONKEY.000/.001`); the Indy 4 disc's demos and the LOOM CD are not languages.
+- Discovery lists the languages (`GameFolderScanner.ListLanguages`, `GameLibrary.Languages`/`Language`/`Key`), labelled by the disc's folder names; the default stays ENGLISH; a missing folder falls back and the note says so.
+- The window shows a language list under the game's name only for such a game; choosing one reopens the game in it and remembers it per folder (`game-languages.txt`). Play, thumbnails, CD room lists, first-visit scenes and ego arrivals are keyed by folder and language.
+- Tests: `GameLanguageChoiceTests` (4) pass; discovery/MonkeyCd/support/architecture 78 passed; LOOM 836 passed (5 skipped); WPF `LanguageWindowCheck` all PASS (Spanish verbs and `Mirar cartel` in play). [Record](../.verification/language-choice-20261019/README.md).
 
 ## 19 October: cutscene lists from one boot (cutscene snapshot, all generic families)
 

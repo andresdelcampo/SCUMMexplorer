@@ -14,7 +14,6 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow : Window
 {
-    private readonly GameFolderScanner _scanner = new();
     private readonly ScummV3EgaRoomDecoder _roomDecoder = new();
     private readonly ScummRoomObjects _objectDecoder = new();
     private readonly ScummRoomObjectDirectory _objectDirectory = new();
@@ -292,7 +291,8 @@ public partial class MainWindow : Window
         StopPlay();
         _play = null;
         _playFolder = null;
-        var game = _scanner.Scan(folder);
+        // R-3.16: a game whose data holds several languages opens in the one remembered for this folder (the default otherwise).
+        var game = new GameFolderScanner { DiscFolder = RememberedLanguage(folder) }.Scan(folder);
         // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
         GameStatusButton.Visibility = Visibility.Collapsed;
         var indexedSnapshot = game.Id == GameId.Loom && game.Version == ScummVersion.V3
@@ -458,6 +458,7 @@ public partial class MainWindow : Window
         PreviewMessage.Visibility = Visibility.Visible;
         GameTitle.Text = game.Title;
         GameInfo.Text = game.Platform.StartsWith("DOS", StringComparison.Ordinal) ? "DOS edition" : game.Platform;
+        ShowLanguageChoice(game);
         GameInfo.ToolTip = $"{game.Version switch { ScummVersion.Unknown => "SCUMM version unconfirmed", _ => $"SCUMM {game.Version}" }} · {game.Platform}";
         ResourceTree.Items.Clear();
         _durationKey = default; // the new tree has no durations yet
@@ -591,14 +592,14 @@ public partial class MainWindow : Window
         // Reopening the last game reuses the saved thumbnails; opening with the button, or a missing or stale
         // cache, rebuilds them with the asynchronous loader and saves each one.
         var cached = _roomCardsMayUseCache
-            ? RoomThumbnailCache.TryLoad(game.FolderPath, rooms.Select(room => room.ResourceId ?? -1)) : null;
+            ? RoomThumbnailCache.TryLoad(game.FolderPath, rooms.Select(room => room.ResourceId ?? -1), game.Language) : null;
         if (cached is not null)
         {
             foreach (var roomResource in rooms)
                 if (cached.TryGetValue(roomResource.ResourceId ?? -1, out var thumbnail)) SetRoomCardThumbnail(roomResource, thumbnail);
             return;
         }
-        RoomThumbnailCache.Begin(game.FolderPath);
+        RoomThumbnailCache.Begin(game.FolderPath, game.Language);
         _ = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
             generation, cancellation.Token);
     }
@@ -639,7 +640,7 @@ public partial class MainWindow : Window
 
             if (cancellationToken.IsCancellationRequested) return;
             if (bitmap is not null && roomResource.ResourceId is int savedId && generation == _roomCardGeneration)
-                RoomThumbnailCache.Save(game.FolderPath, savedId, bitmap);
+                RoomThumbnailCache.Save(game.FolderPath, savedId, bitmap, game.Language);
             try
             {
                 await Dispatcher.InvokeAsync(() =>

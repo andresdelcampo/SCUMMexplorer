@@ -1,6 +1,6 @@
 # Monkey Island 1 CD support status
 
-Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 18 October 2026 | Owner: S7 MonkeyCd agent
+Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 19 October 2026 | Owner: S7 MonkeyCd agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -15,7 +15,8 @@ Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island
 | S9 Editions | **done for SPANISH** (18 Oct) | – (unchanged) | [monkeycd-editions-20261018](../../.verification/monkeycd-editions-20261018/README.md) | `monkey1 vga es` is the Spanish four-disk floppy (MonkeyFloppy, checked there). The disc's own `SPANISH/` folder (read with the new `GameFolderScanner.DiscFolder`) passes boot, room audit (equal to ENGLISH), the R-7.18 route with right click and disc music, the cutscene scan (286/160/62, equal per entry) and accents (charsets 1 and 2 draw every Spanish glyph). **The window opens only ENGLISH** (no folder choice); FRENCH, GERMAN, ITALIAN not run. Tests: `ScummMonkeyCdPlayTests`, `ScummMonkeyCdSessionTests`, `ScummMonkeyCdCutsceneTests` with the SPANISH folder |
 
 Blocked on: nothing.
-Next: a product decision on opening the disc's other language folders in the window (S9 record, "Open"); the user's S7 checks (record, user checks); the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); the user's listening and timing check of play (see the S6 record).
+Language choice: **done (19 Oct)**, R-3.16: the window offers the disc's five language folders (English, French, German, Italian, Spanish) under the game's name, reopens the game in the chosen one and remembers it per folder ([language-choice-20261019](../../.verification/language-choice-20261019/README.md)). FRENCH, GERMAN and ITALIAN open but have had no edition run.
+Next: the user's S7 checks (record, user checks); the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); the user's listening and timing check of play (see the S6 record).
 Open uncertainties: disc track 21 (16 s) is started by no sound and stays unnamed; six `startSound` operands are variables (script 101 `var[100]`, script 162 `local[4]`, room 75 local script 205 `local[0]`), which sound they start needs running scripts.
 
 ## Decision log
@@ -42,6 +43,10 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 | 18 Oct | S9 | `monkey1 vga es` is not the CD | check it as MonkeyCd / in its own family | its own family (MonkeyFloppy, against `monkey1 ega en`), as the brief says; MonkeyCd's Spanish edition is the disc's `SPANISH/` folder | – |
 | 18 Oct | S9 | How to read the disc's SPANISH folder | a separate copy on disk (game data must not be copied) / a scanner option | `GameFolderScanner.DiscFolder` (init, null = ENGLISH as before) and `ScummV5Archive.FindGame(source, folder)`: additive, nothing in the app sets it | drop the property |
 | 18 Oct | S9 | Route sound offsets for SPANISH | pin them / ids and sources only | ids and sources only for SPANISH (`AssertRouteSounds(..., offsets: false)`); ENGLISH keeps its pinned offsets | pass true |
+| 19 Oct | Language choice | Which languages the disc offers and how they are named | folder names / texts of each copy / a table | the data: the folders that each hold the same full game (same `MONKEY.000/.001` names, same room count, 100), labelled by the disc's own folder name in title case; nothing is guessed (`ScummV5Archive.FindGameFolders`) | – |
+| 19 Oct | Language choice | Default language | first folder / ENGLISH | ENGLISH, as before (the folder that wins a tie of room counts, R-3.14), stated in the detection note | change `FindGame`'s tie rule |
+| 19 Oct | Language choice | A remembered language the disc lacks | error / default | the default, and the detection note says so | – |
+| 19 Oct | Language choice | Caches that hold a game's results | key them by folder / folder and language | folder and language (`GameLibrary.Key`; room thumbnails, CD room lists, first-visit scenes, ego arrivals, the play session); a game with one language keeps its old keys | – |
 
 ---
 

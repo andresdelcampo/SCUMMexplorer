@@ -7,7 +7,7 @@ using SCUMMexplorer.Core.Domain;
 namespace SCUMMexplorer.App;
 
 /// <summary>
-/// The rooms each CD scene plays out in (derived by headless runs, which take many seconds), kept per game folder so the room's
+/// The rooms each CD scene plays out in (derived by headless runs, which take many seconds), kept per game folder (and language, R-3.16: <c>GameLibrary.Language</c>) so the room's
 /// "Play Cutscene" button is there at once on later launches. A stamp (the Core assembly's build time and the game folder's
 /// file sizes and times) invalidates it after a new build or changed game data.
 /// </summary>
@@ -20,7 +20,7 @@ internal static class CdRoomScenesCache
 
     private sealed record Stored(string Stamp, Dictionary<string, int[]> Lists);
 
-    private static string FilePath(string gameFolder)
+    private static string FilePath(string gameFolder, string? language)
     {
         var key = Path.GetFullPath(gameFolder).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).ToUpperInvariant();
         return Path.Combine(Root, "cd-room-scenes-" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key)))[..16] + ".json");
@@ -37,11 +37,11 @@ internal static class CdRoomScenesCache
     }
 
     /// <summary>The saved room lists, or null when there are none for this build and game data.</summary>
-    public static Dictionary<string, int[]>? Load(string gameFolder)
+    public static Dictionary<string, int[]>? Load(string gameFolder, string? language = null)
     {
         try
         {
-            var path = FilePath(gameFolder);
+            var path = FilePath(gameFolder, language);
             if (!File.Exists(path)) return null;
             var stored = JsonSerializer.Deserialize<Stored>(File.ReadAllText(path));
             return stored is not null && stored.Stamp == Stamp(gameFolder) ? stored.Lists : null;
@@ -49,12 +49,12 @@ internal static class CdRoomScenesCache
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException) { return null; }
     }
 
-    public static void Save(string gameFolder, Dictionary<string, int[]> lists)
+    public static void Save(string gameFolder, Dictionary<string, int[]> lists, string? language = null)
     {
         try
         {
             System.IO.Directory.CreateDirectory(Root);
-            File.WriteAllText(FilePath(gameFolder), JsonSerializer.Serialize(new Stored(Stamp(gameFolder), lists)));
+            File.WriteAllText(FilePath(gameFolder, language), JsonSerializer.Serialize(new Stored(Stamp(gameFolder), lists)));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
