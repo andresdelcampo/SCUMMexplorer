@@ -31,9 +31,13 @@ public sealed class GameFolderScanner
 
     /// <summary>
     /// S9 (18 October 2026): the folder of a disc that carries one copy of the game per language (Monkey Island 1 CD: ENGLISH, FRENCH, GERMAN, ITALIAN,
-    /// SPANISH) to read instead of the default (ENGLISH). Null keeps the default; nothing in the app sets it yet.
+    /// SPANISH) to read instead of the default (ENGLISH). Null keeps the default. Since 19 October the app sets it from the language the user chose
+    /// (<see cref="ListLanguages"/>, <see cref="GameLibrary.Languages"/>); a folder the disc lacks falls back to the default.
     /// </summary>
     public string? DiscFolder { get; init; }
+
+    /// <summary>A fresh library of the same data set as <paramref name="game"/>: its folder, in its language (a worker's own reader, for one).</summary>
+    public static GameLibrary Reopen(GameLibrary game) => new GameFolderScanner { DiscFolder = game.Language }.Scan(game.FolderPath);
 
     public GameLibrary Scan(string folderPath)
     {
@@ -204,29 +208,60 @@ public sealed class GameFolderScanner
     public static bool IsLoomCd(string fingerprint, int rooms, int costumes, int scripts, int sounds) =>
         string.Equals(fingerprint, LoomCdFingerprint, StringComparison.OrdinalIgnoreCase) || (rooms, costumes, scripts, sounds) == (78, 165, 637, 30);
 
+    /// <summary>
+    /// 19 October 2026: the languages the game at <paramref name="folderPath"/> holds when its data holds more than one, read from the data (today: a disc or folder with one
+    /// copy of the same v5 game per folder, labelled by the folder's own name); empty for a game with one language. Another format with the case adds its own
+    /// candidates here. Pass a language's <see cref="GameLanguage.Key"/> as <see cref="DiscFolder"/> to open it.
+    /// </summary>
+    public static IReadOnlyList<GameLanguage> ListLanguages(string folderPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(folderPath);
+        var source = OpenCdSource(Path.GetFullPath(folderPath));
+        return source is null || ScummV4Archive.IsVga(source) ? [] : LanguagesOf(source);
+    }
+
+    private static IReadOnlyList<GameLanguage> LanguagesOf(IGameFileSource source) =>
+        ScummV5Archive.FindGameFolders(source).Select(folder => new GameLanguage(folder, LanguageLabel(folder))).ToList();
+
+    /// <summary>The disc names the folder ("SPANISH", "ENGLISH"): the label is that name in title case ("Spanish"); the name is data of the disc, so nothing is guessed.</summary>
+    private static string LanguageLabel(string folder)
+    {
+        var name = folder[(folder.LastIndexOf('/') + 1)..];
+        return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(name.ToLowerInvariant());
+    }
+
+    /// <summary>The CD-style source at <paramref name="path"/>: a disc image, a folder holding one, or a folder with v4/v5 container files; null for anything else.</summary>
+    private static IGameFileSource? OpenCdSource(string path)
+    {
+        if (File.Exists(path)) return DiscImage.IsImageFile(path) ? new DiscFileSource(path) : null;
+        if (!Directory.Exists(path)) return null;
+        var folder = new FolderFileSource(path);
+        if (ScummV4Archive.IsVga(folder) || ScummV5Archive.FindGame(folder) is not null) return folder;
+        if (folder.FileNames.Any(n => n.Equals("00.LFL", StringComparison.OrdinalIgnoreCase)) || DiscImage.FindImageIn(path) is null) return null;
+        try { return new DiscFileSource(path); }
+        catch (Exception ex) when (ex is InvalidDataException or IOException) { return null; }
+    }
+
     private static GameLibrary? TryScanCd(string path, string? discFolder)
     {
-        IGameFileSource source;
-        if (File.Exists(path))
+        if (OpenCdSource(path) is not { } source) return null;
+        // A v5 game (NAME.000 and NAME.001, perhaps in a language folder of a disc): browsed. A folder that is not on the disc (a choice remembered for
+        // another copy) falls back to the default and says so.
+        if (!ScummV4Archive.IsVga(source) && (discFolder is null ? null : ScummV5Archive.FindGame(source, discFolder)) is var chosen &&
+            (chosen ?? ScummV5Archive.FindGame(source)) is { } v5)
         {
-            if (!DiscImage.IsImageFile(path)) return null;
-            source = new DiscFileSource(path);
-        }
-        else if (Directory.Exists(path))
-        {
-            var folder = new FolderFileSource(path);
-            if (ScummV4Archive.IsVga(folder) || ScummV5Archive.FindGame(folder) is not null) source = folder;
-            else if (folder.FileNames.Any(n => n.Equals("00.LFL", StringComparison.OrdinalIgnoreCase)) || DiscImage.FindImageIn(path) is null) return null;
-            else
+            var library = ScanOtherV4(source, ScummV4Disks.FromArchives(ScummV5Archive.Load(source, v5)), v5);
+            var languages = LanguagesOf(source);
+            if (languages.Count == 0) return library;
+            var read = ScummV5Archive.FolderOf(v5);
+            var label = languages.FirstOrDefault(l => string.Equals(l.Key, read, StringComparison.OrdinalIgnoreCase))?.Label ?? read;
+            var how = chosen is not null ? "chosen" : discFolder is not null ? $"the default: \"{discFolder}\" is not on this disc" : "the default: the game with the most rooms, an ENGLISH folder winning a tie";
+            return library with
             {
-                try { source = new DiscFileSource(path); }
-                catch (Exception ex) when (ex is InvalidDataException or IOException) { return null; }
-            }
+                Languages = languages, Language = read,
+                DetectionNote = library.DetectionNote + $" The data holds {languages.Count} languages, one folder each ({string.Join(", ", languages.Select(l => l.Key))}); {label} is read ({how})."
+            };
         }
-        else return null;
-        // A v5 game (NAME.000 and NAME.001, perhaps in a language folder of a disc): browsed.
-        if (!ScummV4Archive.IsVga(source) && ScummV5Archive.FindGame(source, discFolder) is { } v5)
-            return ScanOtherV4(source, ScummV4Disks.FromArchives(ScummV5Archive.Load(source, v5)), v5);
         if (!ScummV4Archive.IsVga(source)) return null;
 
         var archive = ScummV4Archive.Load(source);
