@@ -25,9 +25,9 @@ if (args.Length > 2 && args[1] == "route")
                     s.AdvanceFrame();
                     if(i%1000==0 || s.CurrentRoomId!=11)
                         Console.WriteLine($"CONTINUE frame={i} elapsed={watch.Elapsed} room={s.CurrentRoomId} logical={s.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x004]")} input={s.UserInputOn} cut={s.InCutscene} pending={string.Join(';',s.PendingScriptSummary)}");
-                    if(i==6000 || s.CurrentRoomId!=11)
+                    if(s.CurrentRoomId!=11)
                     {
-                        Console.WriteLine(s.CurrentRoomId!=11 ? "FLIGHT ROOM CHANGE" : "OBSERVATION BOUND");
+                        Console.WriteLine("FLIGHT ROOM CHANGE");
                         for(int settle=0;settle<2000;settle++)s.AdvanceFrame();
                         break;
                     }
@@ -40,11 +40,6 @@ if (args.Length > 2 && args[1] == "route")
             case "key": s.PressPlayKey(N(1),out _);break;
             case "click": s.ClickScreen(N(1),N(2),out _);break;
             case "roomclick": s.ClickScreen(N(1)-s.ViewLeft,N(2)+s.MainScreen.Top,out _);break;
-            case "objectclick":
-                var exit=data.ReadRoom(s.CurrentRoomId!.Value).Objects.Last(o=>o.Id==N(1));
-                Console.WriteLine($"NATIVE OBJECT CLICK {exit}");
-                if(s.ClickScreen(exit.X+exit.Width/2-s.ViewLeft,exit.Y+exit.Height/2+s.MainScreen.Top,out var refused) is null)throw new Exception(refused);
-                break;
             case "assertOwner": if(s.Snapshot.ObjectOwners.GetValueOrDefault(N(1))!=N(2))throw new Exception(line);break;
             case "assertWord": if(s.Snapshot.KnownGlobalVariables.GetValueOrDefault($"var[0x{N(1):X3}]")!=N(2))throw new Exception(line);break;
             case "assertRoom": if(s.CurrentRoomId!=N(1))throw new Exception(line);break;

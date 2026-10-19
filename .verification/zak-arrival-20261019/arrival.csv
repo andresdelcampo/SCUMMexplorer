@@ -39,4 +39,7 @@ assertWord,155,0
 assertOwner,82,14
 assertOwner,51,1
 assertControl
-continue,100000
+continue,10000
+assertRoom,8
+assertWord,4,145
+assertControl
