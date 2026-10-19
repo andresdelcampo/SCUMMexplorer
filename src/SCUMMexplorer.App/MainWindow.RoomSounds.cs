@@ -91,6 +91,9 @@ public partial class MainWindow
         var sounds = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
             .GroupBy(r => r.ResourceId!.Value).ToDictionary(g => g.Key, g => g.First());
         var cd = ScummCdAudioTracks.For(game);
+        // A native CD-track sound can omit card renditions and therefore have no sound resource row.
+        foreach (var id in candidates.Keys.Where(id => !sounds.ContainsKey(id) && cd?.Plays(id) == true))
+            sounds[id] = new GameResource($"Sound {id:00}", ResourceKind.Sound, game.FolderPath, id, cd!.Describe(id), null, null);
         _roomSoundChoices = candidates.Where(c => sounds.ContainsKey(c.Key)).OrderBy(c => c.Key)
             .Select(c => (sounds[c.Key], cd?.Plays(c.Key) == true, (TimeSpan?)null, c.Value)).ToList();
         RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
