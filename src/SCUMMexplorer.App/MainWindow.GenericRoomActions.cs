@@ -41,6 +41,7 @@ public partial class MainWindow
         _genericSourceHost.Visibility = GenericRoomActions && room is not null && IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         if (!GenericRoomActions || _game is not { } game || room is not int roomId)
         {
+            if (!GenericRoomActions) InteractButton.Visibility = Visibility.Visible;
             _genericActionsGame = null;
             _genericActionsRoom = null;
             _genericActionsHost.Children.Clear();
