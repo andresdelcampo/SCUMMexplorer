@@ -21,3 +21,18 @@ Also: the xUnit2029 warning in `ScummMonkey2PlayTests.cs` fixed. Suite on master
 3. `mi2 classic es` Room 4: the boot passes the recipe screen by itself; Spanish verbs and sentence line. Indy 4 Spanish talkie: accents and spoken lines.
 
 **Next run:** S9 for the MI1 CD's French, German and Italian; the executor allocation speed-up; the Indy 4 credits overlap.
+
+## Continued (19 October): S9 for the MI1 CD's other languages, executor allocations
+
+Run request: "Keep going: S9 for the Monkey Island CD's French, German and Italian, and in parallel the script executor allocation speed-up for cutscene derivation." Both agents were stopped once by a rate limit and resumed.
+
+| Item | Commits | Result | Record |
+|---|---|---|---|
+| S9 MonkeyCd FRENCH, GERMAN, ITALIAN | 78f76b2d, fb3da87b | Every check passes against ENGLISH (boot, 82 of 83 rooms, the route with each folder's own texts, right click, disc music, 160 cutscene entries with 101 begun, the three acceptance scenes, accents, a window look per language). German Script 12 loads " an "/" mit " sentence words (data). No product code changed | `.verification/monkeycd-editions-20261019/` |
+| Executor allocations | 644d55fc, de7e9f80, dfe38e1c, 1394286a, 207d272b, merges | Script results copy object state only when kept; pooled variable dictionaries; prepared instructions cached; `ScummGameSession.StepFrame()` without the per-frame snapshot; v1/v2 write recording; at most four workers for disk/archive games. Allocations per frame cut 5–20×. First launch in the window: MI2 29 s (was 55), Indy 4 68 s (was 109). All twelve cutscene lists byte-identical | `.verification/executor-alloc-20261019/` |
+
+Suite on master at the end: 1697 tests (1692 passed, 5 skipped, 0 failed), 0 build warnings; the full suite now runs in about 8 minutes (was about 18).
+
+**Not done:** Indy 4's first-launch list is still just over a minute: fourteen 6000-frame runs (Rooms 21, 29, 85–88) and the per-run copy of the 800–1400 global variables, which needs change tracking in `ScummScriptRuntimeState.GlobalVariables` (shared with the Maniac/Zak work).
+
+**User checks (added):** on `Games/monkey1 vga en` choose French, German and Italian in turn, open Room 38 and let it reach the dock; German "Schau" on the poster reads "Schau an Plakat". Time the first-launch progress line for MI2 and Indy 4 again.
