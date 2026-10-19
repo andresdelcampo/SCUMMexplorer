@@ -88,6 +88,12 @@ Source: ScummVM `gfx.cpp::drawFlashlight`, `scumm.cpp` v2 constructor/render ord
 - Room colour mapping precedes lighting. Actors are drawn afterward, with native colour mode bit 8. V1's dark pixel codes use its native colour-11 remap/black; v2 uses gray 8 with the source black/entry-12 behavior. Actor geometry, ownership and story state are not changed by rendering. A full room preview and live Play use the same composition and apply the display palette once.
 - V1 actor costume changes retain every dynamic palette slot. V2 and the existing later old-bundle path retain their identity reset. A costume may therefore appear in multiple native contexts with different colours; a reached context does not turn a global costume card estimate into a universal palette rule.
 
+## DOS SCUMM v1 costume colour contexts (19 October 2026)
+
+The context provider uses the existing v1 palette rules above, with ScummVM `actor.cpp`, `script_v2.cpp` and `costume.cpp` read 19 October 2026. It separates consecutive decoded source pairs (`SourcePath`, a conditional possibility), observed native opening operations (`Opening`, possibly off-room), and independently entered native room states (`RoomPreview`, always an estimate). Room selection runs the existing boot/entry/settle machinery; it does not establish the route or prerequisites. The global costume colour basis remains separate.
+
+Copied native operand resolution preserves v1/v2 indirect slots 14–16, their selected values and both estimate flags; missing bindings remain unknown. Unresolved actor identity invalidates inherited palette/costume bindings. The final actor state is an additional consistency check for the recognized actor-operation subset, not a general proof of every transient effect. Work is cancellable at source observations and only completed results are cached. Selecting a colour changes the costume renderer's preview input, never the live session. [Provider evidence and regression boundaries](../../.verification/zakclassic-palette-core-20261019/README.md).
+
 ## Sources
 
 - [ScummVM old-v3 index and room directory reader](https://github.com/scummvm/scummvm/blob/master/engines/scumm/resource_v3.cpp)

@@ -7,7 +7,10 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow
 {
-    private sealed record CostumeColorChoice(string Label, ScummV1CostumeColor Color, string Evidence);
+    private sealed record CostumeColorChoice(string Label, ScummV1CostumeColor Color, string Evidence)
+    {
+        public override string ToString() => Label;
+    }
     private GameLibrary? _costumeColorGame;
     private GameResource? _costumeColorResource;
     private CancellationTokenSource? _costumeColorCancellation;
@@ -67,7 +70,7 @@ public partial class MainWindow
         });
         _costumeColorPicker = new ComboBox
         {
-            MinWidth = 210, MaxWidth = 420, MinHeight = 32, DisplayMemberPath = nameof(CostumeColorChoice.Label),
+            MinWidth = 210, MaxWidth = 420, MinHeight = 32,
             VerticalAlignment = VerticalAlignment.Center
         };
         System.Windows.Automation.AutomationProperties.SetName(_costumeColorPicker, "Costume colours");
