@@ -1,6 +1,6 @@
 # ZakClassic palette contexts — final integration, 19 October 2026
 
-Baseline `5634143c`; integration `codex/maniaczak-status-polish`. Palette-provider source `97bd82ae` (worker `6b0fe2c`), App `166f6b2` plus actual-window label correction `96dfb06`. Concurrent master changes `77588bdf`, `8f454be3` and `be8d6e87` are preserved through merges. Scope, decisions and remaining limits: [checkpoint](../../docs/checkpoints/20261019-Palettes-ManiacZak.md).
+Baseline `5634143c`; integration `codex/maniaczak-status-polish`. Palette-provider source `97bd82ae` (worker `6b0fe2c`), App `166f6b2` plus actual-window label correction `96dfb06`. Concurrent master changes `77588bdf`, `8f454be3`, `be8d6e87` and `9beb9f61` are preserved through merges. Scope, decisions and remaining limits: [checkpoint](../../docs/checkpoints/20261019-Palettes-ManiacZak.md).
 
 ## Reproduction
 
@@ -15,7 +15,7 @@ rtk proxy powershell -NoProfile -Command '$env:SCUMM_SOUND_TEST_ROOT="D:\Juegos\
 
 ## Results
 
-Final matrix regeneration after the latest concurrent source merge: **3 passed, zero failed/skipped**. Current full solution build: **zero warnings/errors**, 7.00 seconds. The preceding matrix-triggered test rebuild reports the pre-existing imported Monkey2 `xUnit2029` assertion-style warning; its family files are left to the other orchestrator.
+Final matrix regeneration after the latest concurrent source merge: **3 passed, zero failed/skipped**. Current full solution build: **zero warnings/errors**, 6.62 seconds. The preceding matrix-triggered test rebuild reports the pre-existing imported Monkey2 `xUnit2029` assertion-style warning; its family files are left to the other orchestrator.
 
 Dedicated worker packets overlap and are not additive: transformations 18 passed (eight new + ten existing) plus one conformance check; Mars five passed; context/native/legacy packet 29 passed, reviewed pointer/LOOM EGA/CD/conformance packet 49 passed, and frozen fast context packet 32 passed. There are **46 new cases** to confirm in the full suite: eight transformation, five Mars and 33 provider/context cases.
 
@@ -23,4 +23,6 @@ The provider's cold native derivation is deliberately bounded and can take tens 
 
 Three final serial actual-window routes pass with 17 accepted captures; six inspected by the parent and eight by the worker, with overlap. They compare actual pose dimensions/pixels with Core, check default restoration, plain selected/open labels, Advanced-only provenance, cancellation/stale-result handling and compact layout, and preserve native state/clock. The first failed packet is retained separately and diagnosed, not treated as acceptance. [Full commands/results/cost and native pixel distinction](../zakclassic-palette-ui-20261019/README.md), integrated `bf74687c` from worker `19a75c16`.
 
-Production source frozen at merge `84dee6e`; master was `be8d6e87` at the replacement full-suite start. The preceding run on `fb226f83` was deliberately stopped after master changed: its verified integration testhost alone was terminated, leaving the separate root testhost untouched. Its partial report (1,539 passed, zero failed, five skipped; 19m12s) is retained locally as `test-results/full-suite-superseded-master8f.trx`; the aborted run is not acceptance. A fresh required suite validates the latest merged source. Final counters and clean master/normal-executable promotion follow after completion. Raw TRXs/logs/captures and private profiles/cache stay local and ignored; no game assets, ROMs, saves or original-runtime comparison are shipped or claimed.
+The complete suite on `84dee6e` passed: **1,653 passed, zero failed, five expected skips**, 20m42s, with **all 46 new cases confirmed Passed** in the TRX. Its report is retained as `test-results/full-suite-masterbe8.trx`. During that run master advanced to `9beb9f61` with language selection; merge `1432a725` preserves it, matrices/build were repeated and a new required suite is running on the combined source. The shared window-load changes also receive a separate ZakClassic actual-window recheck.
+
+The still earlier run on `fb226f83` was deliberately stopped after master changed: its verified integration testhost alone was terminated, leaving the separate root testhost untouched. Its partial report (1,539 passed, zero failed, five skipped; 19m12s) is retained locally as `test-results/full-suite-superseded-master8f.trx`; the aborted run is not acceptance. Final combined-suite counters and clean master/normal-executable promotion follow after completion. Raw TRXs/logs/captures and private profiles/cache stay local and ignored; no game assets, ROMs, saves or original-runtime comparison are shipped or claimed.
