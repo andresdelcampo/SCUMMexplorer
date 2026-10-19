@@ -704,7 +704,6 @@
                     </StackPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
                         <StackPanel>
-                            <StackPanel x:Name="GenericRoomSourceHost" Visibility="Collapsed"/>
                             <Expander x:Name="RoomNavigationPanel" Style="{StaticResource PanelSection}" Visibility="Collapsed" IsExpanded="True">
                                 <Expander.Header>
                                     <TextBlock x:Name="RoomNavigationHeader" Text="DOORWAYS" Style="{StaticResource PanelHeading}"/>
@@ -727,6 +726,7 @@
                                 <Image x:Name="ObjectAssetPreview" Height="72" Stretch="Uniform" Visibility="Collapsed" Margin="0,8,0,0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                                 <TextBlock x:Name="ObjectAssetDescription" Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,5,0,0"/>
                             </StackPanel>
+                            <StackPanel x:Name="GenericRoomSourceHost" Visibility="Collapsed"/>
                             <Expander x:Name="RoomEntryTraceExpander" Header="Room entry" Visibility="Collapsed" IsExpanded="False"
                                       Margin="0,10,0,0" Foreground="#E7E0D2" Background="#0B1117">
                                 <StackPanel Margin="4,4,4,6">
