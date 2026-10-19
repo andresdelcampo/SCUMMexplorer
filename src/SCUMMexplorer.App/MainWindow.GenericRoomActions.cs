@@ -196,7 +196,8 @@ public partial class MainWindow
     }
 
     private bool GenericRoomActionCanStart => GenericRoomActions && !_genericActionStarting && !_introPreparing &&
-        _game is { } game && _playFolder == game.Key && _play is { PlayerHasControl: true, BootRunning: false } &&
+        PlayActive && _game is { } game && _playFolder == game.Key && _play is { PlayerHasControl: true, BootRunning: false } &&
+        _play.CurrentRoomId == _genericActionsRoom &&
         (ScummProfile.For(game).EngineVersion > ScummVersion.V2 || _play.InventoryCharactersAvailable);
 
     private void UpdateGenericRoomActionAvailability()
@@ -216,7 +217,7 @@ public partial class MainWindow
         first.Focus();
     }
 
-    private async void RunGenericRoomAction(GenericSourceAction action)
+    private void RunGenericRoomAction(GenericSourceAction action)
     {
         if (!GenericRoomActionCanStart || _game is not { } game || _genericActionsRoom is not int roomId ||
             game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is not { } room) return;
@@ -225,14 +226,9 @@ public partial class MainWindow
         UpdateGenericRoomActionAvailability();
         try
         {
-            // This is the explicit exploration action, not a catalog visit or a native click.
-            // A failed quiet preview may be static; open the existing source-action path only
-            // when the retained session has finished its native startup and departed scene.
-            if (!PlayActive || _play!.CurrentRoomId != roomId)
-            {
-                SelectRoomWithIntent(room, RoomOpenKind.Cutscene, reloadSelected: true);
-                if (_roomOpenTask is { } opening) await opening;
-            }
+            // This explicit exploration action never visits a room merely to enable
+            // itself. A static/manual fallback remains quiet until native control is
+            // available in this very room; entry scenes are reserved for their button.
             if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration || _currentRoomResource?.ResourceId != roomId ||
                 !PlayActive || _play is not { PlayerHasControl: true } session || session.CurrentRoomId != roomId) return;
             var result = session.ActivateObjectVerb(action.Object, action.Verb);
