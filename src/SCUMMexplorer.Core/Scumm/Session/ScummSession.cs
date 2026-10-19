@@ -358,7 +358,7 @@ public abstract partial class ScummSession
             }
         }
         var frame = new ScriptFrame { FreezeResistant = freezeResistant, Recursive = recursive, OriginRoom = parent?.OriginRoom,
-            ObservationParent = parent?.ObservationSlot, ObservationCall = observedCall ?? _observer?.CurrentCall };
+            Parent = parent, ObservationParent = parent?.ObservationSlot, ObservationCall = observedCall ?? _observer?.CurrentCall };
         if (frame.ObservationCall?.Slot != frame.ObservationParent) frame.ObservationCall = null;
         if (scriptId < _globalScriptCount)
             return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
@@ -446,6 +446,7 @@ public abstract partial class ScummSession
         var objectFrame = v2Object ? ReplaceV2ObjectSlot(objectId, arguments[2] != 0, arguments[3] != 0)
             : new ScriptFrame();
         objectFrame.OriginRoom = parent?.OriginRoom;
+        objectFrame.Parent = parent;
         objectFrame.ObservationCall = _observer?.CurrentCall;
         _observer?.ObjectCalleeSelected(objectId, verbId, selectedEntry, script);
         _visitTrace.Add($"{source}: startObject runs object {objectId} verb 0x{verbId:X2}");
@@ -469,7 +470,8 @@ public abstract partial class ScummSession
             return new ScummBoundedScriptResult(_runtime.ObjectStates, _runtime.ObjectPositions,
                 _runtime.GlobalVariables, [], [], 0, false, "nested script limit reached");
         }
-        frame ??= new ScriptFrame();
+        frame ??= new ScriptFrame { Parent = _executing.LastOrDefault() };
+        if (_capturingManualEntryRoots && _executing.Count == 0) _manualEntryRoots!.Add(frame);
         if (_observer is not null && frame.ObservationSlot == 0)
         {
             frame.ObservationSlot = _observer.NewSlot();
@@ -1013,6 +1015,8 @@ public abstract partial class ScummSession
     /// </summary>
     protected sealed class ScriptFrame
     {
+        /// <summary>Slot ancestry for explicit exploration cancellation, independent of optional observers.</summary>
+        public ScriptFrame? Parent { get; set; }
         public bool FreezeResistant { get; init; }
         /// <summary>ScummVM <c>ScriptSlot.recursive</c>: a <c>chainScript</c> from this slot passes it on.</summary>
         public bool Recursive { get; init; }

@@ -72,24 +72,62 @@ public sealed class ScummGameSession : ScummSession
     /// (one file per room or several disks) with the game's data source otherwise, as the first visit does (S6 Indy3Vga, 16 October 2026).
     /// </summary>
     public static ScummGameSession BootForPlay(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects)
+        => CreateSession(game, out indexedObjects, boot: true);
+
+    /// <summary>Starts the native opening at its first pause. No answer, key or party choice is assumed.</summary>
+    public static ScummGameSession StartIntro(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects)
+    {
+        var session = CreateSession(game, out indexedObjects, boot: false);
+        session._introPlaying = true;
+        session.RunBootScript();
+        return session;
+    }
+
+    private static ScummGameSession CreateSession(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects, bool boot)
     {
         ArgumentNullException.ThrowIfNull(game);
         if (ScummDataSources.For(game) is ScummV2DataSource v2)
         {
             indexedObjects = v2.ReadIndexedObjects();
-            return new ScummGameSession(game, indexedObjects, data: v2);
+            return new ScummGameSession(game, indexedObjects, data: v2, boot: boot);
         }
         if (!ScummProfile.For(game).UsesV4Archive)
         {
             indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
-            return new ScummGameSession(game, indexedObjects);
+            return new ScummGameSession(game, indexedObjects, boot: boot);
         }
         // S6 MonkeyCd (17 October 2026): a v5 game reads its starting objects from its own index (MONKEY.000's DOBJ), as its first visit does.
         indexedObjects = (game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault())?.ReadIndexedObjects()
             ?? game.V4Disks?.Disks.OfType<ScummV5Archive>().FirstOrDefault()?.ReadIndexedObjects()
             ?? throw new InvalidDataException("The game has no v4 or v5 index to read its objects from.");
-        return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
+        return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game), boot: boot);
     }
+
+    private bool _introPlaying;
+    private int _introFrames;
+
+    public override ScummSessionSnapshot AdvanceFrame()
+    {
+        var state = base.AdvanceFrame();
+        if (!_introPlaying) return state;
+        _introFrames++;
+        if (!BootGoesOn && (!_waitsForControl || PlayerHasControl || _pending.Count == 0))
+        {
+            _introPlaying = false;
+            FinishBoot(_introFrames);
+            BootReport = new(_introFrames, false, CurrentRoomId, _roomsEntered.ToArray());
+        }
+        return Snapshot;
+    }
+
+    protected override void ManualNavigationBegan()
+    {
+        _introPlaying = false;
+        _bootKeys.Clear();
+    }
+
+    protected override ScummSessionSnapshot VisitManualRoomCore(GameResource room) =>
+        _currentRoom?.ResourceId == room.ResourceId ? EnterRoomAgain(room) : VisitRoom(room);
 
     private readonly Dictionary<int, int?> _speechJiffies = [];
 
@@ -373,50 +411,8 @@ public sealed class ScummGameSession : ScummSession
     /// positions, draw order or actors for <paramref name="quietFrames"/> frames; or the room was left (a script loaded another room); or the
     /// frame limit was reached (ambient scripts that never rest). The state of the room is the last one captured while the room was current.
     /// </summary>
-    public ScummSettleResult Settle(int frameLimit = 2400, int quietFrames = 90)
-    {
-        var room = _currentRoom?.ResourceId ?? throw new InvalidOperationException("Visit a room before settling it.");
-        var capture = Capture();
-        // An object whose state or position changes four times within 240 frames is an ambient animator (a crowd, a flame): it never rests in a
-        // living room, so it does not keep the room from settling; it is shown in the phase of its loop the room was in when the rest began.
-        var changes = new Dictionary<int, Queue<int>>();
-        var previous = ObjectValues();
-        var signature = Signature(changes, 0);
-        var quiet = 0;
-        for (var frame = 1; frame <= frameLimit; frame++)
-        {
-            AdvanceFrame();
-            if (_currentRoom?.ResourceId != room) return new(capture, ScummSettleOutcome.RoomLeft, frame, _currentRoom?.ResourceId);
-            var now = ObjectValues();
-            foreach (var (id, value) in now)
-                if (!previous.TryGetValue(id, out var before) || before != value)
-                {
-                    if (!changes.TryGetValue(id, out var queue)) changes[id] = queue = new();
-                    queue.Enqueue(frame);
-                }
-            foreach (var queue in changes.Values)
-                while (queue.Count > 0 && queue.Peek() < frame - 240) queue.Dequeue();
-            previous = now;
-            var current = Signature(changes, frame);
-            var busy = InCutscene || Messages.HaveMsg != 0 || EgoMoving || CameraMoving;
-            capture = Capture();
-            if (current != signature) { signature = current; quiet = 0; }
-            else quiet = busy ? 0 : quiet + 1;
-            if (quiet >= quietFrames) return new(capture, ScummSettleOutcome.Settled, frame, null);
-        }
-        return new(Capture(), ScummSettleOutcome.FrameLimit, frameLimit, null);
-    }
-
-    private Dictionary<int, int> ObjectValues()
-    {
-        var values = new Dictionary<int, int>(_runtime.ObjectStates.Count);
-        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
-        foreach (var pair in _runtime.ObjectStates)
-            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key] = pair.Value;
-        foreach (var pair in _runtime.ObjectPositions)
-            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
-        return values;
-    }
+    public ScummSettleResult Settle(int frameLimit = 2400, int quietFrames = 90, CancellationToken cancellationToken = default) =>
+        SettleRoom(frameLimit, quietFrames, cancellationToken);
 
     // ScummVM getActorFromPos (actor.cpp): for i from 1, an actor drawn on the point's 8-pixel strip (the strip usage bits), not untouchable,
     // with _top <= y <= _bottom of its drawing. The drawing is the session's own (the costume renderer).
@@ -449,29 +445,7 @@ public sealed class ScummGameSession : ScummSession
     /// <summary>Everything the picture of the current room needs, at this frame (the live play view composes it every frame).</summary>
     public ScummRoomCapture CaptureRoom() => Capture();
 
-    private ScummRoomCapture Capture() => new(Snapshot, Actors, CameraX, _runtime.ShadowPalette.ToArray(), _runtime.RoomColors.ToArray(),
-        _runtime.GlobalVariables.GetValueOrDefault(_runtime.CurrentLightsVariable), _runtime.Flashlight, CurrentWalkBoxes)
-        { RoomPointer = ScreenPointer is { } pointer ? (pointer.X, pointer.Y - MainScreen.Top)
-              : Pointer is { } roomPointer ? (roomPointer.X - ViewLeft, roomPointer.Y) : (0, 0),
-          ViewLeft = ViewLeft, ViewWidth = 320, ViewHeight = MainScreen.Bottom - MainScreen.Top };
-
-    private long Signature(Dictionary<int, Queue<int>> changes, int frame)
-    {
-        bool Ambient(int id) => changes.TryGetValue(id, out var queue) && queue.Count >= 4;
-        var hash = new HashCode();
-        // v1/v2 background scripts animate objects in rooms that are not loaded. Their flags still
-        // belong to persistent state, but cannot keep the current room's picture from settling.
-        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
-        foreach (var pair in _runtime.ObjectStates.OrderBy(item => item.Key))
-            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
-        foreach (var pair in _runtime.ObjectPositions.OrderBy(item => item.Key))
-            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
-        foreach (var actor in Actors) { hash.Add(actor.Number); hash.Add(actor.Room); hash.Add(actor.X); hash.Add(actor.Y); hash.Add(actor.Visible); hash.Add(actor.Look.Costume); }
-        foreach (var colour in _runtime.ShadowPalette.Take(16)) hash.Add(colour);
-        foreach (var colour in _runtime.RoomColors.Take(16)) hash.Add(colour);
-        hash.Add(CameraX);
-        return hash.ToHashCode();
-    }
+    private ScummRoomCapture Capture() => CaptureSessionRoom();
     private readonly ScummBootInputPlan? _bootInput;
     private readonly bool _waitsForControl;
 
