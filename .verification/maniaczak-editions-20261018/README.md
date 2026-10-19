@@ -61,4 +61,4 @@ Optional look at the corrected supplied Spanish copy: run the built app, open `D
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Checkpoint](../../docs/checkpoints/20261018-S9-ManiacZak.md), [Maniac tracker](../../docs/maniac/SUPPORT_STATUS.md), [Zak tracker](../../docs/zak/SUPPORT_STATUS.md). Family records retain the edition × check × result tables.
+[Checkpoint](../../docs/checkpoints/20261018-S9-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). Family records retain the edition × check × result tables.

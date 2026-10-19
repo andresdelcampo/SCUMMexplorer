@@ -50,4 +50,4 @@ Optional after integration: open the Classic fixture and let derived Room 2 Entr
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent owns [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md) and [tracker](../../docs/zak/SUPPORT_STATUS.md). Suggested Classic rows (decoded + play/Explorer preview, own fixture, 2026-10-18): Script104 `+01C5 getObjectOwner var1,0033`, `+01C9 isNotEqual var1,000F ->01C4` waits while room-owner15; Script78 `+01D5/+01EF` terminal messages, `+0211 ->01D5` loop, `+0217` restart behind override. No proposed requirement is needed.
+Parent owns [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md) and [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). Suggested Classic rows (decoded + play/Explorer preview, own fixture, 2026-10-18): Script104 `+01C5 getObjectOwner var1,0033`, `+01C9 isNotEqual var1,000F ->01C4` waits while room-owner15; Script78 `+01D5/+01EF` terminal messages, `+0211 ->01D5` loop, `+0217` restart behind override. No proposed requirement is needed.

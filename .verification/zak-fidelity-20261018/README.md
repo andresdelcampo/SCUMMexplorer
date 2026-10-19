@@ -72,4 +72,4 @@ Optional: in either Zak copy, use the scene picker for Room 2 Entry or Room 14 f
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [tracker](../../docs/zak/SUPPORT_STATUS.md), [engine script map](../../docs/engine/SCUMM_SCRIPT_MAP.md), and the final fidelity checkpoint. Other families and game/profile data were untouched.
+[Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [engine script map](../../docs/engine/SCUMM_SCRIPT_MAP.md), and the final fidelity checkpoint. Other families and game/profile data were untouched.

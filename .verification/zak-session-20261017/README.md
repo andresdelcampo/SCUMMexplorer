@@ -69,4 +69,4 @@ None required to reproduce engine acceptance: run the two boot commands above. N
 
 ## Where the facts went
 
-[Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [Zak tracker](../../docs/zak/SUPPORT_STATUS.md), [Enhanced trace](boot-enhanced-trace.txt), [Classic trace](boot-classic-trace.txt). This supersedes the earlier verb-slot blockers here and in `.verification/ClassicBoot` for Zak only. Parent owns roadmap, checkpoint, changelog and handoff.
+[Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [Enhanced trace](boot-enhanced-trace.txt), [Classic trace](boot-classic-trace.txt). This supersedes the earlier verb-slot blockers here and in `.verification/ClassicBoot` for Zak only. Parent owns roadmap, checkpoint, changelog and handoff.

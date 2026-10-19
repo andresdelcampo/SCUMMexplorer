@@ -49,4 +49,4 @@ Open classic Maniac, choose Syd and Bernard and Start, use the existing native r
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [tracker](../../docs/maniac/SUPPORT_STATUS.md), [family index](../../docs/maniac/README.md). Shared requirement and API facts belong to the parent and sole Core owner.
+[Script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [family index](../../docs/maniac/README.md). Shared requirement and API facts belong to the parent and sole Core owner.

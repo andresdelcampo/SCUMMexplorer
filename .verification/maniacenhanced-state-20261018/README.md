@@ -57,4 +57,4 @@ Parent verifies the real window from the native S6 route: choose Syd and Bernard
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-The family worker owns [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md) and [tracker](../../docs/maniac/SUPPORT_STATUS.md). Parent owns shared engine notes, requirements, registry/matrix, App, final checkpoint and handoff. Tests: `ScummManiacEnhancedStateTests`; API: `ScummSessionInventoryStatus`.
+The family worker owns [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md) and [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). Parent owns shared engine notes, requirements, registry/matrix, App, final checkpoint and handoff. Tests: `ScummManiacEnhancedStateTests`; API: `ScummSessionInventoryStatus`.

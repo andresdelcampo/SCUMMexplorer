@@ -73,4 +73,4 @@ No new original-runtime check requested in this bounded investigation. Existing 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent integrates own-edition source rows and the retained Partial claim in [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md) and [tracker](../../docs/zak/SUPPORT_STATUS.md), with version semantics in existing engine notes and the run's checkpoint. This record retains commands/results, not a new game reference document.
+Parent integrates own-edition source rows and the retained Partial claim in [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md) and [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), with version semantics in existing engine notes and the run's checkpoint. This record retains commands/results, not a new game reference document.

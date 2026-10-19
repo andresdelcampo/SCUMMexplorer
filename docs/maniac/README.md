@@ -5,7 +5,7 @@
 | Families (`GameFamily`) | `ManiacClassic`, `ManiacEnhanced` |
 | Fixtures (folders under `Games`) | `mmansion ega en` (classic, English), `mmansionE ega es` (enhanced, Spanish) |
 | SCUMM version(s) and script dialect | classic v1 (`ScummScriptDialect.V1`), enhanced v2 (`V2`) |
-| Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
+| Support requirements | [Maniac and Zak support boundaries](../REQUIREMENTS.md#maniac-and-zak-support-boundaries) |
 | Script map | [MANIAC_SCRIPT_MAP.md](MANIAC_SCRIPT_MAP.md) |
 | Play evidence | [Classic English](../../.verification/maniacclassic-play-20261017/README.md), [Enhanced Spanish](../../.verification/maniacenhanced-play-20261017/README.md) |
 | Cutscene evidence | [Classic English](../../.verification/maniacclassic-cutscenes-20261018/README.md), [Enhanced Spanish](../../.verification/maniacenhanced-cutscenes-20261018/README.md) |

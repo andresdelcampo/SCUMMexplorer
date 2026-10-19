@@ -62,4 +62,4 @@ In the app, open the classic English fixture and enter Play. Choose Syd, Bernard
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Script facts belong in [the Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md); stage status in [the tracker](../../docs/maniac/SUPPORT_STATUS.md). This record distinguishes source execution and app tests from original-game observation.
+Script facts belong in [the Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md); stage status in [the support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). This record distinguishes source execution and app tests from original-game observation.

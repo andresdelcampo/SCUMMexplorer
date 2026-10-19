@@ -58,17 +58,22 @@ public sealed class ScummMonkeyCdCutsceneTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// S9 (18 October 2026): the disc's SPANISH folder (<c>GameFolderScanner.DiscFolder</c>) lists the same triggers, entries, keys, scripts and groups as
+    /// S9 (18 October 2026; FRENCH, GERMAN and ITALIAN 19 October, record <c>.verification/monkeycd-editions-20261019/README.md</c>): each other language folder of the disc (<c>GameFolderScanner.DiscFolder</c>) lists the same triggers, entries, keys, scripts and groups as
     /// ENGLISH, titled with its own verbs and names; the poster's scene begins from a fresh start. Record: <c>.verification/monkeycd-editions-20261018/README.md</c>.
     /// </summary>
-    [Fact]
-    public void TheDiscsSpanishFolderListsTheSameScenesWithItsOwnTexts()
+    [Theory]
+    [InlineData("SPANISH", "Mirar", "Mirar cartel")]
+    [InlineData("FRENCH", "Regarde", "Regarde affiche")]
+    // The German verb button reads "Schau", the sentence line "Schau an" (the copy's sentence script writes its own word): the scan titles with the verb's name.
+    [InlineData("GERMAN", "Schau", "Schau Plakat")]
+    [InlineData("ITALIAN", "Esamina", "Esamina il manifesto")]
+    public void TheDiscsOtherLanguageFoldersListTheSameScenesWithTheirOwnTexts(string disc, string lookAt, string posterTitle)
     {
         if (Folder() is not { } folder) return;
-        var planner = new ScummCutscenePlanner(new GameFolderScanner { DiscFolder = "SPANISH" }.Scan(folder));
+        var planner = new ScummCutscenePlanner(new GameFolderScanner { DiscFolder = disc }.Scan(folder));
         output.WriteLine($"{planner.Triggers.Count} triggers, {planner.Groups.Count} groups, {planner.Groups.Count(g => g.IsScene)} scenes");
-        Assert.Equal("Mirar", planner.Verbs.WordFor(LookAt));
-        Assert.Equal("Room 33 · Mirar cartel", ScummCutsceneTitles.Title(GroupOf(planner, 33, 429, LookAt).First));
+        Assert.Equal(lookAt, planner.Verbs.WordFor(LookAt));
+        Assert.Equal($"Room 33 · {posterTitle}", ScummCutsceneTitles.Title(GroupOf(planner, 33, 429, LookAt).First));
         if (Planner.Value is { } english)
         {
             static string Key(ScummCutsceneGroup g) => $"{g.First.Room}/{g.First.ObjectId}/{g.First.VerbId} {g.IsScene} {string.Join(";", g.First.Scripts)} " +

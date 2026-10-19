@@ -74,4 +74,4 @@ None from this diagnostic. Parent owns the integrated real-window route and user
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent owns coordinated source rows in [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [engine script notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker](../../docs/maniac/SUPPORT_STATUS.md) and [Use-with checkpoint](../../docs/checkpoints/20261018-UseWith-ManiacZak.md). This record retains the independent reproduction and review boundary.
+Parent owns coordinated source rows in [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [engine script notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries) and [Use-with checkpoint](../../docs/checkpoints/20261018-UseWith-ManiacZak.md). This record retains the independent reproduction and review boundary.

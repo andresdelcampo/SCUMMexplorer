@@ -51,4 +51,4 @@ Optional Explorer inspection after parent integration: open the supplied Enhance
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent integrates these edition-owned rows in [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md) and [tracker](../../docs/zak/SUPPORT_STATUS.md): Script 104 `+01C5 getObjectOwner var1,0033` / `+01C9 isNotEqual var1,000F ->01C4` repeats while owner 15; Script 78 `+01D5/+01EF` prints terminal prompts, `+0211 ->01D5` loops, `+0217` is restart after override. Evidence: decoded + play (Explorer preview); own Enhanced fixture, 18 October 2026. No new requirement is proposed.
+Parent integrates these edition-owned rows in [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md) and [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries): Script 104 `+01C5 getObjectOwner var1,0033` / `+01C9 isNotEqual var1,000F ->01C4` repeats while owner 15; Script 78 `+01D5/+01EF` prints terminal prompts, `+0211 ->01D5` loops, `+0217` is restart after override. Evidence: decoded + play (Explorer preview); own Enhanced fixture, 18 October 2026. No new requirement is proposed.

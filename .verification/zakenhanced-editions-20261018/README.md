@@ -51,4 +51,4 @@ None new for this test/document-only pass; prior S7 timing/listening and visual 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Tracker](../../docs/zak/SUPPORT_STATUS.md), [edition index](../../docs/zak/README.md), [existing source map](../../docs/zak/ZAK_SCRIPT_MAP.md). No new script or engine fact was introduced.
+[Support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [edition index](../../docs/zak/README.md), [existing source map](../../docs/zak/ZAK_SCRIPT_MAP.md). No new script or engine fact was introduced.

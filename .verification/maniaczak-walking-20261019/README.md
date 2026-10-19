@@ -68,4 +68,4 @@ Parent owns actual-window acceptance. Existing original-game comparison remains 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent integrates source facts, notices and current scope into [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), [Maniac tracker](../../docs/maniac/SUPPORT_STATUS.md), [Zak tracker](../../docs/zak/SUPPORT_STATUS.md) and the run checkpoint. This worker edits only its leased engine paths, tests, probe and evidence.
+Parent integrates source facts, notices and current scope into [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries) and the run checkpoint. This worker edits only its leased engine paths, tests, probe and evidence.
