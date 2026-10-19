@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Scumm;
 
@@ -17,6 +18,8 @@ public partial class MainWindow
     private Dictionary<int, int[]> _playDoorwayTargets = [];
     private (int X, int Y)? _playOverlayPointer;
     private ScummRoomScene? _playOverlayScene;
+    private Dictionary<int, string> _playOverlayNames = [];
+    private string? _playOverlayListKey;
 
     private void ClearPlayOverlays()
     {
@@ -24,6 +27,7 @@ public partial class MainWindow
         _playOverlayCanvas.Visibility = Visibility.Collapsed;
         _playOverlayPointer = null;
         _playOverlayScene = null;
+        _playOverlayListKey = null;
     }
 
     private void UpdatePlayOverlayHover((int X, int Y)? point)
@@ -59,7 +63,7 @@ public partial class MainWindow
         var wanted = ObjectAreaMode != DisplayMode.Never || DoorwayMode != DisplayMode.Never ||
             IsAdvancedMode && (RoomMaskToggle.IsChecked == true || WalkBoxToggle.IsChecked == true);
         // Decoded backgrounds/objects are cached by ScummPlayScreen. Capture mutable source state only when an aid is visible.
-        if (changed || wanted || _playOverlayScene is null) _playOverlayScene = _playScreen.Scene();
+        if (changed || wanted || IsAdvancedMode || _playOverlayScene is null) _playOverlayScene = _playScreen.Scene();
         if (_playOverlayScene is not { } scene || scene.RoomId != roomId) { ClearPlayOverlays(); return; }
 
         ObjectAreaOptions.Visibility = Visibility.Visible;
@@ -140,15 +144,75 @@ public partial class MainWindow
         }
     }
 
-    private static Dictionary<int, int[]> ReadPlayDoorwayTargets(GameLibrary game, int roomId)
+    private void RefreshPlayOverlayLists(Action<int> interact)
+    {
+        if (!PlayActive || !IsAdvancedMode || _playOverlayScene is not { } scene)
+        {
+            _playOverlayListKey = null;
+            return;
+        }
+        var objects = ScummRoomOverlays.Objects(scene, _playDoorwayTargets);
+        var key = _game!.Key + ":" + scene.RoomId + ":" + string.Join(',', objects.Select(obj => $"{obj.ObjectId}@{obj.X},{obj.Y}"));
+        if (_playOverlayListKey == key) { DisplayLists(); return; }
+        _playOverlayListKey = key;
+        RoomNavigationButtons.Children.Clear(); ObjectList.Children.Clear();
+        foreach (var obj in objects)
+        {
+            var name = _playOverlayNames.GetValueOrDefault(obj.ObjectId, $"Object {obj.ObjectId}");
+            if (obj.IsDoorway)
+                foreach (var destination in obj.Destinations)
+                {
+                    var room = _game.Rooms.FirstOrDefault(item => item.ResourceId == destination);
+                    if (room is null) continue;
+                    var button = Item($"{name} → Room {destination:00}");
+                    button.ToolTip = $"Possible destination decoded from Room {scene.RoomId:00} object {obj.ObjectId}. Opens directly for exploration; source conditions are not promised.";
+                    button.Click += (_, _) => SelectResourceInTree(room);
+                    RoomNavigationButtons.Children.Add(button);
+                }
+            else
+            {
+                var button = Item(name);
+                button.Tag = obj.ObjectId;
+                button.ToolTip = $"Room {scene.RoomId:00} object {obj.ObjectId}: choose an exploration interaction.";
+                button.Click += (_, _) => interact(obj.ObjectId);
+                button.MouseEnter += (_, _) => { _playOverlayPointer = (obj.X + obj.Width / 2 - _playShown!.ViewLeft, obj.Y + obj.Height / 2 + _playShown.RoomTop); RefreshPlayOverlays(); };
+                button.MouseLeave += (_, _) => UpdatePlayOverlayHover(null);
+                ObjectList.Children.Add(button);
+            }
+        }
+        DisplayLists();
+
+        void DisplayLists()
+        {
+            RoomNavigationHeader.Text = $"DOORWAYS · {RoomNavigationButtons.Children.Count}";
+            RoomNavigationPanel.Visibility = RoomNavigationButtons.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            ShowObjectListSection("HOTSPOTS");
+        }
+
+        static Button Item(string text) => new()
+        {
+            Content = text, HorizontalContentAlignment = HorizontalAlignment.Left,
+            Padding = new Thickness(8, 3, 8, 3), Margin = new Thickness(0, 0, 5, 4),
+            Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)), Foreground = Brushes.Beige,
+            BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
+        };
+    }
+
+    private Dictionary<int, int[]> ReadPlayDoorwayTargets(GameLibrary game, int roomId)
     {
         var resource = game.Rooms.FirstOrDefault(room => room.ResourceId == roomId);
         if (resource is null) return [];
         var found = new Dictionary<int, int[]>();
+        _playOverlayNames = [];
         try
         {
+            // Background preparation has its own seekable readers. Never scan an active archive handle concurrently.
+            if (game.V4Archive is not null || game.V4Disks is not null) game = GameFolderScanner.Reopen(game);
             var data = ScummDataSources.For(game);
-            var records = data.ReadRoom(roomId).Objects;
+            var room = data.ReadRoom(roomId);
+            _playOverlayNames = room.ObjectNames.ToDictionary(pair => pair.Key, pair => ScummTextDecoder.DecodeGlyphs(pair.Value).Trim().TrimEnd('@').Trim())
+                .Where(pair => !string.IsNullOrWhiteSpace(pair.Value)).ToDictionary();
+            var records = room.Objects;
             var verbs = data.ReadObjectVerbs(roomId, records);
             var finder = new ScummDoorwayFinder(game, data);
             foreach (var record in records)
