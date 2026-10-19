@@ -10,6 +10,13 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Requirements/support notes and source attribution are updated. Levels stay unchanged; Classic Zak's 11 palette estimates, original-runtime comparisons and unavailable same-family editions remain. [Checkpoint](checkpoints/20261019-LabelsFidelity-ManiacZak.md).
 - Final solution build: zero warnings/errors; three regenerated-matrix checks; full suite **1538 passed, zero failed, five expected skips**, all 64 new cases passed. Six serial actual-window routes pass. Final clean integration and normal executable refresh are recorded at the checkpoint.
 
+## 18 October: the other Monkey Island 2 copies (S9, Monkey2)
+
+- **All four other copies pass** (`mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es`, `mi2 talkie es` against `mi2 talkie en`): boot to the campfire, room audit (107 of 110 rooms without a gap, states equal but two patched rooms), the play route with right click, LeChuck's iMUSE beat, the cutscene scan and runs (floppies 190 groups / 97 begin, talkies 260 / 165), and the accents. Record: [monkey2-editions-20261018](../.verification/monkey2-editions-20261018/README.md).
+- **Floppy copy protection (shared Core, small and additive).** The floppy releases ask the recipe copy protection before the full/Lite choice; the boot presses Enter, types the four digits Script 130 itself derived into `var[0x206]` (labelled assumed input, `ScummBootInputPlan.AnswerDigits`), then clicks the full game once it is touchable. Before, the floppies stood at Room 108 until the frame limit.
+- **Cutscene titles** drop the '@' filler the Spanish talkie pads its verb names with (`ScummCutscenePlanner.VerbsOf`).
+- **Tests.** The Monkey2 session, first-visit, play and cutscene tests run over the five copies, with route texts per copy (the two Spanish copies differ: "Mirar a" / "Mirar"); a glyph check per copy. One look through the real window at the Spanish floppy: Spanish verbs, "Mirar a rótulo", dialogue lines with ¿ and ¡. Registry unchanged.
+
 ## 18 October: Game Status pictures, party and logical item choices, Maniac/Zak
 
 - Maniac waits for native Start and offers the selected three kids. Every Maniac/Zak recipient uses a native full-body sprite; private frame initialization supplies off-room Zak characters without changing live state.

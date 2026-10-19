@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 using Xunit.Abstractions;
@@ -17,9 +17,9 @@ namespace SCUMMexplorer.Tests;
 /// </summary>
 public sealed class ScummMonkey2CutsceneTests(ITestOutputHelper output)
 {
-    private static string? Folder()
+    private static string? Folder(string copy = "mi2 talkie en")
     {
-        var path = Path.Combine(TestGames.Root, "mi2 talkie en");
+        var path = Path.Combine(TestGames.Root, copy);
         return File.Exists(Path.Combine(path, "MONKEY2.000")) ? path : null;
     }
 
@@ -27,6 +27,15 @@ public sealed class ScummMonkey2CutsceneTests(ITestOutputHelper output)
 
     private static readonly Lazy<ScummCutscenePlanner?> Planner =
         new(() => Folder() is { } folder ? new ScummCutscenePlanner(new GameFolderScanner().Scan(folder)) : null);
+
+    /// <summary>S9 Monkey2 (18 October 2026): the other local copies (floppy MT-32 and Sound Blaster, Spanish floppy, Spanish talkie). Record:
+    /// <c>.verification/monkey2-editions-20261018/README.md</c>.</summary>
+    public static TheoryData<string> Copies => new() { "mi2 talkie en", "mi2 mt32 en", "mi2 sb16 en", "mi2 classic es", "mi2 talkie es" };
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, ScummCutscenePlanner> Planners = new();
+
+    private static ScummCutscenePlanner? PlannerOf(string copy) => copy == "mi2 talkie en" ? Planner.Value
+        : Folder(copy) is { } folder ? Planners.GetOrAdd(copy, _ => new ScummCutscenePlanner(new GameFolderScanner().Scan(folder))) : null;
 
     private static ScummCutsceneGroup GroupOf(ScummCutscenePlanner planner, int room, int objectId, int verb) =>
         Assert.Single(planner.Groups, g => g.First.Room == room && (g.First.ObjectId == objectId && g.First.VerbId == verb ||
@@ -59,10 +68,11 @@ public sealed class ScummMonkey2CutsceneTests(ITestOutputHelper output)
         Assert.Equal("Room 22 · verb 0x50 Captain Dread", ScummCutsceneTitles.Title(GroupOf(planner, 22, 239, 0x50).First));
     }
 
-    [Fact]
-    public void ThreeScenesBeginFromAFreshStart()
+    [Theory]
+    [MemberData(nameof(Copies))]
+    public void ThreeScenesBeginFromAFreshStart(string copy)
     {
-        if (Planner.Value is not { } planner) return;
+        if (PlannerOf(copy) is not { } planner) return;
         foreach (var (room, objectId, verb) in new[] { (9, 73, TalkTo), (13, 0, 0), (74, 755, PickUp) })
         {
             var group = GroupOf(planner, room, objectId, verb);
@@ -75,10 +85,11 @@ public sealed class ScummMonkey2CutsceneTests(ITestOutputHelper output)
         Assert.Contains(12, planner.Run(GroupOf(planner, 13, 0, 0).First).RoomsEntered);
     }
 
-    [Fact]
-    public void LeChucksSceneStartsItsSongAndFollowsItsBeat()
+    [Theory]
+    [MemberData(nameof(Copies))]
+    public void LeChucksSceneStartsItsSongAndFollowsItsBeat(string copy)
     {
-        if (Folder() is not { } folder) return;
+        if (Folder(copy) is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = ScummGameSession.BootForPlay(game, out _);
         session.VisitRoom(game.Rooms.First(r => r.ResourceId == 74));
