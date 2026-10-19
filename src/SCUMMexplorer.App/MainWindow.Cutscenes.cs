@@ -128,7 +128,8 @@ public partial class MainWindow
     /// <summary>Plays a LOOM demo's preview: a fresh session whose director script runs, on the playback clock, until another room is opened.</summary>
     private void PlayDemoPreview()
     {
-        if (_game is not { IsDemo: true } || _indexedObjectSnapshot is null || !CanStartCutscene) return;
+        if (_game is not { IsDemo: true } || _indexedObjectSnapshot is null || !CanStartCutscene && !_catalogPreviewOnly) return;
+        _catalogPreviewOnly = false;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, demoPreview: true);
         _sceneSound.Attach(_game, _session);

@@ -35,14 +35,16 @@ public partial class MainWindow
     {
         if (GameIntroButton is null) return;
         var game = _game;
-        var knownLoomIntro = game is { Id: GameId.Loom or GameId.LoomVga, IsDemo: false };
+        var knownDemo = game is { Id: GameId.Loom, IsDemo: true };
+        var knownLoomIntro = knownDemo || game is { Id: GameId.Loom or GameId.LoomVga, IsDemo: false };
         var nativeIntro = game is not null && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs &&
             GameSupport.For(game).LiveSession && game.Resources.Any(r => r.Kind == ResourceKind.Script && r.ResourceId == 1 && r.ScriptRoom is null);
         // Established LOOM entries already provide the intro in Room 01. Generic native
         // startup is a whole-game action, separate from unrelated entry scenes in Room 01.
-        var inRoomOne = knownLoomIntro && (game!.Id == GameId.LoomVga ? CdIntroPlaysIn(1)
+        var inRoomOne = knownDemo || knownLoomIntro && (game!.Id == GameId.LoomVga ? CdIntroPlaysIn(1)
             : ScannedCutscenes || (_replayCatalog?.Membership ?? []).Any(m => m.Id == "opening" && (m.StartRoom == 1 || m.Rooms.Contains(1))));
         GameIntroButton.Visibility = (knownLoomIntro || nativeIntro) && (!inRoomOne || _catalogPreviewOnly) ? Visibility.Visible : Visibility.Collapsed;
+        GameIntroButton.Content = knownDemo ? "Play Demo Preview" : "Play Game Intro";
         GameIntroButton.IsEnabled = !_introPreparing && (IsLoomGame ? CanStartCutscene || _catalogPreviewOnly : !PlayActive || !_play!.InCutscene);
         GameIntroButton.ToolTip = IsAdvancedMode
             ? "Start the game's native opening in a fresh session, replacing the exploration state. Required startup choices remain yours."
@@ -65,6 +67,7 @@ public partial class MainWindow
             _previewCancellation?.Cancel();
             if (_roomOpenTask is { } previousOpen) await previousOpen;
             if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration) return;
+            if (game is { Id: GameId.Loom, IsDemo: true }) { PlayDemoPreview(); return; }
             if (game.Id == GameId.Loom) { PlayOpening(); return; }
             if (game.Id == GameId.LoomVga) { PlayCdIntro(); return; }
             _catalogPreviewOnly = false;
