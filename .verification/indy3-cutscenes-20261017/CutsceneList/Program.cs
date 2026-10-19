@@ -1,4 +1,4 @@
-﻿using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Loom;
 using SCUMMexplorer.Core.Scumm;
@@ -37,7 +37,10 @@ if (args.Length > 2 && args[1] == "prun")
     var planner = args.Length > 3 && args[3] == "boot"
         ? new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _), start: ScummCutsceneStart.BootPerRun)
         : new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(new GameFolderScanner().Scan(args[0]), out _), start: ScummCutsceneStart.SnapshotPerWorker);
-    Parallel.ForEach(planner.Groups, new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g => planner.Run(g.First));
+    // As the App since 19 October 2026: entries handed out one at a time ("boot": the list's default fixed ranges, as before).
+    var options = new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) };
+    if (args.Length > 3 && args[3] == "boot") Parallel.ForEach(planner.Groups, options, g => planner.Run(g.First));
+    else Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(planner.Groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), options, g => planner.Run(g.First));
     Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}; " +
                       $"CPU {(System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime - cpu).TotalSeconds:0} s; boots {planner.PoolBoots?.ToString() ?? "one per run"}");
     foreach (var g in planner.Groups)
