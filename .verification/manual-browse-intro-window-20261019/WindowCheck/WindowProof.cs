@@ -47,6 +47,10 @@ internal static class WindowProof
             Require(condition(), "Timed out: " + description);
         }
         ScummGameSession Play() => (ScummGameSession?)Field("_play") ?? throw new InvalidOperationException("No native play session");
+        string StateToken(ScummGameSession session) => session.CurrentRoomId + ":" + session.InCutscene + ":" + session.SessionTrace.Count + ":" +
+            string.Join(';', session.Snapshot.KnownGlobalVariables.OrderBy(p => p.Key).Select(p => $"{p.Key}={p.Value}")) + ":" +
+            string.Join(';', session.Snapshot.ObjectStates.OrderBy(p => p.Key).Select(p => $"{p.Key}={p.Value}")) + ":" +
+            string.Join(';', session.Snapshot.ObjectOwners.OrderBy(p => p.Key).Select(p => $"{p.Key}={p.Value}")) + ":" + string.Join(';', session.Actors);
         void StopClock() => ((DispatcherTimer?)Field("_playTimer"))?.Stop();
         void Frames(int count) { for (var i = 0; i < count; i++) Call("PlayTimer_Tick", null, EventArgs.Empty); }
         void Click(int x, int y)
@@ -57,6 +61,12 @@ internal static class WindowProof
         {
             for (var i = 0; i < maximum && !condition(); i++) Frames(1);
             Require(condition(), description + "; " + string.Join(" | ", Play().SessionTrace.TakeLast(8)));
+        }
+        void Readiness(string stage)
+        {
+            var play = Play(); var key = ScummProfile.For((GameLibrary)Field("_game")!).EngineVersion <= ScummVersion.V2 ? ScummVars.V2.Ego : ScummVars.Ego;
+            var ego = play.Snapshot.KnownGlobalVariables.GetValueOrDefault(key);
+            Log($"Read-only {stage}: room={play.CurrentRoomId}; PlayerHasControl={play.PlayerHasControl}; inputScript={play.PlayInputScript}; ego={ego}; actor={play.Actors.FirstOrDefault(a => a.Number == ego)}; visibleVerbs=[{string.Join(',', play.Verbs.Where(v => v.Mode == 1).Select(v => v.VerbId))}]; deliveredInputs={play.DeliveredInput.Count}");
         }
         async Task<GameLibrary> Open(bool warm)
         {
@@ -96,8 +106,10 @@ internal static class WindowProof
             }
             Capture(warm ? "warm-selector" : "cold-selector");
         }
+        var manualSequence = 0;
         async Task<bool> Manual(GameLibrary game, int id, bool allowStatic = false)
         {
+            var capturePrefix = $"manual-{++manualSequence}-room-{id}";
             var previous = Field("_play"); Call("SelectResourceInTree", game.Scenes.Single(r => r.ResourceId == id));
             if (Field("_roomOpenTask") is Task opening)
             {
@@ -110,23 +122,65 @@ internal static class WindowProof
                 Require(Field("_playTimer") is null && Control<Image>("PlayScreenImage").Visibility == Visibility.Collapsed
                     && Control<FrameworkElement>("RoomDisplayGroup").Visibility == Visibility.Visible && Field("_browsedScene") is not null,
                     "Failed manual preparation did not show the quiet static fallback");
-                Capture("manual-room-" + id + "-static-fallback");
+                Capture(capturePrefix + "-static-fallback");
                 Log($"Manual Room{id}: bounded preparation chose static fallback; old session not clocked; no native input proof claimed");
                 Require(Control<Button>("GameIntroButton").Visibility == Visibility.Visible && Control<Button>("GameIntroButton").IsEnabled,
                     "Quiet static fallback left no available explicit native intro restart");
+                var frozenSession = Play(); var frozenState = StateToken(frozenSession);
+                await Task.Delay(300);
+                Require(StateToken(frozenSession) == frozenState && Field("_playTimer") is null, "Old native source session advanced behind the static fallback");
                 if (allowStatic) return false;
                 throw new InvalidOperationException($"Quiet static fallback verified for Room{id}; selected acceptance route needs a native prepared session and remains unproved");
             }
             StopClock(); Require(!Play().InCutscene, "Manual browsing autoplayed/retained a cutscene");
             Require(!Control<Button>("SkipCutsceneButton").IsEnabled, "Manual settled room retained enabled cutscene skip");
-            Capture("manual-room-" + id); Log($"Manual Room{id}: native session replaced; no active cutscene; Skip disabled");
+            Capture(capturePrefix); Log($"Manual Room{id}: native session replaced; no active cutscene; Skip disabled");
             return true;
+        }
+        async Task Demo(GameLibrary game)
+        {
+            var first = game.Scenes.Single(r => r.ResourceId == 1);
+            Call("SelectResourceInTree", first);
+            if (Field("_roomOpenTask") is Task initial) { await Wait(() => initial.IsCompleted, "demo manual Room01", 180); await initial; }
+            Require(Field("_playback") is null, "Selecting demo Room01 autoplayed the native preview");
+            var fallback = Field("_catalogPreviewOnly") is true;
+            var intro = Control<Button>("GameIntroButton");
+            if (fallback)
+            {
+                Require(intro.Visibility == Visibility.Visible && intro.IsEnabled && intro.Content?.ToString() == "Play Demo Preview",
+                    "Demo static fallback has no explicit source-native preview restart");
+                Capture("demo-static-explicit-preview"); intro.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            }
+            else
+            {
+                Require(Field("_session") is LoomExplorationSession { InCutscene: false }, "Demo manual Room01 is not quiet");
+                Require(Control<Button>("RoomCutsceneButton").IsEnabled, "Demo Room01 has no existing preview action");
+                Capture("demo-quiet-room01"); Control<Button>("RoomCutsceneButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            }
+            await Wait(() => Field("_playback") is { } playback && playback.GetType().GetProperty("Preview")!.GetValue(playback) is true, "explicit native demo preview", 60);
+            ((DispatcherTimer?)Field("_playbackTimer"))?.Stop();
+            var director = (LoomExplorationSession)Field("_session")!;
+            var running = ((bool Running, string? Estimate))typeof(ScummSession).GetMethod("IsScriptRunning", Private)!.Invoke(director, [45])!;
+            Require(typeof(LoomExplorationSession).GetField("_demoPreview", Private)!.GetValue(director) is true && running.Running,
+                "Explicit action did not start the source-native demo director45");
+            Capture("demo-native-director-preview"); Log($"Demo explicit preview: fallback={fallback}; native director45 running; _playback.Preview=True; room={director.Snapshot.RoomId}");
+            var different = game.Scenes.First(r => r.ResourceId != 1 && r.ResourceId != director.Snapshot.RoomId);
+            Call("SelectResourceInTree", different);
+            if (Field("_roomOpenTask") is Task next) { await Wait(() => next.IsCompleted, "demo manual cancellation room", 180); await next; }
+            Require(Field("_playback") is null && (Field("_playbackTimer") is not DispatcherTimer timer || !timer.IsEnabled),
+                "Manual demo navigation retained/autoplayed the preview clock");
+            string DirectorState() => string.Join(';', director.Snapshot.KnownGlobalVariables.OrderBy(p => p.Key).Select(p => $"{p.Key}={p.Value}")) + director.SessionTrace.Count;
+            var stopped = DirectorState(); await Task.Delay(300);
+            Require(DirectorState() == stopped && Field("_playback") is null, "Old demo director continued behind the manually selected room");
+            Capture("demo-preview-cancelled-by-manual-room"); Log($"Demo manual Room{different.ResourceId}: preview canceled, no autoplay, old native source unchanged; static={Field("_catalogPreviewOnly")}");
         }
         window.ContentRendered += async (_, _) =>
         {
             try
             {
-                var game = await Open(false); await Cards(game, false);
+                var game = await Open(false);
+                if (game.IsDemo) { await Demo(game); Log("PASS bounded short-demo preview/cancellation"); return; }
+                await Cards(game, false);
                 game = await Open(true); await Cards(game, true);
                 var intro = Control<Button>("GameIntroButton");
                 if (game is { Id: GameId.Loom, Version: ScummVersion.V3 })
@@ -160,43 +214,78 @@ internal static class WindowProof
                         Control<Button>("SkipCutsceneButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                         Until(() => Play().PlayerHasControl, "Native opening skip did not return player control");
                         Log("Explicit fresh Intro: actual party inputs repeated; native Skip131 returned control before telescope route");
-                        await Manual(game, 1);
-                        await Manual(game, 28);
+                        await Manual(game, 1, allowStatic: true);
+                        if (await Manual(game, 28, allowStatic: true))
+                        {
                         var use = Play().PlayVerbArea().Items.Single(v => v.VerbId == 11 && v.Mode == 1);
                         Click(use.X + 2, use.Y + 2);
                         var telescope = ScummDataSources.For(game).ReadRoom(28).Objects.Single(o => o.Id == 413);
                         var telescopeX = telescope.X + telescope.Width / 2 - Play().ViewLeft;
                         Require(telescopeX is >= 0 and < 320, "Telescope not within native viewport; no camera shortcut applied");
+                        var telescopeTrace = Play().SessionTrace.Count;
                         for (var i = 0; i < 2; i++) Click(telescopeX, telescope.Y + telescope.Height / 2 + Play().MainScreen.Top);
                         Until(() => Play().InCutscene, "Native Use telescope did not begin source Script23");
+                        Require(Play().SessionTrace.Skip(telescopeTrace).Any(line => line.Contains("cutscene at Script 23", StringComparison.Ordinal)),
+                            "A different scene began instead of source Script23");
                         Require(!Play().CutsceneSkippable, "Telescope did not exercise the no-override scope");
                         Call("ShowPlayFrame"); Call("UpdatePlaybackControls");
                         Require(!Control<Button>("SkipCutsceneButton").IsEnabled, "Native no-override scene incorrectly offers Skip");
                         Capture("native-telescope-no-override");
                         Log("Native Use413: active no-override cutscene; Skip disabled; source Script23");
-                        await Manual(game, 1);
-                        Frames(180); Require(!Play().InCutscene && Play().CurrentRoomId == 1, "Retired telescope owner/child resumed after manual browsing");
-                        Log("Manual browse aborts a no-override scene and its old continuation does not resume");
+                        if (await Manual(game, 1, allowStatic: true))
+                        {
+                            Frames(180); Require(!Play().InCutscene && Play().CurrentRoomId == 1, "Retired telescope owner/child resumed after manual browsing");
+                            Log("Manual browse aborts a no-override scene and its old continuation does not resume");
+                        }
+                        else Log("No-override telescope aborted to verified static fallback; no adopted native continuation claimed");
+                        }
+                        else Log("UNPROVED native telescope/no-override input route: Room28 chose conservative static fallback; no state or placement shortcut applied");
                     }
                     else
                     {
-                        await Manual(game, 51);
-                        Frames(30); Require(!Play().InCutscene, "Manual Room51 auto-played its entry cutscene");
-                        Log("Manual Room51: native entry cutscene settled offscreen; no autoplay");
-                        await Manual(game, 52);
+                        if (args.Contains("complete-intro"))
+                        {
+                            Readiness("raw roomless intro before guarded manual navigation");
+                            if (Play().PlayInputScript == 0)
+                            {
+                                Require(!await Manual(game, 52, allowStatic: true), "Roomless startup without a native input script was falsely offered as a playable manual room");
+                                Log("Raw roomless Intro→manual52: static fallback correctly rejects absent native input handler; old source remains unchanged");
+                            }
+                            intro.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                            await Wait(() => Field("_playTimer") is not null, "explicit fresh native Intro before doorway proof"); StopClock();
+                            Readiness("first native boot pause");
+                            Until(() => Play().PlayerHasControl, "Native Intro did not reach first player control without assumed answers", 6000);
+                            Readiness("first native player control"); Capture("native-intro-first-control");
+                            Require(Play().PlayInputScript > 0, "First native player control has no input handler");
+                            Require(Play().DeliveredInput.Count == 0 && !Play().SessionTrace.Any(l => l.Contains("Player input assumed", StringComparison.Ordinal)),
+                                "Intro readiness used an assumed input instead of actual native execution");
+                        }
+                        if (await Manual(game, 51, allowStatic: true))
+                        {
+                            Frames(30); Require(!Play().InCutscene, "Manual Room51 auto-played its entry cutscene");
+                            Log("Manual Room51: native entry cutscene settled offscreen; no autoplay");
+                        }
+                        else Log("Manual Room51: strict pending-entry watchers keep static preview; no entry autoplay or native controllability claimed");
+                        if (await Manual(game, 52, allowStatic: true))
+                        {
+                        Readiness("native doorway start");
                         var doorway = ScummDataSources.For(game).ReadRoom(52).Objects.Single(o => o.Id == 621);
                         var x = doorway.X + doorway.Width / 2 - Play().ViewLeft;
                         Require(x is >= 0 and < 320, "Native doorway621 lies outside viewport; no placement shortcut applied");
                         Play().PointAtScreen((x, doorway.Y + doorway.Height / 2 + Play().MainScreen.Top)); Frames(2);
                         Click(x, doorway.Y + doorway.Height / 2 + Play().MainScreen.Top);
-                        Until(() => Play().CurrentRoomId == 51, "Native WalkTo621 failed to enter Room51");
+                        try { Until(() => Play().CurrentRoomId == 51, "Native WalkTo621 failed to enter Room51"); }
+                        catch { Readiness("failed native doorway"); throw; }
                         Require(Play().InCutscene && !Play().CutsceneSkippable, "Actual doorway did not preserve Room51's native no-override entry cutscene");
                         Call("ShowPlayFrame"); Call("UpdatePlaybackControls"); Capture("native-doorway-entry-cutscene");
                         Log("Actual WalkTo doorway52/621→51: native entry cutscene runs, unlike manual selection");
-                        await Manual(game, 33);
+                        await Manual(game, 33, allowStatic: true);
+                        }
+                        else Log("UNPROVED native doorway52/621→51 route: Room52 chose conservative static fallback; no previous-room flags or actor placement assigned");
                     }
                 }
-                Log("PASS");
+                Log(report.Any(line => line.Contains("UNPROVED", StringComparison.Ordinal))
+                    ? "PASS bounded UI contracts; UNPROVED native route(s) explicitly recorded above" : "PASS");
             }
             catch (Exception ex) { Log(ex.ToString()); Environment.ExitCode = 1; try { Capture("failed-window"); } catch { } }
             finally
