@@ -115,10 +115,10 @@ public partial class MainWindow
                 var source = _play;
                 var prepared = await Task.Run(() => source.PrepareManualRoom(resource, cancellationToken: token), token);
                 if (!CurrentRequest()) return;
-                if (prepared.Session is not ScummGameSession ready)
+                if (prepared.Session is not ScummGameSession ready || ready.PlayInputScript == 0)
                 {
                     _catalogPreviewOnly = true;
-                    if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason;
+                    if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason ?? "The native startup has not established the game's input script.";
                     StopPlay();
                     return;
                 }
