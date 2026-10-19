@@ -88,7 +88,10 @@ public partial class MainWindow
                 // Each run starts from a copy of a boot (ScummBootSnapshot, 18 October 2026), not from a boot of its own (Monkey Island 2 booted 260 times
                 // before, Indy 4 426 times). The entries are handed out one at a time, so a worker that drew long scenes does not hold the others back (a list's
                 // default split gives each worker a fixed range: Monkey Island 2, 85 s wall for 189 s of work on eight workers).
-                var parallel = Math.Max(1, ownReader ? Math.Min(8, Environment.ProcessorCount / 2) : Environment.ProcessorCount / 2);
+                // A disk or archive game runs on at most four workers (executor allocation speed-up, 19 October 2026): its runs got slower per worker as
+                // workers were added, so that eight took longer than four (CutsceneList prun, 16-core machine: Monkey Island 2 1/2/4/8 workers 30/20/26/56 s,
+                // Indy 4 2/4/8 workers 51/42/75 s; the same lists whatever the count). Record: .verification/executor-alloc-20261019/README.md.
+                var parallel = Math.Max(1, ownReader ? Math.Min(4, Environment.ProcessorCount / 2) : Environment.ProcessorCount / 2);
                 Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), new ParallelOptions { MaxDegreeOfParallelism = parallel }, group =>
                 {
                     _scanGate.Wait();
