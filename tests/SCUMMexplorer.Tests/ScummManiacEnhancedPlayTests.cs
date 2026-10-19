@@ -45,7 +45,7 @@ public sealed class ScummManiacEnhancedPlayTests(ITestOutputHelper output)
         foreach (var obj in ScummDataSources.For(game).ReadRoom(1).Objects.Where(obj => obj.Id is 54 or 55)) output.WriteLine(obj.ToString());
         for (var step = 0; step < 2; step++) { Click(8, 120 + session.MainScreen.Top); Frames(200); }
         output.WriteLine($"entrance: frame={elapsed}, viewLeft={session.ViewLeft}, ego={session.Actors.Single(a => a.Number == 3).X}");
-        Assert.Equal(352, session.ViewLeft);
+        Assert.Equal(336, session.ViewLeft); // Native row search leaves ego at 496 after these two screen-left clicks.
         Key('d');
         Click(376 - session.ViewLeft, 84 + session.MainScreen.Top);
         Assert.Equal(14, session.Snapshot.KnownGlobalVariables[ScummVars.V2.SentenceVerb]);
