@@ -7,7 +7,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Traced indirect transformation costumes, retained animal palettes and the distinction between stored and current Mars clothing colours. Two blocked native character-switch preparations are retained without a prerequisite shortcut.
 - Costume details offer display-only colour choices from separately attributed source/opening/room-preview contexts. The existing default is preserved; seven estimate cards gain contextual records while all eleven global estimates and Costumes Partial remain. Source conditions and estimates are Advanced.
 - Asynchronous progress, cancellation, stale-request guards and window-close cancellation keep context discovery separate from the live game. Actual-window review fixed a plain-label fallback and preserved genuine unused artwork-channel equality. Three final windows pass with native pixel/state checks; Classic Maniac and enhanced Zak are unchanged.
-- Both concurrent master updates are preserved; matrices regenerated, solution build zero warnings/errors. Full-suite counters, clean promotion and remaining boundaries: [checkpoint](checkpoints/20261019-Palettes-ManiacZak.md).
+- All three concurrent master updates are preserved; matrices regenerated, solution build zero warnings/errors. Full-suite counters, clean promotion and remaining boundaries: [checkpoint](checkpoints/20261019-Palettes-ManiacZak.md).
 
 ## 19 October: cutscene lists from one boot (cutscene snapshot, all generic families)
 
