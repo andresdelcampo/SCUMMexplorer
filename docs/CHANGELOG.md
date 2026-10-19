@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 18 October: Spanish editions of Indiana Jones 4 and Monkey Island 1 CD (S9, Indy4 and MonkeyCd)
+
+- **Indy4.** `indy4 talkie vga es` (Spanish texts over the English voices: the same speech offsets and `MONSTER.SOU` size) and `indy4 classic vga es` (Spanish floppy) boot, pass the room audit (96/96 without a gap), the R-7.18 route with keys and speech, the cutscene scan (666/426/182, 210 begin, equal to English per entry) and the accent check. Record: [indy4-editions-20261018](../.verification/indy4-editions-20261018/README.md).
+- **The floppy's stone disk (shared Core, additive).** Room 81's answering script did nothing with local 0 = 0, so the boot stood still. `ScummSessionBoot.NextStartArgument`: after 0 fails, the answering script is started with the next literal the room's own code passes (the submit's 1), labelled assumed input; other games' boots unchanged.
+- **Monkey Island 1 CD (shared Core, additive).** `monkey1 vga es` is the Spanish four-disk floppy (MonkeyFloppy, checked there: only Enter is assumed, its quiz does not wait). The Spanish CD is the reference disc's own `SPANISH/` folder: `GameFolderScanner.DiscFolder` reads it (the app still opens ENGLISH); it passes boot, room audit, the route with right click and disc music, the scan (286/160/62) and accents. Record: [monkeycd-editions-20261018](../.verification/monkeycd-editions-20261018/README.md).
+- **Tests.** Spanish cases in `ScummIndy4PlayTests`, `ScummIndy4SessionTests`, `ScummIndy4CutsceneTests`, `ScummMonkeyCdPlayTests`, `ScummMonkeyCdSessionTests`, `ScummMonkeyCdCutsceneTests` and the MonkeyFloppy classes (`vga es`); charset coverage per copy (`ScummCopyTextBytes`).
+
 ## 18 October: Monkey Island 2 cutscenes from its scripts, with a song's beat (S7, Monkey2)
 
 - **The list.** The shared scan gives 536 triggers and 260 entries (76 scenes) with the game's verb names after the boot (Open … Walk to); 165 begin from a fresh start; eight-worker runs take 153 s in the harness and 140–174 s in the window on first launch (each run boots MI2 in about 0.9 s).

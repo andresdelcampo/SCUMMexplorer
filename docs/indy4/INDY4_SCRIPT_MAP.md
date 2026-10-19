@@ -4,7 +4,7 @@ This map records **Indiana Jones and the Fate of Atlantis-specific** script role
 
 ## Edition scope
 
-Facts below are from the English talkie CD (`Games/indy4 vga en`, `ATLANTIS.cue`/`.img`, the S4b/S5 fixture named by `SupportConformanceTests`), 17 October 2026. The Spanish classic and talkie copies are not checked (S9).
+Facts below are from the English talkie CD (`Games/indy4 vga en`, `ATLANTIS.cue`/`.img`, the S4b/S5 fixture named by `SupportConformanceTests`), 17 October 2026. S9 (18 October 2026) checked the Spanish talkie folder (`indy4 talkie vga es`, the same script numbering as the English disc) and the Spanish floppy (`indy4 classic vga es`); rows marked *(Spanish floppy)* are that copy's own and are not transferred (R-14.2).
 
 ## Row format (every table below)
 
@@ -20,6 +20,9 @@ Boot script number, what it sets (ego, hook scripts, input script, cutscene hook
 | Script 1, low-memory alert | prints "more memory needed" in room 0 when `var[0x028]` (VAR_HEAPSPACE, 1400 at start) is not above 300/345 | decoded | Script 1 +0x0638 to +0x065D | 17 Oct 2026 |
 | Script 1, normal start | fills string 0x16, clears `bit[0x28D]`, starts Script 74 (the logo) and waits for it, sets the charset 2 and `var[0x13B]` = 2, loads Room 4 (Barnett College), turns cursor and user input on | decoded, play (session) | Script 1 +0x3539 to +0x35A9 | 17 Oct 2026 |
 | Copy protection | none met on this path: the talkie CD's boot asks nothing; assumed input none | decoded, play (session) | Script 1 +0x0696 | 17 Oct 2026 |
+| Copy protection *(Spanish floppy)* | Script 1 skips the screen for boot parameter 7873 (+0x0646 `isEqual local[0], 0x1EC1`), else loads Room 81 (+0x06A1), skips the wait for -7873 (+0x06A3) and waits for `var[0x1BC]` (+0x06AE); Room 81's entry clears it (+0x00F5) and only local script 207 sets it (+0x005A) | decoded, play (session) | Script 1 +0x0646 to +0x06AE; Room 81 entry +0x00F5; Room 81 local script 207 +0x005A | 18 Oct 2026 |
+| Room 81 input *(Spanish floppy)* | local script 205 is the screen's input script: it starts 207 with 0 for Esc (key 0x1B, +0x0026) and other clicks (+0x0055, +0x018A, +0x0193) and with 1 for the submit (+0x017A); 207 with 0 jumps to its end (+0x000C to +0x0203); with 1 it compares the wheel `var[0x0F4]`..`[0x0F6]` with `var[0x0D3]`..`[0x0D5]` by branches of offset 0 (+0x0040 to +0x004E), sets `bit[0x28D]` and `var[0x1BC]`; after three wrong tries (`var[0x0D2]`) the screen quits (+0x01FE) | decoded | Room 81 local scripts 205, 207 | 18 Oct 2026 |
+| Floppy numbering *(Spanish floppy)* | Room 2's entry chains to local 228 (talkie 227), Room 4's to 220 (talkie 216); Room 72's object used with verb 8 is 985 (talkie 984) | decoded (scan) | cutscene scan of the S9 record | 18 Oct 2026 |
 
 ## Global scripts (boot)
 
