@@ -1,0 +1,245 @@
+[
+    {
+        "op":  "frames",
+        "count":  150
+    },
+    {
+        "op":  "visit",
+        "value":  2
+    },
+    {
+        "op":  "frames",
+        "count":  300
+    },
+    {
+        "op":  "untilskip",
+        "count":  1200
+    },
+    {
+        "op":  "key",
+        "value":  27
+    },
+    {
+        "op":  "control",
+        "count":  1200
+    },
+    {
+        "op":  "frames",
+        "count":  100
+    },
+    {
+        "op":  "activate",
+        "object":  26,
+        "value":  14
+    },
+    {
+        "op":  "frames",
+        "count":  100
+    },
+    {
+        "op":  "visit",
+        "value":  1
+    },
+    {
+        "op":  "frames",
+        "count":  100
+    },
+    {
+        "op":  "verb",
+        "value":  11
+    },
+    {
+        "op":  "frames",
+        "count":  2
+    },
+    {
+        "op":  "inventory",
+        "object":  26
+    },
+    {
+        "op":  "frames",
+        "count":  2
+    },
+    {
+        "op":  "roomclick",
+        "x":  248,
+        "y":  90
+    },
+    {
+        "op":  "frames",
+        "count":  2
+    },
+    {
+        "op":  "roomclick",
+        "x":  248,
+        "y":  90
+    },
+    {
+        "op":  "frames",
+        "count":  180
+    },
+    {
+        "op":  "owner",
+        "object":  18,
+        "value":  1
+    },
+    {
+        "op":  "visit",
+        "value":  8
+    },
+    {
+        "op":  "frames",
+        "count":  100
+    },
+    {
+        "op":  "untilskip",
+        "count":  1200
+    },
+    {
+        "op":  "key",
+        "value":  27
+    },
+    {
+        "op":  "control",
+        "count":  1200
+    },
+    {
+        "op":  "frames",
+        "count":  100
+    },
+    {
+        "op":  "variable",
+        "text":  "var[0x004]",
+        "value":  144
+    },
+    {
+        "op":  "capture",
+        "text":  "airport-restored"
+    },
+    {
+        "op":  "verb",
+        "value":  11
+    },
+    {
+        "op":  "frames",
+        "count":  2
+    },
+    {
+        "op":  "roomclick",
+        "x":  144,
+        "y":  80
+    },
+    {
+        "op":  "frames",
+        "count":  2
+    },
+    {
+        "op":  "roomclick",
+        "x":  144,
+        "y":  80
+    },
+    {
+        "op":  "frames",
+        "count":  180
+    },
+    {
+        "op":  "room",
+        "value":  45
+    },
+    {
+        "op":  "capture",
+        "text":  "reservations"
+    },
+    {
+        "op":  "roomclick",
+        "x":  80,
+        "y":  40
+    },
+    {
+        "op":  "frames",
+        "count":  30
+    },
+    {
+        "op":  "capture",
+        "text":  "destination-selected"
+    },
+    {
+        "op":  "roomclick",
+        "x":  80,
+        "y":  108
+    },
+    {
+        "op":  "frames",
+        "count":  200
+    },
+    {
+        "op":  "owner",
+        "object":  82,
+        "value":  1
+    },
+    {
+        "op":  "variable",
+        "text":  "var[0x09B]",
+        "value":  144
+    },
+    {
+        "op":  "variable",
+        "text":  "var[0x04F]",
+        "value":  663
+    },
+    {
+        "op":  "capture",
+        "text":  "ticket-received"
+    },
+    {
+        "op":  "verb",
+        "value":  13
+    },
+    {
+        "op":  "frames",
+        "count":  2
+    },
+    {
+        "op":  "roomclick",
+        "x":  20,
+        "y":  60
+    },
+    {
+        "op":  "frames",
+        "count":  2500
+    },
+    {
+        "op":  "control",
+        "count":  300
+    },
+    {
+        "op":  "room",
+        "value":  11
+    },
+    {
+        "op":  "owner",
+        "object":  82,
+        "value":  14
+    },
+    {
+        "op":  "owner",
+        "object":  51,
+        "value":  1
+    },
+    {
+        "op":  "variable",
+        "text":  "var[0x09B]",
+        "value":  0
+    },
+    {
+        "op":  "capture",
+        "text":  "boarded-meal-served"
+    },
+    {
+        "Op":  "nativeflight"
+    },
+    {
+        "Text":  "07-native-arrival",
+        "Op":  "capture"
+    }
+]
