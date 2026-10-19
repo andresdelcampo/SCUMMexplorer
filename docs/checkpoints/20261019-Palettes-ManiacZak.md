@@ -44,6 +44,8 @@ The first failed packet's four captures/report are retained separately. Its reco
 
 The final cold/cancelled lookup took 127.57 seconds under parallel work, while the dispatcher delivered 1,958 heartbeat ticks with a largest observed gap of 390 ms. This is a responsive asynchronous observation, not a speed guarantee. Existing source/frame caps are unchanged. No new user-only check is required for this bounded feature; original-game appearance/timing/listening acceptance remains outside this run under the standing no-run instruction.
 
+After the language-choice merge, a fourth serial actual-window process rechecks ZakClassic against `1432a725` with the unchanged harness. It passes with 15 additional captures (four worker inspections, two parent inspections, overlapping), the same Core pixels/labels/cancellation/layout checks, and exact native snapshot/actors/messages/input preservation at frame 3. Build zero warnings/errors, 12.01 seconds; cold/cancelled load 88.80 seconds, 1,357 heartbeat ticks, maximum gap 253 ms. No speed guarantee is inferred. Record-only integration `8639e9ff` from worker `a915a655`; the WPF lease is released and no harness window remains active. Overall: four successful serial processes, 32 accepted captures across separately preserved packets.
+
 ## Offers
 
 No automatic catalogs, seeds or unrelated-family work.
@@ -58,6 +60,6 @@ Stop at this clean checkpoint; no automatic next item. Suggested bounded request
 
 ## Final integration
 
-The complete suite on merge `84dee6e` passed: **1,653 passed, zero failed, five expected skips**, 20m42s. All **46 new cases** are confirmed Passed in its TRX (`full-suite-masterbe8.trx`). Master advanced during that run to `9beb9f61`; merge `1432a725` preserves the language-choice changes. Matrices/build were repeated before starting the new required full suite on this combined source. App `96dfb06` and provider `97bd82ae` are unchanged; a further ZakClassic actual-window recheck covers the imported shared window-load changes.
+The complete suite on merge `84dee6e` passed: **1,653 passed, zero failed, five expected skips**, 20m42s. All **46 new cases** are confirmed Passed in its TRX (`full-suite-masterbe8.trx`). Master advanced during that run to `9beb9f61`; merge `1432a725` preserves the language-choice changes. Matrices/build were repeated before starting the new required full suite on this combined source. App `96dfb06` and provider `97bd82ae` are unchanged; the fourth passing ZakClassic actual-window process covers the imported shared window-load changes.
 
 The earlier run against master `8f454be3` was deliberately stopped after master advanced; only its exact-path integration testhost was terminated, leaving the separate root testhost untouched. Its partial TRX is retained as `full-suite-superseded-master8f.trx` (1,539 passed, zero failed, five skipped; 19m12s), explicitly aborted and not acceptance. Required sound/Indy3 EGA/MT-32 roots are set under D:/Juegos/Lucas. [Exact commands and final counters](../../.verification/zakclassic-palettes-final-20261019/README.md) will record the final combined suite, clean fast-forward and normal executable refresh.
