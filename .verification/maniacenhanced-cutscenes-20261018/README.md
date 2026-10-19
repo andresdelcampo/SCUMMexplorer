@@ -64,4 +64,4 @@ Open this enhanced Spanish edition. In Advanced, open Play Cutscene and choose `
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Family facts and tracker are parent/classic-worker-owned: [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support status](../../docs/maniac/SUPPORT_STATUS.md). Parent owns engine documentation, requirement R8.34, registry/matrix, App integration and [checkpoint](../../docs/checkpoints/20261018-S7-ManiacZak.md).
+Family facts and tracker are parent/classic-worker-owned: [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). Parent owns engine documentation, requirement R8.34, registry/matrix, App integration and [checkpoint](../../docs/checkpoints/20261018-S7-ManiacZak.md).

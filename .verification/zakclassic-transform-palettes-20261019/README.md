@@ -59,4 +59,4 @@ No new user-only check is required for this bounded evidence item. The existing 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent integrates the decoded transformation table and retained-palette rows in [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), the unchanged Partial claim in [Zak tracker](../../docs/zak/SUPPORT_STATUS.md), and the combined [19 October palette checkpoint](../../docs/checkpoints/20261019-Palettes-ManiacZak.md). Generic v1 palette persistence is already documented in [engine object states](../../docs/engine/SCUMM_OBJECT_STATES.md).
+Parent integrates the decoded transformation table and retained-palette rows in [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), the unchanged Partial claim in [Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), and the combined [19 October palette checkpoint](../../docs/checkpoints/20261019-Palettes-ManiacZak.md). Generic v1 palette persistence is already documented in [engine object states](../../docs/engine/SCUMM_OBJECT_STATES.md).

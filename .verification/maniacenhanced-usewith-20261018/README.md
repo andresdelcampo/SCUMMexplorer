@@ -68,4 +68,4 @@ Parent owns the real-window check and final steps. No repeated subjective timing
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent coordinates [Maniac script facts](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [tracker](../../docs/maniac/SUPPORT_STATUS.md), [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md) and [checkpoint](../../docs/checkpoints/20261018-UseWith-ManiacZak.md). Enhanced battery Use is Room 2 object 167 +0018/+001E/+0022; native input lookup is Script 4 +0247. Classic independently supplies its own offsets/evidence.
+Parent coordinates [Maniac script facts](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md) and [checkpoint](../../docs/checkpoints/20261018-UseWith-ManiacZak.md). Enhanced battery Use is Room 2 object 167 +0018/+001E/+0022; native input lookup is Script 4 +0247. Classic independently supplies its own offsets/evidence.

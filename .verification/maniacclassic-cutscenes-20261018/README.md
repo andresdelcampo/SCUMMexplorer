@@ -60,4 +60,4 @@ Open the classic English fixture, select Room 1 and use its Play Cutscene button
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support tracker](../../docs/maniac/SUPPORT_STATUS.md), [S7 checkpoint](../../docs/checkpoints/20261018-S7-ManiacZak.md).
+[Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [S7 checkpoint](../../docs/checkpoints/20261018-S7-ManiacZak.md).

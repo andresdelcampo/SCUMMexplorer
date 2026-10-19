@@ -42,4 +42,4 @@ Reproduction in Play at native 320×200 coordinates: wait 150 frames; key W, cli
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [tracker](../../docs/zak/SUPPORT_STATUS.md), `ScummZakClassicStateTests.cs` and the adjacent reproducible StateCheck harness.
+[Script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), `ScummZakClassicStateTests.cs` and the adjacent reproducible StateCheck harness.

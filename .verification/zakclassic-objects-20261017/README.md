@@ -67,4 +67,4 @@ Compare the source sample's first-visit pictures with the original game in a lat
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [tracker](../../docs/zak/SUPPORT_STATUS.md), [shared object-state rules](../../docs/engine/SCUMM_OBJECT_STATES.md).
+[Script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [shared object-state rules](../../docs/engine/SCUMM_OBJECT_STATES.md).

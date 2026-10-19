@@ -61,4 +61,4 @@ No new user check for this unchanged reference copy. Earlier S6/S7 visual, timin
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Family tracker](../../docs/maniac/SUPPORT_STATUS.md), [edition index](../../docs/maniac/README.md), [existing source map](../../docs/maniac/MANIAC_SCRIPT_MAP.md). No new decoded script fact was added.
+[Family support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [edition index](../../docs/maniac/README.md), [existing source map](../../docs/maniac/MANIAC_SCRIPT_MAP.md). No new decoded script fact was added.

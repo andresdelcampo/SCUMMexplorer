@@ -57,4 +57,4 @@ Parent owns the integrated real-window inventory checks. This headless source/te
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent integrates these facts into [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support tracker](../../docs/maniac/SUPPORT_STATUS.md) and [run checkpoint](../../docs/checkpoints/20261018-Catalog-ManiacZak.md). This worker edits none of those shared files.
+Parent integrates these facts into [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries) and [run checkpoint](../../docs/checkpoints/20261018-Catalog-ManiacZak.md). This worker edits none of those shared files.

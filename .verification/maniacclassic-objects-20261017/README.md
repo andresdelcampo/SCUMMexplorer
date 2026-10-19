@@ -61,4 +61,4 @@ None required to run this audit. Original-game first-visit picture comparison re
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [family tracker](../../docs/maniac/SUPPORT_STATUS.md), and [engine object-state rules](../../docs/engine/SCUMM_OBJECT_STATES.md).
+[Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [family support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), and [engine object-state rules](../../docs/engine/SCUMM_OBJECT_STATES.md).

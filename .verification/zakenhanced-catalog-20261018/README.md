@@ -84,4 +84,4 @@ Optional visual check only: in the supplied Enhanced Zak copy, open Game Status 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-Parent integrates the shared family facts and support decision into [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [tracker](../../docs/zak/SUPPORT_STATUS.md) and the [orchestrated checkpoint](../../docs/checkpoints/20261018-Catalog-ManiacZak.md). This worker owns the independent tests/evidence only; Core, registry, generated tables, CURRENT_WORK and handoff have exclusive separate owners.
+Parent integrates the shared family facts and support decision into [Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries) and the [orchestrated checkpoint](../../docs/checkpoints/20261018-Catalog-ManiacZak.md). This worker owns the independent tests/evidence only; Core, registry, generated tables, CURRENT_WORK and handoff have exclusive separate owners.

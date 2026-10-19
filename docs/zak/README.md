@@ -5,7 +5,7 @@
 | Families (`GameFamily`) | `ZakClassic`, `ZakEnhanced` |
 | Fixtures (folders under `Games`) | `zak ega en` (classic, English), `zakE ega en` (enhanced, English) |
 | SCUMM version(s) and script dialect | classic v1 (`ScummScriptDialect.V1`), enhanced v2 (`V2`) |
-| Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
+| Support requirements | [Maniac and Zak support boundaries](../REQUIREMENTS.md#maniac-and-zak-support-boundaries) |
 | Script map | [ZAK_SCRIPT_MAP.md](ZAK_SCRIPT_MAP.md) |
 | Inventory state evidence | [Classic](../../.verification/zakclassic-state-20261018/README.md), [Enhanced](../../.verification/zakenhanced-state-20261018/README.md), [integration checkpoint](../checkpoints/20261018-S8-ManiacZak.md) |
 | Other notes | none |
