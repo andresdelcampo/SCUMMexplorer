@@ -64,8 +64,16 @@ public partial class MainWindow
         // each of its own copy and used by one run at a time (ScummBootSnapshotPool: at most one boot per worker); a file-per-room game boots once.
         var ownReader = game.V4Archive is not null || game.V4Disks is not null;
         GameLibrary Copy() => new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(game.FolderPath);
-        var planner = new Lazy<ScummCutscenePlanner>(() => !ownReader ? NewPlayCutscenePlanner(game)
-            : new ScummCutscenePlanner(Copy(), () => ScummGameSession.BootForPlay(Copy(), out _), start: ScummCutsceneStart.SnapshotPerWorker));
+        var planner = new Lazy<ScummCutscenePlanner>(() =>
+        {
+            if (!ownReader) return NewPlayCutscenePlanner(game);
+            // The planner's own copy also serves the first boot: the planner reads it only while it is built (the scan, before any run), and the runs
+            // ask it only for its room list, so the pool's first snapshot may own its reader (one scan of the game fewer).
+            GameLibrary? first = Copy();
+            var scanned = first;
+            return new ScummCutscenePlanner(scanned, () => ScummGameSession.BootForPlay(Interlocked.Exchange(ref first, null) ?? Copy(), out _),
+                start: ScummCutsceneStart.SnapshotPerWorker);
+        });
         _playPlanner = planner;
         _scanDone = 0; _scanTotal = 0;
         if (!_sceneSound.IsPreparing) _scanGate.Set();
