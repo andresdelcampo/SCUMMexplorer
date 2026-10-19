@@ -42,6 +42,8 @@ Commit `dfe38e1c` (App):
 
 (Indy3 and Zak hashes differ from the snapshot record's because master changed those lists in between; both sides here are on the same base.) The intermediate steps were hashed too: step 1 (`644d55fc` content) and step 1 + pooled v2 copy, against the start-of-day master `ea89e1ef`: all twelve the same. The eight-worker per-run lines (`prun 8`, header removed) are the same before and after for all ten generic families.
 
+**After the second master merge** (`42be6241`, manual rooms; `Settle` moved to `ScummSessionSettle` and keeps master's `AdvanceFrame`): the twelve lists rebuilt on the merged tree hash the same as above; `Cutscene|Snapshot|MonkeyCd|ExecutorAllocation|ManualRoom|Settle|Architecture` tests 233 passed, 0 failed.
+
 ## Tests (acceptance 2)
 
 `tests/SCUMMexplorer.Tests/ScummExecutorAllocationTests.cs` (8 cases): Indy 4, Monkey Island 2, Zak and Indy3 EGA, three entries each from one snapshot, 300 frames with `AdvanceFrame` on one copy and `StepFrame` on another: same room, states, positions, variables (in order), trace, uncertainties and pending scripts; and a kept run's (`LastAction.Run`) states and positions do not change over 200 later frames. Full suite on the merged tree (S9 MonkeyCd FR/DE/IT included): **1680 passed, 0 failed, 5 skipped** in 7 m 39 s (`SCUMM_SOUND_TEST_ROOT` = `D:\Juegos\Lucas\loom ega mt32 en`, `SCUMM_INDY3_EGA_TEST_ROOT` = `indy3 ega en`, `SCUMM_MT32_ROM_ROOT` = `mt32`; a first run with the sound root set to `D:\Juegos\Lucas` itself failed five LOOM audio tests that read a LOOM folder there, as expected). Solution build: zero warnings, zero errors.
