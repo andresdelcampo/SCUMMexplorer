@@ -22,9 +22,11 @@ To be recorded; original-runtime comparison remains unavailable under the no-run
 
 Source-established alternatives are preserved as contexts. A prepared or isolated source path is not earned gameplay or a universal costume palette. Production changes require general data-derived behavior and focused regressions.
 
+Shared-code lease: the palette-core worker alone owns `Scumm/V1/ScummV1ActorColors.cs`, new `ScummV1PaletteContexts.cs` and `ScummV1PaletteContextTests.cs`. The two trace workers only write their own new tests/probes/evidence. Parent owns a new App partial and small additive costume-view hooks; no executor, session, profile, variable or data-source change is leased.
+
 ## Proposed requirements to confirm or reject
 
-None yet. Record any required product clarification separately before implementation.
+R-5.4a proposes a source-derived costume colour selector: preserve the existing default and unresolved contexts, show concise choices in Normal and attribution/estimates in Advanced, and change no live state. This extends the requested palette-context work without claiming universal colours or requiring a mid-run approval gate.
 
 ## User checks
 
