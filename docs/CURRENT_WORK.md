@@ -42,6 +42,8 @@ Updated 14 October 2026. This is the single plan and session handoff. Completed 
 
 **S4b for MonkeyFloppy done (14 October).** `ScummGameSession` boots the four-disk floppy (`monkey1 ega en`) through the protection, the credits and the opening to Room 33 in 2522 frames with nothing unsupported; the eight-disk Spanish release boots the same way ([record](../.verification/monkey1-session-20261014/README.md), [checkpoint](checkpoints/20261014-S4b-MonkeyFloppy.md), [tracker](monkey1/SUPPORT_STATUS.md)). Proposed R-3.15, R-15.7, R-15.8. Next for the family: S5.
 
+**Executor allocations (19 October).** The cutscene derivation no longer copies whole state per script run or frame (lists identical); disk/archive games derive on four workers; first launch from play start: Monkey Island 2 29 s, Indy 4 68 s ([record](../.verification/executor-alloc-20261019/README.md)). Next lever for Indy 4: make the executor's per-run variable sync proportional to the changes (change tracking of the runtime's globals or indexed variables).
+
 **19 October run** ([checkpoint](checkpoints/20261019-S9-v5-snapshot-languages.md)): S9 for the Monkey Island 2, Indy 4 and Monkey Island CD copies; cutscene lists derive from one booted snapshot per game; the Monkey Island 1 CD offers its five languages (R-3.16).
 
 **18 October run** ([checkpoint](checkpoints/20261018-S6-v5-S7-MonkeyCd.md)): Monkey Island 2 and Indy 4 are played (S6; iMUSE music with loops and jump hooks, Indy 4 talkie speech), Monkey Island CD, Monkey Island 2 and Indy 4 have their cutscene lists (S7).
