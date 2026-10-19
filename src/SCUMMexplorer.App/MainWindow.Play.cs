@@ -26,6 +26,7 @@ public partial class MainWindow
     private bool _playPaused;
     private int _playFrame;
     private ScummPlayFrame? _playShown;
+    private bool _followingPlayRoom;
     private WriteableBitmap? _playBitmap;
     // The play game's sounds that play a track of its disc (null for a game without them).
     private ScummCdAudioTracks? _playCdTracks;
@@ -155,6 +156,12 @@ public partial class MainWindow
             return;
         }
         if (!CurrentRequest()) return;
+        StartPlayClock();
+    }
+
+    private void StartPlayClock()
+    {
+        if (_play is null) return;
         _playPaused = false;
         _playTimer ??= new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
         _playTimer.Tick -= PlayTimer_Tick;
@@ -209,6 +216,16 @@ public partial class MainWindow
         if (_playScreen is null || _play is null) return;
         var frame = _playScreen.Compose(_playFrame);
         _playShown = frame;
+        if (frame.RoomId is int shownRoom && _currentRoomResource?.ResourceId != shownRoom &&
+            _game?.Rooms.FirstOrDefault(r => r.ResourceId == shownRoom) is { } nativeRoom)
+        {
+            // Follow a native load without re-entering it through catalog preparation.
+            _currentRoomResource = nativeRoom;
+            _lastViewedRoomResource = nativeRoom;
+            _followingPlayRoom = true;
+            try { SelectResourceInTree(nativeRoom); }
+            finally { _followingPlayRoom = false; }
+        }
         _playBitmap ??= new WriteableBitmap(ScummPlayFrame.Width, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
         _playBitmap.WritePixels(new Int32Rect(0, 0, ScummPlayFrame.Width, ScummPlayFrame.Height), frame.Pixels, ScummPlayFrame.Width * 4, 0);
         PlayScreenImage.Source = _playBitmap;

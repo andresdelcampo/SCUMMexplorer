@@ -1029,6 +1029,11 @@ public partial class MainWindow : Window
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
+        if (_followingPlayRoom)
+        {
+            if (e.NewValue is TreeViewItem { Tag: GameResource nativeRoom }) _selectedResource = nativeRoom;
+            return;
+        }
         // Opening a scene can take seconds (a new game session runs the boot scripts, the first visit runs the room's): show it.
         if (e.NewValue is not TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } })
         {
@@ -2434,9 +2439,15 @@ public partial class MainWindow : Window
             foreach (var item in group.Items.OfType<TreeViewItem>())
             {
                 if (item.Tag is not GameResource candidate || candidate != resource) continue;
+                var alreadySelected = item.IsSelected;
                 group.IsExpanded = true;
                 item.IsSelected = true;
                 item.BringIntoView();
+                // A native roomless intro can leave the previous tree node selected.
+                // Clicking that catalog card is still an explicit navigation request.
+                if (alreadySelected && _roomOpenKind == RoomOpenKind.Catalog && !_followingPlayRoom &&
+                    resource.Kind == ResourceKind.Room && _currentRoomResource?.ResourceId != resource.ResourceId)
+                    ResourceTree_SelectedItemChanged(ResourceTree, new RoutedPropertyChangedEventArgs<object>(item, item));
                 return;
             }
         }
