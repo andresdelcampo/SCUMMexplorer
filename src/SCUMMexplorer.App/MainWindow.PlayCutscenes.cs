@@ -60,11 +60,20 @@ public partial class MainWindow
         // A game read from one archive or disk set shares its reader between sessions, so the scan and each background worker read from their own
         // copy of the game (their own reader), never the play session's: Monkey Island floppy, 164 runs, 109 s on one thread, 36 s on eight
         // (17 October 2026; more workers were slower), and a scan through the play session's reader while it played lost 11 groups. A file-per-room
-        // game shares the one copy, as before.
+        // game shares the one copy, as before. Since the cutscene snapshot (18 October 2026) a disk or archive game's runs start from a pool of boots,
+        // each of its own copy and used by one run at a time (ScummBootSnapshotPool: at most one boot per worker); a file-per-room game boots once.
         var ownReader = game.V4Archive is not null || game.V4Disks is not null;
-        var copies = ownReader ? new ThreadLocal<GameLibrary>(() => SCUMMexplorer.Core.Discovery.GameFolderScanner.Reopen(game)) : null;
-        var planner = new Lazy<ScummCutscenePlanner>(() => copies is null ? NewPlayCutscenePlanner(game)
-            : new ScummCutscenePlanner(copies.Value!, () => ScummGameSession.BootForPlay(copies.Value!, out _)));
+        GameLibrary Copy() => SCUMMexplorer.Core.Discovery.GameFolderScanner.Reopen(game); // same folder and language (R-3.16)
+        var planner = new Lazy<ScummCutscenePlanner>(() =>
+        {
+            if (!ownReader) return NewPlayCutscenePlanner(game);
+            // The planner's own copy also serves the first boot: the planner reads it only while it is built (the scan, before any run), and the runs
+            // ask it only for its room list, so the pool's first snapshot may own its reader (one scan of the game fewer).
+            GameLibrary? first = Copy();
+            var scanned = first;
+            return new ScummCutscenePlanner(scanned, () => ScummGameSession.BootForPlay(Interlocked.Exchange(ref first, null) ?? Copy(), out _),
+                start: ScummCutsceneStart.SnapshotPerWorker);
+        });
         _playPlanner = planner;
         _scanDone = 0; _scanTotal = 0;
         if (!_sceneSound.IsPreparing) _scanGate.Set();
@@ -75,9 +84,11 @@ public partial class MainWindow
                 var groups = planner.Value.Groups;
                 _scanTotal = groups.Count;
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) UpdatePlaybackControls(); });
-                // Each run boots its own session (a disk or archive game from its worker's own copy, above).
+                // Each run starts from a copy of a boot (ScummBootSnapshot, 18 October 2026), not from a boot of its own (Monkey Island 2 booted 260 times
+                // before, Indy 4 426 times). The entries are handed out one at a time, so a worker that drew long scenes does not hold the others back (a list's
+                // default split gives each worker a fixed range: Monkey Island 2, 85 s wall for 189 s of work on eight workers).
                 var parallel = Math.Max(1, ownReader ? Math.Min(8, Environment.ProcessorCount / 2) : Environment.ProcessorCount / 2);
-                Parallel.ForEach(groups, new ParallelOptions { MaxDegreeOfParallelism = parallel }, group =>
+                Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), new ParallelOptions { MaxDegreeOfParallelism = parallel }, group =>
                 {
                     _scanGate.Wait();
                     planner.Value.Run(group.First);

@@ -32,14 +32,116 @@ if (args.Length > 2 && args[1] == "prun")
 {
     var clock = System.Diagnostics.Stopwatch.StartNew();
     var copies = new ThreadLocal<GameLibrary>(() => ScanArg(args[0]));
-    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _));
-    Parallel.ForEach(planner.Groups, new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g => planner.Run(g.First));
-    Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}");
+    // Since the cutscene snapshot (18 October 2026) the runs start from a pool of boots, each of its own copy of the game, as the App does;
+    // "prun <workers> boot" boots for every run on the worker's own copy, as before.
+    var cpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
+    var planner = args.Length > 3 && args[3] == "boot"
+        ? new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _), start: ScummCutsceneStart.BootPerRun)
+        : PooledPlanner();
+    // As the App: the planner's copy of the game also serves the pool's first boot.
+    ScummCutscenePlanner PooledPlanner()
+    {
+        GameLibrary? first = game;
+        return new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(Interlocked.Exchange(ref first, null) ?? ScanArg(args[0]), out _),
+            start: ScummCutsceneStart.SnapshotPerWorker);
+    }
+    // As the App since 19 October 2026: entries handed out one at a time ("boot": the list's default fixed ranges, as before).
+    var options = new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) };
+    if (args.Length > 3 && args[3] == "boot") Parallel.ForEach(planner.Groups, options, g => planner.Run(g.First));
+    else Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(planner.Groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), options, g => planner.Run(g.First));
+    Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}; " +
+                      $"CPU {(System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime - cpu).TotalSeconds:0} s; boots {planner.PoolBoots?.ToString() ?? "one per run"}");
     foreach (var g in planner.Groups)
     {
         var r = planner.Run(g.First);
         Console.WriteLine($"{g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2} | run: {(r.Begun ? "begun" : "NOT begun")} frames {r.Frames} rooms [{string.Join(",", r.RoomsEntered)}]");
     }
+    return;
+}
+
+// CutsceneList <folder> snap: the cost of a boot, of keeping its snapshot and of one copy (cutscene snapshot, 18 October 2026).
+if (args.Length > 1 && args[1] == "snap")
+{
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    var booted = ScummGameSession.BootForPlay(game, out _);
+    var boot = clock.ElapsedMilliseconds; clock.Restart();
+    var snapshot = ScummBootSnapshot.Of(booted);
+    var keep = clock.ElapsedMilliseconds; clock.Restart();
+    for (var i = 0; i < 20; i++) snapshot.Start();
+    Console.WriteLine($"boot {boot} ms, snapshot {keep} ms, copy {clock.ElapsedMilliseconds / 20.0:0.0} ms (mean of 20)");
+    return;
+}
+
+// CutsceneList <folder> bench <n>: n entries spread over the list, each run once after its own boot and once from a copy of one boot, alternately
+// on one thread, with the time of each part (cutscene snapshot, 18 October 2026: the machine is shared, so both kinds are timed side by side).
+if (args.Length > 2 && args[1] == "bench")
+{
+    var booting = new ScummCutscenePlanner(game, start: ScummCutsceneStart.BootPerRun);
+    var copying = new ScummCutscenePlanner(ScanArg(args[0]));
+    var step = Math.Max(1, booting.Groups.Count / int.Parse(args[2]));
+    long bootRuns = 0, copyRuns = 0, boots = 0, copies = 0;
+    var clock = new System.Diagnostics.Stopwatch();
+    var snapshot = ScummBootSnapshot.Of(ScummGameSession.BootForPlay(game, out _));
+    foreach (var g in booting.Groups.Where((_, i) => i % step == 0))
+    {
+        clock.Restart(); ScummGameSession.BootForPlay(game, out _); boots += clock.ElapsedMilliseconds;
+        clock.Restart(); snapshot.Start(); copies += clock.ElapsedMilliseconds;
+        clock.Restart(); var a = booting.Run(g.First); bootRuns += clock.ElapsedMilliseconds;
+        clock.Restart(); var b = copying.Run(copying.Groups.First(c => c.First.Room == g.First.Room && c.First.ObjectId == g.First.ObjectId && c.First.VerbId == g.First.VerbId).First); copyRuns += clock.ElapsedMilliseconds;
+        if (a != b && !(a.Begun == b.Begun && a.Frames == b.Frames && a.RoomsEntered.SequenceEqual(b.RoomsEntered))) Console.WriteLine($"DIFFERENT {g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2}");
+    }
+    Console.WriteLine($"{booting.Groups.Count / step} entries: runs with their own boot {bootRuns} ms, runs from a copy {copyRuns} ms; a boot alone {boots} ms, a copy alone {copies} ms");
+    return;
+}
+
+// CutsceneList <folder> rooms <workers> <room>...: the groups of the named rooms, on that many workers from a pool of boots, with the time of each
+// run, the process's CPU time and the garbage collector's pauses (cutscene snapshot, 19 October 2026: whether long runs gain from running together).
+if (args.Length > 3 && args[1] == "rooms")
+{
+    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(ScanArg(args[0]), out _), start: ScummCutsceneStart.SnapshotPerWorker);
+    var only = args.Skip(3).Select(int.Parse).ToHashSet();
+    var groups = planner.Groups.Where(g => only.Contains(g.First.Room)).ToList();
+    var cpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
+    var pause = GC.GetTotalPauseDuration();
+    var gen2 = GC.CollectionCount(2);
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    var times = new System.Collections.Concurrent.ConcurrentBag<string>();
+    Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering),
+        new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g =>
+        {
+            var one = System.Diagnostics.Stopwatch.StartNew();
+            var r = planner.Run(g.First);
+            times.Add($"{g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2} frames {r.Frames} {one.ElapsedMilliseconds} ms");
+        });
+    Console.WriteLine($"{groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms; CPU {(System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime - cpu).TotalSeconds:0.0} s; " +
+                      $"GC pauses {(GC.GetTotalPauseDuration() - pause).TotalSeconds:0.0} s, gen2 {GC.CollectionCount(2) - gen2}, server GC {System.Runtime.GCSettings.IsServerGC}, allocated {GC.GetTotalAllocatedBytes() / 1048576} MB");
+    foreach (var t in times.Order()) Console.WriteLine(t);
+    return;
+}
+
+// CutsceneList <folder> alloc <room> <object> <verb> <frames>: the bytes one run's frames allocate, by what the run asks the session each frame
+// (cutscene snapshot, 19 October 2026: Indy 4's long runs allocated about 16 GB each).
+if (args.Length > 5 && args[1] == "alloc")
+{
+    var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    var session = ScummGameSession.BootForPlay(game, out _);
+    var roomInfo = game.Rooms.First(r => r.ResourceId == room);
+    if (obj == 0) session.EnterRoomAgain(roomInfo); else { session.VisitRoom(roomInfo); session.ActivateObjectVerb(obj, verb); }
+    long snapshotBytes = 0, frame = 0, begun = 0, inCutscene = 0, haveMsg = 0, trace = 0;
+    long Bytes() => GC.GetAllocatedBytesForCurrentThread();
+    using var ticks = new AllocationTicks();
+    for (var i = 0; i < int.Parse(args[5]); i++)
+    {
+        var at = Bytes(); _ = session.CutscenesBegun; begun += Bytes() - at;
+        at = Bytes(); _ = session.InCutscene; inCutscene += Bytes() - at;
+        at = Bytes(); _ = session.Messages.HaveMsg; haveMsg += Bytes() - at;
+        at = Bytes(); _ = session.SessionTrace.Count; trace += Bytes() - at;
+        at = Bytes(); session.AdvanceFrame(); frame += Bytes() - at;
+        at = Bytes(); _ = session.Snapshot; snapshotBytes += Bytes() - at;
+    }
+    Console.WriteLine($"per frame: AdvanceFrame {frame / int.Parse(args[5])} B, CutscenesBegun {begun / int.Parse(args[5])} B, InCutscene {inCutscene / int.Parse(args[5])} B, " +
+                      $"Messages.HaveMsg {haveMsg / int.Parse(args[5])} B, SessionTrace.Count {trace / int.Parse(args[5])} B, the Snapshot property alone {snapshotBytes / int.Parse(args[5])} B; uncertainties {session.Snapshot.Uncertainties.Count}, variables {session.Snapshot.KnownGlobalVariables.Count}; trace lines {session.SessionTrace.Count}");
+    foreach (var (type, bytes) in ticks.Top(15)) Console.WriteLine($"   {bytes / 1048576.0,9:0.0} MB sampled  {type}");
     return;
 }
 
@@ -167,7 +269,9 @@ if (args.Length > 4 && args[1] == "probe")
 if (args.Length > 1 && args[1] == "scan")
 {
     var clock = System.Diagnostics.Stopwatch.StartNew();
-    var planner = new ScummCutscenePlanner(game);
+    // The Maniac Mansion families start from the reviewed character menu, as the App's planner does (cutscene snapshot, 18 October 2026).
+    var planner = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced
+        ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game) : new ScummCutscenePlanner(game);
     Console.WriteLine($"planner (one boot and the scan) {clock.ElapsedMilliseconds} ms");
     if (planner.VerbSource is { } verbSource) Console.WriteLine("verb source: " + verbSource);
     Console.WriteLine($"verb words: {string.Join(", ", Enumerable.Range(0, 256).Select(v => (v, w: planner.Verbs.Word!(v))).Where(p => p.w is not null).Select(p => $"0x{p.v:X2} {p.w}"))}");
@@ -193,3 +297,25 @@ if (args.Length > 1 && args[1] == "scan")
 }
 
 static GameLibrary ScanArg(string arg) => arg.Split('|') is [var path, var disc] ? new GameFolderScanner { DiscFolder = disc }.Scan(path) : new GameFolderScanner().Scan(arg);
+
+/// <summary>The runtime's allocation ticks (one about every 100 KB allocated), summed by allocated type: which types a run's frames allocate.</summary>
+sealed class AllocationTicks : System.Diagnostics.Tracing.EventListener
+{
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, long> _bytes = new();
+
+    protected override void OnEventSourceCreated(System.Diagnostics.Tracing.EventSource source)
+    {
+        if (source.Name == "Microsoft-Windows-DotNETRuntime")
+            EnableEvents(source, System.Diagnostics.Tracing.EventLevel.Verbose, (System.Diagnostics.Tracing.EventKeywords)0x1);
+    }
+
+    protected override void OnEventWritten(System.Diagnostics.Tracing.EventWrittenEventArgs e)
+    {
+        if (e.EventName?.StartsWith("GCAllocationTick", StringComparison.Ordinal) != true || e.Payload is null) return;
+        var type = e.PayloadNames!.IndexOf("TypeName") is >= 0 and var t ? e.Payload[t]?.ToString() ?? "?" : "?";
+        var amount = e.PayloadNames.IndexOf("AllocationAmount64") is >= 0 and var a ? Convert.ToInt64(e.Payload[a]) : 100_000;
+        _bytes.AddOrUpdate(type, amount, (_, sum) => sum + amount);
+    }
+
+    public IEnumerable<(string Type, long Bytes)> Top(int count) => _bytes.OrderByDescending(p => p.Value).Take(count).Select(p => (p.Key, p.Value));
+}

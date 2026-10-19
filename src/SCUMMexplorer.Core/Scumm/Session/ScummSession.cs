@@ -25,6 +25,9 @@ public abstract partial class ScummSession
     protected GameResource? _currentRoom;
     protected IReadOnlyList<ScummRoomObjectRecord> _currentObjects = [];
 
+    /// <summary>The game the session plays: what a <see cref="ScummBootSnapshot"/> shares between its copies instead of copying.</summary>
+    internal GameLibrary SessionGame => _game;
+
     /// <summary>The soundcard-independent part of the session's set-up: data, runtime state and the script clock hooks.</summary>
     /// <param name="soundLifetime">Reads how long a native sound resource plays (the game's own sound formats are the caller's knowledge).</param>
     protected ScummSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed,

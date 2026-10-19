@@ -8,6 +8,13 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Discovery lists the languages (`GameFolderScanner.ListLanguages`, `GameLibrary.Languages`/`Language`/`Key`), labelled by the disc's folder names; the default stays ENGLISH; a missing folder falls back and the note says so.
 - The window shows a language list under the game's name only for such a game; choosing one reopens the game in it and remembers it per folder (`game-languages.txt`). Play, thumbnails, CD room lists, first-visit scenes and ego arrivals are keyed by folder and language.
 - Tests: `GameLanguageChoiceTests` (4) pass; discovery/MonkeyCd/support/architecture 78 passed; LOOM 836 passed (5 skipped); WPF `LanguageWindowCheck` all PASS (Spanish verbs and `Mirar cartel` in play). [Record](../.verification/language-choice-20261019/README.md).
+
+## 19 October: cutscene lists from one boot (cutscene snapshot, all generic families)
+
+- **One boot per game.** `ScummBootSnapshot` keeps a deep copy of a booted session (variables, script slots, actors, objects, room, camera, verbs, sound timelines, seeded picks, caches; the game's readers shared) and every cutscene run starts from a copy of it; disk and archive games use a pool of at most one boot per worker (`ScummBootSnapshotPool`). The App hands entries to its workers one at a time, and `getActorFromPos` keeps the costumes it has read (an Indy 4 frame allocated 4.2 MB, now 0.96 MB).
+- **Same results.** The twelve `CutsceneList` lists (LOOM EGA/CD, Indy3 EGA/VGA, Monkey floppy/CD, Monkey2, Indy4, Maniac and Zak both editions) and the eight-worker runs hash the same before and after; `ScummBootSnapshotTests` compare runs from a copy with runs after their own boot, trace line for line.
+- **Faster.** Eight workers: Monkey Island 2 about 100 s → 55 s, Indy 4 126 s → 70 s, Monkey CD 32 → 12 s, Monkey floppy 33 → 11 s, Indy3 41 → 10 s; real window on first launch: Monkey Island 2 140–174 s → 70 s, Indy 4 185 s → 129 s (machine shared with other runs; under a minute not reached for the window). Remaining cost: the executor's per-script result copies. [Record](../.verification/cutscene-snapshot-20261018/README.md).
+
 ## 19 October: source item qualifiers and resumed fidelity (Maniac/Zak)
 
 - Zak's repeated CashCards, helmets, tickets and tokens use native character qualifiers inferred from each copy's scripts. Shards keep neutral fallback. Current ownership stays separate, and qualifiers survive admin transfers/Undo; catalogs remain 70 items. No character-name or object-ID label table is added.
