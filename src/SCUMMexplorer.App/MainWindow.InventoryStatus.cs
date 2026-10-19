@@ -8,6 +8,7 @@ namespace SCUMMexplorer.App;
 public partial class MainWindow
 {
     private bool InventoryStatusAvailable => _game is { } game && PlayActive && _playFolder == game.FolderPath &&
+        _play?.InventoryCharactersAvailable == true &&
         GameSupport.For(game)[SupportFeature.Status] != SupportLevel.None &&
         ScummProfile.For(game).EngineVersion is ScummVersion.V1 or ScummVersion.V2;
 
@@ -15,13 +16,9 @@ public partial class MainWindow
     {
         var session = _play ?? throw new InvalidOperationException("There is no live inventory session.");
         var folder = _playFolder;
-        var data = _game is { } opened ? ScummDataSources.For(opened) : null;
         var dialog = new InventoryStatusWindow(session, () => ReferenceEquals(_play, session) && _playFolder == folder && _game?.FolderPath == folder,
             () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _game is { } game ? ManiacPreviewText.For(game) : null,
-            _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2,
-            character => character.PortraitRoomId is int room && character.PortraitObjectId is int objectId &&
-                data?.ReadObjectImages(room).FirstOrDefault(candidate => candidate.Id == objectId) is { } image
-                    ? CreateBitmap(image.Width, image.Height, image.Pixels, ScummPlayScreen.EgaPalette) : null)
+            _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2)
         { Owner = this };
         dialog.Resources.MergedDictionaries.Add(Resources);
         return dialog;

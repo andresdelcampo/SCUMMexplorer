@@ -1,0 +1,4 @@
+*.txt
+test-results/
+window-*/
+!arrival.csv

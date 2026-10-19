@@ -1,10 +1,18 @@
 # Maniac Mansion (classic v1) support status
 
-## Inventory catalog completion — 18 October 2026 (current)
+## Native walking fidelity — 19 October 2026 (current)
+
+Both supplied Maniac editions now use the v1/v2 row search, distance metric, descending box priority and native destination recalculation. The source-reference census matches every sampled aligned grid point and declared object approach; both native Play routes and actual Game Status windows pass after integration. Enhanced's previously projected camera endpoint changes 352→336; its native mat/key route still succeeds. All support levels remain unchanged, including the user's accepted Classic costume status. This is engine-source/Explorer evidence; original-runtime picture/timing, other parties/puzzles and additional same-family copies remain separate. [Walking evidence](../../.verification/maniaczak-walking-20261019/README.md), [current checkpoint](../checkpoints/20261019-LabelsFidelity-ManiacZak.md).
+
+## Game Status presentation — 18 October 2026 (current)
+
+The user's selected-party clarification supersedes the earlier seven-recipient UI. Game Status becomes available after native Start, when all three chosen kids have been placed, and offers only those three. Selection portraits are replaced by native full-body costume frames for every recipient. Appearance decoding uses detached state and does not switch the hero, move actors or change story flags. The 48-item admin catalog, native capacity and atomic Apply/Undo remain. Item, recipient and Add controls are compact and bottom aligned. Status stays **Full**; no other support cell changes. [Status checkpoint](../checkpoints/20261018-StatusPolish-ManiacZak.md), [character evidence](../../.verification/status-character-art-20261018/README.md), [window checks](../../.verification/status-polish-window-20261018/README.md).
+
+## Inventory catalog completion — preceding 18 October 2026 pass
 
 Both supplied editions establish **48 named inventory items**, superseding the provisional 49-entry admin catalog. Complete own-edition source censuses cover 1089/1092 blocks, all decoded, with no Pickupable-bit writers or indirect script calls. Eight callers of helper116 account for its ActiveObject1 pickup: piggy bank35 is skipped by its own discriminator guard; hamster34 and dimes36/37/38 pass. The bank stays a scene object. No item-ID exception or earned-pickup prerequisite is added.
 
-All 48 items can be granted to an unselected playable child, preserve every retained native verb entrypoint and Undo exactly. Existing native 80-slot capacity, stale/atomic edit guards and all seven pictured recipients remain. Status is **Full** under the clarified all-items admin contract; final integrated results are in the [catalog checkpoint](../checkpoints/20261018-Catalog-ManiacZak.md). Other cells and prior story/visual/timing/edition limitations are unchanged. [Classic evidence](../../.verification/maniacclassic-catalog-20261018/README.md), [enhanced evidence](../../.verification/maniacenhanced-catalog-20261018/README.md).
+All 48 items preserve every retained native verb entrypoint and Undo exactly. The catalog pass tested all seven playable recipients under its then-current contract; the current refinement restricts the UI to the selected three. Existing native 80-slot capacity and stale/atomic edit guards remain. Status is **Full** under the clarified all-items admin contract; historical results are in the [catalog checkpoint](../checkpoints/20261018-Catalog-ManiacZak.md). Other cells and prior story/visual/timing/edition limitations are unchanged. [Classic evidence](../../.verification/maniacclassic-catalog-20261018/README.md), [enhanced evidence](../../.verification/maniacenhanced-catalog-20261018/README.md).
 
 ## Admin Game Status clarification — preceding 18 October 2026 pass
 
@@ -36,7 +44,7 @@ Family: ManiacClassic | Fixture: D:/Juegos/Lucas/mmansion ega en (TestGames.Root
 | S6 Play | done (bounded native route) | Play/Objects Full | .verification/maniacclassic-play-20261017 | Genuine party choices, override skip, walked exit, composed sentence, mat/key pickup, rendered inventory and inventory selection; original-game picture/timing acceptance remains open. |
 | S7 Cutscenes | done (bounded source-derived list) | Cutscenes Partial; parent owns matrix | .verification/maniacclassic-cutscenes-20261018 | 59 triggers/27 groups; six fresh starts begin; three source-attributed proofs and real-window actions. No complete-story or original-game fidelity claim. |
 | S8 State | done (bounded inventory editor, both families) | Status Full | .verification/maniacclassic-state-20261018; .verification/maniacenhanced-state-20261018 | Genuine pickup, guarded Apply/Cancel/Undo and both actual-window checks pass; source-selected party only. |
-| S8 Admin catalog | done (all inventory items, both supplied editions) | Status Full | [Catalog checkpoint](../checkpoints/20261018-Catalog-ManiacZak.md) | 48 items per copy; source census, all-roster grants/retained verbs/exact Undo, native capacity and seven pictured recipients; supersedes the preceding held-only scope. |
+| S8 Admin catalog | done (all inventory items, both supplied editions) | Status Full | [Status checkpoint](../checkpoints/20261018-StatusPolish-ManiacZak.md) | 48 items per copy; source census, grants/retained verbs/exact Undo and native capacity; selected three recipients after Start, all pictured with native full bodies. |
 | S9 Editions | available-copy checks done; alternate releases blocked | unchanged | .verification/maniacclassic-editions-20261018 | One English classic copy; identity, native startup/play/scene and edition-boundary regressions pass. Enhanced is a separate family. |
 
 Blocked on: S5 original-game picture comparison is unperformed because this run prohibits launching ScummVM. Source-level comparisons and real-window captures do not substitute for that evidence.

@@ -18,6 +18,7 @@ Exe/
 *.suo
 
 # Generated verification output
+.verification/maniaczak-final-20261019/test-results/
 .verification/options-layout-20261011/out/
 .verification/title-wordmark-20261010/out/
 .verification/actor-progression-20261009/out*/

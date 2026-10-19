@@ -110,12 +110,12 @@ public sealed class ScummManiacClassicCatalogTests
             Globals = runtime.GlobalVariables.OrderBy(p => p.Key), Actors = runtime.Actors.Snapshot()
         });
         var before = State();
-        var applied = session.ApplyInventoryEdits(view, view.Catalog.Select(i => new ScummInventoryTransfer(i.ObjectId, 7)).ToArray());
+        var applied = session.ApplyInventoryEdits(view, view.Catalog.Select(i => new ScummInventoryTransfer(i.ObjectId, 5)).ToArray());
         Assert.True(applied.Applied, applied.Refusal);
         foreach (var item in view.Catalog)
         {
             var held = Assert.Single(session.CaptureInventoryStatus().Items, i => i.ObjectId == item.ObjectId);
-            Assert.Equal(7, held.OwnerId);
+            Assert.Equal(5, held.OwnerId);
             Assert.Equal(item.SourceRoomId, held.RetainedRoomId);
             var source = data.ReadRoom(item.SourceRoomId);
             var record = source.Objects.Last(o => o.Id == item.ObjectId);
@@ -131,3 +131,4 @@ public sealed class ScummManiacClassicCatalogTests
         Assert.Equal(before, State());
     }
 }
+

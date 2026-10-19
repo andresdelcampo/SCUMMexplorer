@@ -16,7 +16,6 @@ public partial class InventoryStatusWindow : Window
     private readonly bool _advanced;
     private readonly int _engineVersion;
     private readonly Func<string, string> _readable;
-    private readonly Func<ScummInventoryCharacter, BitmapSource?>? _characterPicture;
     private ScummInventoryStatusSnapshot _snapshot = null!;
     private ScummInventoryUndoToken? _undo;
     private readonly Dictionary<int, int> _targets = [];
@@ -25,19 +24,35 @@ public partial class InventoryStatusWindow : Window
     private CharacterChoice[] _characters = [];
 
     public InventoryStatusWindow(ScummGameSession session, Func<bool> isCurrent, Action refresh,
-        bool advanced = false, Func<string, string>? readable = null, int engineVersion = 2,
-        Func<ScummInventoryCharacter, BitmapSource?>? characterPicture = null)
+        bool advanced = false, Func<string, string>? readable = null, int engineVersion = 2)
     {
         InitializeComponent();
         _session = session; _isCurrent = isCurrent; _refresh = refresh; _advanced = advanced;
         _engineVersion = engineVersion;
-        _characterPicture = characterPicture;
         _readable = readable ?? (text => text);
         LoadSnapshot();
     }
 
     private string DisplayName(string name) => _readable(name).Replace("@", "", StringComparison.Ordinal).Trim();
     private string? CharacterName(int id) => _characters.FirstOrDefault(c => c.ActorId == id)?.Name;
+    private Dictionary<int, string> ItemNames()
+    {
+        var names = new Dictionary<int, string>();
+        foreach (var group in _snapshot.Catalog.GroupBy(item => DisplayName(item.Name ?? $"Object {item.ObjectId}"), StringComparer.CurrentCultureIgnoreCase))
+        {
+            var variants = group.OrderBy(item => item.ObjectId).ToArray();
+            var qualified = variants.Select(item => variants.Length > 1 && item.Context?.Text is { } context &&
+                !string.IsNullOrWhiteSpace(DisplayName(context)) ? $"{group.Key} ({DisplayName(context)})" : group.Key).ToArray();
+            for (var index = 0; index < variants.Length; index++)
+            {
+                var label = qualified[index];
+                var collisions = qualified.Count(name => string.Equals(name, label, StringComparison.CurrentCultureIgnoreCase));
+                names[variants[index].ObjectId] = variants.Length == 1 || label != group.Key && collisions == 1
+                    ? label : $"{label} ({index + 1})";
+            }
+        }
+        return names;
+    }
     private DataTemplate CharacterTemplate => (DataTemplate)FindResource("CharacterChoiceTemplate");
 
     private void LoadSnapshot()
@@ -59,6 +74,8 @@ public partial class InventoryStatusWindow : Window
         AdvancedEvidence.Text = string.Join("\n", _snapshot.Characters.Select(c => c.Evidence).Distinct()) +
             "\n" + string.Join("\n", _portraitEvidence.Values) +
             "\n" + string.Join("\n", _session.InventoryCatalogNotes) +
+            "\n" + string.Join("\n", _snapshot.Catalog.Where(item => item.Context is not null).Select(item =>
+                $"Object {item.ObjectId}: source association actor {item.Context!.ActorId}: {item.Context!.Evidence}")) +
             (_snapshot.Refusal is { } refusal ? "\n" + refusal : "") + "\n" +
             string.Join("\n", _session.SessionTrace.Where(line => line.StartsWith("Explicit inventory ", StringComparison.Ordinal)).TakeLast(5));
         UpdateButtons();
@@ -68,8 +85,9 @@ public partial class InventoryStatusWindow : Window
     {
         var selected = (CatalogItems.SelectedItem as ItemChoice)?.ObjectId;
         var search = ItemSearch.Text.Trim();
+        var names = ItemNames();
         var items = _snapshot.Catalog.Where(item => _advanced || !string.IsNullOrWhiteSpace(item.Name))
-            .Select(item => new ItemChoice(item.ObjectId, DisplayName(item.Name ?? $"Object {item.ObjectId}")))
+            .Select(item => new ItemChoice(item.ObjectId, names[item.ObjectId]))
             .Where(item => search.Length == 0 || item.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase))
             .OrderBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase).ToArray();
         CatalogItems.ItemsSource = items;
@@ -82,6 +100,7 @@ public partial class InventoryStatusWindow : Window
     private void RefreshRows()
     {
         InventoryRows.Children.Clear();
+        var names = ItemNames();
         var rows = _snapshot.Items.Select(item => (item.ObjectId, item.OwnerId, item.Name, Pending: false))
             .Concat(_snapshot.Catalog.Where(item => _targets.ContainsKey(item.ObjectId) && !_snapshot.Items.Any(held => held.ObjectId == item.ObjectId))
                 .Select(item => (item.ObjectId, OwnerId: _targets[item.ObjectId], item.Name, Pending: true)));
@@ -93,7 +112,7 @@ public partial class InventoryStatusWindow : Window
             row.ColumnDefinitions.Add(new() { Width = new GridLength(2, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new() { Width = new GridLength(1, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new() { Width = new GridLength(1, GridUnitType.Star) });
-            row.Children.Add(new TextBlock { Text = DisplayName(item.Name ?? $"Object {item.ObjectId}"), Margin = new Thickness(10, 16, 8, 12), TextWrapping = TextWrapping.Wrap });
+            row.Children.Add(new TextBlock { Text = names.GetValueOrDefault(item.ObjectId, DisplayName(item.Name ?? $"Object {item.ObjectId}")), Margin = new Thickness(10, 16, 8, 12), TextWrapping = TextWrapping.Wrap });
             var owner = new TextBlock { Text = item.Pending ? "Pending addition" : CharacterName(item.OwnerId) ?? (_advanced ? $"Actor {item.OwnerId}" : "Elsewhere"), Margin = new Thickness(10, 16, 8, 12) };
             Grid.SetColumn(owner, 1); row.Children.Add(owner);
             var choice = new ComboBox { ItemsSource = _characters, ItemTemplate = CharacterTemplate, SelectedValuePath = nameof(CharacterChoice.ActorId),
@@ -174,16 +193,9 @@ public partial class InventoryStatusWindow : Window
         BitmapSource? picture = null;
         try
         {
-            picture = _characterPicture?.Invoke(character);
-            if (picture is not null)
+            if (_session.ReadInventoryCharacterAppearance(actorId, out var evidence) is { } actor)
             {
-                _portraitEvidence[actorId] = $"Actor {actorId}: native selection picture; {character.Evidence}";
-                _portraits[actorId] = picture;
-                return picture;
-            }
-            if (_session.Actors.FirstOrDefault(actor => actor.Number == actorId) is { } actor)
-            {
-                _portraitEvidence[actorId] = $"Actor {actorId}: current native costume {actor.Look.Costume}, animation and palette; display crop only" +
+                _portraitEvidence[actorId] = $"Actor {actorId}: {evidence}; native full-body display copy" +
                     (actor.Look.PaletteEstimate is { } paletteEstimate ? "; estimate: " + paletteEstimate : "") +
                     (actor.Look.Estimate is { } estimate ? "; " + estimate : "");
                 var display = actor with { Room = 1, X = 96, Y = 224, Visible = true, WalkBox = null, Look = actor.Look with { Elevation = 0, Scale = 255 } };

@@ -2,12 +2,26 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 19 October: source item qualifiers and resumed fidelity (Maniac/Zak)
+
+- Zak's repeated CashCards, helmets, tickets and tokens use native character qualifiers inferred from each copy's scripts. Shards keep neutral fallback. Current ownership stays separate, and qualifiers survive admin transfers/Undo; catalogs remain 70 items. No character-name or object-ID label table is added.
+- Native flight cruising expires normally and automatically disembarks at the purchased airport. The shared executor now binds a known variable room to the scene event target while preserving unknown/estimated provenance. Both source boundaries and real-window routes pass without timer edits or extra arrival input.
+- V1/v2 walking uses the native row search, metric, box priority and destination recalculation. Four-family source-reference coordinates and native routes pass. Both Zak copies also complete a source-supported paid bus segment after disclosed preparation.
+- Requirements/support notes and source attribution are updated. Levels stay unchanged; Classic Zak's 11 palette estimates, original-runtime comparisons and unavailable same-family editions remain. [Checkpoint](checkpoints/20261019-LabelsFidelity-ManiacZak.md).
+- Final solution build: zero warnings/errors; three regenerated-matrix checks; full suite **1538 passed, zero failed, five expected skips**, all 64 new cases passed. Six serial actual-window routes pass. Final clean integration and normal executable refresh are recorded at the checkpoint.
+
 ## 18 October: Spanish editions of Indiana Jones 4 and Monkey Island 1 CD (S9, Indy4 and MonkeyCd)
 
 - **Indy4.** `indy4 talkie vga es` (Spanish texts over the English voices: the same speech offsets and `MONSTER.SOU` size) and `indy4 classic vga es` (Spanish floppy) boot, pass the room audit (96/96 without a gap), the R-7.18 route with keys and speech, the cutscene scan (666/426/182, 210 begin, equal to English per entry) and the accent check. Record: [indy4-editions-20261018](../.verification/indy4-editions-20261018/README.md).
 - **The floppy's stone disk (shared Core, additive).** Room 81's answering script did nothing with local 0 = 0, so the boot stood still. `ScummSessionBoot.NextStartArgument`: after 0 fails, the answering script is started with the next literal the room's own code passes (the submit's 1), labelled assumed input; other games' boots unchanged.
 - **Monkey Island 1 CD (shared Core, additive).** `monkey1 vga es` is the Spanish four-disk floppy (MonkeyFloppy, checked there: only Enter is assumed, its quiz does not wait). The Spanish CD is the reference disc's own `SPANISH/` folder: `GameFolderScanner.DiscFolder` reads it (the app still opens ENGLISH); it passes boot, room audit, the route with right click and disc music, the scan (286/160/62) and accents. Record: [monkeycd-editions-20261018](../.verification/monkeycd-editions-20261018/README.md).
 - **Tests.** Spanish cases in `ScummIndy4PlayTests`, `ScummIndy4SessionTests`, `ScummIndy4CutsceneTests`, `ScummMonkeyCdPlayTests`, `ScummMonkeyCdSessionTests`, `ScummMonkeyCdCutsceneTests` and the MonkeyFloppy classes (`vga es`); charset coverage per copy (`ScummCopyTextBytes`).
+
+## 18 October: Game Status pictures, party and logical item choices, Maniac/Zak
+
+- Maniac waits for native Start and offers the selected three kids. Every Maniac/Zak recipient uses a native full-body sprite; private frame initialization supplies off-room Zak characters without changing live state.
+- Zak's previous 76 indexed candidates included six source-proven scene aliases. Both editions now offer 70 logical inventory items. Separate cards, shards, helmets, tickets and tokens retain distinct choices with stable numbered labels. No name-based merging or room/item ID exception is added.
+- Item, recipient and Add controls are compact and bottom aligned. Admin grants, native capacity, atomic Undo and modal pause remain. Requirements record the user's clarification; all four Status cells remain Full. [Checkpoint](checkpoints/20261018-StatusPolish-ManiacZak.md).
 
 ## 18 October: Monkey Island 2 cutscenes from its scripts, with a song's beat (S7, Monkey2)
 

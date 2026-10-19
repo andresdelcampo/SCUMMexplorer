@@ -58,7 +58,7 @@ public sealed class ScummZakClassicInventoryCatalogTests
         var pickup = data.ReadObjectVerb(13, room.Objects.Last(o => o.Id == 274), 253, out _);
         Assert.Contains(pickup.Instructions, i => i.Offset == 0x13 && i.Operation == "pickupObject" && i.Operands == ScummVars.V2.ActiveObject1);
         var catalog = session.CaptureInventoryStatus().Catalog;
-        Assert.Equal(76, catalog.Count);
+        Assert.Equal(70, catalog.Count);
         Assert.Contains(catalog, i => i.ObjectId == 53 && i.SourceRoomId == 13 && i.Name == "abandoned bird nest");
         foreach (var header in new[] {117,139,183,184,185,186,187,188,189,274,275,276,298,307,358,607,632})
             Assert.DoesNotContain(catalog, i => i.ObjectId == header);
@@ -156,7 +156,9 @@ public sealed class ScummZakClassicInventoryCatalogTests
         Assert.Equal(72,indexedItems.Length);
         // The four unflagged sources have explicit native pickup/writer evidence:
         // sign's bobby pin 31; nest relay 53; broom 68; boom-box helper 71.
-        Assert.Equal(indexedItems.Concat(new[]{31,53,68,71}).Order(),session.CaptureInventoryStatus().Catalog.Select(x=>x.ObjectId).Order());
+        // Six indexed scene representations redirect pickup to an existing logical item.
+        var sceneAliases = new[] {429,431,471,535,536,537};
+        Assert.Equal(indexedItems.Except(sceneAliases).Concat(new[]{31,53,68,71}).Order(),session.CaptureInventoryStatus().Catalog.Select(x=>x.ObjectId).Order());
     }
 
     [Fact]

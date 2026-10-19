@@ -368,7 +368,19 @@ public sealed partial class ScummBoundedScriptExecutor
             // The session applies loadRoomWithEgo's ego steps after the room entry,
             // so it needs the object and walk destination as they are now.
             if (scriptEvent is { Operation: "loadRoomWithEgo" })
-                scriptEvent = scriptEvent with { ResolvedArguments = ResolveLoadRoomWithEgo(instruction.Operands, knownVariables) };
+            {
+                // o2/o5_loadRoomWithEgo read the room with getVarOrDirectByte.
+                // Bind the event target now too: a variable room is no less a
+                // native scene request than a literal one. Unknown stays null.
+                var arguments = ResolveLoadRoomWithEgo(instruction.Operands, knownVariables);
+                var roomOperand = instruction.Operands.Split(',', StringSplitOptions.TrimEntries).ElementAtOrDefault(1);
+                scriptEvent = scriptEvent with
+                {
+                    TargetId = scriptEvent.TargetId ?? arguments[1], ResolvedArguments = arguments,
+                    Certainty = roomOperand is not null && OperandIsEstimated(roomOperand, estimated, knownVariables)
+                        ? ScummScriptEventCertainty.Conditional : scriptEvent.Certainty
+                };
+            }
             // A started script receives its arguments' values; the session reads only
             // globals and literals, so known locals are passed as literals. An
             // estimated local keeps its index, so the child runs with it as an estimate.
