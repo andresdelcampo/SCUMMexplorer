@@ -132,7 +132,7 @@ public partial class MainWindow : Window
         if (!string.IsNullOrWhiteSpace(release))
             Title = $"SCUMMexplorer · {release}";
         Loaded += (_, _) => ReopenLastFolder();
-        Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
+        Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); _costumeColorCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -1097,6 +1097,7 @@ public partial class MainWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         ObjectVerbButtons.Visibility = Visibility.Visible;
         UpdateConnectionsButton();
+        UpdateCostumeColorVisibility();
     }
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -2564,6 +2565,8 @@ public partial class MainWindow : Window
         CostumeMessage.Visibility = Visibility.Visible;
         StatusText.Text = $"{resource.Name} · reading costume";
 
+        var v1Colors = PrepareCostumeColors(resource);
+
         try
         {
             if (_game?.V4ArchiveFor(resource) is { } vga)
@@ -2595,7 +2598,7 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _game!.V1Game, ScummV1ActorColors.For(_game!)?.ColorOf(resource.ResourceId ?? 0));
+                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _game!.V1Game, v1Colors);
                     if (pose is null) continue;
                     CostumePoseGallery.Children.Add(CreateCostumePoseCard(slot.Index, pose));
                     availableCount++;
