@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 19 October: choosing the language of a game that holds several (R-3.16)
+
+- Requirement R-3.16 (Rule, confirmed by the user 19 Oct). A survey of every local game by its own data found one game with several languages: the Monkey Island 1 CD (`ENGLISH`, `FRENCH`, `GERMAN`, `ITALIAN`, `SPANISH`, each `MONKEY.000/.001`); the Indy 4 disc's demos and the LOOM CD are not languages.
+- Discovery lists the languages (`GameFolderScanner.ListLanguages`, `GameLibrary.Languages`/`Language`/`Key`), labelled by the disc's folder names; the default stays ENGLISH; a missing folder falls back and the note says so.
+- The window shows a language list under the game's name only for such a game; choosing one reopens the game in it and remembers it per folder (`game-languages.txt`). Play, thumbnails, CD room lists, first-visit scenes and ego arrivals are keyed by folder and language.
+- Tests: `GameLanguageChoiceTests` (4) pass; discovery/MonkeyCd/support/architecture 78 passed; LOOM 836 passed (5 skipped); WPF `LanguageWindowCheck` all PASS (Spanish verbs and `Mirar cartel` in play). [Record](../.verification/language-choice-20261019/README.md).
 ## 19 October: source item qualifiers and resumed fidelity (Maniac/Zak)
 
 - Zak's repeated CashCards, helmets, tickets and tokens use native character qualifiers inferred from each copy's scripts. Shards keep neutral fallback. Current ownership stays separate, and qualifiers survive admin transfers/Undo; catalogs remain 70 items. No character-name or object-ID label table is added.
