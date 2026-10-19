@@ -28,6 +28,16 @@ public sealed class CdVoicePlayer
 
     public bool Follows(LoomExplorationSession? session) => session is not null && ReferenceEquals(session, _session);
 
+    /// <summary>A new folder must not retain a voice-event source from the previous game.</summary>
+    public void Detach()
+    {
+        Stop();
+        _session = null;
+        _disc = null;
+        _seen = 0;
+        _paused = false;
+    }
+
     public void Attach(DiscImage? disc, LoomExplorationSession session)
     {
         Stop();

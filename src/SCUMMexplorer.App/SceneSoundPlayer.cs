@@ -122,6 +122,19 @@ public sealed class SceneSoundPlayer
 
     public bool Follows(ScummSession? session) => session is not null && ReferenceEquals(session, _session);
 
+    /// <summary>Retires a game, including pending renders and its event cursor.</summary>
+    public void Detach()
+    {
+        StopAll("another game was opened");
+        _session = null;
+        _game = null;
+        _render = null;
+        _loops = null;
+        _renders.Clear();
+        _seen = 0;
+        _paused = false;
+    }
+
     /// <summary>Plays the sound events the session reached since the last call (one playback frame).</summary>
     public void Update()
     {

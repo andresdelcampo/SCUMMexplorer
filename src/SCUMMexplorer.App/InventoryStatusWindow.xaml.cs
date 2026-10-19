@@ -22,13 +22,16 @@ public partial class InventoryStatusWindow : Window
     private readonly Dictionary<int, BitmapSource?> _portraits = [];
     private readonly Dictionary<int, string> _portraitEvidence = [];
     private CharacterChoice[] _characters = [];
+    internal ScummInventoryUndoToken? LastUndo => _undo;
 
     public InventoryStatusWindow(ScummGameSession session, Func<bool> isCurrent, Action refresh,
-        bool advanced = false, Func<string, string>? readable = null, int engineVersion = 2)
+        bool advanced = false, Func<string, string>? readable = null, int engineVersion = 2,
+        ScummInventoryUndoToken? undo = null)
     {
         InitializeComponent();
         _session = session; _isCurrent = isCurrent; _refresh = refresh; _advanced = advanced;
         _engineVersion = engineVersion;
+        _undo = undo;
         _readable = readable ?? (text => text);
         LoadSnapshot();
     }
@@ -137,7 +140,7 @@ public partial class InventoryStatusWindow : Window
     {
         if (_snapshot is null) return;
         var editable = _isCurrent() && _snapshot.CanEdit;
-        ApplyButton.IsEnabled = editable && HasChanges;
+        ApplyButton.IsEnabled = editable;
         UndoButton.IsEnabled = editable && _undo is not null;
         AddItemButton.IsEnabled = editable && CatalogItems.SelectedItem is ItemChoice selected && GrantRecipient.SelectedValue is int recipient &&
             (!_targets.TryGetValue(selected.ObjectId, out var current) ? PendingAdditions < _snapshot.FreeSlots : current != recipient);
@@ -153,7 +156,7 @@ public partial class InventoryStatusWindow : Window
         if (!AddItemButton.IsEnabled || CatalogItems.SelectedItem is not ItemChoice item || GrantRecipient.SelectedValue is not int actor) return;
         _targets[item.ObjectId] = actor;
         RefreshRows(); RefreshCatalog(advance: true);
-        ChoiceSummary.Text = "Item added to your pending choices. Apply Changes to keep it; Close discards pending choices.";
+        ChoiceSummary.Text = "Item added to your pending choices. Apply and close keeps it; Cancel discards pending choices.";
     }
     private void ItemSearch_TextChanged(object sender, TextChangedEventArgs e) { if (_snapshot is not null) RefreshCatalog(); }
     private void CatalogItems_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateButtons();
@@ -161,13 +164,14 @@ public partial class InventoryStatusWindow : Window
     private void Apply_Click(object sender, RoutedEventArgs e)
     {
         if (!_isCurrent()) { Rejected("The live session changed."); return; }
+        if (!HasChanges) { Close(); return; }
         var changes = _targets.Where(target => !_snapshot.Items.Any(item => item.ObjectId == target.Key && item.OwnerId == target.Value))
             .Select(target => new ScummInventoryTransfer(target.Key, target.Value)).ToArray();
         var result = _session.ApplyInventoryEdits(_snapshot, changes);
         if (!result.Applied) { Rejected(result.Refusal); return; }
         _undo = result.Undo;
-        _refresh(); LoadSnapshot();
-        ChoiceSummary.Text = $"Your inventory choice was applied ({changes.Length} {(changes.Length == 1 ? "item" : "items")}).";
+        _refresh();
+        Close();
     }
 
     private void Undo_Click(object sender, RoutedEventArgs e)

@@ -7,6 +7,8 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow
 {
+    private ScummGameSession? _inventoryUndoSession;
+    private ScummInventoryUndoToken? _inventoryLastUndo;
     private bool InventoryStatusAvailable => _game is { } game && PlayActive && _playFolder == game.Key &&
         _play?.InventoryCharactersAvailable == true &&
         GameSupport.For(game)[SupportFeature.Status] != SupportLevel.None &&
@@ -18,7 +20,8 @@ public partial class MainWindow
         var folder = _playFolder;
         var dialog = new InventoryStatusWindow(session, () => ReferenceEquals(_play, session) && _playFolder == folder && _game?.Key == folder,
             () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _game is { } game ? ManiacPreviewText.For(game) : null,
-            _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2)
+            _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2,
+            ReferenceEquals(_inventoryUndoSession, session) ? _inventoryLastUndo : null)
         { Owner = this };
         dialog.Resources.MergedDictionaries.Add(Resources);
         return dialog;
@@ -34,7 +37,13 @@ public partial class MainWindow
         timer?.Stop(); _playPaused = true;
         if (!soundWasPaused) _sceneSound.Pause();
         _playSoundPaused = true;
-        try { BuildInventoryStatusWindow().ShowDialog(); }
+        try
+        {
+            var dialog = BuildInventoryStatusWindow();
+            dialog.ShowDialog();
+            _inventoryUndoSession = session;
+            _inventoryLastUndo = dialog.LastUndo;
+        }
         finally
         {
             if (ReferenceEquals(_play, session) && ReferenceEquals(_playTimer, timer))

@@ -46,15 +46,15 @@
         </ScrollViewer>
         <StackPanel Grid.Row="4" Margin="0,14,0,14">
             <TextBlock x:Name="CapacitySummary" Foreground="#C6B99F" Margin="0,0,0,6"/>
-            <TextBlock x:Name="ChoiceSummary" Text="Changes take effect when you press Apply Changes. Close discards pending choices." TextWrapping="Wrap" Foreground="#C6B99F"/>
+            <TextBlock x:Name="ChoiceSummary" Text="Apply and close keeps your choices. Cancel discards pending choices." TextWrapping="Wrap" Foreground="#C6B99F"/>
             <ScrollViewer MaxHeight="100" VerticalScrollBarVisibility="Auto" Visibility="{Binding Visibility, ElementName=AdvancedEvidence}">
                 <TextBlock x:Name="AdvancedEvidence" TextWrapping="Wrap" Foreground="#9FABAE" FontSize="11" Margin="0,6,0,0" Visibility="Collapsed"/>
             </ScrollViewer>
         </StackPanel>
         <DockPanel Grid.Row="5" LastChildFill="False">
             <Button x:Name="UndoButton" Content="Undo last change" Click="Undo_Click" Padding="14,8" DockPanel.Dock="Left"/>
-            <Button x:Name="CancelButton" Content="Close" Click="Cancel_Click" IsCancel="True" Padding="18,8" DockPanel.Dock="Right" Margin="10,0,0,0"/>
-            <Button x:Name="ApplyButton" Content="Apply Changes" Click="Apply_Click" IsDefault="True" Padding="18,8" DockPanel.Dock="Right"/>
+            <Button x:Name="CancelButton" Content="Cancel" Click="Cancel_Click" IsCancel="True" Padding="18,8" DockPanel.Dock="Right" Margin="10,0,0,0"/>
+            <Button x:Name="ApplyButton" Content="Apply and close" Click="Apply_Click" IsDefault="True" Padding="18,8" DockPanel.Dock="Right"/>
         </DockPanel>
     </Grid>
 </Window>
