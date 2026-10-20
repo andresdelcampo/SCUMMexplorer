@@ -28,6 +28,12 @@ public abstract partial class ScummSession
     /// <summary>The game the session plays: what a <see cref="ScummBootSnapshot"/> shares between its copies instead of copying.</summary>
     internal GameLibrary SessionGame => _game;
 
+    // The lifetimes the sound clock has read, by sound id.
+    private readonly Dictionary<int, ScummSoundLifetime> _soundLifetimes = [];
+
+    /// <summary>Forgets the sound lifetimes read so far (the device whose driver times the sounds changed); sounds already playing keep theirs.</summary>
+    protected void ForgetSoundLifetimes() => _soundLifetimes.Clear();
+
     /// <summary>The soundcard-independent part of the session's set-up: data, runtime state and the script clock hooks.</summary>
     /// <param name="soundLifetime">Reads how long a native sound resource plays (the game's own sound formats are the caller's knowledge).</param>
     protected ScummSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed,
@@ -41,7 +47,7 @@ public abstract partial class ScummSession
         _observer = observer;
         var soundResources = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
             .GroupBy(r => r.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
-        var soundLifetimes = new Dictionary<int, ScummSoundLifetime>();
+        var soundLifetimes = _soundLifetimes;
         _soundClock = new ScummSoundClock(id =>
         {
             // A sound that is not an indexed resource of its own (a v5 sound that starts a CD track, S4b MonkeyCd) can get its lifetime from the game's session.

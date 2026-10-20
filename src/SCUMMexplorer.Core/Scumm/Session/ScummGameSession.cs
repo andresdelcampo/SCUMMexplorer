@@ -12,9 +12,16 @@ public sealed class ScummGameSession : ScummSession
 {
     public ScummGameSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
         ScummScriptObserver? observer = null, IScummDataSource? data = null, bool boot = true)
-        : base(game, indexedObjects, randomSeed, observer, data,
-            AdlibLifetime(game), ScummCdAudioTracks.For(game) is { } cd ? cd.Lifetime : null)
+        : this(game, indexedObjects, randomSeed, observer, data, boot, new SoundDriver(SpeakerLifetime(game)))
     {
+    }
+
+    private ScummGameSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed,
+        ScummScriptObserver? observer, IScummDataSource? data, bool boot, SoundDriver driver)
+        : base(game, indexedObjects, randomSeed, observer, data,
+            driver.Lifetime(AdlibLifetime(game)), ScummCdAudioTracks.For(game) is { } cd ? cd.Lifetime : null)
+    {
+        _soundDriver = driver;
         _cdTracks = ScummCdAudioTracks.For(game);
         _imuse = ScummImuseMusic.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
@@ -224,6 +231,68 @@ public sealed class ScummGameSession : ScummSession
             EngineStopsSounds(start, previous, "Player_AD startSound", $"music {soundId} starts; the AdLib player has one music slot (Player_AD::startSound stopMusic)");
     }
 
+    private readonly SoundDriver _soundDriver;
+
+    /// <summary>
+    /// Whether the driver of the PC speaker times the sounds the scripts start (sound polish, 19 October 2026): ScummVM plays a version 3 or 4 game's
+    /// PC speaker through <c>Player_V2</c>, whose sound lengths and version 3 music timer differ from the AdLib driver's (<see cref="ScummPcSpeakerAudio.ReadV3Lifetime"/>).
+    /// The app sets it when the user's device is the PC speaker; otherwise (and for games without that driver: v1/v2, which always use it, and v5 iMUSE,
+    /// whose song clock is the same for every device) the AdLib driver's timing stays. Sounds already playing keep the length they started with.
+    /// </summary>
+    public bool PcSpeakerTiming
+    {
+        get => _soundDriver.Speaker;
+        set
+        {
+            var speaker = value && _soundDriver.HasSpeaker;
+            if (speaker == _soundDriver.Speaker) return;
+            _soundDriver.Speaker = speaker;
+            ForgetSoundLifetimes();
+        }
+    }
+
+    /// <summary>Which driver's lengths the session's sound clock reads; one per session (a boot snapshot's copy gets its own).</summary>
+    private sealed class SoundDriver(Func<GameResource, ScummSoundLifetime>? speaker)
+    {
+        public bool Speaker { get; set; }
+        public bool HasSpeaker => speaker is not null;
+
+        public Func<GameResource, ScummSoundLifetime> Lifetime(Func<GameResource, ScummSoundLifetime> adlib) => resource =>
+        {
+            if (!Speaker || speaker is null) return adlib(resource);
+            // Whether a sound is music (the engine's one-music-slot rules) stays the AdLib part's: the resource's own flag.
+            var music = adlib(resource).Music;
+            return speaker(resource) with { Music = music };
+        };
+    }
+
+    // The PC speaker driver of a version 3 or 4 DOS game (Player_V2 with the old bundle's 4-byte header or a v4 disk's WA block's 6); null for other games.
+    private static Func<GameResource, ScummSoundLifetime>? SpeakerLifetime(GameLibrary game)
+    {
+        if (game.Version is ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V5 || game.V4Archive is not null) return null;
+        var speaker = new ScummPcSpeakerAudio();
+        if (game.V4Disks is { } disks)
+        {
+            if (!disks.Disks.OfType<ScummV4Archive>().Any()) return null;
+            var parts = new Dictionary<int, byte[]?>();
+            foreach (var archive in disks.Disks.OfType<ScummV4Archive>())
+                foreach (var sound in archive.ReadSounds())
+                    parts.TryAdd(sound.Id, sound.Speaker);
+            return resource => resource.ResourceId is int id && parts.GetValueOrDefault(id) is { } part
+                ? speaker.ReadV3Lifetime(part, 6)
+                : new(ScummSoundLifetimeKind.Unknown, null, false, "no PC speaker part in the disks' sound blocks");
+        }
+        if (game.Version != ScummVersion.V3) return null;
+        return resource =>
+        {
+            try { return speaker.ReadV3Lifetime(ScummPcSpeakerAudio.ReadOldBundle(resource), 4); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+            {
+                return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
+            }
+        };
+    }
+
     /// <summary><c>VAR_SOUNDCARD</c> for AdLib (vars.cpp: 0 PC speaker, 1 Tandy, 2 CMS, 3 AdLib, 4 Roland).</summary>
     private const int AdlibCard = 3;
 
@@ -235,8 +304,8 @@ public sealed class ScummGameSession : ScummSession
             return new ScummPcSpeakerAudio().ReadV2Lifetime;
         var timing = ScummProfile.For(game).AdlibTiming;
         var adlib = new ScummAdlibAudio();
-        // A game on several v4 disks stores its sounds in the disks' SO blocks (the AD part is the AdLib song); the browsed disks play at half the LOOM tempo
-        // (by ear, 11 October, the explorer's own S3 decision), so the session's music timer follows the same estimate.
+        // A game on several v4 disks stores its sounds in the disks' SO blocks (the AD part is the AdLib song), played with the game's driver clock
+        // (sound polish, 19 October 2026: Indy3 256 colours through Player_AD's constants, Monkey Island 1 through iMUSE's; the earlier half-LOOM-tempo estimate is gone).
         if (game.V4Disks is { } disks && disks.Disks.OfType<ScummV4Archive>().Any())
         {
             var adlibParts = new Dictionary<int, byte[]?>();
@@ -244,7 +313,7 @@ public sealed class ScummGameSession : ScummSession
                 foreach (var sound in archive.ReadSounds())
                     adlibParts.TryAdd(sound.Id, sound.Adlib);
             return resource => resource.ResourceId is int id && adlibParts.GetValueOrDefault(id) is { } part
-                ? adlib.ReadLifetime(part, timing, halfTempo: true)
+                ? adlib.ReadLifetime(part, timing)
                 : new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib part in the disks' sound blocks");
         }
         // S4b Indy4 and S4b Monkey2 (17 October 2026, written independently and reconciled on this one): a v5 game plays its music through iMUSE; the AdLib part's own timeline (ScummImuseTimeline, the S3 player's default

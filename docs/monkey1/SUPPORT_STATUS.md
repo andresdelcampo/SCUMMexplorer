@@ -61,7 +61,7 @@ Family: MonkeyFloppy | Fixture: `Games/monkey1 ega en` (the four-disk 256-colour
 |---|---|---|---|---|
 | S1 Intake | done (before this file) | Rooms | | |
 | S2 Reading | done (before this file) | Costumes, Scripts, Texts | | |
-| S3 Sound | done (before this file) | Sound | | polish: AdLib music at half tempo, set by ear |
+| S3 Sound | done (before this file); polish **done** (19 Oct) | Sound (unchanged) | [sound-polish-20261019](../../.verification/sound-polish-20261019/README.md) | AD music on iMUSE's clock as ScummVM converts it (`convertADResource`, `MidiParser::onTimer`), replacing the half-tempo estimate; long loops render through their restart; PC speaker timing for `isSoundRunning`. Listening check by the user: pending |
 | S4b Session | **done** (14 Oct) | unchanged (no cell changes in S4b) | [monkey1-session-20261014](../../.verification/monkey1-session-20261014/README.md) | boot to Room 33 in 2522 frames, unsupported list empty |
 | S5 Objects | **done** (15 Oct) | Objects raised to full with S6 (16 Oct) | [monkey1-objects-20261015](../../.verification/monkey1-objects-20261015/README.md) | 81/81 rooms without a gap; objects in 30 rooms, actors in 56; 14 rooms compared at source level (no ScummVM picture) |
 | S6 Play | **done** (16 Oct) | Objects and Play raised to full | [monkey1-play-20261016](../../.verification/monkey1-play-20261016/README.md) | the R-7.18 route from the dock: sentence, cutscene skip, the SCUMM Bar, the pirates' conversation, the rubber chicken; WPF check |

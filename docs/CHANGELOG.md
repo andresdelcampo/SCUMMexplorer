@@ -8,6 +8,14 @@ Recent changes: 18–19 October 2026. Current support and acceptance limits belo
 - Mouth sync (ScummVM `startTalkSound`/`processSfxQueues`/`isMouthSyncOff`, sound.cpp read 19 October 2026): while a talkie line plays, the talking actor's mouth follows the sample's `VCTL` times and closes when the voice ends. Indy 4 has real times (first line: closed +24, open +30, closed +36 jiffies); the MI2 patch gives one placeholder word (4095) per sample, so its mouths stay open until the voice ends (plain talk animation, labelled). The boot and the Indy 4 / MI2 cutscene lists are unchanged.
 - Record: [talkie-speech-20261019](../.verification/talkie-speech-20261019/README.md). Listening and looking checks are listed there for the user.
 
+## 19 October: sound polish (Monkey Island 1 floppy, Indy3 EGA and 256 colours)
+
+- Monkey Island 1's AD music plays on iMUSE's clock as ScummVM converts it (`convertADResource`, `MidiParser::onTimer`, read on GitHub master 19 October); the half-tempo estimate set by ear is gone (it was about 6 % fast). Indy3 256 colours uses Indy3's `Player_AD` constants instead of that estimate.
+- R-13.9: the sound player renders Indy3's AdLib with its own constants (songs now last as long as the session says, about twice the old LOOM-constant length).
+- Looping AdLib and PC speaker songs render through their first restart when it comes after three minutes (PC speaker loops up to 434 s); in play, v3/v4 songs go on from their loop target.
+- With the PC speaker, the play session's `isSoundRunning` and version 3 music timer follow `Player_V2` (labelled estimates for the timer's divisor and after a sound ends).
+- Tests: `ScummSoundPolishTests` plus the sound, MonkeyFloppy, Indy3, Maniac/Zak and session tests (353 passed). Listening checks pending. Record: [sound-polish-20261019](../.verification/sound-polish-20261019/README.md).
+
 ## 19 October: stable selectors and deliberate cutscenes (all games)
 
 - Refined the background-first feature: only LOOM EGA fills selector artwork after background loading. Other cards retain their plain backgrounds on cold and warm loads; native first-visit preparation and complete caching still run upfront.
