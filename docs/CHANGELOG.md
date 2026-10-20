@@ -2,6 +2,11 @@
 
 Recent changes: 18–19 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 17 October](archive/CHANGELOG_THROUGH_2026-10-17.md) are an optional historical archive, not startup reading. At a checkpoint, retain roughly the latest two calendar days here and archive older entries with their links.
 
+## 20 October: globals change tracking speeds up the cutscene derivation (all generic games)
+
+- The runtime's globals are a `ScummGlobalVariables` store (same API and the same enumeration order as the old `Dictionary`) that records writes while a script runs. A run whose result is not kept reads the globals through it and copies back only its changes, instead of copying 800–1400 globals at its start and around every event; prints read the run's variables directly instead of copying them. Any rare case the tracking does not follow switches the run to the old full copy, in the old order.
+- All twelve cutscene lists byte-identical to master `a6c0082c`; new `ScummGlobalsTrackingTests` (store order against `Dictionary`; six games played with full copies and through the store, same state and variable order). Indy 4 first launch in the window: 45 → 34 s from play start (target under a minute met); harness, four workers: Indy 4 51.9 → 26.2 s, MI2 25.3 → 20.6 s, Zak 20.9 → 7.4 s. Record: [globals-tracking-20261019](../.verification/globals-tracking-20261019/README.md).
+
 ## 19 October: Indy 4 credits headings and the magazine's icon (S6 leftovers, Indy4)
 
 - The playable credits no longer stack their headings: a `print 0xFE` string is drawn into the room's front buffer, and the game erases it by drawing an object over it (Script 94 +0x0063, object 73). Drawn objects now cover drawn strings under their strips (`ScummMessageTable.ObjectDrawn`, ScummVM `Gdi::drawBitmap`), for every game; v4+ `print` subop 6 (`SO_LEFT`) is applied.
