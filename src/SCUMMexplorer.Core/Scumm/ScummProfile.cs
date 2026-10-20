@@ -43,7 +43,10 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary>The game's resources live in a v4 archive (<c>DISK01.LEC</c>) instead of old-v3 <c>*.LFL</c> files.</summary>
     public bool UsesV4Archive => Version >= ScummVersion.V4;
 
-    /// <summary>The constants of the AdLib music driver (ScummVM <c>Player_AD</c>): LOOM's differ from every other game's.</summary>
+    /// <summary>
+    /// The constants of the AdLib music driver (ScummVM <c>Player_AD</c>): LOOM's differ from Indy3's; a v4 game on disks (Monkey Island 1 floppy) plays its
+    /// AD songs through iMUSE's clock (<see cref="ScummAdlibTiming.ImuseConversion"/>, sound polish 19 October 2026).
+    /// </summary>
     public ScummAdlibTiming AdlibTiming { get; init; } = ScummAdlibTiming.Standard;
 
     /// <summary>
@@ -193,7 +196,11 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             ActorCount = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced ? 25 : 13,
             RestoresClassicCutsceneScene = GameSupport.FamilyOf(game) == GameFamily.ManiacClassic,
             V2VerbYOffset = GameSupport.FamilyOf(game) == GameFamily.ManiacClassic ? 8 : 0,
-            AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
+            // ScummVM setupMusic: Player_AD for LOOM and Indy3 (both editions); the AD songs of the other v4 games (Monkey Island 1 floppy) go to iMUSE.
+            AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom
+                : game.Id == GameId.IndianaJones3 || roomFileGame || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummAdlibTiming.Standard
+                : game.Version == ScummVersion.V4 ? ScummAdlibTiming.ImuseConversion
+                : ScummAdlibTiming.Standard,
             // R-6.12a: every game the generic session boots shows its rooms' first visit. The session reads the version 3 scripts of Indiana Jones (old-bundle
             // LFL files, and the 256-colour room files since S4b Indy3Vga) and the v4 scripts of a game on several disks; LOOM (EGA and CD) has its own session.
             HasFirstVisitScenes = game.Id is not (GameId.Loom or GameId.LoomVga)
