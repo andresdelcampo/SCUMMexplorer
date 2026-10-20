@@ -28,7 +28,7 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
     /// <c>.verification/monkey2-editions-20261018/README.md</c>.
     /// </summary>
     public sealed record RouteTexts(string LookAt, string LookAtSign, string PickUpSign, string Welcome, string SecondLine, string FirstChoice, string SecondChoice,
-        string SecondChoiceSaid, string WalkToDoor);
+        string SecondChoiceSaid, string WalkToDoor, int? SignSpeech = null, int? ChoiceSpeech = null);
 
     private static readonly RouteTexts EnglishTexts = new("Look at", "Look at sign", "Pick up sign", "Welcome to Woodtick", "No Trezer", "Is this some sort of bribe situation?",
         "Then who keeps up the law and maintains order?", "Then who keeps up the law", "Walk to door");
@@ -37,10 +37,13 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
         "¿Entonces quién cuida de la ley y del orden público?", "cuida de la ley", "Ir a puerta");
     private static readonly RouteTexts SpanishTalkieTexts = SpanishFloppyTexts with { LookAt = "Mirar", LookAtSign = "Mirar rótulo" };
 
+    // S10 talkie speech (19 October 2026): the talkie patch's spoken lines, as the texts' code 10 gives their offsets in the copy's monster.sou. The Spanish talkie's lines carry the same offsets (its bank is the English voices).
+    private static readonly RouteTexts EnglishTalkieTexts = EnglishTexts with { SignSpeech = 0x00A485E0, ChoiceSpeech = 0x00B40C6E };
+
     private static readonly Dictionary<string, RouteTexts> RouteTextsByCopy = new()
     {
-        ["mi2 talkie en"] = EnglishTexts, ["mi2 mt32 en"] = EnglishTexts, ["mi2 sb16 en"] = EnglishTexts,
-        ["mi2 classic es"] = SpanishFloppyTexts, ["mi2 talkie es"] = SpanishTalkieTexts
+        ["mi2 talkie en"] = EnglishTalkieTexts, ["mi2 mt32 en"] = EnglishTexts, ["mi2 sb16 en"] = EnglishTexts,
+        ["mi2 classic es"] = SpanishFloppyTexts, ["mi2 talkie es"] = SpanishTalkieTexts with { SignSpeech = 0x00A485E0, ChoiceSpeech = 0x00B40C6E }
     };
 
     public static TheoryData<string> Copies => new() { "mi2 talkie en", "mi2 mt32 en", "mi2 sb16 en", "mi2 classic es", "mi2 talkie es" };
@@ -189,6 +192,7 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
         // 1. Compose a sentence and skip a cutscene: "Look at" then the sign (object 46): its verb 8 prints "`Welcome to Woodtick`" and opens a cutscene
         // with an override (+0x0028..+0x002F); Esc skips "`No Trezer huntin zone`" (+0x0034). The floppy releases print both lines in one printEgo (no cutscene):
         // the route then waits for both lines to be said.
+        var spokenBeforeSign = session.Messages.SpeechEvents.Count;
         play.ClickVerb(LookAt);
         Assert.Equal(texts.LookAt, play.Sentence);
         play.Hover(736, 28);
@@ -212,6 +216,7 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
             Assert.True(play.RunUntil(() => play.Quiet, 900));
         }
 
+        AssertSpoken(game, session, spokenBeforeSign, texts.SignSpeech);
         // 2. Take an object: "Pick up" the sign. Its verb 9 (+0x000C) runs pickupObject 45 (the shovel): the inventory gets it and Script 9 draws its icon.
         play.ClickVerb(PickUp);
         play.Hover(736, 28);
@@ -234,8 +239,10 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
         play.ClickVerb(0x78);
         Assert.True(play.RunUntil(() => play.Var(ScummVars.VerbScript) == 206 && play.Idle && session.Messages.OnScreen.Count == 0, 900));
         Assert.Equal(texts.SecondChoice, play.Glyphs(0x78));
+        var spokenBeforeChoice = session.Messages.SpeechEvents.Count;
         play.ClickVerb(0x78);
         Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Text.Contains(texts.SecondChoiceSaid)), 120));
+        AssertSpoken(game, session, spokenBeforeChoice, texts.ChoiceSpeech);
         Assert.True(play.RunUntil(() => play.Var(ScummVars.VerbScript) == 4 && play.Quiet, 1500));
         play.Log("robbed");
         Assert.Equal(new[] { 45 }, session.Snapshot.Inventory);
@@ -257,6 +264,22 @@ public sealed class ScummMonkey2PlayTests(ITestOutputHelper output)
         // Every input was a click with mode 1 through Script 4, 14 or 206; no key but the Esc skip reached the game.
         Assert.All(session.DeliveredInput, input => Assert.Equal(1, input.Mode));
         foreach (var sound in session.SoundEvents) output.WriteLine($"sound {sound.Event.Kind} {sound.Event.TargetId} {sound.Event.SourceLabel} +0x{sound.Event.Offset:X4} {sound.Event.Certainty}");
+    }
+
+    /// <summary>
+    /// S10 talkie speech (19 October 2026): the line said since <paramref name="from"/> starts its sample (offset from the text's code 10) for as long as the sample
+    /// plays; its single mouth-sync word, 4095, keeps the speaker's mouth open until the sample ends (the plain talk animation). A copy without a bank speaks nothing.
+    /// </summary>
+    private void AssertSpoken(GameLibrary game, ScummGameSession session, int from, int? offset)
+    {
+        var lines = session.Messages.SpeechEvents.Skip(from).Where(e => !e.IsStop).ToList();
+        foreach (var e in lines) output.WriteLine($"speech 0x{e.Offset:X8}/{e.Length} at jiffy {e.Jiffies}, {e.DurationJiffies} jiffies");
+        if (offset is not { } expected) { Assert.Null(game.Speech); Assert.Empty(lines); return; }
+        var line = Assert.Single(lines, e => e.Offset == expected);
+        Assert.Equal(10, line.Length);
+        var wave = game.Speech!.ReadWave(line.Offset, line.Length);
+        Assert.Equal((int)Math.Ceiling((wave.Length - 44) / 2.0 * 60 / BitConverter.ToInt32(wave, 24)), line.DurationJiffies);
+        Assert.Equal([4095], game.Speech.ReadMouthSync(line.Offset, line.Length));
     }
 
     /// <summary>R-7.16: a right click on the sign is <c>runInputScript(2, 0, 2)</c>; Script 4 +0x0005 takes the default verb in <c>var[0x09C]</c> (the sign's verb
