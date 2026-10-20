@@ -75,7 +75,10 @@ internal sealed class ScummRunVariables : IDictionary<string, ushort>, IReadOnly
 
     /// <summary>Whether a run can read through the store: none of the run's own keys is a global (the full copy would have put them first).</summary>
     public static bool CanTrack(ScummGlobalVariables store, IEnumerable<string> ownKeys) =>
-        store.LocalKeyCount == 0 && !ownKeys.Any(store.ContainsKey);
+        !FullCopiesOnThisThread && store.LocalKeyCount == 0 && !ownKeys.Any(store.ContainsKey);
+
+    /// <summary>For tests: runs on this thread copy every global, as before the tracking, so both ways can be compared.</summary>
+    [ThreadStatic] internal static bool FullCopiesOnThisThread;
 
     public bool IsTracking => _full is null;
 
