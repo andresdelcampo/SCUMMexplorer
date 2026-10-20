@@ -102,7 +102,7 @@ public sealed partial class ScummBoundedScriptExecutor
     /// The run's variables as the v1/v2 preparation of an instruction sees them, recording each key it writes or removes with whether it existed and
     /// its value before the first write. Reads and writes go to the run's own dictionary.
     /// </summary>
-    private sealed class WriteRecordingVariables(Dictionary<string, ushort> inner) : IDictionary<string, ushort>
+    private sealed class WriteRecordingVariables(ScummRunVariables inner) : IDictionary<string, ushort>
     {
         public Dictionary<string, (bool Existed, ushort Old)> Written { get; } = new(StringComparer.Ordinal);
 
@@ -182,21 +182,36 @@ public sealed partial class ScummBoundedScriptExecutor
             positions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
         // A run whose result does not keep its variables (and that no observer sees) borrows a dictionary; it goes back at the end.
         var pooled = observation is null && runtime is not null && !snapshotState;
-        Dictionary<string, ushort> knownVariables;
-        if (pooled && _variablePool is { Count: > 0 } pool)
-        {
-            knownVariables = pool.Pop();
-            foreach (var (key, value) in runtime!.GlobalVariables) knownVariables.Add(key, value);
-        }
-        else knownVariables = runtime is null
-            ? new Dictionary<string, ushort>(StringComparer.Ordinal)
-            : new Dictionary<string, ushort>(runtime.GlobalVariables, StringComparer.Ordinal);
-        if (runtime?.IsV2 == true) knownVariables[V2IndirectReads] = 1;
+        // While a run is active the store records writes; a pooled run reads the globals through it instead of copying them all
+        // (globals change tracking, 20 October 2026). Any other run keeps its own full copy, as before.
+        using var runScope = runtime?.GlobalVariables.BeginRun();
+        var initialKeys = new (string Key, ushort Value)[26 + (runtime?.IsV2 == true ? 1 : 0)];
+        var firstLocal = 0;
+        if (runtime?.IsV2 == true) initialKeys[firstLocal++] = (V2IndirectReads, 1);
         for (var index = 0; index < 26; index++)
         {
             var key = LocalKeys[index];
-            knownVariables[key] = initialLocals is not null && initialLocals.TryGetValue(key, out var value)
-                ? value : (ushort)0;
+            initialKeys[firstLocal + index] = (key, initialLocals is not null && initialLocals.TryGetValue(key, out var value) ? value : (ushort)0);
+        }
+        ScummRunVariables knownVariables;
+        if (pooled && ScummRunVariables.CanTrack(runtime!.GlobalVariables, initialKeys.Select(item => item.Key)))
+        {
+            knownVariables = ScummRunVariables.Track(runtime.GlobalVariables, initialKeys);
+            runScope!.Run = knownVariables;
+        }
+        else
+        {
+            Dictionary<string, ushort> full;
+            if (pooled && _variablePool is { Count: > 0 } pool)
+            {
+                full = pool.Pop();
+                foreach (var (key, value) in runtime!.GlobalVariables) full.Add(key, value);
+            }
+            else full = runtime is null
+                ? new Dictionary<string, ushort>(StringComparer.Ordinal)
+                : new Dictionary<string, ushort>(runtime.GlobalVariables, StringComparer.Ordinal);
+            foreach (var (key, value) in initialKeys) full[key] = value;
+            knownVariables = new ScummRunVariables(full);
         }
         var drawQueue = runtime?.DrawQueue ?? new List<int>();
         var trace = new List<string>();
@@ -289,7 +304,7 @@ public sealed partial class ScummBoundedScriptExecutor
                     break;
                 }
                 if (v2Writes.Written.Count > 0)
-                foreach (var value in knownVariables.Where(pair => v2Writes.Written.TryGetValue(pair.Key, out var write) && (!write.Existed || write.Old != pair.Value)))
+                foreach (var value in knownVariables.InOrder(v2Writes.Written.Keys).Where(pair => v2Writes.Written.TryGetValue(pair.Key, out var write) && (!write.Existed || write.Old != pair.Value)))
                 {
                     MarkEstimated(estimated, value.Key, onEstimatedPath);
                     runtime.NotifyGlobalMutation(value.Key);
@@ -493,7 +508,7 @@ public sealed partial class ScummBoundedScriptExecutor
             string? eventHandling = null;
             if (scriptEvent is not null && runtime is not null && onEvent is not null)
             {
-                CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
+                knownVariables.CopyGlobalsTo(runtime.GlobalVariables);
                 CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
                 var call = instruction.Operation is "startScript" or "chainScript" or "startObject" or "cutscene" or "endCutscene"
                     ? observation?.Observer.Dispatch(instructionSequence, observation.Slot, observation.ParentSlot,
@@ -510,7 +525,7 @@ public sealed partial class ScummBoundedScriptExecutor
                             string.IsNullOrEmpty(eventHandling) ? "host dispatch returned; callee outcome remains separate" : eventHandling);
                     dispatched = call;
                 }
-                foreach (var (key, value) in runtime.GlobalVariables) knownVariables[key] = value;
+                knownVariables.CopyGlobalsFrom(runtime.GlobalVariables);
                 estimated.RemoveWhere(IsGlobalKey);
                 estimated.UnionWith(runtime.EstimatedVariables);
                 if (eventHandling == StopAfterEvent)
@@ -946,6 +961,7 @@ public sealed partial class ScummBoundedScriptExecutor
                     break;
                 }
                 trace.Add(runtime.Messages.Print(request, runtime));
+                (request.Variables as ScummRunVariables.PrintView)?.Detach();
                 knownVariables[ScummMessageTable.HaveMsgVariable] = runtime.GlobalVariables[ScummMessageTable.HaveMsgVariable];
                 if (runtime.IsV2)
                     knownVariables[ScummVars.V2.CharCount] = runtime.GlobalVariables[ScummVars.V2.CharCount];
@@ -1600,7 +1616,7 @@ public sealed partial class ScummBoundedScriptExecutor
 
         if (runtime is not null)
         {
-            CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
+            knownVariables.CopyGlobalsTo(runtime.GlobalVariables);
             CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
         }
         var endSequence = observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
@@ -1613,17 +1629,19 @@ public sealed partial class ScummBoundedScriptExecutor
         // The variables are this run's own dictionary, and without a runtime the states and positions are too: nothing changes them after the
         // return, so the result keeps them. A runtime's states and positions go on changing; they are copied unless the caller drops them.
         var keepCopies = runtime is not null && snapshotState;
-        IReadOnlyDictionary<string, ushort> resultVariables = knownVariables;
+        IReadOnlyDictionary<string, ushort> resultVariables = knownVariables.Full!;
         if (pooled)
         {
-            // The caller of such a run reads only the locals of a run that pauses (to resume it); the dictionary goes back to the pool.
+            // The caller of such a run reads only the locals of a run that pauses (to resume it); a full dictionary goes back to the pool.
             var locals = new Dictionary<string, ushort>(StringComparer.Ordinal);
-            if (resumeOffset is not null)
-                foreach (var (key, value) in knownVariables)
-                    if (key.StartsWith("local[", StringComparison.Ordinal)) locals.Add(key, value);
+            if (resumeOffset is not null) knownVariables.CopyLocalsTo(locals);
             resultVariables = locals;
-            knownVariables.Clear();
-            (_variablePool ??= new()).Push(knownVariables);
+            if (knownVariables.Full is { } full)
+            {
+                full.Clear();
+                (_variablePool ??= new()).Push(full);
+            }
+            knownVariables.Release();
         }
         return new ScummBoundedScriptResult(keepCopies ? new Dictionary<int, byte>(states) : states,
             keepCopies ? new Dictionary<int, RoomObjectPosition>(positions) : positions, resultVariables,
@@ -2101,7 +2119,8 @@ public sealed partial class ScummBoundedScriptExecutor
             operations.Add(new ScummPrintOperation(parts[0], Read(1), Read(2)));
         }
         request = new ScummPrintRequest(actor & 0xFF, operations, text, script.Context ?? $"Script {script.ScriptId:00}",
-            instruction.Offset, runtime.CurrentRoom, estimate, new Dictionary<string, ushort>(variables, StringComparer.Ordinal));
+            instruction.Offset, runtime.CurrentRoom, estimate,
+            variables is ScummRunVariables run ? new ScummRunVariables.PrintView(run) : new Dictionary<string, ushort>(variables, StringComparer.Ordinal));
         detail = "";
         return true;
     }
@@ -2360,7 +2379,7 @@ public sealed partial class ScummBoundedScriptExecutor
     // saved result variable, and pushes var 0 after a nested normal opcode.
     // Only the nested getRandomNr form is supported here; other opcodes remain unresolved.
     private static bool TryApplyExpression(ScummScriptInstruction instruction, ScummScriptDisassembly script,
-        Dictionary<string, ushort> variables, HashSet<string> estimated, ScummScriptRuntimeState? runtime,
+        ScummRunVariables variables, HashSet<string> estimated, ScummScriptRuntimeState? runtime,
         bool pathEstimated, List<ScummRandomPick> picks, List<string> trace, out string detail,
         Action<string, (string Role, string Operand)[], string?>? observe = null, IReadOnlyList<ScummRoomObjectRecord>? roomObjects = null)
     {
@@ -3280,7 +3299,7 @@ public sealed partial class ScummBoundedScriptExecutor
     /// Returns false when the instruction is not one of these; <paramref name="handled"/> is false when an operand is unknown.
     /// </summary>
     private static bool ApplyDisplayOperation(ScummScriptInstruction instruction, ScummScriptRuntimeState runtime,
-        Dictionary<string, ushort> knownVariables, HashSet<string> estimated, bool onEstimatedPath, List<string> trace, out bool handled)
+        ScummRunVariables knownVariables, HashSet<string> estimated, bool onEstimatedPath, List<string> trace, out bool handled)
     {
         handled = true;
         var head = instruction.Operands.Split(',', 2, StringSplitOptions.TrimEntries)[0];

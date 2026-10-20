@@ -36,7 +36,7 @@ public sealed partial class ScummBoundedScriptExecutor
     }
 
     private static string? ApplySoundKludge(ScummScriptInstruction instruction, ScummScriptRuntimeState? runtime,
-        Dictionary<string, ushort> knownVariables, HashSet<string> estimated, bool onEstimatedPath, HashSet<string> limitations, List<string> trace)
+        ScummRunVariables knownVariables, HashSet<string> estimated, bool onEstimatedPath, HashSet<string> limitations, List<string> trace)
     {
         if (SoundKludgeWords(instruction.Operands, knownVariables) is not { Length: > 0 } words)
             return $"soundKludge words are unknown ({instruction.Operands})";

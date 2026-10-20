@@ -11,7 +11,7 @@ public sealed partial class ScummBoundedScriptExecutor
     // Read from ScummVM master, 18 October 2026. Descending search and strict comparison
     // intentionally retain the greatest id on a tie and reject distances of 255 or more.
     private static bool TryApplyV2Closest(ScummScriptInstruction instruction,
-        Dictionary<string, ushort> variables, HashSet<string> estimated, ScummScriptRuntimeState runtime,
+        ScummRunVariables variables, HashSet<string> estimated, ScummScriptRuntimeState runtime,
         IReadOnlyList<ScummRoomObjectRecord> objects, bool estimatedPath, List<string> trace,
         HashSet<string> limitations, out string? problem)
     {
