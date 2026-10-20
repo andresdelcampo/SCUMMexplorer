@@ -44,7 +44,7 @@ rtk proxy dotnet Exe/CutsceneList/Debug/net10.0/CutsceneList.dll "D:\Juegos\Luca
   - the four banks: 6808 / 7029 samples; MI2 blocks all 10 bytes with [4095]; Indy 4's first sample's times and `IsMouthSyncOff` at 0..36 jiffies;
   - MI2 talkie en and es on the S6 route: the sign's line starts sample 0x00A485E0 (56 jiffies) and Largo's choice 0x00B40C6E (141 jiffies), each lasting as long as its own wave; the floppy copies speak nothing;
   - Indy 4 mouth sync for one line (above), both copies; Indy 4's speech tests unchanged.
-  - Filter above after the merge of master: see the run report.
+  - The filter above (plus `PlayTests` and `SoundPolish`) after merging master with the sound polish (merge 42a8141f): 200 of 200 pass, 0 skipped, 2 min 51 s; solution build without errors.
 - Window check (real `MainWindow`, private `SCUMM_EXPLORER_PROFILE_ROOT` and room cache in the scratch folder, MI2 talkie en): the list finished (165 picker entries). "Room 74 · Pick up voodoo key to jail": the speech player played sample 232545265/10 (140 jiffies) as LeChuck (actor 3) says "Guybrush Threepwood^". "Room 09 · Talk to barkeeper": two lines played (32089130/10, 37 jiffies; 32102836/10, 34 jiffies), mouths closed at the end of each (actor 1 at +42 jiffies, actor 7 at +36: the first frame after the sample). Its first phase (play in Room 4 before the list) did not see the play loop start within the harness's wait, so only the scenes are evidence.
 - Cutscene lists: `CutsceneList scan run` for `indy4 vga en` (431 lines) and `mi2 talkie en` (264 lines) identical before and after, timings removed. LOOM, Indy 3 and Monkey 1 have no speech bank, so the change cannot reach them.
 
