@@ -70,11 +70,35 @@ internal static class Program
                 await Task.Delay(800);
                 report.Add($"prologue: input script {session.Snapshot.KnownGlobalVariables.GetValueOrDefault(ScummVars.VerbScript)}, messages [{string.Join(" | ", session.Messages.OnScreen.Select(m => m.Text))}]");
                 Save("play-01-prologue.png");
+                // 19 October 2026: the credits go on in Room 5 after the statue's click; captures every 2.5 s show one heading at a time (Script 94 +0x0063's object
+                // erases each heading before the next).
+                if (args.Length > 2 && args[2] == "credits")
+                {
+                    await Click0(80, 92);
+                    for (var n = 0; n < 300 && session.CurrentRoomId != 5; n++) await Task.Delay(100);
+                    for (var shot = 1; shot <= 8; shot++)
+                    {
+                        await Task.Delay(2500);
+                        report.Add($"credits {shot}: room {session.CurrentRoomId}, drawn [{string.Join(" | ", session.Messages.Drawn.Select(m => $"{m.Text} ({m.X},{m.Y})"))}], talk [{session.Messages.Talk?.Text.Replace("\n", " / ")}]");
+                        Save($"play-01-credits-{shot}.png");
+                    }
+                    return; // the credits run only; the route below starts from the prologue (run without "credits")
+                }
+                async Task Click0(int x, int y)
+                {
+                    session.PointAtScreen((x, y));
+                    await Task.Delay(150);
+                    var input = session.ClickScreen(x, y, out var refused);
+                    report.Add($"click at ({x}, {y}): {(input is null ? "refused: " + refused : input.Description)}");
+                }
                 var source = PresentationSource.FromVisual(window) ?? throw new Exception("no presentation source");
                 var escape = new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Escape) { RoutedEvent = UIElement.PreviewKeyDownEvent };
                 var taken = (bool)Call("PlayKeyDown", escape)!;
                 report.Add($"Esc through the window's key handler: taken {taken}; trace: {session.SessionTrace.LastOrDefault(l => l.StartsWith("abortCutscene", StringComparison.Ordinal))}");
                 for (var n = 0; n < 1200 && !(session.CurrentRoomId == 10 && session.UserInputOn && !session.InCutscene && session.Verbs.Any(v => v.VerbId == 3 && v.Mode == 1)); n++) await Task.Delay(100);
+                var magazine = session.Verbs.SingleOrDefault(v => v.VerbId == 0x65);
+                report.Add($"inventory [{string.Join(", ", session.Snapshot.Inventory)}]; slot 0x65: image object {magazine?.ImageObject} of Room {magazine?.ImageRoom}, " +
+                           $"drawn {session.PlayVerbArea().Items.Any(v => v.VerbId == 0x65 && !v.IsText && v.Width > 0)}");
                 report.Add($"Room {session.CurrentRoomId} after {Field("_playFrame")} window frames; verbs drawn: {string.Join(", ", session.PlayVerbArea().Items.Where(v => v.Width > 0 && v.IsText).Select(v => $"0x{v.VerbId:X2} \"{Glyphs(v.VerbId)}\""))}");
                 async Task Click(int x, int y, string what)
                 {

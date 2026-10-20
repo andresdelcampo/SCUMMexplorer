@@ -3226,7 +3226,9 @@ public sealed partial class ScummBoundedScriptExecutor
         if (runtime is null) states[objectId] = state;
         else runtime.SetObjectState(objectId, state);
         drawQueue.Add(objectId);
-        trace.Add($"object {objectId} drawn at {position.X},{position.Y} in state {state}");
+        // The image's strips are copied to the front buffer: drawn strings under it are erased (ScummMessageTable.ObjectDrawn).
+        var erased = runtime?.Messages.ObjectDrawn(position.X, position.Y, record.Width, record.Height) ?? "";
+        trace.Add($"object {objectId} drawn at {position.X},{position.Y} in state {state}{erased}");
         detail = "known state";
         return true;
     }
