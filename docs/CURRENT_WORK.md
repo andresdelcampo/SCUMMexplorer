@@ -46,6 +46,8 @@ Updated 14 October 2026. This is the single plan and session handoff. Completed 
 
 **Executor allocations (19 October).** The cutscene derivation no longer copies whole state per script run or frame (lists identical); disk/archive games derive on four workers; first launch from play start: Monkey Island 2 29 s, Indy 4 68 s ([record](../.verification/executor-alloc-20261019/README.md)). Next lever for Indy 4: make the executor's per-run variable sync proportional to the changes (change tracking of the runtime's globals or indexed variables).
 
+**20 October run** ([checkpoint](checkpoints/20261020-polish-speech-speed.md)): sound polish (iMUSE clock for MI1 floppy, Indy3 AdLib constants, long speaker loops, PC-speaker timing in play), MI2 talkie speech and mouth sync, Indy 4 credits and magazine icon, global-variable change tracking (Indy 4 cutscene list 34 s), play-start guards. Open for the user: a hint on static previews such as MI2's campfire (R-8.5b vs R-5.3a).
+
 **19 October, later**: the Monkey Island 1 CD's French, German and Italian folders pass S9; the script executor stops copying unread state (MI2's cutscene list 29 s, Indy 4's 68 s on first launch) ([checkpoint](checkpoints/20261019-S9-v5-snapshot-languages.md)).
 
 **19 October run** ([checkpoint](checkpoints/20261019-S9-v5-snapshot-languages.md)): S9 for the Monkey Island 2, Indy 4 and Monkey Island CD copies; cutscene lists derive from one booted snapshot per game; the Monkey Island 1 CD offers its five languages (R-3.16).
