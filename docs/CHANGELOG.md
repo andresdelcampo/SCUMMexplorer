@@ -2,6 +2,12 @@
 
 Recent changes: 18–19 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 17 October](archive/CHANGELOG_THROUGH_2026-10-17.md) are an optional historical archive, not startup reading. At a checkpoint, retain roughly the latest two calendar days here and archive older entries with their links.
 
+## 19 October: Indy 4 credits headings and the magazine's icon (S6 leftovers, Indy4)
+
+- The playable credits no longer stack their headings: a `print 0xFE` string is drawn into the room's front buffer, and the game erases it by drawing an object over it (Script 94 +0x0063, object 73). Drawn objects now cover drawn strings under their strips (`ScummMessageTable.ObjectDrawn`, ScummVM `Gdi::drawBitmap`), for every game; v4+ `print` subop 6 (`SO_LEFT`) is applied.
+- The first inventory slot shows the magazine (object 23): a held object's verb runs from the room it was taken from in every version (`ScummSession.StartObjectScript`), so Script 10's icon query (verb 0x5B, `var[0x0A1]`) gets image 1260 of Room 98.
+- Tests in `ScummIndy4PlayTests` (English talkie, Spanish floppy); all play tests, LOOM tests and the cutscene lists of eight played games unchanged; one real-window check. Record: [indy4-play addendum](../.verification/indy4-play-20261017/README.md#addendum-19-october-2026-the-credits-headings-and-the-magazines-icon).
+
 ## 19 October: stable selectors and deliberate cutscenes (all games)
 
 - Refined the background-first feature: only LOOM EGA fills selector artwork after background loading. Other cards retain their plain backgrounds on cold and warm loads; native first-visit preparation and complete caching still run upfront.
