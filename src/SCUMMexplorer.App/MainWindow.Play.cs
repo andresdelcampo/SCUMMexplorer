@@ -73,8 +73,35 @@ public partial class MainWindow
     private SceneSoundPlayer.Loop? PlaySoundLoop(int soundId, SceneSoundPlayer.SoundMode mode)
     {
         if (_playCdTracks is { } cd && cd.Plays(soundId)) return cd.LoopsForever(soundId) ? new SceneSoundPlayer.Loop(TimeSpan.Zero, null) : null;
+        // Sound polish (19 October 2026): a version 3 or 4 song that loops (Player_AD or iMUSE's jump back for AdLib, a repeated channel state for the
+        // PC speaker) goes on from its loop target instead of ending with its rendered wave.
+        if (_playImuse is null && _game is { } game && OldSoundLoop(game, soundId, mode) is { } oldLoop)
+            return new SceneSoundPlayer.Loop(TimeSpan.FromSeconds(oldLoop.RestartSeconds), TimeSpan.FromSeconds(oldLoop.EndSeconds));
         if (_playImuse is not { } imuse || PlayImuseDevice(mode) is not { } device) return null;
         return imuse.Loop(soundId, device) is { } loop ? new SceneSoundPlayer.Loop(TimeSpan.FromSeconds(loop.RestartSeconds), TimeSpan.FromSeconds(loop.EndSeconds)) : null;
+    }
+
+    private ScummImuseLoop? OldSoundLoop(GameLibrary game, int soundId, SceneSoundPlayer.SoundMode mode)
+    {
+        if (game.Version is not (ScummVersion.V3 or ScummVersion.V4) || mode is not (SceneSoundPlayer.SoundMode.Adlib or SceneSoundPlayer.SoundMode.PcSpeaker)) return null;
+        var adlib = mode == SceneSoundPlayer.SoundMode.Adlib;
+        var resource = game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == soundId);
+        try
+        {
+            if (resource is not null && game.V4ArchiveFor(resource) is ScummV4Archive archive)
+            {
+                var sound = archive.ReadSounds().FirstOrDefault(item => item.Id == soundId);
+                return adlib
+                    ? sound?.Adlib is { } part ? _adlibDecoder.ReadLoop(part, ScummProfile.For(game).AdlibTiming) : null
+                    : sound?.Speaker is { } speaker ? _audioDecoder.ReadLoop(speaker, 6) : null;
+            }
+            if (resource is null || game.Version != ScummVersion.V3 || ScummRolandSong.IsRoland(resource)) return null;
+            return adlib ? _adlibDecoder.ReadLoop(resource, ScummProfile.For(game).AdlibTiming) : _audioDecoder.ReadLoop(ScummPcSpeakerAudio.ReadOldBundle(resource), 4);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or System.IO.InvalidDataException or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     private static ScummImuseDevice? PlayImuseDevice(SceneSoundPlayer.SoundMode mode) => mode switch
@@ -287,6 +314,8 @@ public partial class MainWindow
         // vars.cpp's device numbers (also ScummGameSession.AdlibCard): v1/v2
         // have no VAR_SOUNDCARD at var[0x030]; that word is their game's state.
         if (_play is null || _game is not { } game || ScummProfile.For(game).EngineVersion < ScummVersion.V3) return;
+        // Sound polish (19 October 2026): with the PC speaker, the scripts' isSoundRunning follows that driver's lengths (ScummVM Player_V2).
+        _play.PcSpeakerTiming = _sceneSound.Mode == SceneSoundPlayer.SoundMode.PcSpeaker;
         _play.SoundCard = _sceneSound.Mode switch
         {
             SceneSoundPlayer.SoundMode.Roland => 4,

@@ -3,23 +3,35 @@ using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
-/// <summary>Renders old-bundle LOOM AdLib music and effects through an OPL chip emulator.</summary>
 /// <summary>
 /// The constants of ScummVM's <c>Player_AD</c> that differ between games (<c>player_ad.cpp</c>, <c>startMusic</c> and <c>updateMusic</c>):
-/// LOOM's timer limit is 473, its tempo byte counts double and its event delays are shifted right by 2; every other game it plays
-/// (Indiana Jones and the Last Crusade, Monkey Island) uses 256, a plain tempo byte and a shift of 1.
+/// LOOM's timer limit is 473, its tempo byte counts double and its event delays are shifted right by 2; the other game it plays
+/// (Indiana Jones and the Last Crusade, EGA and 256 colours) uses 256, a plain tempo byte and a shift of 1.
+/// <para>
+/// <see cref="ImuseClock"/> (sound polish, 19 October 2026): ScummVM plays the AD music of every other game (Monkey Island 1 floppy and EGA) through iMUSE,
+/// not <c>Player_AD</c> (<c>scumm.cpp</c> <c>setupMusic</c>: <c>Player_AD</c> only for LOOM and Indy3; <c>sound.cpp</c> <c>readSoundResourceSmallHeader</c>
+/// converts the AD block with <c>convertADResource</c>; GitHub master read 19 October 2026). The conversion keeps the event bytes as one MIDI track at 480 ticks
+/// a quarter, with a tempo of 500000 × 256 / the tempo byte microseconds a quarter, 160 ticks before the first event, and a jump back to that first event
+/// (beat 1, tick 160) in place of a looping song's end; iMUSE's parser (<c>MidiParser::onTimer</c>, <c>setTempo</c>) plays it on the AdLib driver's 250 Hz
+/// timer (<c>getBaseTempo</c> 4000 µs, speed 128). Only the clock is iMUSE's: the notes still go through this player's port of <c>Player_AD</c>'s voices.
+/// </para>
 /// </summary>
-public sealed record ScummAdlibTiming(int TimerLimit, int TempoMultiplier, int DelayShift)
+public sealed record ScummAdlibTiming(int TimerLimit, int TempoMultiplier, int DelayShift, bool ImuseClock = false)
 {
     public static readonly ScummAdlibTiming Loom = new(473, 2, 2);
     public static readonly ScummAdlibTiming Standard = new(256, 1, 1);
+    /// <summary>The AD music of a game ScummVM gives to iMUSE (Monkey Island 1 floppy and EGA): see <see cref="ImuseClock"/>.</summary>
+    public static readonly ScummAdlibTiming ImuseConversion = new(256, 1, 1, ImuseClock: true);
 }
 
+/// <summary>Renders old-bundle LOOM AdLib music and effects through an OPL chip emulator.</summary>
 public sealed partial class ScummAdlibAudio
 {
     private const int SampleRate = 49716;
     private const int CallbackRate = 472;
+    // A looping song renders at least this long; one whose first pass and loop take longer renders through its first loop restart (sound polish, 19 October 2026).
     private const int MaxSeconds = 180;
+    private const int LoopTailSeconds = 10;
     private const int MaxLifetimeSeconds = 1800;
     private const int MaxReleaseSeconds = 2;
     private const int QuietSampleLevel = 8;
@@ -71,22 +83,42 @@ public sealed partial class ScummAdlibAudio
     /// </summary>
     public ScummSoundLifetime ReadLifetime(GameResource resource, ScummAdlibTiming timing)
     {
-        try { return ReadLifetime(ReadTrack(resource), timing, false); }
+        try { return ReadLifetime(ReadTrack(resource), timing); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
         {
             return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
         }
     }
 
-    /// <summary>The same for AdLib data given directly (a v4 disk's <c>AD</c> block body); <paramref name="halfTempo"/> as in <see cref="ReadDataLifetime"/>.</summary>
-    public ScummSoundLifetime ReadLifetime(byte[] data, ScummAdlibTiming timing, bool halfTempo)
+    /// <summary>
+    /// The same for AdLib data given directly (a v4 disk's <c>AD</c> block body). With <see cref="ScummAdlibTiming.ImuseClock"/> the music timer is iMUSE's
+    /// (<c>Player::getMusicTimer</c>: the parser's tick × 2 / 480, times the timer frequency over 240; 0 when no song plays) and is given as
+    /// <see cref="ScummSoundLifetime.TimerValues"/>, which start again at the loop's restart.
+    /// </summary>
+    public ScummSoundLifetime ReadLifetime(byte[] data, ScummAdlibTiming timing)
     {
         try
         {
-            var lifetime = ReadDataLifetime(data, halfTempo, timing);
+            var lifetime = ReadDataLifetime(data, timing);
             if (data.Length < 3 || data[2] != 0x80) return lifetime;
             var limit = lifetime.Kind == ScummSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxMarkerSeconds;
-            var player = new MusicPlayer(data, halfTempo, timing);
+            var player = new MusicPlayer(data, timing);
+            if (timing.ImuseClock)
+            {
+                var values = new List<ScummSoundTimerPoint> { new(0, 0) };
+                for (var callbacks = 1; callbacks <= limit && player.Active && player.LoopBoundaries == 0; callbacks++)
+                {
+                    player.Tick();
+                    var value = (ushort)(int)(player.PlayTick * 2 / Ppqn * DosTimerFrequency / 240.0);
+                    if (values[^1].Value != value) values.Add(new(callbacks, value));
+                }
+                return lifetime with
+                {
+                    TimerValues = values.ToArray(),
+                    LoopStartCallback = player.LoopBoundaries > 0 ? player.LoopTargetCallback : null,
+                    LoopEndCallback = player.LoopBoundaries > 0 ? player.FirstLoopCallback : null
+                };
+            }
             var markers = new List<long>();
             for (var callbacks = 1; callbacks <= limit && player.Active; callbacks++)
             {
@@ -104,18 +136,24 @@ public sealed partial class ScummAdlibAudio
 
     private const int MaxMarkerSeconds = 600;
 
+    /// <summary>iMUSE's ticks a quarter for a converted AD song (<c>convertADResource</c>: a constant 480).</summary>
+    private const int Ppqn = 480;
+
+    /// <summary>The iMUSE AdLib driver's timer step (<c>MidiDriver_ADLIB::getBaseTempo</c>: 1000000 / 250 µs), at the default speed 128.</summary>
+    private const int ImuseTimerMicroseconds = 4000;
+
     /// <summary>ScummVM's <c>_timerFrequency</c> for a DOS game of version 2 to 4 (<c>setTimerAndShakeFrequency</c>): the PIT's 1193182 Hz over 5041.</summary>
     private const double DosTimerFrequency = 1193182.0 / 5041.0;
 
     /// <summary>The same for AdLib data given directly (the part after the resource header; the CD game's <c>AD</c> block body).</summary>
-    public ScummSoundLifetime ReadDataLifetime(byte[] data, bool halfTempo = false, ScummAdlibTiming? timing = null)
+    public ScummSoundLifetime ReadDataLifetime(byte[] data, ScummAdlibTiming? timing = null)
     {
         try
         {
             if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
             if (data[2] == 0x80)
             {
-                var player = new MusicPlayer(data, halfTempo, timing);
+                var player = new MusicPlayer(data, timing);
                 for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
                 {
                     player.Tick();
@@ -145,18 +183,61 @@ public sealed partial class ScummAdlibAudio
         }
     }
 
+    /// <summary>Renders an old-bundle sound's AdLib part with LOOM's driver constants.</summary>
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default) =>
         RenderWave(ReadTrack(resource), cancellationToken);
 
-    /// <summary>Renders AdLib data given directly (<paramref name="halfTempo"/>: the browsed Monkey Island and Indy3 256-colour disks, whose music plays at half the LOOM CD rate, by ear 11 October): the bytes after the resource header (old bundle: after 4 bytes; the CD game's <c>AD</c> block body).</summary>
-    public byte[] RenderWave(byte[] data, CancellationToken cancellationToken = default, bool halfTempo = false)
+    /// <summary>Renders an old-bundle sound's AdLib part with the game's driver constants (<see cref="ScummProfile.AdlibTiming"/>: Indy3's are not LOOM's, R-13.9).</summary>
+    public byte[] RenderWave(GameResource resource, ScummAdlibTiming timing, CancellationToken cancellationToken = default) =>
+        RenderWave(ReadTrack(resource), cancellationToken, timing);
+
+    /// <summary>Where an old-bundle sound's AdLib song loops (<see cref="ReadLoop(byte[], ScummAdlibTiming)"/>), or null.</summary>
+    public ScummImuseLoop? ReadLoop(GameResource resource, ScummAdlibTiming timing)
+    {
+        try { return ReadLoop(ReadTrack(resource), timing); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException) { return null; }
+    }
+
+    /// <summary>
+    /// Where a looping AdLib song goes on (sound polish, 19 October 2026): the driver jumps back once its first pass ends (<see cref="ScummImuseLoop.EndSeconds"/>,
+    /// <c>Player_AD</c> at the end-of-track event, iMUSE at the jump that replaced it) and plays on from the loop target, which it first reached at
+    /// <see cref="ScummImuseLoop.RestartSeconds"/> of the rendered wave. Null for a song that ends, an effect, or a song whose first pass outlasts the analysis.
+    /// </summary>
+    public ScummImuseLoop? ReadLoop(byte[] data, ScummAdlibTiming timing)
+    {
+        try
+        {
+            if (data.Length < 0x94 || data[2] != 0x80) return null;
+            var player = new MusicPlayer(data, timing);
+            for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds && player.Active; callbacks++)
+            {
+                player.Tick();
+                if (player.LoopBoundaries > 0)
+                    return player.LoopTargetCallback is int start && callbacks > start
+                        ? new((double)start / CallbackRate, (double)callbacks / CallbackRate) : null;
+            }
+            return null;
+        }
+        catch (InvalidDataException) { return null; }
+    }
+
+    /// <summary>
+    /// Renders AdLib data given directly: the bytes after the resource header (old bundle: after 4 bytes; a v4 disk's <c>AD</c> block body), with the game's
+    /// driver constants (LOOM's when null). A song that ends renders to its end; a looping one for three minutes, or through its first restart and ten
+    /// seconds more when that takes longer (sound polish, 19 October 2026: a long loop was cut at three minutes).
+    /// </summary>
+    public byte[] RenderWave(byte[] data, CancellationToken cancellationToken = default, ScummAdlibTiming? timing = null)
     {
         if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
         if (data[2] != 0x80) return RenderEffectWave(data, cancellationToken);
         if (data.Length < 0x94) throw new InvalidDataException("AdLib music header is incomplete.");
-        var player = new MusicPlayer(data, halfTempo);
-        var lifetime = ReadDataLifetime(data, halfTempo);
+        timing ??= ScummAdlibTiming.Loom;
+        var player = new MusicPlayer(data, timing);
+        var lifetime = ReadDataLifetime(data, timing);
         var maxCallbacks = lifetime.Kind == ScummSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxSeconds;
+        if (lifetime.Kind == ScummSoundLifetimeKind.Looping && ReadLoop(data, timing) is { } loop)
+            maxCallbacks = Math.Min(CallbackRate * MaxLifetimeSeconds,
+                Math.Max(maxCallbacks, (int)Math.Ceiling(loop.EndSeconds * CallbackRate) + CallbackRate * LoopTailSeconds));
         var samples = new List<short>();
         var frameRemainder = 0;
         for (var callback = 0; callback < maxCallbacks && player.Active; callback++)
@@ -297,7 +378,6 @@ public sealed partial class ScummAdlibAudio
         private int _nextEvent = 40;
         private int _timer;
         private int _ticks;
-        private readonly bool _halfTempo;
         private int _rhythm;
 
         public NukedOplChip Chip { get; }
@@ -312,7 +392,26 @@ public sealed partial class ScummAdlibAudio
         /// <summary>Player_AD's <c>_engineMusicTimer</c>: what <c>getMusicTimer</c> reports (the game's variable sees a quarter of it).</summary>
         public int EngineMusicTimer { get; private set; }
 
-        public MusicPlayer(byte[] data, bool halfTempo = false, ScummAdlibTiming? timing = null)
+        /// <summary>The 472 Hz callbacks run so far.</summary>
+        public int Callbacks { get; private set; }
+
+        /// <summary>The callback in which the loop target's event first played (the first event, for the iMUSE clock).</summary>
+        public int? LoopTargetCallback { get; private set; }
+
+        /// <summary>The callback in which the song first jumped back.</summary>
+        public int? FirstLoopCallback { get; private set; }
+
+        // The iMUSE clock (ScummAdlibTiming.ImuseClock): MidiParser's position in microseconds and ticks, the delta before the next event, and the 250 Hz
+        // driver timer's phase against the 472 Hz callbacks (in callbacks × microseconds).
+        private long _imusePhase;
+        private long _playTime, _lastEventTime, _lastEventTick, _pendingDelta, _psecPerTick;
+
+        /// <summary>The iMUSE parser's tick (<c>MidiParser::_position._playTick</c>), counted from the song's start and back to 160 at its loop.</summary>
+        public long PlayTick { get; private set; }
+
+        private int LoopTarget => _timing.ImuseClock ? 0x93 : _loopStart;
+
+        public MusicPlayer(byte[] data, ScummAdlibTiming? timing = null)
         {
             _timing = timing ?? ScummAdlibTiming.Loom;
             Chip = new NukedOplChip(SampleRate);
@@ -331,15 +430,32 @@ public sealed partial class ScummAdlibAudio
             }
             _voiceCount = _rhythm == 0 ? 9 : 6;
             Write(0xbd, _rhythm);
-            _halfTempo = halfTempo;
-            _ticks = halfTempo ? data[3] : data[3] * _timing.TempoMultiplier;
+            _ticks = data[3] * _timing.TempoMultiplier;
             if (_ticks == 0) throw new InvalidDataException("AdLib music has zero tempo.");
             _loop = data[4] == 0;
             _loopStart = _position + BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(5, 2));
+            if (_timing.ImuseClock)
+            {
+                // convertADResource: dw = 500000 * 256 / ticks, written as a three-byte tempo event; the track starts ppqn / 3 ticks later.
+                SetImuseTempo((500000 * 256 / data[3]) & 0xFFFFFF);
+                _pendingDelta = Ppqn / 3;
+            }
         }
 
         public void Tick()
         {
+            Callbacks++;
+            if (_timing.ImuseClock)
+            {
+                // The AdLib driver's timer runs at 250 Hz (4000 µs a step); this player's callbacks at 472 Hz.
+                _imusePhase += 1_000_000;
+                while (_imusePhase >= (long)ImuseTimerMicroseconds * CallbackRate && Active)
+                {
+                    _imusePhase -= (long)ImuseTimerMicroseconds * CallbackRate;
+                    ImuseTimer();
+                }
+                return;
+            }
             _timer += _ticks;
             if (_timer < _timing.TimerLimit) return;
             _timer -= _timing.TimerLimit;
@@ -347,28 +463,97 @@ public sealed partial class ScummAdlibAudio
             if (--_nextEvent > 0) return;
             for (var commands = 0; commands < 256 && Active; commands++)
             {
-                if (_position >= _data.Length) { End(); return; }
-                var command = Read(_position++);
+                var looped = ProcessEvent();
+                if (!Active) return;
+                if (looped) continue;
+                var delay = ReadDelay();
+                if (!Active) return;
+                if (delay == 0) continue;
+                _nextEvent = Math.Max(1, delay >> _timing.DelayShift);
+                return;
+            }
+            if (Active) throw new InvalidDataException("AdLib music has too many simultaneous commands.");
+        }
+
+        /// <summary>
+        /// One step of iMUSE's parser (<c>MidiParser::onTimer</c>): every event whose time has come by the step's end plays; a jump back (the converted
+        /// song's loop) ends the step, and the parser goes on from the jump's time.
+        /// </summary>
+        private void ImuseTimer()
+        {
+            var endTime = _playTime + ImuseTimerMicroseconds;
+            for (var commands = 0; Active; commands++)
+            {
+                if (commands >= 4096) throw new InvalidDataException("AdLib music has too many simultaneous commands.");
+                var eventTime = _lastEventTime + _pendingDelta * _psecPerTick;
+                if (eventTime > endTime) break;
+                _lastEventTime = eventTime;
+                _lastEventTick += _pendingDelta;
+                PlayTick = _lastEventTick;
+                var looped = ProcessEvent();
+                if (!Active) return;
+                if (looped)
+                {
+                    // jumpToTick(beat 1, tick 160): the parse stops here and goes on from the jump's time.
+                    _playTime = _lastEventTime;
+                    _lastEventTick = PlayTick = Ppqn / 3;
+                    _pendingDelta = 0;
+                    return;
+                }
+                _pendingDelta = ReadDelay();
+                if (!Active) return;
+            }
+            _playTime = endTime;
+            PlayTick = (endTime - _lastEventTime) / _psecPerTick + _lastEventTick;
+        }
+
+        private void SetImuseTempo(long microsecondsPerQuarter) => _psecPerTick = Math.Max(1, (microsecondsPerQuarter + (Ppqn >> 2)) / Ppqn);
+
+        /// <summary>The delay after an event: 0, or the AD format's one- or two-byte count (the same bytes as a MIDI variable-length delta).</summary>
+        private int ReadDelay()
+        {
+            if (_position >= _data.Length) { End(); return 0; }
+            if (_data[_position] == 0) { _position++; return 0; }
+            var delay = Read(_position++);
+            if ((delay & 0x80) != 0) delay = ((delay & 0x7f) << 7) | Read(_position++);
+            return delay;
+        }
+
+        /// <summary>Plays the event at the read position; true when it was the song's end and the song jumped back.</summary>
+        private bool ProcessEvent()
+        {
+            if (_position >= _data.Length) { End(); return false; }
+            if (_position == LoopTarget && LoopTargetCallback is null) LoopTargetCallback = Callbacks;
+            var command = Read(_position++);
+            {
                 if (command == 0xff)
                 {
                     var meta = Read(_position++);
                     if (meta == 0x2f)
                     {
-                        if (!_loop) { End(true); return; }
-                        if (_loopStart < 0x93 || _loopStart >= _data.Length)
+                        if (!_loop) { End(true); return false; }
+                        var target = LoopTarget;
+                        if (target < 0x93 || target >= _data.Length)
                             throw new InvalidDataException("AdLib music loop target is outside the event stream.");
                         LoopBoundaries++;
-                        _position = _loopStart;
-                        continue;
+                        FirstLoopCallback ??= Callbacks;
+                        _position = target;
+                        return true;
                     }
-                    if (meta == 0x58) { _position += 5; goto afterCommand; }
+                    if (meta == 0x58) { _position += 5; return false; }
                     var length = Read(_position++);
                     if (meta == 0x51 && length >= 3)
                     {
-                        // The LOOM driver reads the first two payload bytes as its tempo word.
-                        // _position already points past the length byte, at that first byte.
-                        var timing = (Read(_position) << 8) | Read(_position + 1);
-                        if (timing > 0) _ticks = 0x73000 / timing / (_halfTempo ? 2 : 1);
+                        // _position already points past the length byte, at the first payload byte.
+                        if (_timing.ImuseClock)
+                            // iMUSE reads a standard MIDI tempo: three bytes of microseconds a quarter (MidiParser_SMF).
+                            SetImuseTempo((Read(_position) << 16) | (Read(_position + 1) << 8) | Read(_position + 2));
+                        else
+                        {
+                            // Player_AD reads the first two payload bytes as its tempo word.
+                            var timing = (Read(_position) << 8) | Read(_position + 1);
+                            if (timing > 0) _ticks = 0x73000 / timing;
+                        }
                     }
                     _position += length;
                 }
@@ -396,17 +581,10 @@ public sealed partial class ScummAdlibAudio
                             if (rhythmId is > 0 and < 6) { _rhythm &= ~RhythmBits[rhythmId]; Write(0xbd, _rhythm); }
                         }
                     }
-                    else { End(); return; }
+                    else { End(); return false; }
                 }
-                afterCommand:
-                if (_position >= _data.Length) { End(); return; }
-                if (_data[_position] == 0) { _position++; continue; }
-                var delay = Read(_position++);
-                if ((delay & 0x80) != 0) delay = ((delay & 0x7f) << 7) | Read(_position++);
-                _nextEvent = Math.Max(1, delay >> _timing.DelayShift);
-                return;
             }
-            if (Active) throw new InvalidDataException("AdLib music has too many simultaneous commands.");
+            return false;
         }
 
         private void PlayNote(int command, int note, int instrument)

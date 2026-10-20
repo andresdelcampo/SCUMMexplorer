@@ -9,7 +9,8 @@ public sealed record ScummSoundTimerPoint(int Callback, ushort Value);
 
 /// <summary>472 Hz AdLib driver callbacks until native completion, never WAV duration.</summary>
 public sealed record ScummSoundLifetime(ScummSoundLifetimeKind Kind, int? Callbacks, bool Music, string? Reason = null, long[]? MarkerTicks = null,
-    bool KeepsMusicTimer = false, ScummSoundTimerPoint[]? TimerValues = null, int? LoopStartCallback = null, int? LoopEndCallback = null);
+    bool KeepsMusicTimer = false, ScummSoundTimerPoint[]? TimerValues = null, int? LoopStartCallback = null, int? LoopEndCallback = null,
+    bool TimerSurvivesStop = false);
 
 /// <summary>
 /// Resource clocks for independent native AdLib voices. Output mode/mute do not alter game state.
@@ -32,7 +33,7 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
         if (lifetime.KeepsMusicTimer)
         {
             _heldTimer = 0;
-            _heldTimerIsV2 = lifetime.TimerValues is not null;
+            _heldTimerIsV2 = lifetime.TimerValues is not null && !lifetime.TimerSurvivesStop;
         }
         _voices[id] = new(lifetime, _jiffies, estimated);
         _estimatedStops.Remove(id);
@@ -49,8 +50,9 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
     private void StopVoice(int id, bool estimated, bool naturalEnd)
     {
         if (_voices.TryGetValue(id, out var voice) && voice.Lifetime.KeepsMusicTimer)
-            // Player_V2 stopSound clears every channel word; natural completion preserves the channel timer.
-            _heldTimer = voice.Lifetime.TimerValues is not null && !naturalEnd ? 0 : MarkersPassed(voice);
+            // Player_V2 stopSound clears every channel word; natural completion preserves the channel timer. The version 3 player's own counter
+            // (TimerSurvivesStop, sound polish 19 October 2026) is not a channel word, so a stop leaves it.
+            _heldTimer = voice.Lifetime.TimerValues is not null && !voice.Lifetime.TimerSurvivesStop && !naturalEnd ? 0 : MarkersPassed(voice);
         _voices.Remove(id);
         if (estimated) _estimatedStops.Add(id); else _estimatedStops.Remove(id);
     }
@@ -59,7 +61,7 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
     {
         if (_heldTimerIsV2) _heldTimer = 0;
         foreach (var voice in _voices.Values)
-            if (voice.Lifetime.KeepsMusicTimer && voice.Lifetime.TimerValues is null) _heldTimer = Math.Max(_heldTimer, MarkersPassed(voice));
+            if (voice.Lifetime.KeepsMusicTimer && (voice.Lifetime.TimerValues is null || voice.Lifetime.TimerSurvivesStop)) _heldTimer = Math.Max(_heldTimer, MarkersPassed(voice));
         _voices.Clear();
         _estimatedStops.Clear();
     }
