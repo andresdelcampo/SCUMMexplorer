@@ -28,7 +28,7 @@ public abstract partial class ScummSession
         new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses, _runtime.IsPlayerActor);
 
     protected ScummSessionSnapshot EnterRoom(GameResource room, string arrival, ScummScriptEvent? load = null, string? assumedArrival = null,
-        Action<int>? placeAfterLoadRoom = null)
+        Action<int>? placeAfterLoadRoom = null, bool runEntry = true)
     {
         var eventsBeforeVisit = _visitEvents.Count;
         var estimatedLoad = load is { Certainty: not ScummScriptEventCertainty.Reached, Executed: true };
@@ -108,6 +108,14 @@ public abstract partial class ScummSession
         _pointer = null;
         PlaceVirtualMouse();
         _uncertainties.Add(arrival);
+        if (!runEntry)
+        {
+            // R-8.5b ambient preview: the room is loaded as startScene loads it, but no entry code runs (neither the global hooks nor the room's own).
+            LastEntryScript = null;
+            LastEntryRun = null;
+            LastVisitEvents = _visitEvents.Skip(eventsBeforeVisit).ToArray();
+            return Snapshot;
+        }
 
         RunGlobalHook(ScummVars.EntryScript, "before room entry", estimatedLoad);
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);

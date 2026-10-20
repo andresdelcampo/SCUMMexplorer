@@ -6,7 +6,7 @@ namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>A transactional, offscreen exploration preview; never an earned doorway transition.</summary>
 public sealed record ScummManualRoomResult(ScummSession? Session, string? Reason, int Frames = 0,
-    ScummRoomCapture? State = null, bool Cancelled = false)
+    ScummRoomCapture? State = null, bool Cancelled = false, ScummAmbientScripts? Ambient = null)
 {
     public bool Succeeded => Session is not null;
 }
@@ -74,6 +74,68 @@ public abstract partial class ScummSession
         catch (OperationCanceledException) { return new(null, "Manual room preparation was canceled.", Cancelled: true); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException or ArgumentException)
         { return new(null, $"Native room preparation is unavailable: {ex.Message}"); }
+    }
+
+    /// <summary>
+    /// R-8.5b static preview with its ambient scripts (rule confirmed by the user on 20 October 2026): for a manually picked room whose native entry
+    /// cannot be prepared live (<see cref="PrepareManualRoom"/> failed), an independent copy enters the room as <c>startScene</c> loads it but runs
+    /// none of its entry code (no global entry hook, no room entry script), ends every other script slot, and starts only the scripts the entry
+    /// would start that <see cref="ScummAmbientScripts"/> finds ambient, with the entry's literal arguments. Its frames then move the room's
+    /// permanent animation and nothing else: no story, no print, no room change, no input. The ego is not placed (no arrival is assumed). The
+    /// session is a state preview, never a reached outcome; the live session is not modified. Returns no session when the room has no ambient script.
+    /// </summary>
+    public ScummManualRoomResult PrepareAmbientRoom(GameResource room, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        if (room.Kind != ResourceKind.Room || room.ResourceId is not int roomId ||
+            !_game.Rooms.Any(r => r.ResourceId == roomId)) throw new ArgumentException("Choose an indexed room of this game.", nameof(room));
+        try
+        {
+            var ambient = ScummAmbientScripts.Classify(_data, roomId);
+            if (ambient.Ambient.Count == 0) return new(null, "The room's entry starts no ambient script.", Ambient: ambient);
+            cancellationToken.ThrowIfCancellationRequested();
+            var copy = ObjectGraphCopy.Copy(this, ObjectGraphCopy.Reachable(_game));
+            copy.ManualNavigationBegan();
+            copy.CancelDepartedManualRoute(roomId, cancellationToken);
+            copy.EnterRoom(room, $"Room {roomId:00} selected manually as a static preview: its entry code did not run (R-8.5b); only its ambient scripts run.",
+                runEntry: false);
+            // Only the ambient scripts run from here: every other slot (the previous room's exit work, the game's global loops) ends without
+            // executing further; the room's own story stays unplayed.
+            var stopped = copy.EndEverySlot();
+            foreach (var script in ambient.Ambient)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var locals = script.Arguments.Select((value, index) => (Key: $"local[0x{index:X3}]", Value: (ushort)value))
+                    .ToDictionary(item => item.Key, item => item.Value);
+                copy.RunStartedScript(script.ScriptId, 0, locals, 0);
+            }
+            copy._uncertainties.Add($"Room {roomId:00} is a static preview (R-8.5b): its entry code did not run; {stopped} other script slot(s) were ended; " +
+                $"only its ambient script(s) {string.Join(", ", ambient.Ambient.Select(a => a.ScriptId))} run, started as the entry would start them " +
+                "(an exploration preview, not a played route; the ego is not placed).");
+            return new(copy, null, 0, copy.CaptureSessionRoom(), Ambient: ambient);
+        }
+        catch (OperationCanceledException) { return new(null, "Ambient preview was canceled.", Cancelled: true); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException or ArgumentException)
+        { return new(null, $"The ambient preview is unavailable: {ex.Message}"); }
+    }
+
+    // Ends every script slot without executing anything further (no override jump, no end hook); returns how many there were.
+    private int EndEverySlot()
+    {
+        var active = _pending.Select(p => p.Frame).Concat(_executing).Concat(_loadingFrames)
+            .Concat(_frameScripts.Select(p => p.Frame)).Where(f => !f.Stopped).ToHashSet();
+        foreach (var frame in active) frame.Stopped = true;
+        _pending.Clear();
+        _frameScripts.Clear();
+        _loadingFrames.Clear();
+        _requestedLoad = null;
+        _chained = null;
+        _actionLoadFrame = null;
+        _queuedInput.Clear();
+        _runtime.Sentences.Clear();
+        _booting = false;
+        if (active.Count > 0) _visitTrace.Add($"static preview: ended {active.Count} script slot(s) without executing them further");
+        return active.Count;
     }
 
     protected virtual void ManualNavigationBegan() { }
