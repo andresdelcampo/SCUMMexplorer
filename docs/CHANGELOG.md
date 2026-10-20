@@ -8,6 +8,12 @@ Recent changes: 18–19 October 2026. Current support and acceptance limits belo
 - The first inventory slot shows the magazine (object 23): a held object's verb runs from the room it was taken from in every version (`ScummSession.StartObjectScript`), so Script 10's icon query (verb 0x5B, `var[0x0A1]`) gets image 1260 of Room 98.
 - Tests in `ScummIndy4PlayTests` (English talkie, Spanish floppy); all play tests, LOOM tests and the cutscene lists of eight played games unchanged; one real-window check. Record: [indy4-play addendum](../.verification/indy4-play-20261017/README.md#addendum-19-october-2026-the-credits-headings-and-the-magazines-icon).
 
+## 19–20 October: talkie speech for Monkey Island 2 and mouth sync (Indy 4, MI2 talkie)
+
+- Monkey Island 2's fan talkie (`mi2 talkie en`/`es`) stores its speech as Indy 4 does: `monster.sou` holds 6808 `VCTL` + Creative Voice File samples, addressed by the texts' four code-10 operands. The generic speech path already read it; its lines now have tests on the S6 route (the sign 0x00A485E0, Largo's choice 0x00B40C6E, each lasting as its sample) and a window check of two scenes from the list.
+- Mouth sync (ScummVM `startTalkSound`/`processSfxQueues`/`isMouthSyncOff`, sound.cpp read 19 October 2026): while a talkie line plays, the talking actor's mouth follows the sample's `VCTL` times and closes when the voice ends. Indy 4 has real times (first line: closed +24, open +30, closed +36 jiffies); the MI2 patch gives one placeholder word (4095) per sample, so its mouths stay open until the voice ends (plain talk animation, labelled). The boot and the Indy 4 / MI2 cutscene lists are unchanged.
+- Record: [talkie-speech-20261019](../.verification/talkie-speech-20261019/README.md). Listening and looking checks are listed there for the user.
+
 ## 19 October: sound polish (Monkey Island 1 floppy, Indy3 EGA and 256 colours)
 
 - Monkey Island 1's AD music plays on iMUSE's clock as ScummVM converts it (`convertADResource`, `MidiParser::onTimer`, read on GitHub master 19 October); the half-tempo estimate set by ear is gone (it was about 6 % fast). Indy3 256 colours uses Indy3's `Player_AD` constants instead of that estimate.

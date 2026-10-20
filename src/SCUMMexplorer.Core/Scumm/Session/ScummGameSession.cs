@@ -71,7 +71,12 @@ public sealed class ScummGameSession : ScummSession
         if (boot) Boot();
         // S6 Indy4 (17 October 2026): from the end of the boot, a talkie's line lasts until its spoken sample ends (ScummVM processSfxQueues), its length
         // read from the speech bank. The headless boot keeps the text's own timing, so its frame count stays as S4b pinned it (Monkey Island 2 talkie, Indy 4).
-        if (game.Speech is { } speech) Messages.SpeechJiffies = (offset, length) => SpeechJiffies(speech, offset, length);
+        if (game.Speech is { } speech)
+        {
+            Messages.SpeechJiffies = (offset, length) => SpeechJiffies(speech, offset, length);
+            // S10 talkie speech (19 October 2026): the line's mouth-sync times move the talking actor's mouth while it plays (ScummMessageTable.MouthSync).
+            Messages.SpeechMouthSync = (offset, length) => SpeechMouthSync(speech, offset, length);
+        }
     }
 
     /// <summary>
@@ -154,6 +159,18 @@ public sealed class ScummGameSession : ScummSession
             jiffies = null;
         }
         return _speechJiffies[offset] = jiffies;
+    }
+
+    private readonly Dictionary<int, IReadOnlyList<int>?> _speechMouthSync = [];
+
+    /// <summary>The spoken line's mouth-sync times from its VCTL block (ScummSpeechBank.ReadMouthSync); null if it cannot be read.</summary>
+    private IReadOnlyList<int>? SpeechMouthSync(ScummSpeechBank speech, int offset, int length)
+    {
+        if (_speechMouthSync.TryGetValue(offset, out var known)) return known;
+        IReadOnlyList<int>? times;
+        try { times = speech.ReadMouthSync(offset, length); }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or ArgumentException) { times = null; }
+        return _speechMouthSync[offset] = times;
     }
 
     // S6 sound (16 October 2026): a music start stops what the game's AdLib driver stops (ScummProfile.MusicStart). The session's device is AdLib whatever

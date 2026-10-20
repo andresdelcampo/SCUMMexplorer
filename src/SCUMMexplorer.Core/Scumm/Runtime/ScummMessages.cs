@@ -122,7 +122,7 @@ public sealed record ScummPrintRequest(
 /// to <c>VAR_HAVE_MSG</c>, <c>var[0x003]</c>). Slot 1 (<c>print 0xFE</c>) is
 /// <c>drawString</c>: drawn at once, with no delay.
 /// </summary>
-public sealed class ScummMessageTable
+public sealed partial class ScummMessageTable
 {
     /// <summary>ScummVM <c>_actorToPrintStrFor</c> 0xFF: no actor.</summary>
     public const int NoActor = 0xFF;
@@ -503,6 +503,7 @@ public sealed class ScummMessageTable
         Jiffies += delta;
         TalkDelay = Math.Max(0, TalkDelay - delta);
         DisplayDialog(runtime);
+        UpdateMouthSync();
         runtime.SetGlobalVariable(HaveMsgVariable, (ushort)HaveMsg);
     }
 
@@ -550,6 +551,7 @@ public sealed class ScummMessageTable
         // stopTalk stops the talk sound (Sound::stopTalkSound): a line still speaking is cut.
         if (SpeechPlaying) _speechEvents.Add(new ScummSpeechEvent(0, 0, Jiffies, null, true));
         _speechEndsAt = null;
+        EndMouthSync();
         HaveMsg = 0;
         TalkDelay = 0;
         TalkingActor = NoActor;
@@ -692,6 +694,7 @@ public sealed class ScummMessageTable
         var duration = SpeechJiffies?.Invoke(offset, length);
         _speechEvents.Add(new ScummSpeechEvent(offset, length, Jiffies, duration, false));
         _speechEndsAt = duration is int jiffies ? Jiffies + jiffies : null;
+        StartMouthSync(offset, length, duration);
         if (duration is null && SpeechJiffies is not null) estimates.Add($"the spoken line at {offset} could not be read; the line lasts as its text");
     }
 
