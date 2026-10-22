@@ -63,6 +63,21 @@ internal static class Program
             var bounds = card.TransformToAncestor(scroll).TransformBounds(new Rect(card.RenderSize));
             Require(bounds.IntersectsWith(new Rect(scroll.RenderSize)), "Native selected card was not revealed in room selector");
         }
+        void CheckNativeLists()
+        {
+            var scene = (ScummRoomScene)Field("_playOverlayScene")!;
+            var targets = (Dictionary<int, int[]>)Field("_playDoorwayTargets")!;
+            var native = ScummRoomOverlays.Objects(scene, targets);
+            var names = (Dictionary<int, string>)Field("_playOverlayNames")!;
+            var rows = Control<StackPanel>("ObjectList").Children.OfType<Button>().ToArray();
+            var expected = native.Where(obj => !obj.IsDoorway).Select(obj => obj.ObjectId).ToArray();
+            Require(rows.Select(row => row.Tag).SequenceEqual(expected.Cast<object>()), "Advanced hotspots were replaced by stored inspection rows");
+            Require(rows.All(row => Equals(row.Content, names.GetValueOrDefault((int)row.Tag, $"Object {row.Tag}"))), "Advanced native hotspot names changed to inspection labels");
+            Require(Control<TextBlock>("ObjectListHeader").Text.StartsWith("HOTSPOTS"), "Advanced native hotspot heading was replaced by scene details");
+            var expectedDoorways = native.Where(obj => obj.IsDoorway).SelectMany(obj => obj.Destinations.Select(destination =>
+                $"{names.GetValueOrDefault(obj.ObjectId, $"Object {obj.ObjectId}")} → Room {destination:00}")).ToArray();
+            Require(Control<WrapPanel>("RoomNavigationButtons").Children.OfType<Button>().Select(row => row.Content).SequenceEqual(expectedDoorways.Cast<object>()), "Advanced doorway rows no longer match native candidates");
+        }
         window.ContentRendered += async (_, _) =>
         {
             try
@@ -123,9 +138,11 @@ internal static class Program
                 Control<CheckBox>("AdvancedModeToggle").RaiseEvent(new RoutedEventArgs(CheckBox.ClickEvent)); Refresh();
                 Require(Control<CheckBox>("RoomMaskToggle").IsEnabled && Control<CheckBox>("WalkBoxToggle").IsEnabled, "Native depth/walkbox data unavailable");
                 Control<CheckBox>("RoomMaskToggle").IsChecked = true; Refresh(); Require(Children() == 1, "Native depth tint not over visible play screen");
+                CheckNativeLists();
                 var depth = ((Canvas)Field("_playOverlayCanvas")!).Children.OfType<Image>().Single().Source as BitmapSource;
                 var depthPixels = new uint[320 * 200]; depth!.CopyPixels(depthPixels, 320 * 4, 0); Require(depthPixels.Any(pixel => pixel != 0), "Depth tint is empty");
                 Control<CheckBox>("WalkBoxToggle").IsChecked = true; Refresh();
+                CheckNativeLists();
                 Require(((Canvas)Field("_playOverlayCanvas")!).Children.OfType<System.Windows.Shapes.Polygon>().Count() == scene.State.WalkBoxes!.Boxes.Count, "Walkbox polygons missing");
                 Capture("03-advanced-depth-walkboxes");
                 Require(State() == before, "Viewing aids changed native runtime state");

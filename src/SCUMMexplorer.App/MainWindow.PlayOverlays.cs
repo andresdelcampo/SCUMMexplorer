@@ -20,6 +20,8 @@ public partial class MainWindow
     private ScummRoomScene? _playOverlayScene;
     private Dictionary<int, string> _playOverlayNames = [];
     private string? _playOverlayListKey;
+    private UIElement[] _playOverlayObjectRows = [];
+    private UIElement[] _playOverlayDoorwayRows = [];
 
     private void ClearPlayOverlays()
     {
@@ -28,6 +30,8 @@ public partial class MainWindow
         _playOverlayPointer = null;
         _playOverlayScene = null;
         _playOverlayListKey = null;
+        _playOverlayObjectRows = [];
+        _playOverlayDoorwayRows = [];
     }
 
     private void UpdatePlayOverlayHover((int X, int Y)? point)
@@ -153,7 +157,12 @@ public partial class MainWindow
         }
         var objects = ScummRoomOverlays.Objects(scene, _playDoorwayTargets);
         var key = _game!.Key + ":" + scene.RoomId + ":" + string.Join(',', objects.Select(obj => $"{obj.ObjectId}@{obj.X},{obj.Y}"));
-        if (_playOverlayListKey == key) { DisplayLists(); return; }
+        // Preview controls share these panels and can replace their children without changing
+        // native room state. Only reuse rows that are still the ones this view published.
+        if (_playOverlayListKey == key &&
+            ObjectList.Children.Cast<UIElement>().SequenceEqual(_playOverlayObjectRows) &&
+            RoomNavigationButtons.Children.Cast<UIElement>().SequenceEqual(_playOverlayDoorwayRows))
+        { DisplayLists(); return; }
         _playOverlayListKey = key;
         RoomNavigationButtons.Children.Clear(); ObjectList.Children.Clear();
         foreach (var obj in objects)
@@ -180,6 +189,8 @@ public partial class MainWindow
                 ObjectList.Children.Add(button);
             }
         }
+        _playOverlayObjectRows = ObjectList.Children.Cast<UIElement>().ToArray();
+        _playOverlayDoorwayRows = RoomNavigationButtons.Children.Cast<UIElement>().ToArray();
         DisplayLists();
 
         void DisplayLists()
