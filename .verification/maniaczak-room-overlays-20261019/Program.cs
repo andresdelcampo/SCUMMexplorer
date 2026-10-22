@@ -119,7 +119,8 @@ internal static class Program
                 Call("UpdatePlayOverlayHover", (object)(doorway.X + doorway.Width / 2 - Play().ViewLeft, doorway.Y + doorway.Height / 2 + Play().MainScreen.Top));
                 Refresh(); Require(Children() > 0 && Children() <= doorwayCount, "Doorway hover did not track its separate geometry");
                 Never("Doorways");
-                Control<CheckBox>("AdvancedModeToggle").IsChecked = true; Refresh();
+                Control<CheckBox>("AdvancedModeToggle").IsChecked = true;
+                Control<CheckBox>("AdvancedModeToggle").RaiseEvent(new RoutedEventArgs(CheckBox.ClickEvent)); Refresh();
                 Require(Control<CheckBox>("RoomMaskToggle").IsEnabled && Control<CheckBox>("WalkBoxToggle").IsEnabled, "Native depth/walkbox data unavailable");
                 Control<CheckBox>("RoomMaskToggle").IsChecked = true; Refresh(); Require(Children() == 1, "Native depth tint not over visible play screen");
                 var depth = ((Canvas)Field("_playOverlayCanvas")!).Children.OfType<Image>().Single().Source as BitmapSource;
@@ -133,11 +134,14 @@ internal static class Program
                 {
                     Control<CheckBox>("RoomMaskToggle").IsChecked = false; Control<CheckBox>("WalkBoxToggle").IsChecked = false;
                     Control<CheckBox>("AdvancedModeToggle").IsChecked = false;
-                    Key('w'); Click(307, 81); Click(10, 145); Frames(180); Key('e'); Click(307, 81); Frames(240);
-                    Require(Play().CurrentRoomId == 2, "Native opened bedroom door failed to enter Room02");
+                    Control<CheckBox>("AdvancedModeToggle").RaiseEvent(new RoutedEventArgs(CheckBox.ClickEvent));
+                    Key('w'); Click(307, 81); Click(10, 145); Frames(180); Key('e'); Click(307, 81);
+                    Until(() => Play().CurrentRoomId == 2, "Native opened bedroom door failed to enter Room02", 240);
                     CheckSelector(2);
-                    Require(Play().InCutscene, "Native doorway entry suppressed its own scene"); Capture("04-native-room02-selector");
-                    Log("Native Open/Walk through bedroom door enters Room02, selector follows, source entry scene preserved");
+                    Capture("04-native-room02-selector");
+                    Until(() => Play().CurrentRoomId == 16 && Play().CutsceneSkippable, "Native doorway entry suppressed its own delayed scene", 1200);
+                    CheckSelector(16); Capture("05-native-entry-scene-selector");
+                    Log("Native Open/Walk enters Room02 then native delayed Script126 reaches Room16; both selector cards follow and source entry scene is preserved");
                 }
                 Log("PASS");
             }

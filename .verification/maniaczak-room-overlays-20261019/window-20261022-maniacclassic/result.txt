@@ -1,0 +1,6 @@
+0,83s Opened ManiacClassic; no autoplay expected; starting explicit intro
+4,29s Delivered the three native party-selection clicks
+12,56s ManiacClassic: actual native intro/party inputs and Room01; native selector follows; camera=352
+12,56s Native control reached; checking overlay options
+13,21s All modes pass: hotspots=7; source doorways=3; walkboxes=10; native depth tint nonempty; masks and aids leave source state unchanged
+13,21s PASS

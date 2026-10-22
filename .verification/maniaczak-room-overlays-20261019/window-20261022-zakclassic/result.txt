@@ -1,0 +1,7 @@
+0,65s Opened ZakClassic; no autoplay expected; starting explicit intro
+13,38s ZakClassic: actual native intro/party inputs and Room01; native selector follows; camera=0
+13,38s Native control reached; checking overlay options
+14,19s All modes pass: hotspots=16; source doorways=2; walkboxes=4; native depth tint nonempty; masks and aids leave source state unchanged
+16,74s System.InvalidOperationException: Native opened bedroom door failed to enter Room02
+   at Program.Require(Boolean condition, String message) in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-transform-palettes-20261019\.verification\maniaczak-room-overlays-20261019\Program.cs:line 17
+   at Program.<>c__DisplayClass3_0.<<Main>b__18>d.MoveNext() in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-transform-palettes-20261019\.verification\maniaczak-room-overlays-20261019\Program.cs:line 139
