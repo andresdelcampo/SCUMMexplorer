@@ -178,7 +178,8 @@ public partial class MainWindow
         var visitedForIt = false;
         if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room)
         {
-            visitedForIt = true;
+            // Restarting the clock in the same prepared room does not execute entry.
+            visitedForIt = _play?.CurrentRoomId != trigger.Room;
             SelectRoomWithIntent(room, RoomOpenKind.Cutscene, reloadSelected: true);
             if (_roomOpenTask is { } opening) await opening;
             // The room view boots or continues play in the opened room; wait for it (a first boot takes a few seconds).
