@@ -15,6 +15,15 @@ public partial class MainWindow
     private Dictionary<int, string> _genericSoundCandidates = [];
     private Task _genericRoomSoundsTask = Task.CompletedTask;
 
+    /// <summary>Changing a CD device must not hide an unrelated room's cached sound list.</summary>
+    private void RefreshRoomSoundsVisibility()
+    {
+        var available = _game?.Id == GameId.LoomVga
+            ? _cdRoomCues.Count > 0 && _cdVoice.Enabled
+            : _roomSoundChoices.Count > 0;
+        RoomSoundsButton.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     /// <summary>Retire all output/event sources before scanning another folder, including an unsuccessful open.</summary>
     private void ResetGameAudio()
     {
