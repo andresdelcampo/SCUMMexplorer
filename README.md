@@ -47,7 +47,7 @@ Point the app at a game folder and it recognises the game and the edition from t
 - **Maniac Mansion** (classic and enhanced)
 - **Zak McKracken and the Alien Mindbenders** (classic and enhanced)
 
-In these games the room picker fills in on its own, the Costumes tab sits beside the Rooms tab (where costumes can be read), and sounds are in the Advanced tree.
+In these games the room picker fills in on its own, and the Costumes tab sits beside the Rooms tab where costumes can be read. Supported room controls offer cutscenes, direct object interactions and associated sounds; Advanced adds source inspection. Sounds also remain in the Advanced resource tree.
 
 ### What each game supports
 
