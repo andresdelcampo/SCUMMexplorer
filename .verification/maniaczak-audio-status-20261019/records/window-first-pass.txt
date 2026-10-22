@@ -1,0 +1,9 @@
+4,29s PASS actual LOOM→Maniac folder change: synthetic pending render detached; its late completion produces no MediaPlayer/output; old CD source null
+12,94s PASS mmansionE ega es: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+13,16s PASS mmansionE ega es: actual Normal Sounds popup opens; 1 native source/reached candidates; plain labels/no source tooltips; device selector visible; no scan executes game code
+19,30s PASS mmansion ega en: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+19,50s PASS mmansion ega en: actual Normal Sounds popup opens; 1 native source/reached candidates; plain labels/no source tooltips; device selector visible; no scan executes game code
+34,30s PASS zak ega en: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+34,51s PASS zak ega en: actual Normal Sounds popup opens; 22 native source/reached candidates; plain labels/no source tooltips; device selector visible; no scan executes game code
+49,66s PASS zakE ega en: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+49,87s PASS zakE ega en: actual Normal Sounds popup opens; 22 native source/reached candidates; plain labels/no source tooltips; device selector visible; no scan executes game code

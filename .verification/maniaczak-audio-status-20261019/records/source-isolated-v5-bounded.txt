@@ -1,0 +1,3 @@
+PASS mi2 talkie en: 1 rooms; 1 source-linked menus; 4 room/sound links; 0 independent direct entry/exit starts retained
+PASS indy4 vga en: 1 rooms; 1 source-linked menus; 5 room/sound links; 1 independent direct entry/exit starts retained
+PASS 2 native data-source families; 53,35s; no App/MainWindow/window/session created or scripts executed

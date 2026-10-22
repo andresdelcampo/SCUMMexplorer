@@ -1,0 +1,8 @@
+PASS mmansion ega en: 52 rooms; 41 source-linked menus; 216 room/sound links; 17 independent direct entry/exit starts retained
+PASS mmansionE ega es: 53 rooms; 41 source-linked menus; 222 room/sound links; 17 independent direct entry/exit starts retained
+PASS zak ega en: 58 rooms; 39 source-linked menus; 227 room/sound links; 14 independent direct entry/exit starts retained
+PASS zakE ega en: 58 rooms; 39 source-linked menus; 228 room/sound links; 14 independent direct entry/exit starts retained
+PASS indy3 ega en: 88 rooms; 66 source-linked menus; 226 room/sound links; 21 independent direct entry/exit starts retained
+PASS indy3 vga en: 87 rooms; 65 source-linked menus; 225 room/sound links; 21 independent direct entry/exit starts retained
+PASS monkey1 ega en: 81 rooms; 34 source-linked menus; 103 room/sound links; 0 independent direct entry/exit starts retained
+PASS monkey1 vga en: 83 rooms; 58 source-linked menus; 203 room/sound links; 35 independent direct entry/exit starts retained
