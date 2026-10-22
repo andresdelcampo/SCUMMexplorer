@@ -72,6 +72,7 @@ public sealed class SceneSoundPlayer
     private readonly ScummAdlibAudio _adlib = new();
     private readonly ScummPcSpeakerAudio _speaker = new();
     private readonly Dictionary<(SoundMode Mode, int Id), Task<(string? Path, bool Music)>> _renders = [];
+    private CancellationTokenSource _renderLifetime = new();
     private readonly List<Voice> _voices = [];
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private GameLibrary? _game;
@@ -111,7 +112,7 @@ public sealed class SceneSoundPlayer
         _loops = loops;
         if (!ReferenceEquals(game, _game) || !Equals(render, _render))
         {
-            _renders.Clear();
+            RetireRenders();
             _game = game;
             _render = render;
         }
@@ -130,9 +131,28 @@ public sealed class SceneSoundPlayer
         _game = null;
         _render = null;
         _loops = null;
-        _renders.Clear();
+        RetireRenders();
         _seen = 0;
         _paused = false;
+    }
+
+    private void RetireRenders()
+    {
+        _renderLifetime.Cancel();
+        _renderLifetime.Dispose();
+        _renderLifetime = new CancellationTokenSource();
+        foreach (var pending in _renders.Values)
+            _ = pending.ContinueWith(done =>
+            {
+                if (done.IsCompletedSuccessfully && done.Result.Path is { } path) DeleteRender(path);
+            }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        _renders.Clear();
+    }
+
+    private static void DeleteRender(string path)
+    {
+        try { File.Delete(path); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
 
     /// <summary>Plays the sound events the session reached since the last call (one playback frame).</summary>
@@ -228,7 +248,8 @@ public sealed class SceneSoundPlayer
         voice.Preparing = !render.IsCompleted;
         if (voice.Preparing) PreparingChanged?.Invoke();
         (string? Path, bool Music) rendered;
-        try { rendered = render.IsCompleted ? render.Result : await render; }
+        try { rendered = await render; }
+        catch (OperationCanceledException) { End(voice); return; }
         finally
         {
             var wasPreparing = voice.Preparing;
@@ -281,60 +302,66 @@ public sealed class SceneSoundPlayer
     private Task<(string? Path, bool Music)> Render(int id, SoundMode mode)
     {
         if (_renders.TryGetValue((mode, id), out var cached)) return cached;
-        var resource = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == id);
+        var game = _game;
+        var renderer = _render;
+        var roms = Roms;
+        var token = _renderLifetime.Token;
+        var resource = game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == id);
         // A sound the game's list does not show (a CD-track sound of Monkey Island CD has no card parts, so only its track is listed) still goes to the session's
         // own renderer, which knows it by number (S6 MonkeyCd).
-        if (resource is null && _render is not null && _game is { } game)
+        if (resource is null && renderer is not null && game is not null)
             resource = new GameResource($"Sound {id:00}", ResourceKind.Sound, game.FolderPath, id, "A sound the scripts started.", null, null);
         var task = resource is null
             ? Task.FromResult<(string?, bool)>((null, false))
             : Task.Run<(string?, bool)>(() =>
             {
+                string? path = null;
                 try
                 {
-                    if (_render is { } render)
-                    {
-                        var (rendered, isMusic) = render(resource, mode, CancellationToken.None);
-                        var renderedPath = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
-                        File.WriteAllBytes(renderedPath, rendered);
-                        return (renderedPath, isMusic);
-                    }
+                    token.ThrowIfCancellationRequested();
                     bool music;
                     byte[] wave;
-                    if (_game?.V4Archive is { } vga)
+                    if (renderer is not null)
+                    {
+                        (wave, music) = renderer(resource, mode, token);
+                    }
+                    else if (game?.V4Archive is { } vga)
                     {
                         // The CD game's sounds hold an AdLib and a PC speaker part; it has no Roland data.
                         if (mode == SoundMode.Roland || vga.ReadSounds().FirstOrDefault(item => item.Id == id) is not { } cdSound) return (null, false);
                         music = cdSound.IsMusic;
                         wave = mode == SoundMode.Adlib
-                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part."), timing: ScummProfile.For(_game).AdlibTiming), AdlibGainDb)
-                            : _speaker.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("No PC speaker part."), 6);
+                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part."), token, ScummProfile.For(game).AdlibTiming), AdlibGainDb)
+                            : _speaker.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("No PC speaker part."), 6, token);
                     }
                     else if (mode == SoundMode.Roland)
                     {
                         // Only the upgrade's own sounds have a Roland rendition; the scripts choose them when the sound card is 4.
-                        if (Roms is not { } roms || !ScummRolandSong.IsRoland(resource)) return (null, false);
+                        if (roms is null || !ScummRolandSong.IsRoland(resource)) return (null, false);
                         var song = ScummRolandSong.Read(resource);
                         music = song.Duration.TotalSeconds > 3;
-                        wave = new ScummMt32Audio(roms).RenderWave(song);
+                        wave = new ScummMt32Audio(roms).RenderWave(song, token);
                     }
                     else
                     {
                         music = _adlib.HasMusic(resource);
                         wave = mode == SoundMode.Adlib
-                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource, ScummProfile.For(_game!).AdlibTiming), AdlibGainDb)
-                            : _speaker.RenderWave(resource);
+                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource, ScummProfile.For(game!).AdlibTiming, token), AdlibGainDb)
+                            : _speaker.RenderWave(resource, token);
                     }
-                    var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
+                    token.ThrowIfCancellationRequested();
+                    path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
                     File.WriteAllBytes(path, wave);
+                    token.ThrowIfCancellationRequested();
                     return (path, music);
                 }
-                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException
+                catch (Exception ex) when (ex is OperationCanceledException or IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException
                     or Mt32emu.Mt32EmuException or InvalidOperationException or DllNotFoundException)
                 {
+                    if (path is not null) DeleteRender(path);
                     return (null, false);
                 }
-            });
+            }, token);
         _renders[(mode, id)] = task;
         return task;
     }
