@@ -54,6 +54,15 @@ internal static class Program
         string State() => Play().SessionTrace.Count + ":" + string.Join(";", Play().Snapshot.ObjectStates.OrderBy(pair => pair.Key)) + ":" + string.Join(";", Play().Actors);
         void Always(string option) { Control<RadioButton>(option + "Always").IsChecked = true; Refresh(); }
         void Never(string option) { Control<RadioButton>(option + "Never").IsChecked = true; Refresh(); }
+        void CheckSelector(int roomId)
+        {
+            window.UpdateLayout();
+            Require(((GameResource?)Field("_selectedResource"))?.ResourceId == roomId, "Native room transition did not update selector resource");
+            var card = Control<WrapPanel>("RoomCardList").Children.OfType<Button>().Single(item => item.Tag is GameResource resource && resource.ResourceId == roomId);
+            var scroll = Control<ScrollViewer>("RoomCardScroll");
+            var bounds = card.TransformToAncestor(scroll).TransformBounds(new Rect(card.RenderSize));
+            Require(bounds.IntersectsWith(new Rect(scroll.RenderSize)), "Native selected card was not revealed in room selector");
+        }
         window.ContentRendered += async (_, _) =>
         {
             try
@@ -63,6 +72,7 @@ internal static class Program
                 ((CancellationTokenSource?)Field("_roomCardCancellation"))?.Cancel();
                 if (Field("_roomCardLoadTask") is Task cards) await cards;
                 var game = (GameLibrary)Field("_game")!; var family = GameSupport.FamilyOf(game);
+                Log($"Opened {family}; no autoplay expected; starting explicit intro");
                 Require(Field("_playTimer") is null, "Game load autoplayed");
                 Control<Button>("GameIntroButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 await Wait(() => Field("_playTimer") is not null, "explicit native intro clock"); StopClock();
@@ -70,6 +80,7 @@ internal static class Program
                 if (maniac)
                 {
                     foreach (var (x, y) in new[] { (76, 104), (196, 104), (292, 60) }) { Click(x, y + Play().MainScreen.Top); Frames(100); }
+                    Log("Delivered the three native party-selection clicks");
                     Until(() => Play().CurrentRoomId == 44 && Play().CutsceneSkippable, "Party choice did not reach native outdoor intro");
                     Play().PressKey(27); Until(() => Play().PlayerHasControl, "Native intro Skip did not reach control");
                     Click(8, 120 + Play().MainScreen.Top); Until(() => Play().CurrentRoomId == 1, "Native walk did not reach Room01"); Frames(120);
@@ -78,7 +89,7 @@ internal static class Program
                 }
                 else { Until(() => Play().CurrentRoomId == 1 && Play().PlayerHasControl, "Native Zak intro did not reach Bedroom", 6000); Frames(150); }
                 StopClock();
-                Require(((GameResource?)Field("_selectedResource"))?.ResourceId == 1, "Native room transition did not update selector resource");
+                CheckSelector(1);
                 Log($"{family}: actual native intro/party inputs and Room01; native selector follows; camera={Play().ViewLeft}");
                 var transform = typeof(MainWindow).GetMethod("PlayPointAt", Static)!;
                 foreach (var (position, width, height, expected) in new[]
@@ -90,6 +101,7 @@ internal static class Program
                     (new Point(400, 200), 800d, 400d, ((int X, int Y)?)(160, 100))
                 }) Require(Equals(transform.Invoke(null, [position, width, height]), expected), "Uniform native input mapping failed");
                 var before = State();
+                Log("Native control reached; checking overlay options");
                 Never("Objects"); Never("Doorways"); Require(Children() == 0, "Never leaves overlays visible");
                 Always("Objects"); var objectCount = Children(); Require(objectCount > 0, "Always hotspots did not draw over native screen");
                 Require(((Canvas)Field("_playOverlayCanvas")!).IsHitTestVisible == false, "Overlay intercepts native clicks");
@@ -101,6 +113,11 @@ internal static class Program
                 Refresh(); Require(Children() > 0 && Children() <= objectCount, "Hover did not track native object geometry");
                 Never("Objects"); Always("Doorways"); Require(Children() > 0, "Doorway overlay missing for visible source-backed exit");
                 Capture("02-normal-doorways");
+                var doorwayCount = Children();
+                var doorway = objects.First(obj => obj.IsDoorway && obj.X + obj.Width > Play().ViewLeft && obj.X < Play().ViewLeft + 320);
+                Control<RadioButton>("DoorwaysHover").IsChecked = true; Call("UpdatePlayOverlayHover", (object?)null); Refresh(); Require(Children() == 0, "Doorway hover draws with no pointer");
+                Call("UpdatePlayOverlayHover", (object)(doorway.X + doorway.Width / 2 - Play().ViewLeft, doorway.Y + doorway.Height / 2 + Play().MainScreen.Top));
+                Refresh(); Require(Children() > 0 && Children() <= doorwayCount, "Doorway hover did not track its separate geometry");
                 Never("Doorways");
                 Control<CheckBox>("AdvancedModeToggle").IsChecked = true; Refresh();
                 Require(Control<CheckBox>("RoomMaskToggle").IsEnabled && Control<CheckBox>("WalkBoxToggle").IsEnabled, "Native depth/walkbox data unavailable");
@@ -118,7 +135,7 @@ internal static class Program
                     Control<CheckBox>("AdvancedModeToggle").IsChecked = false;
                     Key('w'); Click(307, 81); Click(10, 145); Frames(180); Key('e'); Click(307, 81); Frames(240);
                     Require(Play().CurrentRoomId == 2, "Native opened bedroom door failed to enter Room02");
-                    Require(((GameResource?)Field("_selectedResource"))?.ResourceId == 2, "Native Zak exit failed selector synchronization");
+                    CheckSelector(2);
                     Require(Play().InCutscene, "Native doorway entry suppressed its own scene"); Capture("04-native-room02-selector");
                     Log("Native Open/Walk through bedroom door enters Room02, selector follows, source entry scene preserved");
                 }
