@@ -3152,18 +3152,23 @@ public partial class MainWindow : Window
         CancellationToken token)
     {
         var mode = adlib ? SceneSoundPlayer.SoundMode.Adlib : _sceneSound.Mode;
-        return Task.Run(() => RenderSoundWave(resource, mode, token), token);
+        var game = _game;
+        return Task.Run(() => RenderSoundWave(resource, mode, token, game), token);
     }
 
     /// <summary>
     /// A sound of the open game as the device renders it (the sound player's rendition; AdLib without its output level). Shared by the sound player
     /// and, since S6 sound (16 October 2026), the sounds the play session's scripts start (<see cref="RenderPlaySound"/>).
     /// </summary>
-    private byte[] RenderSoundWave(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token)
+    private byte[] RenderSoundWave(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token, GameLibrary? sourceGame = null)
     {
+        var game = sourceGame ?? _game;
+        var roms = _sceneSound.Roms;
+        token.ThrowIfCancellationRequested();
+        if (game is null) throw new InvalidOperationException("No game is open for this sound.");
         var adlib = mode == SceneSoundPlayer.SoundMode.Adlib;
         {
-            if (_game?.V4ArchiveFor(resource) is { } vga)
+            if (game.V4ArchiveFor(resource) is { } vga)
             {
                 var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in the game's archive.");
                 if (vga is ScummV5Archive)
@@ -3175,7 +3180,7 @@ public partial class MainWindow : Window
                     if (mode == SceneSoundPlayer.SoundMode.Roland)
                     {
                         if (cdSound.ImuseRoland is not { } roland) throw new NotSupportedException("This sound has no Roland MT-32 version.");
-                        if (_sceneSound.Roms is not { } v5Roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
+                        if (roms is not { } v5Roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
                         return new ScummImuseMt32(v5Roms).RenderWave(roland, token);
                     }
                     if (mode == SceneSoundPlayer.SoundMode.Adlib)
@@ -3184,22 +3189,22 @@ public partial class MainWindow : Window
                 }
                 if (mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 return adlib
-                    ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token, ScummProfile.For(_game!).AdlibTiming)
+                    ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token, ScummProfile.For(game).AdlibTiming)
                     : _audioDecoder.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("This sound has no PC speaker part."), 6, token);
             }
             if (mode == SceneSoundPlayer.SoundMode.Roland)
             {
-                if (_sceneSound.Roms is not { } roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
+                if (roms is null) throw new NotSupportedException("The MT-32 ROM images are not set.");
                 if (!ScummRolandSong.IsRoland(resource))
                 {
                     // The scripts of a Roland card choose the sound 32 higher for the same piece (scripts 001, 039, 040, 046, 095, 104).
-                    var twin = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == resource.ResourceId + 32);
+                    var twin = game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == resource.ResourceId + 32);
                     if (twin is null || !ScummRolandSong.IsRoland(twin)) throw new NotSupportedException("This sound has no Roland version.");
                     resource = twin;
                 }
                 return new ScummMt32Audio(roms).RenderWave(resource, token);
             }
-            if (_game is { Version: ScummVersion.V1 or ScummVersion.V2 })
+            if (game is { Version: ScummVersion.V1 or ScummVersion.V2 })
             {
                 // The v1/v2 sound format has no speaker+AdLib bundle header, so IsRoland would misread every sound as Roland.
                 if (adlib) throw new NotSupportedException("This game's sounds are for the PC speaker. Choose that device.");
@@ -3208,7 +3213,7 @@ public partial class MainWindow : Window
             }
             if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
             // R-13.9 (sound polish, 19 October 2026): the game's own driver constants (Indy3's are not LOOM's).
-            return adlib ? _adlibDecoder.RenderWave(resource, ScummProfile.For(_game!).AdlibTiming, token) : _audioDecoder.RenderWave(resource, token);
+            return adlib ? _adlibDecoder.RenderWave(resource, ScummProfile.For(game).AdlibTiming, token) : _audioDecoder.RenderWave(resource, token);
         }
     }
 
@@ -4686,7 +4691,7 @@ public partial class MainWindow : Window
     {
         if (!IsLoaded || CdSoundCombo.SelectedIndex < 0) return;
         _cdVoice.Enabled = CdSoundCombo.SelectedIndex == 1;
-        RoomSoundsButton.Visibility = _game?.Id == GameId.LoomVga && _cdRoomCues.Count > 0 && _cdVoice.Enabled ? Visibility.Visible : Visibility.Collapsed;
+        RefreshRoomSoundsVisibility();
         if (!_cdVoice.Enabled) _cdVoice.Stop();
         SaveViewOptions();
     }

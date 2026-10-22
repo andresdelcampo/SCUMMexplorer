@@ -49,17 +49,21 @@ public partial class MainWindow
     /// </summary>
     private (byte[] Wave, bool Music) RenderPlaySound(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token)
     {
+        var game = _game;
+        var cdTracks = _playCdTracks;
+        token.ThrowIfCancellationRequested();
+        if (game is null) throw new InvalidOperationException("No game is open for this sound.");
         // S6 MonkeyCd (17 October 2026): a sound that plays a track of the game's disc (ScummVM playCDTrackFromSoundID) plays that stretch of the disc's audio,
         // the same samples the room's music panel plays for the track, whatever the device (a CD drive is not a sound card).
-        if (_playCdTracks is { } cd && resource.ResourceId is int cdSound && cd.Plays(cdSound))
+        if (cdTracks is { } cd && resource.ResourceId is int cdSound && cd.Plays(cdSound))
         {
             var cdWave = cd.ReadWave(cdSound);
             if (cdWave.Length == 0) throw new System.IO.InvalidDataException($"Sound {cdSound}'s CD track is not on the disc image.");
             return (cdWave, true);
         }
-        var wave = RenderSoundWave(resource, mode, token);
+        var wave = RenderSoundWave(resource, mode, token, game);
         if (mode == SceneSoundPlayer.SoundMode.Adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, SceneSoundPlayer.AdlibGainDb);
-        var music = _game?.V4ArchiveFor(resource) is { } archive
+        var music = game.V4ArchiveFor(resource) is { } archive
             ? archive.ReadSounds().FirstOrDefault(sound => sound.Id == resource.ResourceId)?.IsMusic == true
             : _adlibDecoder.HasMusic(resource);
         return (wave, music);
