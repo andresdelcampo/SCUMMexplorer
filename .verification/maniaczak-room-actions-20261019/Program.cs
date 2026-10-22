@@ -157,8 +157,10 @@ internal static class Program
                 Log($"Opened {GameSupport.FamilyOf(game)}; initial direct actions={Buttons().Count()}, enabled={Buttons().Count(b => b.IsEnabled)}");
                 Capture("normal-room-actions");
                 await Menu(advanced: false, launch: true);
+                await Select(game, maniac ? 28 : 2);
                 await Select(game, 1);
                 await Menu(advanced: true, launch: true);
+                await Select(game, maniac ? 28 : 2);
                 await Select(game, 1);
                 Control<CheckBox>("AdvancedModeToggle").IsChecked = false; Call("UpdateAdvancedMode");
                 Control<Button>("GameIntroButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
