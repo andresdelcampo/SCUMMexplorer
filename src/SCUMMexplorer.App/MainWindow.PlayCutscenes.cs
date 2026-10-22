@@ -25,7 +25,15 @@ public partial class MainWindow
     private bool PlayCutscenes => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
 
     private bool PlayCanStartCutscene => PlayCutscenes && !_introPreparing && !_genericActionStarting &&
-        (_playFolder != _game?.Key || _play is not { InCutscene: true } && _play is not { BootRunning: true });
+        (UnansweredManiacCutsceneStartup || _playFolder != _game?.Key ||
+            _play is not { InCutscene: true } && _play is not { BootRunning: true });
+
+    // R-8.34 already permits this fingerprinted, disclosed native menu preparation
+    // for an explicit scene launch. Every other abandoned scope remains blocked.
+    private bool UnansweredManiacCutsceneStartup => !PlayActive && _catalogPreviewOnly &&
+        _game is { } game && UsesManiacCutsceneSetup(game) && _playFolder == game.Key &&
+        _play is { CurrentRoomId: 45, InventoryCharactersAvailable: false, HasPendingPlayInput: false } session &&
+        session.DeliveredInput.Count == 0;
 
     private static bool UsesManiacCutsceneSetup(GameLibrary game) =>
         GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
