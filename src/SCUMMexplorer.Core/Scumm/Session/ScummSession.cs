@@ -28,6 +28,12 @@ public abstract partial class ScummSession
     /// <summary>The game the session plays: what a <see cref="ScummBootSnapshot"/> shares between its copies instead of copying.</summary>
     internal GameLibrary SessionGame => _game;
 
+    // The lifetimes the sound clock has read, by sound id.
+    private readonly Dictionary<int, ScummSoundLifetime> _soundLifetimes = [];
+
+    /// <summary>Forgets the sound lifetimes read so far (the device whose driver times the sounds changed); sounds already playing keep theirs.</summary>
+    protected void ForgetSoundLifetimes() => _soundLifetimes.Clear();
+
     /// <summary>The soundcard-independent part of the session's set-up: data, runtime state and the script clock hooks.</summary>
     /// <param name="soundLifetime">Reads how long a native sound resource plays (the game's own sound formats are the caller's knowledge).</param>
     protected ScummSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed,
@@ -41,7 +47,7 @@ public abstract partial class ScummSession
         _observer = observer;
         var soundResources = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
             .GroupBy(r => r.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
-        var soundLifetimes = new Dictionary<int, ScummSoundLifetime>();
+        var soundLifetimes = _soundLifetimes;
         _soundClock = new ScummSoundClock(id =>
         {
             // A sound that is not an indexed resource of its own (a v5 sound that starts a CD track, S4b MonkeyCd) can get its lifetime from the game's session.
@@ -74,6 +80,8 @@ public abstract partial class ScummSession
         _runtime.Actors.CostumeSource = _data.ReadCostume;
         _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
+        // An object image drawn into the room erases the drawn strings under it (Gdi::drawBitmap copies its strips to the front buffer).
+        _runtime.Messages.RoomOnScreen = () => (-ViewLeft, _runtime.MainScreen.Top, _runtime.MainScreen.Bottom);
         _extraTimerVariables = ScummProfile.For(game).ExtraTimerVariables;
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Concat(_runtime.IsV2 ? [] : new[] { TimerTotalVariable }))
@@ -390,8 +398,8 @@ public abstract partial class ScummSession
     /// object that is neither in the room nor held (<c>WIO_NOT_FOUND</c>), or
     /// when the object has no entry for the verb and no fallback
     /// (<c>getVerbEntrypoint</c> 0). Otherwise the verb's code runs at once with
-    /// the arguments as locals (<c>runScriptNested</c>). Held objects' code is
-    /// not modelled; stopping the object's earlier script (<c>stopObjectScript</c>) is not modelled.
+    /// the arguments as locals (<c>runScriptNested</c>). A held object that is not in
+    /// the room runs the code of the room it was taken from; stopping the object's earlier script (<c>stopObjectScript</c>) is not modelled.
     /// </summary>
     protected void StartObjectScript(ScummScriptEvent scriptEvent, int depth)
     {
@@ -418,6 +426,15 @@ public abstract partial class ScummSession
         {
             objectRoom = heldRoom;
             record = _data.ReadRoom(heldRoom).Objects.LastOrDefault(item => item.Id == objectId);
+        }
+        else if (record is null && _runtime.ObjectOwners.TryGetValue(objectId, out var owner) && owner != 0x0F &&
+                 Array.IndexOf(_runtime.InventorySlots, objectId) >= 0 && _runtime.InventoryRooms.TryGetValue(objectId, out var takenFrom))
+        {
+            // v3 and later: a held object's code is the copy addObjectToInventory took from the room it was picked up in (whereIsObject
+            // WIO_INVENTORY), so its verbs run in any room, as getVerbEntrypoint already finds them (ObjectVerbEntrypoint). Indy 4's Script 10
+            // +0x0131 runs verb 0x5B of each held object for its icon (var[0x0A1]): the magazine (object 23, Room 1 local 205 +0x012F) is held in New York.
+            objectRoom = takenFrom;
+            record = _data.ReadRoom(takenFrom).Objects.FirstOrDefault(item => item.Id == objectId);
         }
         if (record is null)
         {

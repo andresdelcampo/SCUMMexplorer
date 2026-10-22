@@ -307,7 +307,7 @@ public sealed class SceneSoundPlayer
                         if (mode == SoundMode.Roland || vga.ReadSounds().FirstOrDefault(item => item.Id == id) is not { } cdSound) return (null, false);
                         music = cdSound.IsMusic;
                         wave = mode == SoundMode.Adlib
-                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part.")), AdlibGainDb)
+                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part."), timing: ScummProfile.For(_game).AdlibTiming), AdlibGainDb)
                             : _speaker.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("No PC speaker part."), 6);
                     }
                     else if (mode == SoundMode.Roland)
@@ -322,7 +322,7 @@ public sealed class SceneSoundPlayer
                     {
                         music = _adlib.HasMusic(resource);
                         wave = mode == SoundMode.Adlib
-                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), AdlibGainDb)
+                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource, ScummProfile.For(_game!).AdlibTiming), AdlibGainDb)
                             : _speaker.RenderWave(resource);
                     }
                     var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");

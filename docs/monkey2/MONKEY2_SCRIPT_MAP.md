@@ -104,6 +104,9 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 | `soundKludge [0x0100, s, 7]` | `Player::getParam` 7, the song's beat (tick / 480 + 1); 8 the tick in the beat; 110 sites (Scripts 47, 48, 52, 58, 76, 119, 120, 122, 146, 164, 165, 199; Rooms 5, 17, 20, 40, 56, 60, 79, 86); 7 and 8 answered from the song's AdLib timeline since S7 (estimate) | decoded, play | `CutsceneList find` | 2026-10-18 |
 | Sound 176 | LeChuck's arrival (AdLib 185 s) | play | Script 76 +0x0019 | 2026-10-18 |
 | Sound 182 | Largo in his room (AdLib 200.7 s) | play | Room 13 local script 211 +0x0072 | 2026-10-18 |
+| `monster.sou` (*talkie patch*) | 6808 spoken lines: `SOU ` header, then `VCTL` blocks of 10 bytes (one mouth-sync word, 4095) each followed by a VOC file (22,222 Hz, 8-bit); texts address a line by four `\xFF\x0A` codes (offset, block size); the Spanish talkie uses the same offsets (English voices) | play, window | `ScummTalkieSpeechTests`; record talkie-speech-20261019 | 2026-10-19 |
+| Speech 0x00A485E0 | "Welcome to Woodtick" (56 jiffies) | play | Room 07 object 46 verb 0x08 | 2026-10-19 |
+| Speech 0x00B40C6E | Guybrush's choice "Then who keeps up the law…" at the bridge (141 jiffies) | play | Room 07 local script 204 (choice list two) | 2026-10-19 |
 | Sound 6 | the sign breaking | decoded | Room 07 object 46 verb 9 +0x0010 | 2026-10-17 |
 
 ## Open questions

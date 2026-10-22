@@ -3184,7 +3184,7 @@ public partial class MainWindow : Window
                 }
                 if (mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 return adlib
-                    ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token, halfTempo: _game!.V4Archive is null)
+                    ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token, ScummProfile.For(_game!).AdlibTiming)
                     : _audioDecoder.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("This sound has no PC speaker part."), 6, token);
             }
             if (mode == SceneSoundPlayer.SoundMode.Roland)
@@ -3207,7 +3207,8 @@ public partial class MainWindow : Window
                 return ScummPcSpeakerV1Audio.RenderOlder(resource, _audioDecoder, token);
             }
             if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
-            return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
+            // R-13.9 (sound polish, 19 October 2026): the game's own driver constants (Indy3's are not LOOM's).
+            return adlib ? _adlibDecoder.RenderWave(resource, ScummProfile.For(_game!).AdlibTiming, token) : _audioDecoder.RenderWave(resource, token);
         }
     }
 

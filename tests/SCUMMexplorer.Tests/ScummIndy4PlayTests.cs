@@ -331,6 +331,73 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// The playable credits (19 October 2026). Each heading is a <c>print 0xFE</c> (Room 4 locals 208 to 211 +0x0008, all centred at 160, 150): drawString draws it
+    /// into the room's front buffer, where it stays. Script 94 +0x0063 draws <c>var[0x134]</c> (object 73, Room 4 entry +0x0051) once a heading's names are over,
+    /// and that image's strips erase it before the next heading. Before the fix all four headings stayed on the screen at once.
+    /// </summary>
+    [Theory]
+    [InlineData("indy4 vga en")]
+    [InlineData("indy4 classic vga es")]
+    public void EachCreditHeadingIsErasedByTheObjectDrawnBeforeTheNext(string copy)
+    {
+        if (Folder(copy) is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = ScummGameSession.BootForPlay(game, out _);
+        var headings = session.Messages.Log.Where(message => message.Kind == ScummMessageKind.Drawn && message.Y == 150).ToArray();
+        // The talkie shows four headings during the boot, the floppy two (its own credits).
+        output.WriteLine(string.Join(" | ", headings.Select(heading => $"{heading.Source}: {heading.Text}")));
+        Assert.True(headings.Length >= 2);
+        // The boot ends after the credits: no heading is left (each one was erased by the object before the next was drawn).
+        Assert.DoesNotContain(session.Messages.Drawn, message => message.Y == 150);
+    }
+
+    /// <summary>
+    /// The engine rule behind the credits (Gdi::drawBitmap copies an object's strips to the front buffer): an object drawn over a drawn string erases it, in screen
+    /// coordinates from the room's place on the screen; outside a session (no place) nothing is erased.
+    /// </summary>
+    [Fact]
+    public void AnObjectDrawnOverADrawnStringErasesIt()
+    {
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var table = runtime.Messages;
+        table.Print(new ScummPrintRequest(254, [new("position", 160, 150), new("center")], "programmed by:"u8.ToArray(), "test", 0, 4, null), runtime);
+        Assert.Equal("", table.ObjectDrawn(0, 140, 320, 32));
+        Assert.Single(table.Drawn);
+        table.RoomOnScreen = () => (-160, 0, 200);
+        Assert.Equal("", table.ObjectDrawn(0, 140, 160, 32)); // left of the view: room x 0 to 159 is off the screen
+        Assert.Single(table.Drawn);
+        Assert.Equal("; 1 drawn string(s) covered", table.ObjectDrawn(160, 140, 320, 32));
+        Assert.Empty(table.Drawn);
+    }
+
+    /// <summary>
+    /// The magazine's icon (19 October 2026). Smith's scene gives Indy the magazine (object 23, Room 1 local 205 +0x012F <c>pickupObject 23, 0</c>). In New York,
+    /// Script 10 +0x0125 finds its verb 0x5B (getVerbEntrypoint) and +0x0131 runs it (startObject) for the icon's object in <c>var[0x0A1]</c>, then +0x01DD gives
+    /// the slot that image from Room 98 (0x62). The held object's code is the copy taken from Room 1 (whereIsObject WIO_INVENTORY); before the fix startObject
+    /// ran nothing outside Room 1 and the slot got image object 0.
+    /// </summary>
+    [Theory]
+    [InlineData("indy4 vga en")]
+    [InlineData("indy4 classic vga es")]
+    public void TheMagazineTakenInSmithsSceneHasItsIconInNewYork(string copy)
+    {
+        if (Folder(copy) is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = ScummGameSession.BootForPlay(game, out _);
+        session.PressKey(0x1B);
+        for (var i = 0; i < 3000 && !(session.CurrentRoomId == 10 && session.UserInputOn && !session.InCutscene && session.Verbs.Any(v => v.VerbId == Open && v.Mode == 1)); i++)
+            session.AdvanceFrame();
+        Assert.Equal(10, session.CurrentRoomId);
+        Assert.Equal([23], session.Snapshot.Inventory);
+        Assert.Contains(session.SessionTrace, line => line == "Script 10 +0x0131: startObject runs object 23 verb 0x5B");
+        var slot = session.Verbs.Single(verb => verb.VerbId == 0x65);
+        output.WriteLine($"slot 0x65: image object {slot.ImageObject} of Room {slot.ImageRoom}");
+        Assert.Equal((1, 98), (slot.Mode, slot.ImageRoom));
+        Assert.NotEqual(0, slot.ImageObject ?? 0);
+        Assert.Contains(session.PlayVerbArea().Items, item => item.VerbId == 0x65 && !item.IsText && item.Width > 0);
+    }
+
+    /// <summary>
     /// S9 accents (18 October 2026): every byte from 0x80 up that a copy's texts hold has a glyph in each charset the play screen reads (the copy's CHAR
     /// blocks). The Spanish copies write their accents and inverted marks as CP437 codes, drawn as the data holds them (no table).
     /// </summary>

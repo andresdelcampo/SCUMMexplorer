@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +9,7 @@ using SCUMMexplorer.Core.Scumm;
 
 // Usage: Monkey2CutsceneWindowCheck <Monkey Island 2 folder> <output folder> <scene title>...
 // S7 Monkey2 (18 October 2026), after the MonkeyCd check: opens the real MainWindow on Monkey Island 2 with a private profile (SCUMM_EXPLORER_PROFILE_ROOT)
-// and a private room-list cache (SCUMM_ROOM_CACHE_DIR), both in the output folder; opens Room 4 (where the play boot ends) so play starts; times the
+// and a private room-list cache (SCUMM_ROOM_CACHE_DIR), both in the output folder; opens Room 7 (Woodtick) so play starts; times the
 // background list (each worker boots from its own copy of the game); lists Room 9's scenes; then plays the named scenes from the global picker, each
 // once the window offers the picker (no cutscene playing), and writes the scene-sound log (the iMUSE song the scene starts). Saves captures and
 // cutscene-check.txt.
@@ -48,12 +48,18 @@ internal static class Program
                 var open = System.Diagnostics.Stopwatch.StartNew();
                 Call("OpenGameFolder", args[0]);
                 var tree = (TreeView)window.FindName("ResourceTree");
-                var room4 = tree.Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>())
-                    .First(i => (int?)i.Tag?.GetType().GetProperty("ResourceId")?.GetValue(i.Tag) == 4 &&
+                var woodtick = tree.Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>())
+                    .First(i => (int?)i.Tag?.GetType().GetProperty("ResourceId")?.GetValue(i.Tag) == 7 &&
                                 i.Tag?.GetType().GetProperty("Kind")?.GetValue(i.Tag)?.ToString() == "Room").Tag!;
-                Call("SelectResourceInTree", room4);
-                for (var n = 0; n < 900 && Field("_playTimer") is null; n++) await Task.Delay(100);
-                var session = (ScummGameSession?)Field("_play") ?? throw new Exception("play did not start in Room 4");
+                // 20 October 2026: since 273cc399 (R-8.5b) a catalog room plays only when its native entry settles quietly. Room 4, where the play boot ends,
+                // does not (the campfire story goes on to Part One and Woodtick): it stays a static preview, and waiting for play there timed out after 90 s
+                // ("play starts 104.5 s after opening, 0 frames"). Woodtick (Room 7) prepares live; a static preview now fails at once
+                // (.verification/mi2-play-start-20261020).
+                Call("SelectResourceInTree", woodtick);
+                for (var n = 0; n < 300 && Field("_playTimer") is null && !(bool)Field("_catalogPreviewOnly")!; n++) await Task.Delay(100);
+                if ((bool)Field("_catalogPreviewOnly")!) throw new Exception("Room 7 stayed a static preview (its catalog preparation did not settle)");
+                var session = (ScummGameSession?)Field("_play") ?? throw new Exception("play did not start in Room 7");
+                if (Field("_playTimer") is null || open.Elapsed.TotalSeconds > 30) throw new Exception($"play did not start within 30 s of opening ({open.Elapsed.TotalSeconds:0.0} s)");
                 var note = (TextBlock)window.FindName("CutsceneScanNote");
                 report.Add($"Play started in Room {session.CurrentRoomId} {open.Elapsed.TotalSeconds:0.0} s after opening; playback bar {((FrameworkElement)window.FindName("PlaybackBar")).Visibility}; " +
                            $"room button {((Button)window.FindName("RoomCutsceneButton")).Visibility}; scan note {note.Visibility}: \"{note.Text.Replace('\n', ' ')}\"");

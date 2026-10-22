@@ -62,6 +62,25 @@ public sealed class ScummSpeechBank
         return samples;
     }
 
+    /// <summary>The most mouth-sync words ScummVM keeps (<c>_mouthSyncTimes</c> holds 64 entries, the last for the 0xFFFF end).</summary>
+    public const int MaxMouthSyncTimes = 63;
+
+    /// <summary>
+    /// The sample's mouth-sync times (S10 talkie speech, 19 October 2026): the big-endian words of its <c>VCTL</c> block after the tag and size,
+    /// <c>(length - 8) / 2</c> of them, as ScummVM <c>startTalkSound</c> reads them into <c>_mouthSyncTimes</c> (sound.cpp, GitHub master read 19 October 2026).
+    /// Each is a time in speech-timer ticks (60 a second) at which the mouth toggles between open (the talk-start frame) and closed (the talk-stop frame);
+    /// the first closes it. Empty for a block with no words. Throws <see cref="InvalidDataException"/> for an offset that holds no sample.
+    /// </summary>
+    public IReadOnlyList<int> ReadMouthSync(int offset, int length)
+    {
+        var count = Math.Min(Math.Max(0, (length - 8) >> 1), MaxMouthSyncTimes);
+        var block = _source.ReadRange(_name, offset, 8 + count * 2);
+        if (block.Length < 8 || !block.AsSpan(0, 4).SequenceEqual("VCTL"u8)) throw new InvalidDataException("There is no speech sample at this offset.");
+        var times = new int[Math.Min(count, (block.Length - 8) / 2)];
+        for (var i = 0; i < times.Length; i++) times[i] = BinaryPrimitives.ReadUInt16BigEndian(block.AsSpan(8 + i * 2));
+        return times;
+    }
+
     /// <summary>The line as a 16-bit mono wave. Throws <see cref="InvalidDataException"/> for an offset that holds no sample.</summary>
     public byte[] ReadWave(int offset, int length)
     {

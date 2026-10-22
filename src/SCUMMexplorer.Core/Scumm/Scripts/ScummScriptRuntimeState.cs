@@ -89,7 +89,7 @@ public sealed class ScummScriptRuntimeState
     { var added = ObjectPositions.TryAdd(subject, value); NotifyNativeMutation("object-position", subject); return added; }
     public bool RemoveObjectPosition(int subject)
     { var removed = ObjectPositions.Remove(subject); NotifyNativeMutation("object-position", subject); return removed; }
-    public Dictionary<string, ushort> GlobalVariables { get; } = new(StringComparer.Ordinal);
+    public ScummGlobalVariables GlobalVariables { get; } = new();
     internal ScummScriptObserver? MutationObserver { get; set; }
 
     /// <summary>Native writes/removals notify even for identical or absent values; estimates are untouched.</summary>

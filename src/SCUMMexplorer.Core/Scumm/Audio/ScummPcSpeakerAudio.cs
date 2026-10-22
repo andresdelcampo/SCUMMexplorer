@@ -71,7 +71,11 @@ public sealed class ScummPcSpeakerAudio
     private static readonly int[] HullOffsets = [0, 12, 24, 36, 48, 60, 72, 88, 104, 120, 136, 256, 152, 164, 180];
     private static readonly int[] ModulationPeriods = [0x1000, 0x1000, 0x20, 0x2000, 0x1000];
 
-    public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
+    public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default) =>
+        RenderWave(ReadOldBundle(resource), 4, cancellationToken);
+
+    /// <summary>The PC speaker part of an old-bundle sound (LOOM, Indy3 EGA): its bytes with their 4-byte header.</summary>
+    public static byte[] ReadOldBundle(GameResource resource)
     {
         if (resource.Kind != ResourceKind.Sound || resource.Offset is null || resource.ContainerFileNumber is null)
             throw new NotSupportedException("This is not an indexed LOOM sound resource.");
@@ -88,8 +92,85 @@ public sealed class ScummPcSpeakerAudio
         if (BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(6, 2)) != 22 ||
             data[8] != 0 || data[9] != 0 || data[10] != 0 || data[11] != 0)
             throw new NotSupportedException("This sound uses a different LOOM music encoding. PC speaker playback is available for the old-bundle tracks.");
+        return data;
+    }
 
-        return RenderWave(data, 4, cancellationToken);
+    /// <summary>
+    /// How long a version 3 or 4 game's PC speaker sound plays through ScummVM's <c>Player_V2</c> (<c>scumm.cpp</c> <c>setupMusic</c>: the PC speaker of a
+    /// version 3 or 4 game; <c>player_v2.cpp</c>, <c>player_v2base.cpp</c>, GitHub master read 19 October 2026), for the scripts' <c>isSoundRunning</c> when the
+    /// user's device is the PC speaker (sound polish). <paramref name="headerLength"/>: 4 in the old bundle, 6 in a v4 disk's <c>WA</c> block.
+    /// The music timer is the version 3 one (<c>getMusicTimer</c> with <c>_isV3Game</c>): a player counter that starts at 0 with each sound
+    /// (<c>chainSound</c>), goes up once every 65536 ticks, or every 126 once a sound has set its parameter 14 (<c>_ticks_per_music_timer = 125</c>), and is
+    /// not cleared when a sound stops; the game's variable sees it times the timer frequency over 240 (<c>Sound::updateMusicTimer</c>). Estimates: the
+    /// counter's divisor is taken per sound (ScummVM keeps 125 for the rest of the run once any sound set it), and after a sound ends the timer is held
+    /// where the player would go on counting.
+    /// </summary>
+    public ScummSoundLifetime ReadV3Lifetime(byte[] data, int headerLength)
+    {
+        try
+        {
+            if (data.Length < headerLength + 10) throw new InvalidDataException("The PC speaker sound header is incomplete.");
+            var player = new Player(data, headerLength);
+            var seen = new Dictionary<UInt128, int>();
+            var timer = new List<ScummSoundTimerPoint> { new(0, 0) };
+            int? loopStart = null;
+            for (var tick = 0; tick < MaxLoopTicks; tick++)
+            {
+                if (loopStart is null)
+                {
+                    if (!player.Playing)
+                        return new(ScummSoundLifetimeKind.Finite, tick * 2, false, TimerValues: timer.ToArray(), KeepsMusicTimer: true, TimerSurvivesStop: true);
+                    var key = player.ControlKey();
+                    if (seen.TryGetValue(key, out var start)) loopStart = start;
+                    else seen.Add(key, tick);
+                }
+                player.NextTick();
+                if (player.Overran) throw new InvalidDataException("The PC speaker sound script reads beyond its resource.");
+                var value = (ushort)(int)(player.V3MusicTimer * DosTimerFrequency / 240.0);
+                if (timer[^1].Value != value) timer.Add(new((tick + 1) * 2, value));
+            }
+            // A looping sound's timer keeps counting through its loops (it is the player's, not the sound's), so its values are not wrapped at the loop.
+            return loopStart is not null
+                ? new(ScummSoundLifetimeKind.Looping, null, false, TimerValues: timer.ToArray(), KeepsMusicTimer: true, TimerSurvivesStop: true)
+                : new(ScummSoundLifetimeKind.Unknown, null, false, "Player_V2 lifetime exceeded the bounded control trace.", TimerValues: timer.ToArray(),
+                    KeepsMusicTimer: true, TimerSurvivesStop: true);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or ArgumentException or IndexOutOfRangeException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Where a looping PC speaker sound goes on (sound polish, 19 October 2026): its channel scripts return to a control state they had before
+    /// (<see cref="ScummImuseLoop.RestartSeconds"/>) at <see cref="ScummImuseLoop.EndSeconds"/>; from there it repeats exactly. Null for a sound that
+    /// ends or whose loop is not found within ten minutes.
+    /// </summary>
+    public ScummImuseLoop? ReadLoop(byte[] data, int headerLength, bool pcjr = false)
+    {
+        try { return FindLoop(data, headerLength, pcjr) is ({ } start, { } end) ? new((double)start / TickRate, (double)end / TickRate) : null; }
+        catch (Exception ex) when (ex is InvalidDataException or ArgumentException or IndexOutOfRangeException) { return null; }
+    }
+
+    private const int MaxLoopTicks = TickRate * 600;
+
+    /// <summary>ScummVM's <c>_timerFrequency</c> for a DOS game of version 2 to 4 (<c>setTimerAndShakeFrequency</c>): the PIT's 1193182 Hz over 5041.</summary>
+    private const double DosTimerFrequency = 1193182.0 / 5041.0;
+
+    private static (int? Start, int? End) FindLoop(byte[] data, int headerLength, bool pcjr)
+    {
+        if (data.Length < headerLength + (pcjr ? 18 : 10)) return (null, null);
+        var player = new Player(data, headerLength, pcjr);
+        var seen = new Dictionary<UInt128, int>();
+        for (var tick = 0; tick < MaxLoopTicks && player.Playing; tick++)
+        {
+            var key = player.ControlKey();
+            if (seen.TryGetValue(key, out var start)) return (start, tick);
+            seen.Add(key, tick);
+            player.NextTick();
+            if (player.Overran) return (null, null);
+        }
+        return (null, null);
     }
 
     /// <summary>
@@ -168,7 +249,10 @@ public sealed class ScummPcSpeakerAudio
         var player = new Player(data, headerLength, pcjr);
         var samples = new List<short>();
         var hadSound = false;
-        for (var tick = 0; tick < MaxTicks && player.Playing; tick++)
+        // A sound that loops renders three minutes, or through its first restart and ten seconds more when that takes longer (sound polish,
+        // 19 October 2026: a long loop was cut at three minutes).
+        var maxTicks = FindLoop(data, headerLength, pcjr) is ({ } loopStart, { } loopEnd) ? Math.Max(MaxTicks, loopEnd + 10 * TickRate) : MaxTicks;
+        for (var tick = 0; tick < maxTicks && player.Playing; tick++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             player.NextTick();
@@ -256,6 +340,26 @@ public sealed class ScummPcSpeakerAudio
         public bool Overran { get; private set; }
         public string ControlState() => _returnAddress + ":" + string.Join(",", _channels.SelectMany(c => c));
 
+        /// <summary>The same control state as a 128-bit digest, for loop searches longer than a few minutes.</summary>
+        public UInt128 ControlKey()
+        {
+            Span<byte> bytes = stackalloc byte[4 + 5 * ChannelWords * 2];
+            BinaryPrimitives.WriteInt32LittleEndian(bytes, _returnAddress);
+            var at = 4;
+            foreach (var channel in _channels)
+                foreach (var word in channel) { BinaryPrimitives.WriteUInt16LittleEndian(bytes[at..], word); at += 2; }
+            Span<byte> hash = stackalloc byte[16];
+            System.Security.Cryptography.MD5.HashData(bytes, hash);
+            return BinaryPrimitives.ReadUInt128LittleEndian(hash);
+        }
+
+        // Player_V2Base's version 3 music timer (_music_timer, _music_timer_ctr, _ticks_per_music_timer).
+        private int _ticksPerMusicTimer = 65535;
+        private int _musicTimerCounter;
+
+        /// <summary>The version 3 player's music timer (<c>Player_V2Base::getMusicTimer</c> with <c>_isV3Game</c>), counted from this sound's start.</summary>
+        public int V3MusicTimer { get; private set; }
+
         public bool HasWinner => WinningChannel() >= 0 || (_pcjr && _channels.Take(4).Any(channel => channel[Volume] != 0 && channel[TimeLeft] != 0));
 
         public void NextTick()
@@ -264,6 +368,11 @@ public sealed class ScummPcSpeakerAudio
             {
                 if (_channels[i][TimeLeft] == 0) continue;
                 NextFreqs(_channels[i]);
+            }
+            if (_musicTimerCounter++ >= _ticksPerMusicTimer)
+            {
+                _musicTimerCounter = 0;
+                V3MusicTimer++;
             }
         }
 
@@ -570,6 +679,8 @@ public sealed class ScummPcSpeakerAudio
                                 var value = Word(ref position);
                                 if (raw / 2 >= ChannelWords) throw new InvalidDataException("Sound parameter is invalid.");
                                 channel[raw / 2] = value;
+                                // "tempo var": from now on the version 3 music timer counts every 126 ticks.
+                                if (raw == 14) _ticksPerMusicTimer = 125;
                                 if (raw == 0) goto end;
                                 break;
                             }

@@ -122,7 +122,7 @@ public sealed record ScummPrintRequest(
 /// to <c>VAR_HAVE_MSG</c>, <c>var[0x003]</c>). Slot 1 (<c>print 0xFE</c>) is
 /// <c>drawString</c>: drawn at once, with no delay.
 /// </summary>
-public sealed class ScummMessageTable
+public sealed partial class ScummMessageTable
 {
     /// <summary>ScummVM <c>_actorToPrintStrFor</c> 0xFF: no actor.</summary>
     public const int NoActor = 0xFF;
@@ -266,6 +266,11 @@ public sealed class ScummMessageTable
                     // v3: subop 6 sets the line height (ScummVM SO_LEFT reads _string.height for version 3).
                     if (operation.First is int height) slot.Height = height;
                     else estimates.Add("the print's line height operand could not be read");
+                    break;
+                case "left":
+                    // v4 and later: subop 6 is SO_LEFT, which clears the centring and the overhead flag (ScummVM decodeParseString, GitHub master 19 October 2026).
+                    slot.Center = false;
+                    slot.Overhead = false;
                     break;
                 case "overhead":
                     slot.Overhead = true;
@@ -442,6 +447,33 @@ public sealed class ScummMessageTable
         return covered == 0 ? "" : $"; {covered} drawn string(s) covered";
     }
 
+    /// <summary>
+    /// Where the room's point (0, 0) is on the screen now (ScummVM <c>-virtscr[0].xstart</c> and the main screen's <c>topline</c>), and the main
+    /// screen's last row; the session sets it. Null (a run outside a session) leaves drawn strings alone when an object is drawn.
+    /// </summary>
+    public Func<(int Left, int Top, int Bottom)>? RoomOnScreen { get; set; }
+
+    /// <summary>
+    /// An object image drawn into the room (ScummVM <c>processDrawQue</c> → <c>drawObject</c> → <c>Gdi::drawBitmap</c>, read on GitHub master
+    /// 19 October 2026): each 8-pixel strip is decoded into the back buffer and then copied to the front buffer (<c>copy8Col</c>) for the image's
+    /// rows. <c>drawString</c> draws its glyphs straight into that front buffer (<c>printChar(c, true)</c>), so the copy erases the part of a
+    /// drawn string under the image, as a box does. Indy 4's playable credits erase each heading this way: Script 94 +0x0063 draws
+    /// <c>var[0x134]</c> (Room 4's object 73, set by the room's entry +0x0051) once the heading's names are over, before the next heading.
+    /// Room coordinates; the strip's whole 8-pixel columns are copied.
+    /// </summary>
+    public string ObjectDrawn(int roomX, int roomY, int width, int height)
+    {
+        NativeMutation?.Invoke();
+        if (RoomOnScreen?.Invoke() is not { } origin || width <= 0 || height <= 0) return "";
+        var left = (roomX & ~7) + origin.Left;
+        var right = ((roomX + width + 7) & ~7) - 1 + origin.Left;
+        var top = roomY + origin.Top;
+        var bottom = Math.Min(roomY + height - 1 + origin.Top, origin.Bottom - 1);
+        if (right < 0 || left > DefaultRight || bottom < top) return "";
+        var covered = Cover(new ScummScreenBox(Math.Max(0, left), top, Math.Min(DefaultRight, right), bottom, 0));
+        return covered == 0 ? "" : $"; {covered} drawn string(s) covered";
+    }
+
     private int Cover(ScummScreenBox box)
     {
         var covered = 0;
@@ -471,6 +503,7 @@ public sealed class ScummMessageTable
         Jiffies += delta;
         TalkDelay = Math.Max(0, TalkDelay - delta);
         DisplayDialog(runtime);
+        UpdateMouthSync();
         runtime.SetGlobalVariable(HaveMsgVariable, (ushort)HaveMsg);
     }
 
@@ -518,6 +551,7 @@ public sealed class ScummMessageTable
         // stopTalk stops the talk sound (Sound::stopTalkSound): a line still speaking is cut.
         if (SpeechPlaying) _speechEvents.Add(new ScummSpeechEvent(0, 0, Jiffies, null, true));
         _speechEndsAt = null;
+        EndMouthSync();
         HaveMsg = 0;
         TalkDelay = 0;
         TalkingActor = NoActor;
@@ -660,6 +694,7 @@ public sealed class ScummMessageTable
         var duration = SpeechJiffies?.Invoke(offset, length);
         _speechEvents.Add(new ScummSpeechEvent(offset, length, Jiffies, duration, false));
         _speechEndsAt = duration is int jiffies ? Jiffies + jiffies : null;
+        StartMouthSync(offset, length, duration);
         if (duration is null && SpeechJiffies is not null) estimates.Add($"the spoken line at {offset} could not be read; the line lasts as its text");
     }
 

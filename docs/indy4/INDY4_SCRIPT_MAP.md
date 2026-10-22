@@ -47,6 +47,8 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
+| 94 | one credits group: starts Script 93 (fade in/out of colours 0x0B and 0x9F) and each name script `local[0]` to `local[1]` in turn, waiting on `bit[0x023]`; after the group's last name it draws `var[0x134]` (+0x0063), which erases the group's heading (`print 0xFE`, drawn into the room's front buffer) before the next heading. Room 4's entry sets `var[0x134]` = 73 (+0x0051) | decoded, play | Script 94 +0x0000 to +0x0076; Room 4 local 201 +0x02DB to +0x033C; Room 4 locals 208 to 211 +0x0008 | 19 Oct 2026 |
+| 10 | the inventory slots 0x65 to 0x6E: for each held object (`findInventory`, +0x0109) with verb 0x5B (`getVerbEntrypoint`, +0x0125) it runs that verb (`startObject`, +0x0131) and takes the icon object from `var[0x0A1]`, else 0x4ED; the slot gets that image from Room 98 (`assignObject …, 0x62`, +0x01DD). The magazine (object 23, taken in Room 1 local 205 +0x012F) gives image object 1260 | decoded, play | Script 10 +0x0109 to +0x01E6 | 19 Oct 2026 |
 
 ## Rooms
 

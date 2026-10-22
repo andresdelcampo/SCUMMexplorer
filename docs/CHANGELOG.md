@@ -2,6 +2,35 @@
 
 Recent changes: 18–19 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 17 October](archive/CHANGELOG_THROUGH_2026-10-17.md) are an optional historical archive, not startup reading. At a checkpoint, retain roughly the latest two calendar days here and archive older entries with their links.
 
+## 20 October: MI2 "slow play start" traced to the catalog policy; play-start guards (Monkey2, all generic games)
+
+- The reported "play starts 104.5 s after opening, 0 frames" was not a slowdown: since `273cc399` (19 October, R-8.5b/R-8.5c) MI2's boot room, Room 4, is a static preview, because its entry tells the campfire story and leaves the room; the cutscene window check waited 90 s for a play clock that never starts. Bisected with scratch worktrees (`b6231d7e~1`: first frame 6.8 s; `273cc399`: none). Today's sound, speech, Indy 4 and globals merges are not involved. App unchanged (the requirements forbid autoplaying the opening from the catalog).
+- The MI2 cutscene check now opens Woodtick (Room 7) and fails at once on a static preview or after 30 s. New `PlayStartWindowCheck` (first frame within 30 s of opening, real window) and `ScummPlayStartTests` (boot plus catalog preparation reach a live room in under 20 s for MI2 talkie and floppy, Indy 4, MonkeyCd, Indy3 EGA; MI2 Room 4 static, Room 7 live). First frames: MI2 talkie 6.4 s, MI2 floppy 1.7 s, Indy 4 5.9 s, MonkeyCd 0.8 s, Indy3 1.8 s. Record: [mi2-play-start-20261020](../.verification/mi2-play-start-20261020/README.md).
+## 20 October: globals change tracking speeds up the cutscene derivation (all generic games)
+
+- The runtime's globals are a `ScummGlobalVariables` store (same API and the same enumeration order as the old `Dictionary`) that records writes while a script runs. A run whose result is not kept reads the globals through it and copies back only its changes, instead of copying 800–1400 globals at its start and around every event; prints read the run's variables directly instead of copying them. Any rare case the tracking does not follow switches the run to the old full copy, in the old order.
+- All twelve cutscene lists byte-identical to master `a6c0082c`; new `ScummGlobalsTrackingTests` (store order against `Dictionary`; six games played with full copies and through the store, same state and variable order). Indy 4 first launch in the window: 45 → 34 s from play start (target under a minute met); harness, four workers: Indy 4 51.9 → 26.2 s, MI2 25.3 → 20.6 s, Zak 20.9 → 7.4 s. Record: [globals-tracking-20261019](../.verification/globals-tracking-20261019/README.md).
+
+## 19 October: Indy 4 credits headings and the magazine's icon (S6 leftovers, Indy4)
+
+- The playable credits no longer stack their headings: a `print 0xFE` string is drawn into the room's front buffer, and the game erases it by drawing an object over it (Script 94 +0x0063, object 73). Drawn objects now cover drawn strings under their strips (`ScummMessageTable.ObjectDrawn`, ScummVM `Gdi::drawBitmap`), for every game; v4+ `print` subop 6 (`SO_LEFT`) is applied.
+- The first inventory slot shows the magazine (object 23): a held object's verb runs from the room it was taken from in every version (`ScummSession.StartObjectScript`), so Script 10's icon query (verb 0x5B, `var[0x0A1]`) gets image 1260 of Room 98.
+- Tests in `ScummIndy4PlayTests` (English talkie, Spanish floppy); all play tests, LOOM tests and the cutscene lists of eight played games unchanged; one real-window check. Record: [indy4-play addendum](../.verification/indy4-play-20261017/README.md#addendum-19-october-2026-the-credits-headings-and-the-magazines-icon).
+
+## 19–20 October: talkie speech for Monkey Island 2 and mouth sync (Indy 4, MI2 talkie)
+
+- Monkey Island 2's fan talkie (`mi2 talkie en`/`es`) stores its speech as Indy 4 does: `monster.sou` holds 6808 `VCTL` + Creative Voice File samples, addressed by the texts' four code-10 operands. The generic speech path already read it; its lines now have tests on the S6 route (the sign 0x00A485E0, Largo's choice 0x00B40C6E, each lasting as its sample) and a window check of two scenes from the list.
+- Mouth sync (ScummVM `startTalkSound`/`processSfxQueues`/`isMouthSyncOff`, sound.cpp read 19 October 2026): while a talkie line plays, the talking actor's mouth follows the sample's `VCTL` times and closes when the voice ends. Indy 4 has real times (first line: closed +24, open +30, closed +36 jiffies); the MI2 patch gives one placeholder word (4095) per sample, so its mouths stay open until the voice ends (plain talk animation, labelled). The boot and the Indy 4 / MI2 cutscene lists are unchanged.
+- Record: [talkie-speech-20261019](../.verification/talkie-speech-20261019/README.md). Listening and looking checks are listed there for the user.
+
+## 19 October: sound polish (Monkey Island 1 floppy, Indy3 EGA and 256 colours)
+
+- Monkey Island 1's AD music plays on iMUSE's clock as ScummVM converts it (`convertADResource`, `MidiParser::onTimer`, read on GitHub master 19 October); the half-tempo estimate set by ear is gone (it was about 6 % fast). Indy3 256 colours uses Indy3's `Player_AD` constants instead of that estimate.
+- R-13.9: the sound player renders Indy3's AdLib with its own constants (songs now last as long as the session says, about twice the old LOOM-constant length).
+- Looping AdLib and PC speaker songs render through their first restart when it comes after three minutes (PC speaker loops up to 434 s); in play, v3/v4 songs go on from their loop target.
+- With the PC speaker, the play session's `isSoundRunning` and version 3 music timer follow `Player_V2` (labelled estimates for the timer's divisor and after a sound ends).
+- Tests: `ScummSoundPolishTests` plus the sound, MonkeyFloppy, Indy3, Maniac/Zak and session tests (353 passed). Listening checks pending. Record: [sound-polish-20261019](../.verification/sound-polish-20261019/README.md).
+
 ## 19 October: stable selectors and deliberate cutscenes (all games)
 
 - Refined the background-first feature: only LOOM EGA fills selector artwork after background loading. Other cards retain their plain backgrounds on cold and warm loads; native first-visit preparation and complete caching still run upfront.
