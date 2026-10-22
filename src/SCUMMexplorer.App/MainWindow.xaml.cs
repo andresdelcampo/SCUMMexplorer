@@ -3771,6 +3771,7 @@ public partial class MainWindow : Window
     {
         RefreshRoomPreview();
         RefreshPlayOverlays();
+        RefreshPlayOverlayLists(SelectGenericInteractTarget);
     }
 
     private void WalkBoxToggle_Changed(object sender, RoutedEventArgs e)
@@ -3779,6 +3780,7 @@ public partial class MainWindow : Window
         RefreshWalkBoxOverlay();
         WalkBoxOverlay.Dispatcher.BeginInvoke(RefreshWalkBoxOverlay, DispatcherPriority.Loaded);
         RefreshPlayOverlays();
+        RefreshPlayOverlayLists(SelectGenericInteractTarget);
     }
 
     private void WalkBoxOverlay_SizeChanged(object sender, SizeChangedEventArgs e) => RefreshWalkBoxOverlay();
@@ -3941,6 +3943,7 @@ public partial class MainWindow : Window
         RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never ? Visibility.Visible : Visibility.Collapsed;
         RoomNavigationOverlay.Dispatcher.BeginInvoke(RefreshRoomNavigationOverlay, DispatcherPriority.Loaded);
         RefreshPlayOverlays();
+        RefreshPlayOverlayLists(SelectGenericInteractTarget);
     }
 
     private void ObjectAreaMode_Changed(object sender, RoutedEventArgs e)
@@ -3949,6 +3952,7 @@ public partial class MainWindow : Window
         SaveViewOptions();
         ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : _highlightedHotspot);
         RefreshPlayOverlays();
+        RefreshPlayOverlayLists(SelectGenericInteractTarget);
     }
 
     /// <summary>On-hover doorways: the doorway boxes under the pointer are the only ones drawn.</summary>
