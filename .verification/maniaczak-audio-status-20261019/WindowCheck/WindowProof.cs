@@ -146,19 +146,28 @@ internal static class WindowProof
                 }
                 scene.SetMode(SceneSoundPlayer.SoundMode.PcSpeaker);
                 using var gate = new ManualResetEventSlim(); var rendered = new TaskCompletionSource(); var began = new TaskCompletionSource(); var starting = 0;
+                CancellationToken oldRenderToken = default; var replacementRenders = 0;
                 scene.Starting += () => starting++;
-                scene.Attach(old, oldSession, (_, _, _) => { began.TrySetResult(); gate.Wait(); rendered.TrySetResult(); return (new byte[48], false); });
+                scene.Attach(old, oldSession, (_, _, token) =>
+                {
+                    oldRenderToken = token; began.TrySetResult(); gate.Wait(); rendered.TrySetResult();
+                    // Deliberately ignore cancellation here: the player must discard even an uncooperative old renderer.
+                    return (new byte[48], false);
+                });
                 var oldId = old.Resources.First(r => r.Kind == ResourceKind.Sound).ResourceId!.Value;
                 typeof(SceneSoundPlayer).GetMethod("Start", Hidden)!.Invoke(scene, [oldId, "synthetic delayed-render cancellation probe", false]);
                 Require(scene.IsPreparing, "Delayed renderer did not start");
                 await began.Task.WaitAsync(TimeSpan.FromSeconds(10));
                 var first = await Open("mmansionE ega es");
                 Require(!scene.Follows(oldSession) && !scene.IsPreparing, "Old session remains attached after real folder change");
+                var replacement = ScummGameSession.BootForPlay(first, out _);
+                scene.Attach(first, replacement, (_, _, _) => { replacementRenders++; return (new byte[48], false); });
+                Require(oldRenderToken.CanBeCanceled && oldRenderToken.IsCancellationRequested, "Old renderer did not receive a canceled lifetime token");
                 var cd = (CdVoicePlayer)Field("_cdVoice")!;
                 Require(typeof(CdVoicePlayer).GetField("_session", Hidden)!.GetValue(cd) is null, "Old CD source retained");
                 gate.Set(); await rendered.Task; await Task.Delay(300);
-                Require(starting == 0 && ((IList)typeof(SceneSoundPlayer).GetField("_voices", Hidden)!.GetValue(scene)!).Count == 0, "Old late render restarted output after folder change");
-                Log("PASS actual LOOM→Maniac folder change: synthetic pending render detached; its late completion produces no MediaPlayer/output; old CD source null");
+                Require(starting == 0 && replacementRenders == 0 && ((IList)typeof(SceneSoundPlayer).GetField("_voices", Hidden)!.GetValue(scene)!).Count == 0, "Old late render restarted output or used the replacement renderer");
+                Log("PASS actual LOOM→Maniac folder change: synthetic pending render canceled, detached and replaced; late uncooperative completion produces no MediaPlayer/output or replacement-renderer call; old CD source null");
                 foreach (var fixture in new[] { "mmansionE ega es", "mmansion ega en", "zak ega en", "zakE ega en" })
                 {
                     var game = fixture == "mmansionE ega es" ? first : await Open(fixture);
@@ -169,6 +178,14 @@ internal static class WindowProof
                     Save(fixture + "-normal");
                     var choices = ((IEnumerable)Field("_roomSoundChoices")!).Cast<object>().Count();
                     Require(choices > 0 && Control<ComboBox>("SoundModeCombo").Visibility == Visibility.Visible, "Sound playback controls absent");
+                    var cdDevice = Control<ComboBox>("CdSoundCombo");
+                    foreach (var index in new[] { 1, 0 })
+                    {
+                        cdDevice.SelectedIndex = index;
+                        Require(Control<Button>("RoomSoundsButton").Visibility == Visibility.Visible &&
+                            ((IEnumerable)Field("_roomSoundChoices")!).Cast<object>().Count() == choices,
+                            "CD device selection hid or replaced generic room sounds");
+                    }
                     Control<Button>("RoomSoundsButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Task.Delay(40);
                     var popup = PresentationSource.CurrentSources.Cast<PresentationSource>().Select(p => p.RootVisual).OfType<FrameworkElement>()
                         .Single(p => Descendants(p).OfType<TextBlock>().Any(t => t.Text == "SOUNDS IN THIS ROOM"));
@@ -176,7 +193,7 @@ internal static class WindowProof
                     Require(buttons.Length == choices + 1 && buttons.All(b => b.ToolTip is null), "Normal Sounds menu missing candidates or exposes technical tooltips");
                     Require(buttons.SelectMany(Descendants).OfType<TextBlock>().All(t => !t.Text.Contains("Script") && !t.Text.Contains("0x") && !t.Text.Contains("verb")), "Technical source in Normal sound title");
                     Save(fixture + "-sound-menu", popup); buttons[0].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                    Log($"PASS {fixture}: actual Normal Sounds popup opens; {choices} native source/reached candidates; plain labels/no source tooltips; device selector visible; no scan executes game code");
+                    Log($"PASS {fixture}: actual Normal Sounds popup opens; {choices} native source/reached candidates; plain labels/no source tooltips; device selector visible; CD mute/unmute preserves generic menu; no scan executes game code");
                 }
                 File.WriteAllLines(Path.Combine(output, "result.txt"), report); window.Close(); app.Shutdown(0);
             }
