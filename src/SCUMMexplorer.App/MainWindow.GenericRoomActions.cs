@@ -171,6 +171,7 @@ public partial class MainWindow
             _genericActionsHost.Children.Add(new Expander
             {
                 Header = "Interact", Content = new ScrollViewer { Content = choices, MaxHeight = 260, VerticalScrollBarVisibility = ScrollBarVisibility.Auto },
+                Style = (Style)FindResource("RoomOptionsSection"), Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
                 Margin = new Thickness(0, 6, 0, 0)
             });
         _genericActionsHost.Visibility = choices.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -186,7 +187,11 @@ public partial class MainWindow
             var content = new StackPanel();
             content.Children.Add(new TextBlock { Text = action.Source, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 4) });
             if (action.Code is { } code) content.Children.Add(GenericSourceCode("Raw disassembly", code));
-            _genericSourceHost.Children.Add(new Expander { Header = $"{action.Title} · object {action.Object} / verb 0x{action.Verb:X2}", Content = content });
+            _genericSourceHost.Children.Add(new Expander
+            {
+                Header = $"{action.Title} · object {action.Object} / verb 0x{action.Verb:X2}", Content = content,
+                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210))
+            });
         }
         _genericSourceHost.Children.Add(new TextBlock { Text = "RELATIONSHIPS · POSSIBLE SOURCE OUTCOMES", Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, 12, 0, 4), TextWrapping = TextWrapping.Wrap });
         var scripts = _genericRoomScripts.Select(s => s.Code).Concat(_genericSourceActions.Select(a => a.Code).OfType<ScummScriptDisassembly>()).Distinct();
@@ -202,13 +207,20 @@ public partial class MainWindow
     {
         var content = new StackPanel();
         // Delay formatting/widget attachment until requested; room changes never open code.
-        var expander = new Expander { Header = label, Content = content, Margin = new Thickness(0, 2, 0, 2) };
+        var expander = new Expander
+        {
+            Header = label, Content = content, Margin = new Thickness(0, 2, 0, 2),
+            Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210))
+        };
         expander.Expanded += (_, _) =>
         {
             if (content.Children.Count == 0) content.Children.Add(new TextBox
             {
                 IsReadOnly = true, Text = code.Format(true), TextWrapping = TextWrapping.NoWrap,
                 FontFamily = new FontFamily("Consolas"), FontSize = 11, MaxHeight = 320,
+                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
+                Background = new SolidColorBrush(Color.FromRgb(16, 24, 33)),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(51, 68, 82)), Padding = new Thickness(6),
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
             });
         };
