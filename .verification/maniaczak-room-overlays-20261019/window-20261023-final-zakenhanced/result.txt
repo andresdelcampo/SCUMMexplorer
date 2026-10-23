@@ -1,0 +1,6 @@
+0,62s Opened ZakEnhanced; no autoplay expected; starting explicit intro
+7,73s ZakEnhanced: actual native intro/party inputs and Room01; native selector follows; camera=0
+7,73s Native control reached; checking overlay options
+8,14s All modes pass: hotspots=15; source doorways=2; walkboxes=4; native depth tint nonempty; masks and aids leave source state unchanged
+9,25s Native Open/Walk enters Room02 then native delayed Script126 reaches Room16; both selector cards follow and source entry scene is preserved
+9,25s PASS

@@ -63,6 +63,21 @@ Inspection found a low-contrast black Interact expander heading on the dark Norm
 
 Every harness window closed in `finally`, stopping its own timer/playback and canceling its card job. Final `Get-Process RoomOverlaysCheck` inventory is empty. Exclusive WPF lease released to parent. No ScummVM runtime, game data, saves, user profile or user application was changed.
 
+## Final native panel correction and acceptance, 23 October 2026
+
+Review of the first Classic Maniac Advanced capture found that depth/walkbox preview refreshes could replace the shared native HOTSPOTS children with old SCENE DETAILS inspection buttons. The earlier native overlay assertions did not check these panel contents. App-only correction `bce484b9` retains the actual published UI elements and reuses its cache only while both ObjectList and RoomNavigationButtons still contain those exact elements; otherwise it rebuilds native rows. Parent restores native lists immediately after the four relevant option handlers and separately corrected heading contrast. No Core/test changes were required.
+
+Final product source is **`bde49369`**, worker merge `48455eb9`, with `git diff --quiet bde49369 -- src tests` exiting zero. The final harness/App build passed with zero warnings/errors in **11.03 seconds**. The same four native routes and all previous assertions were rerun, now also checking actual HOTSPOTS heading, exact native object IDs/names and native doorway labels after both depth and walkbox toggles. In particular, the harness rejects replacement inspection rows even when counts happen to match.
+
+| Family | Final local/committed report directory | Result |
+|---|---|---|
+| ManiacClassic | `window-20261023-final-maniacclassic` | Pass, **7.53 s** |
+| ManiacEnhanced | `window-20261023-final-maniacenhanced` | Pass, **7.67 s** |
+| ZakClassic | `window-20261023-final-zakclassic` | Pass, **9.17 s** |
+| ZakEnhanced | `window-20261023-final-zakenhanced` | Pass, **9.25 s** |
+
+All four final `03-advanced-depth-walkboxes.png` captures were inspected and committed: native HOTSPOTS/DOORWAYS lists remain present, and Interact plus Advanced source headings use readable light text. The final batch produces sixteen captures locally; four inspected final captures and four reports are committed. Combined with the preceding retained batches, there are thirty-six local captures and twelve inspected/committed images. All final harnesses closed normally; no RoomOverlaysCheck process remains. Exclusive WPF lease released directly to the parent-authorized audio/status worker. No further windows were opened by this worker.
+
 ## Limits
 
 No support cell changes: viewing aids do not resolve prior original-game visual acceptance, palette estimates, other manual-room availability or unproved routes. Native input was used, but this is not an OS end-to-end mouse-input or original-game comparison. Parent owns shared XAML/code-behind, required full regression, support matrix generation and final integration/checkpoint.

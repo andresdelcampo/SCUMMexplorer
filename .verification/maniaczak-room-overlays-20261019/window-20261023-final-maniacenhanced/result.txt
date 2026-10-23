@@ -1,0 +1,6 @@
+0,59s Opened ManiacEnhanced; no autoplay expected; starting explicit intro
+4,31s Delivered the three native party-selection clicks
+7,34s ManiacEnhanced: actual native intro/party inputs and Room01; native selector follows; camera=336
+7,34s Native control reached; checking overlay options
+7,67s All modes pass: hotspots=7; source doorways=3; walkboxes=10; native depth tint nonempty; masks and aids leave source state unchanged
+7,67s PASS
