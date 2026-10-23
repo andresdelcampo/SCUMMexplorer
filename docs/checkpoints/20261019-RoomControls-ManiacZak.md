@@ -39,3 +39,7 @@ No approval gate: the listed rules are explicitly requested. Optional checks: wa
 ## Cost and next run
 
 Three isolated implementation agents, resumed as three verification agents after rate limits, plus parent integration. Windows were serialized under an exclusive lease. Shared-source fixes stay App-only after the merged backend freeze. Current requirements and support notes remain in REQUIREMENTS; no redundant tracker is created. Changelog keeps 22–23 October active, moving the prior 18–20 October entries into an optional archive with adjusted relative links (30 dated entries and 37 link targets preserved). Stop at this checkpoint with no automatic next feature.
+
+## Promotion
+
+On 23 October, integration merged master again: already up to date at `ff65ac0b`, with both checkouts clean. Master fast-forwarded to `79b481b8`. The normal App build on master succeeded with zero warnings/errors in 6.77s, refreshing `Exe/Debug/SCUMMexplorer.exe`. This final documentation-only promotion record is committed and fast-forwarded separately; product source remains identical to `bde49369`, and Core/tests to `daf75cd6`. Worktrees are retained; no user app or game data was changed.

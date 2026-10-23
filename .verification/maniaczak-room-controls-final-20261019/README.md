@@ -43,3 +43,7 @@ Final 23 October actual windows:
 - Audio/status: all four pass in 32.82s, including one-click Apply/close/Undo, rejection, Normal Sounds/device changes and a canceled old render completing after replacement-session attachment. Native LOOM Sound 13 → Maniac folder retirement passes in 3.13s. Evidence `57ddc388` and `f9013ef3`; all 14 final captures inspected. No listening claim.
 
 All owned windows and processes are closed, and the exclusive WPF lease is released. The exact unanswered Maniac startup-menu-to-scene window route remains unproved; its narrow existing R-8.34 preparation is retained. Two telescope preparations prove dispatch only, not the guarded scene outcome. Generic readable formatting remains unavailable; raw inspection is accepted. No support levels are promoted.
+
+## Promotion — 23 October
+
+Final integration merge found master unchanged at `ff65ac0b`; master fast-forwarded cleanly to `79b481b8`. Normal executable build on master succeeded with zero warnings/errors in 6.77s (`Exe/Debug/SCUMMexplorer.exe`). The final documentation-only record is committed and fast-forwarded separately. No product changes follow the accepted `bde49369` source; no backend changes follow `daf75cd6`.
