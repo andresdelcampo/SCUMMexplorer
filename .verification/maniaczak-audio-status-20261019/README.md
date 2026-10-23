@@ -1,6 +1,6 @@
 # Maniac/Zak room sound menus and one-click status
 
-Implementation/first verification: 19 October 2026. Evidence finalized on 22 October after interruption. This packet records the accepted implementation through `cd42af7e`; later integration requires its own targeted check. Source commits: `8c5b0d47` (menus, lifecycle and status), `303a267f` (independent background readers), `e2634e1a` (native CD track entries). No registry level changes: menu availability and lifecycle checks are not listening acceptance.
+Implementation/first verification: 19 October 2026. Initial evidence finalized on 22 October after interruption; final integration regression completed on 23 October. The original packet records implementation through `cd42af7e`; the final accepted run below verifies the assembled production source `bde49369`. Source commits: `8c5b0d47` (menus, lifecycle and status), `303a267f` (independent background readers), `e2634e1a` (native CD track entries). No registry level changes: menu availability and lifecycle checks are not listening acceptance.
 
 ## Changes and limits
 
@@ -38,6 +38,17 @@ rtk proxy dotnet Exe/AudioStatusWindowCheck/Debug/net10.0-windows/AudioStatusChe
 
 The harness cancels background room-card generation after actual folder open to keep this check focused. It uses real native intro inputs and actual modal/header/popup button events. The deliberate stale transaction advances one native frame; no variables, actors, flags, rooms or puzzle prerequisites are forced.
 
+## Final integration regression — 23 October 2026
+
+Worktree `b0ce49cd` contains the final harness and has **no production-source diff against `bde49369`**. Build: zero warnings/errors, 9.81 seconds. New checks additionally cover the parent CD-selection hook and render-source lifetime fixes (`fbc7ff3`, `7035931`, integrated by the parent with captured callback sources). The rendering worker captures its game/delegate/ROMs before scheduling, uses a meaningful cancellation token, and retires old cached WAVs after completion. No Core changes were made for these final corrections.
+
+- **PASS, 32.82 seconds, exit 0:** all four native-status/Normal-Sounds routes above rerun against final source. Actual CD combo selection changes to enabled then muted preserve each generic room's sound choices and visible Sounds button. All original atomic Apply/close/Undo/stale-rejection assertions pass again.
+- **PASS within that batch:** deliberately gate the old renderer, change folders through the actual handler, attach a native session from the replacement game, then release the old renderer while it deliberately ignores cancellation. Its token is canceled; no replacement-renderer call, `Starting` event, voice or output is produced. This is a deterministic lifecycle probe, distinct from native playback.
+- **PASS, 3.13 seconds, exit 0:** actual native LOOM Sound 13 rendered with AdLib opens with `MediaPlayer.HasAudio`; actual Maniac-folder open closes the player, retires the WAV, detaches the old source and clears its menu. No listening or audiovisual timing acceptance claimed.
+- **All 14 final captures inspected.** Four representative captures are retained beside the exact final transcripts in `records/`; the remainder stay in ignored local output. Both WPF runs close their windows and exit 0. Afterward an owned-process inventory finds no `AudioStatusCheck.dll` process; the serial WPF lease is released, with no further windows planned.
+
+Final commands are the reproduction commands above with `output/final-window-20261023` and `output/final-native-audio-20261023` respectively. The bounded data-source census was already accepted and was not repeated. The ordinary sandbox denied the read-only CIM inventory; the same narrow owned-process query succeeded with the authorized escalation. No product/check failure occurred.
+
 ## Remaining acceptance
 
-The parent integration owns requirements, final shared-window hooks, final suite and support matrices. In particular, the old CD-device selection handler separately overwrote generic Sounds visibility; that hook was reported to the parent on 22 October for a combined-path correction and targeted rerun. User listening remains needed for audible continuity, device fidelity and synchronization; these automated checks do not replace it.
+The parent integration owns requirements, final suite and support matrices. The old CD-device selection handler's generic-visibility overwrite and the reviewed render-source lifetime race are corrected and covered by the final run above. User listening remains needed for audible continuity, device fidelity and synchronization; these automated checks do not replace it. A bounded listening check is to audition LOOM Sound 13 using AdLib, open a Maniac folder while it is playing, and confirm the old music ends; this does not gate the completed implementation checkpoint.
