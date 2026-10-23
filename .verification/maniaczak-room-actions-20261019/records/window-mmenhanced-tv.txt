@@ -1,0 +1,4 @@
+2,81s FAIL System.NullReferenceException: Object reference not set to an instance of an object.
+   at Program.<>c__DisplayClass4_4.<Window>b__37() in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 177
+   at Program.<Window>g__Wait|4_8(Func`1 ready, String reason, Int32 maximumSeconds) in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 85
+   at Program.<>c__DisplayClass4_0.<<Window>b__19>d.MoveNext() in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 177

@@ -1,0 +1,80 @@
+abortCutscene: Script 120 continues at its skip jump +0x0002, var[0x005] = 1
+stopScript 135 at Script 120 +0x01F0: ended its pending run
+Script 120 +0x01FE: room 0 (no room) after a frame advance
+Script 120 continues at +0x01FF in Room 00 after actorFollowCamera
+Script 131 +0x0004: camera x = 160 (actor 3's x) (estimate)
+Script 131 continues at +0x0006 in Room 44 after actorFollowCamera
+cutscene at Script 131 +0x0006 (native v1/v2 scope)
+Script 131 waits 60 jiffies (delay) before +0x0018
+Script 131's delay ends; it runs again at +0x0018
+Script 131 waits 60 jiffies (delay) before +0x003E
+Script 131's delay ends; it runs again at +0x003E
+Script 131 waits 120 jiffies (delay) before +0x0086
+Script 131's delay ends; it runs again at +0x0086
+Script 131 waits 120 jiffies (delay) before +0x013F
+Script 131's delay ends; it runs again at +0x013F
+Script 131 waits 60 jiffies (delay) before +0x020C
+Script 131's delay ends; it runs again at +0x020C
+Script 131 waits 60 jiffies (delay) before +0x022E
+Script 131's delay ends; it runs again at +0x022E
+endCutscene follows ego at x = 160 (estimate)
+boot: 898 frames after script 001's first room load; now in Room 44
+Script 177 waits 30 jiffies (delay) before +0x003F
+input: click in the room at screen (8, 136), room (8, 120) runs script 4 with [2, 0, 1] (runInputScript)
+stopScript 2 at Script 04 +0x02B9: script 2 was not running
+sentence script 2 runs verb 0x0D with objects 258 and 0
+Script 177's delay ends; it runs again at +0x003F
+Script 177 waits 68 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0078
+Script 02 +0x01AD: startObject runs object 258 verb 0x0D
+loadRoomWithEgo at Room 44 / Object 258 / Verb 0x0D +0x0013 ends this room-owned script (startScene); the session enters Room 01
+stopScript 57 at Room 44 / Exit script +0x0000: script 57 was not running
+Script 168 waits 432000 jiffies (delay) before +0x000A
+Room 44 / Object 258 / Verb 0x0D +0x0013: camera x = 800 (the ego's x) (estimate)
+Room 44 / Object 258 / Verb 0x0D +0x0013: the ego (actor 3) stands at (944, 112), box 8 (estimate: the ego's arrival at Room 44 / Object 258 / Verb 0x0D +0x0013 follows a seeded pick)
+Script 177's delay ends; it runs again at +0x0078
+Script 177 waits 38 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x002C
+Script 177's delay ends; it runs again at +0x002C
+Script 177 waits 80 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0065
+Script 177's delay ends; it runs again at +0x0065
+Script 177 waits 34 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x003F
+Script 177's delay ends; it runs again at +0x003F
+Script 177 waits 51 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0065
+Script 177's delay ends; it runs again at +0x0065
+Script 177 waits 30 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0065
+Script 177's delay ends; it runs again at +0x0065
+Script 177 waits 76 jiffies (delay) before +0x0009
+manual selection of Room 17: retired departed scene slots without executing their remaining story or an override jump
+stopScript 57 at Room 01 / Exit script +0x0000: script 57 was not running
+Room 11 Object 181 Verb 0x0D +0x002D: camera x = 160 (the ego's x) (estimate)
+Room 11 Object 181 Verb 0x0D +0x002D: the ego (actor 3) stands at (40, 112), box 2 (estimate: assumed arrival at Room 11 Object 181 Verb 0x0D +0x002D after a catalog visit)
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0078
+Script 177's delay ends; it runs again at +0x0078
+Script 177 waits 82 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0019
+Script 177's delay ends; it runs again at +0x0019
+Script 177 waits 59 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0052
+Script 177's delay ends; it runs again at +0x0052
+Script 177 waits 41 jiffies (delay) before +0x0009
+Script 177's delay ends; it runs again at +0x0009
+Script 177 waits 30 jiffies (delay) before +0x0078
+Script 177's delay ends; it runs again at +0x0078
+Script 177 waits 67 jiffies (delay) before +0x0009
+cutscene at Script 112 +0x0000 (native v1/v2 scope)
+Script 112 waits 120 jiffies (delay) before +0x0005
+Room 17 / Object 190 / Verb 0x04 pauses after startScript +0x0024: nested execution froze its caller

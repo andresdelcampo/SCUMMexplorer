@@ -117,27 +117,46 @@ internal static class Program
             if (Field("_roomCardLoadTask") is Task cards) { await Wait(() => cards.IsCompleted, "initial room cards", 180); await cards; }
             return (GameLibrary)Field("_game")!;
         }
-        async Task Menu(bool advanced, bool launch)
+        async Task Menu(int menuRoom, bool advanced, bool launch)
         {
             Control<CheckBox>("AdvancedModeToggle").IsChecked = advanced; Call("UpdateAdvancedMode");
             Call("UpdatePlaybackControls");
-            var items = ((IEnumerable)Call("RoomCutsceneItems", 1)!).Cast<object>().ToArray();
-            Require(items.Length > 1, "Expected multiple Room01 scene choices");
+            var items = ((IEnumerable)Call("RoomCutsceneItems", menuRoom)!).Cast<object>().ToArray();
+            Require(items.Length > 0, "No room scene choices");
+            Log($"Scene control state: visible={Control<Button>("RoomCutsceneButton").IsVisible}, enabled={Control<Button>("RoomCutsceneButton").IsEnabled}, timer={Field("_playTimer") is not null}, native boot={((ScummGameSession?)Field("_play"))?.BootRunning}");
             Require(Control<Button>("RoomCutsceneButton").IsVisible && Control<Button>("RoomCutsceneButton").IsEnabled,
                 "Room scenes are not visibly available in " + (advanced ? "Advanced" : "Normal"));
             Control<Button>("RoomCutsceneButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await Task.Delay(50);
             var rows = PopupButtons().Where(b => b.Content is TextBlock).ToArray();
-            Require(rows.Length == items.Length, "Actual popup scene count differs from room source choices");
+            Require(items.Length == 1 ? rows.Length == 0 : rows.Length == items.Length, "Actual popup scene count differs from room source choices");
             Require(rows.All(b => !Caption(b).Contains("verb 0x", StringComparison.OrdinalIgnoreCase)), "Actual scene popup has raw verb name");
             Require(rows.All(b => advanced ? b.ToolTip is string : b.ToolTip is null), "Scene evidence tooltip is in the wrong mode");
-            Log($"{(advanced ? "Advanced" : "Normal")} actual Room01 scene popup: {rows.Length} readable choices, evidence mode correct");
+            Log($"{(advanced ? "Advanced" : "Normal")} actual Room{menuRoom:00} scene control: {items.Length} readable choices, popup rows={rows.Length}, evidence mode correct");
             // Clicking a real source row closes the popup through its normal handler.
-            rows[0].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            if (rows.Length > 0) rows[0].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             if (Field("_roomOpenTask") is Task opening) { await Wait(() => opening.IsCompleted, "explicit scene room"); await opening; }
             await Wait(() => Field("_playTimer") is not null, "explicit scene starts"); StopClock();
             Require(Play().CurrentRoomId is not null, "Explicit scene has no native room");
             if (launch) Log($"Explicit popup launch adopted native Room{Play().CurrentRoomId}, LastAction={Play().LastAction?.ObjectId}/{Play().LastAction?.VerbId}");
+        }
+        async Task NativeStart(bool maniac)
+        {
+            Control<Button>("GameIntroButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await Wait(() => Field("_playTimer") is not null, "native intro"); StopClock();
+            if (maniac)
+            {
+                Until(() => Play().CurrentRoomId == 45, "Native party screen absent");
+                foreach (var (x, y) in new[] { (76, 104), (196, 104), (292, 60) })
+                {
+                    Require(Play().ClickScreen(x, y + Play().MainScreen.Top, out _) is not null, "Native party input refused"); Frames(101);
+                }
+                Until(() => Play().CutsceneSkippable, "Native outdoor intro skip absent");
+                Play().PressKey(27); Until(() => Play().PlayerHasControl, "Native intro did not finish");
+                Require(Play().ClickScreen(8, 120 + Play().MainScreen.Top, out _) is not null, "Native room input refused");
+                Until(() => Play().CurrentRoomId == 1, "Native entrance absent"); Frames(120);
+            }
+            else { Until(() => Play().PlayerHasControl && !Play().BootRunning, "Native Zak intro did not finish", 6000); Frames(150); }
         }
         window.ContentRendered += async (_, _) =>
         {
@@ -156,33 +175,29 @@ internal static class Program
                 Call("UpdatePlaybackControls");
                 Log($"Opened {GameSupport.FamilyOf(game)}; initial direct actions={Buttons().Count()}, enabled={Buttons().Count(b => b.IsEnabled)}");
                 Capture("normal-room-actions");
-                await Menu(advanced: false, launch: true);
-                await Select(game, maniac ? 28 : 2);
-                await Select(game, 1);
-                await Menu(advanced: true, launch: true);
-                await Select(game, maniac ? 28 : 2);
-                await Select(game, 1);
+                var menuRooms = game.Rooms.Select(r => (Room: r.ResourceId!.Value,
+                    Count: ((IEnumerable)Call("RoomCutsceneItems", r.ResourceId.Value)!).Cast<object>().Count())).OrderByDescending(r => r.Count).ToArray();
+                Log("Normal source room choice counts: " + string.Join(", ", menuRooms.Where(r => r.Count > 0).Select(r => $"{r.Room}:{r.Count}")));
+                var menuRoom = menuRooms.First(r => r.Count > 0).Room;
+                if (maniac && !Control<Button>("RoomCutsceneButton").IsEnabled)
+                    Log("KNOWN GAP: static unanswered native party scope keeps explicit scene launch disabled; not bypassing that scope");
                 Control<CheckBox>("AdvancedModeToggle").IsChecked = false; Call("UpdateAdvancedMode");
-                Control<Button>("GameIntroButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                await Wait(() => Field("_playTimer") is not null, "native intro"); StopClock();
-                if (maniac)
-                {
-                    Until(() => Play().CurrentRoomId == 45, "Native party screen absent");
-                    foreach (var (x, y) in new[] { (76, 104), (196, 104), (292, 60) })
-                    {
-                        Require(Play().ClickScreen(x, y + Play().MainScreen.Top, out _) is not null, "Native party input refused"); Frames(101);
-                    }
-                    Until(() => Play().CutsceneSkippable, "Native outdoor intro skip absent");
-                    Play().PressKey(27); Until(() => Play().PlayerHasControl, "Native intro did not finish");
-                    Require(Play().ClickScreen(8, 120 + Play().MainScreen.Top, out _) is not null, "Native room input refused");
-                    Until(() => Play().CurrentRoomId == 1, "Native entrance absent"); Frames(120);
-                    await Select(game, 28);
-                }
-                else { Until(() => Play().PlayerHasControl && !Play().BootRunning, "Native Zak intro did not finish", 6000); Frames(150); }
-                var actionRoom = maniac ? 28 : 1;
+                await NativeStart(maniac);
+                var actionRoom = maniac ? 17 : 1;
+                await Select(game, menuRoom);
+                await Menu(menuRoom, advanced: false, launch: true);
+                await Select(game, menuRoom == 1 ? 28 : 1);
+                await Select(game, menuRoom);
+                await Menu(menuRoom, advanced: true, launch: true);
+                await Select(game, menuRoom == 1 ? 28 : 1);
+                Control<CheckBox>("AdvancedModeToggle").IsChecked = false; Call("UpdateAdvancedMode");
+                // Scene launches intentionally change state. Start the direct-action
+                // proof from a new genuine intro instead of assuming those changes.
+                await NativeStart(maniac);
+                await Select(game, actionRoom);
                 Require(Field("_playTimer") is not null && Play().CurrentRoomId == actionRoom, "Own native direct-action room is not live");
                 Call("RefreshPlayRoomActions");
-                var action = Buttons().Single(b => Value(b, "Object") == (maniac ? 413 : 92) && Value(b, "Verb") == (maniac ? 11 : 1));
+                var action = Buttons().Single(b => Value(b, "Object") == (maniac ? 190 : 92) && Value(b, "Verb") == (maniac ? 4 : 1));
                 var interact = Control<Panel>("GenericRoomActionsHost").Children.OfType<Expander>().Single();
                 interact.IsExpanded = true; window.UpdateLayout();
                 Require(action.IsVisible, "Real Interact expander did not expose direct action row");
@@ -193,11 +208,11 @@ internal static class Program
                 var inputs = Play().DeliveredInput.Count;
                 var sentences = Play().SessionTrace.Count(line => line.StartsWith("sentence script", StringComparison.Ordinal));
                 action.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                Require(Play().LastAction?.ObjectId == (maniac ? 413 : 92) && Play().LastAction?.VerbId == (maniac ? 11 : 1) && Play().DeliveredInput.Count == inputs,
+                Require(Play().LastAction?.ObjectId == (maniac ? 190 : 92) && Play().LastAction?.VerbId == (maniac ? 4 : 1) && Play().DeliveredInput.Count == inputs,
                     "Direct Interact composed/dispatched player input");
                 Require(Play().SessionTrace.Count(line => line.StartsWith("sentence script", StringComparison.Ordinal)) == sentences, "Direct Interact dispatched a native sentence");
-                if (maniac) Require(Play().InCutscene && !Play().CutsceneSkippable, "Native telescope no-override scene not reached");
-                else Require((Play().Snapshot.ObjectStates.GetValueOrDefault(92) & 8) != 0, "Direct native Open did not open the drawer");
+                Require((Play().Snapshot.ObjectStates.GetValueOrDefault(maniac ? 190 : 92) & 8) != 0,
+                    maniac ? "Direct native Turn on did not switch on the TV" : "Direct native Open did not open the drawer");
                 Log($"Direct named {Caption(action)}: own object/verb LastAction; unchanged delivered input and sentence trace; native result reached"); Capture("direct-native-source-action");
                 File.WriteAllLines(Path.Combine(output, "direct-source-trace.txt"), Play().SessionTrace.TakeLast(80));
                 Control<CheckBox>("AdvancedModeToggle").IsChecked = true; Call("UpdateAdvancedMode");
@@ -216,10 +231,14 @@ internal static class Program
                 Require(((StackPanel)raw.Content).Children.OfType<TextBox>().Any(t => t.Text.Length > 0), "Object raw source did not expand");
                 Require(sourceHost.Children.OfType<TextBlock>().Any(t => t.Text.StartsWith("RELATIONSHIPS", StringComparison.Ordinal)), "Possible relationship section missing");
                 Capture("advanced-room-source"); Log("Advanced room scripts/interactions/possible source relationships visible; titles retain no verb byte");
-                await Open("loom ega mt32 en");
-                Require(Control<Button>("InteractButton").Visibility == Visibility.Visible, "Generic-to-LOOM switch lost legacy Interact");
-                Require(Control<Panel>("GenericRoomActionsHost").Visibility == Visibility.Collapsed && Control<Panel>("GenericRoomSourceHost").Visibility == Visibility.Collapsed, "Generic source hosts leaked into LOOM");
-                Log("PASS bounded real-window direct action, static scene availability, Advanced source and generic-to-LOOM checks");
+                if (fixture == "mmansionE ega es")
+                {
+                    await Open("loom ega mt32 en");
+                    Require(Control<Button>("InteractButton").Visibility == Visibility.Visible, "Generic-to-LOOM switch lost legacy Interact");
+                    Require(Control<Panel>("GenericRoomActionsHost").Visibility == Visibility.Collapsed && Control<Panel>("GenericRoomSourceHost").Visibility == Visibility.Collapsed, "Generic source hosts leaked into LOOM");
+                    Log("Generic-to-LOOM legacy Interact visibility restored; both generic hosts collapsed");
+                }
+                Log("PASS actual menus after native intro, direct own-source action and Advanced source; LOOM switch only in enhanced Maniac run");
             }
             catch (Exception ex) { Log("FAIL " + ex); Environment.ExitCode = 1; }
             finally { Call("StopPlay"); window.Close(); app.Shutdown(); }

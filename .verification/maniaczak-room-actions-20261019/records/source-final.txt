@@ -1,0 +1,23 @@
+ManiacClassic | 27 clean source scene titles | Room 28: 10 source entries, 10 fully decoded ordinary actions
+  Room 01 · Give contract
+  Room 01 · Walk to front door
+  Room 01 · Push doorbell
+  Room 04 · Walk to inner door
+  Declared planner start: Preview start assumes the reviewed character-menu clicks selecting Syd, Bernard and Start, then runs the opening to player control. No route to the catalog room was played; an already selected party is preserved.
+ManiacEnhanced | 27 clean source scene titles | Room 28: 10 source entries, 10 fully decoded ordinary actions
+  Room 01 · Da contrato
+  Room 01 · Ir a puerta delantera
+  Room 01 · Empuja timbre
+  Room 04 · Ir a puerta interior
+  Declared planner start: Preview start assumes the reviewed character-menu clicks selecting Syd, Bernard and Start, then runs the opening to player control. No route to the catalog room was played; an already selected party is preserved.
+ZakClassic | 54 clean source scene titles | Room 1: 95 source entries, 74 fully decoded ordinary actions
+  Room 01 · Read phone bill
+  Room 01 · Use telephone
+  Room 02 · Entry
+  Room 02 · Use remote control
+ZakEnhanced | 54 clean source scene titles | Room 1: 91 source entries, 70 fully decoded ordinary actions
+  Room 01 · Read phone bill
+  Room 01 · Use telephone
+  Room 02 · Entry
+  Room 02 · Use remote control
+PASS: four own-data title/source checks; no App/MainWindow/window constructed; no scene run or native fidelity claim.

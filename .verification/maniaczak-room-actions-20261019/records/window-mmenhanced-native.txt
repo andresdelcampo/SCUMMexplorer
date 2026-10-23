@@ -1,0 +1,12 @@
+25,58s Opened ManiacEnhanced; initial direct actions=58, enabled=0
+25,62s Normal source room choice counts: 26:2, 31:2, 1:1, 4:1, 8:1, 17:1, 28:1, 29:1, 30:1, 34:1, 40:1, 51:1
+25,62s KNOWN GAP: static unanswered native party scope keeps explicit scene launch disabled; not bypassing that scope
+28,74s Scene control state: visible=True, enabled=True, timer=True, native boot=False
+29,00s Normal actual Room26 scene control: 2 readable choices, popup rows=2, evidence mode correct
+29,44s Explicit popup launch adopted native Room1, LastAction=394/9
+29,67s Scene control state: visible=True, enabled=True, timer=True, native boot=False
+30,10s Advanced actual Room26 scene control: 5 readable choices, popup rows=5, evidence mode correct
+30,55s Explicit popup launch adopted native Room1, LastAction=394/9
+30,89s FAIL System.InvalidOperationException: Native telescope no-override scene not reached
+   at Program.Require(Boolean value, String reason) in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 19
+   at Program.<>c__DisplayClass4_0.<<Window>b__18>d.MoveNext() in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 207

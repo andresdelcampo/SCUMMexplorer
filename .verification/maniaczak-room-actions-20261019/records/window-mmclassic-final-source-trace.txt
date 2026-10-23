@@ -1,0 +1,67 @@
+cutscene at Script 01 +0x0018 (native v1/v2 scope)
+Script 168 waits 432000 jiffies (delay) before +0x000A
+Script 01 continues at +0x019B in Room 45 after loadRoom
+Script 01 waits 60 jiffies (delay) before +0x01A7
+input: click in the room at screen (76, 120), room (76, 104) runs script 4 with [2, 0, 1] (runInputScript)
+stopScript 2 at Script 04 +0x026A: script 2 was not running
+sentence script 2 runs verb 0x09 with objects 260 and 0
+Script 02 +0x019F: startObject runs object 260 verb 0x09
+Script 01's delay ends; it runs again at +0x01A7
+input: click in the room at screen (196, 120), room (196, 104) runs script 4 with [2, 0, 1] (runInputScript)
+stopScript 2 at Script 04 +0x026A: script 2 was not running
+sentence script 2 runs verb 0x09 with objects 263 and 0
+Script 02 +0x019F: startObject runs object 263 verb 0x09
+input: click in the room at screen (292, 76), room (292, 60) runs script 4 with [2, 0, 1] (runInputScript)
+stopScript 2 at Script 04 +0x026A: script 2 was not running
+sentence script 2 runs verb 0x09 with objects 403 and 0
+Script 02 +0x019F: startObject runs object 403 verb 0x09
+Script 01 +0x025E: room 0 (no room) after a frame advance
+Script 01 continues at +0x025F in Room 00 after loadRoom
+Script 01 +0x025F: room 0 (no room) after a frame advance
+Script 01 continues at +0x0261 in Room 00 after loadRoom
+cutscene at Script 120 +0x0000 (native v1/v2 scope)
+Script 01 pauses after startScript +0x0273: nested execution froze its caller
+Script 120 continues at +0x001C in Room 33 after loadRoom
+Script 120 waits 120 jiffies (delay) before +0x0022
+Script 120's delay ends; it runs again at +0x0022
+Script 120 waits 180 jiffies (delay) before +0x003F
+Script 120's delay ends; it runs again at +0x003F
+abortCutscene: Script 120 continues at its skip jump +0x0002, var[0x005] = 1
+stopScript 135 at Script 120 +0x01B7: ended its pending run
+Script 120 +0x01C2: room 0 (no room) after a frame advance
+Script 120 continues at +0x01C3 in Room 00 after loadRoom
+Script 57 waits 360000 jiffies (delay) before +0x0004
+Script 131 +0x0004: camera x = 160 (actor 3's x) (estimate)
+Script 131 continues at +0x0006 in Room 44 after actorFollowCamera
+cutscene at Script 131 +0x0006 (native v1/v2 scope)
+Script 57 waits 360000 jiffies (delay) before +0x0004
+Script 131 waits 60 jiffies (delay) before +0x001A
+Script 131's delay ends; it runs again at +0x001A
+Script 131 waits 60 jiffies (delay) before +0x003F
+Script 131's delay ends; it runs again at +0x003F
+Script 131 waits 120 jiffies (delay) before +0x0082
+Script 131's delay ends; it runs again at +0x0082
+Script 131 waits 120 jiffies (delay) before +0x013E
+Script 131's delay ends; it runs again at +0x013E
+Script 131 waits 60 jiffies (delay) before +0x020B
+Script 131's delay ends; it runs again at +0x020B
+Script 131 waits 60 jiffies (delay) before +0x0228
+Script 131's delay ends; it runs again at +0x0228
+endCutscene follows ego at x = 160 (estimate)
+boot: 911 frames after script 001's first room load; now in Room 44
+input: click in the room at screen (8, 136), room (8, 120) runs script 4 with [2, 0, 1] (runInputScript)
+stopScript 2 at Script 04 +0x026A: script 2 was not running
+sentence script 2 runs verb 0x0D with objects 258 and 0
+Script 02 +0x019F: startObject runs object 258 verb 0x0D
+loadRoomWithEgo at Room 44 / Object 258 / Verb 0x0D +0x0013 ends this room-owned script (startScene); the session enters Room 01
+stopScript 57 at Room 44 / Exit script +0x0000: ended its pending run
+Script 57 waits 360000 jiffies (delay) before +0x0004
+Room 44 / Object 258 / Verb 0x0D +0x0013: camera x = 1120 (the ego's x) (estimate)
+Room 44 / Object 258 / Verb 0x0D +0x0013: the ego (actor 3) stands at (1256, 134), box 9 (estimate: the ego's arrival at Room 44 / Object 258 / Verb 0x0D +0x0013 follows a seeded pick)
+manual selection of Room 17: retired departed scene slots without executing their remaining story or an override jump
+stopScript 57 at Room 01 / Exit script +0x0000: script 57 was not running
+Room 11 Object 181 Verb 0x0D +0x002B: camera x = 160 (the ego's x) (estimate)
+Room 11 Object 181 Verb 0x0D +0x002B: the ego (actor 3) stands at (40, 112), box 2 (estimate: assumed arrival at Room 11 Object 181 Verb 0x0D +0x002B after a catalog visit)
+cutscene at Script 112 +0x0000 (native v1/v2 scope)
+Script 112 waits 120 jiffies (delay) before +0x0005
+Room 17 / Object 190 / Verb 0x04 pauses after startScript +0x0024: nested execution froze its caller

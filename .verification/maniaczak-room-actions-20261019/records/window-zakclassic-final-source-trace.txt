@@ -1,0 +1,80 @@
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.
+boot: 1784 frames after script 001's first room load; now in Room 01
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Room 01 / Object 101 / Verb 0xFD's delay ends; it runs again at +0x004B
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.
+Room 01 / Object 101 / Verb 0xFD waits 120 jiffies (delay) before +0x004B
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Room 01 / Object 101 / Verb 0xFD's delay ends; it runs again at +0x004B
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Room 01 / Object 101 / Verb 0xFD waits 120 jiffies (delay) before +0x004B
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Room 01 / Object 101 / Verb 0xFD's delay ends; it runs again at +0x004B
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x0092
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x009D
+Sound 02 completed on its Player_V2 control clock.
+Script 09's delay ends; it runs again at +0x0004
+Room 01 / Object 95 / Verb 0xFD's delay ends; it runs again at +0x009D
+Script 09 waits 60 jiffies (delay) before +0x0004
+Room 01 / Object 95 / Verb 0xFD waits 60 jiffies (delay) before +0x0092
+Sound 02 completed on its Player_V2 control clock.

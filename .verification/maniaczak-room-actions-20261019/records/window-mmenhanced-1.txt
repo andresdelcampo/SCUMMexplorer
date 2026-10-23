@@ -1,0 +1,6 @@
+26,31s Opened ManiacEnhanced; initial direct actions=58, enabled=0
+26,35s FAIL System.InvalidOperationException: Expected multiple Room01 scene choices
+   at Program.Require(Boolean value, String reason) in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 19
+   at Program.<>c__DisplayClass4_0.<<Window>g__Menu|17>d.MoveNext() in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 125
+--- End of stack trace from previous location ---
+   at Program.<>c__DisplayClass4_0.<<Window>b__18>d.MoveNext() in D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\zakclassic-palette-core-20261019\.verification\maniaczak-room-actions-20261019\Program.cs:line 159

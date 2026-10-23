@@ -1,0 +1,12 @@
+36,99s Opened ZakEnhanced; initial direct actions=70, enabled=70
+37,02s Normal source room choice counts: 16:4, 1:3, 11:3, 14:2, 2:1, 3:1, 4:1, 7:1, 8:1, 10:1, 15:1, 22:1, 23:1, 30:1, 32:1, 34:1, 40:1, 48:1, 54:1
+41,89s Scene control state: visible=True, enabled=True, timer=True, native boot=False
+42,06s Normal actual Room16 scene control: 4 readable choices, popup rows=4, evidence mode correct
+42,40s Explicit popup launch adopted native Room2, LastAction=/
+42,93s Scene control state: visible=True, enabled=True, timer=True, native boot=False
+43,25s Advanced actual Room16 scene control: 15 readable choices, popup rows=15, evidence mode correct
+43,73s Explicit popup launch adopted native Room2, LastAction=/
+48,82s Direct named Open · dresser drawer: own object/verb LastAction; unchanged delivered input and sentence trace; native result reached
+48,86s Advanced own-data sections: entry=True, exit=True, locals=0; v1/v2 have no local directory
+49,00s Advanced room scripts/interactions/possible source relationships visible; titles retain no verb byte
+49,00s PASS actual menus after native intro, direct own-source action and Advanced source; LOOM switch only in enhanced Maniac run
