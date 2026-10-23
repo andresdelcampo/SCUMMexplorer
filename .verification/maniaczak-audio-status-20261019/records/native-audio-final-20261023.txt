@@ -1,0 +1,2 @@
+2,39s PASS real LOOM music resource 13: native AdLib rendition opened with audio; no listening/sync claim
+3,13s PASS actual rendered LOOM music→Maniac folder switch: player closed, temporary file retired, event source detached and room menu cleared

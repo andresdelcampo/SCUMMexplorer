@@ -1,0 +1,9 @@
+2,62s PASS actual LOOM→Maniac folder change: synthetic pending render canceled, detached and replaced; late uncooperative completion produces no MediaPlayer/output or replacement-renderer call; old CD source null
+10,14s PASS mmansionE ega es: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+10,52s PASS mmansionE ega es: actual Normal Sounds popup opens; 1 native source/reached candidates; plain labels/no source tooltips; device selector visible; CD mute/unmute preserves generic menu; no scan executes game code
+15,03s PASS mmansion ega en: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+15,23s PASS mmansion ega en: actual Normal Sounds popup opens; 1 native source/reached candidates; plain labels/no source tooltips; device selector visible; CD mute/unmute preserves generic menu; no scan executes game code
+23,70s PASS zak ega en: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+23,90s PASS zak ega en: actual Normal Sounds popup opens; 22 native source/reached candidates; plain labels/no source tooltips; device selector visible; CD mute/unmute preserves generic menu; no scan executes game code
+32,62s PASS zakE ega en: actual modal header; native party preserved; one-click grant+close; same-session reopen Undo; unchanged Apply closes; stale native-frame batch rejected and stays open; clock restored
+32,82s PASS zakE ega en: actual Normal Sounds popup opens; 22 native source/reached candidates; plain labels/no source tooltips; device selector visible; CD mute/unmute preserves generic menu; no scan executes game code
