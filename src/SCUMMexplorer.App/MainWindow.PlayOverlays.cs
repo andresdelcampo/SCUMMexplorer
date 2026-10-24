@@ -1,3 +1,4 @@
+using DisplayMode = SCUMMexplorer.Core.Scumm.RoomOverlayMode;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +20,7 @@ public partial class MainWindow
     private (int X, int Y)? _playOverlayPointer;
     private ScummRoomScene? _playOverlayScene;
     private Dictionary<int, string> _playOverlayNames = [];
+    private Dictionary<int, int> _playOverlayLocalIndex = [];
     private string? _playOverlayListKey;
     private UIElement[] _playOverlayObjectRows = [];
     private UIElement[] _playOverlayDoorwayRows = [];
@@ -70,8 +72,8 @@ public partial class MainWindow
         if (changed || wanted || IsAdvancedMode || _playOverlayScene is null) _playOverlayScene = _playScreen.Scene();
         if (_playOverlayScene is not { } scene || scene.RoomId != roomId) { ClearPlayOverlays(); return; }
 
-        ObjectAreaOptions.Visibility = Visibility.Visible;
-        DoorwayOptions.Visibility = _playDoorwayTargets.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        ObjectAreaOptions.Visibility = RoomOverlayRules.HotspotOptionOffered() ? Visibility.Visible : Visibility.Collapsed;
+        DoorwayOptions.Visibility = RoomOverlayRules.DoorwayOptionOffered(_playDoorwayTargets.Count) ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.Visibility = WalkBoxToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.IsEnabled = scene.Room.DepthMask is not null || scene.Room.ExtraDepthMasks.Count > 0;
         RoomMaskToggle.ToolTip = RoomMaskToggle.IsEnabled ? "Highlight the displayed room and active objects' native depth areas." : "No depth areas are stored in this room.";
@@ -118,8 +120,7 @@ public partial class MainWindow
         foreach (var obj in ScummRoomOverlays.Objects(scene, _playDoorwayTargets))
         {
             var mode = obj.IsDoorway ? DoorwayMode : ObjectAreaMode;
-            if (mode == DisplayMode.Never || mode == DisplayMode.Hover &&
-                (pointInRoom is not { } hover || !obj.Contains(hover.X, hover.Y))) continue;
+            if (!RoomOverlayRules.Shows(mode, pointInRoom is { } hover && obj.Contains(hover.X, hover.Y))) continue;
             var at = Map(obj.X, obj.Y);
             var color = obj.IsDoorway ? Color.FromRgb(255, 207, 105) : Color.FromRgb(120, 220, 255);
             var bounds = new Border
@@ -180,9 +181,13 @@ public partial class MainWindow
                 }
             else
             {
-                var button = Item(name);
+                // LOOM's row pattern (R-6.21): the stored name, else `Hotspot N`; a name used twice carries the index.
+                var local = _playOverlayLocalIndex.GetValueOrDefault(obj.ObjectId, obj.ObjectId);
+                var stored = _playOverlayNames.GetValueOrDefault(obj.ObjectId);
+                var repeated = objects.Where(other => !other.IsDoorway).Count(other => _playOverlayNames.GetValueOrDefault(other.ObjectId) is { } n && n == stored) > 1;
+                var button = Item(RoomControlText.HotspotLabel(stored, local, stored is not null && repeated));
                 button.Tag = obj.ObjectId;
-                button.ToolTip = $"Room {scene.RoomId:00} object {obj.ObjectId}: choose an exploration interaction.";
+                button.ToolTip = RoomControlText.HotspotTip(local, obj.ObjectId, stored, obj.X, obj.Y, obj.Width, obj.Height);
                 button.Click += (_, _) => interact(obj.ObjectId);
                 button.MouseEnter += (_, _) => { _playOverlayPointer = (obj.X + obj.Width / 2 - _playShown!.ViewLeft, obj.Y + obj.Height / 2 + _playShown.RoomTop); RefreshPlayOverlays(); };
                 button.MouseLeave += (_, _) => UpdatePlayOverlayHover(null);
@@ -215,6 +220,7 @@ public partial class MainWindow
         if (resource is null) return [];
         var found = new Dictionary<int, int[]>();
         _playOverlayNames = [];
+        _playOverlayLocalIndex = [];
         try
         {
             // Background preparation has its own seekable readers. Never scan an active archive handle concurrently.
@@ -224,6 +230,7 @@ public partial class MainWindow
             _playOverlayNames = room.ObjectNames.ToDictionary(pair => pair.Key, pair => ScummTextDecoder.DecodeGlyphs(pair.Value).Trim().TrimEnd('@').Trim())
                 .Where(pair => !string.IsNullOrWhiteSpace(pair.Value)).ToDictionary();
             var records = room.Objects;
+            _playOverlayLocalIndex = records.DistinctBy(record => record.Id).ToDictionary(record => record.Id, record => record.LocalIndex);
             var verbs = data.ReadObjectVerbs(roomId, records);
             var finder = new ScummDoorwayFinder(game, data);
             foreach (var record in records)

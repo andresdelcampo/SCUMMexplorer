@@ -91,5 +91,17 @@ public static class RoomControlText
         : !canStart ? GlobalCutsceneBusyTip
         : entries.Count == 1 ? $"Play {entries[0].Title}" : "Choose a cutscene that happens in this room.";
 
+    /// <summary>The hotspot row's caption (LOOM's pattern): the stored name, else `Hotspot N`; a name used twice carries the index.</summary>
+    public static string HotspotLabel(string? name, int localIndex, bool repeated)
+    {
+        var label = name ?? $"Hotspot {localIndex}";
+        return repeated ? $"{label} · {localIndex}" : label;
+    }
+
+    /// <summary>The hotspot row's tooltip (LOOM's pattern).</summary>
+    public static string HotspotTip(int localIndex, int objectId, string? name, int x, int y, int width, int height) =>
+        $"Hotspot {localIndex} · object {objectId}" + (name is null ? "" : $" · stored name \"{name}\"") +
+        $" · {x}, {y} · {width} × {height}. Choose a decoded interaction. Use Enter or Space to activate this hotspot.";
+
     public static string InteractCaption(string? targetName) => string.IsNullOrEmpty(targetName) ? "Interact ▴" : $"Interact · {targetName} ▴";
 }

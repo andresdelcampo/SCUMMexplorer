@@ -1,3 +1,4 @@
+using DisplayMode = SCUMMexplorer.Core.Scumm.RoomOverlayMode;
 using System.IO;
 using System.Diagnostics;
 using System.Windows;
@@ -775,7 +776,7 @@ public partial class MainWindow : Window
         {
             var label = same.FirstOrDefault(item => item.Name.Length > 0) ?? same.First();
             var targets = _roomNavigationCandidates.Where(item => same.Any(other => other.Id == item.Object.Id)).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
-            if (targets.Length == 0 || DoorwayMode == DisplayMode.Never || DoorwayMode == DisplayMode.Hover && !same.Any(item => _hoveredDoorwayIds.Contains(item.Id))) continue;
+            if (targets.Length == 0 || !RoomOverlayRules.Shows(DoorwayMode, same.Any(item => _hoveredDoorwayIds.Contains(item.Id)))) continue;
             yield return (label.X, label.Y, label.Width, label.Height, targets, true,
                 $"{BrowsedName(label)}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))} (a static candidate; no script condition is evaluated). " +
                 "The Advanced doorway buttons open the rooms directly.",
@@ -3709,11 +3710,8 @@ public partial class MainWindow : Window
             {
                 var button = new Button
                 {
-                    Content = repeated.Contains(label) ? $"{label} · {record.LocalIndex}" : label,
-                    ToolTip = $"Hotspot {record.LocalIndex} · object {record.Id}" +
-                              (name is null ? "" : $" · stored name \"{name}\"") +
-                              $" · {record.X}, {record.Y} · {record.Width} × {record.Height}. " +
-                              "Choose a decoded interaction. Use Enter or Space to activate this hotspot.",
+                    Content = RoomControlText.HotspotLabel(name, record.LocalIndex, repeated.Contains(label)),
+                    ToolTip = RoomControlText.HotspotTip(record.LocalIndex, record.Id, name, record.X, record.Y, record.Width, record.Height),
                     Tag = record.Id,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     Margin = new Thickness(0, 0, 0, 3),
@@ -3948,7 +3946,7 @@ public partial class MainWindow : Window
         return string.Join("\n", lines);
     }
 
-    private enum DisplayMode { Never, Hover, Always }
+
     private DisplayMode DoorwayMode => DoorwaysAlways.IsChecked == true ? DisplayMode.Always : DoorwaysHover.IsChecked == true ? DisplayMode.Hover : DisplayMode.Never;
     private DisplayMode ObjectAreaMode => ObjectsAlways.IsChecked == true ? DisplayMode.Always : ObjectsHover.IsChecked == true ? DisplayMode.Hover : DisplayMode.Never;
     private bool _viewOptionsReady;
@@ -5724,7 +5722,7 @@ public partial class MainWindow : Window
         RoomNavigationPanel.ToolTip = "Possible doorways: rooms that decoded hotspot code can load. " +
                                       "A button opens the room directly for exploration; clicking a doorway box on the room runs its script.";
         RoomNavigationPanel.Visibility = IsAdvancedMode && _roomNavigationCandidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        DoorwayOptions.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+        DoorwayOptions.Visibility = RoomOverlayRules.DoorwayOptionOffered(_roomNavigationCandidates.Count) ? Visibility.Visible : Visibility.Collapsed;
         ObjectAreaOptions.Visibility = Visibility.Visible;
         RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never
             ? Visibility.Visible : Visibility.Collapsed;
@@ -5751,7 +5749,7 @@ public partial class MainWindow : Window
         if (_olderObjects.Count > 0) boxes = BrowsedDoorwayBoxes();
         else if (_session?.Snapshot is { } snapshot)
             // Doorways that share one rectangle get one box and one label.
-            boxes = VisibleDoorways(snapshot).Where(record => DoorwayMode == DisplayMode.Always || DoorwayMode == DisplayMode.Hover && _hoveredDoorwayIds.Contains(record.Id)).GroupBy(record =>
+            boxes = VisibleDoorways(snapshot).Where(record => RoomOverlayRules.Shows(DoorwayMode, _hoveredDoorwayIds.Contains(record.Id))).GroupBy(record =>
                 {
                     var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
                         ? current : new RoomObjectPosition(record.X, record.Y);
