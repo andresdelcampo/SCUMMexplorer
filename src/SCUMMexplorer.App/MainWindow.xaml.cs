@@ -737,7 +737,9 @@ public partial class MainWindow : Window
     /// </summary>
     private IReadOnlyList<RoomVerbDestination> FindBrowsedDoorways(GameResource room)
     {
-        if (_game is not { Version: ScummVersion.V3 or ScummVersion.V4 } game || room.ResourceId is not int roomId) return [];
+        // R-6.23 / R-6.41 (user, 24 Oct 2026: Maniac enhanced showed no doorways until Play Game Intro): every engine version with a script reader
+        // (v1 to v4 here) derives its doorways from the room's own verb scripts, in a static preview as in play. Only v1/v2 were left out.
+        if (_game is not { Version: ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3 or ScummVersion.V4 } game || room.ResourceId is not int roomId) return [];
         try
         {
             // A browsed v4 game reads its room out of the disk (or the room files) that holds it.

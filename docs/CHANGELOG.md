@@ -2,6 +2,10 @@
 
 Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 24 October: Maniac Mansion and Zak doorways in a static preview; hover freeze not reproduced
+
+The browse path found doorways only for engine versions 3 and 4, so Maniac Mansion and Zak (v1/v2, classic and enhanced) showed none until Play Game Intro ran the native screen; v1 to v4 now derive them from the room's own verb scripts, and the browsed Advanced rows are no longer collapsed while no native screen is live (R-6.47, ScummStaticDoorwayTests, window check in [record](../.verification/hover-freeze-20261024/README.md)). The reported hover freeze on Maniac Room 44 did not reproduce (heartbeat gaps under 40 ms); the HoverStorm harness stays.
+
 ## 24 October: REQUIREMENTS based on the shared room controls (R-6.30 to R-6.46)
 
 New section 6.1 states every room control once (bar, both Play Cutscene buttons, Play Game Intro, Interact, Sounds, Options, Advanced panel, Game Status entry, keys, live/static/cutscene states) as fixed UI plus what IRoomControlProvider supplies; the scattered rows point to it (R-6.9, R-6.17 and R-6.22 are stubs merged into R-6.39; R-6.5, R-6.6, R-6.23, R-7.3 and others rewritten). Documentation only; the rows record the places where code does not yet meet them.

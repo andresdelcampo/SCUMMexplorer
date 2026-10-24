@@ -1,0 +1,19 @@
+# Maniac enhanced: hover freeze report and hidden doorways, 24 October 2026
+
+User report (24 Oct, verbatim): "MM hovering over the cartel at the entrance (room 44) (hovering over objects in general?) feels sluggish and eventually freezes the Windows UI as a whole -until the app is somehow closed. Likely endless loop, recursion." and "MM Doorways not visible until Play Game Intro is used. On purpose? Hotspots IS enabled before."
+
+## Harness
+
+`HoverStorm/` (real `MainWindow`, private `SCUMM_EXPLORER_PROFILE_ROOT` and room cache): opens a game, selects a room, optionally presses Play Game Intro, keeps every clock running, then moves the real cursor (Win32 `SetCursorPos`, device pixels: the first run used device and DIP units mixed, which is why the points missed the sign, as the user saw) over the stored objects' boxes for 5 s per option combination, with a 10 ms `DispatcherTimer` heartbeat, input-queue turnaround per step and the count of steps with an object really under the pointer. A watchdog thread exits if the dispatcher stalls 20 s. `run-storm.ps1` runs one case; `run-doorways.ps1` checks the doorway options and rows of the four Maniac/Zak copies without moving the mouse.
+
+## 1. Freeze: not reproduced
+
+Maniac enhanced Room 44 (static preview, browsed picture, the sign "cartel" at 8,80 32x24 in a 320x128 room), pointer jittering inside the sign (285 of 295 steps over it), Normal and Advanced, Hotspots Never / On hover / Always: heartbeat max gap 19 to 26 ms, input turnaround worst 30 ms, none over 100 ms (`out-before/`). After Play Game Intro (live native screen, 8 stored objects) the same: max gap 35 ms (`out-before-intro/`). The same run on the Codex build `79b481b8` (before the one-path hotspot unification, built in a scratch worktree, removed) also showed max gap 35 ms, but that run only reached live Room 45 and the pointer never was over an object there (0 hits), so it does not rule the older build in or out. The user also could not reproduce it on the current build. No loop or recursion was found in the hover path (`RoomPreview_MouseMove`, `ShowBrowsedHighlight`, `UpdatePlayOverlayHover`); the possible per-move cost (`PlayHotspots.Hotspots()` plus `GenericObjectActions` on every move in the native screen) was not slow in the measurements. Status: open, no fix and no regression guard added (a guard needs a window; the harness is the guard and is kept). The game cursor path (live play with control) was not reached: the intro did not hand control back within 60 to 240 s in the harness.
+
+## 2. Doorways hidden until Play Game Intro: cause and fix
+
+Cause: `MainWindow.FindBrowsedDoorways` (the static/browsed preview) returned nothing for engine versions 1 and 2 (`Version: V3 or V4` gate), so Maniac Mansion and Zak McKracken (v1/v2 classic and enhanced) had no doorway candidates before the game ran; after Play Game Intro the native screen derives them with `ReadPlayDoorwayTargets` (which uses `ScummDataSources.For`, any version). Not intended.
+
+Second cause: `RefreshPlayRoomActions` collapsed the browsed `HOTSPOTS`/`DOORWAYS` panels for every verb-played game even when no native screen was live, so in Advanced the doorway rows vanished after the first toggle.
+
+Fix: the gate admits v1 to v4 (the data source the game's version selects); the panels are collapsed only while a native screen is live (`PlayActive`). Test `ScummStaticDoorwayTests` (the same derivation on the four copies; at least 5 rooms with doorways each). Window check (`doorways-after2.txt`): Doorways option offered, and Advanced rows listed and visible, for Maniac classic and enhanced Rooms 26 (1) and 16 (2) and Zak classic and enhanced Rooms 1 to 3 (1, 2, 3). Maniac Room 44 offers none in a static preview: only its stored visible object (the sign) is shown, and its exits are objects the preview does not draw (R-6.47).

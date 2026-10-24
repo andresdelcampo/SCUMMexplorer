@@ -52,8 +52,13 @@ public partial class MainWindow
         }
         // The old browse-first object/navigation lists were built for the original
         // selected room. The native session can now have loaded another room.
-        ObjectListSection.Visibility = Visibility.Collapsed;
-        RoomNavigationPanel.Visibility = Visibility.Collapsed;
+        // Only while the native screen is live: RefreshPlayOverlayLists then fills its own rows. A static preview (R-6.23, 24 Oct 2026) keeps the
+        // browsed hotspot and doorway rows, which are the only ones it has.
+        if (PlayActive)
+        {
+            ObjectListSection.Visibility = Visibility.Collapsed;
+            RoomNavigationPanel.Visibility = Visibility.Collapsed;
+        }
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         if (changed)
         {
