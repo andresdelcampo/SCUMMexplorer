@@ -2,6 +2,10 @@
 
 Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 24 October: LOOM parity of the room controls (R-6.21 to R-6.25)
+
+Interact (bar button and object menu, right click), Step ▸, Sounds rows and the Hotspots/Doorways default radios of every verb-based game follow LOOM; the radios were unselected in LOOM too. [Record](../.verification/loom-parity-20261024/README.md).
+
 ## 24 October: static previews keep the room's controls and run only ambient scripts (all generic games, LOOM)
 
 - A room that cannot be prepared live (MI2 Room 4, Indy 3 Room 1, LOOM static rooms) keeps the playback bar (Pause works), Play Cutscene, Interact, Sounds and Play Game Intro, and its permanent animation runs: only the scripts its entry starts that loop on pictures/sounds and never cut, print, load a room, move the camera or touch input (`ScummAmbientScripts`, decided from the game's code, no room list); none of the other entry code runs and no click reaches the game. Maniac Mansion keeps its own startup rules. Requirements R-8.5b, R-6.17, R-8.2a, R-13.11, R-13.12 extended. Room Sounds by number for MI2 and Indy 4. Record: [static-preview-controls-20261020](../.verification/static-preview-controls-20261020/README.md).
