@@ -2,6 +2,10 @@
 
 Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 24 October: REQUIREMENTS based on the shared room controls (R-6.30 to R-6.46)
+
+New section 6.1 states every room control once (bar, both Play Cutscene buttons, Play Game Intro, Interact, Sounds, Options, Advanced panel, Game Status entry, keys, live/static/cutscene states) as fixed UI plus what IRoomControlProvider supplies; the scattered rows point to it (R-6.9, R-6.17 and R-6.22 are stubs merged into R-6.39; R-6.5, R-6.6, R-6.23, R-7.3 and others rewritten). Documentation only; the rows record the places where code does not yet meet them.
+
 ## 24 October: LOOM parity of the room controls (R-6.21 to R-6.25)
 
 Interact (bar button and object menu, right click), Step ▸, Sounds rows and the Hotspots/Doorways default radios of every verb-based game follow LOOM; the radios were unselected in LOOM too. [Record](../.verification/loom-parity-20261024/README.md).
