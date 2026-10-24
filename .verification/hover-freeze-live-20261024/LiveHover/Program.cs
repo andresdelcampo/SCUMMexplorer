@@ -14,6 +14,9 @@ using SCUMMexplorer.App;
 // managed memory, overlay children. A watchdog ends only this process.
 internal static class Program
 {
+    [System.Runtime.InteropServices.DllImport("user32.dll")] static extern uint GetGuiResources(IntPtr process, uint flags);
+    static int Visuals(DependencyObject o) { var n = 1; for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(o); i++) n += Visuals(System.Windows.Media.VisualTreeHelper.GetChild(o, i)); return n; }
+    static string Resources(Window w) { var p = Process.GetCurrentProcess(); p.Refresh(); return $"GDI {GetGuiResources(p.Handle, 0)} USER {GetGuiResources(p.Handle, 1)} handles {p.HandleCount} threads {p.Threads.Count} private {p.PrivateMemorySize64 / 1048576} MB visuals {Visuals(w)}"; }
     const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
     [System.Runtime.InteropServices.DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
     [System.Runtime.InteropServices.DllImport("user32.dll")] static extern bool GetCursorPos(out Pt point);
@@ -155,7 +158,7 @@ internal static class Program
                     if ((i + 1) % 250 == 0)
                     {
                         Log($"moves {i + 1}: body mean {sumMs / n:F3} ms worst {worst:F2} ms; heartbeat max gap {maxGap} ms; mem {GC.GetTotalMemory(false) / 1048576} MB, ws {Process.GetCurrentProcess().WorkingSet64 / 1048576} MB; " +
-                            $"overlay children {canvas.Children.Count}, ObjectList {objectList.Children.Count}, trace {PlayGet<IReadOnlyList<string>>("SessionTrace").Count}, elapsed {rate.Elapsed.TotalSeconds:F1} s");
+                            $"overlay children {canvas.Children.Count}, ObjectList {objectList.Children.Count}, trace {PlayGet<IReadOnlyList<string>>("SessionTrace").Count}, elapsed {rate.Elapsed.TotalSeconds:F1} s; {Resources(window)}");
                         sumMs = 0; worst = 0; n = 0; maxGap = 0;
                     }
                 }
