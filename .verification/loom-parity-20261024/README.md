@@ -33,6 +33,20 @@ Method: `ParityAudit/` (serial, private profile `SCUMM_EXPLORER_PROFILE_ROOT`, o
 
 Generic-path changes also reach the Indy3, Monkey Island and Indy 4 sessions: the Interact button/menu (they show it instead of the expander), right click for engine version 3 and below, Step ▸, Sounds rows, radios.
 
+## Abstraction (user, 24 Oct: one shared UI and behaviour, only the content varies; R-16.9)
+
+Done (each a green commit):
+- `c2048098` R-16.9. `Core/Scumm/Session/RoomControlContract.cs`: `IRoomControlProvider` (transport state, room cutscene entries with Normal/Advanced titles, Interact state and menu, Sounds menu, Pause/Step/Skip/Skip line) and `RoomControlText` (LOOM's wording of every caption and tooltip, plus the hotspot row label/tooltip).
+- `6dea8056` `MainWindow.RoomControls.cs` is the only implementation of the playback bar, both Play Cutscene buttons, Interact, Sounds and their click handlers. `LoomRoomControls` (EGA/CD, demos, static preview) and `PlayRoomControls` (every `ScummGameSession` family: v1/v2 Maniac/Zak, verb-based v3/v4/v5, their static previews) are the two providers; `NoRoomControls` is the empty one. The forks `UpdatePlayCutsceneControls`, `UpdatePlayTransportControls`, `CdRoomSounds_Click`, `TryShowGenericRoomSounds`, `OpenGenericInteractMenu`, `OpenInteractMenu` and the per-game branches in the Pause/Skip/Step handlers are deleted. Window dumps of LOOM 2 and 13 and of Maniac Classic, Zak Classic, Zak Enhanced are identical before and after (0 diffs); Indy3, Monkey Island 1, MI2 and Indy 4 static rooms open without error.
+- `773b3639` `RoomOverlayRules`/`RoomOverlayMode` (Core): when a box is drawn (Never/Hover/Always), when the `Doorways` row is offered, the `Hotspots` row in both modes; used by LOOM's picture overlay and the native game screen. Hotspot row label and tooltip (`Hotspot N`, `object ID`, `stored name`) are LOOM's in every game.
+
+Not done (migration list, in this order):
+1. One provider of hotspots/doorways (`IRoomHotspotProvider`: objects with id, name, local index, rectangle, doorway targets) and one drawing/list implementation. Today LOOM draws on its room picture (`ShowHotspotHighlight`, `RefreshRoomNavigationOverlay`, `RoomPreview` hover) and the other games on the native-screen canvas (`MainWindow.PlayOverlays.cs`); only the decisions and wording are shared. Eligibility (R-6.13a/14/15: `IsObjectHotspot`, `IsVerbHotspotAvailable` versus `ScummRoomOverlays.Objects`) still has two implementations.
+2. The global cutscene picker and `RoomCutsceneItems` still dispatch on the game inside the providers' data fill (`PlayableCutsceneItems`, `RoomCutsceneItems`); they should become a provider method `GlobalCutscenes()`.
+3. The Advanced right panel (DOORWAYS/HOTSPOTS/ROOM SCRIPTS/INTERACTIONS versus LOOM's `Room entry`/`Last action`) and Game Status entry points keep their per-game builders.
+4. LOOM double-click look for the verb games (see R-6.25 item 2): needs each game's input-script evidence first.
+5. `.verification/maniaczak-room-actions-20261019` drives the removed Interact expander; keep as a record.
+
 ## Checks
 
 Solution build zero warnings/errors. 198 focused tests (overlay, architecture, support matrix, Maniac, Zak) pass; Core untouched, so the LOOM suites are unaffected. After-window runs: LOOM 13 live (Interact menu `OBJECT 323 / Use / go` unchanged), Maniac Classic 26 static and live, Maniac Enhanced 26 live (Interact `Interact · puerta ▴`), Zak Classic/Enhanced 16 live, Zak Enhanced static. Not re-run: Indy3/Monkey/Indy 4 windows (other agents).
