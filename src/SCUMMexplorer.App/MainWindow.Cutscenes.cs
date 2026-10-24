@@ -428,13 +428,7 @@ public partial class MainWindow
 
     private void RoomCutscene_Click(object sender, RoutedEventArgs e)
     {
-        if (!CanStartCutscene || _currentRoomResource?.ResourceId is not int roomId) return;
-        var items = RoomCutsceneItems(roomId);
-        if (items.Count == 1) items[0].Play?.Invoke();
-        else if (items.Count > 1)
-            OpenPopupMenu(RoomCutsceneButton, System.Windows.Controls.Primitives.PlacementMode.Top, "CUTSCENES IN THIS ROOM",
-                items.Where(item => item.Play is not null)
-                    .Select(item => (item.Title, IsAdvancedMode ? item.Note : null, item.Play!)));
+        ShowRoomCutsceneMenu();
     }
 
     private List<(string Title, string Source, Action Play)> CutsceneChoices()

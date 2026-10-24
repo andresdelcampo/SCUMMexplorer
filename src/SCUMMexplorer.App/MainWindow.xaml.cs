@@ -1768,14 +1768,7 @@ public partial class MainWindow : Window
 
     private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
     {
-        if (PlayCutscenes) { StepPlayFrame(); return; }
-        if (_playbackPaused)
-        {
-            StepPausedPlayback();
-            return;
-        }
-        StopScenePlayback();
-        AdvanceOneFrame();
+        CurrentRoomControls.Step();
     }
 
     private void AdvanceOneFrame()
@@ -4072,13 +4065,7 @@ public partial class MainWindow : Window
         UpdateInteractButton();
     }
 
-    private void UpdateInteractButton()
-    {
-        if (_interactTarget is not null && !_currentRoomObjectRecords.Any(item => item.Id == _interactTarget.Id)) _interactTarget = null;
-        var name = _interactTarget is not null && _roomObjectNames.TryGetValue(_interactTarget.Id, out var stored) ? stored : null;
-        InteractButton.Content = name is null ? "Interact ▴" : $"Interact · {name} ▴";
-        InteractButton.IsEnabled = _interactTarget is not null && InteractVerbs(_interactTarget).Count > 0 && !SessionInScene && _session is not null;
-    }
+    private void UpdateInteractButton() => ApplyInteract(CurrentRoomControls.ReadInteract());
 
     /// <summary>The verbs offered in the menu: look, use or go, and the drafts the object answers (the plumbing verbs stay in Advanced).</summary>
     private IReadOnlyList<ScummObjectVerbEntry> InteractVerbs(ScummRoomObjectRecord record) =>
@@ -4086,16 +4073,6 @@ public partial class MainWindow : Window
             ? verbs.Where(verb => verb.VerbId is 0x36 or 0x38 || LoomDraftNames.ForVerb(verb.VerbId) is not null)
                 .DistinctBy(verb => verb.VerbId).OrderBy(verb => LoomVerbNames.Order(verb.VerbId)).ToArray()
             : [];
-
-    private void OpenInteractMenu(ScummRoomObjectRecord record, FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement)
-    {
-        var heading = _roomObjectNames.TryGetValue(record.Id, out var name) ? name.ToUpperInvariant() : $"OBJECT {record.Id}";
-        var entries = InteractVerbs(record).Select(verb => (LoomVerbNames.Label(verb.VerbId), (string?)null, (Action)(() =>
-        {
-            if (!SessionInScene) ActivateObjectVerb(record, verb, play: true);
-        })));
-        OpenPopupMenu(target, placement, heading, entries);
-    }
 
     /// <summary>The dark pop-up menu used by Interact and the room's Play Cutscene: a small heading and one row per choice.</summary>
     private static void OpenPopupMenu(FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement, string heading,
@@ -4142,8 +4119,7 @@ public partial class MainWindow : Window
 
     private void Interact_Click(object sender, RoutedEventArgs e)
     {
-        if (GenericRoomActions) { GenericInteract_Click(); return; }
-        if (_interactTarget is { } record) OpenInteractMenu(record, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
+        ShowInteractMenu(InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
 
     private void RoomPreview_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -4154,7 +4130,7 @@ public partial class MainWindow : Window
         if (record is not null && InteractVerbs(record).Count > 0)
         {
             e.Handled = true;
-            OpenInteractMenu(record, RoomPreview, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
+            ShowInteractMenu(RoomPreview, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
         }
     }
 
@@ -4511,23 +4487,21 @@ public partial class MainWindow : Window
 
     private void PlaybackPause_Click(object sender, RoutedEventArgs e)
     {
-        // S7: during play the bar's Pause is the app's Pause key (R-7.16).
-        if (PlayActive) { _playPaused = !_playPaused; ShowPlayFrame(); UpdatePlaybackControls(); return; }
-        if (_playbackPaused) ResumeScenePlayback();
-        else PauseScenePlayback();
+        // R-16.9: the bar's buttons act through the game's provider (R-7.16: Pause is the app's Pause key, Skip is Esc).
+        CurrentRoomControls.TogglePause();
+        UpdatePlaybackControls();
     }
 
     private void SkipCutscene_Click(object sender, RoutedEventArgs e)
     {
-        // S7: during play, Skip is Esc: abortCutscene from the override point only (R-7.16).
-        if (PlayActive) { SkipPlayCutscene(); PlayScreenImage.Focus(); return; }
-        SkipCutscene();
+        CurrentRoomControls.Skip();
+        UpdatePlaybackControls();
     }
 
     private void SkipLine_Click(object sender, RoutedEventArgs e)
     {
-        if (PlayActive) { _play!.SkipMessage(); UpdatePlaybackControls(); PlayScreenImage.Focus(); return; }
-        SkipTalk("the Skip line button, same as '.'");
+        CurrentRoomControls.SkipLine();
+        UpdatePlaybackControls();
     }
 
     /// <summary>
@@ -4570,44 +4544,9 @@ public partial class MainWindow : Window
         UpdateGameStatusButton(); // Inspection is available during playback too; editing stays guarded.
         UpdateSoundDeviceControls();
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
-        // S7: a game played through its verbs has its own bar (MainWindow.PlayCutscenes.cs).
-        if (PlayCutscenes) { UpdatePlayCutsceneControls(); return; }
-        var active = GameClickActive && IsLoomGame;
-        // R-8.5b (rule confirmed by the user 20 Oct): a LOOM static preview keeps its bar; Play Cutscene starts from there (stated start).
-        var staticPreview = IsLoomGame && _catalogPreviewOnly && _session is not null && SessionModeToggle.IsChecked == true;
-        UpdateInteractButton();
-        // Step plays one frame of a paused scene; with nothing paused there is nothing to step.
-        AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
-        PlaybackBar.Visibility = active || staticPreview ? Visibility.Visible : Visibility.Collapsed;
-        PlaybackPauseButton.IsEnabled = active && _playback is not null && (_playbackPaused || PlaybackHasActivity);
-        PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
-        SkipLineButton.IsEnabled = active && !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
-        SkipCutsceneButton.IsEnabled = active && SessionInScene && _session?.CutsceneSkippable == true;
-        CutsceneMenuButton.IsEnabled = active && CanStartCutscene;
-        var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
-        // Until the background runs have listed the scenes that play out in rooms, a first launch shows the button disabled (nothing is known yet).
-        var listing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
-        RoomCutsceneButton.Visibility = (active || staticPreview) && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.IsEnabled = (active && CanStartCutscene || staticPreview) && !listing;
-        var computing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null;
-        CutsceneScanNote.Visibility = active && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
-        CutsceneScanProgress.Visibility = active && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
-        RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)." : !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
-            roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
-        if (!active) return;
-        CutsceneMenuButton.Content = "Play Cutscene";
-        CutsceneMenuButton.IsEnabled = CanStartCutscene;
-        CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game." : "Playback is active. Finish or skip it before starting another scene.";
-        UpdateRoomScrollButtons();
-        var inCutscene = SessionInScene;
-        var skippable = _session?.CutsceneSkippable == true;
-        SkipCutsceneButton.IsEnabled = inCutscene && skippable;
-        SkipCutsceneButton.ToolTip = !inCutscene
-            ? "No cutscene is playing."
-            : skippable
-                ? "Skip the cutscene (Escape): ScummVM's abortCutscene sends the script that set the override to its skip jump. Assumed input."
-                : "The cutscene has not set its skip point (beginOverride) yet, so Escape would do nothing now, as in the game.";
+        // R-16.9: one implementation of the bar for every game, filled by the game's provider.
+        RefreshRoomControls();
+        if (!PlayCutscenes && GameClickActive && IsLoomGame) UpdateRoomScrollButtons(); // the room view's scroll arrows, not a control
     }
 
     private bool PlaybackShouldContinue()
@@ -6081,44 +6020,7 @@ public partial class MainWindow : Window
         $"▶ {(IsAdvancedMode ? resource + " · " + kind + " · " + SoundSourceSummary(source) : kind)}" +
         (duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
 
-    /// <summary>The CD game's Sounds menu: the disc audio this room's scripts ask for, played on demand (an exploration action).</summary>
-    private void CdRoomSounds_Click()
-    {
-        if (_cdRoomCues.Count == 0 || SessionInScene || _game?.V4Archive?.Disc is not { } disc) return;
-        var entries = new List<(string Label, string? Tip, Action Run)> { ("■ Stop", null, _cdVoice.Stop) };
-        int music = 0, voices = 0;
-        foreach (var cue in _cdRoomCues)
-        {
-            var picked = cue;
-            var snippet = cue.Text.Length > 36 ? cue.Text[..36] + "…" : cue.Text;
-            var kind = cue.IsMusicOrNarration ? $"♪ Music / narration {++music}" : $"Voice {++voices}";
-            var label = IsAdvancedMode
-                ? RoomSoundLabel($"CD cue {cue.Cue.DiscSeconds:0.#}", kind, cue.Source, TimeSpan.FromSeconds(cue.Cue.Seconds))
-                : $"▶ {(cue.IsMusicOrNarration ? "♪ " : "")}{cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}";
-            entries.Add((label, IsAdvancedMode ? $"{cue.Source}\nDisc second {cue.Cue.DiscSeconds:0.#} · {cue.Cue.Seconds:0.#} s" +
-                (cue.Text.Length > 0 ? $"\n\"{cue.Text}\"" : "") : null, () => _cdVoice.PlayNow(disc, picked.Cue)));
-        }
-        OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
-    }
-
-    private void RoomSounds_Click(object sender, RoutedEventArgs e)
-    {
-        if (TryShowGenericRoomSounds()) return;
-        if (_game?.Id == GameId.LoomVga) { CdRoomSounds_Click(); return; }
-        if (_roomSoundChoices.Count == 0 || SessionInScene) return;
-        var entries = new List<(string Label, string? Tip, Action Run)>();
-        if (_audioSurface == AudioSurface.Room) entries.Add(("■ Stop", null, StopAudio));
-        int music = 0, effects = 0;
-        foreach (var choice in _roomSoundChoices)
-        {
-            var picked = choice;
-            // Normal: the kind of sound, numbered within its kind (the game gives sounds no titles); Advanced: the resource's own name.
-            var kind = picked.Music ? $"♪ Music {++music}" : $"Sound effect {++effects}";
-            var label = RoomSoundLabel(picked.Resource.Name, kind, picked.Evidence, picked.Duration);
-            entries.Add((label, IsAdvancedMode ? picked.Evidence : null, () => _ = AuditionRoomSoundAsync(picked)));
-        }
-        OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
-    }
+    private void RoomSounds_Click(object sender, RoutedEventArgs e) => ShowRoomSoundsMenu();
 
     /// <summary>Plays a sound picked from the room's list on demand (an exploration action; the game's own sounds stop first).</summary>
     private async Task AuditionRoomSoundAsync((GameResource Resource, bool Music, TimeSpan? Duration, string Evidence) choice)

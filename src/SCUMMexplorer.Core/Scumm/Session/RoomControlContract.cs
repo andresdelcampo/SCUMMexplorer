@@ -1,4 +1,4 @@
-namespace SCUMMexplorer.Core.Scumm;
+﻿namespace SCUMMexplorer.Core.Scumm;
 
 // R-16.9: the room controls (playback bar, Play Cutscene, Interact, Sounds) are one shared UI in the App with one
 // behaviour. A game, a SCUMM version or the static preview only fills them through the types below.
@@ -24,6 +24,9 @@ public sealed record RoomTransportState(bool PauseEnabled, bool Paused, bool Ste
     public static RoomTransportState Idle { get; } = new(false, false, false, false, false, false);
 }
 
+/// <summary>The Interact button's state (R-6.22): shown, usable now, and the name of the selected object.</summary>
+public sealed record RoomInteractState(bool Visible, bool Enabled, string? TargetName);
+
 /// <summary>Everything the bar shows now (read by the one shared presenter; no game test belongs in the App).</summary>
 public sealed record RoomControlState(
     RoomTransportState Transport,
@@ -31,14 +34,13 @@ public sealed record RoomControlState(
     bool GlobalCutsceneEnabled,
     bool CanStartCutscene,
     IReadOnlyList<RoomCutsceneEntry> RoomCutscenes,
+    bool RoomCutsceneEnabled,
     bool CutsceneListing,
-    bool CutsceneScanComputing,
-    bool CutsceneScanRunning,
-    bool InteractVisible,
-    bool InteractEnabled,
-    string? InteractTargetName)
+    bool ScanComputing,
+    bool ScanNoteVisible,
+    bool ScanProgressVisible)
 {
-    public static RoomControlState Hidden { get; } = new(RoomTransportState.Idle, false, false, false, [], false, false, false, false, false, null);
+    public static RoomControlState Hidden { get; } = new(RoomTransportState.Idle, false, false, false, [], false, false, false, false, false);
 }
 
 /// <summary>The one interface a game (or the static preview) implements to fill the shared room controls.</summary>
@@ -49,6 +51,8 @@ public interface IRoomControlProvider
     /// <param name="room">The room shown, if any.</param>
     /// <param name="advanced">Advanced wording of titles and notes (R-1.13).</param>
     RoomControlState ReadState(int? room, bool advanced);
+
+    RoomInteractState ReadInteract();
 
     void TogglePause();
     void Step();

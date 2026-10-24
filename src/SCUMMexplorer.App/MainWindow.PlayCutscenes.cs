@@ -244,49 +244,14 @@ public partial class MainWindow
     }
 
     /// <summary>The playback bar during play: Pause, Skip, Skip line and the room's Play Cutscene button, with the scan's note and bar.</summary>
-    private void UpdatePlayCutsceneControls()
-    {
-        var active = PlayActive;
-        if (GenericRoomActions) UpdateGenericInteractButton(); else InteractButton.Visibility = Visibility.Collapsed;
-        AdvanceFrameButton.IsEnabled = active && _playPaused;
-        UpdatePlayTransportControls();
-        var canStart = PlayCanStartCutscene;
-        CutsceneMenuButton.IsEnabled = canStart && _playPlanner is not null;
-        CutsceneMenuButton.Content = "Play Cutscene";
-        CutsceneMenuButton.ToolTip = canStart ? "Choose a cutscene from anywhere in the game." : "A cutscene is playing. Let it finish or skip it before starting another.";
-        var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
-        var shown = _currentRoomResource is not null;
-        var computing = _playPlanner is not null && !_playRoomListsDone && _playSavedRoomLists is null;
-        var listing = computing && roomChoices.Count == 0;
-        // R-8.5b (rule confirmed by the user 20 Oct): the bar stays in a static preview too; what cannot act there is disabled, not hidden.
-        PlaybackBar.Visibility = active || shown ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.Visibility = shown && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.IsEnabled = shown && canStart && roomChoices.Count > 0;
-        RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
-        RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)."
-            : !canStart ? "A cutscene is playing. Let it finish or skip it before starting another."
-            : roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
-        CutsceneScanNote.Visibility = shown && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
-        CutsceneScanProgress.Visibility = shown && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
-    }
+    private void UpdatePlayCutsceneControls() => RefreshRoomControls();
 
     // Native transport state is cheap and must follow every frame: a cutscene's
     // override can appear or disappear between room-list refreshes.
     private void UpdatePlayTransportControls()
     {
-        var active = PlayActive;
         UpdateSoundDeviceControls();
-        PlaybackPauseButton.IsEnabled = active;
-        PlaybackPauseButton.Content = _playPaused ? "▶ Play" : "⏸ Pause";
-        PlaybackPauseButton.ToolTip = "Pause or play the scene (space). In Advanced mode, Step ▸ then plays one frame while paused.";
-        var inCutscene = active && _play!.InCutscene;
-        var skippable = inCutscene && _play!.CutsceneSkippable;
-        SkipCutsceneButton.IsEnabled = skippable;
-        SkipCutsceneButton.ToolTip = !inCutscene ? "No cutscene is playing."
-            : skippable ? "Skip the cutscene (Escape): the script that set the override goes on at its skip point."
-            : "The cutscene has not set its skip point yet, so Escape would do nothing now, as in the game.";
-        SkipLineButton.IsEnabled = active && _play!.Messages.HaveMsg != 0;
-        UpdateGenericRoomActionAvailability();
+        RefreshRoomTransport();
     }
 
     private void SkipPlayCutscene()

@@ -182,26 +182,6 @@ public partial class MainWindow
             Environment.NewLine + "Possible static starts; literal child-script calls followed to depth 4. Variable targets and deeper calls remain unresolved.");
     }
 
-    private bool TryShowGenericRoomSounds()
-    {
-        if (_game is not { } game || game.Id is GameId.Loom or GameId.LoomVga) return false;
-        if (_roomSoundChoices.Count == 0 || SoundDeviceLocked) return true;
-        // As LOOM's menu (RoomSounds_Click): Stop only while room audio plays; music and effects numbered within their kind.
-        var entries = new List<(string Label, string? Tip, Action Run)>();
-        if (_audioSurface == AudioSurface.Room) entries.Add(("■ Stop", null, StopAudio));
-        var cd = ScummCdAudioTracks.For(game);
-        int music = 0, effects = 0;
-        foreach (var choice in _roomSoundChoices)
-        {
-            var picked = choice;
-            var kind = cd?.Plays(choice.Resource.ResourceId!.Value) == true ? $"♪ Music {++music}" : $"Sound effect {++effects}";
-            var label = RoomSoundLabel(choice.Resource.Name, kind, choice.Evidence, choice.Duration);
-            entries.Add((label, IsAdvancedMode ? choice.Evidence : null, () => _ = AuditionGenericRoomSoundAsync(game, picked, cd)));
-        }
-        OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
-        return true;
-    }
-
     private async Task AuditionGenericRoomSoundAsync(GameLibrary game,
         (GameResource Resource, bool Music, TimeSpan? Duration, string Evidence) choice, ScummCdAudioTracks? cd)
     {

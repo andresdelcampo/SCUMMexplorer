@@ -43,7 +43,6 @@ public partial class MainWindow
         _genericSourceHost.Visibility = GenericRoomActions && room is not null && IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         if (!GenericRoomActions || _game is not { } game || room is not int roomId)
         {
-            if (!GenericRoomActions) InteractButton.Visibility = Visibility.Visible;
             _genericActionsGame = null;
             _genericActionsRoom = null;
             _genericActionsHost.Children.Clear();
@@ -220,11 +219,11 @@ public partial class MainWindow
     {
         if (++_genericNamesFrame % 12 == 0 && _genericActionsHost is not null && GenericRoomActions &&
             _genericActionsRoom is not null && RefreshGenericRoomActionWords()) BuildGenericRoomActions();
-        UpdateGenericInteractButton();
+        UpdateInteractButton();
     }
 
-    // LOOM's Interact (R-6.9): the bar's button acts on the selected object and opens that object's menu of
-    // actions (heading: the object's name; rows: the verbs' own words). Choosing one is an exploration action.
+    // The data behind the shared Interact control (R-6.22, R-16.9): the selected object and its source actions.
+    // The button, menu and right click are the shared ones in MainWindow.RoomControls.cs.
     private int? _genericInteractTarget;
 
     private IReadOnlyList<GenericSourceAction> GenericObjectActions(int objectId) =>
@@ -232,27 +231,6 @@ public partial class MainWindow
 
     private static string GenericActionWord(GenericSourceAction action) =>
         action.Title.Split(" · ", 2)[0];
-
-    private void UpdateGenericInteractButton()
-    {
-        if (!GenericRoomActions || _currentRoomResource is null) return;
-        if (_genericInteractTarget is int selected && GenericObjectActions(selected).Count == 0) _genericInteractTarget = null;
-        InteractButton.Visibility = Visibility.Visible;
-        var name = _genericInteractTarget is int target ? GenericObjectActions(target).FirstOrDefault()?.Target : null;
-        InteractButton.Content = name is null ? "Interact ▴" : $"Interact · {name} ▴";
-        InteractButton.IsEnabled = _genericInteractTarget is not null && GenericRoomActionCanStart;
-    }
-
-    private void OpenGenericInteractMenu(int objectId, FrameworkElement anchor, System.Windows.Controls.Primitives.PlacementMode placement)
-    {
-        var actions = GenericObjectActions(objectId);
-        if (actions.Count == 0 || !GenericRoomActionCanStart) return;
-        var heading = (actions[0].Target is { Length: > 0 } name ? name : $"Object {objectId}").ToUpperInvariant();
-        OpenPopupMenu(anchor, placement, heading,
-            actions.Select(action => (GenericActionWord(action), IsAdvancedMode ? action.Source : null, (Action)(() => RunGenericRoomAction(action)))));
-    }
-
-    private void GenericInteract_Click() { if (_genericInteractTarget is int target) OpenGenericInteractMenu(target, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top); }
 
     /// <summary>The object (with actions) under a native screen point, from the same scene the overlays read.</summary>
     private int? GenericObjectAt((int X, int Y)? point)
@@ -269,7 +247,7 @@ public partial class MainWindow
     {
         if (!GenericRoomActions) return;
         _genericInteractTarget = GenericObjectAt(point);
-        UpdateGenericInteractButton();
+        UpdateInteractButton();
     }
 
     // Right button where it stays the app's (R-7.16: up to engine version 3): LOOM's Interact menu at the pointer.
@@ -277,8 +255,8 @@ public partial class MainWindow
     {
         if (!GenericRoomActions || GenericObjectAt(point) is not int objectId) return false;
         _genericInteractTarget = objectId;
-        UpdateGenericInteractButton();
-        OpenGenericInteractMenu(objectId, PlayScreenImage, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
+        UpdateInteractButton();
+        ShowInteractMenu(PlayScreenImage, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
         return true;
     }
 
@@ -287,8 +265,8 @@ public partial class MainWindow
     {
         if (GenericObjectActions(objectId).Count == 0) return;
         _genericInteractTarget = objectId;
-        UpdateGenericInteractButton();
-        if (InteractButton.IsEnabled) OpenGenericInteractMenu(objectId, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
+        UpdateInteractButton();
+        if (InteractButton.IsEnabled) ShowInteractMenu(InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
 
     private void RunGenericRoomAction(GenericSourceAction action)
