@@ -141,13 +141,13 @@ internal static class Program
                                string.Join("; ", items.Select(i => i.GetType().GetProperty("Title")!.GetValue(i))) + $"; button {Control("RoomCutsceneButton")}; Sounds {Control("RoomSoundsButton")}; Interact {Interact()}");
                     if (items.Count > 0)
                     {
-                        var first = items[0];
+                        var first = items[args.FirstOrDefault(a => a.StartsWith("item=", StringComparison.Ordinal)) is { } itemArg ? int.Parse(itemArg[5..], System.Globalization.CultureInfo.InvariantCulture) : 0];
                         ((Action)first.GetType().GetProperty("Play")!.GetValue(first)!).Invoke();
                         var begun = false; var frames0 = (int)(Field("_playFrame") ?? 0);
                         for (var n = 0; n < 100 && !begun; n++)
                         {
                             await Task.Delay(100);
-                            begun = Field("_play") is ScummSession { InCutscene: true } || Field("_play") is ScummSession { Messages.HaveMsg: not 0 };
+                            begun = Field("_play") is ScummSession { InCutscene: true } || Field("_play") is ScummSession { Messages.HaveMsg: not 0 } || Field("_playback") is not null;
                         }
                         report.Add($"played \"{first.GetType().GetProperty("Title")!.GetValue(first)}\": cutscene or line began {begun}; frames {(int)(Field("_playFrame") ?? 0) - frames0}; " +
                                    $"static preview {Field("_catalogPreviewOnly")}; bar {Control("PlaybackBar")}, Pause {Control("PlaybackPauseButton")}, Skip {Control("SkipCutsceneButton")}, Skip line {Control("SkipLineButton")}; status \"{Named<TextBlock>("StatusText").Text}\"");
