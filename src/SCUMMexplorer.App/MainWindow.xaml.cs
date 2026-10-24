@@ -293,6 +293,7 @@ public partial class MainWindow : Window
     private void OpenGameFolder(string folder)
     {
         ResetGameAudio();
+        _loomAmbientSource = null; _playAmbient = false; _playLiveSource = null;
         _roomCardCancellation?.Cancel();
         _roomCardBackgroundsReady.TrySetResult(false);
         _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -1451,6 +1452,8 @@ public partial class MainWindow : Window
                 : cdRoom.ObjectNames.ToDictionary(pair => pair.Key, pair => System.Text.Encoding.Latin1.GetString(pair.Value));
             _objects = objects;
             _catalogPreviewOnly = false;
+            // A static preview's ambient session (R-8.5b) gives way to the session it was made from before any other room opens.
+            if (navigationKind == RoomOpenKind.Catalog) LeaveLoomAmbientPreview(); else _loomAmbientSource = null;
             if (navigationKind == RoomOpenKind.Catalog && _session is { } manualSource && SessionModeToggle.IsChecked == true)
             {
                 _catalogPreviewOnly = true; // no idle frame may mutate the source while its detached preparation is copied
@@ -1465,7 +1468,17 @@ public partial class MainWindow : Window
                 else
                 {
                     _catalogPreviewOnly = true;
-                    if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason;
+                    // R-8.5b (rule confirmed by the user 20 Oct): only the room's ambient scripts run (its permanent animation, decided from its
+                    // code); none of its other entry code. The ambient session is explored like a live room; the source carries the game on.
+                    var ambient = await Task.Run(() => manualSource.PrepareAmbientRoom(resource, token, requireAmbient: false), token);
+                    if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
+                    if (ambient.Session is LoomExplorationSession still)
+                    {
+                        _loomAmbientSource = manualSource;
+                        _session = still;
+                        _catalogPreviewOnly = false;
+                    }
+                    if (IsAdvancedMode) _pendingStaticPreviewNote = prepared.Reason + Environment.NewLine + AmbientNote(ambient);
                 }
                 _pendingCatalogPreparation = null;
             }
@@ -1483,6 +1496,12 @@ public partial class MainWindow : Window
             UpdateAdvancedMode();
             StatusText.Text = "Scene ready";
             StatusText.ToolTip = $"{room.Width} × {room.Height} · {objectRecords.Count} object records · {objects.Count} images";
+            if (_catalogPreviewOnly || _loomAmbientSource is not null)
+            {
+                StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";
+                StatusText.ToolTip = IsAdvancedMode ? _pendingStaticPreviewNote : null;
+            }
+            _pendingStaticPreviewNote = null;
             // A catalog visit can start scripts which yield before their music/arrival work.
             // Use the ordinary bounded clock once the room is visible, without inventing input.
             if (navigationKind != RoomOpenKind.Catalog && GameClickActive && !_playbackEnteringRoom && _playback is null && _session?.Snapshot.PendingScripts > 0)
@@ -4550,10 +4569,12 @@ public partial class MainWindow : Window
         // S7: a game played through its verbs has its own bar (MainWindow.PlayCutscenes.cs).
         if (PlayCutscenes) { UpdatePlayCutsceneControls(); return; }
         var active = GameClickActive && IsLoomGame;
+        // R-8.5b (rule confirmed by the user 20 Oct): a LOOM static preview keeps its bar; Play Cutscene starts from there (stated start).
+        var staticPreview = IsLoomGame && _catalogPreviewOnly && _session is not null && SessionModeToggle.IsChecked == true;
         UpdateInteractButton();
         // Step plays one frame of a paused scene; with nothing paused there is nothing to step.
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
-        PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
+        PlaybackBar.Visibility = active || staticPreview ? Visibility.Visible : Visibility.Collapsed;
         PlaybackPauseButton.IsEnabled = active && _playback is not null && (_playbackPaused || PlaybackHasActivity);
         PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
         SkipLineButton.IsEnabled = active && !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
@@ -4562,8 +4583,8 @@ public partial class MainWindow : Window
         var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
         // Until the background runs have listed the scenes that play out in rooms, a first launch shows the button disabled (nothing is known yet).
         var listing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
-        RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.IsEnabled = active && CanStartCutscene && !listing;
+        RoomCutsceneButton.Visibility = (active || staticPreview) && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
+        RoomCutsceneButton.IsEnabled = (active && CanStartCutscene || staticPreview) && !listing;
         var computing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null;
         CutsceneScanNote.Visibility = active && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
         CutsceneScanProgress.Visibility = active && ScanRunning ? Visibility.Visible : Visibility.Collapsed;

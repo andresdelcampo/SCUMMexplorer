@@ -40,6 +40,37 @@ public partial class MainWindow
 
     private bool PlayActive => _playTimer is not null && _play is not null;
 
+    /// <summary>
+    /// R-8.5b (rule confirmed by the user 20 Oct): the play session is a static preview's, running only the room's ambient scripts
+    /// (<see cref="ScummSession.PrepareAmbientRoom"/>); no click or key reaches the game. <see cref="_playLiveSource"/> is the session it was made from.
+    /// </summary>
+    private bool _playAmbient;
+    private ScummGameSession? _playLiveSource;
+
+    /// <summary>Play that delivers the user's clicks and keys to the game (not a static preview's ambient frames).</summary>
+    private bool PlayTakesInput => PlayActive && !_playAmbient;
+
+    /// <summary>Advanced: which of the room's entry starts are ambient and why, from <see cref="ScummAmbientScripts"/>.</summary>
+    private static string AmbientNote(ScummManualRoomResult ambient) => ambient.Ambient is not { } found
+        ? ambient.Reason ?? ""
+        : (found.Ambient.Count == 0 ? "Static preview: the room's entry starts no ambient script, so nothing runs." :
+              "Static preview: only the room's ambient scripts run (its entry code does not): " + string.Join(" ", found.Ambient.Select(a => a.Evidence + "."))) +
+          (found.Rejected.Count == 0 ? "" : " Not ambient: " + string.Join("; ", found.Rejected.Select(r => $"script {r.ScriptId} ({r.Reason})")) + ".");
+
+    /// <summary>A static preview gives way to the session it was made from before an explicit scene or intro (the stated start of R-8.13).</summary>
+    private void LeaveAmbientPreview()
+    {
+        if (!_playAmbient || _game is not { } game || _playLiveSource is not { } live) return;
+        _sceneSound.StopAll("an explicit scene leaves the static preview");
+        _playAmbient = false;
+        _catalogPreviewOnly = false;
+        _play = live;
+        _playScreen = new ScummPlayScreen(game, live, _playIndexedStates);
+        _sceneSound.Attach(game, live, RenderPlaySound, PlaySoundLoop);
+        if (game.Speech is { } speech) _playSpeech.Attach(speech, live.Messages);
+        _playSpeechBeforeVisit = live.Messages.SpeechEvents.Count;
+    }
+
     // The pause state the play sounds were last given (S6 sound).
     private bool _playSoundPaused;
 
@@ -129,6 +160,8 @@ public partial class MainWindow
             if (_play is null || _playFolder != game.Key)
             {
                 StopPlay();
+                _playAmbient = false;
+                _playLiveSource = null;
                 ScummIndexedObjectSnapshot? objects = null;
                 var session = await Task.Run(() => ScummGameSession.BootForPlay(game, out objects), token);
                 if (!CurrentRequest()) return;
@@ -141,6 +174,9 @@ public partial class MainWindow
                 _playImuse = ScummImuseMusic.For(game);
             }
             if (!CurrentRequest()) return;
+            // A static preview's session runs only its room's ambient scripts; the session it was made from carries the game on.
+            if (_playAmbient && _playLiveSource is { } live) _play = live;
+            _playAmbient = false;
             if (navigationKind == RoomOpenKind.Catalog)
             {
                 var source = _play;
@@ -149,14 +185,35 @@ public partial class MainWindow
                 if (prepared.Session is not ScummGameSession ready || ready.PlayInputScript == 0)
                 {
                     _catalogPreviewOnly = true;
-                    if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason ?? "The native startup has not established the game's input script.";
+                    var reason = prepared.Reason ?? "The native startup has not established the game's input script.";
                     StopPlay();
-                    return;
+                    // R-8.5b (rule confirmed by the user 20 Oct): the static preview keeps the room's controls, and the room's ambient scripts (its
+                    // permanent animation, decided from its code) run on a play clock; none of its other entry code runs, and no input reaches the game.
+                    // Maniac Mansion and Zak keep their own startup and static-preview rules (R-8.34, 19 Oct): no ambient session there.
+                    var ambient = UsesManiacCutsceneSetup(game) ? new ScummManualRoomResult(null, "Maniac Mansion and Zak keep their startup rules.")
+                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token), token);
+                    if (!CurrentRequest()) return;
+                    _playLiveSource = source;
+                    StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";
+                    StatusText.ToolTip = IsAdvancedMode ? reason + Environment.NewLine + AmbientNote(ambient) : null;
+                    if (ambient.Session is not ScummGameSession still)
+                    {
+                        UpdatePlaybackControls();
+                        return;
+                    }
+                    _play = still;
+                    _playAmbient = true;
+                    _playScreen = new ScummPlayScreen(game, still, _playIndexedStates);
+                    _sceneSound.StopAll("a static preview's ambient scripts start");
                 }
-                _play = ready;
-                _playScreen = new ScummPlayScreen(game, ready, _playIndexedStates);
+                else
+                {
+                    _catalogPreviewOnly = false;
+                    _play = ready;
+                    _playScreen = new ScummPlayScreen(game, ready, _playIndexedStates);
+                }
             }
-            _catalogPreviewOnly = false;
+            else _catalogPreviewOnly = false;
             UpdatePlaySoundCard();
             // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
             // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd); an iMUSE song that jumps back
@@ -301,6 +358,7 @@ public partial class MainWindow
     private void PlayScreenImage_MouseMove(object sender, MouseEventArgs e)
     {
         if (!PlayActive) return;
+        if (_playAmbient) { UpdatePlayOverlayHover(PlayPoint(e)); return; }
         _play!.PointAtScreen(PlayPoint(e));
         UpdatePlayOverlayHover(PlayPoint(e));
         if (_playPaused) ShowPlayFrame();
@@ -315,7 +373,7 @@ public partial class MainWindow
     // R-7.10: one press, one click, delivered at the next frame.
     private void PlayScreenImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (!PlayActive || PlayPoint(e) is not { } point) return;
+        if (!PlayTakesInput || PlayPoint(e) is not { } point) return;
         PlayScreenImage.Focus();
         e.Handled = true;
         if (_play!.ClickScreen(point.X, point.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
@@ -332,7 +390,7 @@ public partial class MainWindow
         PlayRightClick(point.X, point.Y);
     }
 
-    private bool PlayRightClickReachesGame => PlayActive && _game is { } game && ScummProfile.For(game).RightClickReachesGame;
+    private bool PlayRightClickReachesGame => PlayTakesInput && _game is { } game && ScummProfile.For(game).RightClickReachesGame;
 
     private void UpdatePlaySoundCard()
     {
@@ -375,6 +433,7 @@ public partial class MainWindow
             e.Handled = true;
             return true;
         }
+        if (_playAmbient) return false; // A static preview takes no keys but its Pause.
         if (key == Key.Escape && !_fullscreen)
         {
             // R-7.16: Esc skips a cutscene only from its override point (abortCutscene); otherwise the game reads it as its key.
@@ -400,7 +459,7 @@ public partial class MainWindow
     // Printable keys as the characters they type (verb shortcuts are lower-case letters; Script 24 reads '<' and '>').
     private void PlayTextInput(TextCompositionEventArgs e)
     {
-        if (!PlayActive || string.IsNullOrEmpty(e.Text) || Keyboard.FocusedElement is System.Windows.Controls.TextBox or System.Windows.Controls.ComboBox) return;
+        if (!PlayTakesInput || string.IsNullOrEmpty(e.Text) || Keyboard.FocusedElement is System.Windows.Controls.TextBox or System.Windows.Controls.ComboBox) return;
         var character = e.Text[0];
         if (character is < ' ' or > '~' || character == ' ') return;
         e.Handled = true;

@@ -12,6 +12,19 @@ public partial class MainWindow
     private int _cutsceneLaunchGeneration;
     private bool _catalogPreviewOnly;
     private bool _introPreparing;
+    // R-8.5b (rule confirmed by the user 20 Oct): a LOOM static preview explores an ambient-only copy (ScummSession.PrepareAmbientRoom); this is the
+    // session it was made from, which carries the game on when another room or a scene is opened.
+    private LoomExplorationSession? _loomAmbientSource;
+    private string? _pendingStaticPreviewNote;
+
+    private void LeaveLoomAmbientPreview()
+    {
+        if (_loomAmbientSource is not { } source) return;
+        _loomAmbientSource = null;
+        StopScenePlayback();
+        _sceneSound.StopAll("the static preview's ambient scripts were left");
+        _session = source;
+    }
     private Task? _roomOpenTask;
 
     // Capture the source in the tree handler before its first await. Never infer a doorway
@@ -58,6 +71,9 @@ public partial class MainWindow
         _introPreparing = true;
         UpdateGameIntroButton();
         StopPlay();
+        _playAmbient = false;
+        _playLiveSource = null;
+        _loomAmbientSource = null; // the intro starts a fresh session either way
         StopScenePlayback();
         _sceneSound.StopAll("the game intro was explicitly started");
         try
