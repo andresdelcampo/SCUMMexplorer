@@ -4,7 +4,7 @@ User, 24 Oct: "Should not harm to add that. As long as the game did not have ano
 
 ## Method
 
-`InputScripts/` (this folder) boots a game's data source, follows the input script (`VAR_VERB_SCRIPT`, script 4 in play in every game below) through `startScript`/`chainScript` calls with a literal id (depth 3), dumps every script reached (`input-chain-*.txt`) and lists every read or write of the three engine timers `var[0x00B]..var[0x00D]` (`VAR_TMR_1..3`), which is what LOOM's script 006 uses for its double-click window (R-7.1). A free double click also needs that no script compares the clicked object with the previous click (the other way a game can give a second click a meaning).
+`InputScripts/` (this folder) boots a game's data source, follows the input script (`VAR_VERB_SCRIPT`, script 4 in play in every game below) through `startScript`/`chainScript` calls with a literal id (depth 3), dumps every script reached (`input-chain-<game>.txt` next to this file; the repository ignores `.verification/**/*.txt`, so rerun the command to read them) and lists every read or write of the three engine timers `var[0x00B]..var[0x00D]` (`VAR_TMR_1..3`), which is what LOOM's script 006 uses for its double-click window (R-7.1). A free double click also needs that no script compares the clicked object with the previous click (the other way a game can give a second click a meaning).
 
 Command: `InputScripts.dll "D:\Juegos\Lucas\<folder>" <out.txt> 3 4`.
 
