@@ -95,6 +95,8 @@ public partial class MainWindow
         public RoomTransportState ReadTransport() => RoomTransportState.Idle;
         public RoomControlState ReadState(int? room, bool advanced) => RoomControlState.Hidden;
         public RoomInteractState ReadInteract() => new(false, false, null);
+        public RoomCutscenePicker GlobalCutscenes(bool advanced) => new([], "");
+        public bool RoomListsDone => true;
         public void TogglePause() { }
         public void Step() { }
         public void Skip() { }
@@ -131,6 +133,16 @@ public partial class MainWindow
             return new(ReadTransport(), active || staticPreview, active && canStart, canStart, entries,
                 (active && canStart || staticPreview) && !listing, listing, pending,
                 active && (pending || w.ScanRunning), active && w.ScanRunning);
+        }
+
+        public bool RoomListsDone => w._cdRoomListsDone;
+
+        public RoomCutscenePicker GlobalCutscenes(bool advanced)
+        {
+            var entries = w.PlayableCutsceneItems().Select(choice => ToEntry(choice.Item)).ToList();
+            foreach (var gap in w._replayCatalog?.Coverage ?? [])
+                entries.Add(new(gap.Title, "Needs validation", gap.Source, null, gap.Status));
+            return new(entries, w._replayCatalog?.Summary ?? "");
         }
 
         public RoomInteractState ReadInteract()
@@ -233,6 +245,11 @@ public partial class MainWindow
                 shown && canStart && entries.Count > 0, listing, computing,
                 shown && (computing || w.ScanRunning), shown && w.ScanRunning);
         }
+
+        public bool RoomListsDone => w._playRoomListsDone;
+
+        public RoomCutscenePicker GlobalCutscenes(bool advanced) =>
+            new(w.PlayCutsceneItems().Select(choice => ToEntry(choice.Item)).ToList(), "");
 
         public RoomInteractState ReadInteract()
         {

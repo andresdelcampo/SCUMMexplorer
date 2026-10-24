@@ -6,6 +6,9 @@
 /// <summary>One entry of the room's `Play Cutscene` list: titles already carry the Normal/Advanced wording (R-8.2).</summary>
 public sealed record RoomCutsceneEntry(string Title, string Category, string Note, Action? Start, string Status = "");
 
+/// <summary>The global `Play Cutscene` picker: every scene the game can start from anywhere, and the line above the list.</summary>
+public sealed record RoomCutscenePicker(IReadOnlyList<RoomCutsceneEntry> Entries, string Summary);
+
 /// <summary>One row of an object's Interact menu: the verb's own word, its source (Advanced tooltip) and the exploration action.</summary>
 public sealed record RoomInteractionChoice(string Label, string? Source, Action Run);
 
@@ -53,6 +56,12 @@ public interface IRoomControlProvider
     RoomControlState ReadState(int? room, bool advanced);
 
     RoomInteractState ReadInteract();
+
+    /// <summary>Whether the background scan has listed the scenes of every room (it shapes the scan note, not the controls).</summary>
+    bool RoomListsDone { get; }
+
+    /// <summary>The global picker behind the header `Play Cutscene` button (the game's own list; the dialog is shared).</summary>
+    RoomCutscenePicker GlobalCutscenes(bool advanced);
 
     void TogglePause();
     void Step();

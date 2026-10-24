@@ -103,17 +103,16 @@ public partial class MainWindow
 
     private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
     {
-        if (!CanStartCutscene) return;
+        if (!CurrentRoomControls.ReadState(_currentRoomResource?.ResourceId, IsAdvancedMode).CanStartCutscene) return;
         var picker = BuildCutscenePicker();
         if (picker.ShowDialog() == true) picker.SelectedPlay?.Invoke();
     }
 
     private CutscenePickerWindow BuildCutscenePicker()
     {
-        var items = PlayableCutsceneItems().Select(choice => choice.Item).ToList();
-        foreach (var gap in _replayCatalog?.Coverage ?? [])
-            items.Add(new(gap.Title, "Needs validation", gap.Source, null, gap.Status));
-        return new(items, _replayCatalog?.Summary ?? "", IsAdvancedMode, roomScope: false) { Owner = this };
+        var picker = CurrentRoomControls.GlobalCutscenes(IsAdvancedMode);
+        var items = picker.Entries.Select(entry => new CutscenePickerItem(entry.Title, entry.Category, entry.Note, entry.Start, entry.Status)).ToList();
+        return new(items, picker.Summary, IsAdvancedMode, roomScope: false) { Owner = this };
     }
 
     private const string DemoPreviewTitle = "The preview";
@@ -208,7 +207,7 @@ public partial class MainWindow
         CutsceneScanProgress.Maximum = Math.Max(1, _scanTotal);
         CutsceneScanProgress.Value = Math.Min(_scanDone, _scanTotal);
         CutsceneScanProgress.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
-        CutsceneScanNote.Text = ((PlayCutscenes ? _playRoomListsDone : _cdRoomListsDone)
+        CutsceneScanNote.Text = (CurrentRoomControls.RoomListsDone
             ? $"Working out how each scene starts… {percent}%\nThe scenes can already be played; the notes fill in as this finishes."
             : $"Looking for the scenes that happen in each room… {percent}%\nThe first launch takes a while; the result is kept for the next one.");
         if (!running) UpdatePlaybackControls();
@@ -392,7 +391,6 @@ public partial class MainWindow
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems(ISet<string>? onlyIds = null)
     {
         if (_game is { Id: GameId.LoomVga }) return [("cd-intro", CdIntroItem()), .. CdCutsceneItems()];
-        if (PlayCutscenes) return PlayCutsceneItems();
         var scanned = ScannedCutscenes && onlyIds is null ? CdCutsceneItems() : [];
         // A demo has no catalog of scenes: the full game's replays name its rooms, objects and scripts.
         if (_game is { IsDemo: true }) return [("demo-preview", DemoPreviewItem())];
@@ -407,7 +405,6 @@ public partial class MainWindow
 
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
-        if (PlayCutscenes) return PlayCutsceneItems(roomId).Select(choice => choice.Item).ToList();
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
         if (ScannedCutscenes)
         {
