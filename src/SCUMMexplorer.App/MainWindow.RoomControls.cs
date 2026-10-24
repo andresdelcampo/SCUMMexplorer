@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Scumm;
 
@@ -67,6 +68,70 @@ public partial class MainWindow
         OpenPopupMenu(anchor, placement, menu.Heading, menu.Choices.Select(choice => (choice.Label, choice.Source, choice.Run)));
     }
 
+    /// <summary>The Interact button (R-6.39): the room's interactions grouped by object, upfront; groups collapse when there are many.</summary>
+    private void ShowInteractOverview(FrameworkElement anchor, PlacementMode placement)
+    {
+        if (CurrentRoomControls.InteractionOverview(IsAdvancedMode) is not { Groups.Count: > 0 } overview) return;
+        OpenGroupedPopupMenu(anchor, placement, "INTERACTIONS IN THIS ROOM",
+            overview.Groups.OrderByDescending(group => group.Selected).Select(group =>
+                (group.Heading, group.Selected, group.Choices.Select(choice => (choice.Label, choice.Source, choice.Run)).ToList())).ToList(),
+            RoomInteractionRules.GroupsStartOpen(overview.Actions));
+    }
+
+    /// <summary>Like <see cref="OpenPopupMenu"/>, with one collapsible group per object (a header with the action count, then its rows).</summary>
+    private static void OpenGroupedPopupMenu(FrameworkElement target, PlacementMode placement, string heading,
+        IReadOnlyList<(string Heading, bool Selected, List<(string Label, string? Tip, Action Run)> Rows)> groups, bool allOpen)
+    {
+        var gold = new SolidColorBrush(Color.FromRgb(183, 132, 66));
+        var text = new SolidColorBrush(Color.FromRgb(231, 224, 210));
+        var hover = new SolidColorBrush(Color.FromRgb(46, 92, 116));
+        var popup = new Popup { PlacementTarget = target, Placement = placement, StaysOpen = false, AllowsTransparency = true, PopupAnimation = PopupAnimation.None };
+        var host = new StackPanel { MinWidth = 190 };
+        host.Children.Add(new TextBlock { Text = heading, Foreground = gold, FontSize = 11, FontWeight = FontWeights.Bold, Margin = new Thickness(10, 7, 10, 3) });
+        var list = new StackPanel();
+        foreach (var (name, selected, rows) in groups)
+        {
+            var open = allOpen || selected;
+            var body = new StackPanel { Visibility = open ? Visibility.Visible : Visibility.Collapsed };
+            var header = new Button
+            {
+                HorizontalContentAlignment = HorizontalAlignment.Left, Padding = new Thickness(10, 4, 10, 4), Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0), Foreground = gold
+            };
+            void ShowHeader() => header.Content = new TextBlock
+            {
+                Text = $"{(body.Visibility == Visibility.Visible ? "▾" : "▸")} {name.ToUpperInvariant()}" + (body.Visibility == Visibility.Visible ? "" : $" · {rows.Count}"),
+                FontSize = 11, FontWeight = FontWeights.Bold
+            };
+            ShowHeader();
+            header.MouseEnter += (_, _) => header.Background = hover;
+            header.MouseLeave += (_, _) => header.Background = Brushes.Transparent;
+            header.Click += (_, _) => { body.Visibility = body.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; ShowHeader(); };
+            list.Children.Add(header);
+            foreach (var (label, tip, run) in rows)
+            {
+                var item = new Button
+                {
+                    Content = new TextBlock { Text = label, TextWrapping = TextWrapping.Wrap, MaxWidth = 640 },
+                    HorizontalContentAlignment = HorizontalAlignment.Left, Padding = new Thickness(22, 4, 10, 4),
+                    Background = Brushes.Transparent, Foreground = text, BorderThickness = new Thickness(0), ToolTip = tip
+                };
+                item.MouseEnter += (_, _) => item.Background = hover;
+                item.MouseLeave += (_, _) => item.Background = Brushes.Transparent;
+                item.Click += (_, _) => { popup.IsOpen = false; run(); };
+                body.Children.Add(item);
+            }
+            list.Children.Add(body);
+        }
+        host.Children.Add(new ScrollViewer { Content = list, MaxHeight = 420, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+        popup.Child = new Border
+        {
+            Child = host, Background = new SolidColorBrush(Color.FromRgb(16, 24, 32)), BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98)),
+            BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(3), Padding = new Thickness(0, 0, 0, 4)
+        };
+        popup.IsOpen = true;
+    }
+
     private void ShowRoomSoundsMenu()
     {
         if (CurrentRoomControls.SoundMenu(IsAdvancedMode) is not { } menu) return;
@@ -104,6 +169,7 @@ public partial class MainWindow
         public void Skip() { }
         public void SkipLine() { }
         public RoomInteractionMenu? InteractionMenu(bool advanced) => null;
+        public RoomInteractionOverview? InteractionOverview(bool advanced) => null;
         public RoomSoundMenu? SoundMenu(bool advanced) => null;
     }
 
@@ -156,7 +222,29 @@ public partial class MainWindow
             var target = w._interactTarget;
             if (target is not null && !w._currentRoomObjectRecords.Any(item => item.Id == target.Id)) { w._interactTarget = null; target = null; }
             var name = target is not null && w._roomObjectNames.TryGetValue(target.Id, out var stored) ? stored : null;
-            return new(true, target is not null && w.InteractVerbs(target).Count > 0 && !w.SessionInScene && w._session is not null, name);
+            // R-6.39: the overview is upfront, so the button works as soon as the room has an action and the game can act.
+            return new(true, w._session is not null && !w.SessionInScene && InteractableObjects().Any(), name);
+        }
+
+        /// <summary>The room's objects the game's pointer can pick now and that answer a verb, in directory order.</summary>
+        private IEnumerable<ScummRoomObjectRecord> InteractableObjects() =>
+            w._session is not { } session ? [] :
+            w._currentRoomObjectRecords.OrderBy(item => item.LocalIndex)
+                .Where(record => w.IsVerbHotspotAvailable(record, session.Snapshot) && w.InteractVerbs(record).Count > 0);
+
+        public RoomInteractionOverview? InteractionOverview(bool advanced)
+        {
+            if (w.SessionInScene) return null;
+            var records = InteractableObjects().ToArray();
+            if (records.Length == 0) return null;
+            var headings = RoomInteractionRules.NumberRepeats(records.Select(record =>
+                w._roomObjectNames.TryGetValue(record.Id, out var name) ? name : $"Hotspot {record.LocalIndex}").ToArray());
+            var groups = records.Select((record, index) => new RoomInteractionGroup(headings[index], w._interactTarget?.Id == record.Id,
+                w.InteractVerbs(record).Select(verb => new RoomInteractionChoice(LoomVerbNames.Label(verb.VerbId), null, () =>
+                {
+                    if (!w.SessionInScene) w.ActivateObjectVerb(record, verb, play: true);
+                })).ToList())).ToList();
+            return new(groups);
         }
 
         public void TogglePause()
@@ -234,8 +322,11 @@ public partial class MainWindow
         {
             var active = w.PlayActive;
             var inCutscene = active && w._play!.InCutscene;
-            return new(active, w._playPaused, active && w._playPaused, inCutscene, inCutscene && w._play!.CutsceneSkippable,
-                active && w._play!.Messages.HaveMsg != 0);
+            var talking = active && w._play!.Messages.HaveMsg != 0;
+            // R-6.32 (LOOM's PlaybackHasActivity): Pause is for cutscenes and scenes. A cutscene, a shown line, the hero walking by a script's order
+            // or the camera panning is activity; the permanent ambient animations of a room (a campfire) are not, and keep running without it.
+            var activity = active && (inCutscene || talking || w._play!.EgoMoving || w._play.CameraMoving);
+            return new(active && (w._playPaused || activity), w._playPaused, active && w._playPaused, inCutscene, inCutscene && w._play!.CutsceneSkippable, talking);
         }
 
         public RoomControlState ReadState(int? room, bool advanced)
@@ -276,7 +367,23 @@ public partial class MainWindow
             if (!w.GenericRoomActions || w._currentRoomResource is null) return new(false, false, null);
             if (w._genericInteractTarget is int selected && w.GenericObjectActions(selected).Count == 0) w._genericInteractTarget = null;
             var name = w._genericInteractTarget is int target ? w.GenericObjectActions(target).FirstOrDefault()?.Target : null;
-            return new(true, w._genericInteractTarget is not null && w.GenericRoomActionCanStart, name);
+            // R-6.39: the overview is upfront; no object has to be selected first.
+            return new(true, w._genericSourceActions.Any(action => action.Executable) && w.GenericRoomActionCanStart, name);
+        }
+
+        public RoomInteractionOverview? InteractionOverview(bool advanced)
+        {
+            if (!w.GenericRoomActions || w._currentRoomResource is null || !w.GenericRoomActionCanStart) return null;
+            // Only objects that are in the room now (the game cannot act on a removed one); the whole list when the scene cannot be read.
+            var present = w._playScreen?.Scene() is { } scene ? ScummRoomOverlays.Objects(scene, w._playDoorwayTargets).Select(item => item.ObjectId).ToHashSet() : null;
+            var objects = w._genericSourceActions.Where(action => action.Executable).Select(action => action.Object).Distinct()
+                .Where(id => present is null || present.Contains(id)).ToArray();
+            if (objects.Length == 0) return null;
+            var headings = RoomInteractionRules.NumberRepeats(objects.Select(id => w.GenericObjectActions(id)[0].Target).ToArray());
+            var groups = objects.Select((id, index) => new RoomInteractionGroup(headings[index], w._genericInteractTarget == id,
+                w.GenericObjectActions(id).Select(action => new RoomInteractionChoice(GenericActionWord(action), advanced ? action.Source : null,
+                    () => w.RunGenericRoomAction(action))).ToList())).ToList();
+            return new(groups);
         }
 
         public void TogglePause()

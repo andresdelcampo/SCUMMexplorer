@@ -454,7 +454,7 @@ public partial class MainWindow
         if (key == Key.Space && Keyboard.Modifiers == ModifierKeys.None)
         {
             // The game's pause key (VAR_PAUSE_KEY, Space in Indiana Jones) is the app's Pause.
-            _playPaused = !_playPaused;
+            if (CurrentRoomControls.ReadTransport().PauseEnabled) _playPaused = !_playPaused; // R-6.32: the key acts under the button's condition
             ShowPlayFrame();
             UpdatePlaybackControls();
             e.Handled = true;

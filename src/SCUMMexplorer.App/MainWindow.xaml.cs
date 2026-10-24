@@ -4089,7 +4089,7 @@ public partial class MainWindow : Window
 
     private void Interact_Click(object sender, RoutedEventArgs e)
     {
-        ShowInteractMenu(InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
+        ShowInteractOverview(InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
 
     private void RoomPreview_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
