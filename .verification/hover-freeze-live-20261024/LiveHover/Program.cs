@@ -108,6 +108,36 @@ internal static class Program
                 var objectList = Control<Panel>("ObjectList");
                 var movePointer = typeof(MainWindow).GetMethod("UpdatePlayOverlayHover", Private)!;
                 var point = Play()!.GetType().GetMethod("PointAtScreen")!;
+                if (args.Length > 3 && args[3] == "render")
+                {
+                    // Off screen render cost: the whole window to a RenderTargetBitmap per size and Hotspots mode, with the pointer on the sign, and the per-frame tick.
+                    phase = "render cost";
+                    var pointer = Play()!.GetType().GetMethod("PointAtScreen")!;
+                    var overlay = typeof(MainWindow).GetMethod("UpdatePlayOverlayHover", Private)!;
+                    var showFrame = typeof(MainWindow).GetMethod("ShowPlayFrame", Private)!;
+                    foreach (var (w, h) in new[] { (1280, 800), (1920, 1080), (2560, 1440) })
+                    {
+                        window.Width = w; window.Height = h; await Task.Delay(1500);
+                        foreach (var m in new[] { "Never", "Hover", "Always" })
+                        {
+                            Control<RadioButton>("Objects" + m).IsChecked = true; await Task.Delay(300);
+                            (int, int)? p = (24, top + 92);
+                            pointer.Invoke(Play(), new object?[] { p }); overlay.Invoke(window, new object?[] { p });
+                            window.UpdateLayout();
+                            var times = new List<double>();
+                            for (var r = 0; r < 6; r++)
+                            {
+                                var bmp = new System.Windows.Media.Imaging.RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                                var t0 = Stopwatch.GetTimestamp(); bmp.Render(window); times.Add((Stopwatch.GetTimestamp() - t0) * 1000.0 / Stopwatch.Frequency);
+                            }
+                            var tf = Stopwatch.GetTimestamp(); for (var r = 0; r < 100; r++) showFrame.Invoke(window, null);
+                            var frameMs = (Stopwatch.GetTimestamp() - tf) * 1000.0 / Stopwatch.Frequency / 100;
+                            Log($"{w}x{h} hotspots {m}: window render median {times.OrderBy(x => x).ElementAt(3):F1} ms (min {times.Min():F1}, max {times.Max():F1}); ShowPlayFrame {frameMs:F2} ms; overlay children {canvas.Children.Count}");
+                        }
+                    }
+                    Log("DONE (render)");
+                    return;
+                }
                 if (real)
                 {
                     // ONE short run with the real pointer (24 Oct brief: under 30 s), then the pointer goes back where it was.

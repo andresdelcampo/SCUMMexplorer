@@ -1,0 +1,17 @@
+20.12.34.962 intro: play=True room=45 PlayActive=True
+20.12.36.471 click 76,104: delivered
+20.12.38.979 click 196,104: delivered
+20.12.41.487 click 292,60: delivered
+20.13.37.582 cutscene: room=44 skippable=True skipButtonEnabled=True
+20.13.41.712 control: True room=44 PlayTakesInput=True
+20.13.42.217 hotspot options visible: True
+20.13.45.173 1280x800 hotspots Never: window render median 6,4 ms (min 6,2, max 11,7); ShowPlayFrame 2,63 ms; overlay children 0
+20.13.45.813 1280x800 hotspots Hover: window render median 6,5 ms (min 6,2, max 7,0); ShowPlayFrame 2,83 ms; overlay children 1
+20.13.46.452 1280x800 hotspots Always: window render median 6,6 ms (min 6,5, max 6,9); ShowPlayFrame 2,93 ms; overlay children 1
+20.13.48.620 1920x1080 hotspots Never: window render median 10,0 ms (min 9,9, max 11,1); ShowPlayFrame 2,64 ms; overlay children 0
+20.13.49.317 1920x1080 hotspots Hover: window render median 11,6 ms (min 10,5, max 19,6); ShowPlayFrame 3,01 ms; overlay children 1
+20.13.50.014 1920x1080 hotspots Always: window render median 10,6 ms (min 10,4, max 10,6); ShowPlayFrame 3,23 ms; overlay children 1
+20.13.52.253 2560x1440 hotspots Never: window render median 15,3 ms (min 14,8, max 27,4); ShowPlayFrame 2,98 ms; overlay children 0
+20.13.52.991 2560x1440 hotspots Hover: window render median 15,7 ms (min 14,5, max 28,5); ShowPlayFrame 3,10 ms; overlay children 1
+20.13.53.706 2560x1440 hotspots Always: window render median 14,6 ms (min 13,8, max 15,0); ShowPlayFrame 3,14 ms; overlay children 1
+20.13.53.707 DONE (render)
