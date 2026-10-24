@@ -138,6 +138,9 @@ public partial class MainWindow : Window
         PreviewKeyDown += MainWindow_PreviewKeyDown;
         PreviewTextInput += (_, e) => PlayTextInput(e);
         LoadViewOptions();
+        // The radios live in a collapsed expander and are realised late: their XAML default is lost until then.
+        foreach (var radio in new[] { DoorwaysNever, DoorwaysHover, DoorwaysAlways, ObjectsNever, ObjectsHover, ObjectsAlways })
+            radio.Loaded += (_, _) => EnsureOverlayModesChecked();
         PreviewTextInput += MainWindow_PreviewTextInput;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
@@ -407,6 +410,7 @@ public partial class MainWindow : Window
 
     private void ShowGame(GameLibrary game)
     {
+        EnsureOverlayModesChecked();
         _cutsceneLaunchGeneration++;
         _catalogPreviewOnly = false;
         _introPreparing = false;
@@ -3993,7 +3997,15 @@ public partial class MainWindow : Window
                 }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        EnsureOverlayModesChecked();
         _viewOptionsReady = true;
+    }
+
+    /// <summary>Hotspots and Doorways always show one selected mode (Never by default, R-6.5), also when the radios were not realised yet when the options were read.</summary>
+    private void EnsureOverlayModesChecked()
+    {
+        if (DoorwaysHover.IsChecked != true && DoorwaysAlways.IsChecked != true) DoorwaysNever.IsChecked = true;
+        if (ObjectsHover.IsChecked != true && ObjectsAlways.IsChecked != true) ObjectsNever.IsChecked = true;
     }
 
     private void RoomOptions_Toggled(object sender, RoutedEventArgs e) { if (ReferenceEquals(sender, e.OriginalSource)) SaveViewOptions(); }
