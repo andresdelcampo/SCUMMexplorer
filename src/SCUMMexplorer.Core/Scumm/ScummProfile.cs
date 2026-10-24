@@ -160,6 +160,16 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// </summary>
     public bool RightClickReachesGame => PlaysThroughVerbs && EngineVersion > ScummVersion.V3;
 
+    /// <summary>
+    /// R-1.5 / R-6.25.2 (user, 24 Oct 2026: "Should not harm to add that. As long as the game did not have another use for double click"): the verb a double
+    /// click on an object runs through the game's own sentence path (click that verb, then the object), or null where the game's input leaves no double click
+    /// free. Set only after reading the game's own input scripts (.verification/doubleclick-20261024): no timer (VAR_TMR_1 to 3) is read anywhere in their
+    /// chain and no click is compared with the previous one, so a second click is just another click. Indiana Jones 3 stays null: Script 4 compares the
+    /// clicked object with the last target (<c>var[0x03D]</c>) and a second click on it runs the sentence (R-7.10). Maniac Mansion and Zak McKracken stay
+    /// null: their input is the native version 1/2 engine's, which this repository has not recorded (inconclusive, so off).
+    /// </summary>
+    public int? DoubleClickLookVerb { get; init; }
+
     /// <summary>The third argument of <c>runInputScript</c> for a right click where <see cref="RightClickReachesGame"/> (ScummVM <c>checkExecVerbs</c>: 2 from version 4).</summary>
     public int RightClickInputMode => EngineVersion > ScummVersion.V3 ? 2 : 0;
 
@@ -240,6 +250,13 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
                 or GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced or GameFamily.Monkey2
                 // S6 Indy4 (17 October 2026): Fate of Atlantis plays through its own verbs, sentence line, icon inventory and dialogue lines on version 5.
                 || GameSupport.FamilyOf(game) == GameFamily.Indy4,
+            // Look at: Monkey Island floppy 0x09, Monkey Island CD and Monkey Island 2 0x08, Indy4 0x09 (the verb tables the games' own scripts set up).
+            DoubleClickLookVerb = GameSupport.FamilyOf(game) switch
+            {
+                GameFamily.MonkeyFloppy or GameFamily.Indy4 => 0x09,
+                GameFamily.MonkeyCd or GameFamily.Monkey2 => 0x08,
+                _ => null
+            },
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
             // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
             MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic

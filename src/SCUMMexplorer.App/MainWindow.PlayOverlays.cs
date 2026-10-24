@@ -46,6 +46,15 @@ public partial class MainWindow
         if (ObjectAreaMode == DisplayMode.Hover || DoorwayMode == DisplayMode.Hover) RefreshPlayOverlays();
     }
 
+    /// <summary>Whether a present object of the room (a hotspot or a doorway) is under a native screen point.</summary>
+    private bool PlayObjectAt((int X, int Y)? point)
+    {
+        if (point is not { } p || _playShown is not { } frame) return false;
+        if (new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom).ToRoom(p.X, p.Y) is not { } at) return false;
+        // The scene as the game leaves it now (the overlays' copy is refreshed only while an aid is visible).
+        return _playScreen?.Scene() is { } scene && ScummRoomOverlays.Objects(scene, _playDoorwayTargets).Any(item => item.Contains(at.X, at.Y));
+    }
+
     /// <summary>The listed hotspot under a native screen point, as the game's search would pick it (the same pick as LOOM's room picture).</summary>
     private RoomHotspot? PlayHotspotAt((int X, int Y)? point)
     {

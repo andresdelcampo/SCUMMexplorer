@@ -22,7 +22,9 @@ public abstract partial class ScummSession
 
     /// <summary>The inputs delivered to the input script so far (Advanced trace, R-7.17).</summary>
     public IReadOnlyList<ScummPlayInput> DeliveredInput => _deliveredInput;
-    public bool HasPendingPlayInput => _queuedInput.Count != 0;
+    public bool HasPendingPlayInput => _queuedInput.Count != 0 || _delayedClick is not null;
+    // A double click's second click waits two frames after the Look at verb's click, as two real presses would: the verb click starts scripts that need a frame.
+    private (int X, int Y, int Frames)? _delayedClick;
     /// <summary>The native input script: fixed script 4 before v3, VAR_VERB_SCRIPT thereafter.</summary>
     public int PlayInputScript => _runtime.IsV2 ? 4 : _runtime.GlobalVariables.GetValueOrDefault(VerbScriptVariable);
 
@@ -223,6 +225,27 @@ public abstract partial class ScummSession
     }
 
     /// <summary>
+    /// A double click on an object where the game's input leaves it free (<see cref="ScummProfile.DoubleClickLookVerb"/>): the game's own Look at verb is clicked
+    /// and then the object, so its sentence script composes and runs "Look at" exactly as two real clicks would. Null with the reason when the game uses
+    /// the double click itself, its Look at verb is not on, or the game reads no click now.
+    /// </summary>
+    public ScummPlayInput? DoubleClickLook(int x, int y, out string? refused)
+    {
+        var profile = ScummProfile.For(_game);
+        if (profile.DoubleClickLookVerb is not int look) { refused = "this game's own input uses a second click (or has not been checked), so a double click is two clicks"; return null; }
+        refused = InputRefusal();
+        if (refused is not null) return null;
+        if (y < _runtime.MainScreen.Top || y >= _runtime.MainScreen.Bottom) { refused = "the point is not in the room"; return null; }
+        var verb = _runtime.Verbs.Snapshot().FirstOrDefault(item => item.VerbId == look && item.Mode == 1);
+        if (verb is null) { refused = $"the game's Look at verb (0x{look:X2}) is not on now"; return null; }
+        PointAtScreen((x, y));
+        var verbClick = new ScummPlayInput(VerbClickArea, look, profile.ClickInputMode, $"double click: click on the Look at verb 0x{look:X2}");
+        _queuedInput.Enqueue(verbClick);
+        _delayedClick = (x, y, 3);
+        return verbClick;
+    }
+
+    /// <summary>
     /// A key the player pressed (R-7.11), queued for the next frame. The engine's own keys are the app's controls and are not queued here: the pause key,
     /// '.', Esc (see <see cref="PressKey"/>), the restart key and the profile's keys that leave the session (save/load). A key that is the shortcut of a
     /// verb that is on is that verb's click <c>(1, verb, 1)</c>; any other key goes as <c>(4, key, 1)</c>.
@@ -269,6 +292,11 @@ public abstract partial class ScummSession
     // checkExecVerbs: each queued input runs the script VAR_VERB_SCRIPT holds now, with (area, value, mode) as its first locals.
     private void DeliverQueuedInput()
     {
+        if (_delayedClick is { } delayed)
+        {
+            if (delayed.Frames <= 1) { _delayedClick = null; ClickScreen(delayed.X, delayed.Y, out _); }
+            else _delayedClick = delayed with { Frames = delayed.Frames - 1 };
+        }
         while (_queuedInput.Count > 0)
         {
             var input = _queuedInput.Dequeue();
