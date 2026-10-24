@@ -41,6 +41,38 @@ public sealed class HoverCostGuardTests
         Assert.True(HoverCost(session, new ScummPlayScreen(game, session, indexed.States), 60 + session.MainScreen.Top, rounds: 8) < 4.0);
     }
 
+    [Fact]
+    public void OnHoverRedrawsOnlyWhenWhatIsPointedAtChangesAndASceneCostsOneCapture()
+    {
+        // The table of Maniac enhanced's Room 44 (the sign, 8,80 32x24) and a doorway: thousands of moves change the key only on entering and leaving.
+        var sign = new RoomHotspot(278, 1, "cartel", 8, 80, 32, 24, []);
+        var door = new RoomHotspot(300, 2, null, 100, 40, 20, 40, [1]);
+        IReadOnlyList<RoomHotspot> table = [sign, door];
+        string? last = null; var changes = 0;
+        for (var i = 0; i < 20000; i++)
+        {
+            var x = 4 + (int)(150 * (0.5 + 0.5 * Math.Sin(i * 0.002 * (1 + i / 4000))));
+            var key = RoomHotspotRules.HoverKey(table, x, 90, objects: true, doorways: true);
+            if (key != last) { changes++; last = key; }
+        }
+        Assert.InRange(changes, 4, 400);
+        Assert.Equal("278|", RoomHotspotRules.HoverKey(table, 20, 90, true, true));
+        Assert.Equal("|300", RoomHotspotRules.HoverKey(table, 110, 50, true, true));
+        Assert.Equal("|", RoomHotspotRules.HoverKey(table, 20, 90, false, false));
+
+        var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = ScummGameSession.BootForPlay(game, out var indexed);
+        for (var i = 0; i < 300; i++) session.AdvanceFrame();
+        var screen = new ScummPlayScreen(game, session, indexed.States);
+        screen.Scene();
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        for (var i = 0; i < 200; i++) screen.Scene();
+        var perScene = (GC.GetAllocatedBytesForCurrentThread() - before) / 200;
+        Assert.True(perScene < 400_000, $"a scene allocated {perScene} bytes");
+    }
+
     // Sweeps the game pointer in and out across the room at several speeds; returns the last round's mean cost over the first round's (a bound of 4 allows noise).
     private static double HoverCost(ScummGameSession session, ScummPlayScreen screen, int rowY, int rounds)
     {

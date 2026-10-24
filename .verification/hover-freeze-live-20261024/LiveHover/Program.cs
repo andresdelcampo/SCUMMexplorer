@@ -172,7 +172,7 @@ internal static class Program
                 }
                 phase = "hover storm";
                 var rate = Stopwatch.StartNew();
-                double sumMs = 0, worst = 0; long worstGap = 0; int n = 0;
+                double sumGame = 0, sumMs = 0, worst = 0; long worstGap = 0; int n = 0;
                 maxGap = 0;
                 for (var i = 0; i < moves; i++)
                 {
@@ -180,6 +180,7 @@ internal static class Program
                     (int, int)? p = Pos(i, top);
                     var t = Stopwatch.GetTimestamp();
                     point.Invoke(Play(), new object?[] { p });
+                    var mid = Stopwatch.GetTimestamp(); sumGame += (mid - t) * 1000.0 / Stopwatch.Frequency;
                     movePointer.Invoke(window, new object?[] { p });
                     var ms = (Stopwatch.GetTimestamp() - t) * 1000.0 / Stopwatch.Frequency;
                     sumMs += ms; worst = Math.Max(worst, ms); n++;
@@ -187,9 +188,9 @@ internal static class Program
                     await Task.Delay(8);
                     if ((i + 1) % 250 == 0)
                     {
-                        Log($"moves {i + 1}: body mean {sumMs / n:F3} ms worst {worst:F2} ms; heartbeat max gap {maxGap} ms; mem {GC.GetTotalMemory(false) / 1048576} MB, ws {Process.GetCurrentProcess().WorkingSet64 / 1048576} MB; " +
+                        Log($"moves {i + 1}: body mean {sumMs / n:F3} ms (PointAtScreen part {sumGame / n:F3}) worst {worst:F2} ms; heartbeat max gap {maxGap} ms; mem {GC.GetTotalMemory(false) / 1048576} MB, ws {Process.GetCurrentProcess().WorkingSet64 / 1048576} MB; " +
                             $"overlay children {canvas.Children.Count}, ObjectList {objectList.Children.Count}, trace {PlayGet<IReadOnlyList<string>>("SessionTrace").Count}, elapsed {rate.Elapsed.TotalSeconds:F1} s; {Resources(window)}");
-                        sumMs = 0; worst = 0; n = 0; maxGap = 0;
+                        sumMs = 0; sumGame = 0; worst = 0; n = 0; maxGap = 0;
                     }
                 }
                 Log("DONE");

@@ -93,4 +93,15 @@ public static class RoomHotspotRules
         var hits = hotspots.Where(item => item.Contains(x, y)).ToArray();
         return hits.FirstOrDefault(item => untouchable?.Invoke(item) != true) ?? hits.FirstOrDefault();
     }
+
+    /// <summary>
+    /// R-6.48: what a room point points at in a hotspot table, as one comparable string: the strong box's object (when <paramref name="objects"/>) and the
+    /// doorway objects under the point (when <paramref name="doorways"/>). A pointer move redraws the hover boxes only when this changes.
+    /// </summary>
+    public static string HoverKey(IReadOnlyList<RoomHotspot> hotspots, int x, int y, bool objects, bool doorways)
+    {
+        var pointed = objects ? PointedAt(hotspots.Where(item => !item.IsDoorway), x, y)?.ObjectId : null;
+        var doors = doorways ? string.Join(',', hotspots.Where(item => item.IsDoorway && item.Contains(x, y)).Select(item => item.ObjectId)) : "";
+        return $"{pointed}|{doors}";
+    }
 }
