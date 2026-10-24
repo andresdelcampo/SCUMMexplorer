@@ -149,32 +149,9 @@ public partial class MainWindow
         _genericActionsHost!.Children.Clear();
         _genericSourceHost!.Children.Clear();
         _genericActionButtons.Clear();
-        var choices = new StackPanel();
-        var totals = _genericSourceActions.Where(a => a.Executable).GroupBy(a => a.Title).ToDictionary(g => g.Key, g => g.Count());
-        var ordinal = new Dictionary<string, int>();
-        foreach (var action in _genericSourceActions.Where(a => a.Executable))
-        {
-            var index = ordinal[action.Title] = ordinal.GetValueOrDefault(action.Title) + 1;
-            var title = totals[action.Title] > 1 ? $"{action.Title} ({index})" : action.Title;
-            var button = new Button
-            {
-                Content = new TextBlock { Text = title, TextWrapping = TextWrapping.Wrap },
-                HorizontalContentAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 2, 0, 2),
-                Padding = new Thickness(8, 5, 8, 5), ToolTip = IsAdvancedMode ? action.Source : null,
-                Tag = action
-            };
-            button.Click += (_, _) => RunGenericRoomAction(action);
-            _genericActionButtons.Add(button);
-            choices.Children.Add(button);
-        }
-        if (choices.Children.Count > 0)
-            _genericActionsHost.Children.Add(new Expander
-            {
-                Header = "Interact", Content = new ScrollViewer { Content = choices, MaxHeight = 260, VerticalScrollBarVisibility = ScrollBarVisibility.Auto },
-                Style = (Style)FindResource("RoomOptionsSection"), Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                Margin = new Thickness(0, 6, 0, 0)
-            });
-        _genericActionsHost.Visibility = choices.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        // Parity with LOOM (R-6.9, 24 Oct): the actions are offered through the bar's Interact button and the
+        // object's menu, not through a list of every action of the room under the bar.
+        _genericActionsHost.Visibility = Visibility.Collapsed;
         if (!IsAdvancedMode) return;
         _genericSourceHost.Children.Add(new TextBlock
         {
@@ -243,19 +220,75 @@ public partial class MainWindow
     {
         if (++_genericNamesFrame % 12 == 0 && _genericActionsHost is not null && GenericRoomActions &&
             _genericActionsRoom is not null && RefreshGenericRoomActionWords()) BuildGenericRoomActions();
-        foreach (var button in _genericActionButtons) button.IsEnabled = GenericRoomActionCanStart;
+        UpdateGenericInteractButton();
     }
 
-    // A native hotspot row selects its object; choosing a verb remains an explicit action.
+    // LOOM's Interact (R-6.9): the bar's button acts on the selected object and opens that object's menu of
+    // actions (heading: the object's name; rows: the verbs' own words). Choosing one is an exploration action.
+    private int? _genericInteractTarget;
+
+    private IReadOnlyList<GenericSourceAction> GenericObjectActions(int objectId) =>
+        _genericSourceActions.Where(a => a.Executable && a.Object == objectId).DistinctBy(a => a.Verb).ToArray();
+
+    private static string GenericActionWord(GenericSourceAction action) =>
+        action.Title.Split(" · ", 2)[0];
+
+    private void UpdateGenericInteractButton()
+    {
+        if (!GenericRoomActions || _currentRoomResource is null) return;
+        if (_genericInteractTarget is int selected && GenericObjectActions(selected).Count == 0) _genericInteractTarget = null;
+        InteractButton.Visibility = Visibility.Visible;
+        var name = _genericInteractTarget is int target ? GenericObjectActions(target).FirstOrDefault()?.Target : null;
+        InteractButton.Content = name is null ? "Interact ▴" : $"Interact · {name} ▴";
+        InteractButton.IsEnabled = _genericInteractTarget is not null && GenericRoomActionCanStart;
+    }
+
+    private void OpenGenericInteractMenu(int objectId, FrameworkElement anchor, System.Windows.Controls.Primitives.PlacementMode placement)
+    {
+        var actions = GenericObjectActions(objectId);
+        if (actions.Count == 0 || !GenericRoomActionCanStart) return;
+        var heading = (actions[0].Target is { Length: > 0 } name ? name : $"Object {objectId}").ToUpperInvariant();
+        OpenPopupMenu(anchor, placement, heading,
+            actions.Select(action => (GenericActionWord(action), IsAdvancedMode ? action.Source : null, (Action)(() => RunGenericRoomAction(action)))));
+    }
+
+    private void GenericInteract_Click() { if (_genericInteractTarget is int target) OpenGenericInteractMenu(target, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top); }
+
+    /// <summary>The object (with actions) under a native screen point, from the same scene the overlays read.</summary>
+    private int? GenericObjectAt((int X, int Y)? point)
+    {
+        if (point is not { } p || _playOverlayScene is not { } scene || _playShown is not { } frame) return null;
+        var viewport = new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom);
+        if (viewport.ToRoom(p.X, p.Y) is not { } at) return null;
+        return ScummRoomOverlays.Objects(scene, _playDoorwayTargets)
+            .FirstOrDefault(o => o.Contains(at.X, at.Y) && GenericObjectActions(o.ObjectId).Count > 0)?.ObjectId;
+    }
+
+    // A click selects the object under it, as in LOOM; the click itself still goes to the game.
+    private void SelectGenericInteractAt((int X, int Y)? point)
+    {
+        if (!GenericRoomActions) return;
+        _genericInteractTarget = GenericObjectAt(point);
+        UpdateGenericInteractButton();
+    }
+
+    // Right button where it stays the app's (R-7.16: up to engine version 3): LOOM's Interact menu at the pointer.
+    private bool TryOpenGenericInteractAt((int X, int Y)? point)
+    {
+        if (!GenericRoomActions || GenericObjectAt(point) is not int objectId) return false;
+        _genericInteractTarget = objectId;
+        UpdateGenericInteractButton();
+        OpenGenericInteractMenu(objectId, PlayScreenImage, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
+        return true;
+    }
+
+    // A native hotspot row selects its object and opens its menu; choosing a verb remains an explicit action.
     private void SelectGenericInteractTarget(int objectId)
     {
-        if (_genericActionsHost?.Children.OfType<Expander>().FirstOrDefault() is not { } expander) return;
-        var first = _genericActionButtons.FirstOrDefault(b => b.Tag is GenericSourceAction a && a.Object == objectId);
-        if (first is null) return;
-        expander.IsExpanded = true;
-        expander.UpdateLayout();
-        first.BringIntoView();
-        first.Focus();
+        if (GenericObjectActions(objectId).Count == 0) return;
+        _genericInteractTarget = objectId;
+        UpdateGenericInteractButton();
+        if (InteractButton.IsEnabled) OpenGenericInteractMenu(objectId, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
 
     private void RunGenericRoomAction(GenericSourceAction action)

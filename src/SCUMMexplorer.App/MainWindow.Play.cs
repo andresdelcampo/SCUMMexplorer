@@ -280,6 +280,19 @@ public partial class MainWindow
         if (PlayCutscenes) UpdatePlayCutsceneControls();
     }
 
+    /// <summary>Step ▸ (Advanced, as in LOOM): while paused, plays exactly one frame of the game's clock.</summary>
+    private void StepPlayFrame()
+    {
+        if (!PlayActive || !_playPaused || _play is null || _sceneSound.IsPreparing) return;
+        _play.AdvanceFrame();
+        _sceneSound.Update();
+        _playSpeech.Update();
+        _playFrame++;
+        ShowPlayFrame();
+        RefreshPlayControlsOnFrame();
+        StatusText.Text = $"Paused after one frame (Room {_play.CurrentRoomId:00}). Play goes on.";
+    }
+
     private void PlayTimer_Tick(object? sender, EventArgs e)
     {
         if (_play is null) return;
@@ -376,6 +389,7 @@ public partial class MainWindow
         if (!PlayTakesInput || PlayPoint(e) is not { } point) return;
         PlayScreenImage.Focus();
         e.Handled = true;
+        SelectGenericInteractAt(point);
         if (_play!.ClickScreen(point.X, point.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
         UpdatePlaybackControls();
     }
@@ -384,7 +398,13 @@ public partial class MainWindow
     // version 4 and later, mode 2; Monkey Island's two-button default verb). Elsewhere it is not taken here and stays the app's.
     private void PlayScreenImage_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (!PlayRightClickReachesGame || PlayPoint(e) is not { } point) return;
+        if (!PlayRightClickReachesGame)
+        {
+            // Where the right button stays the app's (R-7.16), it opens LOOM's Interact menu on the object under it.
+            if (PlayTakesInput && TryOpenGenericInteractAt(PlayPoint(e))) e.Handled = true;
+            return;
+        }
+        if (PlayPoint(e) is not { } point) return;
         PlayScreenImage.Focus();
         e.Handled = true;
         PlayRightClick(point.X, point.Y);

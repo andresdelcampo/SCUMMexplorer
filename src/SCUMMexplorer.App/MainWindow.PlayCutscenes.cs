@@ -247,8 +247,8 @@ public partial class MainWindow
     private void UpdatePlayCutsceneControls()
     {
         var active = PlayActive;
-        InteractButton.Visibility = Visibility.Collapsed; // Generic Interact has its own source-driven expander.
-        AdvanceFrameButton.IsEnabled = false;
+        if (GenericRoomActions) UpdateGenericInteractButton(); else InteractButton.Visibility = Visibility.Collapsed;
+        AdvanceFrameButton.IsEnabled = active && _playPaused;
         UpdatePlayTransportControls();
         var canStart = PlayCanStartCutscene;
         CutsceneMenuButton.IsEnabled = canStart && _playPlanner is not null;
@@ -278,7 +278,7 @@ public partial class MainWindow
         UpdateSoundDeviceControls();
         PlaybackPauseButton.IsEnabled = active;
         PlaybackPauseButton.Content = _playPaused ? "▶ Play" : "⏸ Pause";
-        PlaybackPauseButton.ToolTip = "Pause or resume the game, including walking, dialogue and cutscenes (Space).";
+        PlaybackPauseButton.ToolTip = "Pause or play the scene (space). In Advanced mode, Step ▸ then plays one frame while paused.";
         var inCutscene = active && _play!.InCutscene;
         var skippable = inCutscene && _play!.CutsceneSkippable;
         SkipCutsceneButton.IsEnabled = skippable;

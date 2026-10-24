@@ -1018,6 +1018,8 @@ public partial class MainWindow : Window
         SessionStatusText.Visibility = advanced && _session is not null && SessionModeToggle.IsChecked != true
             ? Visibility.Visible : Visibility.Collapsed;
         AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        // R-6.6: Step ▸ is part of the Advanced bar in every live game (a verb-based game steps its own clock).
+        if (PlayCutscenes) AdvanceFrameButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         SessionActions.Visibility = advanced && _session is not null
             ? Visibility.Visible : Visibility.Collapsed;
         RoomCueTime.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -1766,6 +1768,7 @@ public partial class MainWindow : Window
 
     private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
     {
+        if (PlayCutscenes) { StepPlayFrame(); return; }
         if (_playbackPaused)
         {
             StepPausedPlayback();
@@ -4139,6 +4142,7 @@ public partial class MainWindow : Window
 
     private void Interact_Click(object sender, RoutedEventArgs e)
     {
+        if (GenericRoomActions) { GenericInteract_Click(); return; }
         if (_interactTarget is { } record) OpenInteractMenu(record, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
 
