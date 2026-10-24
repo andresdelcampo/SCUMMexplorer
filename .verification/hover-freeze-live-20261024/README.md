@@ -17,3 +17,11 @@ Result: **not reproduced**. No cause found, no fix made; a bounded-cost guard an
 ## Not covered (ideas for the user's machine)
 
 Large or high-DPI maximised window, the user's saved view options (Doorways mode, Roland sound), a long session, software rendering. If it reproduces, a process dump of the stuck app (Task Manager, Create dump file) would show the stuck thread. Run: `LiveHover.exe <game folder> <out> <moves> [synthetic|real|advanced] [Never|Hover|Always] [stay]`.
+
+## Addendum: thumbnails and first-visit builds (coordinator hypotheses, same day)
+
+The user's parallel-stacks snapshots showed a worker in `LoadRoomCardThumbnailsAsync` -> `ReadFirstVisit` -> `ManiacFirstVisit.Run/Prepare` -> `AdvanceFrame` -> `Snapshot`. Checked:
+
+- The pipeline is one sequential pass over the 53 rooms started when the game opens (`PopulateRoomCards`, one `Lazy` per room in `RoomPreviewScenes`); nothing in the hover path (`PlayScreenImage_MouseMove`, `UpdatePlayOverlayHover`, `RefreshPlayOverlays`, `LightHotspotRow`, `Highlight`) reaches `ReadFirstVisit`, `PopulateRoomCards` or the room-card code (grep; `ReadFirstVisit` has two callers, both in `Task.Run`, no `.Value`/`.Result`/`.Wait` of it on the UI thread).
+- Measured with a temporary counter in `ScummRoomFirstVisit.Run` (removed again): 53 runs by the time the user's steps were done, **0 additional runs during 3,000 hover moves in On hover** (`out-counts`, not kept). Each room's `Prepare` takes about 0.65 s (53 rooms in 37 s headless) and a live hover loop on the main thread running at the same time stayed at 4.8 ms mean, 31 ms worst per iteration with the whole pipeline running in parallel (no blocking, no growth). So the pipeline is a bounded ~40 to 60 s of background CPU after opening a game, not a per-hover job, and not an unbounded loop (`Prepare` is capped at 300 + 5,000 frames).
+- Still open: the user's UI thread was blocked for minutes with 1% CPU; a wait that only exists on the user's machine (saved view options, Roland sound, rendering/GPU) is not excluded. A dump taken during a freeze (Rider/Task Manager) with the UI thread's stack is the next piece of evidence.
