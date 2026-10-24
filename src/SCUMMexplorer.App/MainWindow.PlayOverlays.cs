@@ -31,6 +31,8 @@ public partial class MainWindow
         _playOverlayCanvas.Children.Clear();
         _playOverlayCanvas.Visibility = Visibility.Collapsed;
         _playOverlayPointer = null;
+        _playOverlayHoverKey = null;
+        _playOverlayHotspots = [];
         _playHighlightId = null;
         _playOverlayScene = null;
         _playOverlayListKey = null;
@@ -43,7 +45,24 @@ public partial class MainWindow
         if (_playOverlayPointer == point) return;
         _playOverlayPointer = point;
         if (IsAdvancedMode) LightHotspotRow(PlayHotspotAt(point)?.ObjectId);
-        if (ObjectAreaMode == DisplayMode.Hover || DoorwayMode == DisplayMode.Hover) RefreshPlayOverlays();
+        // R-6.48: a pointer move redraws only when what it points at changed (the hotspot under it, the doorways under it); the table is the one the last
+        // redraw (every game frame) built, so a move does no scene capture, no hotspot derivation and no control writes.
+        if (ObjectAreaMode != DisplayMode.Hover && DoorwayMode != DisplayMode.Hover) return;
+        var key = PlayHoverKey(point);
+        if (key == _playOverlayHoverKey) return;
+        _playOverlayHoverKey = key;
+        RefreshPlayOverlays();
+    }
+
+    private string? _playOverlayHoverKey;
+    private IReadOnlyList<RoomHotspot> _playOverlayHotspots = [];
+
+    /// <summary>What the pointer points at in the cached hotspot table: the strong box's object and the doorway objects under it ("" for neither).</summary>
+    private string PlayHoverKey((int X, int Y)? point)
+    {
+        if (point is not { } p || _playShown is not { } frame ||
+            new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom).ToRoom(p.X, p.Y) is not { } at) return "";
+        return RoomHotspotRules.HoverKey(_playOverlayHotspots, at.X, at.Y, _playHighlightId is null && ObjectAreaMode != DisplayMode.Never, DoorwayMode == DisplayMode.Hover);
     }
 
     /// <summary>Whether a present object of the room (a hotspot or a doorway) is under a native screen point.</summary>
@@ -79,6 +98,7 @@ public partial class MainWindow
             _playOverlayGame = _game;
             _playOverlayRoom = roomId;
             _playOverlayPointer = null;
+            _playOverlayHoverKey = null;
             _playDoorwayTargets = ReadPlayDoorwayTargets(_game, roomId);
         }
         if (_playOverlayCanvas.Parent is null)
@@ -140,6 +160,7 @@ public partial class MainWindow
         var surface = new RoomSurface(_playOverlayCanvas, scale, Map, offsetX, offsetX + ScummPlayFrame.Width * scale);
         var pointInRoom = _playOverlayPointer is { } pointer ? viewport.ToRoom(pointer.X, pointer.Y) : null;
         var hotspots = PlayHotspots.Hotspots();
+        _playOverlayHotspots = hotspots;
         // The same drawing as LOOM's room picture: doorway boxes by their option; hotspot boxes faint under `Always`, strong for the one pointed at or chosen in the list.
         DrawDoorwayBoxes(surface, RoomHotspotRules.DoorwayBoxes(hotspots,
             group => RoomOverlayRules.Shows(DoorwayMode, pointInRoom is { } hover && group.Any(item => item.Contains(hover.X, hover.Y))),

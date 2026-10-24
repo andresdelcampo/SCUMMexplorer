@@ -41,7 +41,10 @@ public sealed class ScummPlayScreen
     /// <summary>The scene of the current room at this frame (objects, actors, palettes), or null outside a room.</summary>
     public ScummRoomScene? Scene()
     {
-        if (_session.CurrentRoomId is not int roomId || _session.Snapshot.RoomId != roomId) return null;
+        if (_session.CurrentRoomId is not int roomId) return null;
+        // One capture per scene (its snapshot also answers whether the session is in that room): the snapshot copies the variable tables, so it is not built twice (R-6.48).
+        var capture = _session.CaptureRoom();
+        if (capture.Snapshot.RoomId != roomId) return null;
         if (!_rooms.TryGetValue(roomId, out var room))
         {
             var resource = _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId);
@@ -51,7 +54,6 @@ public sealed class ScummPlayScreen
                 : new ScummV3EgaRoomDecoder().Decode(File.ReadAllBytes(resource.FilePath));
             _rooms[roomId] = room = (image, _data.ReadRoom(roomId).Objects, _data.ReadObjectImages(roomId));
         }
-        var capture = _session.CaptureRoom();
         var snapshot = capture.Snapshot;
         // S6 Monkey2 (17 October 2026): a v5 object stores one image per state (IM01, IM02, …) and drawObject takes getObjectImage(ptr, getState(obj))
         // (object.cpp), so each frame picks the image of the object's current state, as the first visit does (ScummRoomScene); older versions keep one image.
