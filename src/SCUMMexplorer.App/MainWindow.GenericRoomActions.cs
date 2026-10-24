@@ -152,31 +152,37 @@ public partial class MainWindow
         // object's menu, not through a list of every action of the room under the bar.
         _genericActionsHost.Visibility = Visibility.Collapsed;
         if (!IsAdvancedMode) return;
-        _genericSourceHost.Children.Add(new TextBlock
+        FillRoomInspection(_genericSourceHost, CurrentRoomControls.Inspection());
+    }
+
+    /// <summary>The Advanced inspection (R-16.9): headed sections of expanders with the raw code, then the relationships; the content is the provider's.</summary>
+    private void FillRoomInspection(Panel host, RoomInspection? inspection)
+    {
+        if (inspection is null) return;
+        var heading = (string text, double top) => new TextBlock { Text = text, Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, top, 0, 4), TextWrapping = TextWrapping.Wrap };
+        var first = true;
+        foreach (var section in inspection.Sections)
         {
-            Text = "ROOM SCRIPTS", Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, 8, 0, 4)
-        });
-        foreach (var (label, code) in _genericRoomScripts) _genericSourceHost.Children.Add(GenericSourceCode(label, code));
-        _genericSourceHost.Children.Add(new TextBlock { Text = "INTERACTIONS", Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, 12, 0, 4) });
-        foreach (var action in _genericSourceActions)
-        {
-            var content = new StackPanel();
-            content.Children.Add(new TextBlock { Text = action.Source, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 4) });
-            if (action.Code is { } code) content.Children.Add(GenericSourceCode("Raw disassembly", code));
-            _genericSourceHost.Children.Add(new Expander
+            host.Children.Add(heading(section.Heading, first ? 8 : 12));
+            first = false;
+            foreach (var item in section.Items)
             {
-                Header = $"{action.Title} · object {action.Object} / verb 0x{action.Verb:X2}", Content = content,
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210))
-            });
+                if (item.Detail is null)
+                {
+                    if (item.Code is { } script) host.Children.Add(GenericSourceCode(item.Header, script));
+                    continue;
+                }
+                var content = new StackPanel();
+                content.Children.Add(new TextBlock { Text = item.Detail, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 4) });
+                if (item.Code is { } code) content.Children.Add(GenericSourceCode("Raw disassembly", code));
+                host.Children.Add(new Expander { Header = item.Header, Content = content, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)) });
+            }
         }
-        _genericSourceHost.Children.Add(new TextBlock { Text = "RELATIONSHIPS · POSSIBLE SOURCE OUTCOMES", Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, 12, 0, 4), TextWrapping = TextWrapping.Wrap });
-        var scripts = _genericRoomScripts.Select(s => s.Code).Concat(_genericSourceActions.Select(a => a.Code).OfType<ScummScriptDisassembly>()).Distinct();
-        var relationships = scripts.SelectMany(code => code.Instructions.Select(i => ScummScriptEvent.FromInstruction(code, i, ScummScriptEventCertainty.StaticPotential)))
-            .OfType<ScummScriptEvent>().Where(e => e.TargetKind is not null).DistinctBy(e => (e.SourceLabel, e.Offset, e.TargetKind, e.TargetId)).ToArray();
+        host.Children.Add(heading("RELATIONSHIPS · POSSIBLE SOURCE OUTCOMES", 12));
         var links = new StackPanel();
-        ShowScriptEvents(links, relationships);
-        _genericSourceHost.Children.Add(links);
-        if (relationships.Length == 0) _genericSourceHost.Children.Add(new TextBlock { Text = "No literal resource links were decoded. Computed destinations remain unresolved.", TextWrapping = TextWrapping.Wrap });
+        ShowScriptEvents(links, inspection.Relationships);
+        host.Children.Add(links);
+        if (inspection.Relationships.Count == 0) host.Children.Add(new TextBlock { Text = "No literal resource links were decoded. Computed destinations remain unresolved.", TextWrapping = TextWrapping.Wrap });
     }
 
     private static Expander GenericSourceCode(string label, ScummScriptDisassembly code)

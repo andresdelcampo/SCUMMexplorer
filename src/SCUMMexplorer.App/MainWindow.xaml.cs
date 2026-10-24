@@ -271,20 +271,19 @@ public partial class MainWindow : Window
     }, _game, () => IsAdvancedMode, _game?.Id == GameId.LoomVga ? null : LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
 
 
-    /// <summary>Each status editor is offered only for a loaded game with its matching live session.</summary>
-    private bool GameStatusAvailable => (_game is { Id: GameId.Loom or GameId.LoomVga } && _session is not null) || InventoryStatusAvailable;
-
     private void UpdateGameStatusButton()
     {
-        GameStatusButton.Visibility = GameStatusAvailable ? Visibility.Visible : Visibility.Collapsed;
-        GameStatusButton.IsEnabled = GameStatusAvailable;
-        GameStatusButton.ToolTip = InventoryStatusAvailable ? "Inspect held items and make explicit inventory choices." : "Inspect or explicitly edit this exploration session's staff, notes and drafts.";
+        var entry = CurrentRoomControls.GameStatus();
+        GameStatusButton.Visibility = entry.Available ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.IsEnabled = entry.Available;
+        GameStatusButton.ToolTip = entry.Tip;
     }
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {
-        if (!GameStatusAvailable) { UpdateGameStatusButton(); return; }
-        try { if (InventoryStatusAvailable) ShowInventoryStatus(); else BuildGameStatusWindow().ShowDialog(); }
+        var entry = CurrentRoomControls.GameStatus();
+        if (!entry.Available) { UpdateGameStatusButton(); return; }
+        try { entry.Open(); }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NullReferenceException)
         {
             MessageBox.Show(this, ex.Message, "Game Status could not open", MessageBoxButton.OK, MessageBoxImage.Error);
