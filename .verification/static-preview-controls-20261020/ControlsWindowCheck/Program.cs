@@ -42,11 +42,24 @@ internal static class Program
                 if (item is UIElement { Visibility: not Visibility.Visible }) return "-";
             return element.IsEnabled ? "on" : "off";
         }
-        int Hash(ScummPlayFrame? frame) => frame is null ? 0 : frame.Pixels.Aggregate(17, (h, b) => unchecked(h * 31 + (int)b));
+        // LOOM's Interact ▴ button, or the verb-based games' Interact expander (GenericRoomActionsHost): "on" when one of its actions can start.
+        string Interact()
+        {
+            var button = Control("InteractButton");
+            if (button != "-") return button;
+            if (Control("GenericRoomActionsHost") == "-") return "-";
+            var host = Named<Panel>("GenericRoomActionsHost");
+            var actions = host.Children.OfType<Expander>().SelectMany(e => ((e.Content as ScrollViewer)?.Content as Panel)?.Children.OfType<Button>() ?? []).ToList();
+            return actions.Count == 0 ? "-" : actions.Any(b => b.IsEnabled) ? $"on ({actions.Count})" : $"off ({actions.Count})";
+        }
+        // LOOM has no play screen: its explore session's actors stand for the picture.
+        int Hash(ScummPlayFrame? frame) => frame is null ? (Field("_session") as ScummSession)?.Actors is { } actors ? string.Join(";", actors).GetHashCode() : 0 : frame.Pixels.Aggregate(17, (h, b) => unchecked(h * 31 + (int)b));
         window.ContentRendered += async (_, _) =>
         {
             try
             {
+                window.Activate(); // LOOM's idle frames run only while the window is active
+                window.Activate(); // LOOM's idle frames run only while the window is active
                 if (advanced) ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("AdvancedModeToggle")).IsChecked = true;
                 var open = Stopwatch.StartNew();
                 Call("OpenGameFolder", args[0]);
@@ -68,7 +81,7 @@ internal static class Program
                     // The play clock or the preparation may still be starting; wait for one of them.
                     for (var n = 0; n < 150 && Field("_playTimer") is null && !(bool)Field("_catalogPreviewOnly")!; n++) await Task.Delay(100);
                     await Task.Delay(1500);
-                    var isStatic = (bool)Field("_catalogPreviewOnly")!;
+                    var isStatic = (bool)Field("_catalogPreviewOnly")! || Field("_loomAmbientSource") is not null || Field("_playAmbient") is true;
                     var play = Field("_play") as ScummSession;
                     var frames0 = (int)(Field("_playFrame") ?? 0);
                     var hash0 = Hash(Field("_playShown") as ScummPlayFrame);
@@ -89,9 +102,27 @@ internal static class Program
                     var clock = Field("_playTimer") is not null || Field("_idleFrameTimer") is not null && !isStatic && Prop("GameClickActive") is true;
                     report.Add($"{id:00} | {(isStatic ? "static" : "live")} | {(clock ? "on" : "off")} | {frames} | {(changed ? "yes" : "no")} | {(moved.Length == 0 ? "no" : moved.Trim())} | " +
                                $"{Control("PlaybackBar")} | {Control("PlaybackPauseButton")} | {Control("SkipLineButton")} | {Control("SkipCutsceneButton")} | " +
-                               $"{Control("RoomCutsceneButton")} | {Control("CutsceneMenuButton")} | {Control("InteractButton")} | {Control("RoomSoundsButton")} | {Control("GameIntroButton")}");
+                               $"{Control("RoomCutsceneButton")} | {Control("CutsceneMenuButton")} | {Interact()} | {Control("RoomSoundsButton")} | {Control("GameIntroButton")}");
                     if (isStatic) { sawStatic = true; staticRoom ??= id; } else sawLive = true;
                     if (roomsArg == "auto" && sawLive == true && sawStatic == true) break;
+                }
+                // switch=<folder>: R-13.12, the old game's sounds stop when another folder opens.
+                if (args.FirstOrDefault(a => a.StartsWith("switch=", StringComparison.Ordinal)) is { } switchArg)
+                {
+                    var player = Field("_sceneSound")!;
+                    int Voices() => ((System.Collections.IEnumerable)player.GetType().GetField("_voices", Private)!.GetValue(player)!).Cast<object>()
+                        .Count(v => v.GetType().GetProperty("Stopped")!.GetValue(v) is false);
+                    for (var n = 0; n < 50 && Voices() == 0; n++) await Task.Delay(100);
+                    var before = Voices();
+                    var log = (System.Collections.IList)player.GetType().GetProperty("Log")!.GetValue(player)!;
+                    var started = log.Cast<object>().Count(entry => entry.GetType().GetProperty("Action")!.GetValue(entry) is "opened");
+                    Call("OpenGameFolder", switchArg["switch=".Length..]);
+                    await Task.Delay(2500);
+                    var after = Voices();
+                    var media = (System.Windows.Media.MediaPlayer)Field("_audioPlayer")!;
+                    report.Add($"folder switch: {before} sound(s) playing before ({started} sounds opened in the log), {after} after opening {switchArg[7..]}; " +
+                               $"resource player source {(media.Source is null ? "none" : media.Source.ToString())}, position {media.Position}");
+                    if (before == 0 || after != 0) Environment.ExitCode = 1;
                 }
                 if (scene && staticRoom is int shown)
                 {
@@ -107,7 +138,7 @@ internal static class Program
                         await Task.Delay(100);
                     }
                     report.Add($"Room {shown:00}'s Play Cutscene lists {items!.Count} scene(s) after {open.Elapsed.TotalSeconds:0} s: " +
-                               string.Join("; ", items.Select(i => i.GetType().GetProperty("Title")!.GetValue(i))) + $"; button {Control("RoomCutsceneButton")}");
+                               string.Join("; ", items.Select(i => i.GetType().GetProperty("Title")!.GetValue(i))) + $"; button {Control("RoomCutsceneButton")}; Sounds {Control("RoomSoundsButton")}; Interact {Interact()}");
                     if (items.Count > 0)
                     {
                         var first = items[0];

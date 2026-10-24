@@ -82,9 +82,10 @@ public abstract partial class ScummSession
     /// none of its entry code (no global entry hook, no room entry script), ends every other script slot, and starts only the scripts the entry
     /// would start that <see cref="ScummAmbientScripts"/> finds ambient, with the entry's literal arguments. Its frames then move the room's
     /// permanent animation and nothing else: no story, no print, no room change, no input. The ego is not placed (no arrival is assumed). The
-    /// session is a state preview, never a reached outcome; the live session is not modified. Returns no session when the room has no ambient script.
+    /// session is a state preview, never a reached outcome; the live session is not modified. Returns no session when the room has no ambient script,
+    /// unless <paramref name="requireAmbient"/> is false (a still room whose objects an explicit Interact action can then act on).
     /// </summary>
-    public ScummManualRoomResult PrepareAmbientRoom(GameResource room, CancellationToken cancellationToken = default)
+    public ScummManualRoomResult PrepareAmbientRoom(GameResource room, CancellationToken cancellationToken = default, bool requireAmbient = true)
     {
         ArgumentNullException.ThrowIfNull(room);
         if (room.Kind != ResourceKind.Room || room.ResourceId is not int roomId ||
@@ -92,7 +93,7 @@ public abstract partial class ScummSession
         try
         {
             var ambient = ScummAmbientScripts.Classify(_data, roomId);
-            if (ambient.Ambient.Count == 0) return new(null, "The room's entry starts no ambient script.", Ambient: ambient);
+            if (ambient.Ambient.Count == 0 && requireAmbient) return new(null, "The room's entry starts no ambient script.", Ambient: ambient);
             cancellationToken.ThrowIfCancellationRequested();
             var copy = ObjectGraphCopy.Copy(this, ObjectGraphCopy.Reachable(_game));
             copy.ManualNavigationBegan();
