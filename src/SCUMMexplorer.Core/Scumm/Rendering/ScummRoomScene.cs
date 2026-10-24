@@ -77,22 +77,7 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
     /// Whether the game's own object search (<c>findObject</c>) can select this object here: it has a box, it is not at 0, 0 (off the scene), the room owns it,
     /// it is not untouchable (class 24, R-6.15) and its parent chain is in the required states. Doorways and stored boxes outside these rules are not hotspots.
     /// </summary>
-    public bool IsHotspot(ScummRoomObjectRecord record)
-    {
-        if (record.Width <= 0 || record.Height <= 0) return false;
-        var at = Snapshot.ObjectPositions.TryGetValue(record.Id, out var moved) ? moved : new RoomObjectPosition(record.X, record.Y);
-        if (at == new RoomObjectPosition(0, 0)) return false;
-        if (Snapshot.ObjectOwners.GetValueOrDefault(record.Id, (byte)0x0F) != 0x0F || Snapshot.IsUntouchable(record.Id)) return false;
-        if (IntrinsicStateMask == 8 && (Snapshot.ObjectStates.GetValueOrDefault(record.Id) & 2) != 0) return false;
-        var current = record;
-        for (var steps = 0; current.ParentLocalIndex != 0; steps++)
-        {
-            var parent = Records.FirstOrDefault(item => item.LocalIndex == current.ParentLocalIndex);
-            if (steps > Records.Count || parent is null || (Snapshot.ObjectStates.GetValueOrDefault(parent.Id) & IntrinsicStateMask) != current.ParentRequiredState) return false;
-            current = parent;
-        }
-        return true;
-    }
+    public bool IsHotspot(ScummRoomObjectRecord record) => RoomHotspotRules.IsHotspot(record, Records, Snapshot, IntrinsicStateMask);
 
     /// <summary><c>VAR_CURRENT_LIGHTS</c> bit 1 (ScummVM <c>LIGHTMODE_room_lights_on</c>): when clear, the game shows the room dark except under a flashlight.</summary>
     public bool RoomLit => (State.Lights & 2) != 0;

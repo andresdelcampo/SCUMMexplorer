@@ -344,7 +344,7 @@ public partial class MainWindow
         else PlayScreenImage.ToolTip = null;
         TryUpdateGenericRoomSounds();
         RefreshPlayOverlays(frame);
-        RefreshPlayOverlayLists(SelectGenericInteractTarget);
+        RefreshPlayOverlayLists();
     }
 
     // The image's point as a game screen point (0..319, 0..199).
@@ -390,6 +390,13 @@ public partial class MainWindow
         PlayScreenImage.Focus();
         e.Handled = true;
         SelectGenericInteractAt(point);
+        // R-1.5 / R-6.25.2: where the game's own input leaves a double click free (ScummProfile.DoubleClickLookVerb), the second press of a double click
+        // looks at the object under it through the game's own sentence path; the first press was the normal click. Elsewhere it is just a second click.
+        if (e.ClickCount == 2 && PlayObjectAt(point) && _play!.DoubleClickLook(point.X, point.Y, out _) is not null)
+        {
+            UpdatePlaybackControls();
+            return;
+        }
         if (_play!.ClickScreen(point.X, point.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
         UpdatePlaybackControls();
     }

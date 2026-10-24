@@ -95,6 +95,10 @@ public partial class MainWindow
         public RoomTransportState ReadTransport() => RoomTransportState.Idle;
         public RoomControlState ReadState(int? room, bool advanced) => RoomControlState.Hidden;
         public RoomInteractState ReadInteract() => new(false, false, null);
+        public RoomCutscenePicker GlobalCutscenes(bool advanced) => new([], "");
+        public bool RoomListsDone => true;
+        public RoomGameStatusEntry GameStatus() => RoomGameStatusEntry.None;
+        public RoomInspection? Inspection() => null;
         public void TogglePause() { }
         public void Step() { }
         public void Skip() { }
@@ -131,6 +135,20 @@ public partial class MainWindow
             return new(ReadTransport(), active || staticPreview, active && canStart, canStart, entries,
                 (active && canStart || staticPreview) && !listing, listing, pending,
                 active && (pending || w.ScanRunning), active && w.ScanRunning);
+        }
+
+        public bool RoomListsDone => w._cdRoomListsDone;
+        public RoomInspection? Inspection() => null;
+
+        public RoomGameStatusEntry GameStatus() => new(w._game is not null && w._session is not null,
+            "Inspect or explicitly edit this exploration session's staff, notes and drafts.", () => w.BuildGameStatusWindow().ShowDialog());
+
+        public RoomCutscenePicker GlobalCutscenes(bool advanced)
+        {
+            var entries = w.PlayableCutsceneItems().Select(choice => ToEntry(choice.Item)).ToList();
+            foreach (var gap in w._replayCatalog?.Coverage ?? [])
+                entries.Add(new(gap.Title, "Needs validation", gap.Source, null, gap.Status));
+            return new(entries, w._replayCatalog?.Summary ?? "");
         }
 
         public RoomInteractState ReadInteract()
@@ -233,6 +251,25 @@ public partial class MainWindow
                 shown && canStart && entries.Count > 0, listing, computing,
                 shown && (computing || w.ScanRunning), shown && w.ScanRunning);
         }
+
+        public bool RoomListsDone => w._playRoomListsDone;
+
+        public RoomInspection? Inspection()
+        {
+            var scripts = w._genericRoomScripts.Select(item => new RoomInspectionItem(item.Label, null, item.Code)).ToList();
+            var actions = w._genericSourceActions.Select(action => new RoomInspectionItem(
+                $"{action.Title} · object {action.Object} / verb 0x{action.Verb:X2}", action.Source, action.Code)).ToList();
+            var codes = w._genericRoomScripts.Select(item => item.Code).Concat(w._genericSourceActions.Select(a => a.Code).OfType<ScummScriptDisassembly>()).Distinct();
+            var relationships = codes.SelectMany(code => code.Instructions.Select(i => ScummScriptEvent.FromInstruction(code, i, ScummScriptEventCertainty.StaticPotential)))
+                .OfType<ScummScriptEvent>().Where(e => e.TargetKind is not null).DistinctBy(e => (e.SourceLabel, e.Offset, e.TargetKind, e.TargetId)).ToArray();
+            return new([new("ROOM SCRIPTS", scripts), new("INTERACTIONS", actions)], relationships);
+        }
+
+        public RoomGameStatusEntry GameStatus() => new(w.InventoryStatusAvailable,
+            "Inspect held items and make explicit inventory choices.", w.ShowInventoryStatus);
+
+        public RoomCutscenePicker GlobalCutscenes(bool advanced) =>
+            new(w.PlayCutsceneItems().Select(choice => ToEntry(choice.Item)).ToList(), "");
 
         public RoomInteractState ReadInteract()
         {

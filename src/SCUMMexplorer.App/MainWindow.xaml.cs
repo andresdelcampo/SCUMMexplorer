@@ -271,20 +271,19 @@ public partial class MainWindow : Window
     }, _game, () => IsAdvancedMode, _game?.Id == GameId.LoomVga ? null : LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
 
 
-    /// <summary>Each status editor is offered only for a loaded game with its matching live session.</summary>
-    private bool GameStatusAvailable => (_game is { Id: GameId.Loom or GameId.LoomVga } && _session is not null) || InventoryStatusAvailable;
-
     private void UpdateGameStatusButton()
     {
-        GameStatusButton.Visibility = GameStatusAvailable ? Visibility.Visible : Visibility.Collapsed;
-        GameStatusButton.IsEnabled = GameStatusAvailable;
-        GameStatusButton.ToolTip = InventoryStatusAvailable ? "Inspect held items and make explicit inventory choices." : "Inspect or explicitly edit this exploration session's staff, notes and drafts.";
+        var entry = CurrentRoomControls.GameStatus();
+        GameStatusButton.Visibility = entry.Available ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.IsEnabled = entry.Available;
+        GameStatusButton.ToolTip = entry.Tip;
     }
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {
-        if (!GameStatusAvailable) { UpdateGameStatusButton(); return; }
-        try { if (InventoryStatusAvailable) ShowInventoryStatus(); else BuildGameStatusWindow().ShowDialog(); }
+        var entry = CurrentRoomControls.GameStatus();
+        if (!entry.Available) { UpdateGameStatusButton(); return; }
+        try { entry.Open(); }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NullReferenceException)
         {
             MessageBox.Show(this, ex.Message, "Game Status could not open", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -769,7 +768,7 @@ public partial class MainWindow : Window
     }
 
     /// <summary>The doorway boxes of a browse-only room (those stored objects whose scripts can load a room), per the Never / On hover / Always doorway option.</summary>
-    private IEnumerable<(int X, int Y, int Width, int Height, int[] Targets, bool Live, string ToolTip, string Prefix)> BrowsedDoorwayBoxes()
+    private IEnumerable<RoomDoorwayBox> BrowsedDoorwayBoxes()
     {
         // Doorways in one rectangle share one box.
         foreach (var same in _olderObjects.Where(label => _roomNavigationCandidates.Any(item => item.Object.Id == label.Id)).GroupBy(label => (label.X, label.Y, label.Width, label.Height)))
@@ -777,7 +776,7 @@ public partial class MainWindow : Window
             var label = same.FirstOrDefault(item => item.Name.Length > 0) ?? same.First();
             var targets = _roomNavigationCandidates.Where(item => same.Any(other => other.Id == item.Object.Id)).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
             if (targets.Length == 0 || !RoomOverlayRules.Shows(DoorwayMode, same.Any(item => _hoveredDoorwayIds.Contains(item.Id)))) continue;
-            yield return (label.X, label.Y, label.Width, label.Height, targets, true,
+            yield return new RoomDoorwayBox(label.X, label.Y, label.Width, label.Height, targets, true,
                 $"{BrowsedName(label)}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))} (a static candidate; no script condition is evaluated). " +
                 "The Advanced doorway buttons open the rooms directly.",
                 label.Name.Length > 0 ? label.Name + " → " : "");
@@ -1037,7 +1036,7 @@ public partial class MainWindow : Window
         UpdateCostumeColorVisibility();
         RefreshPlayRoomActions();
         RefreshPlayOverlays();
-        RefreshPlayOverlayLists(SelectGenericInteractTarget);
+        RefreshPlayOverlayLists();
     }
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1428,7 +1427,7 @@ public partial class MainWindow : Window
                     UpdateRoomMusicActions();
                     RefreshPlayRoomActions();
                     RefreshPlayOverlays();
-                    RefreshPlayOverlayLists(SelectGenericInteractTarget);
+                    RefreshPlayOverlayLists();
                 }
                 return;
             }
@@ -3693,41 +3692,7 @@ public partial class MainWindow : Window
         var interactive = SessionModeToggle.IsChecked == true && _session is not null;
         if (interactive)
         {
-            var hotspots = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex)
-                .Where(record => IsVerbHotspotAvailable(record, _session!.Snapshot) &&
-                                 _roomVerbs.TryGetValue(record.Id, out var verbs) && verbs.Count > 0 &&
-                                 IsObjectHotspot(record))
-                .Select(record =>
-                {
-                    // The stored name, else its index.
-                    var name = _roomObjectNames.TryGetValue(record.Id, out var stored) ? stored : null;
-                    var label = name ?? $"Hotspot {record.LocalIndex}";
-                    return (Record: record, Name: name, Label: label);
-                }).ToArray();
-            var repeated = hotspots.GroupBy(item => item.Label).Where(group => group.Count() > 1)
-                .Select(group => group.Key).ToHashSet();
-            foreach (var (record, name, label) in hotspots)
-            {
-                var button = new Button
-                {
-                    Content = RoomControlText.HotspotLabel(name, record.LocalIndex, repeated.Contains(label)),
-                    ToolTip = RoomControlText.HotspotTip(record.LocalIndex, record.Id, name, record.X, record.Y, record.Width, record.Height),
-                    Tag = record.Id,
-                    HorizontalContentAlignment = HorizontalAlignment.Left,
-                    Margin = new Thickness(0, 0, 0, 3),
-                    Padding = new Thickness(8, 3, 8, 3),
-                    Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
-                    Foreground = Brushes.Beige,
-                    BorderThickness = new Thickness(0)
-                };
-                button.Click += ObjectButton_Click;
-                // Hovering or focusing a row outlines its box on the room.
-                button.MouseEnter += (_, _) => ShowHotspotHighlight(record);
-                button.GotKeyboardFocus += (_, _) => ShowHotspotHighlight(record);
-                button.MouseLeave += (_, _) => { if (!button.IsKeyboardFocused) ShowHotspotHighlight(null); };
-                button.LostKeyboardFocus += (_, _) => { if (!button.IsMouseOver) ShowHotspotHighlight(null); };
-                ObjectList.Children.Add(button);
-            }
+            FillHotspotRows(LoomHotspots);
             ShowObjectListSection("HOTSPOTS");
             return;
         }
@@ -3777,18 +3742,23 @@ public partial class MainWindow : Window
         if (sender is not Button { Tag: int id }) return;
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
-            var record = _currentRoomObjectRecords.FirstOrDefault(item => item.Id == id);
-            ShowObjectVerbChoices(record is null || !_roomVerbs.TryGetValue(id, out var verbs)
-                ? [] : verbs.Select(verb => new RoomVerbChoice(record, verb)).ToArray());
+            ChooseLoomObject(id);
         }
         else SelectObject(id);
+    }
+
+    private void ChooseLoomObject(int id)
+    {
+        var record = _currentRoomObjectRecords.FirstOrDefault(item => item.Id == id);
+        ShowObjectVerbChoices(record is null || !_roomVerbs.TryGetValue(id, out var verbs)
+            ? [] : verbs.Select(verb => new RoomVerbChoice(record, verb)).ToArray());
     }
 
     private void RoomMaskToggle_Changed(object sender, RoutedEventArgs e)
     {
         RefreshRoomPreview();
         RefreshPlayOverlays();
-        RefreshPlayOverlayLists(SelectGenericInteractTarget);
+        RefreshPlayOverlayLists();
     }
 
     private void WalkBoxToggle_Changed(object sender, RoutedEventArgs e)
@@ -3797,7 +3767,7 @@ public partial class MainWindow : Window
         RefreshWalkBoxOverlay();
         WalkBoxOverlay.Dispatcher.BeginInvoke(RefreshWalkBoxOverlay, DispatcherPriority.Loaded);
         RefreshPlayOverlays();
-        RefreshPlayOverlayLists(SelectGenericInteractTarget);
+        RefreshPlayOverlayLists();
     }
 
     private void WalkBoxOverlay_SizeChanged(object sender, SizeChangedEventArgs e) => RefreshWalkBoxOverlay();
@@ -3960,7 +3930,7 @@ public partial class MainWindow : Window
         RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never ? Visibility.Visible : Visibility.Collapsed;
         RoomNavigationOverlay.Dispatcher.BeginInvoke(RefreshRoomNavigationOverlay, DispatcherPriority.Loaded);
         RefreshPlayOverlays();
-        RefreshPlayOverlayLists(SelectGenericInteractTarget);
+        RefreshPlayOverlayLists();
     }
 
     private void ObjectAreaMode_Changed(object sender, RoutedEventArgs e)
@@ -3969,7 +3939,7 @@ public partial class MainWindow : Window
         SaveViewOptions();
         ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : _highlightedHotspot);
         RefreshPlayOverlays();
-        RefreshPlayOverlayLists(SelectGenericInteractTarget);
+        RefreshPlayOverlayLists();
     }
 
     /// <summary>On-hover doorways: the doorway boxes under the pointer are the only ones drawn.</summary>
@@ -5497,9 +5467,6 @@ public partial class MainWindow : Window
         return hits.FirstOrDefault(record => !snapshot.IsUntouchable(record.Id)) ?? hits.FirstOrDefault();
     }
 
-    private int? _hoveredHotspotRowId;
-    private static readonly SolidColorBrush HotspotRowBrush = new(Color.FromRgb(39, 54, 66));
-    private static readonly SolidColorBrush HoveredHotspotRowBrush = new(Color.FromRgb(46, 92, 116));
 
     /// <summary>
     /// Hovering the room highlights the hotspot row of the object under the
@@ -5509,14 +5476,7 @@ public partial class MainWindow : Window
     {
         // Inspection mode lists scene details with their own colours.
         if (SessionModeToggle.IsChecked != true || _hoveredHotspotRowId == record?.Id) return;
-        _hoveredHotspotRowId = record?.Id;
-        foreach (var button in ObjectList.Children.OfType<Button>())
-        {
-            if (button.Tag is not int id || !_currentRoomObjectRecords.Any(item => item.Id == id)) continue;
-            var hovered = id == record?.Id;
-            button.Background = hovered ? HoveredHotspotRowBrush : HotspotRowBrush;
-            if (hovered) button.BringIntoView();
-        }
+        LightHotspotRow(record?.Id);
         // The row's own hover and focus outline take the box when the pointer leaves the room.
         if (record is not null || ObjectList.Children.OfType<Button>().All(button => !button.IsMouseOver && !button.IsKeyboardFocused))
             ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never || record is not null && !IsObjectHotspot(record) ? null : record);
@@ -5543,15 +5503,10 @@ public partial class MainWindow : Window
     /// <summary>An object hotspot: a doorway is not one (it has its own overlay and room clicks, R-6.13).</summary>
     private bool IsObjectHotspot(ScummRoomObjectRecord record) => DoorwayTargets(record).Length == 0;
 
+    // R-6.14/R-6.15 in one rule for every game (RoomHotspotRules): a box, on the scene, owned by the room, touchable, parents in their states.
+    // LOOM keeps its draft previews (48 x 40) at 0, 0 (R-6.14) and lists no owner for an object that does not exist.
     private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, ScummSessionSnapshot snapshot) =>
-        record.Width > 0 && record.Height > 0 &&
-        // LOOM keeps its draft previews (48 × 40) at 0, 0: they are not in the scene, so they are no hotspots (R-6.14).
-        (snapshot.ObjectPositions.TryGetValue(record.Id, out var at) ? at : new RoomObjectPosition(record.X, record.Y)) != new RoomObjectPosition(0, 0) &&
-        snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
-        // The game's findObject skips untouchable objects (class 24): Room 28 keeps one dragon object per state and
-        // makes the other states untouchable, so offering their verbs runs scenes the game never reaches (R-6.15).
-        !snapshot.IsUntouchable(record.Id) &&
-        ParentStateMatches(record, snapshot);
+        RoomHotspotRules.IsHotspot(record, _currentRoomObjectRecords, snapshot, 0x0F, 0);
 
     /// <summary>
     /// Doorway hotspots at a room point that are present in the room (owned by
@@ -5570,10 +5525,7 @@ public partial class MainWindow : Window
 
     private IEnumerable<ScummRoomObjectRecord> VisibleDoorways(ScummSessionSnapshot snapshot) =>
         _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
-            .Where(record => record.Width > 0 && record.Height > 0 &&
-                             snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
-                             !snapshot.IsUntouchable(record.Id) &&
-                             ParentStateMatches(record, snapshot))
+            .Where(record => IsVerbHotspotAvailable(record, snapshot))
             .OrderBy(record => record.LocalIndex);
 
     private int[] DoorwayTargets(ScummRoomObjectRecord record) => _roomNavigationCandidates
@@ -5690,34 +5642,10 @@ public partial class MainWindow : Window
     /// <summary>The doorway buttons, options and overlay for a list of candidates; the session's rooms and the browse-only games share it.</summary>
     private void ShowRoomNavigationCandidates(GameResource room, IReadOnlyList<RoomVerbDestination> candidates)
     {
+        _roomNavigationRoom = room;
         _roomNavigationCandidates = candidates.DistinctBy(item =>
             (item.Object.Id, item.Verb.VerbId, item.TargetRoomId)).ToArray();
-        // One button per target room; every hotspot that leads there stays in its tooltip.
-        foreach (var target in _roomNavigationCandidates.GroupBy(item => item.TargetRoomId))
-        {
-            var candidate = target.First();
-            // Verbs that share one code block are one source; name them all.
-            var sources = target.GroupBy(item => (item.Object.Id, item.Verb.ScriptOffset, item.InstructionOffset, item.Path))
-                .Select(source =>
-                    $"{room.Name} object {source.Key.Id} ({string.Join(", ", source.Select(item => item.Verb.Label).Distinct())}) " +
-                    $"code 0x{source.Key.ScriptOffset:X4}, room-load instruction +0x{source.Key.InstructionOffset:X4} ({source.Key.Path})")
-                .ToArray();
-            var button = new Button
-            {
-                Content = $"Room {target.Key:00}",
-                ToolTip = (sources.Length == 1
-                              ? $"Static candidate: {sources[0]}."
-                              : $"Static candidates ({sources.Length} sources):\n• {string.Join("\n• ", sources)}") +
-                          "\nOpen directly for exploration; script conditions and effects are not simulated.",
-                Padding = new Thickness(8, 3, 8, 3),
-                Margin = new Thickness(0, 0, 5, 5),
-                Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
-            };
-            button.Click += (_, _) => OpenRoomDestination(candidate);
-            RoomNavigationButtons.Children.Add(button);
-        }
+        FillDoorwayRows(LoomHotspots.DoorwayRows());
         RoomNavigationHeader.Text = $"DOORWAYS · {RoomNavigationButtons.Children.Count}";
         RoomNavigationPanel.ToolTip = "Possible doorways: rooms that decoded hotspot code can load. " +
                                       "A button opens the room directly for exploration; clicking a doorway box on the room runs its script.";
@@ -5735,71 +5663,24 @@ public partial class MainWindow : Window
     private void RefreshRoomNavigationOverlay()
     {
         RoomNavigationOverlay.Children.Clear();
-        if (_currentRoom is null || RoomNavigationOverlay.ActualWidth <= 0 || RoomNavigationOverlay.ActualHeight <= 0)
-            return;
+        if (LoomSurface(RoomNavigationOverlay) is not { } surface) return;
+        if (_olderObjects.Count > 0) DrawDoorwayBoxes(surface, BrowsedDoorwayBoxes());
+        else if (_session is not null)
+            DrawDoorwayBoxes(surface, RoomHotspotRules.DoorwayBoxes(LoomHotspots.Hotspots(),
+                group => RoomOverlayRules.Shows(DoorwayMode, group.Any(item => _hoveredDoorwayIds.Contains(item.ObjectId))),
+                item => LoomHotspots.DoorwayTip(item), item => LoomHotspots.IsLive(item)));
+    }
 
+    /// <summary>Where room points land on one of the canvases laid over the room picture; null while it has no size.</summary>
+    private RoomSurface? LoomSurface(Canvas canvas)
+    {
+        if (_currentRoom is null || canvas.ActualWidth <= 0 || canvas.ActualHeight <= 0) return null;
         var room = _currentRoom;
-        var scale = Math.Min(RoomNavigationOverlay.ActualWidth / room.Width,
-            RoomNavigationOverlay.ActualHeight / room.Height);
-        if (scale <= 0) return;
-        var offsetX = (RoomNavigationOverlay.ActualWidth - room.Width * scale) / 2;
-        var offsetY = (RoomNavigationOverlay.ActualHeight - room.Height * scale) / 2;
-
-        IEnumerable<(int X, int Y, int Width, int Height, int[] Targets, bool Live, string ToolTip, string Prefix)> boxes;
-        if (_olderObjects.Count > 0) boxes = BrowsedDoorwayBoxes();
-        else if (_session?.Snapshot is { } snapshot)
-            // Doorways that share one rectangle get one box and one label.
-            boxes = VisibleDoorways(snapshot).Where(record => RoomOverlayRules.Shows(DoorwayMode, _hoveredDoorwayIds.Contains(record.Id))).GroupBy(record =>
-                {
-                    var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
-                        ? current : new RoomObjectPosition(record.X, record.Y);
-                    return (at.X, at.Y, record.Width, record.Height);
-                }).Select(group => (group.Key.X, group.Key.Y, group.Key.Width, group.Key.Height,
-                    group.SelectMany(DoorwayTargets).Distinct().Order().ToArray(), group.Any(record => !snapshot.IsUntouchable(record.Id)),
-                    string.Join("\n", group.Select(DoorwayToolTip)), ""));
-        else return;
-        foreach (var (x, y, width, height, targetIds, live, toolTip, prefix) in boxes)
-        {
-            var accent = live ? Color.FromRgb(255, 207, 105) : Color.FromRgb(190, 176, 150);
-
-            var bounds = new Border
-            {
-                Width = width * scale,
-                Height = height * scale,
-                BorderThickness = new Thickness(Math.Clamp(scale, 1, 3)),
-                BorderBrush = new SolidColorBrush(accent),
-                Background = new SolidColorBrush(Color.FromArgb((byte)(live ? 48 : 24), 247, 187, 72)),
-                CornerRadius = new CornerRadius(2),
-                ToolTip = toolTip
-            };
-            Canvas.SetLeft(bounds, offsetX + x * scale);
-            Canvas.SetTop(bounds, offsetY + y * scale);
-            RoomNavigationOverlay.Children.Add(bounds);
-
-            var label = new Border
-            {
-                Child = new TextBlock
-                {
-                    Text = prefix + "Room " + string.Join(" / ", targetIds.Select(id => id.ToString("00"))),
-                    FontStyle = live ? FontStyles.Normal : FontStyles.Italic,
-                    Foreground = Brushes.White,
-                    FontWeight = FontWeights.SemiBold,
-                    FontSize = Math.Clamp(scale * 6, 8, 13),
-                    Margin = new Thickness(4, 2, 4, 2)
-                },
-                Background = new SolidColorBrush(Color.FromArgb(224, 17, 24, 32)),
-                BorderBrush = new SolidColorBrush(accent),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(2),
-                ToolTip = toolTip
-            };
-            // Keep the label inside the room image, even for a narrow box at its edge.
-            label.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            Canvas.SetLeft(label, Math.Max(offsetX, Math.Min(offsetX + x * scale + 2,
-                offsetX + room.Width * scale - label.DesiredSize.Width - 2)));
-            Canvas.SetTop(label, offsetY + y * scale + 2);
-            RoomNavigationOverlay.Children.Add(label);
-        }
+        var scale = Math.Min(canvas.ActualWidth / room.Width, canvas.ActualHeight / room.Height);
+        if (scale <= 0) return null;
+        var offsetX = (canvas.ActualWidth - room.Width * scale) / 2;
+        var offsetY = (canvas.ActualHeight - room.Height * scale) / 2;
+        return new RoomSurface(canvas, scale, (x, y) => new Point(offsetX + x * scale, offsetY + y * scale), offsetX, offsetX + room.Width * scale);
     }
 
     private ScummRoomObjectRecord? _highlightedHotspot;
@@ -5819,45 +5700,11 @@ public partial class MainWindow : Window
         HotspotHighlightOverlay.Children.Clear();
         var all = ObjectAreaMode == DisplayMode.Always && SessionModeToggle.IsChecked == true && _session is not null;
         HotspotHighlightOverlay.Visibility = record is null && !all ? Visibility.Collapsed : Visibility.Visible;
-        if (_currentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 ||
-            HotspotHighlightOverlay.ActualHeight <= 0 || record is null && !all) return;
-
-        var room = _currentRoom;
-        var scale = Math.Min(HotspotHighlightOverlay.ActualWidth / room.Width,
-            HotspotHighlightOverlay.ActualHeight / room.Height);
-        if (scale <= 0) return;
-        var offsetX = (HotspotHighlightOverlay.ActualWidth - room.Width * scale) / 2;
-        var offsetY = (HotspotHighlightOverlay.ActualHeight - room.Height * scale) / 2;
+        if (record is null && !all || LoomSurface(HotspotHighlightOverlay) is not { } surface) return;
         if (all)
-            foreach (var other in _currentRoomObjectRecords)
-            {
-                if (other.Id == record?.Id || !IsVerbHotspotAvailable(other, _session!.Snapshot) || !IsObjectHotspot(other)) continue;
-                var otherAt = _session.Snapshot.ObjectPositions.TryGetValue(other.Id, out var pos) ? pos : new RoomObjectPosition(other.X, other.Y);
-                var faint = new Border
-                {
-                    Width = Math.Max(1, other.Width * scale), Height = Math.Max(1, other.Height * scale),
-                    BorderThickness = new Thickness(1), BorderBrush = new SolidColorBrush(Color.FromArgb(150, 120, 220, 255)),
-                    Background = new SolidColorBrush(Color.FromArgb(22, 120, 220, 255)), CornerRadius = new CornerRadius(2)
-                };
-                Canvas.SetLeft(faint, offsetX + otherAt.X * scale);
-                Canvas.SetTop(faint, offsetY + otherAt.Y * scale);
-                HotspotHighlightOverlay.Children.Add(faint);
-            }
-        if (record is null) return;
-        var at = _session?.Snapshot.ObjectPositions.TryGetValue(record.Id, out var current) == true
-            ? current : new RoomObjectPosition(record.X, record.Y);
-        var bounds = new Border
-        {
-            Width = Math.Max(1, record.Width * scale),
-            Height = Math.Max(1, record.Height * scale),
-            BorderThickness = new Thickness(Math.Clamp(scale, 2, 3)),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(120, 220, 255)),
-            Background = new SolidColorBrush(Color.FromArgb(56, 120, 220, 255)),
-            CornerRadius = new CornerRadius(2)
-        };
-        Canvas.SetLeft(bounds, offsetX + at.X * scale);
-        Canvas.SetTop(bounds, offsetY + at.Y * scale);
-        HotspotHighlightOverlay.Children.Add(bounds);
+            foreach (var other in LoomHotspots.Hotspots())
+                if (other.ObjectId != record?.Id && !other.IsDoorway) DrawHotspotBox(surface, other, false);
+        if (record is not null) DrawHotspotBox(surface, LoomHotspots.Describe(record), true);
     }
 
     private int? _roomMusicActionsRoom;

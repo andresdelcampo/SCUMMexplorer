@@ -6,6 +6,24 @@
 /// <summary>One entry of the room's `Play Cutscene` list: titles already carry the Normal/Advanced wording (R-8.2).</summary>
 public sealed record RoomCutsceneEntry(string Title, string Category, string Note, Action? Start, string Status = "");
 
+/// <summary>The global `Play Cutscene` picker: every scene the game can start from anywhere, and the line above the list.</summary>
+public sealed record RoomCutscenePicker(IReadOnlyList<RoomCutsceneEntry> Entries, string Summary);
+
+/// <summary>The `Game Status` button (R-6.25.3): whether the game has a status to show now, its tooltip and what opens it. One click applies and closes.</summary>
+public sealed record RoomGameStatusEntry(bool Available, string Tip, Action Open)
+{
+    public static RoomGameStatusEntry None { get; } = new(false, "", () => { });
+}
+
+/// <summary>One entry of an Advanced inspection section: a script or an interaction, with the game's own description and its raw code.</summary>
+public sealed record RoomInspectionItem(string Header, string? Detail, ScummScriptDisassembly? Code);
+
+/// <summary>A headed group of inspection entries (room entry/exit and local scripts, interactions).</summary>
+public sealed record RoomInspectionSection(string Heading, IReadOnlyList<RoomInspectionItem> Items);
+
+/// <summary>What the Advanced right panel lists for the room: the sections and the relationships (resource links) decoded from their code.</summary>
+public sealed record RoomInspection(IReadOnlyList<RoomInspectionSection> Sections, IReadOnlyList<ScummScriptEvent> Relationships);
+
 /// <summary>One row of an object's Interact menu: the verb's own word, its source (Advanced tooltip) and the exploration action.</summary>
 public sealed record RoomInteractionChoice(string Label, string? Source, Action Run);
 
@@ -53,6 +71,18 @@ public interface IRoomControlProvider
     RoomControlState ReadState(int? room, bool advanced);
 
     RoomInteractState ReadInteract();
+
+    /// <summary>The Advanced inspection of the room, or null when the game shows its own (LOOM's `Room entry` trace carries readable text the other versions lack, R-6.25.4).</summary>
+    RoomInspection? Inspection();
+
+    /// <summary>The Game Status entry (the button and its flow are shared; the content is the game's).</summary>
+    RoomGameStatusEntry GameStatus();
+
+    /// <summary>Whether the background scan has listed the scenes of every room (it shapes the scan note, not the controls).</summary>
+    bool RoomListsDone { get; }
+
+    /// <summary>The global picker behind the header `Play Cutscene` button (the game's own list; the dialog is shared).</summary>
+    RoomCutscenePicker GlobalCutscenes(bool advanced);
 
     void TogglePause();
     void Step();
