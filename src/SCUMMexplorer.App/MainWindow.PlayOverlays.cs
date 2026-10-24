@@ -18,6 +18,7 @@ public partial class MainWindow
     private int? _playOverlayRoom;
     private Dictionary<int, int[]> _playDoorwayTargets = [];
     private (int X, int Y)? _playOverlayPointer;
+    private int? _playHighlightId;
     private ScummRoomScene? _playOverlayScene;
     private Dictionary<int, string> _playOverlayNames = [];
     private Dictionary<int, int> _playOverlayLocalIndex = [];
@@ -30,6 +31,7 @@ public partial class MainWindow
         _playOverlayCanvas.Children.Clear();
         _playOverlayCanvas.Visibility = Visibility.Collapsed;
         _playOverlayPointer = null;
+        _playHighlightId = null;
         _playOverlayScene = null;
         _playOverlayListKey = null;
         _playOverlayObjectRows = [];
@@ -40,7 +42,17 @@ public partial class MainWindow
     {
         if (_playOverlayPointer == point) return;
         _playOverlayPointer = point;
+        if (IsAdvancedMode) LightHotspotRow(PlayHotspotAt(point)?.ObjectId);
         if (ObjectAreaMode == DisplayMode.Hover || DoorwayMode == DisplayMode.Hover) RefreshPlayOverlays();
+    }
+
+    /// <summary>The listed hotspot under a native screen point, as the game's search would pick it (the same pick as LOOM's room picture).</summary>
+    private RoomHotspot? PlayHotspotAt((int X, int Y)? point)
+    {
+        if (point is not { } p || _playShown is not { } frame) return null;
+        if (new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom).ToRoom(p.X, p.Y) is not { } at) return null;
+        var provider = PlayHotspots;
+        return RoomHotspotRules.PointedAt(provider.Hotspots().Where(item => !item.IsDoorway && provider.HasActions(item)), at.X, at.Y);
     }
 
     private void RefreshPlayOverlays() => RefreshPlayOverlays(_playShown);
@@ -66,7 +78,7 @@ public partial class MainWindow
             Panel.SetZIndex(_playOverlayCanvas, 1);
             _playOverlayCanvas.SizeChanged += (_, _) => RefreshPlayOverlays();
         }
-        var wanted = ObjectAreaMode != DisplayMode.Never || DoorwayMode != DisplayMode.Never ||
+        var wanted = ObjectAreaMode != DisplayMode.Never || DoorwayMode != DisplayMode.Never || _playHighlightId is not null ||
             IsAdvancedMode && (RoomMaskToggle.IsChecked == true || WalkBoxToggle.IsChecked == true);
         // Decoded backgrounds/objects are cached by ScummPlayScreen. Capture mutable source state only when an aid is visible.
         if (changed || wanted || IsAdvancedMode || _playOverlayScene is null) _playOverlayScene = _playScreen.Scene();
@@ -116,23 +128,20 @@ public partial class MainWindow
                 _playOverlayCanvas.Children.Add(polygon);
                 Label(box.Index.ToString(), Map(box.Corners.Average(point => point.X), box.Corners.Average(point => point.Y)), color);
             }
+        var surface = new RoomSurface(_playOverlayCanvas, scale, Map, offsetX, offsetX + ScummPlayFrame.Width * scale);
         var pointInRoom = _playOverlayPointer is { } pointer ? viewport.ToRoom(pointer.X, pointer.Y) : null;
-        foreach (var obj in ScummRoomOverlays.Objects(scene, _playDoorwayTargets))
-        {
-            var mode = obj.IsDoorway ? DoorwayMode : ObjectAreaMode;
-            if (!RoomOverlayRules.Shows(mode, pointInRoom is { } hover && obj.Contains(hover.X, hover.Y))) continue;
-            var at = Map(obj.X, obj.Y);
-            var color = obj.IsDoorway ? Color.FromRgb(255, 207, 105) : Color.FromRgb(120, 220, 255);
-            var bounds = new Border
-            {
-                Width = Math.Max(1, obj.Width * scale), Height = Math.Max(1, obj.Height * scale),
-                BorderBrush = new SolidColorBrush(color), BorderThickness = new Thickness(Math.Clamp(scale, 1, 3)),
-                Background = new SolidColorBrush(Color.FromArgb(40, color.R, color.G, color.B)), CornerRadius = new CornerRadius(2)
-            };
-            Canvas.SetLeft(bounds, at.X); Canvas.SetTop(bounds, at.Y);
-            _playOverlayCanvas.Children.Add(bounds);
-            if (obj.IsDoorway) Label("Room " + string.Join(" / ", obj.Destinations.Select(id => id.ToString("00"))), at, color);
-        }
+        var hotspots = PlayHotspots.Hotspots();
+        // The same drawing as LOOM's room picture: doorway boxes by their option; hotspot boxes faint under `Always`, strong for the one pointed at or chosen in the list.
+        DrawDoorwayBoxes(surface, RoomHotspotRules.DoorwayBoxes(hotspots,
+            group => RoomOverlayRules.Shows(DoorwayMode, pointInRoom is { } hover && group.Any(item => item.Contains(hover.X, hover.Y))),
+            item => PlayHotspots.DoorwayTip(item), _ => true));
+        var objects = hotspots.Where(item => !item.IsDoorway).ToArray();
+        var pointed = _playHighlightId is int chosen ? objects.FirstOrDefault(item => item.ObjectId == chosen)
+            : ObjectAreaMode != DisplayMode.Never && pointInRoom is { } at ? RoomHotspotRules.PointedAt(objects, at.X, at.Y) : null;
+        if (ObjectAreaMode == DisplayMode.Always)
+            foreach (var item in objects)
+                if (item.ObjectId != pointed?.ObjectId) DrawHotspotBox(surface, item, false);
+        if (pointed is not null) DrawHotspotBox(surface, pointed, true);
 
         void Label(string text, Point at, Color color)
         {
@@ -149,15 +158,16 @@ public partial class MainWindow
         }
     }
 
-    private void RefreshPlayOverlayLists(Action<int> interact)
+    private void RefreshPlayOverlayLists()
     {
         if (!PlayActive || !IsAdvancedMode || _playOverlayScene is not { } scene)
         {
             _playOverlayListKey = null;
             return;
         }
-        var objects = ScummRoomOverlays.Objects(scene, _playDoorwayTargets);
-        var key = _game!.Key + ":" + scene.RoomId + ":" + string.Join(',', objects.Select(obj => $"{obj.ObjectId}@{obj.X},{obj.Y}"));
+        var provider = PlayHotspots;
+        var hotspots = provider.Hotspots();
+        var key = _game!.Key + ":" + scene.RoomId + ":" + string.Join(',', hotspots.Select(item => $"{item.ObjectId}@{item.X},{item.Y}:{(provider.HasActions(item) ? 1 : 0)}"));
         // Preview controls share these panels and can replace their children without changing
         // native room state. Only reuse rows that are still the ones this view published.
         if (_playOverlayListKey == key &&
@@ -166,34 +176,9 @@ public partial class MainWindow
         { DisplayLists(); return; }
         _playOverlayListKey = key;
         RoomNavigationButtons.Children.Clear(); ObjectList.Children.Clear();
-        foreach (var obj in objects)
-        {
-            var name = _playOverlayNames.GetValueOrDefault(obj.ObjectId, $"Object {obj.ObjectId}");
-            if (obj.IsDoorway)
-                foreach (var destination in obj.Destinations)
-                {
-                    var room = _game.Rooms.FirstOrDefault(item => item.ResourceId == destination);
-                    if (room is null) continue;
-                    var button = Item($"{name} → Room {destination:00}");
-                    button.ToolTip = $"Possible destination decoded from Room {scene.RoomId:00} object {obj.ObjectId}. Opens directly for exploration; source conditions are not promised.";
-                    button.Click += (_, _) => SelectResourceInTree(room);
-                    RoomNavigationButtons.Children.Add(button);
-                }
-            else
-            {
-                // LOOM's row pattern (R-6.21): the stored name, else `Hotspot N`; a name used twice carries the index.
-                var local = _playOverlayLocalIndex.GetValueOrDefault(obj.ObjectId, obj.ObjectId);
-                var stored = _playOverlayNames.GetValueOrDefault(obj.ObjectId);
-                var repeated = objects.Where(other => !other.IsDoorway).Count(other => _playOverlayNames.GetValueOrDefault(other.ObjectId) is { } n && n == stored) > 1;
-                var button = Item(RoomControlText.HotspotLabel(stored, local, stored is not null && repeated));
-                button.Tag = obj.ObjectId;
-                button.ToolTip = RoomControlText.HotspotTip(local, obj.ObjectId, stored, obj.X, obj.Y, obj.Width, obj.Height);
-                button.Click += (_, _) => interact(obj.ObjectId);
-                button.MouseEnter += (_, _) => { _playOverlayPointer = (obj.X + obj.Width / 2 - _playShown!.ViewLeft, obj.Y + obj.Height / 2 + _playShown.RoomTop); RefreshPlayOverlays(); };
-                button.MouseLeave += (_, _) => UpdatePlayOverlayHover(null);
-                ObjectList.Children.Add(button);
-            }
-        }
+        _hoveredHotspotRowId = null;
+        FillHotspotRows(provider);
+        FillDoorwayRows(provider.DoorwayRows());
         _playOverlayObjectRows = ObjectList.Children.Cast<UIElement>().ToArray();
         _playOverlayDoorwayRows = RoomNavigationButtons.Children.Cast<UIElement>().ToArray();
         DisplayLists();
@@ -204,14 +189,6 @@ public partial class MainWindow
             RoomNavigationPanel.Visibility = RoomNavigationButtons.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             ShowObjectListSection("HOTSPOTS");
         }
-
-        static Button Item(string text) => new()
-        {
-            Content = text, HorizontalContentAlignment = HorizontalAlignment.Left,
-            Padding = new Thickness(8, 3, 8, 3), Margin = new Thickness(0, 0, 5, 4),
-            Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)), Foreground = Brushes.Beige,
-            BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
-        };
     }
 
     private Dictionary<int, int[]> ReadPlayDoorwayTargets(GameLibrary game, int roomId)
