@@ -463,7 +463,7 @@ Game Status lets the user construct a game state directly. LOOM is the reference
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-12.14 | SCUMM, APP | **One-click commit and close.** Game Status uses **Apply and close**, as in LOOM: one click validates and atomically applies the pending edits, then closes on success. A rejected/stale/over-capacity batch leaves the window open without partial changes. Cancel/closing without applying discards pending edits. Preserve supported undo semantics for previously committed changes. | Rule (user, 19 Oct 2026) |
+| R-12.14 | SCUMM, APP | **One-click commit and close.** Game Status uses **Apply and close**, as in LOOM: one click validates and atomically applies the pending edits, then closes on success. A rejected/stale/over-capacity batch leaves the window open without partial changes. Cancel/closing without applying discards pending edits. Preserve supported undo semantics for previously committed changes. A game with no Status editor (24 Oct survey: Indy3 EGA/256 colours, Monkey Island 1 and 2, Indy 4) does not offer the button. | Rule (user, 19 Oct 2026) |
 
 ## 13. Audio
 

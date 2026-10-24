@@ -1,0 +1,4 @@
+out-*/
+OverlaySurvey/bin/
+OverlaySurvey/obj/
+survey-before*.txt
