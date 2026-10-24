@@ -532,8 +532,11 @@ public partial class MainWindow
     /// </summary>
     private void PlayKnownCutscene(KnownCutscene cutscene)
     {
-        if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene ||
+        if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene && !_catalogPreviewOnly ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == cutscene.RoomId) is not { } room) return;
+        // R-8.5b: from a static preview the scene starts from the session the preview was made from (its stated start).
+        _catalogPreviewOnly = false;
+        LeaveLoomAmbientPreview();
         StopScenePlayback();
         // A single scene keeps the running session (the user's state stays, a later one too; "Restart" goes back to the boot) and gets only
         // the minimum it needs. A stated sequence carries its own steps from the post-boot state, so it starts a fresh session.

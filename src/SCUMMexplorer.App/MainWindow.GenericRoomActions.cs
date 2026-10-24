@@ -227,10 +227,17 @@ public partial class MainWindow
         return expander;
     }
 
+    // A static preview's ambient session (R-8.5b) takes the explicit exploration action too: the object's verb code runs from the preview's state.
+    // A still static preview (no ambient script, no clock) prepares its preview session when the user picks an action (R-6.17, R-8.5b1).
     private bool GenericRoomActionCanStart => GenericRoomActions && !_genericActionStarting && !_introPreparing &&
-        PlayActive && _game is { } game && _playFolder == game.Key && _play is { PlayerHasControl: true, BootRunning: false } &&
-        _play.CurrentRoomId == _genericActionsRoom &&
+        _game is { } game && _playFolder == game.Key && _play is not null &&
+        (StillPreviewCanAct || PlayActive &&
+            (_play is { PlayerHasControl: true, BootRunning: false } || _playAmbient && _play is { InCutscene: false }) &&
+            _play.CurrentRoomId == _genericActionsRoom) &&
         (ScummProfile.For(game).EngineVersion > ScummVersion.V2 || _play.InventoryCharactersAvailable);
+
+    private bool StillPreviewCanAct => _catalogPreviewOnly && _game is { } still && !UsesManiacCutsceneSetup(still) && !PlayActive && _play is not null && _genericActionsRoom is not null &&
+        _currentRoomResource?.ResourceId == _genericActionsRoom;
 
     private void UpdateGenericRoomActionAvailability()
     {
@@ -260,11 +267,24 @@ public partial class MainWindow
         UpdateGenericRoomActionAvailability();
         try
         {
+            if (StillPreviewCanAct && _play is { } source)
+            {
+                // R-8.5b1: the still preview becomes the room entered without its entry code (nothing else runs), and the action runs there.
+                var prepared = source.PrepareAmbientRoom(room, requireAmbient: false);
+                if (prepared.Session is not ScummGameSession still) { if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason; return; }
+                _playLiveSource = source;
+                _play = still;
+                _playAmbient = true;
+                _playScreen = new ScummPlayScreen(game, still, _playIndexedStates);
+                _sceneSound.Attach(game, still, RenderPlaySound, PlaySoundLoop);
+                if (game.Speech is { } speech) _playSpeech.Attach(speech, still.Messages);
+                StartPlayClock();
+            }
             // This explicit exploration action never visits a room merely to enable
             // itself. A static/manual fallback remains quiet until native control is
             // available in this very room; entry scenes are reserved for their button.
             if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration || _currentRoomResource?.ResourceId != roomId ||
-                !PlayActive || _play is not { PlayerHasControl: true } session || session.CurrentRoomId != roomId) return;
+                !PlayActive || _play is not { } session || !session.PlayerHasControl && !_playAmbient || session.CurrentRoomId != roomId) return;
             var result = session.ActivateObjectVerb(action.Object, action.Verb);
             _playPaused = false;
             ShowPlayFrame();

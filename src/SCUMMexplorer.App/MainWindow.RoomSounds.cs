@@ -103,6 +103,11 @@ public partial class MainWindow
         // A native CD-track sound can omit card renditions and therefore have no sound resource row.
         foreach (var id in candidates.Keys.Where(id => !sounds.ContainsKey(id) && cd?.Plays(id) == true))
             sounds[id] = new GameResource($"Sound {id:00}", ResourceKind.Sound, game.FolderPath, id, cd!.Describe(id), null, null);
+        // R-13.11 (20 Oct): a game whose sounds the browser does not list (Monkey Island 2, Indiana Jones 4) still renders them by number, as play does
+        // (SceneSoundPlayer.Render), so its scripts' literal starts are offered too.
+        if (ScummProfile.For(game).PlaysThroughVerbs)
+            foreach (var id in candidates.Keys.Where(id => !sounds.ContainsKey(id)))
+                sounds[id] = new GameResource($"Sound {id:00}", ResourceKind.Sound, game.FolderPath, id, "A sound this room's scripts may start.", null, null);
         _roomSoundChoices = candidates.Where(c => sounds.ContainsKey(c.Key)).OrderBy(c => c.Key)
             .Select(c => (sounds[c.Key], cd?.Plays(c.Key) == true, (TimeSpan?)null, c.Value)).ToList();
         RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;

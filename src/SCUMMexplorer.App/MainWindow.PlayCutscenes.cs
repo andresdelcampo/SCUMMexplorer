@@ -25,8 +25,13 @@ public partial class MainWindow
     private bool PlayCutscenes => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
 
     private bool PlayCanStartCutscene => PlayCutscenes && !_introPreparing && !_genericActionStarting &&
-        (UnansweredManiacCutsceneStartup || _playFolder != _game?.Key ||
+        (UnansweredManiacCutsceneStartup || _playFolder != _game?.Key || StaticPreviewMayStartScene ||
             _play is not { InCutscene: true } && _play is not { BootRunning: true });
+
+    // R-8.5b1 (rule confirmed by the user 20 Oct): a static preview of the other families keeps Play Cutscene; the scene starts from the session the
+    // preview was made from (its stated start), whatever that session was doing. Maniac Mansion and Zak keep their own startup rule below.
+    private bool StaticPreviewMayStartScene => _catalogPreviewOnly && _game is { } preview && !UsesManiacCutsceneSetup(preview) &&
+        !(_playAmbient && _play is { InCutscene: true });
 
     // R-8.34 already permits this fingerprinted, disclosed native menu preparation
     // for an explicit scene launch. Every other abandoned scope remains blocked.
@@ -174,6 +179,8 @@ public partial class MainWindow
         if (!PlayCanStartCutscene || _game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
         var launch = ++_cutsceneLaunchGeneration;
         _introPreparing = false;
+        // R-8.5b: a static preview's ambient session gives way to the session it was made from; the scene plays from there (stated start).
+        LeaveAmbientPreview();
         if (!PreparePlayCutsceneStartup(game)) return;
         var visitedForIt = false;
         if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room)
@@ -251,7 +258,8 @@ public partial class MainWindow
         var shown = _currentRoomResource is not null;
         var computing = _playPlanner is not null && !_playRoomListsDone && _playSavedRoomLists is null;
         var listing = computing && roomChoices.Count == 0;
-        PlaybackBar.Visibility = active || shown && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
+        // R-8.5b (rule confirmed by the user 20 Oct): the bar stays in a static preview too; what cannot act there is disabled, not hidden.
+        PlaybackBar.Visibility = active || shown ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.Visibility = shown && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = shown && canStart && roomChoices.Count > 0;
         RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
