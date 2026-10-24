@@ -1,0 +1,32 @@
+19.25.43.325 intro: play=True room=45 PlayActive=True
+19.25.44.844 click 76,104: delivered
+19.25.47.355 click 196,104: delivered
+19.25.49.862 click 292,60: delivered
+19.26.47.105 cutscene: room=44 skippable=True skipButtonEnabled=True
+19.26.51.212 control: True room=44 PlayTakesInput=True
+19.26.51.725 hotspot options visible: True
+19.26.56.461 moves 250: body mean 0,255 ms worst 1,44 ms; heartbeat max gap 30 ms; mem 179 MB, ws 606 MB; overlay children 1, ObjectList 23, trace 104, elapsed 3,9 s
+19.27.00.359 moves 500: body mean 0,237 ms worst 0,85 ms; heartbeat max gap 16 ms; mem 199 MB, ws 597 MB; overlay children 1, ObjectList 23, trace 112, elapsed 7,8 s
+19.27.04.261 moves 750: body mean 0,240 ms worst 0,83 ms; heartbeat max gap 31 ms; mem 198 MB, ws 609 MB; overlay children 1, ObjectList 23, trace 120, elapsed 11,7 s
+19.27.08.166 moves 1000: body mean 0,241 ms worst 0,83 ms; heartbeat max gap 31 ms; mem 211 MB, ws 617 MB; overlay children 1, ObjectList 23, trace 128, elapsed 15,6 s
+19.27.12.070 moves 1250: body mean 0,245 ms worst 0,94 ms; heartbeat max gap 27 ms; mem 231 MB, ws 630 MB; overlay children 1, ObjectList 23, trace 138, elapsed 19,5 s
+19.27.15.990 moves 1500: body mean 0,235 ms worst 0,84 ms; heartbeat max gap 28 ms; mem 232 MB, ws 637 MB; overlay children 1, ObjectList 23, trace 146, elapsed 23,4 s
+19.27.19.891 moves 1750: body mean 0,238 ms worst 0,92 ms; heartbeat max gap 16 ms; mem 252 MB, ws 637 MB; overlay children 1, ObjectList 23, trace 155, elapsed 27,3 s
+19.27.23.813 moves 2000: body mean 0,242 ms worst 0,76 ms; heartbeat max gap 31 ms; mem 271 MB, ws 637 MB; overlay children 1, ObjectList 23, trace 161, elapsed 31,3 s
+19.27.27.712 moves 2250: body mean 0,250 ms worst 0,89 ms; heartbeat max gap 30 ms; mem 270 MB, ws 637 MB; overlay children 1, ObjectList 23, trace 169, elapsed 35,2 s
+19.27.31.622 moves 2500: body mean 0,242 ms worst 0,74 ms; heartbeat max gap 31 ms; mem 285 MB, ws 637 MB; overlay children 1, ObjectList 23, trace 179, elapsed 39,1 s
+19.27.35.531 moves 2750: body mean 0,238 ms worst 0,85 ms; heartbeat max gap 31 ms; mem 302 MB, ws 638 MB; overlay children 1, ObjectList 23, trace 187, elapsed 43,0 s
+19.27.39.471 moves 3000: body mean 0,241 ms worst 0,97 ms; heartbeat max gap 31 ms; mem 175 MB, ws 594 MB; overlay children 1, ObjectList 23, trace 195, elapsed 46,9 s
+19.27.43.371 moves 3250: body mean 0,246 ms worst 0,84 ms; heartbeat max gap 30 ms; mem 193 MB, ws 596 MB; overlay children 1, ObjectList 23, trace 203, elapsed 50,8 s
+19.27.47.299 moves 3500: body mean 0,236 ms worst 0,80 ms; heartbeat max gap 29 ms; mem 208 MB, ws 607 MB; overlay children 1, ObjectList 23, trace 213, elapsed 54,8 s
+19.27.51.229 moves 3750: body mean 0,242 ms worst 0,87 ms; heartbeat max gap 27 ms; mem 213 MB, ws 620 MB; overlay children 1, ObjectList 23, trace 221, elapsed 58,7 s
+19.27.55.144 moves 4000: body mean 0,239 ms worst 0,88 ms; heartbeat max gap 31 ms; mem 230 MB, ws 631 MB; overlay children 1, ObjectList 23, trace 229, elapsed 62,6 s
+19.27.59.060 moves 4250: body mean 0,247 ms worst 0,92 ms; heartbeat max gap 29 ms; mem 233 MB, ws 638 MB; overlay children 1, ObjectList 23, trace 239, elapsed 66,5 s
+19.28.02.963 moves 4500: body mean 0,241 ms worst 0,72 ms; heartbeat max gap 31 ms; mem 247 MB, ws 638 MB; overlay children 1, ObjectList 23, trace 247, elapsed 70,4 s
+19.28.06.882 moves 4750: body mean 0,238 ms worst 0,73 ms; heartbeat max gap 28 ms; mem 267 MB, ws 639 MB; overlay children 1, ObjectList 23, trace 253, elapsed 74,3 s
+19.28.10.793 moves 5000: body mean 0,239 ms worst 0,86 ms; heartbeat max gap 31 ms; mem 269 MB, ws 639 MB; overlay children 1, ObjectList 23, trace 263, elapsed 78,3 s
+19.28.14.711 moves 5250: body mean 0,243 ms worst 0,88 ms; heartbeat max gap 29 ms; mem 288 MB, ws 639 MB; overlay children 1, ObjectList 23, trace 271, elapsed 82,2 s
+19.28.18.661 moves 5500: body mean 0,285 ms worst 1,02 ms; heartbeat max gap 31 ms; mem 293 MB, ws 639 MB; overlay children 1, ObjectList 23, trace 281, elapsed 86,1 s
+19.28.22.607 moves 5750: body mean 0,276 ms worst 0,77 ms; heartbeat max gap 30 ms; mem 181 MB, ws 596 MB; overlay children 1, ObjectList 23, trace 289, elapsed 90,1 s
+19.28.26.518 moves 6000: body mean 0,265 ms worst 0,94 ms; heartbeat max gap 23 ms; mem 185 MB, ws 598 MB; overlay children 1, ObjectList 23, trace 297, elapsed 94,0 s
+19.28.26.519 DONE

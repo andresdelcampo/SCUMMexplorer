@@ -2,6 +2,10 @@
 
 Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 24 October: Maniac enhanced hover freeze, live route: still not reproduced (guard added, R-6.48)
+
+The user's steps (Play Game Intro, two kids, skip, Hotspots On hover, hover the sign, then in and out of it) were run live: headless on `ScummGameSession` (flat 0.09 ms frame, 0.15 ms scene, 2.4 ms compose over 3,600 frames), in a real `MainWindow` placed off screen with 6,000 and 8,000 synthetic moves (body 0.2 ms, heartbeat gap at most 31 ms, no growth in overlay children, rows or trace) and with the real pointer for 20 s each in Hover and Always. No cost growth, so no fix. Added `HoverCostGuardTests` and R-6.48; record: [hover-freeze-live-20261024](../.verification/hover-freeze-live-20261024/README.md).
+
 ## 24 October: Maniac Mansion and Zak doorways in a static preview; hover freeze not reproduced
 
 The browse path found doorways only for engine versions 3 and 4, so Maniac Mansion and Zak (v1/v2, classic and enhanced) showed none until Play Game Intro ran the native screen; v1 to v4 now derive them from the room's own verb scripts, and the browsed Advanced rows are no longer collapsed while no native screen is live (R-6.47, ScummStaticDoorwayTests, window check in [record](../.verification/hover-freeze-20261024/README.md)). The reported hover freeze on Maniac Room 44 did not reproduce (heartbeat gaps under 40 ms); the HoverStorm harness stays.

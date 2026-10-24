@@ -1,0 +1,28 @@
+19.37.02.304 intro: play=True room=45 PlayActive=True
+19.37.03.819 click 76,104: delivered
+19.37.06.337 click 196,104: delivered
+19.37.08.851 click 292,60: delivered
+19.38.05.260 cutscene: room=44 skippable=True skipButtonEnabled=True
+19.38.09.332 control: True room=44 PlayTakesInput=True
+19.38.09.846 hotspot options visible: True
+19.38.11.675 real t=1s steps 64: heartbeat max gap 23 ms, worst input turnaround 1 ms, overlay children 0, mem 299 MB, highlight=True
+19.38.12.674 real t=2s steps 127: heartbeat max gap 25 ms, worst input turnaround 1 ms, overlay children 0, mem 288 MB, highlight=True
+19.38.13.676 real t=3s steps 190: heartbeat max gap 26 ms, worst input turnaround 0 ms, overlay children 0, mem 291 MB, highlight=True
+19.38.14.672 real t=4s steps 251: heartbeat max gap 28 ms, worst input turnaround 4 ms, overlay children 0, mem 169 MB, highlight=True
+19.38.15.672 real t=5s steps 314: heartbeat max gap 22 ms, worst input turnaround 19 ms, overlay children 0, mem 172 MB, highlight=True
+19.38.16.661 real t=6s steps 373: heartbeat max gap 27 ms, worst input turnaround 1 ms, overlay children 0, mem 175 MB, highlight=True
+19.38.17.666 real t=7s steps 435: heartbeat max gap 27 ms, worst input turnaround 0 ms, overlay children 0, mem 180 MB, highlight=True
+19.38.18.663 real t=8s steps 499: heartbeat max gap 30 ms, worst input turnaround 0 ms, overlay children 0, mem 184 MB, highlight=True
+19.38.19.665 real t=9s steps 560: heartbeat max gap 29 ms, worst input turnaround 2 ms, overlay children 1, mem 186 MB, highlight=True
+19.38.20.674 real t=10s steps 623: heartbeat max gap 16 ms, worst input turnaround 1 ms, overlay children 0, mem 187 MB, highlight=True
+19.38.21.672 real t=11s steps 687: heartbeat max gap 20 ms, worst input turnaround 0 ms, overlay children 0, mem 190 MB, highlight=True
+19.38.22.670 real t=12s steps 751: heartbeat max gap 18 ms, worst input turnaround 0 ms, overlay children 0, mem 193 MB, highlight=True
+19.38.23.674 real t=13s steps 815: heartbeat max gap 22 ms, worst input turnaround 0 ms, overlay children 0, mem 198 MB, highlight=True
+19.38.24.663 real t=14s steps 875: heartbeat max gap 29 ms, worst input turnaround 1 ms, overlay children 0, mem 200 MB, highlight=True
+19.38.25.666 real t=15s steps 934: heartbeat max gap 29 ms, worst input turnaround 0 ms, overlay children 0, mem 203 MB, highlight=True
+19.38.26.673 real t=16s steps 998: heartbeat max gap 22 ms, worst input turnaround 1 ms, overlay children 0, mem 207 MB, highlight=True
+19.38.27.661 real t=17s steps 1060: heartbeat max gap 24 ms, worst input turnaround 1 ms, overlay children 0, mem 211 MB, highlight=True
+19.38.28.668 real t=18s steps 1121: heartbeat max gap 31 ms, worst input turnaround 0 ms, overlay children 1, mem 214 MB, highlight=True
+19.38.29.664 real t=19s steps 1182: heartbeat max gap 28 ms, worst input turnaround 0 ms, overlay children 0, mem 216 MB, highlight=True
+19.38.30.673 real t=20s steps 1246: heartbeat max gap 28 ms, worst input turnaround 0 ms, overlay children 1, mem 221 MB, highlight=True
+19.38.30.674 DONE (real)
