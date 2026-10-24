@@ -30,6 +30,37 @@ public sealed record RoomInteractionChoice(string Label, string? Source, Action 
 /// <summary>The Interact menu of the selected object: the object's name (any case) and the rows.</summary>
 public sealed record RoomInteractionMenu(string Heading, IReadOnlyList<RoomInteractionChoice> Choices);
 
+/// <summary>One object of the room's Interact overview (R-6.39): its heading (already numbered when a name repeats), whether it is the selected object, and its rows.</summary>
+public sealed record RoomInteractionGroup(string Heading, bool Selected, IReadOnlyList<RoomInteractionChoice> Choices);
+
+/// <summary>The room's interactions, grouped by object, offered upfront by the Interact button (R-6.39).</summary>
+public sealed record RoomInteractionOverview(IReadOnlyList<RoomInteractionGroup> Groups)
+{
+    public int Actions => Groups.Sum(group => group.Choices.Count);
+}
+
+/// <summary>The one grouping rule of the Interact overview, for every game (R-6.39, R-6.25 item 7).</summary>
+public static class RoomInteractionRules
+{
+    /// <summary>Up to this many rows the groups all start open (LOOM's rooms: median 9, 90th percentile 20); above it they start collapsed except the selected object's.</summary>
+    public const int OpenByDefaultLimit = 24;
+
+    public static bool GroupsStartOpen(int actions) => actions <= OpenByDefaultLimit;
+
+    /// <summary>A repeated heading carries its running number from the second on (`Unnamed object`, `Unnamed object 2`): no raw ids in Normal.</summary>
+    public static IReadOnlyList<string> NumberRepeats(IReadOnlyList<string> headings)
+    {
+        var seen = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var result = new List<string>(headings.Count);
+        foreach (var heading in headings)
+        {
+            seen[heading] = seen.GetValueOrDefault(heading) + 1;
+            result.Add(seen[heading] == 1 ? heading : $"{heading} {seen[heading]}");
+        }
+        return result;
+    }
+}
+
 /// <summary>One row of the Sounds menu (label already formatted, R-6.24).</summary>
 public sealed record RoomSoundChoice(string Label, string? Tip, Action Play);
 
@@ -92,6 +123,9 @@ public interface IRoomControlProvider
     /// <summary>The menu of the selected object, or null when there is none to offer now.</summary>
     RoomInteractionMenu? InteractionMenu(bool advanced);
 
+    /// <summary>The room's interactions, grouped by object (the Interact button's upfront overview, R-6.39), or null when there are none to offer now.</summary>
+    RoomInteractionOverview? InteractionOverview(bool advanced);
+
     /// <summary>The room's sounds, or null when the menu cannot open now (device locked, nothing to offer).</summary>
     RoomSoundMenu? SoundMenu(bool advanced);
 }
@@ -105,7 +139,7 @@ public static class RoomControlText
     public const string GlobalCutsceneTip = "Choose a cutscene from anywhere in the game.";
     public const string GlobalCutsceneBusyTip = "Playback is active. Finish or skip it before starting another scene.";
     public const string RoomCutsceneListingTip = "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one).";
-    public const string InteractTip = "Click an object to select it, then choose what to do with it. Right-clicking an object opens the same menu.";
+    public const string InteractTip = "Choose what to do in this room. Click or right-click an object to start with it.";
 
     public static string PauseCaption(bool paused) => paused ? "▶ Play" : "⏸ Pause";
 

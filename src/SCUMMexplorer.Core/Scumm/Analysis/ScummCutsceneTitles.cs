@@ -1,4 +1,4 @@
-namespace SCUMMexplorer.Core.Scumm;
+﻿namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>
 /// The titles of the Play Cutscene lists, in one place for every game (REQUIREMENTS §8.2): "Room 04 · Look at leaf", "Room 73 · Push light switch".
@@ -15,6 +15,16 @@ public static class ScummCutsceneTitles
         var prefix = $"Room {room:00} · ";
         return description.StartsWith(prefix, StringComparison.Ordinal) ? description : prefix + description;
     }
+
+    /// <summary>
+    /// The title as Normal mode shows it for a verb-based game (R-6.36): an unnamed object reads `Unnamed object` and a verb the game never names reads `Action`,
+    /// so no title carries an id or a verb byte (Advanced adds them elsewhere). An unknown native word never becomes a made-up action.
+    /// </summary>
+    public static string Plain(ScummCutscene trigger) => Title(trigger with
+    {
+        ObjectName = trigger.ObjectName.Length > 0 ? trigger.ObjectName : "Unnamed object",
+        Verbs = trigger.Roles with { Word = id => trigger.Roles.Word?.Invoke(id) is { Length: > 0 } word ? word : "Action" }
+    });
 
     /// <summary>
     /// The title of a trigger found by the script scan: "Reached Room 03" when the verb leads to other rooms, otherwise the verb and the
@@ -37,7 +47,7 @@ public static class ScummCutsceneTitles
         if (trigger.IsRoomEntry) return Format(trigger.Room, "Entry");
         var word = roles.WordFor(trigger.VerbId);
         if (trigger.ObjectName.Length == 0 && plain) return Format(trigger.Room, word.Split(' ')[0] + " response");
-        var target = trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}";
+        var target = trigger.ObjectName.Length > 0 ? trigger.ObjectName : "unnamed object"; // R-6.36: Normal titles carry no raw ids (the id is in the note)
         return Format(trigger.Room, $"{word} {(roles.AimsAt?.Invoke(trigger.VerbId) == true ? "at " : "")}{target}");
     }
 }

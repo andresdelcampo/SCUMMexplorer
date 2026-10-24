@@ -127,15 +127,11 @@ public partial class MainWindow
 
     private bool PlayCutscenePlaysIn(ScummCutscenePlanner planner, ScummCutsceneGroup group, int room) =>
         planner.PlaysIn(group, room) || _playSavedRoomLists is { } saved && saved.TryGetValue(PlayCutsceneKey(group.First), out var rooms) && rooms.Contains(room) ||
-        IsAdvancedMode && new[] { group.First }.Concat(group.Others).Any(t => t.LeadsTo.Contains(room) || (t.LoadTargets?.Contains(room) ?? false));
+        new[] { group.First }.Concat(group.Others).Any(t => t.LeadsTo.Contains(room) || (t.LoadTargets?.Contains(room) ?? false)); // R-6.36: Normal lists what Advanced lists
 
     // Titles stay readable in both modes; raw verb/object provenance belongs in the
     // entry's Advanced note. An unknown native word never becomes a made-up action.
-    private static string GenericCutsceneTitle(ScummCutscene trigger) => ScummCutsceneTitles.Title(trigger with
-    {
-        ObjectName = trigger.ObjectName.Length > 0 ? trigger.ObjectName : "Unnamed object",
-        Verbs = trigger.Roles with { Word = id => trigger.Roles.Word?.Invoke(id) is { Length: > 0 } word ? word : "Action" }
-    });
+    private static string GenericCutsceneTitle(ScummCutscene trigger) => ScummCutsceneTitles.Plain(trigger);
 
     /// <summary>The list's entries (all, or those that play out in <paramref name="room"/>). The room's list waits for the scan (no entries until then).</summary>
     private List<(string Id, CutscenePickerItem Item)> PlayCutsceneItems(int? room = null)
@@ -144,9 +140,8 @@ public partial class MainWindow
         ScummCutscenePlanner planner;
         try { planner = lazy.Value; }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { return []; }
-        // R-1.13: in Normal mode a scene whose fresh-start run began no cutscene is not offered (nothing would play); Advanced lists it with its note.
+        // R-6.36 (user, 24 Oct): Normal lists every entry Advanced lists for the room; no fresh-start-run filter, no mode filter.
         return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value))
-            .Where(group => IsAdvancedMode || planner.TryGetRun(group.First, out var run) && run.Begun)
             .Select(group => ($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", new CutscenePickerItem(
                 GenericCutsceneTitle(group.First) +
                 (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
