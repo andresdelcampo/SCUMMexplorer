@@ -1,6 +1,6 @@
 # Next session: orchestrator brief
 
-You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261020-polish-speech-speed.md` is the last run). Everything below is only what those do not say.
+You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261024-shared-room-controls.md` is the last run). Everything below is only what those do not say.
 
 ## State (20 October)
 - Played through their own verbs (Objects ✔, Play ✔), with sound during play and script-derived cutscene lists (Cutscenes ◐): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Spanish copies of all three checked (S9). Monkey Island CD (disc music), Monkey Island 2 and Indy 4 (iMUSE music in play with loops, jump hooks and beat; Indy 4 talkie speech) are played too (Objects ✔, Play ✔), and every played game has a script-derived cutscene list (Cutscenes ◐). Spanish and other copies of every played game checked (S9). Cutscene lists derive from one booted snapshot per game. Monkey Island 1 CD offers its five languages (R-3.16), all five checked (S9).
@@ -24,6 +24,7 @@ When answered, change those rows' Basis to `Rule (confirmed by the user <date>)`
 - The agents cannot hear or see the real window and cannot drive ScummVM: collect those checks for the user in the checkpoint.
 
 ## Suggested next runs (pick with the user, or take the first if they say "keep going")
+- Shared room controls: finish the five items "Not done" in docs/checkpoints/20261024-shared-room-controls.md (full-screen Esc, one key handler, Play Game Intro as a provider method, LOOM CD Sounds rows, double-click hint); ask the user the four questions listed there.
 - MonkeyCd Rooms 88, 89, 99; cutscene start setups for entries that begin nothing from a fresh start (R-8.33); the `printEgo` first-text offer.
 - A fixed-point stop for long cutscene runs (proposal in `.verification/globals-tracking-20261019/`); cheaper operand parsing (regex groups are now the largest allocation); server GC (user's call).
 - Open from S6: iMUSE hook classes other than 0, markers, fades; the room change ScummVM's `killScriptsAndResources` ends a calling script with (broke MI2's boot when tried).
