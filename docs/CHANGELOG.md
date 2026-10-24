@@ -2,6 +2,10 @@
 
 Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 24 October: room overlays survey of the verb-based games
+
+Surveyed Indy3 EGA/256 colours, Monkey Island 1 floppy/CD, Monkey 2 and Indy 4 in the real window on master 71d55e98: Hotspots, Doorways (own list and markers), depth areas, walk boxes and the Advanced room scripts/interactions already work through the shared generic path; none of them has a Game Status editor, so the button is correctly absent. No product change. [Survey](../.verification/room-overlays-20261020/README.md).
+
 ## 23 October: room controls and audio lifecycle (Maniac/Zak, shared UI)
 
 - Requirements now make Normal/Advanced room cutscene and direct Interact access, native room-selector following, effective overlays and Advanced room source inspection explicit for the supported games. Plain native names replace verb bytes in Normal mode.
