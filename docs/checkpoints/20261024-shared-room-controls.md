@@ -37,3 +37,9 @@ Items 1 to 4 above as one migration agent, then S9 and polish items in NEXT_SESS
 - Skip line: only while a line is shown (also in cutscenes), live or static. Static-preview Skip line and Interact enablement confirmed as stated.
 - Campfire still picture: the animation runs permanently in a loop; the controls stay (R-8.5b).
 - New from the same message, done: Normal `Play Cutscene` lists what Advanced lists (plain titles); Interact is an upfront, grouped overview of the room, not "select an object first". Open: none from these answers; items 1 to 6 above stay open.
+
+## Hover freeze: fixed (24 October, evening)
+
+User report: Maniac Mansion enhanced, Play Game Intro, two kids, skip, Hotspots On hover, hover over any object: sluggish, then the whole Windows desktop stalled for minutes (no Event Viewer entries). Cause found by the user's own read of the code ("each hover calls RefreshPlayOverlays"): only On hover refreshed the overlays on every pointer move, and each refresh re-captured the scene (two full session snapshots, the hotspot table, the action lists, the overlay canvas, option-control property writes). Fix `2bbe9888` (merge `df77ecb3`): `UpdatePlayOverlayHover` redraws only when `RoomHotspotRules.HoverKey` changes; `ScummPlayScreen.Scene()` takes one snapshot; requirement R-6.48; guard `HoverCostGuardTests`. Confirmed by the user in the real app: "works like a charm". Diagnostic switch kept: `SCUMM_EXPLORER_RENDER=software`.
+
+Still open from this checkpoint: the five "Not done" items above (full-screen Esc, one key handler, Play Game Intro as a provider method, LOOM CD Sounds rows, visible double-click hint); Maniac static-preview Interact (accepted); the still-picture question is answered (permanent animation, controls present).
