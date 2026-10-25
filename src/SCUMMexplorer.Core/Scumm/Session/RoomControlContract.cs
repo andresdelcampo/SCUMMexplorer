@@ -15,15 +15,36 @@ public sealed record RoomGameStatusEntry(bool Available, string Tip, Action Open
     public static RoomGameStatusEntry None { get; } = new(false, "", () => { });
 }
 
-/// <summary>The last exploration action of the room, for the Advanced panel's `Last action`: its title, the sentence of the summary, the source (tooltip), what the run had to assume and the verb's code.</summary>
-public sealed record RoomPanelAction(string Title, string Summary, string Source, IReadOnlyList<string> Uncertainties, ScummScriptDisassembly? Code);
+/// <summary>One group of the Advanced `Assumptions` section (a title with its count, one sentence of meaning, the lines; a line's second part is its tooltip).</summary>
+public sealed record RoomAssumptionGroup(string Title, string Meaning, IReadOnlyList<(string Text, string Tip)> Items);
+
+/// <summary>
+/// The last exploration action of the room, for the Advanced panel's `Last action`: its title, the sentence of the summary, the source (tooltip), what the run had to
+/// assume and the verb's code. A game with a richer account (LOOM's timeline and run summary) supplies <see cref="Timeline"/> and <see cref="RawTrace"/>.
+/// </summary>
+public sealed record RoomPanelAction(string Title, string Summary, string Source, IReadOnlyList<string> Uncertainties, ScummScriptDisassembly? Code)
+{
+    public string? Timeline { get; init; }
+    public string? RawTrace { get; init; }
+}
 
 /// <summary>
 /// What the Advanced right panel draws for the room besides the shared lists (R-6.43): the entry and exit scripts, the numbers of the room's local scripts
 /// (the panel offers them as buttons to their tree entries), the last action and the assumptions. Data only; the App draws it once for every game.
+/// A game with a richer account of the entry supplies it as <see cref="EntrySummary"/> (the one line), <see cref="EntryEvents"/> (what the entry run caused,
+/// instead of the static candidates of its code) and <see cref="EntryText"/> (the text of the nested box); its assumptions arrive as <see cref="AssumptionGroups"/>.
 /// </summary>
 public sealed record RoomPanelData(int Room, ScummScriptDisassembly? Entry, ScummScriptDisassembly? Exit, IReadOnlyList<int> LocalScripts,
-    RoomPanelAction? LastAction, IReadOnlyList<string> Assumptions);
+    RoomPanelAction? LastAction, IReadOnlyList<string> Assumptions)
+{
+    public string? EntrySummary { get; init; }
+    public IReadOnlyList<ScummScriptEvent>? EntryEvents { get; init; }
+    public string? EntryText { get; init; }
+    public IReadOnlyList<RoomAssumptionGroup>? AssumptionGroups { get; init; }
+
+    /// <summary>False where the game has nothing to assume yet (no session): the section is not offered.</summary>
+    public bool HasAssumptions { get; init; } = true;
+}
 
 /// <summary>
 /// The header's `Play Game Intro` / `Play Demo Preview` button (R-6.38): whether the game offers it now, whether it can start, its caption, and the start

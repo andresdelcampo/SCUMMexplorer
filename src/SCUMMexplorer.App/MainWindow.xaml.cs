@@ -808,9 +808,13 @@ public partial class MainWindow : Window
         if (_olderObjects.Count == 0) { ShowBrowsedHighlight(null, true); return; }
         var present = _olderObjects.Select(label => label.Id).ToHashSet();
         ShowRoomNavigationCandidates(room, doorways.Where(item => present.Contains(item.Object.Id)).ToArray());
+        var rowIndex = 0;
         foreach (var label in BrowsedObjects)
         {
-            var text = label.Name.Length > 0 ? label.Name : $"Object {label.Id}";
+            var hotspotRows = PlayCutscenes && SessionModeToggle.IsChecked == true;
+            var text = hotspotRows
+                ? RoomControlText.HotspotLabel(label.Name.Length > 0 ? label.Name : null, ++rowIndex, BrowsedObjects.Count(item => item.Name == label.Name && label.Name.Length > 0) > 1)
+                : label.Name.Length > 0 ? label.Name : $"Object {label.Id}";
             var button = new Button
             {
                 Content = text,
@@ -831,7 +835,7 @@ public partial class MainWindow : Window
             ObjectList.Children.Add(button);
         }
         ObjectAreaOptions.Visibility = Visibility.Visible;
-        ShowObjectListSection("STORED OBJECTS");
+        ShowObjectListSection(PlayCutscenes && SessionModeToggle.IsChecked == true ? "HOTSPOTS" : "STORED OBJECTS");
         ShowBrowsedHighlight(null, true);
     }
 
@@ -1208,6 +1212,7 @@ public partial class MainWindow : Window
         _currentRoomObjectRecords = [];
         _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
         _roomNavigationCandidates = [];
+        _loomPanelEntry = null;
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         RoomEntryTraceOutput.Text = "";
         RoomEntryEventButtons.Children.Clear();
@@ -1259,12 +1264,11 @@ public partial class MainWindow : Window
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
             PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
-            PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" + (LoomResourceNames.Entry(_glossary, resource) is { } cdNamed ? $" · name: {cdNamed.EvidenceLabel}" : "") : LoomResourceNames.Entry(_glossary, resource) is { } named
-                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : _game?.Id == GameId.IndianaJones3 ? "Indexed script resource · Indiana Jones 3 EGA · SCUMM v3" : _game?.Version is ScummVersion.V1 or ScummVersion.V2 ? $"{_game.Title} script · SCUMM v{(_game.Version == ScummVersion.V1 ? 1 : 2)}" : _game?.V4Disks is not null ? $"{_game.Title} script · SCUMM {(_game.V4Disks.Disks.OfType<ScummV4Archive>().Any(d => d.IsRoomFileGame) ? "v3 (one file per room)" : _game.Version == ScummVersion.V5 ? "v5" : "v4")}" : "Indexed script resource · DOS LOOM old-v3";
+            PageSubtitle.Text = ScriptPageSubtitle(resource);
             PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
-            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.IndianaJones3 ? "Reading Indiana Jones 3 EGA bytecode…" : _game?.Version is ScummVersion.V1 or ScummVersion.V2 || _game?.V4Disks is not null ? "Reading the game's bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
+            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.Loom ? "Reading DOS LOOM old-v3 bytecode…" : "Reading the game's bytecode…";
             var interior = _game is { Id: GameId.Loom } egaGame
                 ? new LflResourceChain().FindLeftover(egaGame, resource) : null;
             var boundaryNote = interior is null ? "" : interior.Describe() +
@@ -1597,6 +1601,7 @@ public partial class MainWindow : Window
         IReadOnlyList<RoomObjectImage> images, bool visit)
     {
         _estimatedObjectIds = new HashSet<int>();
+        _loomPanelEntry = null;
         RoomEntryEventButtons.Children.Clear();
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         if (SessionModeToggle.IsChecked == true && _session is not null && !_catalogPreviewOnly)
@@ -1619,7 +1624,7 @@ public partial class MainWindow : Window
             _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
             var run = _session.LastEntryRun;
             var script = _session.LastEntryScript;
-            RoomEntryTraceOutput.Text = (script is null ? "No embedded entry script." : FormatScript(script)) +
+            var entryText = (script is null ? "No embedded entry script." : FormatScript(script)) +
                                         Environment.NewLine + "SESSION INTERPRETATION" + Environment.NewLine +
                                         (run?.FormatSummary() ?? "No entry run recorded.") +
                                         Environment.NewLine + "Known global variables: " + snapshot.KnownGlobalVariables.Count +
@@ -1630,11 +1635,9 @@ public partial class MainWindow : Window
                                         (_session.CameraEstimated ? " (estimate)" : "");
             // A room entered in the session opens where its camera is, not at the left edge.
             if (visit) _pendingCameraX = _session.CameraX;
-            RoomEntryTraceExpander.Header = "Room entry";
-            RoomEntryTraceExpander.Visibility = Visibility.Visible;
-            RoomEntrySummary.Text = $"{script?.Instructions.Count ?? 0} instructions · camera x {(_session.CameraX?.ToString() ?? "unknown")}{(_session.CameraEstimated ? " (estimate)" : "")} · " +
-                                    (snapshot.ActiveSounds.Count == 0 ? "no script-started sounds" : "sounds " + string.Join(", ", snapshot.ActiveSounds));
-            ShowScriptEvents(RoomEntryEventButtons, _session.LastVisitEvents);
+            _loomPanelEntry = new LoomPanelEntry(script, _session.LastVisitEvents,
+                $"{script?.Instructions.Count ?? 0} instructions · camera x {(_session.CameraX?.ToString() ?? "unknown")}{(_session.CameraEstimated ? " (estimate)" : "")} · " +
+                (snapshot.ActiveSounds.Count == 0 ? "no script-started sounds" : "sounds " + string.Join(", ", snapshot.ActiveSounds)), entryText);
             RefreshStateIssues();
             UpdateRoomMusicActions();
             SessionStatusText.Text = snapshot.IsFaithful
@@ -1655,8 +1658,6 @@ public partial class MainWindow : Window
         ObjectActionPanel.Visibility = Visibility.Collapsed;
         SessionStatusText.Text = "Inspection mode: a click cycles an object's stored images; it is not the game's click and runs no script. Each room starts from the index; changes are local to this view.";
         SessionStatusText.ToolTip = null;
-        RoomEntryTraceExpander.Header = "Room entry";
-        RefreshStateIssues();
         UpdatePlaybackControls();
         _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
         _artworkEstimates = [];
@@ -1667,19 +1668,17 @@ public partial class MainWindow : Window
         {
             var entryScript = _scriptReader.DecodeRoomEntry(resource);
             if (entryScript is null)
-                RoomEntryTraceOutput.Text = "This room has no embedded entry-script pointer.";
+                _loomPanelEntry = new LoomPanelEntry(null, [], "", "This room has no embedded entry-script pointer.");
             else
             {
                 var run = _scriptExecutor.Execute(entryScript, _indexedStates, records);
-                ShowScriptEvents(RoomEntryEventButtons, run.Events);
-                RoomEntrySummary.Text = $"{entryScript.Instructions.Count} instructions" + (run.UnresolvedReason is null && !run.ResumeOffset.HasValue ? " · reached the end" : " · stopped early (see the raw disassembly)");
                 _objectSelection = new RoomObjectSelection(images, run.ObjectStates,
                     run.ObjectPositions, background: _currentRoom, drawQueue: run.DrawOrder);
                 if (run.UnresolvedReason is not null || run.ResumeOffset.HasValue)
                     CloseArtworkGaps(resource, images);
-                RoomEntryTraceOutput.Text = FormatScript(entryScript) + Environment.NewLine +
-                                            "BOUNDED INTERPRETATION" + Environment.NewLine + run.FormatSummary();
-                RoomEntryTraceExpander.Visibility = Visibility.Visible;
+                _loomPanelEntry = new LoomPanelEntry(entryScript, run.Events,
+                    $"{entryScript.Instructions.Count} instructions" + (run.UnresolvedReason is null && !run.ResumeOffset.HasValue ? " · reached the end" : " · stopped early (see the raw disassembly)"),
+                    FormatScript(entryScript) + Environment.NewLine + "BOUNDED INTERPRETATION" + Environment.NewLine + run.FormatSummary());
                 ObjectsNote.Text = run.UnresolvedReason is null && !run.ResumeOffset.HasValue
                     ? $"{records.Count} local object records, {images.Count} stored images. Entry bytecode reached stopObjectCode; the bounded result is shown in the room-entry trace."
                     : $"{records.Count} local object records, {images.Count} stored images. {_estimatedObjectIds.Count} unresolved details use an artwork estimate; see the trace for script limits.";
@@ -1688,10 +1687,10 @@ public partial class MainWindow : Window
         catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
         {
             CloseArtworkGaps(resource, images);
-            RoomEntryTraceOutput.Text = $"Room entry script could not be interpreted: {ex.Message}";
-            RoomEntryTraceExpander.Visibility = Visibility.Visible;
+            _loomPanelEntry = new LoomPanelEntry(null, [], "", $"Room entry script could not be interpreted: {ex.Message}");
             ObjectsNote.Text = $"{records.Count} local object records, {images.Count} stored images. The entry script is unavailable; {_estimatedObjectIds.Count} details use an artwork estimate.";
         }
+        RefreshLoomPanel();
         UpdateRoomMusicActions();
         UpdateAdvancedMode();
     }
@@ -1898,6 +1897,7 @@ public partial class MainWindow : Window
         {
             ObjectActionsSection.Visibility = Visibility.Collapsed;
             ObjectActionPanel.Visibility = Visibility.Collapsed;
+            RefreshLoomPanel();
             return;
         }
         ObjectActionPanel.Visibility = Visibility.Visible;
@@ -1914,17 +1914,7 @@ public partial class MainWindow : Window
             : action.VerbId == 0 ? $"{actionName}: ran; no scene change followed."
             : $"{actionName} · {LoomVerbNames.Label(action.VerbId)}: ran; no scene change followed.";
         ObjectActionNote.ToolTip = (action.DestinationRoomId is int destination ? $"Room {destination:00} · " : "") + action.Evidence;
-        LastActionSummary.Text = ObjectActionNote.Text;
-        LastActionIssues.Children.Clear();
-        RefreshStateIssues();
-        var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull), actionName,
-            action.VerbId == 0 ? null : LoomVerbNames.Label(action.VerbId)));
-        LastActionTimeline.Text = timeline.TrimEnd();
-        ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
-            string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
-            Environment.NewLine + (action.Script is null ? "Object bytecode unavailable." : FormatScript(action.Script)) +
-            Environment.NewLine + (action.Run?.FormatSummary() ?? "No object bytecode was run.");
-        ObjectActionTraceExpander.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
+        RefreshLoomPanel();
         UpdateAdvancedMode();
     }
 
@@ -2115,64 +2105,10 @@ public partial class MainWindow : Window
     /// <summary>The state the session could not settle, one short line each (the full text in the tooltip), in the inspector's own section.</summary>
     private int _issueBaseline;
 
+    /// <summary>LOOM's Advanced panel is redrawn from the session (R-6.43); the assumptions are one of its sections.</summary>
     private void RefreshStateIssues()
     {
-        StateIssueList.Children.Clear();
-        if (_session is null || SessionModeToggle.IsChecked != true) { StateIssuesSection.Visibility = Visibility.Collapsed; return; }
-        var issues = new List<string>();
-        if (_estimatedObjectIds.Count > 0) issues.Add($"The artwork of {_estimatedObjectIds.Count} object(s) is estimated.");
-        // The session logs everything it assumed since it began; this view lists what came after the last room entry.
-        var log = _session.Snapshot.Uncertainties;
-        issues.AddRange(log.Skip(Math.Min(_issueBaseline, log.Count)).Distinct().TakeLast(30));
-        StateIssuesSection.Header = issues.Count == 0 ? "No assumptions" : $"Assumptions · {issues.Count}";
-        if (issues.Count > 0)
-            StateIssueList.Children.Add(new TextBlock
-            {
-                Text = "What the explorer had to assume or estimate to show this room (clicks sent as assumed input, camera or artwork estimates). Nothing is waiting on you.",
-                Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
-            });
-        // Flat sections instead of nested expanders: a title with its count, one sentence of meaning, then the first few lines
-        // (two lines each, full text in the tooltip) with a link to reveal the rest.
-        const int visibleItems = 4;
-        var dim = new SolidColorBrush(Color.FromRgb(159, 171, 174));
-        foreach (var group in LoomAssumptionGroups.Group(issues))
-        {
-            var section = new StackPanel { Margin = new Thickness(0, 0, 0, 10) };
-            section.Children.Add(new TextBlock
-            {
-                Text = $"{group.Title} ({group.Items.Count})", FontWeight = FontWeights.SemiBold, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)), Margin = new Thickness(0, 0, 0, 2)
-            });
-            section.Children.Add(new TextBlock { Text = group.Meaning, Foreground = dim, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 4) });
-            var lines = new List<TextBlock>();
-            foreach (var issue in group.Items)
-            {
-                var named = LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue));
-                var line = new TextBlock
-                {
-                    Text = "• " + named, ToolTip = issue, Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11,
-                    TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, MaxHeight = 30,
-                    Margin = new Thickness(8, 0, 0, 3), Visibility = lines.Count < visibleItems ? Visibility.Visible : Visibility.Collapsed
-                };
-                lines.Add(line); section.Children.Add(line);
-            }
-            if (lines.Count > visibleItems)
-            {
-                var more = new TextBlock
-                {
-                    Text = $"Show {lines.Count - visibleItems} more", Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11,
-                    Cursor = System.Windows.Input.Cursors.Hand, Margin = new Thickness(8, 0, 0, 0), TextDecorations = TextDecorations.Underline
-                };
-                more.MouseLeftButtonUp += (_, _) =>
-                {
-                    bool expand = lines[visibleItems].Visibility != Visibility.Visible;
-                    for (int i = visibleItems; i < lines.Count; i++) lines[i].Visibility = expand ? Visibility.Visible : Visibility.Collapsed;
-                    more.Text = expand ? "Show fewer" : $"Show {lines.Count - visibleItems} more";
-                };
-                section.Children.Add(more);
-            }
-            StateIssueList.Children.Add(section);
-        }
-        StateIssuesSection.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
+        if (IsLoomGame) RefreshLoomPanel();
     }
 
     private GameResource? FindEventTarget(ScummScriptEvent scriptEvent)
@@ -2273,6 +2209,17 @@ public partial class MainWindow : Window
             ScriptUsedByList.Children.Add(new TextBlock { Text = $"… and {uses.Count - 60} more", Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11 });
     }
     private ScummScriptDisassembly? _scriptShown;
+
+    /// <summary>R-6.51: the script page's subtitle. LOOM keeps its two fixed wordings (R-9.1); every other game's comes from its own data.</summary>
+    private string ScriptPageSubtitle(GameResource resource)
+    {
+        var named = LoomResourceNames.Entry(_glossary, resource) is { } entry ? $" · name: {entry.EvidenceLabel}" : "";
+        if (_game?.Id == GameId.LoomVga) return "LOOM CD script · SCUMM v4" + named;
+        if (_game?.Id == GameId.Loom) return "Indexed script resource · DOS LOOM old-v3" + named;
+        if (_game is not { } game) return "Indexed script resource";
+        var scope = resource.ScriptRoom is null ? "script" : "room-local script";
+        return $"{game.Title} {scope} · SCUMM v{(int)ScummProfile.For(game).EngineVersion}{named}";
+    }
 
     private void ScriptBytesToggle_Changed(object sender, RoutedEventArgs e)
     {
@@ -3780,6 +3727,8 @@ public partial class MainWindow : Window
             ShowObjectListSection("HOTSPOTS");
             return;
         }
+        // R-6.42 (25 Oct 2026): a played game's static preview lists hotspots like LOOM; the stored-image rows are the inspection list (Interactive off).
+        if (PlayCutscenes && SessionModeToggle.IsChecked == true) return;
         for (var index = 0; index < _objects.Count; index++)
         {
             var obj = _objects[index];

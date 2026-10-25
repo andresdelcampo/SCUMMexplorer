@@ -186,7 +186,7 @@ public partial class MainWindow
     {
         var advanced = IsAdvancedMode;
         RoomEntryEventButtons.Children.Clear();
-        if (data is null || data.Entry is null && data.Exit is null && data.LocalScripts.Count == 0)
+        if (data is null || data.EntryText is null && data.Entry is null && data.Exit is null && data.LocalScripts.Count == 0)
         {
             RoomEntryTraceOutput.Text = "";
             RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
@@ -194,27 +194,27 @@ public partial class MainWindow
         else
         {
             RoomEntryTraceExpander.Header = "Room entry";
-            RoomEntrySummary.Text = data.Entry is null ? "No embedded entry script." : $"{data.Entry.Instructions.Count} instructions" +
-                (data.Exit is { } exit ? $" · exit script {exit.Instructions.Count} instructions" : "");
-            var events = new[] { data.Entry, data.Exit }.OfType<ScummScriptDisassembly>()
+            RoomEntrySummary.Text = data.EntrySummary ?? (data.Entry is null ? "No embedded entry script." : $"{data.Entry.Instructions.Count} instructions" +
+                (data.Exit is { } exit ? $" · exit script {exit.Instructions.Count} instructions" : ""));
+            var events = data.EntryEvents ?? new[] { data.Entry, data.Exit }.OfType<ScummScriptDisassembly>()
                 .SelectMany(code => code.Instructions.Select(i => ScummScriptEvent.FromInstruction(code, i, ScummScriptEventCertainty.StaticPotential)))
                 .OfType<ScummScriptEvent>().Where(e => e.TargetKind is not null).DistinctBy(e => (e.SourceLabel, e.Offset, e.TargetKind, e.TargetId)).ToArray();
             ShowScriptEvents(RoomEntryEventButtons, events);
             foreach (var id in data.LocalScripts.Where(id => !events.Any(e => e.TargetKind == ResourceKind.Script && e.TargetId == id)))
                 if (_game?.AllScripts.FirstOrDefault(r => r.ScriptRoom == data.Room && r.ResourceId == id) is { } local)
                     AddResourceButton(RoomEntryEventButtons, $"has {local.Name}", local);
-            RoomEntryTraceOutput.Text = string.Join(Environment.NewLine + Environment.NewLine,
+            RoomEntryTraceOutput.Text = data.EntryText ?? string.Join(Environment.NewLine + Environment.NewLine,
                 new[] { data.Entry, data.Exit }.OfType<ScummScriptDisassembly>().Select(FormatScript));
-            RoomEntryTraceExpander.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+            RoomEntryTraceExpander.Visibility = advanced && !string.IsNullOrWhiteSpace(RoomEntryTraceOutput.Text) ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        LastActionIssues.Children.Clear();
         if (data?.LastAction is { } action)
         {
             LastActionSummary.Text = action.Summary;
-            LastActionTimeline.Text = "";
-            LastActionTimeline.Visibility = Visibility.Collapsed;
-            LastActionIssues.Children.Clear();
-            ObjectActionTraceOutput.Text = action.Source + Environment.NewLine +
+            LastActionTimeline.Text = action.Timeline ?? "";
+            LastActionTimeline.Visibility = string.IsNullOrEmpty(action.Timeline) ? Visibility.Collapsed : Visibility.Visible;
+            ObjectActionTraceOutput.Text = action.RawTrace ?? action.Source + Environment.NewLine +
                 string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
                 Environment.NewLine + (action.Code is null ? "Object bytecode unavailable." : FormatScript(action.Code));
             ObjectActionTraceExpander.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -226,19 +226,58 @@ public partial class MainWindow
         }
 
         StateIssueList.Children.Clear();
-        if (data is null) { StateIssuesSection.Visibility = Visibility.Collapsed; return; }
-        StateIssuesSection.Header = data.Assumptions.Count == 0 ? "No assumptions" : $"Assumptions · {data.Assumptions.Count}";
-        if (data.Assumptions.Count > 0)
+        if (data is null || !data.HasAssumptions) { StateIssuesSection.Visibility = Visibility.Collapsed; return; }
+        var groups = data.AssumptionGroups ?? (data.Assumptions.Count == 0 ? [] : [new RoomAssumptionGroup("", "", [.. data.Assumptions.Select(item => (item, item))])]);
+        var count = data.AssumptionGroups?.Sum(group => group.Items.Count) ?? data.Assumptions.Count;
+        StateIssuesSection.Header = count == 0 ? "No assumptions" : $"Assumptions · {count}";
+        var dim = new SolidColorBrush(Color.FromRgb(159, 171, 174));
+        if (count > 0)
             StateIssueList.Children.Add(new TextBlock
             {
-                Text = "What the explorer had to assume or estimate to show this room. Nothing is waiting on you.",
-                Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
+                Text = "What the explorer had to assume or estimate to show this room (clicks sent as assumed input, camera or artwork estimates). Nothing is waiting on you.",
+                Foreground = dim, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
             });
-        foreach (var item in data.Assumptions)
-            StateIssueList.Children.Add(new TextBlock
+        // Flat sections: a title with its count, one sentence of meaning, the first few lines (two lines each, the full text in the tooltip) and a link to reveal the rest.
+        const int visibleItems = 4;
+        foreach (var group in groups)
+        {
+            var section = new StackPanel { Margin = new Thickness(0, 0, 0, 10) };
+            if (group.Title.Length > 0)
             {
-                Text = "• " + item, Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(8, 0, 0, 3)
-            });
+                section.Children.Add(new TextBlock
+                {
+                    Text = $"{group.Title} ({group.Items.Count})", FontWeight = FontWeights.SemiBold, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)), Margin = new Thickness(0, 0, 0, 2)
+                });
+                section.Children.Add(new TextBlock { Text = group.Meaning, Foreground = dim, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 4) });
+            }
+            var lines = new List<TextBlock>();
+            foreach (var (text, tip) in group.Items)
+            {
+                var line = new TextBlock
+                {
+                    Text = "• " + text, ToolTip = tip, Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11,
+                    TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, MaxHeight = group.Title.Length > 0 ? 30 : double.PositiveInfinity,
+                    Margin = new Thickness(8, 0, 0, 3), Visibility = lines.Count < visibleItems || group.Title.Length == 0 ? Visibility.Visible : Visibility.Collapsed
+                };
+                lines.Add(line); section.Children.Add(line);
+            }
+            if (group.Title.Length > 0 && lines.Count > visibleItems)
+            {
+                var more = new TextBlock
+                {
+                    Text = $"Show {lines.Count - visibleItems} more", Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11,
+                    Cursor = System.Windows.Input.Cursors.Hand, Margin = new Thickness(8, 0, 0, 0), TextDecorations = TextDecorations.Underline
+                };
+                more.MouseLeftButtonUp += (_, _) =>
+                {
+                    var expand = lines[visibleItems].Visibility != Visibility.Visible;
+                    for (var i = visibleItems; i < lines.Count; i++) lines[i].Visibility = expand ? Visibility.Visible : Visibility.Collapsed;
+                    more.Text = expand ? "Show fewer" : $"Show {lines.Count - visibleItems} more";
+                };
+                section.Children.Add(more);
+            }
+            StateIssueList.Children.Add(section);
+        }
         StateIssuesSection.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
     }
 

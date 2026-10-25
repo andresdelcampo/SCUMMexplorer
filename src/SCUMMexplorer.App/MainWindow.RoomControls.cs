@@ -206,7 +206,7 @@ public partial class MainWindow
         }
 
         public bool RoomListsDone => w._cdRoomListsDone;
-        public RoomPanelData? Panel() => null;
+        public RoomPanelData? Panel() => w.BuildLoomPanel();
 
         public RoomIntroEntry GameIntro()
         {
