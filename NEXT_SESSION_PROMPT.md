@@ -24,7 +24,7 @@ When answered, change those rows' Basis to `Rule (confirmed by the user <date>)`
 - The agents cannot hear or see the real window and cannot drive ScummVM: collect those checks for the user in the checkpoint.
 
 ## Suggested next runs (pick with the user, or take the first if they say "keep going")
-- Shared room controls: finish the five items "Not done" in docs/checkpoints/20261024-shared-room-controls.md (full-screen Esc, one key handler, Play Game Intro as a provider method, LOOM CD Sounds rows, double-click hint); ask the user the four questions listed there.
+- Shared room controls (25 Oct): the five items of checkpoint 20261024 are done (shared key handler, full-screen Esc, `GameIntro()` provider method, LOOM CD Sounds rows, double-click hint), and LOOM's Advanced panel, room view (pan, wide mode), Restart/Interactive/Connections and local-script entries now serve every game (R-6.43, R-6.49 to R-6.51). Open: LOOM's own panel through `RoomPanelData`; the static preview's `STORED OBJECTS` list as LOOM's `HOTSPOTS`; Maniac/Zak room-local scripts (their data source reads none); the script page subtitle chain; check by hand the sluggish Advanced scrolling in Maniac Mansion Enhanced.
 - MonkeyCd Rooms 88, 89, 99; cutscene start setups for entries that begin nothing from a fresh start (R-8.33); the `printEgo` first-text offer.
 - A fixed-point stop for long cutscene runs (proposal in `.verification/globals-tracking-20261019/`); cheaper operand parsing (regex groups are now the largest allocation); server GC (user's call).
 - Open from S6: iMUSE hook classes other than 0, markers, fades; the room change ScummVM's `killScriptsAndResources` ends a calling script with (broke MI2's boot when tried).
