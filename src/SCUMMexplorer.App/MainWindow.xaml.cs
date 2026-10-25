@@ -565,7 +565,17 @@ public partial class MainWindow : Window
         UpdateGameStatusButton();
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
+        // R-8.5c (user, 25 Oct 2026): a game that cannot be played before the player's startup choices (Maniac Mansion: who the kids are) plays its intro by
+        // default; any other game opens as before, and needs the user's agreement first.
+        if (IntroRequiredForPlay(game) && GameSupport.For(game).LiveSession)
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+            {
+                if (ReferenceEquals(_game, game) && GameIntroButton.IsEnabled && !PlayActive) GameIntro_Click(GameIntroButton, new RoutedEventArgs());
+            }));
     }
+
+    /// <summary>The games whose play needs the intro's startup choices first (R-7.20, R-8.5c): Maniac Mansion, classic and enhanced.</summary>
+    private static bool IntroRequiredForPlay(GameLibrary game) => UsesManiacCutsceneSetup(game);
 
     private void PopulateRoomCards(GameLibrary game)
     {
@@ -2292,10 +2302,38 @@ public partial class MainWindow : Window
     private readonly List<(UIElement Element, Visibility Visibility)> _fullscreenHidden = [];
     private Thickness _contentMarginBefore;
 
-    private void PlayHost_MouseEnter(object sender, MouseEventArgs e) => PlayFullscreenButton.Visibility = PlayScreenImage.IsVisible ? Visibility.Visible : Visibility.Collapsed;
-    private void PlayHost_MouseLeave(object sender, MouseEventArgs e) => PlayFullscreenButton.Visibility = Visibility.Collapsed;
-    private void VerbStrip_MouseEnter(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Visible;
-    private void VerbStrip_MouseLeave(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Collapsed;
+    private void PlayHost_MouseEnter(object sender, MouseEventArgs e) => PlaceFullscreenButton();
+    private void PlayHost_MouseLeave(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Collapsed;
+
+    /// <summary>
+    /// R-6.49 (user, 25 Oct 2026: the indicator behaved differently in LOOM and the others, and was missing in some rooms): one full-screen button for every game, at
+    /// the bottom right of the picture (the played game's screen, else the verb strip, else the room), whatever is shown, while the pointer is over the room view.
+    /// </summary>
+    private void PlaceFullscreenButton()
+    {
+        Rect? picture = null;
+        try
+        {
+            if (RoomDisplayLayout.Visibility != Visibility.Visible) { FullscreenButton.Visibility = Visibility.Collapsed; return; }
+            if (PlayScreenImage.IsVisible && PlayScreenImage.ActualWidth > 0 && _playShown is { } frame)
+            {
+                var scale = Math.Min(PlayScreenImage.ActualWidth / frame.PixelWidth, PlayScreenImage.ActualHeight / ScummPlayFrame.Height);
+                var origin = PlayScreenImage.TranslatePoint(new Point(0, 0), RoomViewportHost);
+                var (w, h) = (frame.PixelWidth * scale, ScummPlayFrame.Height * scale);
+                picture = new Rect(origin.X + (PlayScreenImage.ActualWidth - w) / 2, origin.Y + (PlayScreenImage.ActualHeight - h) / 2, w, h);
+            }
+            else
+            {
+                FrameworkElement? shown = VerbStripPanel.IsVisible ? VerbStripPanel : RoomViewport.IsVisible ? RoomViewport : null;
+                if (shown is { ActualWidth: > 0 }) picture = new Rect(shown.TranslatePoint(new Point(0, 0), RoomViewportHost), new Size(shown.ActualWidth, shown.ActualHeight));
+            }
+        }
+        catch (InvalidOperationException) { picture = null; }
+        if (picture is not { } rect) { FullscreenButton.Visibility = Visibility.Collapsed; return; }
+        var margin = new Thickness(Math.Max(0, rect.Right - FullscreenButton.Width - 10), Math.Max(0, rect.Bottom - FullscreenButton.Height - 8), 0, 0);
+        if (FullscreenButton.Margin != margin) FullscreenButton.Margin = margin;
+        if (FullscreenButton.Visibility != Visibility.Visible) FullscreenButton.Visibility = Visibility.Visible;
+    }
     private void Fullscreen_Click(object sender, RoutedEventArgs e) => SetFullscreen(!_fullscreen);
 
     /// <summary>The scene alone on the whole screen (F11 or the corner button); Escape leaves it. Everything else is hidden and comes back as it was.</summary>

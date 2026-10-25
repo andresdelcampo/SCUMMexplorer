@@ -213,10 +213,8 @@ public partial class MainWindow
             var game = w._game;
             var demo = game is { Id: GameId.Loom, IsDemo: true };
             var offered = game is { Id: GameId.Loom or GameId.LoomVga };
-            // The established LOOM entries already provide the intro in Room 01; the button is for the rooms that do not (or a static preview).
-            var inRoomOne = demo || offered && (game!.Id == GameId.LoomVga ? w.CdIntroPlaysIn(1)
-                : w.ScannedCutscenes || (w._replayCatalog?.Membership ?? []).Any(m => m.Id == "opening" && (m.StartRoom == 1 || m.Rooms.Contains(1))));
-            return new(offered && (!inRoomOne || w._catalogPreviewOnly), !w._introPreparing && (w.CanStartCutscene || w._catalogPreviewOnly),
+            // R-6.38: offered whenever the game is loaded (user, 25 Oct 2026); it no longer comes and goes with the room shown.
+            return new(offered, !w._introPreparing && (w.CanStartCutscene || w._catalogPreviewOnly),
                 demo ? "Play Demo Preview" : "Play Game Intro", _ =>
                 {
                     if (demo) w.PlayDemoPreview();
