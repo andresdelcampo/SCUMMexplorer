@@ -45,6 +45,8 @@ public partial class MainWindow
     /// (<see cref="ScummSession.PrepareAmbientRoom"/>); no click or key reaches the game. <see cref="_playLiveSource"/> is the session it was made from.
     /// </summary>
     private bool _playAmbient;
+    /// <summary>The kids were chosen by the reviewed assumption, not by the player (R-6.52); Advanced says so.</summary>
+    private bool _playPartyAssumed;
     private ScummGameSession? _playLiveSource;
 
     /// <summary>Play that delivers the user's clicks and keys to the game (not a static preview's ambient frames).</summary>
@@ -180,7 +182,18 @@ public partial class MainWindow
             if (navigationKind == RoomOpenKind.Catalog)
             {
                 var source = _play;
+                // R-6.52 (user, 25 Oct 2026): a Maniac Mansion room picked before the kids are chosen uses the reviewed, labelled assumed party (Syd, Bernard)
+                // so the room is live; kids already chosen are kept. The assumption is listed under Assumptions in Advanced.
+                if (UsesManiacCutsceneSetup(game) && roomId != 45)
+                {
+                    try { if (await Task.Run(() => SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PrepareIfNeeded(game, source), token)) _playPartyAssumed = true; }
+                    catch (InvalidOperationException) { /* the player has begun choosing: keep the choices as they are */ }
+                    catch (System.IO.InvalidDataException) { /* no reviewed recipe for this menu: the room stays a static preview */ }
+                }
+                if (!CurrentRequest()) return;
+                RoomHint = "Getting the room ready to play…";
                 var prepared = await Task.Run(() => source.PrepareManualRoom(resource, cancellationToken: token), token);
+                RoomHint = null;
                 if (!CurrentRequest()) return;
                 if (prepared.Session is not ScummGameSession ready || ready.PlayInputScript == 0)
                 {
@@ -195,6 +208,7 @@ public partial class MainWindow
                     if (!CurrentRequest()) return;
                     _playLiveSource = source;
                     StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";
+                    RoomHint = "A still picture: this room's own scene does not settle into a state you can play here. Play Cutscene shows its scenes; Play Game Intro starts the game.";
                     StatusText.ToolTip = IsAdvancedMode ? reason + Environment.NewLine + AmbientNote(ambient) : null;
                     if (ambient.Session is not ScummGameSession still)
                     {
@@ -258,6 +272,7 @@ public partial class MainWindow
         _playTimer.Start();
         RoomDisplayGroup.Visibility = Visibility.Collapsed;
         PlayScreenImage.Visibility = Visibility.Visible;
+        RoomHint = null;
         ObjectsNote.Text = "";
         ShowPlayFrame();
         UpdateGameStatusButton();

@@ -47,7 +47,7 @@ internal static class Program
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)?.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private, values.Select(v => v!.GetType()).ToArray())!.Invoke(window, values);
         T Control<T>(string name) where T : class => (T)window.FindName(name);
-        _ = new System.Threading.Timer(_ => { File.WriteAllText(Path.Combine(output, "panel.txt"), "TIMEOUT\n" + log); Environment.Exit(3); }, null, 120_000, Timeout.Infinite);
+        _ = new System.Threading.Timer(_ => { File.WriteAllText(Path.Combine(output, "panel.txt"), "TIMEOUT\n" + log); Environment.Exit(3); }, null, 170_000, Timeout.Infinite);
 
         window.ContentRendered += async (_, _) =>
         {
@@ -62,7 +62,11 @@ internal static class Program
                 log.AppendLine($"game: {game.Title} {game.Version}; scripts {game.Resources.Count(r => r.Kind == ResourceKind.Script)} + local {game.RoomLocalScripts.Count}");
                 var resource = game.Rooms.First(r => r.ResourceId == room);
                 Call("SelectResourceInTree", resource);
-                await Task.Delay(9000);
+                var wait = Environment.GetEnvironmentVariable("SCUMM_PANEL_WAIT") is { } w ? int.Parse(w) : 9000;
+                var started = Stopwatch.StartNew();
+                while (started.ElapsedMilliseconds < wait && Control<TextBlock>("StatusText").Text.StartsWith("Opening")) await Task.Delay(250);
+                log.AppendLine($"opening took {started.ElapsedMilliseconds} ms; status '{Control<TextBlock>("StatusText").Text}'");
+                await Task.Delay(int.Parse(Environment.GetEnvironmentVariable("SCUMM_PANEL_EXTRA") ?? "1500"));
                 if (args.Length > 3 && args[3] == "wide")
                 {
                     var framing = Control<CheckBox>("NormalRoomWidthToggle");
@@ -119,9 +123,12 @@ internal static class Program
                     File.WriteAllText(Path.Combine(output, "script.txt"), local.Name + Environment.NewLine + ssb + Environment.NewLine + Control<TextBox>("ScriptOutput").Text);
                 }
                 Control<Expander>("RoomEntryTraceExpander").IsExpanded = true; Control<Expander>("StateIssuesSection").IsExpanded = true; await Task.Delay(800);
-                foreach (var name in new[] { "RestartButton", "ConnectionsButton", "SessionModeToggle", "PlayFullscreenButton", "AdvanceFrameButton" })
+                foreach (var name in new[] { "RestartButton", "ConnectionsButton", "SessionModeToggle", "FullscreenButton", "AdvanceFrameButton" })
                     log.AppendLine($"{name}: visible={Control<UIElement>(name).IsVisible} enabled={Control<UIElement>(name).IsEnabled}");
                 log.AppendLine($"GameIntroButton: visible={Control<UIElement>("GameIntroButton").IsVisible} enabled={Control<UIElement>("GameIntroButton").IsEnabled} content={Control<Button>("GameIntroButton").Content}");
+                log.AppendLine($"PlayActive={typeof(MainWindow).GetProperty("PlayActive", Private)!.GetValue(window)} catalogPreviewOnly={Field("_catalogPreviewOnly")} playAmbient={Field("_playAmbient")} playScreen={Control<UIElement>("PlayScreenImage").IsVisible} verbStrip={Control<UIElement>("VerbStripPanel").IsVisible} interactEnabled={Control<UIElement>("InteractButton").IsEnabled} interactVisible={Control<UIElement>("InteractButton").IsVisible}");
+                log.AppendLine($"Hint: visible={Control<UIElement>("ObjectsNote").IsVisible} '{Control<TextBlock>("ObjectsNote").Text}'");
+                log.AppendLine("Status: " + Control<TextBlock>("StatusText").Text + " | " + Control<TextBlock>("StatusText").ToolTip);
                 log.AppendLine("Interact tip: " + Control<Button>("InteractButton").ToolTip);
                 log.AppendLine("Connections: " + Control<Button>("ConnectionsButton").Content + " / " + Control<Button>("ConnectionsButton").ToolTip);
                 var sb = new StringBuilder();

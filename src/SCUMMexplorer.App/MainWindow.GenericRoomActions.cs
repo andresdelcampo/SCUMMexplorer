@@ -172,6 +172,7 @@ public partial class MainWindow
     {
         var list = new List<string>();
         if (_genericSourceFailure is not null) list.Add(_genericSourceFailure);
+        if (_playPartyAssumed) list.Add(SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PreparationNote);
         if (_browsedScene is { } shown && _currentRoom is not null && ReferenceEquals(shown.Room, _currentRoom)) list.Add(BrowsedSceneNote(shown));
         if (_genericLastAction is { } action) list.AddRange(action.Uncertainties);
         _genericAssumptions = list.Where(item => !string.IsNullOrWhiteSpace(item)).Distinct().ToArray();

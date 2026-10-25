@@ -293,7 +293,7 @@ public partial class MainWindow : Window
     private void OpenGameFolder(string folder)
     {
         ResetGameAudio();
-        _loomAmbientSource = null; _playAmbient = false; _playLiveSource = null;
+        _loomAmbientSource = null; _playAmbient = false; _playLiveSource = null; _playPartyAssumed = false; RoomHint = null;
         _roomCardCancellation?.Cancel();
         _roomCardBackgroundsReady.TrySetResult(false);
         _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -1009,12 +1009,29 @@ public partial class MainWindow : Window
         UpdateAdvancedMode();
     }
 
+    private string? _roomHint;
+
+    /// <summary>
+    /// A line under the scene in Normal mode too (user, 25 Oct 2026: say why a room is not live instead of leaving a silent picture): shown while a room is being
+    /// made ready and for a room that stays a still picture. Null clears it.
+    /// </summary>
+    private string? RoomHint
+    {
+        get => _roomHint;
+        set
+        {
+            _roomHint = value;
+            if (value is not null) ObjectsNote.Text = value;
+            ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || value is not null ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
     private void UpdateAdvancedMode()
     {
         var advanced = IsAdvancedMode;
         UpdateSoundDeviceVisibility();
         // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
-        ObjectsNote.Visibility = SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
+        ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || RoomHint is not null ? Visibility.Visible : Visibility.Collapsed;
         // A browsed first visit explains itself in Advanced mode only (R-1.13).
         if (_browsedScene is { } shownScene && _currentRoom is not null && ReferenceEquals(shownScene.Room, _currentRoom)) ObjectsNote.Text = BrowsedSceneNote(shownScene);
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
@@ -1814,6 +1831,8 @@ public partial class MainWindow : Window
         _playFolder = null;
         _playScreen = null;
         _genericLastAction = null;
+        _playPartyAssumed = false;
+        RoomHint = null;
         if (_currentRoomResource is { } room) SelectRoomWithIntent(room, RoomOpenKind.Catalog, reloadSelected: true);
         else StatusText.Text = "Game state restarted. Select a room to visit it.";
     }
