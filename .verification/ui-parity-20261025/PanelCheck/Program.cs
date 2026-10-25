@@ -63,6 +63,18 @@ internal static class Program
                 var resource = game.Rooms.First(r => r.ResourceId == room);
                 Call("SelectResourceInTree", resource);
                 await Task.Delay(9000);
+                if (args.Length > 3 && args[3].StartsWith("pan"))
+                {
+                    object? play = Field("_play");
+                    string Cam() => play is null ? "no play" : $"camera {play.GetType().GetProperty("CameraX")!.GetValue(play)} range {play.GetType().GetProperty("CameraPanRange")!.GetValue(play)} view {play.GetType().GetProperty("ViewLeft")!.GetValue(play)} active {(bool)typeof(MainWindow).GetProperty("PlayActive", Private)!.GetValue(window)!}";
+                    log.AppendLine("before: " + Cam());
+                    log.AppendLine($"panel: {Control<UIElement>("PlayScrollButtonsPanel").Visibility}");
+                    for (var i = 0; i < 6; i++) { Call("PlayPanBy", 60.0); await Task.Delay(500); }
+                    log.AppendLine("after right: " + Cam());
+                    for (var i = 0; i < 12; i++) { Call("PlayPanBy", -60.0); await Task.Delay(500); }
+                    log.AppendLine("after left: " + Cam());
+                    log.AppendLine($"left enabled {Control<Button>("PlayScrollLeftButton").IsEnabled}, right enabled {Control<Button>("PlayScrollRightButton").IsEnabled}");
+                }
                 if (select)
                 {
                     var actions = (System.Collections.IEnumerable)Field("_genericSourceActions")!;

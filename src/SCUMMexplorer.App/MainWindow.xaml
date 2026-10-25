@@ -468,6 +468,7 @@
                                 </StackPanel>
                             </Expander>
                             <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged" Background="Transparent" MouseEnter="PlayHost_MouseEnter" MouseLeave="PlayHost_MouseLeave">
+                                <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                 <!-- Play in a verb-based game (R-7.8): the game's whole screen, composed every frame from the live session. -->
                                 <Image x:Name="PlayScreenImage" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Focusable="True"
                                        RenderOptions.BitmapScalingMode="NearestNeighbor" AutomationProperties.Name="Game screen"
@@ -480,6 +481,16 @@
                                     <Path Stroke="#E7E0D2" StrokeThickness="1.6" Width="14" Height="14" Stretch="Fill"
                                           Data="M 0,5 L 0,0 L 5,0 M 9,0 L 14,0 L 14,5 M 14,9 L 14,14 L 9,14 M 5,14 L 0,14 L 0,9"/>
                                 </Button>
+                                <!-- R-6.49: LOOM's two scroll arrows under the game's own screen; here they move the game's camera. -->
+                                <Grid x:Name="PlayScrollButtonsPanel" Grid.Row="1" Height="24" HorizontalAlignment="Center" Margin="0,2,0,4" Visibility="Collapsed">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <Button x:Name="PlayScrollLeftButton" Grid.Column="0" Tag="M 5,0 L 0,4.5 L 5,9" ToolTip="Scroll room left" AutomationProperties.Name="Scroll room left"
+                                            Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                            LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,1,0" BorderBrush="#334452"/>
+                                    <Button x:Name="PlayScrollRightButton" Grid.Column="1" Tag="M 0,0 L 5,4.5 L 0,9" ToolTip="Scroll room right" AutomationProperties.Name="Scroll room right"
+                                            Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                            LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,0,0" BorderBrush="#334452"/>
+                                </Grid>
                                 <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
                                                   VerticalScrollBarVisibility="Disabled" CanContentScroll="False"

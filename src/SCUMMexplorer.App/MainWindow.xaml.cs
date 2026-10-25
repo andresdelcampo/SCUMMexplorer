@@ -2854,6 +2854,7 @@ public partial class MainWindow : Window
 
     private void UpdateRoomScrollButtons()
     {
+        if (PlayActive) { UpdatePlayScrollButtons(); return; }
         var normalSize = NormalRoomWidthToggle.IsChecked == true;
         var (low, high) = RoomViewScrollRange();
         var canScroll = normalSize && high - low > 0.5;
@@ -2875,7 +2876,7 @@ public partial class MainWindow : Window
     private void PanButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (sender is not Button button) return;
-        var direction = ReferenceEquals(button, ScrollRoomLeftButton) ? -1 : 1;
+        var direction = IsLeftPanButton(button) ? -1 : 1;
         BeginRoomPan(direction, maximumStep: 160, button: button);
         _roomPanMouseGesture = true;
         e.Handled = true;
@@ -2903,19 +2904,26 @@ public partial class MainWindow : Window
             _roomPanMouseGesture = false;
             return;
         }
-        var direction = ReferenceEquals(sender, ScrollRoomLeftButton) ? -1 : 1;
+        var direction = IsLeftPanButton(sender) ? -1 : 1;
         PanRoomBySourcePixels(direction * 2);
     }
 
     private void BeginRoomPan(int direction, double maximumStep, Button? button = null, Key? key = null)
     {
         StopRoomPan();
-        var (low, high) = RoomViewScrollRange();
-        if (NormalRoomWidthToggle.IsChecked != true || high - low <= 0.5 ||
-            (direction < 0 && RoomViewport.HorizontalOffset <= low + 0.5) ||
-            (direction > 0 && RoomViewport.HorizontalOffset >= high - 0.5)) return;
-
-        RoomViewport.Focus();
+        if (PlayActive)
+        {
+            if (NormalRoomWidthToggle.IsChecked != true || !PlayPanCan(direction)) return;
+            PlayScreenImage.Focus();
+        }
+        else
+        {
+            var (low, high) = RoomViewScrollRange();
+            if (NormalRoomWidthToggle.IsChecked != true || high - low <= 0.5 ||
+                (direction < 0 && RoomViewport.HorizontalOffset <= low + 0.5) ||
+                (direction > 0 && RoomViewport.HorizontalOffset >= high - 0.5)) return;
+            RoomViewport.Focus();
+        }
         _roomPanActive = true;
         _roomPanDirection = Math.Sign(direction);
         _roomPanMaximumStep = Math.Max(2, maximumStep);
@@ -2944,6 +2952,7 @@ public partial class MainWindow : Window
 
     private void PanRoomBySourcePixels(double sourcePixels)
     {
+        if (PlayActive) { PlayPanBy(sourcePixels); return; }
         var previous = RoomViewport.HorizontalOffset;
         var requested = previous + sourcePixels * _roomDisplayScale;
         var (low, high) = RoomViewScrollRange();

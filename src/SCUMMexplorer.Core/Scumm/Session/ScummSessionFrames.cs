@@ -181,6 +181,42 @@ public abstract partial class ScummSession
         return true;
     }
 
+    private (int Mode, int Follows)? _panRestore;
+
+    /// <summary>The camera limits the player may pan within (the game's own <c>VAR_CAMERA_MIN_X</c>/<c>MAX_X</c> of the room), or null outside a room.</summary>
+    public (int Min, int Max)? CameraPanRange => _runtime.CameraRange ?? _runtime.RoomCameraBounds;
+
+    /// <summary>
+    /// R-6.49 (user, 25 Oct 2026): exploring a wide room while it is played. Moves the game's own camera by <paramref name="pixels"/> the way
+    /// <c>panCameraTo</c> does (it travels 8 pixels a frame to the new place, inside the game's camera limits), so the picture and the camera stay one thing
+    /// and every click is a valid point of the game's screen. A camera that followed an actor is put in normal mode until that actor walks again.
+    /// An exploration action, not something the game did.
+    /// </summary>
+    public void PanCameraBy(int pixels)
+    {
+        if (CameraPanRange is not { } range || CameraX is not int x) return;
+        var camera = _runtime.Camera;
+        if (camera.Mode == ScummCamera.FollowActor && _panRestore is null) _panRestore = (camera.Mode, camera.Follows);
+        var basis = _panRestore is not null && camera.Mode == ScummCamera.Normal ? camera.DestX : x;
+        camera.Mode = ScummCamera.Normal;
+        camera.MovingToActor = false;
+        // The destination stays within a few frames of the camera, so letting go of the button stops the view soon after.
+        camera.DestX = Math.Clamp(Math.Clamp(basis + pixels, x - 96, x + 96), range.Min, Math.Max(range.Min, range.Max));
+    }
+
+    /// <summary>R-6.49: puts the camera at <paramref name="roomX"/> at once (as <c>setCameraAt</c>), so a click on a place the game was not showing can be delivered.</summary>
+    public void JumpCameraTo(int roomX)
+    {
+        if (CameraPanRange is not { } range) return;
+        var camera = _runtime.Camera;
+        if (camera.Mode == ScummCamera.FollowActor && _panRestore is null) _panRestore = (camera.Mode, camera.Follows);
+        camera.Mode = ScummCamera.Normal;
+        camera.MovingToActor = false;
+        var target = Math.Clamp(roomX, range.Min, Math.Max(range.Min, range.Max));
+        camera.DestX = target;
+        _runtime.WriteCameraPixels(target);
+    }
+
     /// <summary>
     /// The end of ScummVM's <c>scummLoop</c> after the scripts: <c>walkActors</c> steps every walking or turning actor
     /// in the room (<see cref="ScummActorTable.StepWalks"/>), then <c>moveCamera</c> moves the camera up to 8 pixels
@@ -189,6 +225,12 @@ public abstract partial class ScummSession
     protected void StepWalksAndCamera()
     {
         if (_currentRoom is null) return;
+        // R-6.49: a camera the user panned goes back to following its actor once that actor walks again (a script that sets another mode ends it too).
+        if (_panRestore is { } restore)
+        {
+            if (_runtime.Camera.Mode != ScummCamera.Normal) _panRestore = null;
+            else if (EgoMoving) { _runtime.Camera.Mode = restore.Mode; _runtime.Camera.Follows = restore.Follows; _panRestore = null; }
+        }
         var place = CurrentPlacement();
         _runtime.Actors.StepWalks(place);
         if (_runtime.ReadCameraPixels() is not int camera || _runtime.RoomCameraBounds is not { } bounds) return;

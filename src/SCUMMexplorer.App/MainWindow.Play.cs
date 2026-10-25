@@ -273,6 +273,7 @@ public partial class MainWindow
         if (_play is not null && _sceneSound.Follows(_play)) _sceneSound.StopAll("play was left");
         _playSpeech.Detach();
         PlayScreenImage.Visibility = Visibility.Collapsed;
+        PlayScrollButtonsPanel.Visibility = Visibility.Collapsed;
         ClearPlayOverlays();
         PlayScreenImage.Cursor = null;
         RoomDisplayGroup.Visibility = Visibility.Visible;
@@ -343,6 +344,7 @@ public partial class MainWindow
                                       (_playPaused ? " · paused" : "");
         else PlayScreenImage.ToolTip = null;
         TryUpdateGenericRoomSounds();
+        UpdatePlayScrollButtons();
         RefreshPlayOverlays(frame);
         RefreshPlayOverlayLists();
     }
