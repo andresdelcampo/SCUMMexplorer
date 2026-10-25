@@ -10,7 +10,7 @@ namespace SCUMMexplorer.Core.Loom;
 /// stays the evidence. SCUMM conditionals jump when the condition is false, so a block is the code that runs when it is true.
 /// Anything without a phrase keeps its raw line.
 /// </summary>
-public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int, string?>? verbLabel = null)
+public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int, string?>? verbLabel = null, string egoName = "Bobbin")
 {
     /// <summary>Object numbers below this are actors (ScummVM <c>putClass</c> and <c>_numActors</c> for v3).</summary>
     private const int NumActors = 13;
@@ -247,7 +247,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 case "isScriptRunning": return $"{Value(a[0])} = whether {Value(a[1], Role.Script)} is running";
                 case "isSoundRunning": return $"{Value(a[0])} = whether {Value(a[1], Role.Sound)} is playing";
                 case "loadRoom": return $"go to {Value(a[0], Role.Room)}";
-                case "loadRoomWithEgo": return $"go to {Value(a[1], Role.Room)} through {Value(a[0], Role.Object)}; Bobbin walks to {a[2].Replace("walkTo=", "")}";
+                case "loadRoomWithEgo": return $"go to {Value(a[1], Role.Room)} through {Value(a[0], Role.Object)}; {egoName} walks to {a[2].Replace("walkTo=", "")}";
                 case "putActor": return $"place {Value(a[0], Role.Actor)} at ({Value(a[1])}, {Value(a[2])})";
                 case "putActorInRoom": return $"put {Value(a[0], Role.Actor)} in {Value(a[1], Role.Room)}";
                 case "putActorAtObject": return $"place {Value(a[0], Role.Actor)} at {Value(a[1], Role.Object)}";
@@ -424,7 +424,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
 
     private string Print(List<string> a, bool ego)
     {
-        var who = ego ? "Bobbin" : Literal(a[0]) switch
+        var who = ego ? egoName : Literal(a[0]) switch
         {
             0xFF => "text with no actor",
             0xFE => "text in the verb area",
@@ -579,7 +579,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
         var kind = match.Groups[1].Value;
         var index = int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         if (kind == "local") return $"local {index}";
-        if (role == Role.Actor && kind == "var" && index == 0x001) return "Bobbin";
+        if (role == Role.Actor && kind == "var" && index == 0x001) return egoName;
         var entry = kind == "var" ? glossary.Variable(index) : glossary.Bit(index);
         var phrase = entry is null ? token : Use(entry, token);
         return role == Role.Actor && entry is null ? $"the actor in {phrase}" : phrase;

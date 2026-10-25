@@ -2225,9 +2225,13 @@ public partial class MainWindow : Window
         if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
     }
 
-    private string FormatScript(ScummScriptDisassembly script) => _readableScripts && _game?.Id is GameId.Loom or GameId.LoomVga
-        ? new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull).Present(script)
-        : script.Format(_showScriptBytes);
+    // Every game gets the readable view; only LOOM has names for its verbs and its hero, other games keep the engine's variable names.
+    private string FormatScript(ScummScriptDisassembly script)
+    {
+        if (!_readableScripts) return script.Format(_showScriptBytes);
+        var loom = _game?.Id is GameId.Loom or GameId.LoomVga;
+        return new LoomScriptPresenter(_glossary, loom ? LoomVerbNames.LabelOrNull : null, loom ? "Bobbin" : "the hero").Present(script);
+    }
 
     // A script the catalog knows as a scene can be played from its view: the cutscene machinery goes to the room and runs it.
     private KnownCutscene? ScriptCutscene(int? scriptId) =>

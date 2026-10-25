@@ -190,10 +190,11 @@ public partial class MainWindow
         if (inspection.Relationships.Count == 0) host.Children.Add(new TextBlock { Text = "No literal resource links were decoded. Computed destinations remain unresolved.", TextWrapping = TextWrapping.Wrap });
     }
 
-    private static Expander GenericSourceCode(string label, ScummScriptDisassembly code)
+    private Expander GenericSourceCode(string label, ScummScriptDisassembly code)
     {
         var content = new StackPanel();
-        // Delay formatting/widget attachment until requested; room changes never open code.
+        // Delay formatting/widget attachment until requested; room changes never open code. Same readable view as LOOM; wrapped, because
+        // a no-wrap box of long lines made horizontal scrolling crawl.
         var expander = new Expander
         {
             Header = label, Content = content, Margin = new Thickness(0, 2, 0, 2),
@@ -203,12 +204,12 @@ public partial class MainWindow
         {
             if (content.Children.Count == 0) content.Children.Add(new TextBox
             {
-                IsReadOnly = true, Text = code.Format(true), TextWrapping = TextWrapping.NoWrap,
+                IsReadOnly = true, Text = FormatScript(code), TextWrapping = TextWrapping.Wrap,
                 FontFamily = new FontFamily("Consolas"), FontSize = 11, MaxHeight = 320,
                 Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
                 Background = new SolidColorBrush(Color.FromRgb(16, 24, 33)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(51, 68, 82)), Padding = new Thickness(6),
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
             });
         };
         return expander;
