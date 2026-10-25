@@ -44,21 +44,17 @@ public partial class MainWindow
         finally { _roomOpenKind = previous; }
     }
 
+    /// <summary>A played game whose own scripts start an opening (script 1), offered in the header until Room 01's list has it (R-6.38).</summary>
+    private bool NativeIntroOffered => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs &&
+        GameSupport.For(game).LiveSession && game.Resources.Any(r => r.Kind == ResourceKind.Script && r.ResourceId == 1 && r.ScriptRoom is null);
+
     private void UpdateGameIntroButton()
     {
         if (GameIntroButton is null) return;
-        var game = _game;
-        var knownDemo = game is { Id: GameId.Loom, IsDemo: true };
-        var knownLoomIntro = knownDemo || game is { Id: GameId.Loom or GameId.LoomVga, IsDemo: false };
-        var nativeIntro = game is not null && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs &&
-            GameSupport.For(game).LiveSession && game.Resources.Any(r => r.Kind == ResourceKind.Script && r.ResourceId == 1 && r.ScriptRoom is null);
-        // Established LOOM entries already provide the intro in Room 01. Generic native
-        // startup is a whole-game action, separate from unrelated entry scenes in Room 01.
-        var inRoomOne = knownDemo || knownLoomIntro && (game!.Id == GameId.LoomVga ? CdIntroPlaysIn(1)
-            : ScannedCutscenes || (_replayCatalog?.Membership ?? []).Any(m => m.Id == "opening" && (m.StartRoom == 1 || m.Rooms.Contains(1))));
-        GameIntroButton.Visibility = (knownLoomIntro || nativeIntro) && (!inRoomOne || _catalogPreviewOnly) ? Visibility.Visible : Visibility.Collapsed;
-        GameIntroButton.Content = knownDemo ? "Play Demo Preview" : "Play Game Intro";
-        GameIntroButton.IsEnabled = !_introPreparing && (IsLoomGame ? CanStartCutscene || _catalogPreviewOnly : !PlayActive || !_play!.InCutscene);
+        var entry = CurrentRoomControls.GameIntro();
+        GameIntroButton.Visibility = entry.Offered ? Visibility.Visible : Visibility.Collapsed;
+        GameIntroButton.Content = entry.Caption;
+        GameIntroButton.IsEnabled = entry.Enabled;
         GameIntroButton.ToolTip = IsAdvancedMode
             ? "Start the game's native opening in a fresh session, replacing the exploration state. Required startup choices remain yours."
             : "Start the game's opening.";
@@ -83,41 +79,7 @@ public partial class MainWindow
             _previewCancellation?.Cancel();
             if (_roomOpenTask is { } previousOpen) await previousOpen;
             if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration) return;
-            if (game is { Id: GameId.Loom, IsDemo: true }) { PlayDemoPreview(); return; }
-            if (game.Id == GameId.Loom) { PlayOpening(); return; }
-            if (game.Id == GameId.LoomVga) { PlayCdIntro(); return; }
-            _catalogPreviewOnly = false;
-            ScummIndexedObjectSnapshot? objects = null;
-            var intro = await Task.Run(() => ScummGameSession.StartIntro(game, out objects));
-            if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration) return;
-            _play = intro;
-            _playFolder = game.Key;
-            _playIndexedStates = objects!.States;
-            _playScreen = new ScummPlayScreen(game, intro, _playIndexedStates);
-            _playCdTracks = ScummCdAudioTracks.For(game);
-            _playImuse = ScummImuseMusic.For(game);
-            UpdatePlaySoundCard();
-            if (intro.CurrentRoomId is int roomId && game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is { } room)
-            {
-                SelectRoomWithIntent(room, RoomOpenKind.Intro, reloadSelected: true);
-                if (_roomOpenTask is { } opening) await opening;
-            }
-            else
-            {
-                // Native boots can yield before loading any room. Show their real black
-                // screen/messages and advance normally, without guessing a room to enter.
-                _currentRoom = null;
-                _currentRoomResource = null;
-                UpdateRoomCardSelection(null);
-                ShowPageHeader(false);
-                PreviewMessage.Visibility = Visibility.Collapsed;
-                RoomDisplayLayout.Visibility = Visibility.Visible;
-                _sceneSound.Attach(game, intro, RenderPlaySound, PlaySoundLoop, replayReachedEvents: true);
-                if (game.Speech is { } speech) _playSpeech.Attach(speech, intro.Messages, 0);
-                StartPlayClock();
-            }
-            if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration) return;
-            StatusText.ToolTip = IsAdvancedMode ? "Native boot started explicitly; fresh session, no assumed player answers." : null;
+            await CurrentRoomControls.GameIntro().Start(launch);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException)
@@ -130,5 +92,42 @@ public partial class MainWindow
             if (ReferenceEquals(_game, game) && launch == _cutsceneLaunchGeneration) _introPreparing = false;
             UpdatePlaybackControls();
         }
+    }
+
+    /// <summary>The native opening of a game played through <see cref="ScummGameSession"/>: a fresh session from the game's own start, nothing answered for the player (R-7.20).</summary>
+    private async Task StartGenericIntroAsync(GameLibrary game, int launch)
+    {
+        _catalogPreviewOnly = false;
+        ScummIndexedObjectSnapshot? objects = null;
+        var intro = await Task.Run(() => ScummGameSession.StartIntro(game, out objects));
+        if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration) return;
+        _play = intro;
+        _playFolder = game.Key;
+        _playIndexedStates = objects!.States;
+        _playScreen = new ScummPlayScreen(game, intro, _playIndexedStates);
+        _playCdTracks = ScummCdAudioTracks.For(game);
+        _playImuse = ScummImuseMusic.For(game);
+        UpdatePlaySoundCard();
+        if (intro.CurrentRoomId is int roomId && game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is { } room)
+        {
+            SelectRoomWithIntent(room, RoomOpenKind.Intro, reloadSelected: true);
+            if (_roomOpenTask is { } opening) await opening;
+        }
+        else
+        {
+            // Native boots can yield before loading any room. Show their real black
+            // screen/messages and advance normally, without guessing a room to enter.
+            _currentRoom = null;
+            _currentRoomResource = null;
+            UpdateRoomCardSelection(null);
+            ShowPageHeader(false);
+            PreviewMessage.Visibility = Visibility.Collapsed;
+            RoomDisplayLayout.Visibility = Visibility.Visible;
+            _sceneSound.Attach(game, intro, RenderPlaySound, PlaySoundLoop, replayReachedEvents: true);
+            if (game.Speech is { } speech) _playSpeech.Attach(speech, intro.Messages, 0);
+            StartPlayClock();
+        }
+        if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration) return;
+        StatusText.ToolTip = IsAdvancedMode ? "Native boot started explicitly; fresh session, no assumed player answers." : null;
     }
 }

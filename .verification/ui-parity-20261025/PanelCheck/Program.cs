@@ -121,6 +121,8 @@ internal static class Program
                 Control<Expander>("RoomEntryTraceExpander").IsExpanded = true; Control<Expander>("StateIssuesSection").IsExpanded = true; await Task.Delay(800);
                 foreach (var name in new[] { "RestartButton", "ConnectionsButton", "SessionModeToggle", "PlayFullscreenButton", "AdvanceFrameButton" })
                     log.AppendLine($"{name}: visible={Control<UIElement>(name).IsVisible} enabled={Control<UIElement>(name).IsEnabled}");
+                log.AppendLine($"GameIntroButton: visible={Control<UIElement>("GameIntroButton").IsVisible} enabled={Control<UIElement>("GameIntroButton").IsEnabled} content={Control<Button>("GameIntroButton").Content}");
+                log.AppendLine("Interact tip: " + Control<Button>("InteractButton").ToolTip);
                 log.AppendLine("Connections: " + Control<Button>("ConnectionsButton").Content + " / " + Control<Button>("ConnectionsButton").ToolTip);
                 var sb = new StringBuilder();
                 Dump(Control<Border>("RoomObjectPanel"), sb, 0);

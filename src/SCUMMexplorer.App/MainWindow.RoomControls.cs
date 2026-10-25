@@ -60,6 +60,7 @@ public partial class MainWindow
         InteractButton.Visibility = interact.Visible ? Visibility.Visible : Visibility.Collapsed;
         InteractButton.Content = RoomControlText.InteractCaption(interact.TargetName);
         InteractButton.IsEnabled = interact.Enabled;
+        InteractButton.ToolTip = RoomControlText.InteractTooltip(interact.DoubleClickLooks);
     }
 
     private void ShowInteractMenu(FrameworkElement anchor, PlacementMode placement)
@@ -163,6 +164,7 @@ public partial class MainWindow
         public RoomCutscenePicker GlobalCutscenes(bool advanced) => new([], "");
         public bool RoomListsDone => true;
         public RoomGameStatusEntry GameStatus() => RoomGameStatusEntry.None;
+        public RoomIntroEntry GameIntro() => RoomIntroEntry.None;
         public RoomPanelData? Panel() => null;
         public void TogglePause() { }
         public void Step() { }
@@ -206,6 +208,24 @@ public partial class MainWindow
         public bool RoomListsDone => w._cdRoomListsDone;
         public RoomPanelData? Panel() => null;
 
+        public RoomIntroEntry GameIntro()
+        {
+            var game = w._game;
+            var demo = game is { Id: GameId.Loom, IsDemo: true };
+            var offered = game is { Id: GameId.Loom or GameId.LoomVga };
+            // The established LOOM entries already provide the intro in Room 01; the button is for the rooms that do not (or a static preview).
+            var inRoomOne = demo || offered && (game!.Id == GameId.LoomVga ? w.CdIntroPlaysIn(1)
+                : w.ScannedCutscenes || (w._replayCatalog?.Membership ?? []).Any(m => m.Id == "opening" && (m.StartRoom == 1 || m.Rooms.Contains(1))));
+            return new(offered && (!inRoomOne || w._catalogPreviewOnly), !w._introPreparing && (w.CanStartCutscene || w._catalogPreviewOnly),
+                demo ? "Play Demo Preview" : "Play Game Intro", _ =>
+                {
+                    if (demo) w.PlayDemoPreview();
+                    else if (game!.Id == GameId.Loom) w.PlayOpening();
+                    else w.PlayCdIntro();
+                    return Task.CompletedTask;
+                });
+        }
+
         public RoomGameStatusEntry GameStatus() => new(w._game is not null && w._session is not null,
             "Inspect or explicitly edit this exploration session's staff, notes and drafts.", () => w.BuildGameStatusWindow().ShowDialog());
 
@@ -223,7 +243,7 @@ public partial class MainWindow
             if (target is not null && !w._currentRoomObjectRecords.Any(item => item.Id == target.Id)) { w._interactTarget = null; target = null; }
             var name = target is not null && w._roomObjectNames.TryGetValue(target.Id, out var stored) ? stored : null;
             // R-6.39: the overview is upfront, so the button works as soon as the room has an action and the game can act.
-            return new(true, w._session is not null && !w.SessionInScene && InteractableObjects().Any(), name);
+            return new(true, w._session is not null && !w.SessionInScene && InteractableObjects().Any(), name, DoubleClickLooks: true);
         }
 
         /// <summary>The room's objects the game's pointer can pick now and that answer a verb, in directory order.</summary>
@@ -301,17 +321,17 @@ public partial class MainWindow
             foreach (var cue in w._cdRoomCues)
             {
                 var picked = cue;
-                var snippet = cue.Text.Length > 36 ? cue.Text[..36] + "…" : cue.Text;
-                var kind = cue.IsMusicOrNarration ? $"♪ Music / narration {++music}" : $"Voice {++voices}";
+                // R-6.24: the same rows as every game: the kind numbered within its kind (a spoken line is a Voice, the rest Music), the duration, and
+                // in Advanced the source; the line the voice speaks is the tooltip (the game's own text, so Normal may show it).
+                var kind = cue.IsMusicOrNarration ? $"♪ Music {++music}" : $"Voice {++voices}";
                 var advanced = w.IsAdvancedMode;
-                var label = advanced
-                    ? w.RoomSoundLabel($"CD cue {cue.Cue.DiscSeconds:0.#}", kind, cue.Source, TimeSpan.FromSeconds(cue.Cue.Seconds))
-                    : $"▶ {(cue.IsMusicOrNarration ? "♪ " : "")}{cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}";
-                choices.Add(new(label, advanced ? $"{cue.Source}\nDisc second {cue.Cue.DiscSeconds:0.#} · {cue.Cue.Seconds:0.#} s" +
-                    (cue.Text.Length > 0 ? $"\n\"{cue.Text}\"" : "") : null, () => w._cdVoice.PlayNow(disc, picked.Cue)));
+                var label = w.RoomSoundLabel($"CD cue {cue.Cue.DiscSeconds:0.#}", kind, cue.Source, TimeSpan.FromSeconds(cue.Cue.Seconds));
+                var line = cue.Text.Length > 0 ? $"\"{cue.Text}\"" : null;
+                var detail = $"{cue.Source}\nDisc second {cue.Cue.DiscSeconds:0.#} · {cue.Cue.Seconds:0.#} s";
+                var tip = advanced ? line is null ? detail : detail + "\n" + line : line;
+                choices.Add(new(label, tip, () => w._cdVoice.PlayNow(disc, picked.Cue)));
             }
-            // The disc player exposes no playing state: Stop is always offered, as it was.
-            return new(choices, true, w._cdVoice.Stop);
+            return new(choices, w._cdVoice.Playing, w._cdVoice.Stop);
         }
     }
 
@@ -354,6 +374,10 @@ public partial class MainWindow
             return new(room, Find("Room entry"), Find("Room exit"), locals, w._genericLastAction, w._genericAssumptions);
         }
 
+        public RoomIntroEntry GameIntro() =>
+            new(w.NativeIntroOffered, !w._introPreparing && (!w.PlayActive || !w._play!.InCutscene), "Play Game Intro",
+                launch => w.StartGenericIntroAsync(w._game!, launch));
+
         public RoomGameStatusEntry GameStatus() => new(w.InventoryStatusAvailable,
             "Inspect held items and make explicit inventory choices.", w.ShowInventoryStatus);
 
@@ -366,7 +390,8 @@ public partial class MainWindow
             if (w._genericInteractTarget is int selected && w.GenericObjectActions(selected).Count == 0) w._genericInteractTarget = null;
             var name = w._genericInteractTarget is int target ? w.GenericObjectActions(target).FirstOrDefault()?.Target : null;
             // R-6.39: the overview is upfront; no object has to be selected first.
-            return new(true, w._genericSourceActions.Any(action => action.Executable) && w.GenericRoomActionCanStart, name);
+            return new(true, w._genericSourceActions.Any(action => action.Executable) && w.GenericRoomActionCanStart, name,
+                DoubleClickLooks: w._game is { } game && ScummProfile.For(game).DoubleClickLookVerb is not null);
         }
 
         public RoomInteractionOverview? InteractionOverview(bool advanced)

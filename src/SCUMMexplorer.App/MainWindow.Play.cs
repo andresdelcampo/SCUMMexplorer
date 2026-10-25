@@ -476,23 +476,7 @@ public partial class MainWindow
         if (!PlayActive || Keyboard.FocusedElement is System.Windows.Controls.TextBox or System.Windows.Controls.ComboBox) return false;
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
         if (key == Key.F11) return false;
-        if (key == Key.Space && Keyboard.Modifiers == ModifierKeys.None)
-        {
-            // The game's pause key (VAR_PAUSE_KEY, Space in Indiana Jones) is the app's Pause.
-            if (CurrentRoomControls.ReadTransport().PauseEnabled) _playPaused = !_playPaused; // R-6.32: the key acts under the button's condition
-            ShowPlayFrame();
-            UpdatePlaybackControls();
-            e.Handled = true;
-            return true;
-        }
         if (_playAmbient) return false; // A static preview takes no keys but its Pause.
-        if (key == Key.Escape && !_fullscreen)
-        {
-            // R-7.16: Esc skips a cutscene only from its override point (abortCutscene); otherwise the game reads it as its key.
-            SkipPlayCutscene();
-            e.Handled = true;
-            return true;
-        }
         int? code = key switch
         {
             >= Key.F1 and <= Key.F9 => 315 + (key - Key.F1),
@@ -513,9 +497,8 @@ public partial class MainWindow
     {
         if (!PlayTakesInput || string.IsNullOrEmpty(e.Text) || Keyboard.FocusedElement is System.Windows.Controls.TextBox or System.Windows.Controls.ComboBox) return;
         var character = e.Text[0];
-        if (character is < ' ' or > '~' || character == ' ') return;
+        if (character is < ' ' or > '~' || character is ' ' or '.') return; // '.' is Skip line, a shared key (SharedTextInput)
         e.Handled = true;
-        if (character == '.') { _play!.SkipMessage(); UpdatePlaybackControls(); return; }
         _play!.PressPlayKey(character, out _);
         UpdatePlaybackControls();
     }

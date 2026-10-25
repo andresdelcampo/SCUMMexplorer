@@ -3005,27 +3005,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (PlayKeyDown(e)) return;
-        // Full screen: F11 toggles; Escape leaves it unless it is needed to skip a cutscene.
-        if (e.Key == Key.F11 && _game is not null && RoomDisplayLayout.Visibility == Visibility.Visible) { e.Handled = true; SetFullscreen(!_fullscreen); return; }
-        if (e.Key == Key.Escape && _fullscreen && !(GameClickActive && SessionInScene)) { e.Handled = true; SetFullscreen(false); return; }
-        // Playback controls in the explore mode: Escape skips a cutscene
-        // (abortCutscene, as the game's key does) and space pauses or plays the scene (the game's pause key).
-        if (GameClickActive && Keyboard.FocusedElement is not (TextBox or ComboBox) && Keyboard.Modifiers == ModifierKeys.None)
-        {
-            if (e.Key == Key.Escape && SessionInScene)
-            {
-                e.Handled = true;
-                SkipCutscene();
-                return;
-            }
-            if (e.Key == Key.Space && _playback is not null)
-            {
-                e.Handled = true;
-                PlaybackPause_Click(this, new RoutedEventArgs());
-                return;
-            }
-        }
+        if (SharedKeyDown(e) || PlayKeyDown(e)) return;
         if (e.Key is Key.Left or Key.Right && RoomPanKeysAvailable) { RoomViewport_PreviewKeyDown(sender, e); if (e.Handled) return; }
         if (!GameKeysActive) return;
         // F10 arrives as a system key.
@@ -3037,16 +3017,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        // '.' is the engine's talk-stop key (processKeyboard; v3 has no VAR_TALKSTOP_KEY, so it is always on):
-        // it ends the current text's delay and never reaches the scripts. It works whenever the interactive
-        // session runs, also while a cutscene changes rooms.
-        if (e.Text == "." && GameClickActive && IsLoomGame && Keyboard.FocusedElement is not (TextBox or ComboBox))
-        {
-            e.Handled = true;
-            if (!SkipTalk("the game's talk-stop key '.'"))
-                StatusText.Text = "'.' (the game's talk-stop key): no text is shown.";
-            return;
-        }
+        if (SharedTextInput(e)) return;
         // Printable characters go as their ASCII code, as ScummVM passes lastKeyHit.ascii.
         if (!GameKeysActive || e.Text is not { Length: 1 } text || text[0] is < ' ' or > '~') return;
         e.Handled = true;

@@ -96,6 +96,9 @@ public sealed class CdVoicePlayer
         PlayNext();
     }
 
+    /// <summary>A stretch of the disc is playing or waits its turn (the room's Sounds menu offers Stop only then, R-6.24).</summary>
+    public bool Playing => _busy || _queue.Count > 0;
+
     public void Pause() { _paused = true; _player?.Pause(); }
 
     public void Resume() { _paused = false; _player?.Play(); }

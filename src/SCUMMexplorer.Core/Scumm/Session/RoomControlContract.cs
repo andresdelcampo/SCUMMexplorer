@@ -25,6 +25,15 @@ public sealed record RoomPanelAction(string Title, string Summary, string Source
 public sealed record RoomPanelData(int Room, ScummScriptDisassembly? Entry, ScummScriptDisassembly? Exit, IReadOnlyList<int> LocalScripts,
     RoomPanelAction? LastAction, IReadOnlyList<string> Assumptions);
 
+/// <summary>
+/// The header's `Play Game Intro` / `Play Demo Preview` button (R-6.38): whether the game offers it now, whether it can start, its caption, and the start
+/// action (which receives the launch number the click claimed, so a later request can cancel it). What an opening is, and how it starts, is the game's.
+/// </summary>
+public sealed record RoomIntroEntry(bool Offered, bool Enabled, string Caption, Func<int, Task> Start)
+{
+    public static RoomIntroEntry None { get; } = new(false, false, "Play Game Intro", _ => Task.CompletedTask);
+}
+
 /// <summary>One row of an object's Interact menu: the verb's own word, its source (Advanced tooltip) and the exploration action.</summary>
 public sealed record RoomInteractionChoice(string Label, string? Source, Action Run);
 
@@ -75,7 +84,7 @@ public sealed record RoomTransportState(bool PauseEnabled, bool Paused, bool Ste
 }
 
 /// <summary>The Interact button's state (R-6.22): shown, usable now, and the name of the selected object.</summary>
-public sealed record RoomInteractState(bool Visible, bool Enabled, string? TargetName);
+public sealed record RoomInteractState(bool Visible, bool Enabled, string? TargetName, bool DoubleClickLooks = false);
 
 /// <summary>Everything the bar shows now (read by the one shared presenter; no game test belongs in the App).</summary>
 public sealed record RoomControlState(
@@ -106,6 +115,9 @@ public interface IRoomControlProvider
 
     /// <summary>The Advanced panel's data of the room, or null when the game still builds its own (LOOM's `Room entry` and `Last action` come from its exploration session; not migrated yet).</summary>
     RoomPanelData? Panel();
+
+    /// <summary>The game's native opening (R-6.38): offered, enabled, caption and start; the button, its tooltips and the click flow are shared.</summary>
+    RoomIntroEntry GameIntro();
 
     /// <summary>The Game Status entry (the button and its flow are shared; the content is the game's).</summary>
     RoomGameStatusEntry GameStatus();
@@ -141,6 +153,10 @@ public static class RoomControlText
     public const string GlobalCutsceneBusyTip = "Playback is active. Finish or skip it before starting another scene.";
     public const string RoomCutsceneListingTip = "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one).";
     public const string InteractTip = "Choose what to do in this room. Click or right-click an object to start with it.";
+    public const string DoubleClickLookTip = " Double-click an object to look at it.";
+
+    /// <summary>The Interact tooltip; where a double click on an object looks at it (R-1.5, R-6.25.2) it says so, so the gesture can be found.</summary>
+    public static string InteractTooltip(bool doubleClickLooks) => doubleClickLooks ? InteractTip + DoubleClickLookTip : InteractTip;
 
     public static string PauseCaption(bool paused) => paused ? "▶ Play" : "⏸ Pause";
 
