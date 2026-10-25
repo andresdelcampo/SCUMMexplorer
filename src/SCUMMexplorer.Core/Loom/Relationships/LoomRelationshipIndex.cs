@@ -47,12 +47,11 @@ public sealed partial class LoomRelationshipIndexer
 {
     private static readonly Regex CostumeOperation = new(@"(?:\[|;\s*)costume,\s*(?<value>0x[0-9A-Fa-f]+)", RegexOptions.CultureInvariant);
 
-    /// <summary>The relationships the game's code and containers show: the LFL index and room files for old v3 (<c>Ega/</c>), the archive's scripts for the CD game (<c>Cd/</c>).</summary>
+    /// <summary>The relationships the game's code and containers show: the LFL index and room files for LOOM EGA (<c>Ega/</c>), the decoded scripts of any other game (<c>Cd/</c>, first written for the CD game).</summary>
     public LoomRelationshipIndex Build(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        if (game.Id == GameId.LoomVga) return BuildCd(game);
-        if (game.Version != ScummVersion.V3) return LoomRelationshipIndex.Empty;
-        return BuildEga(game);
+        // R-6.50: every game has Connections. LOOM EGA keeps its container-level reader; any other game's links come from its decoded code.
+        return game.Id == GameId.Loom && game.Version == ScummVersion.V3 ? BuildEga(game) : BuildFromCode(game);
     }
 }

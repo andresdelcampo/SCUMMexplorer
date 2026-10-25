@@ -467,12 +467,19 @@
                                     </WrapPanel>
                                 </StackPanel>
                             </Expander>
-                            <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged">
+                            <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged" Background="Transparent" MouseEnter="PlayHost_MouseEnter" MouseLeave="PlayHost_MouseLeave">
                                 <!-- Play in a verb-based game (R-7.8): the game's whole screen, composed every frame from the live session. -->
                                 <Image x:Name="PlayScreenImage" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Focusable="True"
                                        RenderOptions.BitmapScalingMode="NearestNeighbor" AutomationProperties.Name="Game screen"
                                        MouseMove="PlayScreenImage_MouseMove" MouseLeave="PlayScreenImage_MouseLeave"
                                        MouseLeftButtonDown="PlayScreenImage_MouseLeftButtonDown" MouseRightButtonDown="PlayScreenImage_MouseRightButtonDown"/>
+                                <!-- R-6.49: the same full-screen button LOOM shows on its verb strip, over the game's own screen while it is played. -->
+                                <Button x:Name="PlayFullscreenButton" Visibility="Collapsed" Click="Fullscreen_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                        Margin="0,0,10,8" Width="30" Height="26" Padding="0" Background="#CC101821" BorderBrush="#4A5962"
+                                        ToolTip="Full screen (F11, Esc to leave)" AutomationProperties.Name="Full screen">
+                                    <Path Stroke="#E7E0D2" StrokeThickness="1.6" Width="14" Height="14" Stretch="Fill"
+                                          Data="M 0,5 L 0,0 L 5,0 M 9,0 L 14,0 L 14,5 M 14,9 L 14,14 L 9,14 M 5,14 L 0,14 L 0,9"/>
+                                </Button>
                                 <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
                                                   VerticalScrollBarVisibility="Disabled" CanContentScroll="False"

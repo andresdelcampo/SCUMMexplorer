@@ -4,12 +4,12 @@ namespace SCUMMexplorer.Core.Loom;
 
 public sealed partial class LoomRelationshipIndexer
 {
-    private static LoomRelationshipIndex BuildCd(GameLibrary game)
+    private static LoomRelationshipIndex BuildFromCode(GameLibrary game)
     {
         var data = ScummDataSources.For(game);
         var relationships = new List<LoomRelationship>();
-        var resources = game.Resources.Where(r => r.ResourceId.HasValue)
-            .ToDictionary(r => (r.Kind, Id: r.ResourceId!.Value, r.ScriptRoom));
+        var resources = game.Resources.Concat(game.RoomLocalScripts).Where(r => r.ResourceId.HasValue)
+            .GroupBy(r => (r.Kind, Id: r.ResourceId!.Value, r.ScriptRoom)).ToDictionary(g => g.Key, g => g.First());
         GameResource? Target(ResourceKind kind, int id, int room) => kind == ResourceKind.Script && id >= data.GlobalScriptCount
             ? room > 0 ? resources.GetValueOrDefault((kind, id, room)) : null
             : resources.GetValueOrDefault((kind, id, null));

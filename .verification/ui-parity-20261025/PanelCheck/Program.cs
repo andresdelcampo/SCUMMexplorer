@@ -78,7 +78,19 @@ internal static class Program
                     }
                     await Task.Delay(1500);
                 }
+                if (args.Length > 4 && args[4] == "script")
+                {
+                    var local = game.AllScripts.FirstOrDefault(r => r.ScriptRoom is not null) ?? game.AllScripts.First();
+                    Call("SelectResourceInTree", local);
+                    await Task.Delay(4000);
+                    var ssb = new StringBuilder();
+                    Dump(Control<Grid>("ScriptPanel"), ssb, 0);
+                    File.WriteAllText(Path.Combine(output, "script.txt"), local.Name + Environment.NewLine + ssb + Environment.NewLine + Control<TextBox>("ScriptOutput").Text);
+                }
                 Control<Expander>("RoomEntryTraceExpander").IsExpanded = true; Control<Expander>("StateIssuesSection").IsExpanded = true; await Task.Delay(800);
+                foreach (var name in new[] { "RestartButton", "ConnectionsButton", "SessionModeToggle", "PlayFullscreenButton", "AdvanceFrameButton" })
+                    log.AppendLine($"{name}: visible={Control<UIElement>(name).IsVisible} enabled={Control<UIElement>(name).IsEnabled}");
+                log.AppendLine("Connections: " + Control<Button>("ConnectionsButton").Content + " / " + Control<Button>("ConnectionsButton").ToolTip);
                 var sb = new StringBuilder();
                 Dump(Control<Border>("RoomObjectPanel"), sb, 0);
                 File.WriteAllText(Path.Combine(output, "panel.txt"), log + sb.ToString());

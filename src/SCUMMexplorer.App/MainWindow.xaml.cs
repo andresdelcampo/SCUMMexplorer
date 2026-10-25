@@ -317,7 +317,7 @@ public partial class MainWindow : Window
         _game = game;
         _glossary = LoomGlossary.Load(game);
         _usageIndex = LoomUsageIndex.Empty;
-        if (game.Id is GameId.Loom or GameId.LoomVga) _ = BuildUsageIndexAsync(game);
+        _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
         if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
         _setupPlanner = null;
@@ -443,7 +443,12 @@ public partial class MainWindow : Window
         _selectedObject = null;
         ClearObjectList();
         ObjectsNote.Text = "Choose a room.";
-        SessionModeToggle.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
+        SessionModeToggle.Visibility = _session is null && !PlayCutscenes ? Visibility.Collapsed : Visibility.Visible;
+        // R-6.50: the same switch in every game; its tooltip names the game's own interface (LOOM's is the one written in the XAML).
+        var loomTip = SessionModeToggleLoomTip;
+        SessionModeToggle.ToolTip = PlayCutscenes
+            ? "Interactive: play the game through its own verbs, sentence line and inventory; keys go to the game, . skips the text shown, Escape skips a cutscene, space pauses it. Uncheck to inspect: a click then cycles an object's stored images and no script runs."
+            : loomTip;
         SessionActions.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
         SessionStatusText.Text = _session is null ? "" : "Session ready. Select a room to visit it.";
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
@@ -1021,7 +1026,7 @@ public partial class MainWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         // R-6.6: Step ▸ is part of the Advanced bar in every live game (a verb-based game steps its own clock).
-        if (PlayCutscenes) AdvanceFrameButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        if (PlayCutscenes) AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         SessionActions.Visibility = advanced && _session is not null
             ? Visibility.Visible : Visibility.Collapsed;
         RoomCueTime.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -1424,7 +1429,7 @@ public partial class MainWindow : Window
                 StatusText.Text = "Ready";
                 StatusText.ToolTip = "Room background read from the game's own data.";
                 // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
-                if (browsedScene is not null && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
+                if (browsedScene is not null && SessionModeToggle.IsChecked == true && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
                     await StartPlayCoreAsync(resource, token, navigationKind);
                 if (!token.IsCancellationRequested && ReferenceEquals(_game, previewGame))
                 {
@@ -1737,8 +1742,19 @@ public partial class MainWindow : Window
         return sources.Length == 0 ? "" : $" (from {string.Join("; ", sources.Take(2))}{(sources.Length > 2 ? "; …" : "")})";
     }
 
+    private object SessionModeToggleLoomTip => _sessionModeToggleLoomTip ??= SessionModeToggle.ToolTip;
+    private object? _sessionModeToggleLoomTip;
+
     private void SessionMode_Changed(object sender, RoutedEventArgs e)
     {
+        if (PlayCutscenes)
+        {
+            // R-6.50: off = inspection (the room as stored, a click cycles an object's stored images, nothing runs); on = the game plays on from where it was.
+            StopPlay();
+            if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
+            if (_currentRoomResource is { } shown) SelectRoomWithIntent(shown, RoomOpenKind.Catalog, reloadSelected: true);
+            return;
+        }
         _gamePointerTarget = null;
         _session?.SetPointer(null);
         StopScenePlayback();
@@ -1756,6 +1772,7 @@ public partial class MainWindow : Window
 
     private void ResetSession_Click(object sender, RoutedEventArgs e)
     {
+        if (PlayCutscenes) { RestartPlay(); return; }
         if (_game is null || _indexedObjectSnapshot is null) return;
         StopScenePlayback();
         _sceneSound.StopAll("the session was reset");
@@ -1768,6 +1785,27 @@ public partial class MainWindow : Window
             RefreshRoomPreview();
         }
         else SessionStatusText.Text = "Session reset. Select a room to visit it.";
+    }
+
+    /// <summary>
+    /// R-6.50, R-15.2: Restart game state for a game played through <see cref="ScummGameSession"/>: everything explored so far is forgotten (the play session,
+    /// its static preview, its sounds) and the room shown is opened again from the game's boot state, as picking it from the catalog does.
+    /// </summary>
+    private void RestartPlay()
+    {
+        if (_game is null) return;
+        _cutsceneLaunchGeneration++;
+        StopPlay();
+        _sceneSound.StopAll("the game state was restarted");
+        _playSpeech.Detach();
+        _playAmbient = false;
+        _playLiveSource = null;
+        _play = null;
+        _playFolder = null;
+        _playScreen = null;
+        _genericLastAction = null;
+        if (_currentRoomResource is { } room) SelectRoomWithIntent(room, RoomOpenKind.Catalog, reloadSelected: true);
+        else StatusText.Text = "Game state restarted. Select a room to visit it.";
     }
 
     private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
@@ -2126,13 +2164,6 @@ public partial class MainWindow : Window
     private void StartRelationshipIndexBuild(GameLibrary game)
     {
         var generation = Interlocked.Increment(ref _relationshipBuildGeneration);
-        if (game.Id != GameId.LoomVga && (game.Id != GameId.Loom || game.Version != ScummVersion.V3))
-        {
-            _relationshipIndex = LoomRelationshipIndex.Empty;
-            UpdateConnectionsButton();
-            return;
-        }
-
         UpdateConnectionsButton();
         _ = BuildRelationshipIndexAsync(game, generation);
     }
@@ -2170,7 +2201,7 @@ public partial class MainWindow : Window
             _usageIndex = index;
             if (_selectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
         }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or NotSupportedException or InvalidOperationException) { }
     }
 
     /// <summary>Names the story bits after the catalog scene that sets them (about a second of scanning, so off the UI thread).</summary>
@@ -2192,7 +2223,7 @@ public partial class MainWindow : Window
     private void UpdateScriptUsedBy(GameResource resource)
     {
         ScriptUsedByList.Children.Clear();
-        if (resource.Kind != ResourceKind.Script || resource.ResourceId is not int id || _game?.Id is not (GameId.Loom or GameId.LoomVga) || !IsAdvancedMode)
+        if (resource.Kind != ResourceKind.Script || resource.ResourceId is not int id || !IsAdvancedMode)
         {
             ScriptUsedByExpander.Visibility = Visibility.Collapsed;
             return;
@@ -2261,6 +2292,8 @@ public partial class MainWindow : Window
     private readonly List<(UIElement Element, Visibility Visibility)> _fullscreenHidden = [];
     private Thickness _contentMarginBefore;
 
+    private void PlayHost_MouseEnter(object sender, MouseEventArgs e) => PlayFullscreenButton.Visibility = PlayScreenImage.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+    private void PlayHost_MouseLeave(object sender, MouseEventArgs e) => PlayFullscreenButton.Visibility = Visibility.Collapsed;
     private void VerbStrip_MouseEnter(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Visible;
     private void VerbStrip_MouseLeave(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Collapsed;
     private void Fullscreen_Click(object sender, RoutedEventArgs e) => SetFullscreen(!_fullscreen);
@@ -2321,8 +2354,7 @@ public partial class MainWindow : Window
     private void UpdateConnectionsButton()
     {
         UpdateBackToSceneButton();
-        if (!IsAdvancedMode || _selectedResource is null ||
-            (_game?.Id != GameId.LoomVga && _game is not { Id: GameId.Loom, Version: ScummVersion.V3 }))
+        if (!IsAdvancedMode || _selectedResource is null || _game is null)
         {
             ConnectionsButton.Visibility = Visibility.Collapsed;
             return;
