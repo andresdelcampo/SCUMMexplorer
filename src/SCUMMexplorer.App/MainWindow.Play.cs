@@ -317,7 +317,7 @@ public partial class MainWindow
     private void ShowPlayFrame()
     {
         if (_playScreen is null || _play is null) return;
-        var frame = _playScreen.Compose(_playFrame);
+        var frame = _playScreen.Compose(_playFrame, wide: NormalRoomWidthToggle.IsChecked != true);
         _playShown = frame;
         if (frame.RoomId is int shownRoom && _currentRoomResource?.ResourceId != shownRoom &&
             _game?.Rooms.FirstOrDefault(r => r.ResourceId == shownRoom) is { } nativeRoom)
@@ -333,8 +333,8 @@ public partial class MainWindow
                 .FirstOrDefault(card => Equals(card.Tag, nativeRoom))?.BringIntoView();
             RefreshPlayRoomActions();
         }
-        _playBitmap ??= new WriteableBitmap(ScummPlayFrame.Width, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
-        _playBitmap.WritePixels(new Int32Rect(0, 0, ScummPlayFrame.Width, ScummPlayFrame.Height), frame.Pixels, ScummPlayFrame.Width * 4, 0);
+        if (_playBitmap is null || _playBitmap.PixelWidth != frame.PixelWidth) _playBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
+        _playBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
         PlayScreenImage.Source = _playBitmap;
         // R-7.9: the game's cursor replaces the system pointer while the game shows it, and nothing shows while it is off.
         PlayScreenImage.Cursor = Cursors.None;
@@ -352,30 +352,52 @@ public partial class MainWindow
     // The image's point as a game screen point (0..319, 0..199).
     private (int X, int Y)? PlayPoint(MouseEventArgs e)
     {
-        return PlayPointAt(e.GetPosition(PlayScreenImage), PlayScreenImage.ActualWidth, PlayScreenImage.ActualHeight);
+        return PlayPointAt(e.GetPosition(PlayScreenImage), PlayScreenImage.ActualWidth, PlayScreenImage.ActualHeight, _playShown?.PixelWidth ?? ScummPlayFrame.Width);
     }
 
     // Match Image.Stretch=Uniform, including the unused bands around the native screen.
-    private static (int X, int Y)? PlayPointAt(Point position, double width, double height)
+    private static (int X, int Y)? PlayPointAt(Point position, double width, double height, int frameWidth = ScummPlayFrame.Width)
     {
         if (width <= 0 || height <= 0) return null;
-        var scale = Math.Min(width / ScummPlayFrame.Width, height / ScummPlayFrame.Height);
-        var offsetX = (width - ScummPlayFrame.Width * scale) / 2;
+        var scale = Math.Min(width / frameWidth, height / ScummPlayFrame.Height);
+        var offsetX = (width - frameWidth * scale) / 2;
         var offsetY = (height - ScummPlayFrame.Height * scale) / 2;
         var nativeX = (position.X - offsetX) / scale;
         var nativeY = (position.Y - offsetY) / scale;
         if (nativeX < 0 || nativeY < 0) return null;
         var x = (int)nativeX;
         var y = (int)nativeY;
-        return x is >= 0 and < ScummPlayFrame.Width && y is >= 0 and < ScummPlayFrame.Height ? (x, y) : null;
+        return x >= 0 && x < frameWidth && y is >= 0 and < ScummPlayFrame.Height ? (x, y) : null;
+    }
+
+    /// <summary>
+    /// A point of the shown frame as a point of the game's own 320 × 200 screen. In wide mode (R-6.49) the room rows show the whole room: a point the game's
+    /// camera shows maps straight; one it does not show is, when <paramref name="jump"/> (a click), first shown by putting the camera there at once, as
+    /// <c>setCameraAt</c> would, so the game never receives a click for a place it is not showing. The verb and text rows are the screen's own.
+    /// </summary>
+    private (int X, int Y)? GamePoint((int X, int Y)? point, bool jump)
+    {
+        if (point is not { } p || _playShown is not { } frame || !frame.Wide || _play is not { } play) return point;
+        if (p.Y >= frame.RoomTop && p.Y < frame.RoomBottom)
+        {
+            var screenX = p.X - frame.CameraLeft;
+            if (screenX is >= 0 and < ScummPlayFrame.Width) return (screenX, p.Y);
+            if (!jump || !PlayTakesInput) return null;
+            play.JumpCameraTo(p.X);
+            screenX = p.X - play.ViewLeft;
+            return screenX is >= 0 and < ScummPlayFrame.Width ? (screenX, p.Y) : null;
+        }
+        var verbX = p.X - frame.VerbLeft;
+        return verbX is >= 0 and < ScummPlayFrame.Width ? (verbX, p.Y) : null;
     }
 
     private void PlayScreenImage_MouseMove(object sender, MouseEventArgs e)
     {
         if (!PlayActive) return;
-        if (_playAmbient) { UpdatePlayOverlayHover(PlayPoint(e)); return; }
-        _play!.PointAtScreen(PlayPoint(e));
-        UpdatePlayOverlayHover(PlayPoint(e));
+        var shownPoint = PlayPoint(e);
+        if (_playAmbient) { UpdatePlayOverlayHover(shownPoint); return; }
+        _play!.PointAtScreen(GamePoint(shownPoint, jump: false));
+        UpdatePlayOverlayHover(shownPoint);
         if (_playPaused) ShowPlayFrame();
     }
 
@@ -394,12 +416,13 @@ public partial class MainWindow
         SelectGenericInteractAt(point);
         // R-1.5 / R-6.25.2: where the game's own input leaves a double click free (ScummProfile.DoubleClickLookVerb), the second press of a double click
         // looks at the object under it through the game's own sentence path; the first press was the normal click. Elsewhere it is just a second click.
-        if (e.ClickCount == 2 && PlayObjectAt(point) && _play!.DoubleClickLook(point.X, point.Y, out _) is not null)
+        if (GamePoint(point, jump: true) is not { } gamePoint) return;
+        if (e.ClickCount == 2 && PlayObjectAt(point) && _play!.DoubleClickLook(gamePoint.X, gamePoint.Y, out _) is not null)
         {
             UpdatePlaybackControls();
             return;
         }
-        if (_play!.ClickScreen(point.X, point.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
+        if (_play!.ClickScreen(gamePoint.X, gamePoint.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
         UpdatePlaybackControls();
     }
 
@@ -413,7 +436,7 @@ public partial class MainWindow
             if (PlayTakesInput && TryOpenGenericInteractAt(PlayPoint(e))) e.Handled = true;
             return;
         }
-        if (PlayPoint(e) is not { } point) return;
+        if (GamePoint(PlayPoint(e), jump: true) is not { } point) return;
         PlayScreenImage.Focus();
         e.Handled = true;
         PlayRightClick(point.X, point.Y);

@@ -17,6 +17,16 @@ public sealed class ScummRoomOverlayTests
         Assert.Null(viewport.ToRoom(320, 100));
     }
 
+    [Fact]
+    public void WideFrameProjectionIsTheWholeRoomAtItsOwnWidth()
+    {
+        // R-6.49 wide mode: the room rows show the whole room, so room x is frame x and the viewport is as wide as the frame.
+        var viewport = new ScummRoomViewport(0, 16, 144, 480);
+        Assert.Equal((450, 84), viewport.ToRoom(450, 100));
+        Assert.Null(viewport.ToRoom(480, 100));
+        Assert.Null(new ScummRoomViewport(0, 16, 144).ToRoom(450, 100));
+    }
+
     [Theory]
     [InlineData("mmansion ega en")]
     [InlineData("mmansionE ega es")]

@@ -10,6 +10,18 @@ public sealed record ScummPlayFrame(uint[] Pixels, int? RoomId, int RoomTop, int
 {
     public const int Width = 320;
     public const int Height = 200;
+
+    /// <summary>
+    /// R-6.49 wide mode: the frame is as wide as the room, the room rows show the whole room (<see cref="ViewLeft"/> is then 0, so room x is frame x),
+    /// the verb area and text rows sit at <see cref="VerbLeft"/>, and <see cref="CameraLeft"/> says which 320 columns the game's own camera shows.
+    /// A normal frame is 320 wide, <see cref="CameraLeft"/> equals <see cref="ViewLeft"/> and <see cref="VerbLeft"/> is 0.
+    /// </summary>
+    public int PixelWidth { get; init; } = Width;
+    public int CameraLeft { get; init; }
+    public int VerbLeft { get; init; }
+    public bool Wide => PixelWidth != Width;
+
+    public ScummRoomViewport Viewport => new(ViewLeft, RoomTop, RoomBottom, PixelWidth);
 }
 
 /// <summary>
@@ -66,13 +78,17 @@ public sealed class ScummPlayScreen
     }
 
     /// <summary>The screen at this frame; <paramref name="frame"/> drives the cursor's colour cycle.</summary>
-    public ScummPlayFrame Compose(int frame)
+    public ScummPlayFrame Compose(int frame, bool wide = false)
     {
-        var pixels = new uint[ScummPlayFrame.Width * ScummPlayFrame.Height];
-        Array.Fill(pixels, 0xFF000000u);
         var (top, bottom) = _session.MainScreen;
-        var viewLeft = _session.ViewLeft;
+        var cameraLeft = _session.ViewLeft;
         var scene = Scene();
+        // R-6.49: wide mode draws the whole room; a room that is not wider than the screen is drawn as always.
+        var pixelWidth = wide && scene is not null ? Math.Max(ScummPlayFrame.Width, scene.Room.Width) : ScummPlayFrame.Width;
+        var viewLeft = pixelWidth == ScummPlayFrame.Width ? cameraLeft : 0;
+        var verbLeft = (pixelWidth - ScummPlayFrame.Width) / 2;
+        var pixels = new uint[pixelWidth * ScummPlayFrame.Height];
+        Array.Fill(pixels, 0xFF000000u);
         // updatePalette (palette.cpp): with _shadowPalRemap (set by the v3 constructor outside CGA/Hercules/Mac b/w, scumm.cpp, read 16 October 2026) the
         // shadow palette of roomOps roomPalette remaps the whole displayed palette, so verbs, messages and the cursor follow it as the room does (S6 Indy3Vga:
         // the 256-colour gym's light switch darkens the screen through it).
@@ -88,15 +104,20 @@ public sealed class ScummPlayScreen
             {
                 var roomY = y - top;
                 if (roomY >= scene.Room.Height) break;
-                for (var x = 0; x < ScummPlayFrame.Width; x++)
+                for (var x = 0; x < pixelWidth; x++)
                 {
                     var roomX = x + viewLeft;
                     if (roomX >= width) break;
                     var index = roomY * width + roomX;
-                    pixels[y * ScummPlayFrame.Width + x] = actors.IsDrawn(index)
+                    pixels[y * pixelWidth + x] = actors.IsDrawn(index)
                         ? Colour(actorPalette, actors.Pixels[index]) : Colour(background, room[index]);
                 }
             }
+            // The two edges of what the game's own camera shows, as a dotted line, so the user can see where the game's screen is in the whole room.
+            if (pixelWidth != ScummPlayFrame.Width)
+                for (var y = top; y < bottom; y += 2)
+                    foreach (var edge in new[] { cameraLeft, cameraLeft + ScummPlayFrame.Width - 1 })
+                        if (edge < pixelWidth) pixels[y * pixelWidth + edge] = 0xFFFFFFFFu;
         }
         var verbs = _session.PlayVerbArea();
         for (var y = 0; y < verbs.Height; y++)
@@ -104,13 +125,19 @@ public sealed class ScummPlayScreen
             {
                 var screenY = ScummVerbArea.Top + y;
                 if (screenY < bottom || screenY >= ScummPlayFrame.Height) continue;
-                pixels[screenY * ScummPlayFrame.Width + x] = Colour(basePalette, verbs.Pixels[y * verbs.Width + x]);
+                pixels[screenY * pixelWidth + verbLeft + x] = Colour(basePalette, verbs.Pixels[y * verbs.Width + x]);
             }
         if ((_session.PlayCharset(0) ?? _session.CurrentPlayCharset()) is { } charset)
         {
             var layer = charset.RenderMessages(_session.Messages.OnScreen, number => number is int n ? _session.PlayCharset(n) : null);
             for (var i = 0; i < layer.Pixels.Length; i++)
-                if (layer.Pixels[i] != ScummV3MessageRenderer.Transparent) pixels[i] = Colour(basePalette, layer.Pixels[i]);
+                if (layer.Pixels[i] != ScummV3MessageRenderer.Transparent)
+                {
+                    var (mx, my) = (i % ScummPlayFrame.Width, i / ScummPlayFrame.Width);
+                    // The game's messages are screen points of its camera; the text and verb rows are not part of the room.
+                    var left = pixelWidth == ScummPlayFrame.Width ? 0 : my >= top && my < bottom ? cameraLeft : verbLeft;
+                    pixels[my * pixelWidth + left + mx] = Colour(basePalette, layer.Pixels[i]);
+                }
         }
         var cursor = _session.CursorShown;
         if (cursor && _session.ScreenPointer is { } pointer)
@@ -119,10 +146,11 @@ public sealed class ScummPlayScreen
             foreach (var (dx, dy) in _data is ScummV2DataSource ? OldCursorPoints : CursorPoints)
             {
                 var (px, py) = (pointer.X + dx, pointer.Y + dy);
-                if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * ScummPlayFrame.Width + px] = colour;
+                var left = pixelWidth == ScummPlayFrame.Width ? 0 : pointer.Y >= top && pointer.Y < bottom ? cameraLeft : verbLeft;
+                if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * pixelWidth + left + px] = colour;
             }
         }
-        return new ScummPlayFrame(pixels, scene?.RoomId, top, bottom, viewLeft, verbs, cursor);
+        return new ScummPlayFrame(pixels, scene?.RoomId, top, bottom, viewLeft, verbs, cursor) { PixelWidth = pixelWidth, CameraLeft = cameraLeft, VerbLeft = verbLeft };
     }
 
     // ScummEngine_v5::resetCursors, cursor 0: one word per row, bit 15 is the left column; setBuiltinCursor paints the set bits.

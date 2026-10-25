@@ -63,6 +63,25 @@ internal static class Program
                 var resource = game.Rooms.First(r => r.ResourceId == room);
                 Call("SelectResourceInTree", resource);
                 await Task.Delay(9000);
+                if (args.Length > 3 && args[3] == "wide")
+                {
+                    var framing = Control<CheckBox>("NormalRoomWidthToggle");
+                    framing.IsChecked = false;
+                    await Task.Delay(2500);
+                    var shown = Field("_playShown");
+                    var st = shown!.GetType();
+                    log.AppendLine($"frame width {st.GetProperty("PixelWidth")!.GetValue(shown)} camera left {st.GetProperty("CameraLeft")!.GetValue(shown)} view left {st.GetProperty("ViewLeft")!.GetValue(shown)} wide {st.GetProperty("Wide")!.GetValue(shown)}");
+                    object? play = Field("_play");
+                    var cam = play!.GetType().GetProperty("CameraX")!;
+                    var gp = typeof(MainWindow).GetMethod("GamePoint", Private)!;
+                    log.AppendLine($"camera before {cam.GetValue(play)}; panel {Control<UIElement>("PlayScrollButtonsPanel").Visibility}");
+                    var top = (int)st.GetProperty("RoomTop")!.GetValue(shown)!;
+                    log.AppendLine("hover far point (no jump): " + gp.Invoke(window, new object?[] { ((int, int)?)(450, top + 60), false }));
+                    log.AppendLine($"camera after hover {cam.GetValue(play)}");
+                    log.AppendLine("click far point (jump): " + gp.Invoke(window, new object?[] { ((int, int)?)(450, top + 60), true }));
+                    log.AppendLine($"camera after click {cam.GetValue(play)}");
+                    await Task.Delay(1200);
+                }
                 if (args.Length > 3 && args[3].StartsWith("pan"))
                 {
                     object? play = Field("_play");

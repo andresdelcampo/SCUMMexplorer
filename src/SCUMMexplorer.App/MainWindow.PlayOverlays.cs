@@ -61,7 +61,7 @@ public partial class MainWindow
     private string PlayHoverKey((int X, int Y)? point)
     {
         if (point is not { } p || _playShown is not { } frame ||
-            new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom).ToRoom(p.X, p.Y) is not { } at) return "";
+            frame.Viewport.ToRoom(p.X, p.Y) is not { } at) return "";
         return RoomHotspotRules.HoverKey(_playOverlayHotspots, at.X, at.Y, _playHighlightId is null && ObjectAreaMode != DisplayMode.Never, DoorwayMode == DisplayMode.Hover);
     }
 
@@ -69,7 +69,7 @@ public partial class MainWindow
     private bool PlayObjectAt((int X, int Y)? point)
     {
         if (point is not { } p || _playShown is not { } frame) return false;
-        if (new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom).ToRoom(p.X, p.Y) is not { } at) return false;
+        if (frame.Viewport.ToRoom(p.X, p.Y) is not { } at) return false;
         // The scene as the game leaves it now (the overlays' copy is refreshed only while an aid is visible).
         return _playScreen?.Scene() is { } scene && ScummRoomOverlays.Objects(scene, _playDoorwayTargets).Any(item => item.Contains(at.X, at.Y));
     }
@@ -78,7 +78,7 @@ public partial class MainWindow
     private RoomHotspot? PlayHotspotAt((int X, int Y)? point)
     {
         if (point is not { } p || _playShown is not { } frame) return null;
-        if (new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom).ToRoom(p.X, p.Y) is not { } at) return null;
+        if (frame.Viewport.ToRoom(p.X, p.Y) is not { } at) return null;
         var provider = PlayHotspots;
         return RoomHotspotRules.PointedAt(provider.Hotspots().Where(item => !item.IsDoorway && provider.HasActions(item)), at.X, at.Y);
     }
@@ -124,19 +124,19 @@ public partial class MainWindow
         _playOverlayCanvas.Children.Clear();
         _playOverlayCanvas.Visibility = wanted ? Visibility.Visible : Visibility.Collapsed;
         if (!wanted || _playOverlayCanvas.ActualWidth <= 0 || _playOverlayCanvas.ActualHeight <= 0) return;
-        var scale = Math.Min(_playOverlayCanvas.ActualWidth / ScummPlayFrame.Width, _playOverlayCanvas.ActualHeight / ScummPlayFrame.Height);
-        var offsetX = (_playOverlayCanvas.ActualWidth - ScummPlayFrame.Width * scale) / 2;
+        var scale = Math.Min(_playOverlayCanvas.ActualWidth / frame.PixelWidth, _playOverlayCanvas.ActualHeight / ScummPlayFrame.Height);
+        var offsetX = (_playOverlayCanvas.ActualWidth - frame.PixelWidth * scale) / 2;
         var offsetY = (_playOverlayCanvas.ActualHeight - ScummPlayFrame.Height * scale) / 2;
-        var viewport = new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom);
+        var viewport = frame.Viewport;
         _playOverlayCanvas.Clip = new RectangleGeometry(new Rect(offsetX, offsetY + frame.RoomTop * scale,
-            ScummPlayFrame.Width * scale, Math.Max(0, frame.RoomBottom - frame.RoomTop) * scale));
+            frame.PixelWidth * scale, Math.Max(0, frame.RoomBottom - frame.RoomTop) * scale));
         Point Map(double x, double y) => new(offsetX + (x - frame.ViewLeft) * scale, offsetY + (y + frame.RoomTop) * scale);
 
         if (IsAdvancedMode && RoomMaskToggle.IsChecked == true && RoomMaskToggle.IsEnabled)
         {
-            var tint = BitmapSource.Create(ScummPlayFrame.Width, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null,
-                ScummRoomOverlays.DepthPixels(scene, viewport), ScummPlayFrame.Width * 4);
-            var image = new Image { Source = tint, Width = ScummPlayFrame.Width * scale, Height = ScummPlayFrame.Height * scale };
+            var tint = BitmapSource.Create(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null,
+                ScummRoomOverlays.DepthPixels(scene, viewport), frame.PixelWidth * 4);
+            var image = new Image { Source = tint, Width = frame.PixelWidth * scale, Height = ScummPlayFrame.Height * scale };
             RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.NearestNeighbor);
             Canvas.SetLeft(image, offsetX); Canvas.SetTop(image, offsetY);
             _playOverlayCanvas.Children.Add(image);
@@ -157,7 +157,7 @@ public partial class MainWindow
                 _playOverlayCanvas.Children.Add(polygon);
                 Label(box.Index.ToString(), Map(box.Corners.Average(point => point.X), box.Corners.Average(point => point.Y)), color);
             }
-        var surface = new RoomSurface(_playOverlayCanvas, scale, Map, offsetX, offsetX + ScummPlayFrame.Width * scale);
+        var surface = new RoomSurface(_playOverlayCanvas, scale, Map, offsetX, offsetX + frame.PixelWidth * scale);
         var pointInRoom = _playOverlayPointer is { } pointer ? viewport.ToRoom(pointer.X, pointer.Y) : null;
         var hotspots = PlayHotspots.Hotspots();
         _playOverlayHotspots = hotspots;

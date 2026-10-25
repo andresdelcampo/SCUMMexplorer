@@ -2704,6 +2704,7 @@ public partial class MainWindow : Window
         SaveViewOptions();
         StopRoomPan();
         UpdateRoomViewportLayout();
+        if (PlayActive) ShowPlayFrame(); // R-6.49: the played game's screen follows the framing too
     }
 
     private void CostumePoseScrollViewer_SizeChanged(object sender, SizeChangedEventArgs e) => ApplyCostumePoseScale();

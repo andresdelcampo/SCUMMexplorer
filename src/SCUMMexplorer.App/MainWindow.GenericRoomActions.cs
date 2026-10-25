@@ -298,7 +298,7 @@ public partial class MainWindow
     private int? GenericObjectAt((int X, int Y)? point)
     {
         if (point is not { } p || _playOverlayScene is not { } scene || _playShown is not { } frame) return null;
-        var viewport = new ScummRoomViewport(frame.ViewLeft, frame.RoomTop, frame.RoomBottom);
+        var viewport = frame.Viewport;
         if (viewport.ToRoom(p.X, p.Y) is not { } at) return null;
         return ScummRoomOverlays.Objects(scene, _playDoorwayTargets)
             .FirstOrDefault(o => o.Contains(at.X, at.Y) && GenericObjectActions(o.ObjectId).Count > 0)?.ObjectId;
