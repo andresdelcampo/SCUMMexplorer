@@ -63,6 +63,12 @@ public sealed record GameLibrary(
     /// <summary>The SCUMM v4 archive (DISK01.LEC; LOOM CD); null for every other game.</summary>
     public ScummV4Archive? V4Archive { get; init; }
 
+    /// <summary>Room-local scripts of an index-driven game (old v1 to v3), read from its rooms; the other games list theirs among <see cref="Resources"/>.</summary>
+    public IReadOnlyList<GameResource> RoomLocalScripts { get; init; } = [];
+
+    /// <summary>Every script the tree offers: the indexed ones and the room-local ones.</summary>
+    public IEnumerable<GameResource> AllScripts => Resources.Where(r => r.Kind == ResourceKind.Script).Concat(RoomLocalScripts);
+
     /// <summary>The disks of a v4 game that is only browsed (rooms, costumes, sounds; not LOOM CD); null for every other game.</summary>
     public ScummV4Disks? V4Disks { get; init; }
 

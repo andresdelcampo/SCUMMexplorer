@@ -15,14 +15,15 @@ public sealed record RoomGameStatusEntry(bool Available, string Tip, Action Open
     public static RoomGameStatusEntry None { get; } = new(false, "", () => { });
 }
 
-/// <summary>One entry of an Advanced inspection section: a script or an interaction, with the game's own description and its raw code.</summary>
-public sealed record RoomInspectionItem(string Header, string? Detail, ScummScriptDisassembly? Code);
+/// <summary>The last exploration action of the room, for the Advanced panel's `Last action`: its title, the sentence of the summary, the source (tooltip), what the run had to assume and the verb's code.</summary>
+public sealed record RoomPanelAction(string Title, string Summary, string Source, IReadOnlyList<string> Uncertainties, ScummScriptDisassembly? Code);
 
-/// <summary>A headed group of inspection entries (room entry/exit and local scripts, interactions).</summary>
-public sealed record RoomInspectionSection(string Heading, IReadOnlyList<RoomInspectionItem> Items);
-
-/// <summary>What the Advanced right panel lists for the room: the sections and the relationships (resource links) decoded from their code.</summary>
-public sealed record RoomInspection(IReadOnlyList<RoomInspectionSection> Sections, IReadOnlyList<ScummScriptEvent> Relationships);
+/// <summary>
+/// What the Advanced right panel draws for the room besides the shared lists (R-6.43): the entry and exit scripts, the numbers of the room's local scripts
+/// (the panel offers them as buttons to their tree entries), the last action and the assumptions. Data only; the App draws it once for every game.
+/// </summary>
+public sealed record RoomPanelData(int Room, ScummScriptDisassembly? Entry, ScummScriptDisassembly? Exit, IReadOnlyList<int> LocalScripts,
+    RoomPanelAction? LastAction, IReadOnlyList<string> Assumptions);
 
 /// <summary>One row of an object's Interact menu: the verb's own word, its source (Advanced tooltip) and the exploration action.</summary>
 public sealed record RoomInteractionChoice(string Label, string? Source, Action Run);
@@ -103,8 +104,8 @@ public interface IRoomControlProvider
 
     RoomInteractState ReadInteract();
 
-    /// <summary>The Advanced inspection of the room, or null when the game shows its own (LOOM's `Room entry` trace carries readable text the other versions lack, R-6.25.4).</summary>
-    RoomInspection? Inspection();
+    /// <summary>The Advanced panel's data of the room, or null when the game still builds its own (LOOM's `Room entry` and `Last action` come from its exploration session; not migrated yet).</summary>
+    RoomPanelData? Panel();
 
     /// <summary>The Game Status entry (the button and its flow are shared; the content is the game's).</summary>
     RoomGameStatusEntry GameStatus();

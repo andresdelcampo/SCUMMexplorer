@@ -1,5 +1,6 @@
 using System.Globalization;
 using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Scumm;
 
 namespace SCUMMexplorer.Core.Discovery;
 
@@ -191,7 +192,38 @@ public sealed class GameFolderScanner
         if (recognizedBy.Length > 0 && gameId != GameId.Unknown)
             note += edition is not null ? $" Recognised by known data: {edition.Label}." : $" Recognised by: {recognizedBy}.";
         // The classic index is never "parsed" by the old-v3 reader, so its rooms and costumes come from the loop above only when the classic index was read.
-        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo, edition?.Label ?? "") { V1Game = classic?.Game };
+        var library = new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo, edition?.Label ?? "") { V1Game = classic?.Game };
+        return isV1 || indexWasParsed ? WithRoomLocalScripts(library) : library;
+    }
+
+    /// <summary>
+    /// R-5.9, R-6.51: a room's local scripts are tree entries (<c>Room NN local script N</c>) in every game, as in LOOM CD, so the Advanced panel's
+    /// event buttons can open them. The old-v3 index lists only global scripts; the local ones are read from the rooms through the game's data source
+    /// and kept apart from <see cref="GameLibrary.Resources"/> (whose scripts all readers treat as the index's global ones).
+    /// </summary>
+    private static GameLibrary WithRoomLocalScripts(GameLibrary library)
+    {
+        try
+        {
+            var data = ScummDataSources.For(library);
+            var local = new List<GameResource>();
+            foreach (var room in library.Rooms)
+            {
+                if (room.ResourceId is not int number) continue;
+                try
+                {
+                    foreach (var id in data.RoomLocalScriptIds(number))
+                        local.Add(new GameResource($"Room {number:00} local script {id}", ResourceKind.Script, room.FilePath, id,
+                            $"Room-local script of room {number:00}.", room.ContainerFileNumber, null, ScriptRoom: number));
+                }
+                catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or EndOfStreamException or ArgumentException) { }
+            }
+            return local.Count == 0 ? library : library with { RoomLocalScripts = local };
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or EndOfStreamException or ArgumentException)
+        {
+            return library;
+        }
     }
 
     /// <summary>

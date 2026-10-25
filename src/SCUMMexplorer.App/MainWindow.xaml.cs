@@ -499,7 +499,7 @@ public partial class MainWindow : Window
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.IndianaJones3 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
                 !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && kind != ResourceKind.Executable) continue;
-            var group = game.Resources.Where(resource => resource.Kind == kind && !IsDiscTrack(game, resource)).ToArray();
+            var group = (kind == ResourceKind.Script ? game.AllScripts : game.Resources.Where(resource => resource.Kind == kind && !IsDiscTrack(game, resource))).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
             foreach (var item in group)
@@ -1243,6 +1243,8 @@ public partial class MainWindow : Window
                     ? (resource.ScriptRoom is int scriptRoom ? _cdData.RoomLocalScript(scriptRoom, resource.ResourceId!.Value)
                         : _cdData.GlobalScript(resource.ResourceId!.Value)) ?? throw new InvalidDataException("This script is not stored in the CD data.")
                     : _game?.V4Disks is not null ? DecodeBrowsedV4Script(resource)
+                    : resource.ScriptRoom is int localRoom && _game is not null
+                        ? ScummDataSources.For(_game).RoomLocalScript(localRoom, resource.ResourceId!.Value) ?? throw new InvalidDataException("This room-local script is not stored in the room.")
                     : _scriptReader.Decode(resource);
                 _scriptShown = disassembly;
                 ScriptOutput.Text = FormatScript(disassembly);
@@ -1880,19 +1882,9 @@ public partial class MainWindow : Window
         var host = inPanel ? ObjectActionsList : ObjectVerbButtons;
         foreach (var choice in choices.OrderBy(item => LoomVerbNames.Order(item.Verb.VerbId)))
         {
-            var button = new Button
-            {
-                Content = LoomVerbNames.Label(choice.Verb.VerbId),
-                ToolTip = $"Object {choice.Object.Id} · verb 0x{choice.Verb.VerbId:X2} · code 0x{choice.Verb.ScriptOffset:X4}. " +
-                          "This directly runs the object verb; input dispatch and walking are not simulated.",
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(8, 4, 8, 4),
-                Margin = new Thickness(0, 0, 0, 3),
-                Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderThickness = new Thickness(0)
-            };
+            var button = ActionPanelButton(LoomVerbNames.Label(choice.Verb.VerbId),
+                $"Object {choice.Object.Id} · verb 0x{choice.Verb.VerbId:X2} · code 0x{choice.Verb.ScriptOffset:X4}. " +
+                "This directly runs the object verb; input dispatch and walking are not simulated.");
             button.Click += (_, _) => ActivateObjectVerb(choice.Object, choice.Verb, play: true);
             host.Children.Add(button);
         }
@@ -1963,6 +1955,35 @@ public partial class MainWindow : Window
         return false;
     }
 
+    /// <summary>One flat row of the panels' script and event lists: a click opens the resource in the tree.</summary>
+    private void AddResourceButton(StackPanel container, string label, GameResource target)
+    {
+        var button = new Button
+        {
+            Content = label,
+            ToolTip = $"Open {target.Name}",
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Left,
+            Padding = new Thickness(7, 2, 7, 2),
+            Margin = new Thickness(0, 1, 0, 1),
+            Background = new SolidColorBrush(Color.FromRgb(31, 44, 56)),
+            Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
+            BorderThickness = new Thickness(0)
+        };
+        button.Click += (_, _) => SelectResourceInTree(target);
+        container.Children.Add(button);
+    }
+
+    /// <summary>A verb button of the `ACTIONS · object` section (the same look in every game).</summary>
+    private static Button ActionPanelButton(string content, string tip) => new()
+    {
+        Content = content, ToolTip = tip,
+        HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left,
+        Padding = new Thickness(8, 4, 8, 4), Margin = new Thickness(0, 0, 0, 3),
+        Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)), Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
+        BorderThickness = new Thickness(0)
+    };
+
     /// <summary>
     /// The events a script or room entry causes, digestibly: one flat row per thing it starts or opens (grouped, with a count,
     /// and a click opens it), then one line that counts the rest (character actions, dialogue...) with the full list in its tooltip.
@@ -1997,20 +2018,7 @@ public partial class MainWindow : Window
         foreach (var (target, verb, certainty, count) in rows)
         {
             var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {LoomResourceNames.Label(_glossary, target)}{(count > 1 ? $" ×{count}" : "")}";
-            var button = new Button
-            {
-                Content = label,
-                ToolTip = $"Open {target.Name}",
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(7, 2, 7, 2),
-                Margin = new Thickness(0, 1, 0, 1),
-                Background = new SolidColorBrush(Color.FromRgb(31, 44, 56)),
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderThickness = new Thickness(0)
-            };
-            button.Click += (_, _) => SelectResourceInTree(target);
-            container.Children.Add(button);
+            AddResourceButton(container, label, target);
         }
         if (others.Count > 0)
         {
@@ -2104,7 +2112,7 @@ public partial class MainWindow : Window
     {
         if (scriptEvent.TargetKind is not (ResourceKind.Sound or ResourceKind.Script or ResourceKind.Room) ||
             scriptEvent.TargetId is not int resourceId) return null;
-        return _game?.Resources.FirstOrDefault(resource =>
+        return (scriptEvent.TargetKind == ResourceKind.Script ? _game?.AllScripts : _game?.Resources)?.FirstOrDefault(resource =>
             resource.Kind == scriptEvent.TargetKind && resource.ResourceId == resourceId &&
             (resource.ScriptRoom is null || resource.ScriptRoom == EventSourceRoom(scriptEvent)));
     }
@@ -4039,7 +4047,7 @@ public partial class MainWindow : Window
         UpdateInteractButton();
     }
 
-    private void UpdateInteractButton() => ApplyInteract(CurrentRoomControls.ReadInteract());
+    private void UpdateInteractButton() { ApplyInteract(CurrentRoomControls.ReadInteract()); UpdateGenericActionsSection(); }
 
     /// <summary>The verbs offered in the menu: look, use or go, and the drafts the object answers (the plumbing verbs stay in Advanced).</summary>
     private IReadOnlyList<ScummObjectVerbEntry> InteractVerbs(ScummRoomObjectRecord record) =>

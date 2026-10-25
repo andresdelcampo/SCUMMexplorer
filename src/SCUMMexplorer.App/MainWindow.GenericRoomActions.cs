@@ -21,6 +21,10 @@ public partial class MainWindow
     private readonly List<Button> _genericActionButtons = [];
     private readonly List<(string Label, ScummScriptDisassembly Code)> _genericRoomScripts = [];
     private readonly List<GenericSourceAction> _genericSourceActions = [];
+    private RoomPanelAction? _genericLastAction;
+    private IReadOnlyList<string> _genericAssumptions = [];
+    private string? _genericSourceFailure;
+    private int? _genericActionsShownFor;
     private sealed record GenericSourceAction(int Object, int Verb, string Title, string Target, ScummScriptDisassembly? Code, string Source, bool Executable);
 
     private bool GenericRoomActions => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs;
@@ -59,9 +63,11 @@ public partial class MainWindow
             ObjectListSection.Visibility = Visibility.Collapsed;
             RoomNavigationPanel.Visibility = Visibility.Collapsed;
         }
-        RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         if (changed)
         {
+            _genericLastAction = null;
+            _genericSourceFailure = null;
+            _genericActionsShownFor = null;
             _genericActionsGame = game;
             _genericActionsRoom = roomId;
             _genericRoomScripts.Clear();
@@ -124,7 +130,7 @@ public partial class MainWindow
         {
             _genericRoomScripts.Clear();
             _genericSourceActions.Clear();
-            if (IsAdvancedMode) _genericSourceHost!.Children.Add(new TextBlock { Text = "Room source unavailable: " + ex.Message, TextWrapping = TextWrapping.Wrap });
+            _genericSourceFailure = "Room source unavailable: " + ex.Message;
         }
     }
 
@@ -156,63 +162,107 @@ public partial class MainWindow
         // Parity with LOOM (R-6.9, 24 Oct): the actions are offered through the bar's Interact button and the
         // object's menu, not through a list of every action of the room under the bar.
         _genericActionsHost.Visibility = Visibility.Collapsed;
-        if (!IsAdvancedMode) return;
-        FillRoomInspection(_genericSourceHost, CurrentRoomControls.Inspection());
+        _genericSourceHost.Visibility = Visibility.Collapsed;
+        UpdateGenericAssumptions();
+        FillRoomPanel(CurrentRoomControls.Panel());
+        UpdateGenericActionsSection();
     }
 
-    /// <summary>The Advanced inspection (R-16.9): headed sections of expanders with the raw code, then the relationships; the content is the provider's.</summary>
-    private void FillRoomInspection(Panel host, RoomInspection? inspection)
+    private void UpdateGenericAssumptions()
     {
-        if (inspection is null) return;
-        var heading = (string text, double top) => new TextBlock { Text = text, Foreground = Brushes.DarkGoldenrod, Margin = new Thickness(0, top, 0, 4), TextWrapping = TextWrapping.Wrap };
-        var first = true;
-        foreach (var section in inspection.Sections)
+        var list = new List<string>();
+        if (_genericSourceFailure is not null) list.Add(_genericSourceFailure);
+        if (_browsedScene is { } shown && _currentRoom is not null && ReferenceEquals(shown.Room, _currentRoom)) list.Add(BrowsedSceneNote(shown));
+        if (_genericLastAction is { } action) list.AddRange(action.Uncertainties);
+        _genericAssumptions = list.Where(item => !string.IsNullOrWhiteSpace(item)).Distinct().ToArray();
+    }
+
+    /// <summary>
+    /// R-6.43: the Advanced panel's `Room entry`, `Last action` and `Assumptions` sections, drawn once for every game from the provider's data in
+    /// LOOM's widgets: the scripts are buttons to their tree entries and the readable text sits in the one nested expander.
+    /// </summary>
+    private void FillRoomPanel(RoomPanelData? data)
+    {
+        var advanced = IsAdvancedMode;
+        RoomEntryEventButtons.Children.Clear();
+        if (data is null || data.Entry is null && data.Exit is null && data.LocalScripts.Count == 0)
         {
-            host.Children.Add(heading(section.Heading, first ? 8 : 12));
-            first = false;
-            foreach (var item in section.Items)
-            {
-                if (item.Detail is null)
-                {
-                    if (item.Code is { } script) host.Children.Add(GenericSourceCode(item.Header, script));
-                    continue;
-                }
-                var content = new StackPanel();
-                content.Children.Add(new TextBlock { Text = item.Detail, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 4) });
-                if (item.Code is { } code) content.Children.Add(GenericSourceCode("Raw disassembly", code));
-                host.Children.Add(new Expander { Header = item.Header, Content = content, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)) });
-            }
+            RoomEntryTraceOutput.Text = "";
+            RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         }
-        host.Children.Add(heading("RELATIONSHIPS · POSSIBLE SOURCE OUTCOMES", 12));
-        var links = new StackPanel();
-        ShowScriptEvents(links, inspection.Relationships);
-        host.Children.Add(links);
-        if (inspection.Relationships.Count == 0) host.Children.Add(new TextBlock { Text = "No literal resource links were decoded. Computed destinations remain unresolved.", TextWrapping = TextWrapping.Wrap });
+        else
+        {
+            RoomEntryTraceExpander.Header = "Room entry";
+            RoomEntrySummary.Text = data.Entry is null ? "No embedded entry script." : $"{data.Entry.Instructions.Count} instructions" +
+                (data.Exit is { } exit ? $" · exit script {exit.Instructions.Count} instructions" : "");
+            var events = new[] { data.Entry, data.Exit }.OfType<ScummScriptDisassembly>()
+                .SelectMany(code => code.Instructions.Select(i => ScummScriptEvent.FromInstruction(code, i, ScummScriptEventCertainty.StaticPotential)))
+                .OfType<ScummScriptEvent>().Where(e => e.TargetKind is not null).DistinctBy(e => (e.SourceLabel, e.Offset, e.TargetKind, e.TargetId)).ToArray();
+            ShowScriptEvents(RoomEntryEventButtons, events);
+            foreach (var id in data.LocalScripts.Where(id => !events.Any(e => e.TargetKind == ResourceKind.Script && e.TargetId == id)))
+                if (_game?.AllScripts.FirstOrDefault(r => r.ScriptRoom == data.Room && r.ResourceId == id) is { } local)
+                    AddResourceButton(RoomEntryEventButtons, $"has {local.Name}", local);
+            RoomEntryTraceOutput.Text = string.Join(Environment.NewLine + Environment.NewLine,
+                new[] { data.Entry, data.Exit }.OfType<ScummScriptDisassembly>().Select(FormatScript));
+            RoomEntryTraceExpander.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        if (data?.LastAction is { } action)
+        {
+            LastActionSummary.Text = action.Summary;
+            LastActionTimeline.Text = "";
+            LastActionTimeline.Visibility = Visibility.Collapsed;
+            LastActionIssues.Children.Clear();
+            ObjectActionTraceOutput.Text = action.Source + Environment.NewLine +
+                string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
+                Environment.NewLine + (action.Code is null ? "Object bytecode unavailable." : FormatScript(action.Code));
+            ObjectActionTraceExpander.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        }
+        else
+        {
+            ObjectActionTraceOutput.Text = "";
+            ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
+        }
+
+        StateIssueList.Children.Clear();
+        if (data is null) { StateIssuesSection.Visibility = Visibility.Collapsed; return; }
+        StateIssuesSection.Header = data.Assumptions.Count == 0 ? "No assumptions" : $"Assumptions · {data.Assumptions.Count}";
+        if (data.Assumptions.Count > 0)
+            StateIssueList.Children.Add(new TextBlock
+            {
+                Text = "What the explorer had to assume or estimate to show this room. Nothing is waiting on you.",
+                Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
+            });
+        foreach (var item in data.Assumptions)
+            StateIssueList.Children.Add(new TextBlock
+            {
+                Text = "• " + item, Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(8, 0, 0, 3)
+            });
+        StateIssuesSection.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private Expander GenericSourceCode(string label, ScummScriptDisassembly code)
+    /// <summary>`ACTIONS · object` (LOOM's section): a flat button per verb of the selected object.</summary>
+    private void UpdateGenericActionsSection()
     {
-        var content = new StackPanel();
-        // Delay formatting/widget attachment until requested; room changes never open code. Same readable view as LOOM; wrapped, because
-        // a no-wrap box of long lines made horizontal scrolling crawl.
-        var expander = new Expander
+        if (!GenericRoomActions || !IsAdvancedMode || _genericInteractTarget is not int id || GenericObjectActions(id) is not { Count: > 0 } actions)
         {
-            Header = label, Content = content, Margin = new Thickness(0, 2, 0, 2),
-            Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210))
-        };
-        expander.Expanded += (_, _) =>
+            if (_genericActionsShownFor is null) return;
+            _genericActionsShownFor = null;
+            ObjectActionsList.Children.Clear();
+            ObjectActionsSection.Visibility = Visibility.Collapsed;
+            return;
+        }
+        if (_genericActionsShownFor == id && ObjectActionsList.Children.Count > 0) return;
+        _genericActionsShownFor = id;
+        ObjectActionsList.Children.Clear();
+        ObjectActionsHeader.Text = $"ACTIONS · {(actions[0].Target is { Length: > 0 } name ? name : $"Object {id}")}";
+        foreach (var action in actions)
         {
-            if (content.Children.Count == 0) content.Children.Add(new TextBox
-            {
-                IsReadOnly = true, Text = FormatScript(code), TextWrapping = TextWrapping.Wrap,
-                FontFamily = new FontFamily("Consolas"), FontSize = 11, MaxHeight = 320,
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                Background = new SolidColorBrush(Color.FromRgb(16, 24, 33)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(51, 68, 82)), Padding = new Thickness(6),
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-            });
-        };
-        return expander;
+            var button = ActionPanelButton(GenericActionWord(action), action.Source);
+            button.Click += (_, _) => RunGenericRoomAction(action);
+            ObjectActionsList.Children.Add(button);
+        }
+        ObjectActionsSection.Visibility = Visibility.Visible;
     }
 
     // A static preview's ambient session (R-8.5b) takes the explicit exploration action too: the object's verb code runs from the preview's state.
@@ -313,6 +363,9 @@ public partial class MainWindow
             ShowPlayFrame();
             PlayScreenImage.Focus();
             StatusText.Text = action.Title;
+            _genericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: ran.", action.Source, result.Uncertainties.ToArray(), action.Code);
+            UpdateGenericAssumptions();
+            FillRoomPanel(CurrentRoomControls.Panel());
             StatusText.ToolTip = IsAdvancedMode ? action.Source + Environment.NewLine + string.Join(Environment.NewLine, result.Uncertainties) : null;
             UpdatePlaybackControls();
         }

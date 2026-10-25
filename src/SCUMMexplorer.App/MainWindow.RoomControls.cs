@@ -163,7 +163,7 @@ public partial class MainWindow
         public RoomCutscenePicker GlobalCutscenes(bool advanced) => new([], "");
         public bool RoomListsDone => true;
         public RoomGameStatusEntry GameStatus() => RoomGameStatusEntry.None;
-        public RoomInspection? Inspection() => null;
+        public RoomPanelData? Panel() => null;
         public void TogglePause() { }
         public void Step() { }
         public void Skip() { }
@@ -204,7 +204,7 @@ public partial class MainWindow
         }
 
         public bool RoomListsDone => w._cdRoomListsDone;
-        public RoomInspection? Inspection() => null;
+        public RoomPanelData? Panel() => null;
 
         public RoomGameStatusEntry GameStatus() => new(w._game is not null && w._session is not null,
             "Inspect or explicitly edit this exploration session's staff, notes and drafts.", () => w.BuildGameStatusWindow().ShowDialog());
@@ -345,15 +345,13 @@ public partial class MainWindow
 
         public bool RoomListsDone => w._playRoomListsDone;
 
-        public RoomInspection? Inspection()
+        public RoomPanelData? Panel()
         {
-            var scripts = w._genericRoomScripts.Select(item => new RoomInspectionItem(item.Label, null, item.Code)).ToList();
-            var actions = w._genericSourceActions.Select(action => new RoomInspectionItem(
-                $"{action.Title} · object {action.Object} / verb 0x{action.Verb:X2}", action.Source, action.Code)).ToList();
-            var codes = w._genericRoomScripts.Select(item => item.Code).Concat(w._genericSourceActions.Select(a => a.Code).OfType<ScummScriptDisassembly>()).Distinct();
-            var relationships = codes.SelectMany(code => code.Instructions.Select(i => ScummScriptEvent.FromInstruction(code, i, ScummScriptEventCertainty.StaticPotential)))
-                .OfType<ScummScriptEvent>().Where(e => e.TargetKind is not null).DistinctBy(e => (e.SourceLabel, e.Offset, e.TargetKind, e.TargetId)).ToArray();
-            return new([new("ROOM SCRIPTS", scripts), new("INTERACTIONS", actions)], relationships);
+            if (w._genericActionsRoom is not int room) return null;
+            ScummScriptDisassembly? Find(string label) => w._genericRoomScripts.FirstOrDefault(item => item.Label == label).Code;
+            var locals = w._genericRoomScripts.Where(item => item.Label.StartsWith("Local script ", StringComparison.Ordinal))
+                .Select(item => int.Parse(item.Label["Local script ".Length..], System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            return new(room, Find("Room entry"), Find("Room exit"), locals, w._genericLastAction, w._genericAssumptions);
         }
 
         public RoomGameStatusEntry GameStatus() => new(w.InventoryStatusAvailable,
