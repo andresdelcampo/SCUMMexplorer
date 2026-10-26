@@ -77,7 +77,7 @@ internal static class LflFolderLayout
         var version = parsed ? index!.Version : ScummVersion.Unknown;
         var title = identity.Game == KnownGame.Unknown ? Path.GetFileName(Path.TrimEndingDirectorySeparator(folder)) : KnownGames.TitleOf(identity.Game, version, identity.IsDemo);
         var note = LayoutNote(parsed ? index : null, omitted) + " " + identity.Note;
-        var id = identity.Game switch { KnownGame.Loom => GameId.Loom, KnownGame.IndianaJones3 => GameId.IndianaJones3, _ => GameId.Unknown };
+        var id = GameIds.For(identity.Game, version);
         var library = new GameLibrary(title, folder, version, Platform, resources, note, id, identity.IsDemo, identity.EditionLabel)
         {
             Game = identity.Game, V1Game = index?.V1Game
@@ -176,7 +176,7 @@ internal static class LflFolderLayout
     /// </summary>
     private static int DropUnreadableDemoResources(string folder, List<GameResource> resources, GameIdentity identity, ScummVersion version)
     {
-        var id = identity.Game switch { KnownGame.Loom => GameId.Loom, KnownGame.IndianaJones3 => GameId.IndianaJones3, _ => GameId.Unknown };
+        var id = GameIds.For(identity.Game, version);
         var provisional = new GameLibrary("", folder, version, Platform, resources, "", id, true) { Game = identity.Game };
         var scripts = new ScummScriptReader(ScummProfile.For(provisional).Dialect);
         bool Reads(GameResource resource)

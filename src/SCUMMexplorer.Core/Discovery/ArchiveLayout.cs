@@ -7,7 +7,7 @@ namespace SCUMMexplorer.Core.Discovery;
 /// <summary>
 /// A game in container files (SCUMM v4 and v5), from a folder or a disc image: v4 on one or several disks (<c>000.LFL</c> + <c>DISKnn.LEC</c>) or one plain
 /// <c>NN.LFL</c> per room, v5 as <c>NAME.000</c> + <c>NAME.001</c> (perhaps one copy per language folder of a disc). The game is identified from its data
-/// (<see cref="GameIdentifier"/>); LOOM CD is listed for its own session, every other game is browsed through the shared readers.
+/// (<see cref="GameIdentifier"/>); every game, LOOM CD included, is listed through the same readers.
 /// </summary>
 internal static class ArchiveLayout
 {
@@ -44,11 +44,7 @@ internal static class ArchiveLayout
         if (v5 is null)
         {
             var disks = ScummV4Disks.Load(source);
-            var identity = GameIdentifier.Identify(GameFingerprint.Of(source, null, () => ShapeOf(disks, ScummVersion.V4)));
-            // LOOM CD has its own session, which reads the single archive of the disc.
-            if (identity.Game == KnownGame.Loom && ScummV4Archive.IsVga(source) && disks.Disks is [ScummV4Archive archive])
-                return ListLoomCd(source, archive, identity);
-            return ListBrowsed(source, disks, null, identity);
+            return ListBrowsed(source, disks, null, GameIdentifier.Identify(GameFingerprint.Of(source, null, () => ShapeOf(disks, ScummVersion.V4))));
         }
 
         var v5Disks = ScummV4Disks.FromArchives(ScummV5Archive.Load(source, v5));
@@ -93,28 +89,6 @@ internal static class ArchiveLayout
                 disks.Disks.Sum(d => d.ReadSounds().Count));
         }
         catch (Exception ex) when (ex is InvalidDataException or IndexOutOfRangeException or ArgumentException or EndOfStreamException) { return null; }
-    }
-
-    /// <summary>LOOM CD (game-specific): the single archive of the disc, listed for the LOOM session (rooms, costumes, sounds, global and room-local scripts).</summary>
-    private static GameLibrary ListLoomCd(IGameFileSource source, ScummV4Archive archive, GameIdentity identity)
-    {
-        var resources = archive.Rooms.Select(room => new GameResource($"Room {room.Number:00}", ResourceKind.Room, source.Location,
-            room.Number, string.IsNullOrEmpty(room.Name) ? "LOOM CD room (DISK01.LEC)." : $"LOOM CD room \"{room.Name}\" (DISK01.LEC).",
-            1, room.Offset)).ToList();
-        resources.AddRange(archive.ReadCostumes().OrderBy(c => c.Id).Select(c => new GameResource($"Costume {c.Id:00}", ResourceKind.Costume, source.Location,
-            c.Id, $"LOOM CD costume, stored in room {c.Room:00} (DISK01.LEC).", 1, null)));
-        resources.AddRange(archive.ReadSounds().Select(s => new GameResource($"Sound {s.Id:00}", ResourceKind.Sound, source.Location,
-            s.Id, $"LOOM CD {(s.IsMusic ? "music" : "sound effect")}, stored in room {s.Room:00} (DISK01.LEC): a PC speaker and an AdLib rendition.", 1, null)));
-        resources.AddRange(archive.GlobalScriptNumbers().Select(id => new GameResource($"Script {id:00}", ResourceKind.Script,
-            source.Location, id, "LOOM CD global script (DISK01.LEC).", 1, archive.ReadGlobalScript(id)?.BlockOffset)));
-        foreach (var room in archive.Rooms)
-            resources.AddRange(archive.ReadScripts(room.Number).Where(s => s.Kind == "LS").Select(s => new GameResource(
-                $"Room {room.Number:00} local script {s.Number}", ResourceKind.Script, source.Location, s.Number,
-                "LOOM CD room-local script (DISK01.LEC).", 1, s.BlockOffset, ScriptRoom: room.Number)));
-        var note = "LOOM CD (SCUMM v4, VGA) read from its disc image or files: 000.LFL and DISK01.LEC. Rooms, scripts, objects, actors, texts, the sounds in DISK01.LEC " +
-            "(AdLib and PC speaker) and the voices on the disc's audio track are read. " + identity.Note;
-        return new GameLibrary(KnownGames.TitleOf(KnownGame.Loom, ScummVersion.V4, identity.IsDemo), source.Location, ScummVersion.V4, "CD (VGA)", resources, note,
-            GameId.LoomVga, identity.IsDemo, identity.EditionLabel) { Game = KnownGame.Loom, V4Archive = archive };
     }
 
     /// <summary>
@@ -170,7 +144,8 @@ internal static class ArchiveLayout
             }
         }
         var disc = source is DiscFileSource discSource && discSource.Image.AudioTracks.Count > 0 ? discSource.Image : null;
-        if (disc is not null) resources.AddRange(ListCdTracks(source, disks, disc));
+        // The disc's tracks are listed where the game's own sounds name them (v5 CD sounds); a v4 disc's voices are cues read from the archive.
+        if (disc is not null && disks.Disks.OfType<ScummV5Archive>().Any()) resources.AddRange(ListCdTracks(source, disks, disc));
         // A talkie game: every spoken line of MONSTER.SOU is a sound of its own (device-independent digital audio, like the disc's tracks).
         var speech = v5 is null ? null : ScummSpeechBank.Find(source);
         if (speech is not null)
@@ -185,7 +160,9 @@ internal static class ArchiveLayout
         }
 
         var title = identity.Game == KnownGame.Unknown ? UnknownTitle(source, v5) : KnownGames.TitleOf(identity.Game, version, identity.IsDemo);
-        var platform = $"DOS (SCUMM v{(int)version})";
+        var platform = source is DiscFileSource ? $"CD (SCUMM v{(int)version})" : $"DOS (SCUMM v{(int)version})";
+        // A v4 game on one disk of the old container format is read through its single archive (the dedicated LOOM CD session reads it).
+        var single = v5 is null && disks.Disks is [ScummV4Archive { IsRoomFileGame: false } only] ? only : null;
         var layout = v5 is not null ? $"a SCUMM v5 index and resource file ({v5.Stem}.000 and .001)" : perRoomFiles ? "one file per room (00.LFL and NN.LFL)"
             : $"{disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC)";
         if (!resources.Any(r => r.Kind == ResourceKind.Room))
@@ -194,9 +171,9 @@ internal static class ArchiveLayout
                 IsDemo: identity.IsDemo, Edition: identity.EditionLabel) { Game = identity.Game };
         var ordered = resources.OrderBy(r => r.Kind).ThenBy(r => r.ResourceId).ToList();
         var note = $"A SCUMM v{(int)version} game read from {layout}." + (withoutPicture > 0 ? $" {withoutPicture} room entries without a picture are left out." : "") + " " + identity.Note;
-        return new GameLibrary(title, source.Location, version, platform, ordered, note, IsDemo: identity.IsDemo, Edition: identity.EditionLabel)
+        return new GameLibrary(title, source.Location, version, platform, ordered, note, GameIds.For(identity.Game, version), identity.IsDemo, identity.EditionLabel)
         {
-            Game = identity.Game, V4Disks = disks, AudioDisc = disc, Speech = speech
+            Game = identity.Game, V4Archive = single, V4Disks = disks, AudioDisc = disc, Speech = speech
         };
     }
 

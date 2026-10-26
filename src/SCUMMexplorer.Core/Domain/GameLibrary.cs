@@ -42,6 +42,18 @@ public enum GameId
     LoomVga
 }
 
+/// <summary>Which game-specific code path a game takes in a format: the one place that maps (game, SCUMM version) onto a <see cref="GameId"/>.</summary>
+public static class GameIds
+{
+    public static GameId For(KnownGame game, ScummVersion version) => (game, version) switch
+    {
+        (KnownGame.Loom, ScummVersion.V4) => GameId.LoomVga,
+        (KnownGame.Loom, _) => GameId.Loom,
+        (KnownGame.IndianaJones3, ScummVersion.V3) => GameId.IndianaJones3,
+        _ => GameId.Unknown
+    };
+}
+
 public enum ResourceKind
 {
     Room,
