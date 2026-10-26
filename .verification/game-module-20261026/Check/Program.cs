@@ -46,6 +46,23 @@ internal static class Program
                     var catalog = Field("_replayCatalog");
                     var catalogReplays = catalog is null ? -1 : ((Array)catalog.GetType().GetProperty("Replays")!.GetValue(catalog)!).Length;
                     var galleryViaWindow = typeof(MainWindow).GetMethod("GalleryCutscenes", Private) is { } old ? (System.Collections.IDictionary)old.Invoke(window, null)! : gallery;
+                    string Hash(string t) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(t)))[..12];
+                    string Page(GameResource? r, bool script)
+                    {
+                        if (r is null) return "none";
+                        typeof(MainWindow).GetMethod("SelectResourceInTree", Private)!.Invoke(window, [r]);
+                        var title = ((System.Windows.Controls.TextBlock)window.FindName("PageTitle")).Text;
+                        var sub = ((System.Windows.Controls.TextBlock)window.FindName("PageSubtitle")).Text;
+                        var text = script ? ((System.Windows.Controls.TextBox)window.FindName("ScriptOutput")).Text : "";
+                        return $"{title} | {sub} | {Hash(text)}/{text.Length}";
+                    }
+                    var room = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Room);
+                    var script = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Script && r.ScriptRoom is null);
+                    var roomPage = Page(room, false);
+                    var scriptPage = Page(script, true);
+                    await Task.Delay(300);
+                    var usedBy = string.Join(";", ((System.Windows.Controls.Panel)window.FindName("ScriptUsedByList")).Children.OfType<System.Windows.Controls.TextBlock>().Select(t => t.Text));
+                    report.Add($"{fixture}: room=[{roomPage}] script=[{scriptPage}] usedBy={Hash(usedBy)}/{usedBy.Length}");
                     report.Add($"{fixture}: family={GameSupport.FamilyOf(game)} picker={entries.Count} first=[{string.Join("; ", titles.Take(3))}] last=[{titles.LastOrDefault()}] gallery={galleryViaWindow.Count} replays={Math.Max(catalogReplays, 0)}");
                 }
                 report.Add("DONE");

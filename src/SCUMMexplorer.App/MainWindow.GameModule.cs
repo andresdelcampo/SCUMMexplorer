@@ -20,6 +20,39 @@ internal interface IGameModule
 
     /// <summary>The cutscenes Game Texts offers, by the indexed script that prints their texts.</summary>
     Dictionary<int, GalleryCutscene> GalleryCutscenes();
+
+    /// <summary>The names the game gives its resources, verbs and hero (what every tree, title and readable script shows).</summary>
+    GameNames CreateNames(GameLibrary game);
+
+    /// <summary>The fixed wording of a script page's subtitle when the game has one (without the name part); null for the generic wording.</summary>
+    string? ScriptKind(GameResource resource);
+
+    /// <summary>What a script page's Play button does for the script, when the game has a catalog that knows it as a scene; null hides the button.</summary>
+    Action? ScriptPlayback(int? scriptId);
+}
+
+/// <summary>
+/// What the window shows as the names of a game's things. Every game gets the engine's variable names; a game's module adds its own resource names (the glossary),
+/// verb names and the name of its hero. The glossary type is still LOOM's (<c>Core/Loom/Text</c>) and reads only the engine rows for any other game.
+/// </summary>
+internal sealed class GameNames(LoomGlossary glossary, Func<int, string?>? verbName, string hero)
+{
+    public LoomGlossary Glossary { get; } = glossary;
+
+    /// <summary>The name of a verb, or null where the game gives none (the script then shows the number).</summary>
+    public Func<int, string?>? VerbName { get; } = verbName;
+
+    /// <summary>What readable scripts call the hero.</summary>
+    public string Hero { get; } = hero;
+
+    public string Label(GameResource resource) => LoomResourceNames.Label(Glossary, resource);
+    public string? Evidence(GameResource resource) => LoomResourceNames.Evidence(Glossary, resource);
+
+    /// <summary>The evidence word of the resource's name ("decoded", "reading"...), or null when it has none.</summary>
+    public string? EvidenceLabel(GameResource resource) => LoomResourceNames.Entry(Glossary, resource)?.EvidenceLabel;
+
+    public string NameScripts(string text) => LoomResourceNames.NameScripts(Glossary, text);
+    public string NameBits(string text) => LoomResourceNames.NameBits(Glossary, text);
 }
 
 public partial class MainWindow
@@ -39,5 +72,8 @@ public partial class MainWindow
         public void Opened(GameLibrary game) { }
         public void StartBackgroundDerivation(GameLibrary game) { }
         public Dictionary<int, GalleryCutscene> GalleryCutscenes() => [];
+        public GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), null, "the hero");
+        public string? ScriptKind(GameResource resource) => null;
+        public Action? ScriptPlayback(int? scriptId) => null;
     }
 }

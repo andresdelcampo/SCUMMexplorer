@@ -313,7 +313,7 @@ public partial class MainWindow : Window
             ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
         _game = game;
-        _glossary = LoomGlossary.Load(game);
+        _names = CurrentModule.CreateNames(game);
         _usageIndex = LoomUsageIndex.Empty;
         _ = BuildUsageIndexAsync(game);
         _replayCatalog = null;
@@ -489,7 +489,7 @@ public partial class MainWindow : Window
         _soundLines.Clear();
         var rooms = new TreeViewItem { Header = $"Rooms  ({game.Scenes.Count()})", IsExpanded = false };
         foreach (var room in game.Scenes)
-            rooms.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, room), ToolTip = LoomResourceNames.Evidence(_glossary, room), Tag = room });
+            rooms.Items.Add(new TreeViewItem { Header = _names.Label(room), ToolTip = _names.Evidence(room), Tag = room });
         ResourceTree.Items.Add(rooms);
 
         foreach (var (kind, label) in new[]
@@ -504,8 +504,8 @@ public partial class MainWindow : Window
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
             foreach (var item in group)
-                node.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, item),
-                    ToolTip = LoomResourceNames.Evidence(_glossary, item) ?? item.Description, Tag = item });
+                node.Items.Add(new TreeViewItem { Header = _names.Label(item),
+                    ToolTip = _names.Evidence(item) ?? item.Description, Tag = item });
             ResourceTree.Items.Add(node);
         }
 
@@ -1259,9 +1259,9 @@ public partial class MainWindow : Window
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
-            PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
+            PageTitle.Text = _names.Label(resource);
             PageSubtitle.Text = ScriptPageSubtitle(resource);
-            PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
+            PageTitle.ToolTip = _names.Evidence(resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
             ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.Loom ? "Reading DOS LOOM old-v3 bytecode…" : "Reading the game's bytecode…";
@@ -1280,7 +1280,7 @@ public partial class MainWindow : Window
                     : _scriptReader.Decode(resource);
                 _scriptShown = disassembly;
                 ScriptOutput.Text = FormatScript(disassembly);
-                ScriptPlayButton.Visibility = ScriptCutscene(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
+                ScriptPlayButton.Visibility = CurrentModule.ScriptPlayback(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
                 var events = disassembly.Instructions
                     .Select(instruction => ScummScriptEvent.FromInstruction(disassembly, instruction,
                         ScummScriptEventCertainty.StaticPotential))
@@ -1754,8 +1754,8 @@ public partial class MainWindow : Window
         if (card is null) return;
         _roomCardStages[resource] = stage;
         if (card.Content is Image preview) preview.Source = bitmap;
-        else card.Content = CreateRoomCardImage(bitmap, LoomResourceNames.Label(_glossary, resource));
-        card.ToolTip = $"Open {LoomResourceNames.Label(_glossary, resource)}";
+        else card.Content = CreateRoomCardImage(bitmap, _names.Label(resource));
+        card.ToolTip = $"Open {_names.Label(resource)}";
     }
 
     private string EstimateSummary()
@@ -1950,7 +1950,7 @@ public partial class MainWindow : Window
         var uses = _usageIndex.UsedBy(LoomUsageTarget.Object, objectId);
         var text = uses.Count == 0
             ? "Used by: no code names this object (clicks and drafts reach it through the input scripts)."
-            : "Used by: " + string.Join("; ", uses.Take(6).Select(use => LoomUsageIndex.Describe(use, _glossary, VerbNameOrNull))) + (uses.Count > 6 ? $"; {uses.Count - 6} more" : "");
+            : "Used by: " + string.Join("; ", uses.Take(6).Select(use => LoomUsageIndex.Describe(use, _names.Glossary, _names.VerbName))) + (uses.Count > 6 ? $"; {uses.Count - 6} more" : "");
         ObjectActionsList.Children.Add(new TextBlock
         {
             Text = text, Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 0)
@@ -2070,7 +2070,7 @@ public partial class MainWindow : Window
         }
         foreach (var (target, verb, certainty, count) in rows)
         {
-            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {LoomResourceNames.Label(_glossary, target)}{(count > 1 ? $" ×{count}" : "")}";
+            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {_names.Label(target)}{(count > 1 ? $" ×{count}" : "")}";
             AddResourceButton(container, label, target);
         }
         if (others.Count > 0)
@@ -2150,7 +2150,7 @@ public partial class MainWindow : Window
 
     // The bytecode column choice is kept from script to script (and while the app runs).
     private bool _showScriptBytes;
-    private LoomGlossary _glossary = LoomGlossary.Default;
+    private GameNames _names = new(LoomGlossary.Default, null, "the hero");
     private LoomUsageIndex _usageIndex = LoomUsageIndex.Empty;
 
     private async Task BuildUsageIndexAsync(GameLibrary game)
@@ -2179,8 +2179,6 @@ public partial class MainWindow : Window
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
     }
 
-    private Func<int, string?> VerbNameOrNull => LoomVerbNames.LabelOrNull;
-
     private void UpdateScriptUsedBy(GameResource resource)
     {
         ScriptUsedByList.Children.Clear();
@@ -2198,7 +2196,7 @@ public partial class MainWindow : Window
         foreach (var use in uses.Take(60))
             ScriptUsedByList.Children.Add(new TextBlock
             {
-                Text = LoomUsageIndex.Describe(use, _glossary, VerbNameOrNull),
+                Text = LoomUsageIndex.Describe(use, _names.Glossary, _names.VerbName),
                 Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 2)
             });
         if (uses.Count > 60)
@@ -2209,9 +2207,8 @@ public partial class MainWindow : Window
     /// <summary>R-6.51: the script page's subtitle. LOOM keeps its two fixed wordings (R-9.1); every other game's comes from its own data.</summary>
     private string ScriptPageSubtitle(GameResource resource)
     {
-        var named = LoomResourceNames.Entry(_glossary, resource) is { } entry ? $" · name: {entry.EvidenceLabel}" : "";
-        if (_game?.Id == GameId.LoomVga) return "LOOM CD script · SCUMM v4" + named;
-        if (_game?.Id == GameId.Loom) return "Indexed script resource · DOS LOOM old-v3" + named;
+        var named = _names.EvidenceLabel(resource) is { } label ? $" · name: {label}" : "";
+        if (CurrentModule.ScriptKind(resource) is { } kind) return kind + named;
         if (_game is not { } game) return "Indexed script resource";
         var scope = resource.ScriptRoom is null ? "script" : "room-local script";
         return $"{game.Title} {scope} · SCUMM v{(int)ScummProfile.For(game).EngineVersion}{named}";
@@ -2240,22 +2237,15 @@ public partial class MainWindow : Window
     private string FormatScript(ScummScriptDisassembly script)
     {
         if (!_readableScripts) return script.Format(_showScriptBytes);
-        var loom = _game?.Id is GameId.Loom or GameId.LoomVga;
-        return new LoomScriptPresenter(_glossary, loom ? LoomVerbNames.LabelOrNull : null, loom ? "Bobbin" : "the hero").Present(script);
+        return new LoomScriptPresenter(_names.Glossary, _names.VerbName, _names.Hero).Present(script);
     }
 
     // A script the catalog knows as a scene can be played from its view: the cutscene machinery goes to the room and runs it.
-    private KnownCutscene? ScriptCutscene(int? scriptId) =>
-        scriptId is int id && _game?.Id == GameId.Loom
-            ? AllCutscenes().FirstOrDefault(c => c.Steps is null && c.ObjectId != 0 && (c.TextScripts?.Contains(id) ?? c.Script == id))
-              ?? AllCutscenes().FirstOrDefault(c => c.Steps is null && c.Script == id)
-            : null;
-
     private void ScriptPlay_Click(object sender, RoutedEventArgs e)
     {
-        if (_selectedResource is not { Kind: ResourceKind.Script } script || ScriptCutscene(script.ResourceId) is not { } cutscene || !CanStartCutscene) return;
+        if (_selectedResource is not { Kind: ResourceKind.Script } script || CurrentModule.ScriptPlayback(script.ResourceId) is not { } play || !CanStartCutscene) return;
         if (_lastViewedRoomResource is { } room) SelectResourceInTree(room);
-        PlayFromGameTexts(() => PlayKnownCutscene(cutscene));
+        play();
     }
 
     private bool _fullscreen;
@@ -2391,7 +2381,7 @@ public partial class MainWindow : Window
         var relationships = _relationshipIndex.ForResource(selected);
         var window = new Window
         {
-            Title = $"Connections · {LoomResourceNames.Label(_glossary, selected)}",
+            Title = $"Connections · {_names.Label(selected)}",
             Owner = this,
             Width = 620,
             Height = 620,
@@ -2430,7 +2420,7 @@ public partial class MainWindow : Window
         {
             var isOutgoing = relationship.SourceResource == selected;
             var otherResource = isOutgoing ? relationship.TargetResource : relationship.SourceResource;
-            var heading = $"{LoomResourceNames.Label(_glossary, relationship.SourceResource)}  →  {relationship.Relationship}  →  {LoomResourceNames.NameScripts(_glossary, relationship.TargetLabel)}";
+            var heading = $"{_names.Label(relationship.SourceResource)}  →  {relationship.Relationship}  →  {_names.NameScripts(relationship.TargetLabel)}";
             var content = new StackPanel { Margin = new Thickness(2) };
             content.Children.Add(new TextBlock
             {
@@ -3430,7 +3420,7 @@ public partial class MainWindow : Window
         var items = ResourceTree.Items.OfType<TreeViewItem>().SelectMany(group => group.Items.OfType<TreeViewItem>())
             .Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound } sound && !IsCdCue(sound) && !IsCdTrack(sound) && !IsSpeech(sound)).ToArray();
         string Header(TreeViewItem item, string? duration) =>
-            LoomResourceNames.Label(_glossary, (GameResource)item.Tag) + (duration is null ? "" : " - " + duration);
+            _names.Label((GameResource)item.Tag) + (duration is null ? "" : " - " + duration);
         foreach (var item in items)
             item.Header = Header(item, _durationLabels.GetValueOrDefault((mode, (GameResource)item.Tag)));
         if (mode == SceneSoundPlayer.SoundMode.None) return;

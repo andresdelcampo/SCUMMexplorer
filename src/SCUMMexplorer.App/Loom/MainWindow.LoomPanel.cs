@@ -33,7 +33,7 @@ public partial class MainWindow
                     : $"{actionName}: a new scene opened in this state preview."
                 : action.VerbId == 0 ? $"{actionName}: ran; no scene change followed."
                 : $"{actionName} · {LoomVerbNames.Label(action.VerbId)}: ran; no scene change followed.";
-            var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull), actionName,
+            var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_names.Glossary, _names.VerbName), actionName,
                 action.VerbId == 0 ? null : LoomVerbNames.Label(action.VerbId)));
             last = new RoomPanelAction(actionName, summary, action.Evidence, action.Uncertainties, action.Script)
             {
@@ -55,7 +55,7 @@ public partial class MainWindow
             issues.AddRange(log.Skip(Math.Min(_issueBaseline, log.Count)).Distinct().TakeLast(30));
             foreach (var group in LoomAssumptionGroups.Group(issues))
                 groups.Add(new(group.Title, group.Meaning, [.. group.Items.Select(issue =>
-                    (LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue)), issue))]));
+                    (_names.NameBits(_names.NameScripts(issue)), issue))]));
         }
         return new RoomPanelData(roomId, entry?.Script, null, [], last, [])
         {

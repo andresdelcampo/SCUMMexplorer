@@ -70,7 +70,7 @@ public partial class MainWindow
         public void Opened(GameLibrary game)
         {
             w._replayCatalog = LoomReplayCatalog.Load(game);
-            if (game.Id == GameId.Loom) _ = w.NameStoryBitsAsync(game, w._glossary, w._replayCatalog.Replays);
+            if (game.Id == GameId.Loom) _ = w.NameStoryBitsAsync(game, w._names.Glossary, w._replayCatalog.Replays);
             w._setupPlanner = null;
             w._readiness = null;
         }
@@ -78,6 +78,24 @@ public partial class MainWindow
         public void StartBackgroundDerivation(GameLibrary game) => w.StartCdSetupDerivation(game);
 
         public Dictionary<int, GalleryCutscene> GalleryCutscenes() => w.LoomGalleryCutscenes();
+
+        public GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), LoomVerbNames.LabelOrNull, "Bobbin");
+
+        /// <summary>R-9.1: LOOM keeps its two fixed wordings.</summary>
+        public string? ScriptKind(GameResource resource) => w._game?.Id switch
+        {
+            GameId.LoomVga => "LOOM CD script · SCUMM v4",
+            GameId.Loom => "Indexed script resource · DOS LOOM old-v3",
+            _ => null
+        };
+
+        public Action? ScriptPlayback(int? scriptId)
+        {
+            if (scriptId is not int id || w._game?.Id != GameId.Loom) return null;
+            var cutscene = w.AllCutscenes().FirstOrDefault(c => c.Steps is null && c.ObjectId != 0 && (c.TextScripts?.Contains(id) ?? c.Script == id))
+                ?? w.AllCutscenes().FirstOrDefault(c => c.Steps is null && c.Script == id);
+            return cutscene is null ? null : () => w.PlayFromGameTexts(() => w.PlayKnownCutscene(cutscene));
+        }
     }
 
     private IEnumerable<KnownCutscene> AllCutscenes()

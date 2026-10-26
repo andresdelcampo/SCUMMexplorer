@@ -18,3 +18,5 @@ DONE
 ```
 
 Run: `dotnet run --project .verification/game-module-20261026/Check -- "D:\Juegos\Lucas" <private output>`. It proves the lists and the open/reset lifecycle are unchanged; it does not exercise playing a cutscene or the user's saved state.
+
+Names seam (same day): the check also prints each game's first room page, first script page (title, subtitle, SHA of the readable text) and the Used by text; the reports before and after the names change were identical for the nine games (Used by is empty in Normal mode).
