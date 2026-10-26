@@ -32,7 +32,6 @@ public partial class MainWindow : Window
     private readonly MediaPlayer _audioPlayer = new();
     // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
     private readonly SceneSoundPlayer _sceneSound = new();
-    private readonly CdVoicePlayer _cdVoice = new();
     private readonly DispatcherTimer _audioTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private readonly DispatcherTimer _idleFrameTimer = new() { Interval = TimeSpan.FromMilliseconds(15) };
     private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
@@ -327,7 +326,6 @@ public partial class MainWindow : Window
         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
         StopScenePlayback();
         _sceneSound.StopAll("another game was opened");
-        _cdVoice.Stop();
         // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
         ApplySoundDeviceChoices(game);
         // v1/v2 games (Maniac Mansion, Zak McKracken) only ever had PC speaker sound: AdLib and Roland are not offered.
@@ -364,7 +362,7 @@ public partial class MainWindow : Window
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
         if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
-        else if (_session is not null && game.V4Archive is { } cdGame) _cdVoice.Attach(cdGame.Disc, _session);
+        else if (_session is not null) CurrentModule.Voice.Attach(_session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? ScummV3Charset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
         _cdCharsets.Clear();
@@ -1164,7 +1162,7 @@ public partial class MainWindow : Window
             if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } && _session is not null && SessionModeToggle.IsChecked == true)
                 _catalogPreviewOnly = true;
             _sceneSound.StopAll("manual catalog navigation cancels the previous scene");
-            _cdVoice.Stop();
+            CurrentModule.Voice.Stop();
         }
         // Opening another view stops the playback clock, unless the playback itself entered the room.
         if (!_playbackEnteringRoom && navigationKind == RoomOpenKind.Catalog)
@@ -1611,7 +1609,7 @@ public partial class MainWindow : Window
                 _session.RecordCatalogPreparation(preparation);
                 snapshot = _session.Snapshot;
             }
-            if (visit && _game?.Id == GameId.LoomVga && _cdVoice.Follows(_session)) _cdVoice.SkipPending();
+            if (visit) CurrentModule.Voice.SkipPending(_session);
             var sceneBatches = _sceneBatches ?? ScummSceneDrawBatches.Empty;
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
                 _indexedStates, sceneBatches, estimateArtwork: _game?.Id != GameId.LoomVga);
@@ -1781,7 +1779,7 @@ public partial class MainWindow : Window
         _session?.SetPointer(null);
         StopScenePlayback();
         if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
-        if (SessionModeToggle.IsChecked != true) _cdVoice.Stop();
+        if (SessionModeToggle.IsChecked != true) CurrentModule.Voice.Stop();
         if (_currentRoomResource is not { } room || _currentRoom is null) return;
         ApplyRoomState(room, _currentRoomObjectRecords, _objects,
             visit: SessionModeToggle.IsChecked == true && !_restoringInteractiveView);
@@ -3992,7 +3990,7 @@ public partial class MainWindow : Window
                             _sceneSound.SetMode(mode);
                             SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
                             break;
-                        case "voices": CdSoundCombo.SelectedIndex = parts[1] != "0" ? 1 : 0; _cdVoice.Enabled = parts[1] != "0"; break;
+                        case "voices": CdSoundCombo.SelectedIndex = parts[1] != "0" ? 1 : 0; LoomModule.VoicesEnabled = parts[1] != "0"; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                         case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
                     }
@@ -4432,7 +4430,7 @@ public partial class MainWindow : Window
         _playbackTimer?.Stop();
         _playbackPaused = true;
         _sceneSound.Pause();
-        _cdVoice.Pause();
+        CurrentModule.Voice.Pause();
         StatusText.Text = "Paused. Play (or space) goes on.";
         StatusText.ToolTip = "The scene's frames wait while paused. The game's own pause key (space, VAR_PAUSE_KEY) stops ScummVM's frame loop the same way.";
         UpdatePlaybackControls();
@@ -4443,7 +4441,7 @@ public partial class MainWindow : Window
         if (_playback is null || !_playbackPaused) return;
         _playbackPaused = false;
         _sceneSound.Resume();
-        _cdVoice.Resume();
+        CurrentModule.Voice.Resume();
         _playbackTimer ??= CreatePlaybackTimer();
         _playbackTimer.Interval = PlaybackFrameInterval();
         _playbackTimer.Start();
@@ -4578,7 +4576,7 @@ public partial class MainWindow : Window
         _replaySequence?.FrameAdvanced();
         if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
         // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
-        if (!_playbackBatch) { _sceneSound.Update(); if (_game?.Id == GameId.LoomVga) _cdVoice.Update(); }
+        if (!_playbackBatch) { _sceneSound.Update(); CurrentModule.Voice.Update(); }
         return true;
     }
 
@@ -4642,24 +4640,25 @@ public partial class MainWindow : Window
 
     private void FollowSessionSound()
     {
-        if (GameClickActive && _game is { Id: not GameId.LoomVga } && _session is not null && !_sceneSound.Follows(_session))
+        var voice = CurrentModule.Voice;
+        if (GameClickActive && _game is not null && !voice.ReplacesSceneSound && _session is not null && !_sceneSound.Follows(_session))
             _sceneSound.Attach(_game, _session);
-        else if (GameClickActive && _game is { Id: GameId.LoomVga, V4Archive: { } vga } && _session is not null && !_cdVoice.Follows(_session))
-            _cdVoice.Attach(vga.Disc, _session);
+        else if (GameClickActive && voice.ReplacesSceneSound && _session is not null && !voice.Follows(_session))
+            voice.Attach(_session);
     }
 
     private void UpdateSessionSound()
     {
-        if (GameClickActive && !_playbackBatch && _game?.Id != GameId.LoomVga) _sceneSound.Update();
-        else if (GameClickActive && !_playbackBatch && _game?.Id == GameId.LoomVga) _cdVoice.Update();
+        if (GameClickActive && !_playbackBatch && !CurrentModule.Voice.ReplacesSceneSound) _sceneSound.Update();
+        else if (GameClickActive && !_playbackBatch) CurrentModule.Voice.Update();
     }
 
     private void CdSoundCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || CdSoundCombo.SelectedIndex < 0) return;
-        _cdVoice.Enabled = CdSoundCombo.SelectedIndex == 1;
+        LoomModule.VoicesEnabled = CdSoundCombo.SelectedIndex == 1;
         RefreshRoomSoundsVisibility();
-        if (!_cdVoice.Enabled) _cdVoice.Stop();
+        if (!LoomModule.VoicesEnabled) LoomModule.Voice.Stop();
         SaveViewOptions();
     }
 
@@ -4810,7 +4809,7 @@ public partial class MainWindow : Window
         _replaySequence = null;
         UpdatePlaybackControls();
         _sceneSound.Update();
-        if (_game?.Id == GameId.LoomVga) _cdVoice.Update();
+        CurrentModule.Voice.Update();
         var snapshot = session.Snapshot;
         var note = playback.Note is null ? "" : Environment.NewLine + playback.Note;
         if (sequenceFailure is not null)
@@ -5742,15 +5741,8 @@ public partial class MainWindow : Window
             _roomSoundChoices = [];
             RoomSoundsButton.Visibility = Visibility.Collapsed;
         }
-        if (_game is { Id: GameId.LoomVga, V4Archive.Disc: not null } && _currentRoomResource is { ResourceId: int cdRoomId })
-        {
-            // The CD game: the disc's audio the room's own scripts ask for (music or narration first, then the spoken lines), played on demand.
-            try { _cdRoomCues = LoomCdCueIndex.ScanRoom(_cdData ?? ScummDataSources.For(_game), cdRoomId).OrderByDescending(cue => cue.IsMusicOrNarration).ThenBy(cue => cue.Cue.Offset).ToArray(); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException) { _cdRoomCues = []; }
-            RoomSoundsButton.Visibility = _cdRoomCues.Count > 0 && _cdVoice.Enabled ? Visibility.Visible : Visibility.Collapsed;
-            return;
-        }
-        if (_game is null || _game.Id == GameId.LoomVga || _currentRoomResource is not { } room) return;
+        if (CurrentModule.UpdateRoomSounds(_currentRoomResource)) return;
+        if (_game is null || _currentRoomResource is not { } room) return;
         // The interactive LOOM mode plays the music the game's scripts start (SceneSoundPlayer), so the panel's own
         // player would only duplicate it (the user's choice, 30 Sep; .verification/room-music-analysis). Inspection mode keeps it.
         // The Sounds menu (every music and effect the room may start, played on demand) serves both modes.
@@ -5868,8 +5860,6 @@ public partial class MainWindow : Window
     }
 
     private List<(GameResource Resource, bool Music, TimeSpan? Duration, string Evidence)> _roomSoundChoices = [];
-
-    private IReadOnlyList<LoomCdCue> _cdRoomCues = [];
 
     private static string SoundSourceSummary(string evidence)
     {

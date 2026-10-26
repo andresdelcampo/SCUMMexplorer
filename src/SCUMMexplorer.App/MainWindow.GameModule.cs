@@ -21,6 +21,15 @@ internal interface IGameModule
     /// <summary>The cutscenes Game Texts offers, by the indexed script that prints their texts.</summary>
     Dictionary<int, GalleryCutscene> GalleryCutscenes();
 
+    /// <summary>The game's own spoken or disc audio beside the scene sounds (<see cref="NoVoice"/> for a game with none).</summary>
+    IGameVoice Voice { get; }
+
+    /// <summary>The option "play the game's voices" (kept even while another game is open).</summary>
+    bool VoicesEnabled { get; set; }
+
+    /// <summary>Rebuilds the room's Sounds list when the game has its own kind (true: handled, the generic list is not built); false leaves it to the generic code.</summary>
+    bool UpdateRoomSounds(GameResource? room);
+
     /// <summary>The names the game gives its resources, verbs and hero (what every tree, title and readable script shows).</summary>
     GameNames CreateNames(GameLibrary game);
 
@@ -29,6 +38,39 @@ internal interface IGameModule
 
     /// <summary>What a script page's Play button does for the script, when the game has a catalog that knows it as a scene; null hides the button.</summary>
     Action? ScriptPlayback(int? scriptId);
+}
+
+/// <summary>The voice or disc-audio player of a game, driven by the window's session and playback lifecycle.</summary>
+internal interface IGameVoice
+{
+    void Stop();
+    void Pause();
+    void Resume();
+    void Detach();
+    /// <summary>Plays the cues the session issued since the last call.</summary>
+    void Update();
+    /// <summary>Drops the cues a room visit issued without playing them.</summary>
+    void SkipPending(LoomExplorationSession? session);
+    /// <summary>True when the voice already follows the session.</summary>
+    bool Follows(LoomExplorationSession? session);
+    /// <summary>Starts following the session; false when the game has no voice.</summary>
+    bool Attach(LoomExplorationSession session);
+    /// <summary>True when this game's sound comes from the voice and not from the scene sound player.</summary>
+    bool ReplacesSceneSound { get; }
+}
+
+internal sealed class NoVoice : IGameVoice
+{
+    public static NoVoice Instance { get; } = new();
+    public void Stop() { }
+    public void Pause() { }
+    public void Resume() { }
+    public void Detach() { }
+    public void Update() { }
+    public void SkipPending(LoomExplorationSession? session) { }
+    public bool Follows(LoomExplorationSession? session) => false;
+    public bool Attach(LoomExplorationSession session) => false;
+    public bool ReplacesSceneSound => false;
 }
 
 /// <summary>
@@ -72,6 +114,9 @@ public partial class MainWindow
         public void Opened(GameLibrary game) { }
         public void StartBackgroundDerivation(GameLibrary game) { }
         public Dictionary<int, GalleryCutscene> GalleryCutscenes() => [];
+        public IGameVoice Voice => NoVoice.Instance;
+        public bool VoicesEnabled { get; set; } = true;
+        public bool UpdateRoomSounds(GameResource? room) => false;
         public GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), null, "the hero");
         public string? ScriptKind(GameResource resource) => null;
         public Action? ScriptPlayback(int? scriptId) => null;

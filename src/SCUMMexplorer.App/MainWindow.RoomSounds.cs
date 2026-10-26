@@ -18,8 +18,8 @@ public partial class MainWindow
     /// <summary>Changing a CD device must not hide an unrelated room's cached sound list.</summary>
     private void RefreshRoomSoundsVisibility()
     {
-        var available = _game?.Id == GameId.LoomVga
-            ? _cdRoomCues.Count > 0 && _cdVoice.Enabled
+        var available = CurrentModule.Voice.ReplacesSceneSound
+            ? _cdRoomCues.Count > 0 && CurrentModule.VoicesEnabled
             : _roomSoundChoices.Count > 0;
         RoomSoundsButton.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -34,7 +34,7 @@ public partial class MainWindow
         StopScenePlayback();
         StopAudio();
         _sceneSound.Detach();
-        _cdVoice.Detach();
+        CurrentModule.Voice.Detach();
         _playSpeech.Detach();
         _session = null;
         _idleSession = null;
