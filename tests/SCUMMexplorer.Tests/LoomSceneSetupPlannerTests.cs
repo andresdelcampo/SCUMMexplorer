@@ -168,7 +168,7 @@ public sealed class LoomSceneSetupPlannerTests
     {
         var game = Game();
         var planner = new LoomSceneSetupPlanner(game);
-        var json = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/loom-replays.json"));
+        var json = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/Loom/Ega/loom-replays.json"));
         using var doc = JsonDocument.Parse(File.ReadAllText(json));
         var lines = new List<string>();
         foreach (var r in doc.RootElement.GetProperty("replays").EnumerateArray())
@@ -215,7 +215,7 @@ public sealed class LoomSceneSetupPlannerTests
             lines.Add($"Room {room:00}: scripts [{string.Join(", ", scan.Scripts)}] reads [{string.Join(" ", reads)}] costume [{string.Join(" | ", scan.CostumeChanges)}]");
         }
         lines.Add("== scenes: story bits read but not written by the scene's own code, and who sets them ==");
-        var json = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/loom-replays.json"));
+        var json = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/Loom/Ega/loom-replays.json"));
         using var doc = JsonDocument.Parse(File.ReadAllText(json));
         static bool Story(string v) => v.StartsWith("bit[0x", StringComparison.Ordinal) && int.Parse(v.AsSpan(6, v.Length - 7), System.Globalization.NumberStyles.HexNumber) >= 0xD72;
         var writerCache = new Dictionary<string, IReadOnlyList<LoomStateSource>>();

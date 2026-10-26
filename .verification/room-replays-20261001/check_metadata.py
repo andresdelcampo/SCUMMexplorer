@@ -1,5 +1,5 @@
 import collections, json, pathlib
-catalog=json.load(open('src/SCUMMexplorer.App/loom-replays.json',encoding='utf-8'))
+catalog=json.load(open('src/SCUMMexplorer.App/Loom/Ega/loom-replays.json',encoding='utf-8'))
 audit=json.load(open('Exe/VerificationSession-20261001/replay-audit/audit.json',encoding='utf-8'))
 established=json.load(open('Exe/VerificationSession-20261001/established-membership-1.json',encoding='utf-8'))
 assert catalog['sourceFiles']==audit['sourceFiles']==established['sourceFiles']

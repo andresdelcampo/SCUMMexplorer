@@ -11,7 +11,7 @@ public class ReplayCatalogReachabilityTests
 {
     private static JsonElement Catalog()
     {
-        var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/loom-replays.json"));
+        var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/Loom/Ega/loom-replays.json"));
         return JsonDocument.Parse(File.ReadAllText(path)).RootElement;
     }
 

@@ -7,7 +7,7 @@ public sealed class LoomCatalogStartTests
 {
     private sealed record Catalog(LoomCatalogStartRecipe[] CatalogStarts);
     private static LoomCatalogStartRecipe Recipe() => JsonSerializer.Deserialize<Catalog>(File.ReadAllText(
-        Path.GetFullPath("../../../../src/SCUMMexplorer.App/loom-replays.json", AppContext.BaseDirectory)),
+        Path.GetFullPath("../../../../src/SCUMMexplorer.App/Loom/Ega/loom-replays.json", AppContext.BaseDirectory)),
         new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!.CatalogStarts.Single();
 
     private static LoomExplorationSession Fresh()

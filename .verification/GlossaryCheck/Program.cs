@@ -145,7 +145,7 @@ foreach (var label in new[] { "Script 046", "Script 086", "Script 087", "Script 
     var esGame = new GameFolderScanner().Scan(args[1]);
     var enEvents = LoomStoryEvents.Read(enGame);
     var esEvents = LoomStoryEvents.Read(esGame);
-    using var catalogStream = File.OpenRead("src/SCUMMexplorer.App/loom-replays.json");
+    using var catalogStream = File.OpenRead("src/SCUMMexplorer.App/Loom/Ega/loom-replays.json");
     using var catalog = JsonDocument.Parse(catalogStream);
     var recipes = catalog.RootElement.GetProperty("replays").EnumerateArray()
         .Select(r => (Title: r.GetProperty("title").GetString()!, Room: r.GetProperty("room").GetInt32(), Obj: r.GetProperty("objectId").GetInt32(), Verb: r.GetProperty("verb").GetInt32(),

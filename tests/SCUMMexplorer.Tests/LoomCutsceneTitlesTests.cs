@@ -105,7 +105,7 @@ public class LoomReferenceCatalogTitleTests
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
             if (File.Exists(Path.Combine(dir.FullName, "SCUMMexplorer.slnx")))
-                return Path.Combine(dir.FullName, "src", "SCUMMexplorer.App", "loom-replays.json");
+                return Path.Combine(dir.FullName, "src", "SCUMMexplorer.App", "Loom", "Ega", "loom-replays.json");
         throw new FileNotFoundException("Repository root not found.");
     }
 
