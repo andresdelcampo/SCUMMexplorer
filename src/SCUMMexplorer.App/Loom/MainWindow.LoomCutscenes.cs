@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -57,6 +57,29 @@ public partial class MainWindow
     ];
     internal const int FirewoodSilentSteps = 8;
 
+    /// <summary>LOOM EGA and CD (and the demos): the state, derivations and Game Texts cutscenes that are LOOM's alone.</summary>
+    private sealed class LoomGameModule(MainWindow w) : IGameModule
+    {
+        public void Reset()
+        {
+            w._cdSetupPlanner = null;
+            w._cdSavedRoomLists = null;
+            w._cdRoomListsDone = false;
+        }
+
+        public void Opened(GameLibrary game)
+        {
+            w._replayCatalog = LoomReplayCatalog.Load(game);
+            if (game.Id == GameId.Loom) _ = w.NameStoryBitsAsync(game, w._glossary, w._replayCatalog.Replays);
+            w._setupPlanner = null;
+            w._readiness = null;
+        }
+
+        public void StartBackgroundDerivation(GameLibrary game) => w.StartCdSetupDerivation(game);
+
+        public Dictionary<int, GalleryCutscene> GalleryCutscenes() => w.LoomGalleryCutscenes();
+    }
+
     private IEnumerable<KnownCutscene> AllCutscenes()
     {
         foreach (var scene in KnownCutscenes) yield return scene;
@@ -73,7 +96,7 @@ public partial class MainWindow
     /// The known cutscenes by the indexed script that prints their texts, for Game Texts' "Play this cutscene".
     /// Script 052 prints no text (decoded), so none of its texts can offer it. Empty outside a LOOM session.
     /// </summary>
-    private Dictionary<int, GalleryCutscene> GalleryCutscenes()
+    private Dictionary<int, GalleryCutscene> LoomGalleryCutscenes()
     {
         var cutscenes = new Dictionary<int, GalleryCutscene>();
         if (_game?.Id != GameId.Loom || _game.IsDemo || _session is null || _indexedObjectSnapshot is null) return cutscenes;

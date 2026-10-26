@@ -1,0 +1,59 @@
+// 26 October 2026: opens each game through the real MainWindow.OpenGameFolder and reports what the per-game seams hand back (cutscene picker, Game Texts
+// cutscenes, replay catalog), so the same run on the commit before the IGameModule change and on the current tree can be compared line by line.
+// Usage: GameModuleCheck <games root> <private output> [fixture...]
+using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Threading;
+using SCUMMexplorer.App;
+using SCUMMexplorer.Core.Domain;
+
+internal static class Program
+{
+    private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
+    private static readonly string[] Fixtures = ["loom ega mt32 en", "loom ega es", "loom demo short ega en", "loom vga en", "indy3 ega en", "monkey1 ega en",
+        "mi2 talkie en", "mmansionE ega es", "zak ega en"];
+
+    [STAThread]
+    private static void Main(string[] args)
+    {
+        var output = Path.GetFullPath(args[1]); Directory.CreateDirectory(output);
+        Environment.SetEnvironmentVariable("SCUMM_EXPLORER_PROFILE_ROOT", Path.Combine(output, "profile"));
+        Environment.SetEnvironmentVariable("SCUMM_ROOM_CACHE_DIR", Path.Combine(output, "room-cache"));
+        var fixtures = args.Length > 2 ? args[2..] : Fixtures;
+        var report = new List<string>();
+        var app = new App(); app.InitializeComponent(); var window = new MainWindow();
+        object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
+        object? Prop(string name) => typeof(MainWindow).GetProperty(name, Private)!.GetValue(window);
+        window.ContentRendered += async (_, _) =>
+        {
+            try
+            {
+                foreach (var fixture in fixtures)
+                {
+                    var folder = Path.Combine(args[0], fixture);
+                    if (!Directory.Exists(folder)) { report.Add($"{fixture}: missing"); continue; }
+                    typeof(MainWindow).GetMethod("OpenGameFolder", Private)!.Invoke(window, [folder]);
+                    for (var n = 0; n < 400; n++) { await Task.Delay(25); if (Field("_game") is not null) break; }
+                    await Task.Delay(3000); // the background derivations start once the room cards have their artwork
+                    var game = (GameLibrary)Field("_game")!;
+                    var controls = Prop("CurrentRoomControls")!;
+                    var global = controls.GetType().GetMethod("GlobalCutscenes")!.Invoke(controls, [false])!;
+                    var entries = ((System.Collections.IEnumerable)global.GetType().GetProperty("Entries")!.GetValue(global)!).Cast<object>().ToList();
+                    var titles = entries.Select(e => (string)e.GetType().GetProperty("Title")!.GetValue(e)!).ToList();
+                    var gallery = (System.Collections.IDictionary)typeof(MainWindow).GetMethod("LoomGalleryCutscenes", Private)?.Invoke(window, null)!
+                        ?? new Dictionary<int, object>();
+                    var catalog = Field("_replayCatalog");
+                    var catalogReplays = catalog is null ? -1 : ((Array)catalog.GetType().GetProperty("Replays")!.GetValue(catalog)!).Length;
+                    var galleryViaWindow = typeof(MainWindow).GetMethod("GalleryCutscenes", Private) is { } old ? (System.Collections.IDictionary)old.Invoke(window, null)! : gallery;
+                    report.Add($"{fixture}: family={GameSupport.FamilyOf(game)} picker={entries.Count} first=[{string.Join("; ", titles.Take(3))}] last=[{titles.LastOrDefault()}] gallery={galleryViaWindow.Count} replays={Math.Max(catalogReplays, 0)}");
+                }
+                report.Add("DONE");
+            }
+            catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }
+            File.WriteAllLines(Path.Combine(output, "report.txt"), report);
+            window.Close(); app.Shutdown();
+        };
+        app.Run(window);
+    }
+}

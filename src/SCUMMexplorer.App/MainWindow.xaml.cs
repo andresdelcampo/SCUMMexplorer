@@ -1,4 +1,4 @@
-using DisplayMode = SCUMMexplorer.Core.Scumm.RoomOverlayMode;
+﻿using DisplayMode = SCUMMexplorer.Core.Scumm.RoomOverlayMode;
 using System.IO;
 using System.Diagnostics;
 using System.Windows;
@@ -248,7 +248,7 @@ public partial class MainWindow : Window
             {
                 if (_game?.Rooms.FirstOrDefault(room => room.ResourceId == roomId) is { } room)
                     SelectResourceInTree(room);
-            }, GalleryCutscenes(), RenderFirstVisitRoomAsync) { Owner = this };
+            }, CurrentModule.GalleryCutscenes(), RenderFirstVisitRoomAsync) { Owner = this };
             gallery.ShowDialog();
         }
         catch (Exception ex)
@@ -297,12 +297,10 @@ public partial class MainWindow : Window
         _roomCardCancellation?.Cancel();
         _roomCardBackgroundsReady.TrySetResult(false);
         _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        _cdSetupPlanner = null;
-        _cdSavedRoomLists = null;
+        _loomModuleInstance?.Reset();
         _playPlanner = null;
         _playSavedRoomLists = null;
         _playRoomListsDone = false;
-        _cdRoomListsDone = false;
         _scanDone = _scanTotal = 0;
         StopPlay();
         _play = null;
@@ -318,10 +316,8 @@ public partial class MainWindow : Window
         _glossary = LoomGlossary.Load(game);
         _usageIndex = LoomUsageIndex.Empty;
         _ = BuildUsageIndexAsync(game);
-        _replayCatalog = LoomReplayCatalog.Load(game);
-        if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
-        _setupPlanner = null;
-        _readiness = null;
+        _replayCatalog = null;
+        CurrentModule.Opened(game);
         _scriptReader = new ScummScriptReader(ScummProfile.For(game).Dialect);
         _verbReader = new ScummObjectVerbReader(ScummProfile.For(game).Dialect);
         _sceneBatches = null;

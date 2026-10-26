@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using SCUMMexplorer.Core.Domain;
@@ -24,7 +24,7 @@ public partial class MainWindow
         _roomCardsMayUseCache = useCache;
         try
         {
-            StartCdSetupDerivation(game);
+            CurrentModule.StartBackgroundDerivation(game);
             StartPlayCutsceneDerivation(game);
             UpdatePlaybackControls();
         }
