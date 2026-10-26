@@ -17,7 +17,6 @@ public sealed class ScummOldEditionTests
         Assert.Equal(family, GameSupport.FamilyOf(game));
         Assert.StartsWith(language + ",", game.Edition);
         // The edition detector receives filenames and bytes, not the folder label.
-        var paths = Directory.GetFiles(folder, "*.LFL").ToDictionary(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
-        Assert.Equal(game.Edition, KnownGameFiles.IdentifyEdition(paths)?.Label);
+        Assert.Equal(game.Edition, KnownEditions.Identify(GameFolderScanner.Fingerprint(folder)!)?.Label);
     }
 }

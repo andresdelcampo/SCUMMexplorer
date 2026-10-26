@@ -13,6 +13,26 @@ public enum ScummVersion
     V8
 }
 
+/// <summary>
+/// Which game the data is, whatever its format or edition, told by its bytes alone (<see cref="Discovery.GameIdentifier"/>); <see cref="Unknown"/> when no known
+/// data matches. What the explorer can do with it is <see cref="GameSupport.FamilyOf"/>, which also weighs the format.
+/// </summary>
+public enum KnownGame
+{
+    Unknown,
+    Loom,
+    IndianaJones3,
+    IndianaJones4,
+    MonkeyIsland,
+    MonkeyIsland2,
+    ManiacMansion,
+    ZakMcKracken
+}
+
+/// <summary>
+/// The game-specific code path a library takes: LOOM EGA, LOOM CD and Indiana Jones 3 EGA have readers and sessions of their own; every other game,
+/// named (<see cref="GameLibrary.Game"/>) or not, is <see cref="Unknown"/> and runs on the shared engine. Set by the scanner from the game and its format.
+/// </summary>
 public enum GameId
 {
     Unknown,
@@ -60,6 +80,17 @@ public sealed record GameLibrary(
     bool IsDemo = false,
     string Edition = "")
 {
+    /// <summary>
+    /// Which game the data is (told by its bytes); <see cref="KnownGame.Unknown"/> when no known data matches. A library made without the scanner takes the
+    /// game of its <see cref="Id"/>.
+    /// </summary>
+    public KnownGame Game { get; init; } = Id switch
+    {
+        GameId.Loom or GameId.LoomVga => KnownGame.Loom,
+        GameId.IndianaJones3 => KnownGame.IndianaJones3,
+        _ => KnownGame.Unknown
+    };
+
     /// <summary>The SCUMM v4 archive (DISK01.LEC; LOOM CD); null for every other game.</summary>
     public ScummV4Archive? V4Archive { get; init; }
 

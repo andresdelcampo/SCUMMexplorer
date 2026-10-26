@@ -19,12 +19,37 @@ public sealed class GameFolderScannerTests
         Assert.Equal(demo, game.IsDemo);
     }
 
+    [Theory]
+    [InlineData("loom ega en", KnownGame.Loom, GameEvidence.EditionFiles)]
+    [InlineData("loom vga en", KnownGame.Loom, GameEvidence.EditionFiles)]
+    [InlineData("loom vga en kixx", KnownGame.Loom, GameEvidence.EditionFiles)]
+    [InlineData("indy3 ega es", KnownGame.IndianaJones3, GameEvidence.EditionFiles)]
+    [InlineData("indy3 vga en", KnownGame.IndianaJones3, GameEvidence.EditionFiles)]
+    [InlineData("indy4 vga en", KnownGame.IndianaJones4, GameEvidence.EditionFiles)]
+    [InlineData("indy4 talkie vga es", KnownGame.IndianaJones4, GameEvidence.EditionFiles)]
+    [InlineData("monkey1 ega en", KnownGame.MonkeyIsland, GameEvidence.EditionFiles)]
+    [InlineData("monkey1 vga en", KnownGame.MonkeyIsland, GameEvidence.EditionFiles)]
+    [InlineData("monkey1 vga es", KnownGame.MonkeyIsland, GameEvidence.EditionFiles)]
+    [InlineData("mi2 sb16 en", KnownGame.MonkeyIsland2, GameEvidence.EditionFiles)]
+    [InlineData("mi2 talkie es", KnownGame.MonkeyIsland2, GameEvidence.EditionFiles)]
+    [InlineData("mmansion ega en", KnownGame.ManiacMansion, GameEvidence.EditionFiles)]
+    [InlineData("zakE ega en", KnownGame.ZakMcKracken, GameEvidence.EditionFiles)]
+    public void EveryFormatIsIdentifiedFromItsDataAlone(string folderName, KnownGame expected, GameEvidence evidence)
+    {
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, folderName));
+        if (!Directory.Exists(folder)) return;
+        var identity = GameIdentifier.Identify(GameFolderScanner.Fingerprint(folder)!);
+        Assert.Equal(expected, identity.Game);
+        Assert.Equal(evidence, identity.Evidence);
+        Assert.Equal(expected, new GameFolderScanner().Scan(folder).Game);
+    }
+
     [Fact]
     public void OnlyLoomCdDataIsClaimedAsLoomCd()
     {
-        Assert.True(GameFolderScanner.IsLoomCd("8A23DBBAFC432CE3F428DF15AFA47B6ED4F38117BF9490ED7DDB0F6F23E6318B-A13D9B5D5EBDA838014293E5A9BF131D4BF7DC792DC3A0AE193838B8B3395A05", 1, 1, 1, 1));
-        Assert.True(GameFolderScanner.IsLoomCd("other", 78, 165, 637, 30)); // another release of the disc: the directory sizes
-        Assert.False(GameFolderScanner.IsLoomCd("other", 85, 120, 400, 60)); // another game on the same archive format
+        // The directory sizes of both local dumps of the disc name LOOM; another game on the same archive format does not match.
+        Assert.Equal(KnownGame.Loom, GameIdentifier.Identify(new GameFingerprint(new Dictionary<string, Func<byte[]>>(), () => new DirectoryShape(ScummVersion.V4, 78, 165, 637, 30))).Game);
+        Assert.Equal(KnownGame.Unknown, GameIdentifier.Identify(new GameFingerprint(new Dictionary<string, Func<byte[]>>(), () => new DirectoryShape(ScummVersion.V4, 85, 120, 400, 60))).Game);
     }
 
     [Fact]
@@ -48,7 +73,7 @@ public sealed class GameFolderScannerTests
     [Fact]
     public void RecognizesLoomWithoutItsExecutableFromTheIndexAndStillSaysNothingAboutAnUnknownIndex()
     {
-        // An install without LOOM.EXE (a SCUMMVM-style copy, or the Italian release as found) is told by the index's costume and script counts.
+        // An install without LOOM.EXE (a SCUMMVM-style copy, or the Italian release as found) is told by the data alone.
         var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(source, "00.LFL"))) return;
         var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
@@ -71,7 +96,7 @@ public sealed class GameFolderScannerTests
             foreach (var file in Directory.EnumerateFiles(folder, "*.LFL").Where(f => !new[] { "00.LFL", "01.LFL", "02.LFL" }.Contains(Path.GetFileName(f)))) File.Delete(file);
             var inferred = new GameFolderScanner().Scan(folder);
             Assert.Equal(GameId.Loom, inferred.Id);
-            Assert.Contains("index shape only", inferred.DetectionNote);
+            Assert.Contains("sizes of its resource directories only (inferred)", inferred.DetectionNote);
         }
         finally { Directory.Delete(folder, recursive: true); }
         var tiny = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
@@ -86,12 +111,13 @@ public sealed class GameFolderScannerTests
     }
 
     [Fact]
-    public void RecognizesLikelyDosLoomAndKeepsIndexOutOfRoomList()
+    public void ListsAnOldV3IndexWithoutNamingTheGameFromAnExecutable()
     {
         var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
         Directory.CreateDirectory(folder);
         try
         {
+            // Executables carry no data the explorer reads: a LOOM.EXE beside an unknown index does not name the game.
             File.WriteAllBytes(Path.Combine(folder, "LOOM.EXE"), []);
             WriteOldV3Index(Path.Combine(folder, "00.LFL"));
             File.WriteAllBytes(Path.Combine(folder, "01.LFL"), []);
@@ -99,8 +125,8 @@ public sealed class GameFolderScannerTests
 
             var game = new GameFolderScanner().Scan(folder);
 
-            Assert.Equal("LOOM", game.Title);
-            Assert.Equal(GameId.Loom, game.Id);
+            Assert.Equal(KnownGame.Unknown, game.Game);
+            Assert.Equal(GameId.Unknown, game.Id);
             Assert.Equal(ScummVersion.V3, game.Version);
             Assert.Equal(new int?[] { 1, 2 }, game.Rooms.Select(room => room.ResourceId));
             Assert.Contains(game.Resources, resource => resource.Name == "Game index" && resource.Kind == ResourceKind.Other);
@@ -117,53 +143,27 @@ public sealed class GameFolderScannerTests
     [Fact]
     public void LoomDemoKeepsOnlyResourcesItsFolderContains()
     {
-        var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(folder);
-        try
-        {
-            File.WriteAllBytes(Path.Combine(folder, "LOOMDEMO.EXE"), []);
-            WriteOldV3Index(Path.Combine(folder, "00.LFL"));
-            File.WriteAllBytes(Path.Combine(folder, "01.LFL"), []);
-            File.WriteAllBytes(Path.Combine(folder, "02.LFL"), []);
-
-            var game = new GameFolderScanner().Scan(folder);
-
-            Assert.Equal("LOOM (demo)", game.Title);
-            Assert.Equal(new int?[] { 1, 2 }, game.Rooms.Select(room => room.ResourceId));
-            // The index entries point into empty files: no resource starts there.
-            Assert.DoesNotContain(game.Resources, resource => resource.Kind is ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound);
-            Assert.Contains("self-running preview", game.DetectionNote);
-        }
-        finally
-        {
-            Directory.Delete(folder, recursive: true);
-        }
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom demo short ega en"));
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal("LOOM (demo)", game.Title);
+        Assert.True(game.IsDemo);
+        // The demo's index also lists entries for files it lacks: none of them is offered.
+        Assert.All(game.Resources.Where(r => r.Kind is ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound && r.ContainerFileNumber is not null),
+            resource => Assert.True(File.Exists(resource.FilePath)));
+        Assert.Contains("index also lists", game.DetectionNote);
     }
 
     [Fact]
-    public void RecognizesIndianaJonesEgaFromItsOldV3Index()
+    public void RecognizesIndianaJonesEgaFromItsData()
     {
-        var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(folder);
-        try
-        {
-            File.WriteAllBytes(Path.Combine(folder, "INDY3.EXE"), []);
-            WriteOldV3Index(Path.Combine(folder, "00.LFL"));
-            File.WriteAllBytes(Path.Combine(folder, "01.LFL"), []);
-            File.WriteAllBytes(Path.Combine(folder, "02.LFL"), []);
-
-            var game = new GameFolderScanner().Scan(folder);
-
-            Assert.Equal("Indiana Jones and the Last Crusade", game.Title);
-            Assert.Equal(GameId.IndianaJones3, game.Id);
-            Assert.Equal(ScummVersion.V3, game.Version);
-            Assert.Equal(new int?[] { 1, 2 }, game.Rooms.Select(room => room.ResourceId));
-            Assert.Contains("Room backgrounds are supported", game.DetectionNote);
-        }
-        finally
-        {
-            Directory.Delete(folder, recursive: true);
-        }
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "indy3 ega en"));
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal("Indiana Jones and the Last Crusade", game.Title);
+        Assert.Equal(GameId.IndianaJones3, game.Id);
+        Assert.Equal(KnownGame.IndianaJones3, game.Game);
+        Assert.Equal(ScummVersion.V3, game.Version);
     }
 
     [Fact]

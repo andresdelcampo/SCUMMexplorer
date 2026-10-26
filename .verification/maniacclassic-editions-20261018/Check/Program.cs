@@ -17,8 +17,7 @@ foreach (var name in new[] { "00.LFL", "45.LFL", "MANIAC.EXE" })
     var path = Directory.GetFiles(folder).SingleOrDefault(path => Path.GetFileName(path).Equals(name, StringComparison.OrdinalIgnoreCase));
     Console.WriteLine(path is null ? $"{name}: absent" : $"{name}: {new FileInfo(path).Length} bytes, SHA256={Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)))}");
 }
-var paths = Directory.GetFiles(folder, "*.LFL").ToDictionary(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
-Console.WriteLine("Content-only identity agrees: " + (KnownGameFiles.IdentifyEdition(paths)?.Label == game.Edition));
+Console.WriteLine("Content-only identity agrees: " + (KnownEditions.Identify(GameFolderScanner.Fingerprint(folder)!)?.Label == game.Edition));
 Console.WriteLine("Spanish label transform present: " + (ManiacPreviewText.For(game) is not null));
 var session = ManiacCutsceneSetup.NewSession(game);
 Console.WriteLine($"Reviewed native startup: room={session.CurrentRoomId}; control={session.PlayerHasControl}; cutscene={session.InCutscene}; deliveredInputs={session.DeliveredInput.Count}");

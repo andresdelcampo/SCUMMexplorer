@@ -1,5 +1,4 @@
 using System.Text;
-using SCUMMexplorer.Core.Discovery;
 
 namespace SCUMMexplorer.Core.Domain;
 
@@ -124,35 +123,30 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
     /// <summary>The edition label of the English LOOM EGA release with the Roland upgrade: the one whose replay catalog is hand-validated.</summary>
     public const string ReferenceEditionLabel = "English, Roland upgrade";
 
-    /// <summary>The one place that maps a detected game onto its family. Version and title decide the browsed games, which are all <see cref="GameId.Unknown"/>.</summary>
+    /// <summary>
+    /// The one place that maps a detected game onto its family: the game its data is (<see cref="GameLibrary.Game"/>, told by its bytes) and the format it was
+    /// read in. A game the data does not name is an other game of its format.
+    /// </summary>
     public static GameFamily FamilyOf(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        switch (game.Id)
+        return (game.Game, game.Version) switch
         {
-            case GameId.Loom:
-                return game.IsDemo ? GameFamily.LoomEgaDemo : game.Edition == ReferenceEditionLabel ? GameFamily.LoomEgaReference : GameFamily.LoomEga;
-            case GameId.LoomVga:
-                return GameFamily.LoomCd;
-            case GameId.IndianaJones3:
-                return game.Version == ScummVersion.V3 ? GameFamily.Indy3Ega : GameFamily.Unsupported;
-        }
-
-        var title = game.Title;
-        bool Is(string known) => title.StartsWith(known, StringComparison.Ordinal);
-        return game.Version switch
-        {
-            ScummVersion.V3 => GameFamily.OtherV3,
-            ScummVersion.V4 when Is(KnownGameTitles.MonkeyIsland) => GameFamily.MonkeyFloppy,
-            ScummVersion.V4 when Is(KnownGameTitles.Indy3) => GameFamily.Indy3Vga,
-            ScummVersion.V5 when Is(KnownGameTitles.MonkeyIsland2) => GameFamily.Monkey2,
-            ScummVersion.V5 when Is(KnownGameTitles.MonkeyIsland) => GameFamily.MonkeyCd,
-            ScummVersion.V5 when Is(KnownGameTitles.FateOfAtlantis) => GameFamily.Indy4,
-            ScummVersion.V2 when Is(KnownGameTitles.ManiacMansion) => GameFamily.ManiacEnhanced,
-            ScummVersion.V2 when Is(KnownGameTitles.ZakMcKracken) => GameFamily.ZakEnhanced,
-            ScummVersion.V1 when game.V1Game == ScummV1Game.ManiacMansion => GameFamily.ManiacClassic,
-            ScummVersion.V1 when game.V1Game == ScummV1Game.ZakMcKracken => GameFamily.ZakClassic,
-            ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V4 or ScummVersion.V5 => GameFamily.OtherBrowsed,
+            (KnownGame.Loom, ScummVersion.V4) => GameFamily.LoomCd,
+            (KnownGame.Loom, _) => game.IsDemo ? GameFamily.LoomEgaDemo : game.Edition == ReferenceEditionLabel ? GameFamily.LoomEgaReference : GameFamily.LoomEga,
+            (KnownGame.IndianaJones3, ScummVersion.V3) => GameFamily.Indy3Ega,
+            (KnownGame.IndianaJones3, ScummVersion.V4) => GameFamily.Indy3Vga,
+            (KnownGame.MonkeyIsland, ScummVersion.V4) => GameFamily.MonkeyFloppy,
+            (KnownGame.MonkeyIsland, ScummVersion.V5) => GameFamily.MonkeyCd,
+            (KnownGame.MonkeyIsland2, ScummVersion.V5) => GameFamily.Monkey2,
+            (KnownGame.IndianaJones4, ScummVersion.V5) => GameFamily.Indy4,
+            (KnownGame.ManiacMansion, ScummVersion.V1) => GameFamily.ManiacClassic,
+            (KnownGame.ManiacMansion, ScummVersion.V2) => GameFamily.ManiacEnhanced,
+            (KnownGame.ZakMcKracken, ScummVersion.V1) => GameFamily.ZakClassic,
+            (KnownGame.ZakMcKracken, ScummVersion.V2) => GameFamily.ZakEnhanced,
+            (KnownGame.IndianaJones3, _) => GameFamily.Unsupported,
+            (_, ScummVersion.V3) => GameFamily.OtherV3,
+            (_, ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V4 or ScummVersion.V5) => GameFamily.OtherBrowsed,
             _ => GameFamily.Unsupported
         };
     }
