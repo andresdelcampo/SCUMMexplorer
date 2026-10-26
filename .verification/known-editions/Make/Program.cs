@@ -43,7 +43,7 @@ var root = Environment.GetEnvironmentVariable("SCUMM_GAMES_ROOT") is { Length: >
     ("zakE ega en", KnownGame.ZakMcKracken, "English, Zak McKracken enhanced", false),
 ];
 
-var data = new List<(string Folder, KnownGame Game, string Label, bool Demo, SortedDictionary<string, string> Hashes)>();
+var data = new List<(string Folder, KnownGame Game, string Label, bool Demo, SortedDictionary<string, string> Hashes, DirectoryShape? Shape)>();
 foreach (var (folder, game, label, demo) in editions)
 {
     var path = Path.Combine(root, folder);
@@ -53,7 +53,7 @@ foreach (var (folder, game, label, demo) in editions)
     foreach (var (key, languageLabel) in languages.Count == 0 ? [((string?)null, label)] : languages.Select(l => ((string?)l.Key, $"{l.Label}{label[(label.IndexOf(',') < 0 ? label.Length : label.IndexOf(','))..]}")))
     {
         var fingerprint = GameFolderScanner.Fingerprint(path, key)!;
-        data.Add((key is null ? folder : folder + "|" + key, game, languageLabel, demo, new(fingerprint.FileNames.ToDictionary(n => n.ToUpperInvariant(), n => fingerprint.Hash(n) ?? ""), StringComparer.Ordinal)));
+        data.Add((key is null ? folder : folder + "|" + key, game, languageLabel, demo, new(fingerprint.FileNames.ToDictionary(n => n.ToUpperInvariant(), n => fingerprint.Hash(n) ?? ""), StringComparer.Ordinal), fingerprint.Shape));
     }
 }
 
@@ -84,6 +84,34 @@ foreach (var group in data.GroupBy(e => e.Game))
                 Console.WriteLine($"not told apart by this edition's own files: {edition.Label} ({edition.Game}) <- {o.Label}");
         output.Add(new { game = edition.Game.ToString(), label = edition.Label, demo = edition.Demo, dataFiles = h.Count, files = sample.Order(StringComparer.Ordinal).ToDictionary(n => n, n => h[n]) });
     }
+// Per game, what its editions share, so an edition the catalog lacks (another language) is still told: (1) per format, the data files present in every
+// non-demo edition in at most two versions; (2) per format, the directory sizes every non-demo edition has. Both must match no other game's editions.
+var games = new List<object>();
+foreach (var group in data.GroupBy(e => e.Game))
+{
+    var others = data.Where(e => e.Game != group.Key).ToList();
+    var shared = new SortedDictionary<string, SortedSet<string>>(StringComparer.Ordinal);
+    var shapes = new List<object>();
+    foreach (var format in group.Where(e => !e.Demo && e.Shape is not null).GroupBy(e => e.Shape!.Version))
+    {
+        var editionsOfFormat = format.ToList();
+        if (editionsOfFormat.Count >= 2)
+        {
+            var candidates = editionsOfFormat[0].Hashes.Keys.Where(n => editionsOfFormat.All(e => e.Hashes.ContainsKey(n)))
+                .Select(n => (Name: n, Hashes: editionsOfFormat.Select(e => e.Hashes[n]).Distinct().ToList()))
+                .Where(c => c.Hashes.Count <= 2 && !others.Any(o => o.Hashes.TryGetValue(c.Name, out var x) && c.Hashes.Contains(x)))
+                .OrderBy(c => c.Hashes.Count).ThenBy(c => c.Name, StringComparer.Ordinal).Take(6);
+            foreach (var c in candidates) shared[c.Name] = new SortedSet<string>(c.Hashes, StringComparer.Ordinal);
+        }
+        int? Common(Func<DirectoryShape, int> pick) => editionsOfFormat.Select(e => pick(e.Shape!)).Distinct().Count() == 1 ? pick(editionsOfFormat[0].Shape!) : null;
+        var known = new KnownShape(format.Key, Common(x => x.Rooms), Common(x => x.Costumes), Common(x => x.Scripts), Common(x => x.Sounds));
+        if (known.Rooms is null && known.Costumes is null && known.Scripts is null && known.Sounds is null) continue;
+        var clash = others.FirstOrDefault(o => o.Shape is not null && known.Matches(o.Shape));
+        if (clash.Label is not null) { Console.WriteLine($"shape of {group.Key} {format.Key} also matches {clash.Game} {clash.Label}: not used"); continue; }
+        shapes.Add(new { version = format.Key.ToString(), rooms = known.Rooms, costumes = known.Costumes, scripts = known.Scripts, sounds = known.Sounds });
+    }
+    games.Add(new { game = group.Key.ToString(), sharedFiles = shared.ToDictionary(p => p.Key, p => p.Value.ToArray()), shapes });
+}
 var target = Path.Combine("src", "SCUMMexplorer.Core", "Discovery", "known-editions.json");
-File.WriteAllText(target, JsonSerializer.Serialize(output, new JsonSerializerOptions { WriteIndented = true, IndentSize = 1 }));
+File.WriteAllText(target, JsonSerializer.Serialize(new { editions = output, games }, new JsonSerializerOptions { WriteIndented = true, IndentSize = 1 }));
 Console.WriteLine($"{output.Count} editions");

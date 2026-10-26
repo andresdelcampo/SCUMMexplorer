@@ -45,6 +45,22 @@ public sealed class GameFolderScannerTests
     }
 
     [Fact]
+    public void EveryGameIsToldInAnEditionTheCatalogLacksByTheDirectorySizesItsEditionsShare()
+    {
+        // The fallback is derived from the catalog the same way for every game: a data set with no known file but the sizes of a known game is that game, labelled inferred.
+        foreach (var info in KnownGames.All)
+        {
+            Assert.NotEmpty(info.Shapes);
+            foreach (var shape in info.Shapes)
+            {
+                var identity = GameIdentifier.Identify(new GameFingerprint(new Dictionary<string, Func<byte[]>>(), () => new DirectoryShape(shape.Version, shape.Rooms ?? 1, shape.Costumes ?? 1, shape.Scripts ?? 1, shape.Sounds ?? 1)));
+                Assert.Equal(info.Game, identity.Game);
+                Assert.Equal(GameEvidence.DirectoryShape, identity.Evidence);
+            }
+        }
+    }
+
+    [Fact]
     public void OnlyLoomCdDataIsClaimedAsLoomCd()
     {
         // The directory sizes of both local dumps of the disc name LOOM; another game on the same archive format does not match.

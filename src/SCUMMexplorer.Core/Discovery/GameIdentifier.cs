@@ -49,8 +49,8 @@ public static class GameIdentifier
     {
         ArgumentNullException.ThrowIfNull(data);
         if (KnownEditions.Identify(data) is { } edition) return new(edition.Game, GameEvidence.EditionFiles, edition);
-        foreach (var info in KnownGames.All)
-            if (info.SharedFiles.Count(file => data.Hash(file.Key) is { } hash && file.Value.Contains(hash, StringComparer.OrdinalIgnoreCase)) >= KnownGames.RequiredSharedMatches)
+        foreach (var info in KnownGames.All.Where(info => info.SharedFiles.Count > 0))
+            if (info.SharedFiles.Count(file => data.Hash(file.Key) is { } hash && file.Value.Contains(hash, StringComparer.OrdinalIgnoreCase)) >= Math.Min(KnownGames.RequiredSharedMatches, info.SharedFiles.Count))
                 return new(info.Game, GameEvidence.SharedFiles);
         if (byIndexLayout != KnownGame.Unknown) return new(byIndexLayout, GameEvidence.IndexLayout);
         if (data.Shape is { } shape && KnownGames.All.FirstOrDefault(info => info.Shapes.Any(known => known.Matches(shape))) is { } byShape)
