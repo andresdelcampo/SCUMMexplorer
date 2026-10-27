@@ -8,9 +8,9 @@ namespace SCUMMexplorer.App;
 /// <summary>Where a room preview's data came from; the preview's later steps (objects, note, doorways) differ by it.</summary>
 internal enum RoomSourceKind { CdArchive, BrowsedV4, OlderV1V2, OldV3Lfl }
 
-/// <summary>What a <see cref="RoomSource"/> read for one room: the background and the data the preview builds the room's objects from.</summary>
+/// <summary>What a <see cref="RoomSource"/> read for one room: the background and the data the preview builds the room's objects from. <c>Live</c>: the room belongs to a live session (its objects, verbs and names come from the session's data); false: a browsed room shown as the data stores it.</summary>
 internal sealed record RoomLoad(RoomSourceKind Kind, RoomImage Room, byte[] Bytes, ScummWalkBoxSet? WalkBoxes, LoomCdScene? CdScene,
-    ScummRoomScene? BrowsedScene, BrowsedObjects? BrowsedObjects, ScummRoomData? CdRoom, IBrowsableArchive? BrowseArchive);
+    ScummRoomScene? BrowsedScene, BrowsedObjects? BrowsedObjects, ScummRoomData? CdRoom, IBrowsableArchive? BrowseArchive, bool Live = false);
 
 public partial class MainWindow
 {
@@ -92,7 +92,7 @@ public partial class MainWindow
         public override RoomSourceKind Kind => RoomSourceKind.OldV3Lfl;
 
         public override bool Reads(MainWindow w, GameLibrary game, GameResource resource) =>
-            game is { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } && w._roomDecoder.CanDecode(resource.FilePath, 3);
+            game.Version == ScummVersion.V3 && w._roomDecoder.CanDecode(resource.FilePath, 3);
 
         public override async Task<RoomLoad?> LoadAsync(MainWindow w, GameLibrary game, GameResource resource, Func<bool> cancelled, CancellationToken token)
         {
@@ -104,7 +104,7 @@ public partial class MainWindow
             w._browsedScene = browsedScene;
             var room = browsedScene?.Room ?? DecodeBrowsedOldV3Room(game, w._roomDecoder.Decode(bytes), bytes);
             if (cancelled()) return null;
-            return new(Kind, room, bytes, TryReadWalkBoxes(bytes), null, browsedScene, null, null, null);
+            return new(Kind, room, bytes, TryReadWalkBoxes(bytes), null, browsedScene, null, null, null, Live: w.CurrentModule.HasDedicatedSession);
         }
     }
 }

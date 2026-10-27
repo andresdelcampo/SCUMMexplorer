@@ -1332,7 +1332,7 @@ public partial class MainWindow : Window
             var cdRoom = load.CdRoom;
             var room = load.Room;
             _currentWalkBoxes = load.WalkBoxes;
-            if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
+            if (!load.Live)
             {
                 IReadOnlyList<RoomVerbDestination> browsedDoorways = isCd ? [] : await Task.Run(() => FindBrowsedDoorways(resource), token);
                 if (token.IsCancellationRequested) return;

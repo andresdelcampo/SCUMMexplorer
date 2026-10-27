@@ -30,7 +30,7 @@ public partial class MainWindow
             var cdRoom = w._session is not null && w._cdData is not null ? await Task.Run(() => w._cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
             if (cancelled()) return null;
             w._cdScene = cdScene;
-            return new(Kind, room, [], cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes, cdScene, browsedScene, null, cdRoom, null);
+            return new(Kind, room, [], cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes, cdScene, browsedScene, null, cdRoom, null, Live: cdRoom is not null);
         }
     }
 }
