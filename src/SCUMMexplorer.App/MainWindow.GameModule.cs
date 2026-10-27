@@ -1,3 +1,4 @@
+using System.Windows.Controls;
 ﻿using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.App;
@@ -14,6 +15,9 @@ internal interface IGameModule
 
     /// <summary>Starts the game's live session (and its sound or voice) and loads the charset it draws with; leaves the window's session null for a game with none.</summary>
     void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot);
+
+    /// <summary>A group of the game's own resources for the Advanced tree beyond the shared ones (LOOM CD's audio cues); null for none.</summary>
+    TreeViewItem? ExtraResourceGroup(GameLibrary game);
 
     /// <summary>Forgets what the previous game left (called before another game opens).</summary>
     void Reset();
@@ -143,6 +147,7 @@ public partial class MainWindow
         public string? ScriptKind(GameResource resource) => null;
         public Action? ScriptPlayback(int? scriptId) => null;
         public bool HasDedicatedSession => false;
+        public TreeViewItem? ExtraResourceGroup(GameLibrary game) => null;
         public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => null;
         public void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot) { }
         public string? ScriptLoadingNote => null;

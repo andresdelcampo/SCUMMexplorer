@@ -34,12 +34,9 @@ public partial class MainWindow
     private bool IsCurrentRoomCardLoad(GameLibrary game, int generation, CancellationToken token) =>
         !token.IsCancellationRequested && generation == _roomCardGeneration && ReferenceEquals(_game, game);
 
-    private static bool UsesInitializedRoomCards(GameLibrary game) =>
-        game is { Id: GameId.Loom, Version: ScummVersion.V3 };
-
     private async Task PrepareRoomArtworkAsync(GameLibrary game, CancellationToken token)
     {
-        if (game is not { Id: GameId.Loom, Version: ScummVersion.V3 } || _sceneBatches is not null) return;
+        if (!UsesInitializedRoomCards(game) || _sceneBatches is not null) return;
         ScummSceneDrawBatches batches;
         try { batches = await DrawBatchesAsync(game).WaitAsync(token); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
@@ -133,7 +130,7 @@ public partial class MainWindow
 
             // Cache pixels accelerate display; native states are still prepared for opening rooms.
             var batches = ScummSceneDrawBatches.Empty;
-            if (game is { Id: GameId.Loom, Version: ScummVersion.V3 } && indexedSnapshot is not null)
+            if (UsesInitializedRoomCards(game) && indexedSnapshot is not null)
             {
                 try { batches = await DrawBatchesAsync(game).WaitAsync(cancellationToken); }
                 catch (OperationCanceledException) { throw; }

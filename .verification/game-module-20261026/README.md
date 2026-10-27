@@ -24,3 +24,5 @@ Names seam (same day): the check also prints each game's first room page, first 
 Sound seam (same day): the check also prints the session's sound owner (scene sound or CD voice), the room Sounds button and the voices option; identical before and after on the nine games.
 
 Status seam (same day): the check also prints the Game Status button state and tooltip; identical before and after on the nine games.
+
+Tree and room-card seam (same day): the check also hashes the first four room cards' pixels and lists the Advanced tree groups; identical before and after on the nine games.

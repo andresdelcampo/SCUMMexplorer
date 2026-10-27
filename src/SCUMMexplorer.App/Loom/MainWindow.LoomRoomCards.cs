@@ -1,4 +1,5 @@
 using System.IO;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Loom;
@@ -75,5 +76,44 @@ public partial class MainWindow
             if (layer.IsDrawn(i)) pixels[i] = layer.Pixels[i];
         }
         cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    private static bool UsesInitializedRoomCards(GameLibrary game) =>
+        game is { Id: GameId.Loom, Version: ScummVersion.V3 };
+
+    /// <summary>LOOM's room cards: the CD game's rendered scene, and the EGA game's initial state with its actors.</summary>
+    private static BitmapSource? TryRenderLoomRoomCard(GameLibrary game, GameResource roomResource, ScummIndexedObjectSnapshot? indexedSnapshot,
+        IReadOnlyDictionary<int, byte> indexedStates, ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
+    {
+        if (game is { Id: GameId.LoomVga, V4Archive: not null })
+            return RenderLoomCdRoomCard(game, roomResource.ResourceId!.Value, cancellationToken);
+        if (!UsesInitializedRoomCards(game) || indexedSnapshot is null) return null;
+        var bytes = File.ReadAllBytes(roomResource.FilePath);
+        var room = new ScummV3EgaRoomDecoder().Decode(bytes);
+        return RenderLoomEgaRoomCard(game, roomResource, room, bytes, indexedSnapshot, indexedStates, sceneBatches, cancellationToken);
+    }
+
+    /// <summary>LOOM CD: the disc's audio track as a tree group, every stretch a script asks for with sayVoice.</summary>
+    private TreeViewItem? CdCueTreeGroup(GameLibrary game)
+    {
+        if (game.Id != GameId.LoomVga || game.V4Archive is not { Disc: not null }) return null;
+        // The disc's audio track: every stretch a script asks for with sayVoice. Long ones and those without a line are the music and narration.
+        _cdCues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
+        var cueNode = new TreeViewItem { Header = $"CD audio  ({_cdCues.Count})", IsExpanded = false };
+        for (var i = 0; i < _cdCues.Count; i++)
+        {
+            var cue = _cdCues[i];
+            var kind = cue.IsMusicOrNarration ? "music / narration" : "voice";
+            var resource = new GameResource($"CD audio {i + 1:000}", ResourceKind.Sound, game.FolderPath, CdCueIdBase + i,
+                $"{kind}, {cue.Cue.Seconds:0.#} s at disc second {cue.Cue.DiscSeconds:0.#}; first asked for by {cue.Source}.", 1, null);
+            _soundLines[resource] = cue.Text;
+            var snippet = cue.Text.Length > 40 ? cue.Text[..40] + "…" : cue.Text;
+            cueNode.Items.Add(new TreeViewItem
+            {
+                Header = $"{(cue.IsMusicOrNarration ? "♪ " : "")}{resource.Name} · {cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}",
+                ToolTip = resource.Description, Tag = resource
+            });
+        }
+        return cueNode;
     }
 }

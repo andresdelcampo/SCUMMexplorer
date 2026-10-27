@@ -69,6 +69,24 @@ internal static class Program
                     var voices = ((System.Windows.Controls.ComboBox)window.FindName("CdSoundCombo")).SelectedIndex;
                     var scriptNote = ((System.Windows.Controls.TextBlock)window.FindName("ScriptNote")).Text;
                     report.Add($"{fixture}: open charset={Field("_charset") is not null} cdData={Field("_cdData") is not null} states={((System.Collections.IDictionary)Field("_indexedStates")!).Count} snapshot={Field("_indexedObjectSnapshot") is not null} scriptNote={Hash(scriptNote)}/{scriptNote.Length}");
+                    {
+                        var render = typeof(MainWindow).GetMethod("RenderRoomCardThumbnail", BindingFlags.Static | BindingFlags.NonPublic)!;
+                        var batches = Field("_sceneBatches") ?? typeof(SCUMMexplorer.Core.Scumm.ScummSceneDrawBatches).GetProperty("Empty")!.GetValue(null)!;
+                        var hashes = new List<string>();
+                        foreach (var r in game.Scenes.Take(4))
+                        {
+                            try
+                            {
+                                var bmp = (System.Windows.Media.Imaging.BitmapSource)render.Invoke(null, [game, r, Field("_indexedObjectSnapshot"), Field("_indexedStates"), batches, CancellationToken.None])!;
+                                var px = new byte[bmp.PixelWidth * bmp.PixelHeight * ((bmp.Format.BitsPerPixel + 7) / 8)];
+                                bmp.CopyPixels(px, bmp.PixelWidth * ((bmp.Format.BitsPerPixel + 7) / 8), 0);
+                                hashes.Add($"{r.ResourceId}:{Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(px))[..10]}");
+                            }
+                            catch (Exception ex) { hashes.Add($"{r.ResourceId}:{(ex is System.Reflection.TargetInvocationException t ? t.InnerException!.GetType().Name : ex.GetType().Name)}"); }
+                        }
+                        var treeGroups = string.Join(",", ((System.Windows.Controls.TreeView)window.FindName("ResourceTree")).Items.OfType<System.Windows.Controls.TreeViewItem>().Select(t => $"{t.Header}"));
+                        report.Add($"{fixture}: cards [{string.Join(" ", hashes)}] tree [{treeGroups}]");
+                    }
                     var statusBtn = (System.Windows.Controls.Button)window.FindName("GameStatusButton");
                     report.Add($"{fixture}: status button={statusBtn.Visibility}/{statusBtn.IsEnabled} tip={statusBtn.ToolTip}");
                     report.Add($"{fixture}: sound session={session is not null} scene={Follows(sceneSound)} voice={Follows(Field("_cdVoice"))} soundsBtn={soundBtn} voicesCombo={voices}");

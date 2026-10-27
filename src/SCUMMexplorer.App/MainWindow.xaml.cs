@@ -495,27 +495,7 @@ public partial class MainWindow : Window
             ResourceTree.Items.Add(trackNode);
         }
 
-        if (game.Id == GameId.LoomVga && game.V4Archive is { Disc: not null } cdArchive)
-        {
-            // The disc's audio track: every stretch a script asks for with sayVoice. Long ones and those without a line are the music and narration.
-            _cdCues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
-            var cueNode = new TreeViewItem { Header = $"CD audio  ({_cdCues.Count})", IsExpanded = false };
-            for (var i = 0; i < _cdCues.Count; i++)
-            {
-                var cue = _cdCues[i];
-                var kind = cue.IsMusicOrNarration ? "music / narration" : "voice";
-                var resource = new GameResource($"CD audio {i + 1:000}", ResourceKind.Sound, game.FolderPath, CdCueIdBase + i,
-                    $"{kind}, {cue.Cue.Seconds:0.#} s at disc second {cue.Cue.DiscSeconds:0.#}; first asked for by {cue.Source}.", 1, null);
-                _soundLines[resource] = cue.Text;
-                var snippet = cue.Text.Length > 40 ? cue.Text[..40] + "…" : cue.Text;
-                cueNode.Items.Add(new TreeViewItem
-                {
-                    Header = $"{(cue.IsMusicOrNarration ? "♪ " : "")}{resource.Name} · {cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}",
-                    ToolTip = resource.Description, Tag = resource
-                });
-            }
-            ResourceTree.Items.Add(cueNode);
-        }
+        if (CurrentModule.ExtraResourceGroup(game) is { } extra) ResourceTree.Items.Add(extra);
 
         PopulateRoomCards(game);
         PopulateCostumeCards(game);
@@ -882,13 +862,19 @@ public partial class MainWindow : Window
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, IReadOnlyDictionary<int, byte>?> BrowsedObjectStates = new();
 
+    /// <summary>A game's own room-card renderers, tried first (null: not this game's card). A game with initialized cards of its own adds its renderer here.</summary>
+    private static readonly RoomCardRenderer[] GameRoomCardRenderers = [TryRenderLoomRoomCard];
+
+    private delegate BitmapSource? RoomCardRenderer(GameLibrary game, GameResource roomResource, ScummIndexedObjectSnapshot? indexedSnapshot,
+        IReadOnlyDictionary<int, byte> indexedStates, ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken);
+
     private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,
         ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
         ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (game is { Id: GameId.LoomVga, V4Archive: not null })
-            return RenderLoomCdRoomCard(game, roomResource.ResourceId!.Value, cancellationToken);
+        foreach (var render in GameRoomCardRenderers)
+            if (render(game, roomResource, indexedSnapshot, indexedStates, sceneBatches, cancellationToken) is { } own) return own;
         // First visit of a game the generic session boots (R-5.3, R-6.12a): the room as the session leaves it, with its actors; the plain background where that cannot run.
         if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
             ReadFirstVisit(game, firstVisitRoom) is { } firstVisit)
@@ -908,9 +894,6 @@ public partial class MainWindow : Window
         var decoder = new ScummV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
         if (game.Id != GameId.Loom) return CreateRoomCardBitmap(room, DecodeBrowsedOldV3Room(game, room, bytes).Pixels.ToArray(), 0, room.Palette);
-        if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
-            return RenderLoomEgaRoomCard(game, roomResource, room, bytes, indexedSnapshot,
-                indexedStates, sceneBatches, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         return CreateRoomCardBitmap(room, room.Pixels.ToArray(), 0, room.Palette);
     }
