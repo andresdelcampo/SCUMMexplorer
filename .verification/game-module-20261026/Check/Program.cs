@@ -87,6 +87,7 @@ internal static class Program
                         var treeGroups = string.Join(",", ((System.Windows.Controls.TreeView)window.FindName("ResourceTree")).Items.OfType<System.Windows.Controls.TreeViewItem>().Select(t => $"{t.Header}"));
                         report.Add($"{fixture}: cards [{string.Join(" ", hashes)}] tree [{treeGroups}]");
                     }
+                    report.Add($"{fixture}: rows={Prop("RoomScreenRows")}");
                     var statusBtn = (System.Windows.Controls.Button)window.FindName("GameStatusButton");
                     report.Add($"{fixture}: status button={statusBtn.Visibility}/{statusBtn.IsEnabled} tip={statusBtn.ToolTip}");
                     report.Add($"{fixture}: sound session={session is not null} scene={Follows(sceneSound)} voice={Follows(Field("_cdVoice"))} soundsBtn={soundBtn} voicesCombo={voices}");

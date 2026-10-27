@@ -100,6 +100,10 @@ public partial class MainWindow
 
         public bool HasDedicatedSession => true;
 
+        public bool EstimatesRoomArtwork => w._game?.Id != GameId.LoomVga;
+
+        public int? RoomScreenRows => ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop;
+
         public TreeViewItem? ExtraResourceGroup(GameLibrary game) => w.CdCueTreeGroup(game);
 
         public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => game.Id == GameId.Loom && game.Version == ScummVersion.V3

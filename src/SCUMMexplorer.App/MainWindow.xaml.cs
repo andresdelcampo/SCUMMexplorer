@@ -1568,7 +1568,7 @@ public partial class MainWindow : Window
             if (visit) CurrentModule.Voice.SkipPending(_session);
             var sceneBatches = _sceneBatches ?? ScummSceneDrawBatches.Empty;
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
-                _indexedStates, sceneBatches, estimateArtwork: _game?.Id != GameId.LoomVga);
+                _indexedStates, sceneBatches, estimateArtwork: CurrentModule.EstimatesRoomArtwork);
             _objectSelection = initialized.Selection;
             _artworkEstimates = initialized.Estimates;
             _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
@@ -2686,7 +2686,7 @@ public partial class MainWindow : Window
     /// shown as stored): Indy3 EGA has rooms 136 to 200 rows tall and classic Maniac Mansion 136 (a cap of 128 cut
     /// their bottoms), so they show every row of the picture.
     /// </summary>
-    private int RoomScreenRows => _game?.Id is GameId.Loom or GameId.LoomVga ? ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop : int.MaxValue;
+    private int RoomScreenRows => CurrentModule.RoomScreenRows ?? int.MaxValue;
 
     private int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
 
@@ -4325,7 +4325,7 @@ public partial class MainWindow : Window
         _playbackPaused = false;
         // The scene opens where the game's camera is, whatever the view showed before (a replay can start in a wide room).
         if (_session?.CameraX is int startCamera && ViewShowsSessionRoom()) ScrollToGameCamera(startCamera);
-        if (_game is { Id: not GameId.LoomVga } && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
+        if (_game is not null && !CurrentModule.Voice.ReplacesSceneSound && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
         if (_playInstantly || instant)
         {
             _playbackTimer?.Stop();
@@ -4623,7 +4623,7 @@ public partial class MainWindow : Window
         // The CD game's audio (voice, overture) runs on the real clock; a frame that took longer than its jiffies (drawing, a room's load) is
         // made up by running the frames it was late for, up to four a tick, so the scene stays with the music.
         var catchUp = 0;
-        if (_game.Id == GameId.LoomVga)
+        if (CurrentModule.Voice.ReplacesSceneSound)
         {
             var now = System.Diagnostics.Stopwatch.GetTimestamp();
             if (playback.LastTickAt != 0)
@@ -4678,7 +4678,7 @@ public partial class MainWindow : Window
             playback.FrameSignature = signature;
             // The first frame of a room entered during a playback may already differ from the state the room's view was built with (the CD skill
             // screen's buttons are drawn a few frames in, before the first frame shows), so the CD game refreshes on it too.
-            if (!first || _game?.Id == GameId.LoomVga)
+            if (!first || CurrentModule.Voice.ReplacesSceneSound)
             {
                 ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
                 UpdateRoomNavigationActions(room);
@@ -5587,7 +5587,7 @@ public partial class MainWindow : Window
             foreach (var verb in verbs)
             {
                 ScummScriptDisassembly script;
-                try { script = _game.Id == GameId.LoomVga ? _cdData!.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _verbReader.Decode(room, record, verb.VerbId); }
+                try { script = _cdData is not null ? _cdData.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _verbReader.Decode(room, record, verb.VerbId); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
                 // Follow started room-local and global scripts too: many exits
                 // (for example Room 03's town and cemetery paths) load the room there.

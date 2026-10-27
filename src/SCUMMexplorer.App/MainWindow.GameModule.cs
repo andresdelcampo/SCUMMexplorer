@@ -19,6 +19,12 @@ internal interface IGameModule
     /// <summary>A group of the game's own resources for the Advanced tree beyond the shared ones (LOOM CD's audio cues); null for none.</summary>
     TreeViewItem? ExtraResourceGroup(GameLibrary game);
 
+    /// <summary>True when the artwork of an initialized room is an estimate (labelled as one); false when the game's data draws it exactly.</summary>
+    bool EstimatesRoomArtwork { get; }
+
+    /// <summary>How many pixel rows of a room the game's screen shows above its verb area; null when the room is shown whole.</summary>
+    int? RoomScreenRows { get; }
+
     /// <summary>Forgets what the previous game left (called before another game opens).</summary>
     void Reset();
 
@@ -147,6 +153,8 @@ public partial class MainWindow
         public string? ScriptKind(GameResource resource) => null;
         public Action? ScriptPlayback(int? scriptId) => null;
         public bool HasDedicatedSession => false;
+        public bool EstimatesRoomArtwork => true;
+        public int? RoomScreenRows => null;
         public TreeViewItem? ExtraResourceGroup(GameLibrary game) => null;
         public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => null;
         public void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot) { }

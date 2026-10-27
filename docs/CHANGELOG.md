@@ -2,6 +2,10 @@
 
 Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 26 October: playback and verb traits of IGameModule
+
+Smaller LOOM checks became traits: `EstimatesRoomArtwork` and `RoomScreenRows` on the module, the CD game's real-clock playback (catch-up frames, the first-frame refresh, the scene-sound attach) keyed on `Voice.ReplacesSceneSound`, and the object-verb decode on whether the game has its own data source (`_cdData`). Checked by the real-window run (rows per game added): identical before and after on nine games. Not moved: `RefreshRoomPreview` / the room preview's `isCd` branches. It is one 150-line method that builds a room from four different sources (CD archive, browsed v4 disk, older v1/v2 file, v3 EGA file); moving the CD branch alone would copy the other three. It wants a room-source abstraction designed together with a non-LOOM module trial.
+
 ## 26 October: tree and room-card seams of IGameModule
 
 `MainWindow.RoomCardActors.cs` moved to `Loom/MainWindow.LoomRoomCards.cs`, with LOOM's card rendering behind one static list in the shared window (`GameRoomCardRenderers`: each entry returns a game's own card or null; LOOM's `TryRenderLoomRoomCard` covers the CD scene and the EGA initial state). `UsesInitializedRoomCards` moved there too. The Advanced tree's CD audio cue group is built by `IGameModule.ExtraResourceGroup` (`CdCueTreeGroup` in the LOOM file). The real-window check now renders the first four room cards of each game (pixel hashes) and lists the tree groups: identical before and after on nine games. Still LOOM-keyed in the shared window: the tree's group filter by game id, the browsed old-v3 room (`DecodeBrowsedOldV3Room`, `game.Id != Loom`), the room preview's CD/EGA branch and the object-verb decoding.
