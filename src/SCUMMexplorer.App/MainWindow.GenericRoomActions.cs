@@ -27,7 +27,7 @@ public partial class MainWindow
     private int? _genericActionsShownFor;
     private sealed record GenericSourceAction(int Object, int Verb, string Title, string Target, ScummScriptDisassembly? Code, string Source, bool Executable);
 
-    private bool GenericRoomActions => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs;
+    private bool GenericRoomActions => _game is { } game && !HasDedicatedSession && ScummProfile.For(game).PlaysThroughVerbs;
 
     private void InitializeGenericRoomActions(Panel actionsHost, Panel sourceHost)
     {

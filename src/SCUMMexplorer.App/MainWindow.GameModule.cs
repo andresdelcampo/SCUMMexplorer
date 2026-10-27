@@ -9,6 +9,12 @@ namespace SCUMMexplorer.App;
 /// </summary>
 internal interface IGameModule
 {
+    /// <summary>The object states the game's live session starts from, read from its data (null for a game with no dedicated session).</summary>
+    ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game);
+
+    /// <summary>Starts the game's live session (and its sound or voice) and loads the charset it draws with; leaves the window's session null for a game with none.</summary>
+    void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot);
+
     /// <summary>Forgets what the previous game left (called before another game opens).</summary>
     void Reset();
 
@@ -38,6 +44,18 @@ internal interface IGameModule
 
     /// <summary>The fixed wording of a script page's subtitle when the game has one (without the name part); null for the generic wording.</summary>
     string? ScriptKind(GameResource resource);
+
+    /// <summary>True when the game runs in a live session of its own (LOOM's); false for the generic session or none.</summary>
+    bool HasDedicatedSession { get; }
+
+    /// <summary>The note a script page shows while it reads the bytecode; null for the generic wording.</summary>
+    string? ScriptLoadingNote { get; }
+
+    /// <summary>The note that says an entry is leftover bytes and not a standalone script, or null when it is a script.</summary>
+    string? ScriptBoundaryNote(GameResource resource);
+
+    /// <summary>Decodes a script from the game's own source when it has one (null: the generic decoders read it).</summary>
+    ScummScriptDisassembly? DecodeScript(GameResource resource);
 
     /// <summary>What a script page's Play button does for the script, when the game has a catalog that knows it as a scene; null hides the button.</summary>
     Action? ScriptPlayback(int? scriptId);
@@ -124,5 +142,11 @@ public partial class MainWindow
         public GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), null, "the hero");
         public string? ScriptKind(GameResource resource) => null;
         public Action? ScriptPlayback(int? scriptId) => null;
+        public bool HasDedicatedSession => false;
+        public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => null;
+        public void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot) { }
+        public string? ScriptLoadingNote => null;
+        public string? ScriptBoundaryNote(GameResource resource) => null;
+        public ScummScriptDisassembly? DecodeScript(GameResource resource) => null;
     }
 }

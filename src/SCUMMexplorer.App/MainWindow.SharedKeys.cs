@@ -12,7 +12,7 @@ namespace SCUMMexplorer.App;
 public partial class MainWindow
 {
     /// <summary>The game takes the user's clicks and keys now (LOOM's interactive session, a played game that is not a static preview).</summary>
-    private bool GameTakesKeys => GameClickActive && IsLoomGame || PlayTakesInput;
+    private bool GameTakesKeys => GameClickActive && HasDedicatedSession || PlayTakesInput;
 
     private bool SharedKeyDown(KeyEventArgs e)
     {
@@ -38,7 +38,7 @@ public partial class MainWindow
             if (_fullscreen && !(GameTakesKeys && transport.InCutscene)) { e.Handled = true; SetFullscreen(false); return true; }
             return false;
         }
-        if (key == Key.Space && !typing && Keyboard.Modifiers == ModifierKeys.None && (GameClickActive && IsLoomGame || PlayActive))
+        if (key == Key.Space && !typing && Keyboard.Modifiers == ModifierKeys.None && (GameClickActive && HasDedicatedSession || PlayActive))
         {
             // R-6.32: the key acts under the Pause button's condition; a played game takes the key either way.
             if (transport.PauseEnabled) { provider.TogglePause(); UpdatePlaybackControls(); e.Handled = true; return true; }

@@ -98,6 +98,43 @@ public partial class MainWindow
             _ => null
         };
 
+        public bool HasDedicatedSession => true;
+
+        public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => game.Id == GameId.Loom && game.Version == ScummVersion.V3
+            ? w._stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
+            : null;
+
+        public void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot)
+        {
+            // The CD game gets a live session as well (clicks, walks, verbs); its entry points are the same scripts 005-007. It starts past
+            // the intro (see LoomExplorationSession.ContinueCdBootAfterIntro) and has no sound or catalog yet.
+            var cdIndexed = game is { Id: GameId.LoomVga, V4Archive: { } vga } ? vga.ReadIndexedObjects() : null;
+            w._cdData = cdIndexed is null ? null : ScummDataSources.For(game);
+            if (cdIndexed is not null) w._indexedStates = cdIndexed.States;
+            w._session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
+                : snapshot is null ? null : new LoomExplorationSession(game, snapshot, soundCard: w.SoundCard);
+            if (w._session is not null && cdIndexed is null) w._sceneSound.Attach(game, w._session);
+            else if (w._session is not null) Voice.Attach(w._session);
+            w._charset = game.Id == GameId.Loom ? ScummV3Charset.TryLoad(game.FolderPath, 0, out w._charsetError) : null;
+        }
+
+        public string? ScriptLoadingNote => w._game?.Id switch
+        {
+            GameId.LoomVga => "Reading LOOM CD bytecode…",
+            GameId.Loom => "Reading DOS LOOM old-v3 bytecode…",
+            _ => null
+        };
+
+        public string? ScriptBoundaryNote(GameResource resource) => w._game is { Id: GameId.Loom } ega && new LflResourceChain().FindLeftover(ega, resource) is { } interior
+            ? interior.Describe() + " This entry does not establish a standalone script.\n" : null;
+
+        public ScummScriptDisassembly? DecodeScript(GameResource resource)
+        {
+            if (w._game?.Id != GameId.LoomVga || w._cdData is not { } cd) return null;
+            return (resource.ScriptRoom is int scriptRoom ? cd.RoomLocalScript(scriptRoom, resource.ResourceId!.Value) : cd.GlobalScript(resource.ResourceId!.Value))
+                ?? throw new InvalidDataException("This script is not stored in the CD data.");
+        }
+
         public Action? ScriptPlayback(int? scriptId)
         {
             if (scriptId is not int id || w._game?.Id != GameId.Loom) return null;

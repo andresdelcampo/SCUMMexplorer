@@ -294,10 +294,8 @@ public partial class MainWindow : Window
         var game = new GameFolderScanner { DiscFolder = RememberedLanguage(folder) }.Scan(folder);
         // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
         GameStatusButton.Visibility = Visibility.Collapsed;
-        var indexedSnapshot = game.Id == GameId.Loom && game.Version == ScummVersion.V3
-            ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
-            : null;
         _game = game;
+        var indexedSnapshot = CurrentModule.ReadObjectSnapshot(game);
         _names = CurrentModule.CreateNames(game);
         _usageIndex = LoomUsageIndex.Empty;
         _ = BuildUsageIndexAsync(game);
@@ -339,18 +337,12 @@ public partial class MainWindow : Window
             SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.Adlib;
             _soundModeFallback = false;
         }
-        // The CD game gets a live session as well (clicks, walks, verbs); its entry points are the same scripts 005-007. It starts past
-        // the intro (see LoomExplorationSession.ContinueCdBootAfterIntro) and has no sound or catalog yet.
-        var cdIndexed = game is { Id: GameId.LoomVga, V4Archive: { } vga } ? vga.ReadIndexedObjects() : null;
-        _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
+        _cdData = null;
         _cdCutsceneGroups = null;
-        if (cdIndexed is not null) _indexedStates = cdIndexed.States;
-        _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
-            : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
-        if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
-        else if (_session is not null) CurrentModule.Voice.Attach(_session);
+        _session = null;
         _charsetError = null;
-        _charset = game.Id == GameId.Loom ? ScummV3Charset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
+        _charset = null;
+        CurrentModule.StartSession(game, indexedSnapshot);
         _cdCharsets.Clear();
         try { _cdCharset = game.V4Archive?.ReadCharset(2); }
         catch (InvalidDataException error) { _cdCharset = null; _charsetError = $"charset 2 could not be read: {error.Message}"; }
@@ -1248,20 +1240,15 @@ public partial class MainWindow : Window
             PageTitle.ToolTip = _names.Evidence(resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
-            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.Loom ? "Reading DOS LOOM old-v3 bytecode…" : "Reading the game's bytecode…";
-            var interior = _game is { Id: GameId.Loom } egaGame
-                ? new LflResourceChain().FindLeftover(egaGame, resource) : null;
-            var boundaryNote = interior is null ? "" : interior.Describe() +
-                " This entry does not establish a standalone script.\n";
+            ScriptNote.Text = CurrentModule.ScriptLoadingNote ?? "Reading the game's bytecode…";
+            var boundaryNote = CurrentModule.ScriptBoundaryNote(resource) ?? "";
             try
             {
-                var disassembly = _game?.Id == GameId.LoomVga && _cdData is not null
-                    ? (resource.ScriptRoom is int scriptRoom ? _cdData.RoomLocalScript(scriptRoom, resource.ResourceId!.Value)
-                        : _cdData.GlobalScript(resource.ResourceId!.Value)) ?? throw new InvalidDataException("This script is not stored in the CD data.")
-                    : _game?.V4Disks is not null ? DecodeBrowsedV4Script(resource)
+                var disassembly = CurrentModule.DecodeScript(resource)
+                    ?? (_game?.V4Disks is not null ? DecodeBrowsedV4Script(resource)
                     : resource.ScriptRoom is int localRoom && _game is not null
                         ? ScummDataSources.For(_game).RoomLocalScript(localRoom, resource.ResourceId!.Value) ?? throw new InvalidDataException("This room-local script is not stored in the room.")
-                    : _scriptReader.Decode(resource);
+                    : _scriptReader.Decode(resource));
                 _scriptShown = disassembly;
                 ScriptOutput.Text = FormatScript(disassembly);
                 ScriptPlayButton.Visibility = CurrentModule.ScriptPlayback(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
@@ -2069,7 +2056,7 @@ public partial class MainWindow : Window
     /// <summary>LOOM's Advanced panel is redrawn from the session (R-6.43); the assumptions are one of its sections.</summary>
     private void RefreshStateIssues()
     {
-        if (IsLoomGame) RefreshLoomPanel();
+        if (HasDedicatedSession) RefreshLoomPanel();
     }
 
     private GameResource? FindEventTarget(ScummScriptEvent scriptEvent)
@@ -2941,7 +2928,7 @@ public partial class MainWindow : Window
     // ScummVM), never while typing in a text box. Script 005 reads the note rows q-i and c-C, < and > (text speed),
     // F5 (save screen), F6 (music and effects), F7 (animation), Ctrl+V (version) and Escape.
     private bool GameKeysActive => SessionModeToggle.IsChecked == true &&
-                                   _session is not null && _currentRoomResource is not null && IsLoomGame &&
+                                   _session is not null && _currentRoomResource is not null && HasDedicatedSession &&
                                    Keyboard.FocusedElement is not (TextBox or ComboBox);
 
     /// <summary>
@@ -4105,6 +4092,10 @@ public partial class MainWindow : Window
     /// it goes through the input scripts (005–007). Inspection mode cycles artwork instead.
     /// </summary>
     /// <summary>LOOM on EGA or on CD: the click path (scripts 005-007) is the same; what reads EGA-only files stays on <c>GameId.Loom</c>.</summary>
+    /// <summary>The game runs in its own live session (not the generic one): the click path, keys, scroll arrows and the one-screen layout are its. The open game's module says so.</summary>
+    private bool HasDedicatedSession => CurrentModule.HasDedicatedSession;
+
+    /// <summary>The open game is LOOM's data (EGA or CD): what picks LOOM's module and room controls.</summary>
     private bool IsLoomGame => _game?.Id is GameId.Loom or GameId.LoomVga;
 
     private bool GameClickActive => SessionModeToggle.IsChecked == true && _session is not null && !_catalogPreviewOnly;
@@ -4498,7 +4489,7 @@ public partial class MainWindow : Window
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         // R-16.9: one implementation of the bar for every game, filled by the game's provider.
         RefreshRoomControls();
-        if (!PlayCutscenes && GameClickActive && IsLoomGame) UpdateRoomScrollButtons(); // the room view's scroll arrows, not a control
+        if (!PlayCutscenes && GameClickActive && HasDedicatedSession) UpdateRoomScrollButtons(); // the room view's scroll arrows, not a control
     }
 
     private bool PlaybackShouldContinue()
@@ -4955,7 +4946,7 @@ public partial class MainWindow : Window
     private BitmapSource? _verbMessageBitmap;
 
     /// <summary>The interactive LOOM mode, where the room and the verb screen are drawn as the game's one screen.</summary>
-    private bool OneGameScreen() => _currentRoom is not null && GameClickActive && IsLoomGame;
+    private bool OneGameScreen() => _currentRoom is not null && GameClickActive && HasDedicatedSession;
 
     /// <summary>The game's camera left edge in room pixels (ScummVM <c>virtscr[0].xstart</c>).</summary>
     private int GameCameraLeft(RoomImage room)
@@ -5281,7 +5272,7 @@ public partial class MainWindow : Window
     }
 
     private bool VerbStripShown() =>
-        GameClickActive && IsLoomGame && _currentRoom is not null;
+        GameClickActive && HasDedicatedSession && _currentRoom is not null;
 
     /// <summary>
     /// The interactive verb strip: a presentation of the session's verb slots
@@ -5291,7 +5282,7 @@ public partial class MainWindow : Window
     // The verb screen is shown for the strip, or for text a script printed there (rows 144–199).
     // In the interactive LOOM mode it is always shown, so the room keeps its size when a script prints there or clears it.
     private bool VerbScreenShown() => VerbStripShown() ||
-        _currentRoom is not null && (_verbMessageBitmap is not null || GameClickActive && IsLoomGame);
+        _currentRoom is not null && (_verbMessageBitmap is not null || GameClickActive && HasDedicatedSession);
 
     private void UpdateVerbStrip()
     {

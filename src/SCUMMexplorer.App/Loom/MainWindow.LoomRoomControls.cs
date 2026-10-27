@@ -11,10 +11,10 @@ public partial class MainWindow
     /// <summary>LOOM EGA and CD (and its demos): the reference. Reads the exploration session.</summary>
     private sealed class LoomRoomControls(MainWindow w) : IRoomControlProvider
     {
-        private bool Active => w.GameClickActive && w.IsLoomGame;
+        private bool Active => w.GameClickActive && w.HasDedicatedSession;
 
         // R-8.5b: a static preview keeps its bar; Play Cutscene starts from there (stated start).
-        private bool StaticPreview => w.IsLoomGame && w._catalogPreviewOnly && w._session is not null && w.SessionModeToggle.IsChecked == true;
+        private bool StaticPreview => w.HasDedicatedSession && w._catalogPreviewOnly && w._session is not null && w.SessionModeToggle.IsChecked == true;
 
         public RoomTransportState ReadTransport()
         {

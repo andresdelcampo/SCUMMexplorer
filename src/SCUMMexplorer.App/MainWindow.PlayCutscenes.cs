@@ -22,7 +22,7 @@ public partial class MainWindow
     private bool _playControlsInCutscene;
 
     /// <summary>The open game lists its cutscenes from its scripts and plays them in the play screen.</summary>
-    private bool PlayCutscenes => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
+    private bool PlayCutscenes => _game is { } game && !HasDedicatedSession && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
 
     private bool PlayCanStartCutscene => PlayCutscenes && !_introPreparing && !_genericActionStarting &&
         (UnansweredManiacCutsceneStartup || _playFolder != _game?.Key || StaticPreviewMayStartScene ||

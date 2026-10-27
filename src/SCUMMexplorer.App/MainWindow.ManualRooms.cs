@@ -45,7 +45,7 @@ public partial class MainWindow
     }
 
     /// <summary>A played game whose own scripts start an opening (script 1), offered in the header until Room 01's list has it (R-6.38).</summary>
-    private bool NativeIntroOffered => _game is { } game && !IsLoomGame && ScummProfile.For(game).PlaysThroughVerbs &&
+    private bool NativeIntroOffered => _game is { } game && !HasDedicatedSession && ScummProfile.For(game).PlaysThroughVerbs &&
         GameSupport.For(game).LiveSession && game.Resources.Any(r => r.Kind == ResourceKind.Script && r.ResourceId == 1 && r.ScriptRoom is null);
 
     private void UpdateGameIntroButton()
