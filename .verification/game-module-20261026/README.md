@@ -26,3 +26,5 @@ Sound seam (same day): the check also prints the session's sound owner (scene so
 Status seam (same day): the check also prints the Game Status button state and tooltip; identical before and after on the nine games.
 
 Tree and room-card seam (same day): the check also hashes the first four room cards' pixels and lists the Advanced tree groups; identical before and after on the nine games.
+
+Room-source seam (same day): the check also selects the first three rooms of each game (size, pixel hash, object/record/verb counts). Compare with the object note and status text left out: those two vary between runs of the browsed games, on the old build as well.

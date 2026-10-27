@@ -58,17 +58,19 @@ public partial class MainWindow
     internal const int FirewoodSilentSteps = 8;
 
     /// <summary>LOOM EGA and CD (and the demos): the state, derivations and Game Texts cutscenes that are LOOM's alone.</summary>
-    private sealed class LoomGameModule(MainWindow w) : IGameModule
+    private sealed class LoomGameModule(MainWindow w) : GameModuleBase
     {
-        public List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId) => w.PlaceSpeakersForDirectVerb(room, objectId, verbId);
+        public override List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId) => w.PlaceSpeakersForDirectVerb(room, objectId, verbId);
 
-        public IGameVoice Voice => w._game?.Id == GameId.LoomVga ? w.LoomVoice : NoVoice.Instance;
+        public override IGameVoice Voice => w._game?.Id == GameId.LoomVga ? w.LoomVoice : NoVoice.Instance;
 
-        public bool VoicesEnabled { get => w._cdVoice.Enabled; set => w._cdVoice.Enabled = value; }
+        public override bool VoicesEnabled { get => w._cdVoice.Enabled; set => w._cdVoice.Enabled = value; }
 
-        public bool UpdateRoomSounds(GameResource? room) => w.UpdateCdRoomSounds(room);
+        public override bool UpdateRoomSounds(GameResource? room) => w.UpdateCdRoomSounds(room);
 
-        public void Reset()
+        public override bool Handles(GameLibrary game) => game.Id is GameId.Loom or GameId.LoomVga;
+
+        public override void Reset()
         {
             w._cdVoice.Stop();
             w._cdSetupPlanner = null;
@@ -76,7 +78,7 @@ public partial class MainWindow
             w._cdRoomListsDone = false;
         }
 
-        public void Opened(GameLibrary game)
+        public override void Opened(GameLibrary game)
         {
             w._replayCatalog = LoomReplayCatalog.Load(game);
             if (game.Id == GameId.Loom) _ = w.NameStoryBitsAsync(game, w._names.Glossary, w._replayCatalog.Replays);
@@ -84,33 +86,33 @@ public partial class MainWindow
             w._readiness = null;
         }
 
-        public void StartBackgroundDerivation(GameLibrary game) => w.StartCdSetupDerivation(game);
+        public override void StartBackgroundDerivation(GameLibrary game) => w.StartCdSetupDerivation(game);
 
-        public Dictionary<int, GalleryCutscene> GalleryCutscenes() => w.LoomGalleryCutscenes();
+        public override Dictionary<int, GalleryCutscene> GalleryCutscenes() => w.LoomGalleryCutscenes();
 
-        public GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), LoomVerbNames.LabelOrNull, "Bobbin");
+        public override GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), LoomVerbNames.LabelOrNull, "Bobbin");
 
         /// <summary>R-9.1: LOOM keeps its two fixed wordings.</summary>
-        public string? ScriptKind(GameResource resource) => w._game?.Id switch
+        public override string? ScriptKind(GameResource resource) => w._game?.Id switch
         {
             GameId.LoomVga => "LOOM CD script · SCUMM v4",
             GameId.Loom => "Indexed script resource · DOS LOOM old-v3",
             _ => null
         };
 
-        public bool HasDedicatedSession => true;
+        public override bool HasDedicatedSession => true;
 
-        public bool EstimatesRoomArtwork => w._game?.Id != GameId.LoomVga;
+        public override bool EstimatesRoomArtwork => w._game?.Id != GameId.LoomVga;
 
-        public int? RoomScreenRows => ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop;
+        public override int? RoomScreenRows => ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop;
 
-        public TreeViewItem? ExtraResourceGroup(GameLibrary game) => w.CdCueTreeGroup(game);
+        public override TreeViewItem? ExtraResourceGroup(GameLibrary game) => w.CdCueTreeGroup(game);
 
-        public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => game.Id == GameId.Loom && game.Version == ScummVersion.V3
+        public override ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => game.Id == GameId.Loom && game.Version == ScummVersion.V3
             ? w._stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
 
-        public void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot)
+        public override void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot)
         {
             // The CD game gets a live session as well (clicks, walks, verbs); its entry points are the same scripts 005-007. It starts past
             // the intro (see LoomExplorationSession.ContinueCdBootAfterIntro) and has no sound or catalog yet.
@@ -124,24 +126,24 @@ public partial class MainWindow
             w._charset = game.Id == GameId.Loom ? ScummV3Charset.TryLoad(game.FolderPath, 0, out w._charsetError) : null;
         }
 
-        public string? ScriptLoadingNote => w._game?.Id switch
+        public override string? ScriptLoadingNote => w._game?.Id switch
         {
             GameId.LoomVga => "Reading LOOM CD bytecode…",
             GameId.Loom => "Reading DOS LOOM old-v3 bytecode…",
             _ => null
         };
 
-        public string? ScriptBoundaryNote(GameResource resource) => w._game is { Id: GameId.Loom } ega && new LflResourceChain().FindLeftover(ega, resource) is { } interior
+        public override string? ScriptBoundaryNote(GameResource resource) => w._game is { Id: GameId.Loom } ega && new LflResourceChain().FindLeftover(ega, resource) is { } interior
             ? interior.Describe() + " This entry does not establish a standalone script.\n" : null;
 
-        public ScummScriptDisassembly? DecodeScript(GameResource resource)
+        public override ScummScriptDisassembly? DecodeScript(GameResource resource)
         {
             if (w._game?.Id != GameId.LoomVga || w._cdData is not { } cd) return null;
             return (resource.ScriptRoom is int scriptRoom ? cd.RoomLocalScript(scriptRoom, resource.ResourceId!.Value) : cd.GlobalScript(resource.ResourceId!.Value))
                 ?? throw new InvalidDataException("This script is not stored in the CD data.");
         }
 
-        public Action? ScriptPlayback(int? scriptId)
+        public override Action? ScriptPlayback(int? scriptId)
         {
             if (scriptId is not int id || w._game?.Id != GameId.Loom) return null;
             var cutscene = w.AllCutscenes().FirstOrDefault(c => c.Steps is null && c.ObjectId != 0 && (c.TextScripts?.Contains(id) ?? c.Script == id))

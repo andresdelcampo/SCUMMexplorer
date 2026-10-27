@@ -88,6 +88,26 @@ internal static class Program
                         report.Add($"{fixture}: cards [{string.Join(" ", hashes)}] tree [{treeGroups}]");
                     }
                     report.Add($"{fixture}: rows={Prop("RoomScreenRows")}");
+                    foreach (var r in game.Scenes.Take(3))
+                    {
+                        typeof(MainWindow).GetMethod("SelectResourceInTree", Private)!.Invoke(window, [r]);
+                        for (var n = 0; n < 1200 && !(ReferenceEquals(Field("_currentRoomResource"), r) && !((System.Windows.Controls.TextBlock)window.FindName("StatusText")).Text.StartsWith("Opening", StringComparison.Ordinal) && ((System.Windows.UIElement)window.FindName("PreviewMessage")).Visibility != System.Windows.Visibility.Visible); n++) await Task.Delay(25);
+                        await Task.Delay(800);
+                        var cur = Field("_currentRoom");
+                        var size = cur is null ? "none" : $"{cur.GetType().GetProperty("Width")!.GetValue(cur)}x{cur.GetType().GetProperty("Height")!.GetValue(cur)}";
+                        int Count(string name) => Field(name) is System.Collections.ICollection c ? c.Count : -1;
+                        var src = ((System.Windows.Controls.Image)window.FindName("RoomPreview")).Source as System.Windows.Media.Imaging.BitmapSource;
+                        var shot = "nosrc";
+                        if (src is not null)
+                        {
+                            var bpp = (src.Format.BitsPerPixel + 7) / 8; var px = new byte[src.PixelWidth * src.PixelHeight * bpp];
+                            src.CopyPixels(px, src.PixelWidth * bpp, 0);
+                            shot = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(px))[..10];
+                        }
+                        var note = ((System.Windows.Controls.TextBlock)window.FindName("ObjectsNote")).Text;
+                        var status = ((System.Windows.Controls.TextBlock)window.FindName("StatusText")).Text;
+                        report.Add($"{fixture}: preview room {r.ResourceId} size={size} px={shot} walk={Count("_currentWalkBoxes")} objs={Count("_objects")} older={Count("_olderObjects")} recs={Count("_currentRoomObjectRecords")} verbs={Count("_roomVerbs")} names={Count("_roomObjectNames")} cam={Field("_pendingCameraX")} note={Hash(note)}/{note.Length} status={status}");
+                    }
                     var statusBtn = (System.Windows.Controls.Button)window.FindName("GameStatusButton");
                     report.Add($"{fixture}: status button={statusBtn.Visibility}/{statusBtn.IsEnabled} tip={statusBtn.ToolTip}");
                     report.Add($"{fixture}: sound session={session is not null} scene={Follows(sceneSound)} voice={Follows(Field("_cdVoice"))} soundsBtn={soundBtn} voicesCombo={voices}");

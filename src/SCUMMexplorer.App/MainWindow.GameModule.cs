@@ -10,6 +10,9 @@ namespace SCUMMexplorer.App;
 /// </summary>
 internal interface IGameModule
 {
+    /// <summary>True when this module is the open game's (the window asks each module in <c>GameModules</c>; none: the game has no module).</summary>
+    bool Handles(GameLibrary game);
+
     /// <summary>The object states the game's live session starts from, read from its data (null for a game with no dedicated session).</summary>
     ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game);
 
@@ -128,38 +131,51 @@ internal sealed class GameNames(LoomGlossary glossary, Func<int, string?>? verbN
     public string NameBits(string text) => LoomResourceNames.NameBits(Glossary, text);
 }
 
+/// <summary>
+/// The defaults of a module: a game with no module of its own gets exactly these. A game's module derives from this and overrides only what the game does differently,
+/// so a new game costs the members it needs and nothing else.
+/// </summary>
+internal abstract class GameModuleBase : IGameModule
+{
+    public virtual bool Handles(GameLibrary game) => false;
+    public virtual void Reset() { }
+    public virtual void Opened(GameLibrary game) { }
+    public virtual void StartBackgroundDerivation(GameLibrary game) { }
+    public virtual Dictionary<int, GalleryCutscene> GalleryCutscenes() => [];
+    public virtual List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId) => [];
+    public virtual IGameVoice Voice => NoVoice.Instance;
+    public virtual bool VoicesEnabled { get; set; } = true;
+    public virtual bool UpdateRoomSounds(GameResource? room) => false;
+    public virtual GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), null, "the hero");
+    public virtual string? ScriptKind(GameResource resource) => null;
+    public virtual Action? ScriptPlayback(int? scriptId) => null;
+    public virtual bool HasDedicatedSession => false;
+    public virtual bool EstimatesRoomArtwork => true;
+    public virtual int? RoomScreenRows => null;
+    public virtual TreeViewItem? ExtraResourceGroup(GameLibrary game) => null;
+    public virtual ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => null;
+    public virtual void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot) { }
+    public virtual string? ScriptLoadingNote => null;
+    public virtual string? ScriptBoundaryNote(GameResource resource) => null;
+    public virtual ScummScriptDisassembly? DecodeScript(GameResource resource) => null;
+}
+
 public partial class MainWindow
 {
-    private IGameModule? _loomModuleInstance;
+    private IReadOnlyList<IGameModule>? _gameModules;
+
+    /// <summary>Every game module the window knows. A game with its own folder of code adds its module here, and nothing else in the window changes.</summary>
+    private IReadOnlyList<IGameModule> GameModules => _gameModules ??= [new LoomGameModule(this)];
 
     /// <summary>The one place that picks the module of the open game (composition, like <see cref="CurrentRoomControls"/>).</summary>
-    private IGameModule CurrentModule => IsLoomGame ? LoomModule : NoGameModule.Instance;
+    private IGameModule CurrentModule => _game is { } game ? GameModules.FirstOrDefault(module => module.Handles(game)) ?? NoGameModule.Instance : NoGameModule.Instance;
 
-    private IGameModule LoomModule => _loomModuleInstance ??= new LoomGameModule(this);
+    /// <summary>LOOM's module, whichever game is open (the voices option belongs to it and survives a change of game).</summary>
+    private IGameModule LoomModule => GameModules.OfType<LoomGameModule>().First();
 
     /// <summary>A game with no module of its own.</summary>
-    private sealed class NoGameModule : IGameModule
+    private sealed class NoGameModule : GameModuleBase
     {
         public static NoGameModule Instance { get; } = new();
-        public void Reset() { }
-        public void Opened(GameLibrary game) { }
-        public void StartBackgroundDerivation(GameLibrary game) { }
-        public Dictionary<int, GalleryCutscene> GalleryCutscenes() => [];
-        public List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId) => [];
-        public IGameVoice Voice => NoVoice.Instance;
-        public bool VoicesEnabled { get; set; } = true;
-        public bool UpdateRoomSounds(GameResource? room) => false;
-        public GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), null, "the hero");
-        public string? ScriptKind(GameResource resource) => null;
-        public Action? ScriptPlayback(int? scriptId) => null;
-        public bool HasDedicatedSession => false;
-        public bool EstimatesRoomArtwork => true;
-        public int? RoomScreenRows => null;
-        public TreeViewItem? ExtraResourceGroup(GameLibrary game) => null;
-        public ScummIndexedObjectSnapshot? ReadObjectSnapshot(GameLibrary game) => null;
-        public void StartSession(GameLibrary game, ScummIndexedObjectSnapshot? snapshot) { }
-        public string? ScriptLoadingNote => null;
-        public string? ScriptBoundaryNote(GameResource resource) => null;
-        public ScummScriptDisassembly? DecodeScript(GameResource resource) => null;
     }
 }

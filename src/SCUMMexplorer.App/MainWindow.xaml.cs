@@ -282,7 +282,7 @@ public partial class MainWindow : Window
         _roomCardCancellation?.Cancel();
         _roomCardBackgroundsReady.TrySetResult(false);
         _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        _loomModuleInstance?.Reset();
+        foreach (var module in _gameModules ?? []) module.Reset();
         _playPlanner = null;
         _playSavedRoomLists = null;
         _playRoomListsDone = false;
@@ -1311,13 +1311,8 @@ public partial class MainWindow : Window
         StatusText.Text = $"Opening {resource.Name}…";
         StatusText.ToolTip = resource.FilePath;
 
-        var isCd = _game is { Id: GameId.LoomVga, V4Archive: not null };
-        // A browsed v4 game (not LOOM CD) reads its room out of the disk that holds it.
-        var browseArchive = _game?.V4Disks is null ? null : _game.V4ArchiveFor(resource);
-        // An enhanced v2 game (Maniac Mansion Enhanced) reads its XOR-encoded room file with the v2 decoder.
-        var enhancedV2 = _game is { Version: ScummVersion.V1 or ScummVersion.V2 };
-        if (!isCd && browseArchive is null && !enhancedV2 && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } ||
-            !_roomDecoder.CanDecode(resource.FilePath, 3)))
+        var roomSource = RoomSourceFor(this, _game!, resource);
+        if (roomSource is null)
         {
             PreviewDescription.Text = "This room format is not supported yet.";
             return;
@@ -1326,38 +1321,17 @@ public partial class MainWindow : Window
         var previewGame = _game!;
         try
         {
-            // The CD game's rooms come out of DISK01.LEC (no per-room file); the others read their LFL file.
-            var bytes = isCd || browseArchive is not null ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
-            await PrepareRoomArtworkAsync(previewGame, token);
-            if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
-            LoomCdScene? cdScene = null;
-            if (isCd && _session is null)
-            {
-                var cdGame = _game!;
-                try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(cdGame, resource.ResourceId!.Value), token); }
-                catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
-            }
-            // First visit of a browsed old-bundle game (R-5.3): the entry hooks and scripts run in a fresh generic session; the plain background where that cannot run.
-            ScummRoomScene? browsedScene = null;
-            if (_game is { } sceneGame && ScummProfile.For(sceneGame).HasFirstVisitScenes && resource.ResourceId is int sceneRoomId)
-                browsedScene = await Task.Run(() => ReadFirstVisit(sceneGame, sceneRoomId), token);
-            if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
-            _browsedScene = browsedScene;
-            var room = browsedScene?.Room ?? cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
-                : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
-                : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : DecodeBrowsedOldV3Room(_game!, _roomDecoder.Decode(bytes), bytes));
-            ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
-                ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
-            // A browsed game without a first visit shows its stored object images and names, nothing run; a first visit (R-6.12a) decides the objects itself.
-            Core.Scumm.BrowsedObjects? browsedObjects = null;
-            if (browseArchive is not null && browsedScene is null)
-            {
-                try { browsedObjects = await Task.Run(() => browseArchive.ReadBrowsedObjects(resource.ResourceId!.Value), token); }
-                catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException or ArgumentOutOfRangeException or IndexOutOfRangeException) { }
-            }
-            if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
-            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null ? browseArchive.ReadWalkBoxes(resource.ResourceId!.Value) : enhancedV2 ? TryReadOlderWalkBoxes(bytes) : TryReadWalkBoxes(bytes);
-            _cdScene = cdScene;
+            if (await roomSource.LoadAsync(this, previewGame, resource, () => token.IsCancellationRequested || !ReferenceEquals(_game, previewGame), token) is not { } load) return;
+            var isCd = load.Kind == RoomSourceKind.CdArchive;
+            var enhancedV2 = load.Kind == RoomSourceKind.OlderV1V2;
+            var browseArchive = load.BrowseArchive;
+            var bytes = load.Bytes;
+            var cdScene = load.CdScene;
+            var browsedScene = load.BrowsedScene;
+            var browsedObjects = load.BrowsedObjects;
+            var cdRoom = load.CdRoom;
+            var room = load.Room;
+            _currentWalkBoxes = load.WalkBoxes;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
             {
                 IReadOnlyList<RoomVerbDestination> browsedDoorways = isCd ? [] : await Task.Run(() => FindBrowsedDoorways(resource), token);
