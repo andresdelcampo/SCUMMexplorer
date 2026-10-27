@@ -30,6 +30,9 @@ internal interface IGameModule
     /// <summary>Rebuilds the room's Sounds list when the game has its own kind (true: handled, the generic list is not built); false leaves it to the generic code.</summary>
     bool UpdateRoomSounds(GameResource? room);
 
+    /// <summary>The notes of the speakers a direct verb needs placed in the room before it runs (empty for a game that does not place them).</summary>
+    List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId);
+
     /// <summary>The names the game gives its resources, verbs and hero (what every tree, title and readable script shows).</summary>
     GameNames CreateNames(GameLibrary game);
 
@@ -114,6 +117,7 @@ public partial class MainWindow
         public void Opened(GameLibrary game) { }
         public void StartBackgroundDerivation(GameLibrary game) { }
         public Dictionary<int, GalleryCutscene> GalleryCutscenes() => [];
+        public List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId) => [];
         public IGameVoice Voice => NoVoice.Instance;
         public bool VoicesEnabled { get; set; } = true;
         public bool UpdateRoomSounds(GameResource? room) => false;

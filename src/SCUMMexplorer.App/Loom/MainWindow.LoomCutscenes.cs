@@ -60,6 +60,8 @@ public partial class MainWindow
     /// <summary>LOOM EGA and CD (and the demos): the state, derivations and Game Texts cutscenes that are LOOM's alone.</summary>
     private sealed class LoomGameModule(MainWindow w) : IGameModule
     {
+        public List<string> SpeakersForDirectVerb(GameResource room, int objectId, int verbId) => w.PlaceSpeakersForDirectVerb(room, objectId, verbId);
+
         public IGameVoice Voice => w._game?.Id == GameId.LoomVga ? w.LoomVoice : NoVoice.Instance;
 
         public bool VoicesEnabled { get => w._cdVoice.Enabled; set => w._cdVoice.Enabled = value; }

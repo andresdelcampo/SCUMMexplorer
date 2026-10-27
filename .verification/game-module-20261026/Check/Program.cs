@@ -67,6 +67,8 @@ internal static class Program
                     bool Follows(object? owner) => owner is not null && session is not null && (bool)owner.GetType().GetMethod("Follows")!.Invoke(owner, [session])!;
                     var soundBtn = ((System.Windows.UIElement)window.FindName("RoomSoundsButton")).Visibility;
                     var voices = ((System.Windows.Controls.ComboBox)window.FindName("CdSoundCombo")).SelectedIndex;
+                    var statusBtn = (System.Windows.Controls.Button)window.FindName("GameStatusButton");
+                    report.Add($"{fixture}: status button={statusBtn.Visibility}/{statusBtn.IsEnabled} tip={statusBtn.ToolTip}");
                     report.Add($"{fixture}: sound session={session is not null} scene={Follows(sceneSound)} voice={Follows(Field("_cdVoice"))} soundsBtn={soundBtn} voicesCombo={voices}");
                     report.Add($"{fixture}: room=[{roomPage}] script=[{scriptPage}] usedBy={Hash(usedBy)}/{usedBy.Length}");
                     report.Add($"{fixture}: family={GameSupport.FamilyOf(game)} picker={entries.Count} first=[{string.Join("; ", titles.Take(3))}] last=[{titles.LastOrDefault()}] gallery={galleryViaWindow.Count} replays={Math.Max(catalogReplays, 0)}");

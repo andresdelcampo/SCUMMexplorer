@@ -22,3 +22,5 @@ Run: `dotnet run --project .verification/game-module-20261026/Check -- "D:\Juego
 Names seam (same day): the check also prints each game's first room page, first script page (title, subtitle, SHA of the readable text) and the Used by text; the reports before and after the names change were identical for the nine games (Used by is empty in Normal mode).
 
 Sound seam (same day): the check also prints the session's sound owner (scene sound or CD voice), the room Sounds button and the voices option; identical before and after on the nine games.
+
+Status seam (same day): the check also prints the Game Status button state and tooltip; identical before and after on the nine games.

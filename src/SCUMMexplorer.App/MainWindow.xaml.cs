@@ -256,20 +256,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private bool CanEditGameStatus => _session?.GameStatus.CanEdit == true && _replaySequence is null &&
-        !_playbackPaused && (_playback is null || !PlaybackHasActivity);
-
-    private GameStatusWindow BuildGameStatusWindow() => new(() => _session, () => CanEditGameStatus, () =>
-    {
-        if (_currentRoomResource is { } room && _currentRoom is not null && room.ResourceId == _session?.Snapshot.RoomId)
-        {
-            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
-            UpdateRoomNavigationActions(room);
-            RefreshRoomPreview(); UpdateActorLayer(); UpdateVerbArea(); UpdatePlaybackControls();
-        }
-    }, _game, () => IsAdvancedMode, _game?.Id == GameId.LoomVga ? null : LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
-
-
     private void UpdateGameStatusButton()
     {
         var entry = CurrentRoomControls.GameStatus();
@@ -1955,32 +1941,13 @@ public partial class MainWindow : Window
         });
     }
 
-    /// <summary>
-    /// The derived speaker placements (<see cref="LoomSceneSetupPlanner"/>, the "actor" steps only) for an object verb that prints lines for
-    /// an actor who is not in the room. Returns the labelled notes; nothing happens outside LOOM or while the session cannot be edited.
-    /// </summary>
-    private List<string> PlaceSpeakersForDirectVerb(GameResource room, int objectId, int verbId)
-    {
-        var notes = new List<string>();
-        if (_game is null || _session is null || _game.Id is not (GameId.Loom or GameId.LoomVga) || room.ResourceId is not int roomId || !_session.GameStatus.CanEdit) return notes;
-        _setupPlanner ??= new LoomSceneSetupPlanner(_game);
-        var setup = _setupPlanner.DeriveActors(roomId, objectId, verbId);
-        foreach (var step in setup.Steps.Where(item => item.Kind == "actor"))
-        {
-            try { _session.PlaceActorInRoom(step.ObjectId, step.X, step.Y, step.Verb, step.EndBoundary ?? "the game's code"); }
-            catch (InvalidOperationException) { continue; }
-        }
-        notes.AddRange(setup.Notes.Where(note => note.Contains("an actor outside the room is not shown", StringComparison.Ordinal)));
-        return notes;
-    }
-
     private bool ActivateObjectVerb(ScummRoomObjectRecord record, ScummObjectVerbEntry verb, bool play = false)
     {
         if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         FollowSessionSound();
         // A verb run from the interaction menu has no scene start of its own, so the speakers its lines need (an actor who is not in the
         // room shows nothing) are placed as the catalog's start setup does: only the derived actor placements, never a pickup or a scene.
-        var speakerNotes = play ? PlaceSpeakersForDirectVerb(sourceRoom, record.Id, verb.VerbId) : [];
+        var speakerNotes = play ? CurrentModule.SpeakersForDirectVerb(sourceRoom, record.Id, verb.VerbId) : [];
         var action = _session.ActivateObjectVerb(record.Id, verb.VerbId);
         UpdateSessionSound();
         StatusText.Text = action.DestinationRoomId is int destination
