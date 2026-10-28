@@ -65,6 +65,9 @@ public partial class MainWindow : Window
     private IScummDataSource? _cdData;
     private IReadOnlyList<ScummRoomObjectRecord> _currentRoomObjectRecords = [];
     private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
+
+    /// <summary>True when <see cref="_roomObjectNames"/> are the names a browsed room stores (shown on its stored-image rows), not a live session's.</summary>
+    private bool _roomNamesAreStored;
     private IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> _roomVerbs =
         new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
     private IReadOnlyList<RoomVerbDestination> _roomNavigationCandidates = [];
@@ -474,8 +477,7 @@ public partial class MainWindow : Window
             (ResourceKind.Sound, "Sounds & music"), (ResourceKind.Executable, "Game files")
         })
         {
-            if (game.Id != GameId.Loom && !(game.Id == GameId.IndianaJones3 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && kind != ResourceKind.Executable) continue;
+            if (!(kind == ResourceKind.Executable || HasCostumeCards(game))) continue;
             var group = (kind == ResourceKind.Script ? game.AllScripts : game.Resources.Where(resource => resource.Kind == kind && !IsDiscTrack(game, resource))).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -1297,6 +1299,7 @@ public partial class MainWindow : Window
         _browsedScene = null;
         _currentRoomObjectRecords = [];
         _roomObjectNames = new Dictionary<int, string>();
+        _roomNamesAreStored = false;
         _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
         _roomNavigationCandidates = [];
         RoomNavigationButtons.Children.Clear();
@@ -1348,7 +1351,7 @@ public partial class MainWindow : Window
                 // First visit beats stored images; stored images (R-6.16) only where no first visit ran.
                 _objects = browsedScene?.Images ?? cdScene?.Images ?? browsedObjects?.Images ?? [];
                 _objectSelection = browsedScene?.NewSelection() ?? cdScene?.Selection ?? new RoomObjectSelection(_objects, background: room);
-                if (browsedObjects is not null) _roomObjectNames = browsedObjects.Names;
+                if (browsedObjects is not null) { _roomObjectNames = browsedObjects.Names; _roomNamesAreStored = true; }
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
@@ -2512,7 +2515,7 @@ public partial class MainWindow : Window
                 }
                 return;
             }
-            if (_game is not ({ Id: GameId.Loom or GameId.IndianaJones3, Version: ScummVersion.V3 } or { Version: ScummVersion.V1 or ScummVersion.V2 }) || resource.Offset is not int resourceOffset)
+            if (_game is not { Version: ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3 } || resource.Offset is not int resourceOffset)
                 throw new NotSupportedException("This costume has no supported DOS LOOM resource offset.");
 
             var container = LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath));
@@ -3629,7 +3632,7 @@ public partial class MainWindow : Window
             var obj = _objects[index];
             var visible = _objectSelection.IsActive(obj);
             // A browsed game has stored names; a later stored image of one object is numbered by BrowsedObjects.NumberStates.
-            var storedName = _game?.Id == GameId.Unknown && _roomObjectNames.TryGetValue(Core.Scumm.BrowsedObjects.BaseId(obj.Id), out var browsedName) ? browsedName : null;
+            var storedName = _roomNamesAreStored && _roomObjectNames.TryGetValue(Core.Scumm.BrowsedObjects.BaseId(obj.Id), out var browsedName) ? browsedName : null;
             var button = new Button
             {
                 Content = interactive
