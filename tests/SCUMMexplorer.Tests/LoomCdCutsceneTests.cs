@@ -48,7 +48,7 @@ public sealed class LoomCdCutsceneTests
         var after = 0;
         while (session.BootRunning && after++ < 1500) session.AdvanceFrame();
         Assert.Equal(2, session.Snapshot.RoomId);
-        Assert.Contains(session.Messages.Log, m => m.Text == "LucasArts Entertainment Company" && m.Charset == 4);
+        Assert.Contains(session.Messages.Log, m => string.Join(" ", m.Lines) == "LucasArts Entertainment Company" && m.Charset == 4);
         Assert.True(frames + after > 800, $"{frames} + {after} frames");
     }
 

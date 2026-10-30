@@ -1,6 +1,14 @@
 # Changelog
 
-Recent changes: 22–23 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
+Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
+
+## 30 October: MI2 copy protection readable in Play Game Intro; strings inside strings; talk-line wrapping (v4+)
+
+User report (28 October): the MI2 opening stopped at the copy protection. The explicit intro answers nothing for the player, and the floppy recipe screen could not be answered: `ScummTextDecoder` dropped a string named inside a string (code 7 in string 31 names string 43, the recipe's name; string 45 names the ingredients and the `_` fields), and talk lines were never wrapped, so the centred prompt ran off the screen. Code 7 now converts the stored string with string support (depth-bounded, as ScummVM's `convertStringMessage`), and `ScummMessageTable.AddLineBreaks` ports `displayDialog`/`addLinebreaks` for engine version 4 and later. Real-window check through the protection to the opening ([record](../.verification/mi2-intro-protection-20261030/README.md)); `ScummMonkey2IntroTests`. Wrapping now applies to every v4/v5 game's talk lines.
+
+## 30 October: roadmap, crash log, honest matrix
+
+[ROADMAP](ROADMAP.md) (seven gates per game), `CrashLog` in the shipped app (`%LOCALAPPDATA%\SCUMMexplorer\crash-logs`, last actions, unclean-exit log), Sound ◐ for the ten non-LOOM rows until the user's listening check, and [USER_CHECKS](USER_CHECKS.md).
 
 ## 28 October: format rules replace the last game-id capability lists
 

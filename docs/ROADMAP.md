@@ -83,7 +83,7 @@ Each step names its gate. Steps marked **(shared)** are one piece of engine work
 5. F — Five languages passed S9 headless only; open each in the window.
 
 ### Monkey Island 2
-1. A — **User-reported:** the copy protection blocks the opening cutscene and its screen is not shown. The profile answers the recipe wheel as labelled input (`ScummProfile.BootInput`, var[0x206], four digits); find why play still stops.
+1. A — ~~The copy protection blocks the opening~~ **Fixed 30 October** (retest pending): Play Game Intro answers nothing, and the recipe screen lost its strings inside strings and the prompt was not wrapped ([record](../.verification/mi2-intro-protection-20261030/README.md)).
 2. G — Decide the static-preview question (Room 4 campfire: Normal-mode hint vs. letting the boot room play, R-8.5b vs R-5.3a). This decision also shapes A.
 3. B — ScummVM comparison (shared); Rooms 104–106 keep colour-0 image holders (accepted, documented).
 4. C — iMUSE: hooks of classes 1–5, markers, trigger queue, fades, music timer are labelled estimates; listening check pending.

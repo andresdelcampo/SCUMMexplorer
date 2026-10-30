@@ -125,7 +125,15 @@ public static class ScummTextDecoder
     /// operand as the code holds it (the caller reads a variable first where the version does: ScummVM reads it in version 3 only). Null leaves code 7 unmodelled.
     /// </summary>
     public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
-        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, Func<int, byte[]?>? stringText, out string? note)
+        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, Func<int, byte[]?>? stringText, out string? note) =>
+        ConvertMessage(text, variables, objectName, verbName, stringText, 0, out note);
+
+    // A string that names a string (MI2 floppy Script 130: string 31 holds string 43, the recipe's name) is converted again, as ScummVM's convertStringMessage
+    // passes it to convertMessageToString. The depth bound stops a string that names itself.
+    private const int MaxStringDepth = 8;
+
+    private static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
+        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, Func<int, byte[]?>? stringText, int depth, out string? note)
     {
         note = null;
         var output = new List<byte>();
@@ -174,7 +182,8 @@ public static class ScummTextDecoder
                         output.AddRange(ConvertMessage(verbText, variables, objectName, null, stringText, out _));
                     break;
                 case 7 when stringText is not null:
-                    if (stringText(value) is { } stored) output.AddRange(ConvertMessage(stored, variables, objectName, verbName, null, out _));
+                    if (stringText(value) is { } stored)
+                        output.AddRange(ConvertMessage(stored, variables, objectName, verbName, depth < MaxStringDepth ? stringText : null, depth + 1, out _));
                     break;
                 case 5 or 7:
                     note = $"the text includes {(code == 5 ? "a verb's name" : "a string")} (code {code}), which is not modelled and left out";

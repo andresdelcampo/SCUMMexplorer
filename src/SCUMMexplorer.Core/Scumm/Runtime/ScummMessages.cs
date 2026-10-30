@@ -580,6 +580,7 @@ public sealed partial class ScummMessageTable
             _useTalkAnims = true;
         }
         TalkDelay = DefaultTalkDelay;
+        AddLineBreaks();
         if (!_keepText) _shown.Clear();
         if (_shown.Count == 0) _shown.Add([]);
         var charInc = runtime.IsV2 ? runtime.V2TextSpeed : runtime.GlobalVariables.TryGetValue(CharIncVariable, out var inc) ? (short)inc : 0;
@@ -612,6 +613,55 @@ public sealed partial class ScummMessageTable
             _shown.Select(line => line.ToArray()).ToArray(), _slotCopy.X, _slotCopy.Y, _slotCopy.Center, _slotCopy.Height,
             _slotCopy.Right, _color, source.RoomId, source.SourceLabel, source.Offset, TalkDelay, estimate) { Charset = _charset, Voice = _talkVoice };
         _log.Add(Talk);
+    }
+
+    /// <summary>
+    /// The charset a talk line is wrapped in (version 4 and later; the session sets it). Null: no wrapping, as version 1 to 3 do.
+    /// </summary>
+    public Func<int, IScummTextCharset?>? LineBreakCharset { get; set; }
+
+    /// <summary>
+    /// ScummVM <c>displayDialog</c> for version 4 and later (string.cpp, read 30 October 2026): before a chunk is shown, <c>addLinebreaks</c> turns the
+    /// last space before the line would pass <c>maxwidth</c> into a new line (13). <c>maxwidth</c> is the slot's right edge minus its x, minus 1; centred
+    /// text takes twice the smaller of that and its x. MI2 floppy Script 128 +0x0022 centres "PRESS ENTER TO BEGIN LAME-O COPY PROTECTION." at x 160 in
+    /// charset 7, wider than the screen: the game shows it on two lines. Codes 10, 21, 12, 13 skip their operand; code 14 changes the charset measured;
+    /// code 8 adds nothing (ScummVM also hides the spaces after it, not modelled).
+    /// </summary>
+    private void AddLineBreaks()
+    {
+        if (LineBreakCharset?.Invoke(_charset ?? 0) is not { } charset) return;
+        var maxWidth = _slotCopy.Right - _slotCopy.X - 1;
+        if (_slotCopy.Center) maxWidth = Math.Min(maxWidth, _slotCopy.X) * 2;
+        var lastSpace = -1;
+        var width = 1;
+        for (var pos = _bufferPos; pos < _buffer.Count; pos++)
+        {
+            int c = _buffer[pos];
+            if (c == 0) break;
+            if (c is 0xFF or 0xFE && pos + 1 < _buffer.Count)
+            {
+                var code = _buffer[++pos];
+                if (code is 2 or 3) break;
+                if (code == 1) { width = 1; continue; }
+                if (code == 14 && pos + 2 < _buffer.Count)
+                {
+                    charset = LineBreakCharset(_buffer[pos + 1] | (_buffer[pos + 2] << 8)) ?? charset;
+                    pos += 2;
+                    continue;
+                }
+                if (code is 10 or 21 or 12 or 13) { pos += 2; continue; }
+                // Any other code (9, a talk animation) is measured as a character, as addLinebreaks does.
+                c = code;
+            }
+            if (c == 13) { width = 1; continue; }
+            if (c == ' ') lastSpace = pos;
+            width += charset.CharWidth(c);
+            if (lastSpace == -1 || width <= maxWidth) continue;
+            _buffer[lastSpace] = 13;
+            width = 1;
+            pos = lastSpace;
+            lastSpace = -1;
+        }
     }
 
     /// <summary>

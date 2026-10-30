@@ -23,6 +23,7 @@ Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If th
 | Rooms 15, 18, 20: staff notes after the 11 October fix | CURRENT_WORK | |
 | Each other EGA copy once in the window: Italian (accents), plain English, French, German, v1.2, both demos | CURRENT_WORK, release list | |
 | LOOM CD: picture, voice and music timing in a few scenes | CURRENT_WORK | |
+| LOOM CD intro: "LucasArts Entertainment Company" now shows on two lines (ScummVM's v4 wrapping rule); same as the real game? | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
 | First run on a clean profile; Roland with no ROM folder | CURRENT_WORK, release list | |
 
 ## Indiana Jones 3 (EGA and 256 colours)
@@ -55,7 +56,8 @@ Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If th
 
 | Check | Steps | Result |
 |---|---|---|
-| **Open:** the opening stops at the copy protection and its screen is not shown (reported 28 October). Retest after the fix. | CURRENT_WORK | |
+| **Retest (fixed 30 Oct):** a floppy copy (`mi2 mt32 en`), Play Game Intro: the prompt on two lines, the recipe names its disease and ingredients, your wheel answer is accepted and the opening plays | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
+| Long talk lines in LOOM CD, Monkey Island and Indy 4 now wrap as in the game (version 4 and later): any line that looks wrongly broken? | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
 | Roland and AdLib: Woodtick music (107) loops, pauses with Space; Largo's theme (151) at the bridge | [play record](../.verification/monkey2-play-20261017/README.md) | |
 | Route next to ScummVM: sign, dialogue order, inventory icon, verb colours; right click on the sign | [play record](../.verification/monkey2-play-20261017/README.md) | |
 | Room 74 · voodoo key (LeChuck on the beat?), Room 13 · Entry, Room 09 · Talk to barkeeper | [cutscene record](../.verification/monkey2-cutscenes-20261018/README.md) | |

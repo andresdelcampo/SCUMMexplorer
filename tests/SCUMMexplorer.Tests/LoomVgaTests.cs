@@ -449,8 +449,8 @@ public sealed class LoomVgaCharsetPerMessageTests
             [44, 0x210, new Dictionary<string, ushort>(), 0, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing], null);
         var drawn = session.Messages.OnScreen.ToArray();
         // The talk slot holds one line, so the company line is already replaced on screen; the log keeps it.
-        Assert.Contains(session.Messages.Log, message => message.Text == "LucasArts Entertainment Company" && message.Charset == 4);
-        Assert.Contains(drawn, message => message.Text.Contains("All rights reserved", StringComparison.Ordinal) && message.Charset == 2);
+        Assert.Contains(session.Messages.Log, message => string.Join(" ", message.Lines) == "LucasArts Entertainment Company" && message.Charset == 4);
+        Assert.Contains(drawn, message => string.Join(" ", message.Lines).Contains("All rights reserved", StringComparison.Ordinal) && message.Charset == 2);
         var archive = game.V4Archive!;
         var layer = ScummV4MessageRenderer.Render(drawn, number => archive.ReadCharset(number ?? 2)!);
         Assert.NotNull(layer.Bounds);
@@ -626,7 +626,7 @@ public sealed class LoomVgaIntroTests
         Assert.Equal(2, session.Snapshot.RoomId);
         var log = session.Messages.Log;
         Assert.Contains(log, m => m.Text == "Please choose your skill level.");
-        Assert.Contains(log, m => m.Text == "LucasArts Entertainment Company" && m.Charset == 4);
+        Assert.Contains(log, m => string.Join(" ", m.Lines) == "LucasArts Entertainment Company" && m.Charset == 4);
         Assert.Contains(log, m => m.Text == "Rise, son of Cygna.");
         // The overture (3029.2 s, 83.9 s long) is one of the cues, and the timer ran past the values script 044 waits for.
         Assert.Contains(session.Messages.VoiceEvents, cue => cue.Offset == 30292 && cue.Length == 839);

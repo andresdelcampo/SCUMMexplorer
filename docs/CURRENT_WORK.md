@@ -32,7 +32,7 @@ Everything here is open. Items marked **user-reported** come from the user's own
 
 | Game | Open |
 |---|---|
-| **Monkey Island 2** | **User-reported:** the copy protection blocks play of the game's initial cutscene, and the protection screen itself is not shown. Opposite of the intended boot (the generic session should reach Woodtick/the campfire without a blocked state). Needs investigation. |
+| **Monkey Island 2** | Fixed 30 October, retest pending: in Play Game Intro the floppy copies' recipe screen lost the recipe's name and ingredients (strings inside strings) and the prompt ran off screen (no talk-line wrapping from version 4 on); both are engine fixes ([record](../.verification/mi2-intro-protection-20261030/README.md)). The player still needs the code wheel. |
 | **Monkey Island 1 CD** | Rooms 88 and 89 each have one unfollowed item; Room 99 cannot run (the rubber chicken shows as its Room 99 icon). The window shows the lookout for one frame at start. |
 | **Monkey Island 1** (all) | Spanish eight-disk and CD language folders passed S9 only; no real-window look at every edition. |
 | **Indy 4** | Rooms 76, 77, 87 have an unfollowed camera-after-walk item. The play view still draws each object's first-state image. CD has no audio tracks. |
@@ -55,7 +55,7 @@ Open before shipping:
 
 No automatic next feature. The user is collecting issues from their own testing and will supply a list; work from that list, one step at a time. Candidates meanwhile, in order of visible effect:
 1. Capture and fix the crash and the black-rooms report once the user names the game and room.
-2. Monkey Island 2 copy-protection / opening-cutscene blocking.
+2. ~~Monkey Island 2 copy-protection / opening-cutscene blocking~~ (fixed 30 October; retest in USER_CHECKS).
 3. Known MI CD and Indy 4 room items above.
 4. Release readiness list.
 
