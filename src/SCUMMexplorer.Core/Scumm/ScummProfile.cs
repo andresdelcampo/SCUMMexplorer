@@ -15,7 +15,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <remarks>
 /// <paramref name="ClickObject"/> (S4b Monkey2, 17 October 2026): the boot waits for a click on a screen of choices instead (Monkey Island 2's "Monkey Island 2"
 /// or "Monkey 2 Lite"); the session clicks the middle of that object's box through the game's input script, as a player would. Edition data: the object of
-/// the choice the explorer takes (Â§4.5: the full game).
+/// the choice the explorer takes (§4.5: the full game).
 /// <paramref name="AnswerDigits"/> (S9 Monkey2, 18 October 2026): the number of digits the question reads, so an answer below 1000 is typed with its leading
 /// zeros (Monkey Island 2 floppy Script 130 +0x015C starts its place value at 1000: four digits). 0 types the number as it is.
 /// </remarks>
@@ -120,7 +120,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     public bool BootEndsWhenPlayerHasControl { get; init; }
 
     /// <summary>
-    /// The game is played through its own verb interface (REQUIREMENTS Â§7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
+    /// The game is played through its own verb interface (REQUIREMENTS §7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
     /// from its verbs and the player's clicks and keys go to its input script (<see cref="ScummSession.ClickScreen"/>). True only for a family whose Play
     /// cell is raised (R-7.17: no clicks reach the scripts of the others). S6 Indy3Ega; S6 Indy3Vga (16 October 2026) by the same data: a game whose
     /// first visit the generic session runs with the Indy3 script dialect, whatever its container (old-bundle LFL or one file per room).
@@ -225,7 +225,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]")
                 // Monkey Island 2 (S4b, 17 October 2026): Script 130 +0x034A waits for the choice between "Monkey Island 2" (object 1156, Script 131 +0x0067:
-                // bit[0x237] = 0, "Regular Mode") and "Monkey 2 Lite" (object 1157); the explorer takes the full game (Â§4.5), labelled as assumed input.
+                // bit[0x237] = 0, "Regular Mode") and "Monkey 2 Lite" (object 1157); the explorer takes the full game (§4.5), labelled as assumed input.
                 // S9 Monkey2 (18 October 2026): the floppy releases first ask the recipe copy protection (Script 128 "PRESS ENTER", then Script 130 keeps the
                 // expected four digits in var[0x206] at +0x0134 before it waits); the talkie skips it and never writes var[0x206].
                 : GameSupport.FamilyOf(game) == GameFamily.Monkey2 ? new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4)
@@ -259,7 +259,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
                 _ => null
             },
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
-            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) â†’ Player_AD; the other DOS games of version 3 and later â†’ iMuse (Monkey's workaround in triggerSound).
+            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
             MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic
                 : GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? ScummMusicStart.StopsAllSounds
                 : ScummMusicStart.StopsNothing
