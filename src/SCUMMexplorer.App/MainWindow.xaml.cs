@@ -36,10 +36,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _idleFrameTimer = new() { Interval = TimeSpan.FromMilliseconds(15) };
     private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
-    private static readonly string LastFolderFile = Path.Combine(
-        Environment.GetEnvironmentVariable("SCUMM_EXPLORER_PROFILE_ROOT") ?? Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SCUMMexplorer"),
-        "last-folder.txt");
+    private static readonly string LastFolderFile = Path.Combine(AppProfile.Root, "last-folder.txt");
     private GameLibrary? _game;
     private LoomReplayCatalog? _replayCatalog;
     private LoomSceneSetupPlanner? _setupPlanner;
@@ -298,6 +295,7 @@ public partial class MainWindow : Window
         // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
         GameStatusButton.Visibility = Visibility.Collapsed;
         _game = game;
+        CrashLog.Note($"Opened {game.Title} ({game.Version}{(game.Edition is { Length: > 0 } edition ? ", " + edition : "")}) from {folder}");
         var indexedSnapshot = CurrentModule.ReadObjectSnapshot(game);
         _names = CurrentModule.CreateNames(game);
         _usageIndex = LoomUsageIndex.Empty;
@@ -1181,6 +1179,7 @@ public partial class MainWindow : Window
         RoomPreview.Cursor = Cursors.Arrow;
         ScriptEventButtons.Children.Clear();
         _selectedResource = resource;
+        CrashLog.Note($"Picked {resource.Kind} {resource.Name}");
         if (resource.Kind is ResourceKind.Room or ResourceKind.Costume)
             _showCostumeCards = resource.Kind == ResourceKind.Costume;
         UpdateRoomCardSelection(resource);

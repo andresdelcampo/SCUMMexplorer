@@ -20,6 +20,13 @@ public partial class App : Application
     {
         if (string.Equals(Environment.GetEnvironmentVariable("SCUMM_EXPLORER_RENDER"), "software", StringComparison.OrdinalIgnoreCase))
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+        CrashLog.Start(this);
         base.OnStartup(e);
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        CrashLog.Stop();
+        base.OnExit(e);
     }
 }
