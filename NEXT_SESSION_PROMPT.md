@@ -1,34 +1,27 @@
-# Next session: orchestrator brief
+# Next session
 
-You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261024-shared-room-controls.md` is the last run). Everything below is only what those do not say.
+Read `docs/ROADMAP.md` (the seven gates per game and the steps left), `docs/USER_CHECKS.md` (what only the user can check or decide) and `docs/CURRENT_WORK.md`. Maniac Mansion and Zak McKracken stay with their own orchestrator (`NEXT_SESSION_PROMPT_MANIAC_ZAK.md`).
 
-## State (20 October)
-- Played through their own verbs (Objects ✔, Play ✔), with sound during play and script-derived cutscene lists (Cutscenes ◐): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Spanish copies of all three checked (S9). Monkey Island CD (disc music), Monkey Island 2 and Indy 4 (iMUSE music in play with loops, jump hooks and beat; Indy 4 talkie speech) are played too (Objects ✔, Play ✔), and every played game has a script-derived cutscene list (Cutscenes ◐). Spanish and other copies of every played game checked (S9). Cutscene lists derive from one booted snapshot per game. Monkey Island 1 CD offers its five languages (R-3.16), all five checked (S9).
-- A separate orchestrator may be running Maniac Mansion and Zak McKracken (v1/v2) on its own (`NEXT_SESSION_PROMPT_MANIAC_ZAK.md`, checkpoints `*-ManiacZak.md`): leave those families to it; merge master before fast-forwarding, and retry if master moved.
-- **R-7.16** (right click) is confirmed: right click goes to the game only where its interface uses it (`ScummProfile.RightClickReachesGame`: verb-based and engine version 4 or later, today Monkey Island floppy); elsewhere it is the Interact menu. The rest of R-7.7 to R-7.18 is still `Proposed`.
+## Done on 30 October 2026 (all on master, not pushed)
 
-## Ask the user first (one short question each, only if still open)
-0. A picked room whose own entry leaves it (MI2's campfire, Room 4) is a static preview by R-8.5b, with the reason only in Advanced: add a Normal-mode hint pointing to Play Game Intro, or let a boot room play its settled boot state (R-5.3a)? (checkpoint 20 October)
-1. Restart and save/load keys (Indy3 F5, `VAR_MAINMENU_KEY`): refused (current) or working?
-2. R-1.5 met through the game's default verb; ScummVM's 16×16 cross-hair cursor: acceptable?
-3. R-8.32, R-8.33 (cutscene lists and fresh-start runs for the generic session) are `Proposed`.
-4. What did they see and hear in the user checks of the last checkpoint (play, sound and cutscenes in the three games, right click in Monkey Island, the Spanish copies, Monkey Island CD rooms; see the last checkpoint)?
-When answered, change those rows' Basis to `Rule (confirmed by the user <date>)` or adjust them.
+- Roadmap and per-game user checks; crash log in the shipped app (`%LOCALAPPDATA%\SCUMMexplorer\crash-logs`); Sound ◐ for the ten non-LOOM rows until the user's listening check.
+- MI2 floppy copy protection answerable in Play Game Intro: strings inside strings resolve; talk lines wrap from version 4 on (ScummVM `displayDialog`/`addLinebreaks`).
+- MI1 CD Rooms 88 (empty entry block), 89, 99 (icon-holder room the game never enters), lookout frame: closed.
+- Indy 4 Rooms 76, 77, 87: an at-once walk with no box route ends where it started (ScummVM `walkActor`); first-state images and Room 4's magenta line no longer seen.
+- Indy 3: castle Rooms 20, 28, 32 explained (cut-away plan, guards that can start a fight; decision 7 in USER_CHECKS); `getActorWidth`; `actorFollowCamera` into another room loads it in version 3 too.
 
-## How this user wants the work run
-- Delegate: one worktree agent per item, review, merge, write the checkpoint. No approval gates inside a run; minimise the user's intervention; run independent items in parallel and tell each agent which shared files the other owns.
-- Budget is limited: stop at a clean checkpoint. A rate limit kills agents mid-run: resume the same agent with SendMessage (it keeps its worktree).
-- Merge: `git merge master` inside the agent's worktree, resolve (nearly always keep both; the README/REQUIREMENTS matrix is regenerated with `SCUMM_UPDATE_SUPPORT_MATRIX=1`), build, full suite (about 3 min, expect 0 failed, with `SCUMM_SOUND_TEST_ROOT`, `SCUMM_INDY3_EGA_TEST_ROOT`, `SCUMM_MT32_ROM_ROOT` under `D:\Juegos\Lucas`), then `git merge --ff-only` into master. Update the README matrix notes as cells change.
-- Documentation only in the fixed places (instructions section 7). Raise a matrix cell only with its test; the user may raise one on their own judgement.
-- **Game data is in `D:\Juegos\Lucas`, ScummVM in `D:\Juegos\scummvm`, both outside the repo.** Tests use `TestGames.Root`. **Never create a `Games` junction**; before removing any worktree, list its reparse points (`cmd /c dir /AL <worktree>`) and delete junctions on their own first (on 15 October `git worktree remove` followed one and wiped all game data; restored from the user's Macrium backup).
-- The agents cannot hear or see the real window and cannot drive ScummVM: collect those checks for the user in the checkpoint.
+## How to work
 
-## Suggested next runs (pick with the user, or take the first if they say "keep going")
-- Shared room controls (25 Oct): the five items of checkpoint 20261024 are done (shared key handler, full-screen Esc, `GameIntro()` provider method, LOOM CD Sounds rows, double-click hint), and LOOM's Advanced panel, room view (pan, wide mode), Restart/Interactive/Connections and local-script entries now serve every game (R-6.43, R-6.49 to R-6.51). Maniac/Zak (v1/v2) have no room-local scripts by nature (checked, `.verification/ui-parity-20261025/LocalScan`). Open: Zak room 19 and similar rooms whose entry never settles stay a still picture after about 25 s (R-6.52; the wait could be cut); hand-check the sluggish Advanced scrolling in Maniac Mansion Enhanced; LOOM's last-action panel was moved to the shared data without a click-through check.
-- MonkeyCd Rooms 88, 89, 99; cutscene start setups for entries that begin nothing from a fresh start (R-8.33); the `printEgo` first-text offer.
-- A fixed-point stop for long cutscene runs (proposal in `.verification/globals-tracking-20261019/`); cheaper operand parsing (regex groups are now the largest allocation); server GC (user's call).
-- Open from S6: iMUSE hook classes other than 0, markers, fades; the room change ScummVM's `killScriptsAndResources` ends a calling script with (broke MI2's boot when tried).
-- Polish with no cell effect: Indy3Vga rooms 26, 36, 38, 55, 61 differ from EGA by one object; `actorFollowCamera` of a hero in another room; a verb's click area is its text box.
+The user said "keep making fixes, no need to ask": take the next roadmap item, fix, check through the real window where it shows, run the relevant tests (full suite before committing engine changes, about 8 minutes, `SCUMM_SOUND_TEST_ROOT` must be the LOOM folder `D:\Juegos\Lucas\loom ega mt32 en`), commit each item separately, update the roadmap, CURRENT_WORK, CHANGELOG and the game's tracker. Stop only for product decisions (gate G). Read ScummVM's source on GitHub (raw.githubusercontent.com) before porting engine behaviour. Edit files with the Edit tool or UTF-8 Python, never PowerShell `Get-Content`/`WriteAllText` (it damaged "§" once).
 
-## Housekeeping
-Merged agent worktrees remain under `.claude/worktrees/` (none had junctions when merged; still check before removing, and only with the user's OK). Commit with the attribution line from the system reminder; end the session with a fresh `NEXT_SESSION_PROMPT.md`.
+Harnesses added today: `.verification/mi2-intro-protection-20261030/IntroWindowCheck` (real window, Play Game Intro, keys), `IntroProbe`; `.verification/monkeycd-rooms-20261030/StartFrames` (real window, pick a room, rooms per frame, picture), `BlockDump`; `.verification/indy3-castle-20261030/SourceDump` (any game: `g:`, `e:`, `l:`, `v:` object verbs, `o:`, `find:`, `box:`, `visit:`, `prep:`).
+
+## Next, in order
+
+1. Gate A leftovers: Indy 3 Rooms 1, 15 (never settle: crowds) and 13/3 (Script 131 +0x0038 starts 132 with unknown arguments; Room 3 entry +0x006F); Indy 3 inventory objects run no verb code of their own.
+2. The user's crash and "thin black rooms" reports once they name the game and room (the crash log now records them).
+3. Indy 4's 68 s first launch (cutscene derivation 34 s; lever: change tracking in the executor's variable sync).
+4. Shared engine work E3 (a working ScummVM capture for picture comparisons), E4 (generic cutscene start planner), then E5 (Status beyond v1/v2) if the user wants it.
+5. Release readiness for LOOM (packaging, version, clean-profile first run).
+
+Ask the user, once, for the answers in USER_CHECKS (seven decisions, the retests) if they have not given them.
