@@ -90,7 +90,7 @@ Each step names its gate. Steps marked **(shared)** are one piece of engine work
 5. D — 95 of 260 entries begin nothing; derivation takes 140–174 s in the window. E — S8 (shared).
 
 ### Indiana Jones 4
-1. A — Rooms 76, 77, 87 keep a camera-after-walk item; the play view draws each object's first-state image; a magenta line crosses Room 4 after the boot (not investigated); first launch takes about 68 s (34 s cutscene derivation).
+1. A — **Done 30 October** ([record](../.verification/indy4-rooms-20261030/README.md)): Rooms 76, 77, 87 clean (walks with no box route end where they start, as ScummVM), first-state images and the Room 4 magenta line no longer seen. Open: first launch takes about 68 s.
 2. B — Ten-room ScummVM comparison not done (shared).
 3. C — Listening, including talkie speech (the CD image has no audio tracks: data, not a gap).
 4. D — 216 of 426 groups begin nothing (shared planner). E — S8 (shared). F — Spanish talkie and floppy seen in the window.

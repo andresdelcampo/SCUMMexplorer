@@ -55,4 +55,20 @@ public sealed class ScummIndy4FirstVisitTests
         Assert.Equal(active, ActiveImages(scene));
         Assert.Empty(scene.Gaps());
     }
+
+    [Fact]
+    public void AnArrivalWalkWithNoRouteEndsWhereItStarts()
+    {
+        // 30 October 2026 (.verification/indy4-rooms-20261030): Room 76's catalog visit assumes the arrival through Room 77's door
+        // (loadRoomWithEgo 0x0419, walk to (735, 126)), while the entry put the ego at object 0x040B in box 13, which has no route to box 17.
+        // ScummVM's walkActor ends such a walk where it started; the ego and the camera stay known, so local script 214 (the parrot) is followed.
+        if (Game() is not { } game) return;
+
+        var scene = ScummRoomFirstVisit.Run(game, 76);
+
+        Assert.Equal(ScummSettleOutcome.Settled, scene.Outcome);
+        Assert.Contains(scene.State.Actors, actor => actor.Number == 1 && actor.Room == 76 && actor.X == 50 && actor.WalkBox == 13);
+        Assert.DoesNotContain(scene.Snapshot.Uncertainties, item => item.Contains("is unknown", StringComparison.Ordinal) && item.Contains("Camera", StringComparison.Ordinal));
+        Assert.DoesNotContain(scene.Snapshot.Uncertainties, item => item.Contains("depends on var[0x002]", StringComparison.Ordinal));
+    }
 }

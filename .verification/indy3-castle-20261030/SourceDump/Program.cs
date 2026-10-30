@@ -26,6 +26,40 @@ foreach (var spec in args.Skip(1))
             foreach (var o in room.Objects) Console.WriteLine(o);
             Console.WriteLine("locals: " + string.Join(", ", data.RoomLocalScriptIds(int.Parse(p[1]))));
             break;
+        case "v":
+            // v:<room>:<object>:<verb> (verb in hex)
+            var vroom = int.Parse(p[1]);
+            var record = data.ReadRoom(vroom).Objects.First(o => o.Id == int.Parse(p[2]));
+            Dump(spec, data.ReadObjectVerb(vroom, record, Convert.ToInt32(p[3], 16), out _));
+            break;
+        case "visit":
+            // visit:<room>: the first visit's trace lines about the ego, the camera and walks, and its uncertainties
+            var booted = ScummGameSession.BootForPlay(game, out _);
+            booted.VisitRoom(game.Rooms.First(r => r.ResourceId == int.Parse(p[1])));
+            foreach (var line in booted.SessionTrace.Where(l => l.Contains("ego", StringComparison.OrdinalIgnoreCase) || l.Contains("camera", StringComparison.OrdinalIgnoreCase) || l.Contains("walk"))) Console.WriteLine("  " + line);
+            Console.WriteLine("  ego: " + booted.Actors.FirstOrDefault(a => a.Number == 1));
+            foreach (var u in booted.Snapshot.Uncertainties.Where(u => u.Contains("Camera") || u.Contains("ego"))) Console.WriteLine("  ? " + u);
+            break;
+        case "box":
+            // box:<room>:<x>:<y>[:<object>] - the boxes that hold a point (and an object's walk point), and the matrix's next box between them
+            var broom = int.Parse(p[1]);
+            var rd = data.ReadRoom(broom);
+            var boxes = rd.WalkBoxes!;
+            Console.WriteLine($"boxes: {boxes.Count}");
+            int BoxOf(int bx, int by) { for (var b = 0; b < boxes.Count; b++) if (boxes.Contains(b, bx, by)) return b; return -1; }
+            var (tx, ty) = (int.Parse(p[2]), int.Parse(p[3]));
+            var tb = BoxOf(tx, ty);
+            Console.WriteLine($"target ({tx},{ty}) in box {tb}");
+            if (p.Length > 4)
+            {
+                var o = rd.Objects.First(item => item.Id == int.Parse(p[4]));
+                var sb = BoxOf(o.WalkX, o.WalkY);
+                Console.WriteLine($"object {o.Id} at ({o.X},{o.Y}) walk ({o.WalkX},{o.WalkY}) in box {sb}; next box {sb}->{tb}: {boxes.GetNextBox(sb, tb)}");
+                for (var b = 0; b < boxes.Count; b++) Console.WriteLine($"  box {b} flags 0x{boxes.GetFlags(b):X2} corners {boxes.Boxes[b]} next->{tb}: {boxes.GetNextBox(b, tb)}");
+                var adj = boxes.Adjust(o.WalkX, o.WalkY, true, 0, 0);
+                Console.WriteLine($"adjust ({o.WalkX},{o.WalkY}) -> ({adj.X},{adj.Y}) box {adj.Box}");
+            }
+            break;
         case "prep":
             var session = ScummGameSession.BootForPlay(game, out _);
             var target = game.Rooms.First(r => r.ResourceId == int.Parse(p[1]));

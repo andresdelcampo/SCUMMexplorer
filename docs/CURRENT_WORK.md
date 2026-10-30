@@ -35,7 +35,7 @@ Everything here is open. Items marked **user-reported** come from the user's own
 | **Monkey Island 2** | Fixed 30 October, retest pending: in Play Game Intro the floppy copies' recipe screen lost the recipe's name and ingredients (strings inside strings) and the prompt ran off screen (no talk-line wrapping from version 4 on); both are engine fixes ([record](../.verification/mi2-intro-protection-20261030/README.md)). The player still needs the code wheel. |
 | **Monkey Island 1 CD** | Done 30 October ([record](../.verification/monkeycd-rooms-20261030/README.md)): Room 88 (empty entry block) and 89 run with nothing unfollowed; Room 99 is an icon-holder room the game never enters (objects past the 1000-object table), refused with that reason; the lookout frame at start no longer occurs. |
 | **Monkey Island 1** (all) | Spanish eight-disk and CD language folders passed S9 only; no real-window look at every edition. |
-| **Indy 4** | Rooms 76, 77, 87 have an unfollowed camera-after-walk item. The play view still draws each object's first-state image. CD has no audio tracks. |
+| **Indy 4** | 30 October ([record](../.verification/indy4-rooms-20261030/README.md)): Rooms 76, 77, 87 run with nothing unfollowed (a walk with no box route now ends where it started, as ScummVM's `walkActor`); the play view's first-state images and Room 4's magenta line are no longer seen. CD has no audio tracks (data). |
 | **Indy 3** | Play uses a 16 × 16 cross-hair from ScummVM; the drawn one differs. Offer: count `printEgo` lines as first texts (changes text columns). |
 | **Maniac Mansion / Zak** | Retained black rectangles, Zak camera placement, old-actor alignment and shown-lit previews in S5 (original-game visual acceptance open). Native darkness/flashlight, flight timer and bus approaches, and several unproved paths. Zak classic: 24 derived / 11 estimated palettes, Costumes ◐. Preparation to reach states is labelled exploration, not earned play. |
 | **v5 audio** | Script-driven hooks beyond those followed; speech and named tracks not yet heard/seen by the user. |
@@ -56,7 +56,7 @@ Open before shipping:
 No automatic next feature. The user is collecting issues from their own testing and will supply a list; work from that list, one step at a time. Candidates meanwhile, in order of visible effect:
 1. Capture and fix the crash and the black-rooms report once the user names the game and room.
 2. ~~Monkey Island 2 copy-protection / opening-cutscene blocking~~ (fixed 30 October; retest in USER_CHECKS).
-3. Known Indy 4 room items above (MI CD done 30 October).
+3. ~~Known MI CD and Indy 4 room items~~ (done 30 October).
 4. Release readiness list.
 
 ## Product rules

@@ -813,7 +813,13 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
             }
             if (from != endBox && place.Boxes.GetNextBox(from, endBox) < 0)
             {
-                actor.Forget($"{label}: the box matrix has no route from box {from} to box {endBox}, so where the walk stops is not modelled");
+                // ScummVM walkActor: getNextBox < 0 makes the current box the destination and sets the last leg, which ends the walk where it
+                // started with the stand frame (the stepped walk does the same, WalkActor). Indy 4 Room 76: a catalog visit's assumed arrival
+                // through Room 77's door walks to (735, 126) from where the entry put the ego (box 13), which has no route there.
+                actor.DestBox = from;
+                actor.Moving = 0;
+                StartAnimation(actor, actor.StandFrame, place);
+                actor.LookEstimate = $"{label}: the box matrix has no route from box {from} to box {endBox}, so the walk ends where it started";
                 return;
             }
         }

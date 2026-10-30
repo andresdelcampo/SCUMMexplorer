@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 30 October: Indy 4 room items; Indy 3 castle rooms explained
+
+Indy 4: a walk taken to end at once with no box route now ends where it started (ScummVM `walkActor`, as the stepped walk already did), so Room 76's catalog visit keeps the ego and camera and follows the parrot's local script 214; Rooms 77 and 87 were already clean; the first-state images and Room 4's magenta line are no longer seen ([record](../.verification/indy4-rooms-20261030/README.md)). Indy 3 castle Rooms 20, 28, 32: black by the game's cut-away design and still pictures because guards can start a confrontation (R-8.5b); decision 7 in USER_CHECKS ([record](../.verification/indy3-castle-20261030/README.md)).
+
 ## 30 October: Monkey Island CD Rooms 88, 89, 99 and the lookout frame
 
 Room 88's `ENCD`/`EXCD` are empty blocks: the v5 data source now reads them as no script (ScummVM would run the next block's header bytes). Room 89 runs clean (closed by earlier reader work). Room 99 holds inventory icons 955–1045 past the 1000-object index, so the game never enters it (ScummVM `getState`/`drawObject` assert): its refusal now says so. The one-frame lookout at start no longer occurs (real-window `StartFrames`). [Record](../.verification/monkeycd-rooms-20261030/README.md); `ScummMonkeyCdFirstVisitTests`.

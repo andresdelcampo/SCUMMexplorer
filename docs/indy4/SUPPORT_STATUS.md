@@ -17,7 +17,7 @@ Family: Indy4 | Fixture: `Games/indy4 vga en` (`ATLANTIS.cue`) | Last updated: 1
 
 Blocked on: nothing.
 Next: S8 State (not requested); the user checks of the S6, S7 and S9 records. Fixed 19 October: the credits' headings drawn on top of one another (every copy) and the magazine's missing inventory icon ([play record addendum](../../.verification/indy4-play-20261017/README.md#addendum-19-october-2026-the-credits-headings-and-the-magazines-icon)).
-Open uncertainties: as Monkey Island 2. The CD image has a single data track (`TRACK 1 MODE1/2352` only), so there are no CD audio tracks to list; its music is iMUSE on the devices (456 parts, 226 loop). Session sound lengths are the iMUSE default path (estimates). A magenta line crosses Room 4's picture after the boot (not investigated).
+Open uncertainties: as Monkey Island 2. The CD image has a single data track (`TRACK 1 MODE1/2352` only), so there are no CD audio tracks to list; its music is iMUSE on the devices (456 parts, 226 loop). Session sound lengths are the iMUSE default path (estimates). Room 4's magenta line is no longer seen, and Rooms 76, 77, 87 run with nothing unfollowed (30 October, [record](../../.verification/indy4-rooms-20261030/README.md)).
 
 ## Decision log
 
