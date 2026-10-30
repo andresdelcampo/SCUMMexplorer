@@ -31,3 +31,9 @@ All other rooms of the 88 are unchanged by this line; all 88 run without a gap. 
 
 - `ScummIndy3FirstVisitTests` (new): Room 6 leaves for Room 9 with nothing unfollowed; actor width defaults and `actorOps`.
 - Indy 3 filter (69 tests) and full suite: 1831 passed, 0 failed, 5 skipped.
+
+## Addendum, 30 October: indexed script arguments
+
+`SubstituteLocalArguments` passed a started script's arguments by their raw text, so an indexed variable stayed unresolved: Room 13's Script 131 +0x0038 (`local[0x003+0x000]` .. `local[0x003+0x004]`, random delays for Script 132) and Room 3's entry +0x006F (`var[0x064+local[0x000]]`, twelve runs of local script 200). It now reads an indexed argument at its resolved slot when the script starts (as `getWordVararg` does). Full Indy 3 EGA audit: all 88 rooms run with nothing unfollowed; the only change is Room 3, now 13 of 28 images (the classroom's students). `ScummIndy3FirstVisitTests.AStartedScriptReceivesItsIndexedArguments`; full suite 1835 passed.
+
+Rooms 1 and 15 still never rest: their crowds and ambient scripts keep changing them (the state at the frame limit is shown).

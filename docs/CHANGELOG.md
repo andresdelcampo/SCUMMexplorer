@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 30 October: indexed script arguments
+
+A started script's indexed argument (`local[0x003+0x000]`, `var[0x064+local[0x000]]`) is read at its resolved slot when the script starts, as ScummVM's `getWordVararg` does. Indy 3 Rooms 3 and 13 were the last rooms with an unfollowed item; all 88 EGA rooms now run with nothing unfollowed ([record](../.verification/indy3-rooms-20261030/README.md)).
+
 ## 30 October: Indy 3 getActorWidth and actorFollowCamera into another room
 
 `getActorWidth` is answered (actor width 24 from `initActor`, changed by `actorOps width`), and `actorFollowCamera` on an actor in another room starts that room's scene in version 3 too, as ScummVM's `setCameraFollows` does in every version. Indy 3 Rooms 6, 18, 78, 80 now leave as their scenes do; the rest of the 88 rooms are unchanged by it ([record](../.verification/indy3-rooms-20261030/README.md)); `ScummIndy3FirstVisitTests`.

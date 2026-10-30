@@ -33,6 +33,20 @@ public sealed class ScummIndy3FirstVisitTests
         Assert.DoesNotContain(scene.Snapshot.Uncertainties, item => item.Contains("which would load that room", StringComparison.Ordinal));
     }
 
+    [Theory]
+    [InlineData(3)]
+    [InlineData(13)]
+    public void AStartedScriptReceivesItsIndexedArguments(int room)
+    {
+        // Room 3's entry +0x006F passes var[0x064+local[0x000]] to local script 200 (twelve times: the students' images); Room 13's Script 131 +0x0038
+        // passes local[0x003+0x000] .. local[0x003+0x004] to Script 132. The executor now resolves an indexed argument when the script starts.
+        if (Folder() is not { } folder) return;
+        var scene = ScummRoomFirstVisit.Run(new GameFolderScanner().Scan(folder), room);
+
+        Assert.DoesNotContain(scene.Snapshot.Uncertainties, item => item.Contains("arguments depending on unknown variables", StringComparison.Ordinal));
+        if (room == 3) Assert.True(scene.Images.Where(scene.Selection.IsActive).Select(image => image.Id).Distinct().Count() >= 12);
+    }
+
     [Fact]
     public void AnActorsWidthStartsAtTwentyFourAndFollowsActorOps()
     {

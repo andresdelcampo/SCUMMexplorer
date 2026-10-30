@@ -1826,9 +1826,13 @@ public sealed partial class ScummBoundedScriptExecutor
         var arguments = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Select((argument, index) =>
             {
-                if (!argument.StartsWith("local[", StringComparison.Ordinal) || !variables.TryGetValue(argument, out var value))
+                // An indexed variable is read at its resolved slot when the script starts, as getWordVararg reads it: Indy 3 Script 131 +0x0038 passes
+                // local[0x003+0x000] .. local[0x003+0x004], Room 3's entry +0x006F var[0x064+local[0x000]] (a global the session cannot index by a local).
+                var indexed = argument.Contains('+', StringComparison.Ordinal);
+                var key = indexed || argument.StartsWith("local[", StringComparison.Ordinal) ? ResolveIndexed(argument, variables) : argument;
+                if (!(indexed || key.StartsWith("local[", StringComparison.Ordinal)) || !variables.TryGetValue(key, out var value))
                     return argument;
-                if (estimated.Contains(argument)) estimatedIndexes.Add(index);
+                if (estimated.Contains(key)) estimatedIndexes.Add(index);
                 return $"0x{value:X4}";
             }).ToArray();
         return ($"{operands[..(open + 1)]}{string.Join(", ", arguments)}{operands[close..]}", estimatedIndexes);
