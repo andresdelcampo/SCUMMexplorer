@@ -62,7 +62,7 @@ Each step names its gate. Steps marked **(shared)** are one piece of engine work
 2. D — Check the run-based category against the bundled ScummVM (19 of 98 scenes are called dialogue).
 
 ### Indiana Jones 3 (EGA and 256 colours)
-1. A — Rooms 20, 28, 32 show mostly black pictures; Rooms 1, 6, 13, 15 and more never settle within 2400 frames; `actorFollowCamera` of an ego in another room is not modelled; inventory objects run no verb code of their own. Possibly the user's "thin black rooms".
+1. A — Rooms 20, 28, 32: **explained 30 October** ([record](../.verification/indy3-castle-20261030/README.md)): the castle's cut-away plan draws only Indy's section (Script 25), and patrolling guards can start a confrontation, so they stay still pictures by R-8.5b (decision 7 in USER_CHECKS). Rooms 1, 6, 13, 15 and more never settle within 2400 frames; `actorFollowCamera` of an ego in another room is not modelled; inventory objects run no verb code of their own. Possibly the user's "thin black rooms".
 2. B — Get a working ScummVM capture (shared) and compare ten rooms per edition; Rooms 47, 60, 66 start dark and are shown lit; the 256-colour release differs from EGA by one object in Rooms 26, 36, 38, 55, 61; the drawn cross-hair differs from ScummVM's 16 × 16.
 3. C — Listening check of play and cutscenes (AdLib with Indy 3's `Player_AD` constants, PC speaker).
 4. D — 58 of 153 entries begin nothing from a fresh start: generic start planner (shared).

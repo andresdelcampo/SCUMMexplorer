@@ -14,6 +14,7 @@ Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If th
 | 4 | Indy 3's cursor: ScummVM's 16 × 16 cross-hair is used; the game draws a different one. Acceptable? | R-1.5, Indy 3 tracker | |
 | 5 | Indy 3: count `printEgo` lines as first texts (changes the text columns)? | CURRENT_WORK | |
 | 6 | Is a script-derived cutscene list (◐) the finish line for every game except LOOM English, or should some get a hand-checked list? | ROADMAP gate D | |
+| 7 | Indy 3 castle Rooms 20, 28, 32: guards can start a confrontation at any moment, so the catalog shows a still picture (R-8.5b). Make such rooms live anyway? | [record](../.verification/indy3-castle-20261030/README.md) | |
 
 ## LOOM
 
@@ -32,7 +33,7 @@ Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If th
 |---|---|---|
 | Listen in play: Room 73 onwards, AdLib then PC speaker | [play record](../.verification/indy3-play-20261015/README.md), [sound polish](../.verification/sound-polish-20261019/README.md) | |
 | Room 73 · Turn off light switch, Room 22 · Entry, Room 80 · Entry: start as in the game? Esc and Space work? | [cutscene record](../.verification/indy3-cutscenes-20261017/README.md) | |
-| Rooms 20, 28, 32: are they black in the real game too? | [Indy 3 tracker](indy3/SUPPORT_STATUS.md) | |
+| Rooms 20, 28, 32: the castle's cut-away plan shows only the section around Indy (decoded, Script 25). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
 | The same in the 256-colour copy, and the Spanish copies' accents | [editions](../.verification/indy3-editions-20261017/README.md) | |
 
 ## Monkey Island 1 floppy

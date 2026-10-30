@@ -71,6 +71,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 
 | Room | What it is, entry/exit script facts, local scripts | Evidence | Source | Date |
 |---|---|---|---|---|
+| 20, 28, 32 | Castle Brunwald cut-away floor plans: the entry starts Script 25 with (first set, second set, count) = (280, 288, 7), (408, 418, 9), (470, 479, 8); Script 25 turns the first set off and the second on, then loops for ever drawing only the section images of the walk boxes Indy stands in (and sections whose first-set object has state 1): the rest of the room stays black. Room 20 local 200 seeds the guards (`var[0x077]..var[0x093]`, once) and starts Script 57 → Script 58 per guard: a patrol loop that chains to Script 60 (the confrontation) when the guard is within 10 of Indy | decoded | Room 20/28/32 entry +0x0000; Script 25 +0x005D..+0x015A; Room 20 local 200; Script 58 +0x0056..+0x007A | 2026-10-30 |
 | 76 | opening: entry starts object 842 verb 0xFA and script 201 (local) if `var[0x039]` is 0; local 201 starts sound 35 and ten timed scripts | decoded | Room 76 entry +0x0013; Room 76 local script 201 | 2026-10-14 |
 | 79 | opening credits scrolling over three screens (text "TM & ... 1989 Lucasfilm Ltd."), timed by the music timer; local 205 moves actor 1 across | decoded | Room 79 local script 200 +0x0047; local script 205 | 2026-10-14 |
 | 0 | "no room" (ScummVM room 0): used to clear the screen between scenes | engine | Script 1 +0x0219 | 2026-10-14 |

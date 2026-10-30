@@ -50,6 +50,11 @@ internal static class Program
                 Call("SelectRoomWithIntent", room, Enum.Parse(kind, "Catalog"), false);
                 Log($"picked Room {args[1]}");
                 var until = clock.Elapsed.TotalSeconds + 25; while (clock.Elapsed.TotalSeconds < until) await Task.Delay(20);
+                window.UpdateLayout();
+                var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                bitmap.Render(window);
+                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                using (var stream = File.Create(Path.Combine(output, $"room-{args[1]}.png"))) encoder.Save(stream);
                 var other = shownRooms.Where(r => r != int.Parse(args[1])).Distinct().ToArray();
                 Log(other.Length == 0 ? "PASS: only the picked room was shown" : $"FAIL: other rooms shown: {string.Join(", ", other)}");
             }
