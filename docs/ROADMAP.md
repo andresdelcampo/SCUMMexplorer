@@ -36,7 +36,7 @@ Symbols: ✅ done · 🟡 works but unchecked or partial · 🔴 known broken or
 | Indiana Jones 3 EGA | 🟡 | 🔴 | 🟡 | 🟡 | ⬜ | ✅ | 🟡 |
 | Indiana Jones 3 256 colours | 🟡 | 🔴 | 🟡 | 🟡 | ⬜ | ✅ | 🟡 |
 | Monkey Island 1 floppy | ✅ | 🔴 | 🟡 | 🟡 | ⬜ | 🟡 | 🟡 |
-| Monkey Island 1 CD | 🔴 | 🔴 | 🟡 | 🟡 | ⬜ | 🟡 | 🟡 |
+| Monkey Island 1 CD | ✅ | 🔴 | 🟡 | 🟡 | ⬜ | 🟡 | 🟡 |
 | Monkey Island 2 | 🔴 | 🔴 | 🟡 | 🟡 | ⬜ | 🟡 | 🔴 |
 | Indiana Jones 4 | 🟡 | 🔴 | 🟡 | 🟡 | ⬜ | 🟡 | 🟡 |
 | Maniac Mansion (classic, enhanced) | 🟡 | 🔴 | 🟡 | 🟡 | ✅ | 🟡 | 🟡 |
@@ -76,7 +76,7 @@ Each step names its gate. Steps marked **(shared)** are one piece of engine work
 4. E — S8 (shared). F — Spanish eight-disk copy seen in play.
 
 ### Monkey Island 1 CD
-1. A — Rooms 88 (undecoded entry byte) and 89 (`saveRestoreVerbs` sub-opcode 0x00) each have one unfollowed item; Room 99 cannot run (object 1000 outside the state table; the rubber chicken shows as its icon); the lookout flashes for one frame at start.
+1. A — **Done 30 October** ([record](../.verification/monkeycd-rooms-20261030/README.md)): Room 88's empty entry block, Room 89 clean, Room 99 is an icon-holder room the game never enters (refused with that reason), the lookout frame no longer occurs.
 2. B — ScummVM comparison (shared).
 3. C — Listening; disc track 21 is started by no sound; six `startSound` operands are variables.
 4. D — 59 of 160 entries begin nothing; category check against ScummVM. E — S8 (shared).

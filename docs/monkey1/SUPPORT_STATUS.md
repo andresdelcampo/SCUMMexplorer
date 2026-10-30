@@ -16,7 +16,7 @@ Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island
 
 Blocked on: nothing.
 Language choice: **done (19 Oct)**, R-3.16: the window offers the disc's five language folders (English, French, German, Italian, Spanish) under the game's name, reopens the game in the chosen one and remembers it per folder ([language-choice-20261019](../../.verification/language-choice-20261019/README.md)). FRENCH, GERMAN and ITALIAN had their S9 run on 19 October ([record](../../.verification/monkeycd-editions-20261019/README.md)).
-Next: the user's S7 checks (record, user checks); the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); the user's listening and timing check of play (see the S6 record).
+Next: the user's S7 checks (record, user checks); the user's listening and timing check of play (see the S6 record). The three S5 rooms were closed on 30 October ([record](../../.verification/monkeycd-rooms-20261030/README.md)): 88 has empty entry/exit blocks (no script), 89 runs clean, 99 is an icon-holder room the game never enters.
 Open uncertainties: disc track 21 (16 s) is started by no sound and stays unnamed; six `startSound` operands are variables (script 101 `var[100]`, script 162 `local[4]`, room 75 local script 205 `local[0]`), which sound they start needs running scripts.
 
 ## Decision log

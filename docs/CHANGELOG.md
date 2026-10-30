@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 30 October: Monkey Island CD Rooms 88, 89, 99 and the lookout frame
+
+Room 88's `ENCD`/`EXCD` are empty blocks: the v5 data source now reads them as no script (ScummVM would run the next block's header bytes). Room 89 runs clean (closed by earlier reader work). Room 99 holds inventory icons 955–1045 past the 1000-object index, so the game never enters it (ScummVM `getState`/`drawObject` assert): its refusal now says so. The one-frame lookout at start no longer occurs (real-window `StartFrames`). [Record](../.verification/monkeycd-rooms-20261030/README.md); `ScummMonkeyCdFirstVisitTests`.
+
 ## 30 October: MI2 copy protection readable in Play Game Intro; strings inside strings; talk-line wrapping (v4+)
 
 User report (28 October): the MI2 opening stopped at the copy protection. The explicit intro answers nothing for the player, and the floppy recipe screen could not be answered: `ScummTextDecoder` dropped a string named inside a string (code 7 in string 31 names string 43, the recipe's name; string 45 names the ingredients and the `_` fields), and talk lines were never wrapped, so the centred prompt ran off the screen. Code 7 now converts the stored string with string support (depth-bounded, as ScummVM's `convertStringMessage`), and `ScummMessageTable.AddLineBreaks` ports `displayDialog`/`addLinebreaks` for engine version 4 and later. Real-window check through the protection to the opening ([record](../.verification/mi2-intro-protection-20261030/README.md)); `ScummMonkey2IntroTests`. Wrapping now applies to every v4/v5 game's talk lines.
