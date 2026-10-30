@@ -114,8 +114,8 @@ Ordered by how many gates each one unlocks.
 
 | # | Work | Unlocks | Where in the code |
 |---|---|---|---|
-| E1 | **Crash log in the shipped app.** The user's crash came with no trace; only harnesses log (`HarnessFailurePolicy`). | A for all | `App.xaml.cs` (25 lines today) |
-| E2 | **Honest matrix and one user-check list per game.** Lower Sound to ◐ where listening is pending (or add an "accepted" mark), refresh the stale "Checked by" column and family notes in REQUIREMENTS §3.1, and collect the scattered user checks into one short checklist per game. | G for all | `GameSupport.cs`, REQUIREMENTS §3.1, trackers |
+| E1 | **Done 30 Oct:** `CrashLog` writes `crash-logs` under the profile, with a trail of the last actions and an unclean-exit log after a crash no handler sees. **Crash log in the shipped app.** The user's crash came with no trace; only harnesses log (`HarnessFailurePolicy`). | A for all | `App.xaml.cs` (25 lines today) |
+| E2 | **Done 30 Oct:** Sound ◐ for the ten non-LOOM rows, §3.1 refreshed, [USER_CHECKS](USER_CHECKS.md). **Honest matrix and one user-check list per game.** Lower Sound to ◐ where listening is pending (or add an "accepted" mark), refresh the stale "Checked by" column and family notes in REQUIREMENTS §3.1, and collect the scattered user checks into one short checklist per game. | G for all | `GameSupport.cs`, REQUIREMENTS §3.1, trackers |
 | E3 | **ScummVM picture capture that works** (the bundled build showed a white window for Indy 3; try the OpenGL renderer or a save-state screenshot) plus a side-by-side harness. | B for all non-LOOM | `.verification/` |
 | E4 | **Generic cutscene start planner.** `ScummCutscenePlanner` only runs fresh starts; the prerequisite search is LOOM-only (`LoomCdSceneSetupPlanner`, story bits, staff). About 40% of non-LOOM entries begin nothing. | D for 6 game groups | `Scumm/Session/ScummCutscenePlanner.cs` |
 | E5 | **Status (S8) beyond v1/v2.** The inventory editor needs a `ScummV2DataSource` and returns "no reviewed inventory edit contract" on any other version. | E for Indy 3, MI1, MI2, Indy 4 | `Scumm/Session/ScummSessionInventory*.cs` |

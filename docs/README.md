@@ -17,6 +17,7 @@
 ## Project references
 
 - [Roadmap](ROADMAP.md): per game, the seven gates to the finish line and the steps left (audit of 30 October 2026).
+- [User checks](USER_CHECKS.md): the checks and decisions only the user can do, one short list per game.
 - [Requirements](REQUIREMENTS.md): what the app must do, tagged by engine, version, game and edition scope.
 - [Templates](templates/README.md): the fixed formats for a game's README, tracker, script map and evidence record.
 - [Boot sequence by version](engine/SCUMM_BOOT_SEQUENCE.md): how each SCUMM version starts.

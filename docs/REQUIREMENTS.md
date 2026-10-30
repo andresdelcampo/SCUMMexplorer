@@ -76,16 +76,16 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 | **LOOM** demos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 | **LOOM** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
+| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
+| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
+| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
+| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
+| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
+| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
 <!-- support-matrix:end -->
 
 Maniac/Zak edition coverage at the [18 October S9 checkpoint](checkpoints/20261018-S9-ManiacZak.md): classic English Maniac, enhanced Spanish Maniac, classic English Zak and enhanced English Zak only. There is one local copy per family; no additional language, demo or revision within a family was available to establish compatibility. These checks do not raise the existing feature levels.
@@ -101,13 +101,13 @@ The [18 October admin clarification](checkpoints/20261018-Admin-ManiacZak.md) re
 | Column | ◐ Partial | ✔ Full | Checked by |
 |---|---|---|---|
 | Rooms | – | every room picture decodes and is offered; LOOM also shows the first-visit state (R-1.4) | rooms offered, picture decodes |
-| Objects | stored object boxes and names from the room data (no script run) | first-visit state from the entry scripts, and click responses through the game's own scripts (R-1.5) | LOOM only today |
+| Objects | stored object boxes and names from the room data (no script run) | first-visit state from the entry scripts, and click responses through the game's own scripts (R-1.5) | LOOM tests; per family a room audit and an S6 route test (`Scumm<Family>PlayTests`) |
 | Walk boxes | – | read for the room and drawn in Advanced | – |
 | Costumes | drawn, but in an estimated palette (Zak McKracken classic: 11 of 35 actor colours depend on what ran and stay labelled estimates; Maniac Mansion classic is derived from the scripts and counts as full) | drawn in the correct palette | costumes offered |
-| Sound | some devices or kinds not heard or not played (e.g. PCjr/Tandy not listened to, MT-32 needs the user's ROMs) | every kind plays on every device the game has, as listened to by the user; the v5 hooks that wait for a script id (S6) are a known limit and do not hold the cell back (decision of 14 October) | sounds offered |
+| Sound | some devices or kinds not heard or not played (e.g. PCjr/Tandy not listened to, MT-32 needs the user's ROMs) | every kind plays on every device the game has, as listened to by the user; the v5 hooks that wait for a script id (S6) are a known limit and do not hold the cell back (decision of 14 October) | sounds offered; ✔ only after the user's listening check ([USER_CHECKS](USER_CHECKS.md)) |
 | Texts | – | Game Texts extracts spoken lines, names and labels | extractor finds entries |
 | Scripts | – | raw disassembly in the family's dialect, and the Readable view | scripts offered |
-| Play | – | live room: actors, camera, clicks run the game's scripts | LOOM; Indiana Jones 3 EGA through its own verbs (§7.1) |
+| Play | – | live room: actors, camera, clicks run the game's scripts | LOOM; every other family through its own verbs (§7.1), the R-7.18 route per family |
 | Cutscenes | list derived from the scripts, not hand-validated | hand-validated catalog (English Roland LOOM only) | – |
 | Status | View/limited edits, incomplete item catalog or missing required native artwork | Admin Game Status editor (§12): LOOM fields; inventory catalog grants and recipient selection for inventory games | LOOM status tests; inventory catalog/capacity/edit/undo and window checks, including native artwork |
 
@@ -115,7 +115,7 @@ Family notes (what is behind a row):
 
 - `LoomEgaReference`: the English Roland edition (`GameSupport.ReferenceEditionLabel`); the replay catalog (328 replays, R-8.18) is enabled only for its fingerprint. `LoomEga`: the other editions (Spanish, plain English, French, German, v1.2, Italian) use the same code with the script-derived cutscene list (R-8.24); their first-visit state per edition is not recorded (I-07).
 - `LoomEgaDemo`: the short and long self-running demos; the picker offers only **The preview** (R-3.3). `LoomCd`: CD/VGA with voices and disc music; cutscenes derived from scripts (R-8.21, R-8.25).
-- `Indy3Ega`: backgrounds, costumes, sounds, scripts and texts including dialogue choices (R-11.6); since S5/S6 (14–16 Oct) every room's first visit and Play through the game's own verbs (§7.1; `ScummIndy3PlayTests`); no cutscene list, no state window. The browsed families (`Indy3Vga`, `MonkeyFloppy`, `MonkeyCd`, `Monkey2`, `Indy4`, `ManiacEnhanced`, `ManiacClassic`, `ZakEnhanced`, `ZakClassic`) share the same reading: rooms, costumes, walk boxes, sounds, scripts, texts and stored-object boxes (R-3.10 to R-3.14, R-13.8). `Indy3Vga`, `MonkeyFloppy` (16 Oct) and `MonkeyCd` (17 Oct, `ScummMonkeyCdPlayTests`: its music plays from the disc's audio tracks) also show every room's first visit and play through their own verbs (§7.1).
+- `Indy3Ega`, `Indy3Vga`, `MonkeyFloppy`, `MonkeyCd`, `Monkey2`, `Indy4`, `ManiacEnhanced`, `ManiacClassic`, `ZakEnhanced`, `ZakClassic`: every room's first visit from the generic session (`ScummGameSession`) and Play through the game's own verbs (§7.1; `Scumm<Family>PlayTests`, 14–18 Oct); script-derived cutscene lists (◐). Status ✔ only for the four Maniac/Zak families (inventory editor, v1/v2 only); the others have no state window. Sound is ◐ for all ten until the user's listening check (30 October; the per-game checks are in [USER_CHECKS](USER_CHECKS.md)). What is left per game: [ROADMAP](ROADMAP.md).
 - Not in the matrix: `OtherV3` (any other old-v3 game whose `00.LFL` parses: rooms and texts, LOOM script dialect, may read wrongly) and `OtherBrowsed` (an unrecognised v1/v2/v4/v5 game, read like the browsed families).
 
 Every Rooms ✔ means the same thing: no gaps, objects and actors drawn by the shared engine code. The reference edition differs only in having a **replay catalog**, which is data, not room rendering.

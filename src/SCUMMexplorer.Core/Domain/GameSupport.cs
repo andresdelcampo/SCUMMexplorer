@@ -72,30 +72,32 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.LoomEga, "**LOOM** EGA other editions", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.LoomEgaDemo, "**LOOM** demos", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.LoomCd, "**LOOM** CD", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
+        // Sound ◐ for every non-LOOM row (30 October 2026, roadmap E2): ✔ means "listened to by the user" (REQUIREMENTS §3.1, S3), and each
+        // tracker records that check as pending. Raise a row back to ✔ when the user reports its listening check (docs/USER_CHECKS.md).
         // S7 Indy3Ega and Indy3Vga (17 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummIndy3CutsceneTests).
-        Row_(GameFamily.Indy3Ega, "**Indiana Jones 3** EGA", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.Indy3Ega, "**Indiana Jones 3** EGA", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Indy3Vga (16 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy3VgaPlayTests).
-        Row_(GameFamily.Indy3Vga, "**Indiana Jones 3** 256 colours", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.Indy3Vga, "**Indiana Jones 3** 256 colours", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S7 MonkeyFloppy (17 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummMonkeyFloppyCutsceneTests).
-        Row_(GameFamily.MonkeyFloppy, "**Monkey Island 1** floppy", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.MonkeyFloppy, "**Monkey Island 1** floppy", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S6 MonkeyCd (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummMonkeyCdPlayTests).
         // S7 MonkeyCd (17 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummMonkeyCdCutsceneTests).
-        Row_(GameFamily.MonkeyCd, "**Monkey Island 1** CD", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.MonkeyCd, "**Monkey Island 1** CD", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Monkey2 (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummMonkey2PlayTests).
         // S7 Monkey2 (18 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummMonkey2CutsceneTests).
-        Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Indy4 (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy4PlayTests), spoken lines in play.
         // S7 Indy4 (18 October 2026): Cutscenes ◐, the list derived from the scripts and playable with its speech (ScummIndy4CutsceneTests).
-        Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Maniac/Zak (17 October 2026): native bounded routes and real-window checks; visual limits in the checkpoint.
         // S7 (18 October): script-derived lists with fresh-run proofs and window playback; Partial, not a hand-validated catalog.
         // Admin clarification (18 October): catalog grants, native capacity and atomic Apply/Undo;
         // Catalog completion (18 October): own-edition source census, all-item grant/retained-code/Undo,
         // native capacity and pictured-recipient window checks establish the admin inventory contract.
-        Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
-        Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
-        Row_(GameFamily.ZakEnhanced, "**Zak McKracken** enhanced", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
-        Row_(GameFamily.ZakClassic, "**Zak McKracken** classic", [F, F, F, P, F, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, F, F, F, P, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, F, F, F, P, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ZakEnhanced, "**Zak McKracken** enhanced", [F, F, F, F, P, F, F, F, P, F], Explore, ExplorePreview),
+        Row_(GameFamily.ZakClassic, "**Zak McKracken** classic", [F, F, F, P, P, F, F, F, P, F], Explore, ExplorePreview),
         // Another old-v3 game (Zak McKracken EGA and the like): the room pictures and the texts need nothing game-specific. Limited on purpose.
         Row_(GameFamily.OtherV3, "Other old-v3 game", [F, N, N, N, N, F, N, N, N, N], BackgroundsAndTexts, BrowsedPreview, false),
         Row_(GameFamily.OtherBrowsed, "Other browsed game", [F, P, F, P, P, F, F, N, N, N], Browsed, BrowsedPreview, false)
