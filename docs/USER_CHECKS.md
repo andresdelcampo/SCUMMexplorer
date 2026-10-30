@@ -34,6 +34,7 @@ Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If th
 | Listen in play: Room 73 onwards, AdLib then PC speaker | [play record](../.verification/indy3-play-20261015/README.md), [sound polish](../.verification/sound-polish-20261019/README.md) | |
 | Room 73 · Turn off light switch, Room 22 · Entry, Room 80 · Entry: start as in the game? Esc and Space work? | [cutscene record](../.verification/indy3-cutscenes-20261017/README.md) | |
 | Rooms 20, 28, 32: the castle's cut-away plan shows only the section around Indy (decoded, Script 25). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
+| Rooms 6, 18, 78, 80: their pictures now come from the moment their scene leaves them (the game follows Indy into the next room). Do they look right? | [record](../.verification/indy3-rooms-20261030/README.md) | |
 | The same in the 256-colour copy, and the Spanish copies' accents | [editions](../.verification/indy3-editions-20261017/README.md) | |
 
 ## Monkey Island 1 floppy

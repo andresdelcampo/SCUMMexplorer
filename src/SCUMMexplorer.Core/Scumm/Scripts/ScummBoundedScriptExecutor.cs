@@ -1788,7 +1788,7 @@ public sealed partial class ScummBoundedScriptExecutor
 
     private static bool IsActorQuery(string operation) => operation is
         "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom" or
-        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale";
+        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale" or "getActorWidth";
 
     private static bool IsActorPlacement(string operation) => operation is
         "putActor" or "putActorAtObject" or "putActorInRoom" or "walkActorTo" or "walkActorToObject" or
@@ -2005,6 +2005,8 @@ public sealed partial class ScummBoundedScriptExecutor
                     else if (item.StartsWith("talkColor,", StringComparison.Ordinal) &&
                              TryReadValue(item["talkColor,".Length..].Trim(), variables, out var talkColor, out _))
                         actors.SetTalkColor(number, talkColor & 0xFF);
+                    else if (item.StartsWith("width,", StringComparison.Ordinal) && ReadItem(item, 1) is int widthValue)
+                        actors.SetWidth(number, widthValue & 0xFF);
                     else if (item.StartsWith("scale,", StringComparison.Ordinal) && ReadItem(item, 1) is int scaleValue)
                         actors.SetScale(number, scaleValue & 0xFF);
                     else if (item.StartsWith("elevation,", StringComparison.Ordinal))
@@ -2231,6 +2233,8 @@ public sealed partial class ScummBoundedScriptExecutor
             "getActorMoving" => actor.Moving,
             // o5_getActorScale (v5 0x3B): the actor's _scalex.
             "getActorScale" => actor.Look.Scale,
+            // o5_getActorWidth: the actor's _width (24 from initActor, actorOps width).
+            "getActorWidth" => runtime.Actors.Width(number),
             _ => actor.Y
         };
         if (value is null)
@@ -2247,7 +2251,7 @@ public sealed partial class ScummBoundedScriptExecutor
             detail = $"{operation} reads actor {number}, whose {what} the preview does not know ({actor.Look.Estimate ?? actor.Unknown ?? "not known"})";
             return false;
         }
-        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale")
+        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale" or "getActorWidth")
         {
             answer = value.Value;
             // S5 Indy4: the scale actorOps set; the walk-box scaling of a moving actor (setupActorScale) is not simulated, so the value is an estimate.
@@ -2885,6 +2889,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 "getActorX" => actor.X, "getActorY" => actor.Y, "getActorCostume" => actor.Look.Costume,
                 "getActorElevation" => actor.Look.Elevation, "getActorFacing" => actor.Look.Direction,
                 "getActorScale" => actor.Look.Scale,
+                "getActorWidth" => runtime.Actors.Width(id),
                 _ => actor.Moving
             };
             var reason = op is "getActorX" or "getActorY" or "getActorRoom" or "getActorWalkBox" ? actor.Estimate :

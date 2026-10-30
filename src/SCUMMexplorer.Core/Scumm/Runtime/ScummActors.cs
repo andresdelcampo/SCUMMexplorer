@@ -116,6 +116,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         actor.LastValidX = actor.LastValidY = 0;
         actor.IgnoreBoxes = false;
         actor.TalkColor = DefaultTalkColor;
+        actor.Width = DefaultWidth;
         // Actor::initActor(0) for v3: elevation 0, walk speed (8, 2), frames 1-5; the facing and costume stay.
         actor.Elevation = 0;
         (actor.WalkSpeedX, actor.WalkSpeedY) = (8, 2);
@@ -124,6 +125,15 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
 
     /// <summary>ScummVM <c>initActor</c>: every mode sets <c>_talkColor</c> to 15.</summary>
     public const int DefaultTalkColor = 15;
+
+    /// <summary>ScummVM <c>initActor</c>: every mode sets <c>_width</c> to 24.</summary>
+    public const int DefaultWidth = 24;
+
+    /// <summary>The actor's width (<c>actorOps width</c>, ScummVM <c>_width</c>, read by <c>getActorWidth</c>).</summary>
+    public int Width(int number) => _actors[number].Width;
+
+    public void SetWidth(int number, int width)
+    { _actors[number].Width = width; Notify(number); }
 
     /// <summary>The colour of the actor's talk text (<c>actorOps talkColor</c>, ScummVM <c>_talkColor</c>).</summary>
     public int TalkColor(int number) => _actors[number].TalkColor;
@@ -999,6 +1009,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public bool? Visible { get; set; } = false;
         public bool? IgnoreBoxes { get; set; } = false;
         public int TalkColor { get; set; } = DefaultTalkColor;
+        public int Width { get; set; } = DefaultWidth;
         public int? LastValidX { get; set; } = 0;
         public int? LastValidY { get; set; } = 0;
         public string? Unknown { get; set; }

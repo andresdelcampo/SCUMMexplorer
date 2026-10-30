@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 30 October: Indy 3 getActorWidth and actorFollowCamera into another room
+
+`getActorWidth` is answered (actor width 24 from `initActor`, changed by `actorOps width`), and `actorFollowCamera` on an actor in another room starts that room's scene in version 3 too, as ScummVM's `setCameraFollows` does in every version. Indy 3 Rooms 6, 18, 78, 80 now leave as their scenes do; the rest of the 88 rooms are unchanged by it ([record](../.verification/indy3-rooms-20261030/README.md)); `ScummIndy3FirstVisitTests`.
+
 ## 30 October: Indy 4 room items; Indy 3 castle rooms explained
 
 Indy 4: a walk taken to end at once with no box route now ends where it started (ScummVM `walkActor`, as the stepped walk already did), so Room 76's catalog visit keeps the ego and camera and follows the parrot's local script 214; Rooms 77 and 87 were already clean; the first-state images and Room 4's magenta line are no longer seen ([record](../.verification/indy4-rooms-20261030/README.md)). Indy 3 castle Rooms 20, 28, 32: black by the game's cut-away design and still pictures because guards can start a confrontation (R-8.5b); decision 7 in USER_CHECKS ([record](../.verification/indy3-castle-20261030/README.md)).
