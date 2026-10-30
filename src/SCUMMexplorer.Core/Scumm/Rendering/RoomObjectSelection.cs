@@ -80,7 +80,10 @@ public sealed class RoomObjectSelection
                 if (_positions.ContainsKey(id)) _positions[id] = position;
         _states = objects.GroupBy(obj => obj.Id).Select(group => group.Last()).ToDictionary(obj => obj.Id, obj =>
             initialStates is null ? (byte)0 : initialStates.TryGetValue(obj.Id, out var state)
-                ? state : throw new InvalidDataException($"Object {obj.Id} is absent from the global state table."));
+                // ScummVM getState and drawObject assert that the number is below _numGlobalObjects: the game itself cannot enter such a room. Monkey Island
+                // CD Room 99 holds inventory icons 955 to 1045 for an index of 1000 objects; Script 9 only takes images from it (verbOps assignObject).
+                ? state : throw new InvalidDataException($"Object {obj.Id} is outside the game's object table, so the game never enters this room " +
+                                                         "(ScummVM's getState and drawObject refuse it); the room only holds images other scripts take."));
         _knownStates.UnionWith(_states.Keys);
         // The room code directory also contains hitboxes and parent objects
         // without their own image. Parent-state requirements apply to those

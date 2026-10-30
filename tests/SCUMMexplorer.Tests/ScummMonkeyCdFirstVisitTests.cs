@@ -53,4 +53,33 @@ public sealed class ScummMonkeyCdFirstVisitTests
         Assert.Contains(layer.Actors, actor => actor.Costume == 24);
         Assert.Empty(layer.Skipped);
     }
+
+    [Theory]
+    [InlineData(88)]
+    [InlineData(89)]
+    public void RoomsWithAnEmptyEntryOrAPaletteLoopRunWithNothingUnfollowed(int room)
+    {
+        // 30 October 2026 (.verification/monkeycd-rooms-20261030): Room 88's ENCD and EXCD blocks are empty (8 bytes, no code): no entry script, not an
+        // undecoded byte. Room 89's local script 200 (palette flashes) decodes in full; its old saveRestoreVerbs gap was closed by later reader work.
+        if (Game() is not { } game) return;
+        Assert.Null(ScummDataSources.For(game).RoomEntryScript(88));
+
+        var scene = ScummRoomFirstVisit.Run(game, room);
+
+        Assert.Equal(ScummSettleOutcome.Settled, scene.Outcome);
+        Assert.DoesNotContain(scene.Snapshot.Uncertainties, item => item.Contains("undecoded", StringComparison.Ordinal) || item.Contains("disassembly stops", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void TheInventoryIconRoomIsNotARoomTheGameEnters()
+    {
+        // Room 99 holds the inventory icons 955 to 1045 (Script 9 takes them by verbOps assignObject); the index has 1000 objects, so ScummVM's getState and
+        // drawObject would refuse objects 1000 and up: the game never enters it, and its first visit refuses with that reason instead of inventing states.
+        if (Game() is not { } game) return;
+        var data = (ScummV5DataSource)ScummDataSources.For(game);
+        Assert.Equal(999, data.ReadIndexedObjects().States.Keys.Max());
+
+        var refused = Assert.Throws<InvalidDataException>(() => ScummRoomFirstVisit.Run(game, 99));
+        Assert.Contains("never enters this room", refused.Message, StringComparison.Ordinal);
+    }
 }

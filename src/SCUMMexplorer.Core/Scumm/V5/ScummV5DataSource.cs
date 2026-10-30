@@ -137,8 +137,11 @@ public sealed class ScummV5DataSource : IScummDataSource
         verbs.Where(v => v.ObjectId == objectId)
             .Select((v, i) => new ScummObjectVerbEntry(objectId, v.VerbId, 0, 8 + i * 3, v.StartOffset, v.Block.Length)).ToArray();
 
+    // An empty ENCD/EXCD block (Monkey Island CD Room 88: both 8 bytes) has no code. ScummVM's setupRoomSubBlocks keeps its data pointer, so runEntryScript
+    // would read the next block's header ("NLSC") as opcodes; that is not game code, so the room is read as having no such script (written down in
+    // .verification/monkeycd-rooms-20261030).
     private ScummScriptDisassembly? RoomScript(int room, string kind, string label) =>
-        Scripts(room).FirstOrDefault(s => s.Kind == kind) is { } script
+        Scripts(room).FirstOrDefault(s => s.Kind == kind && s.Code.Length > 0) is { } script
             ? Decode(script, room, 8) with { Context = $"Room {room:00} {label}" }
             : null;
 
