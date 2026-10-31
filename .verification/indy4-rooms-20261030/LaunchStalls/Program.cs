@@ -32,6 +32,8 @@ internal static class Program
             Directory.CreateDirectory(Path.Combine(output, "profile"));
             File.WriteAllText(Path.Combine(output, "profile", "last-folder.txt"), args[0]);
         }
+        // App.xaml's StartupUri would open a second MainWindow when Application.Run starts (it too would reopen the last folder), so the harness
+        // pumps the dispatcher itself (Dispatcher.Run): one window only. The App still loads its resources.
         var app = new App(); app.InitializeComponent(); var window = new MainWindow();
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
@@ -130,9 +132,9 @@ internal static class Program
                 Log($"end: play shown {shown}, lists done {listsDone}, UI stalled {stallTotal:F1} s in total");
             }
             catch (Exception ex) { Log("FAILED: " + ex); }
-            finally { timer.Stop(); window.Close(); app.Shutdown(); }
+            finally { timer.Stop(); window.Close(); Dispatcher.CurrentDispatcher.InvokeShutdown(); }
         };
         window.Show();
-        app.Run();
+        Dispatcher.Run();
     }
 }

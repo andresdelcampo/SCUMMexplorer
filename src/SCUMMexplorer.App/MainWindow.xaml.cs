@@ -132,10 +132,14 @@ public partial class MainWindow : Window
         if (!string.IsNullOrWhiteSpace(release))
             Title = $"SCUMMexplorer · {release}";
         // After the first render (30 October 2026): opened during Loaded, the game's work became part of the window's first show, which then took
-        // 10 s more on Indy 4 (.verification/indy4-rooms-20261030). ContentRendered can come more than once; only the first reopens.
-        EventHandler? reopen = null;
-        reopen = (_, _) => { ContentRendered -= reopen; ReopenLastFolder(); };
-        ContentRendered += reopen;
+        // 10 s more on Indy 4 (.verification/indy4-rooms-20261030). Only the first ContentRendered reopens.
+        var reopened = false;
+        ContentRendered += (_, _) =>
+        {
+            if (reopened) return;
+            reopened = true;
+            ReopenLastFolder();
+        };
         Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); _costumeColorCancellation?.Cancel(); StopRoomPan(); ResetGameAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;

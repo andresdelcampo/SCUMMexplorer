@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: talkie speech listing read ahead; first-launch numbers
+
+A profile (dotnet-trace) showed the talkie games' scan opening `MONSTER.SOU` once per small read of the speech walk; `ScummSpeechBank.ListSamples` now reads through a 256 KB window. With the earlier inspection-copy change, Indy 4 shows play at 4.5 s and MI2 at 4.2 s after startup (87 s and 18 s before), with about 2 s of UI blocking in total ([record](../.verification/indy4-rooms-20261030/README.md)).
+
 ## 31 October: the first launch no longer freezes the window
 
 Indy 4's first launch held the UI thread for 85 of 87 seconds: the room actions, the doorway overlay and the room sounds each rescanned the whole game (`GameFolderScanner.Reopen`) on every room change, two on the UI thread, up to 56 s under the cutscene derivation's load. One inspection copy per opened game is now made once in the background (`MainWindow.Inspection.cs`), the room actions and doorway targets are read on workers, and the last folder reopens after the window's first render. Play shows at 18.5 s instead of 87 s; the UI is blocked 15 s instead of 85 ([record](../.verification/indy4-rooms-20261030/README.md)). Open: a 5.5 s scan and a 10 s first render on MI2 and Indy 4.

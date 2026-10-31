@@ -38,19 +38,33 @@ public sealed class ScummSpeechBank
     {
         var samples = new List<(int, int)>();
         var total = _source.Length(_name);
+        // The walk reads a few bytes at a time, in file order: serve them from a 256 KB window (31 October 2026: one ReadRange each opened the
+        // file, thousands of times for MI2's and Indy 4's MONSTER.SOU, about 10 s of a talkie game's opening; .verification/indy4-rooms-20261030).
+        long windowStart = 0;
+        byte[] window = [];
+        byte[] Read(long at, int count)
+        {
+            if (at < windowStart || at + count > windowStart + window.Length)
+            {
+                windowStart = at;
+                window = _source.ReadRange(_name, at, Math.Max(count, ReadAhead));
+            }
+            var from = (int)(at - windowStart);
+            return window.AsSpan(from, Math.Max(0, Math.Min(count, window.Length - from))).ToArray();
+        }
         long position = 8;
         while (position + 8 <= total && position < int.MaxValue)
         {
-            var header = _source.ReadRange(_name, position, 8);
+            var header = Read(position, 8);
             if (header.Length < 8 || !header.AsSpan(0, 4).SequenceEqual("VCTL"u8)) break;
             var size = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(4));
             if (size < 8) break;
-            var voc = _source.ReadRange(_name, position + size, 26);
+            var voc = Read(position + size, 26);
             if (voc.Length < 26 || !voc.AsSpan(0, 19).SequenceEqual("Creative Voice File"u8)) break;
             var block = position + size + BinaryPrimitives.ReadUInt16LittleEndian(voc.AsSpan(20));
             for (var guard = 0; guard < 4096 && block < total; guard++)
             {
-                var head = _source.ReadRange(_name, block, 4);
+                var head = Read(block, 4);
                 if (head.Length < 1) break;
                 if (head[0] == 0) { block++; break; }
                 if (head.Length < 4) break;
@@ -61,6 +75,8 @@ public sealed class ScummSpeechBank
         }
         return samples;
     }
+
+    private const int ReadAhead = 256 * 1024;
 
     /// <summary>The most mouth-sync words ScummVM keeps (<c>_mouthSyncTimes</c> holds 64 entries, the last for the 0xFFFF end).</summary>
     public const int MaxMouthSyncTimes = 63;

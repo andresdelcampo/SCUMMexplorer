@@ -37,3 +37,22 @@ Not addressed: the inconsistency between a catalog visit's assumed arrival and t
 **Result (Indy 4, Room 4, fresh profile).** Play view's first frame: 87 s → 18.5 s; UI blocked: 85 s → 15 s. MI CD: first frame 2–3 s, UI never blocked. Full suite 1835 passed.
 
 **Still open.** Two stalls remain for MI2 and Indy 4 only (not MI CD): the synchronous game scan in `OpenGameFolder` (5.5 s) and about 10 s in the first render after the game opens (whatever dispatcher operation is running when it happens; layout itself 0.33 s; not the speech-line naming, ruled out by skipping it; not a single dispatcher operation). Needs a profiler (dotnet-trace or dotnet-stack, not installed). The derivation itself takes about 70 s in the window against 24.5 s headless, because the room cards run beside it; it no longer blocks anything.
+
+## Addendum, 31 October: the profile (dotnet-trace, installed with the user's permission)
+
+`dotnet-trace collect --profile dotnet-sampled-thread-time --format Speedscope` on `LaunchStalls` (reopen mode), then the UI thread's stack replayed from the speedscope events every 50 to 500 ms (a short Python script; the traces stay in the scratchpad).
+
+1. **The game scan of a talkie game.** Nearly every UI sample in the scan was `GameFolderScanner.Scan` → `ArchiveLayout.ListBrowsed` → `ScummSpeechBank.ListSamples` → `FolderFileSource.ReadRange`, which opens `MONSTER.SOU` for each of the walk's small reads (headers and block lengths, thousands of times for MI2's 6808 and Indy 4's 7029 samples). `ListSamples` now reads through a 256 KB read-ahead window. The sample lists are unchanged (`ScummTalkieSpeechTests` pins both counts).
+2. **The "second" 10 s stall was a harness artifact.** `App.xaml`'s `StartupUri` opens a second `MainWindow` when `Application.Run` starts; in reopen mode it reopened the last folder too. `LaunchStalls` now pumps the dispatcher itself (`Dispatcher.Run`) and has one window. Earlier window harnesses that call `app.Run()` with an empty private profile (StartFrames, IntroWindowCheck) had an idle second window: their results stand, but their timings include it.
+3. The reopen on `ContentRendered` keeps a once-only flag (harmless; the double call came from the second window).
+
+**Final measurements (one window, fresh profile and room cache, Release):**
+
+| Game | Path | Play view first frame | UI blocked in total |
+|---|---|---|---|
+| Indy 4 | startup reopen | 87 s before 30 Oct → 4.5 s | 85 s → 2.1 s |
+| MI2 talkie | startup reopen | 4.2 s | 1.9 s |
+| MI CD | startup reopen | 2.1 s | 0 s |
+| Indy 4 / MI2 / MI CD | Open Game Folder | 4.9 / 5.1 / 3.3 s | 1.2 / 1.0 / 0 s |
+
+Room actions and doorway objects fill in for all three (Indy 4 38/1, MI2 56/7, MI CD 8/3). The cutscene derivation still runs in the background for about a minute. Full suite 1835 passed.

@@ -22,7 +22,7 @@ Harnesses added today: `.verification/mi2-intro-protection-20261030/IntroWindowC
 
 1. Gate A leftovers: Indy 3 Rooms 1 and 15 never rest (crowds; not a bug); the Indy 3 held-object note looks stale (the play path already uses `InventoryRooms`), confirm with a cross-room play test.
 2. The user's crash and "thin black rooms" reports once they name the game and room (the crash log now records them).
-3. MI2 and Indy 4 first launch: a 5.5 s synchronous scan in `OpenGameFolder` and a 10 s first render remain (`.verification/indy4-rooms-20261030/LaunchStalls`, `SCUMM_LAUNCH_MODE=reopen`); ask the user before installing a profiler (download).
+3. First launch is fixed (Indy 4 play at 4.5 s). `dotnet-trace` is installed (global tool): `--profile dotnet-sampled-thread-time --format Speedscope` with `LaunchStalls` finds UI stalls; remember App.xaml's StartupUri opens a second window under `app.Run()`.
 4. Shared engine work E3 (a working ScummVM capture for picture comparisons), E4 (generic cutscene start planner), then E5 (Status beyond v1/v2) if the user wants it.
 5. Release readiness for LOOM (packaging, version, clean-profile first run).
 
