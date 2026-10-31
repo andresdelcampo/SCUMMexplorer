@@ -77,7 +77,14 @@ public partial class MainWindow
     private async Task LoadGenericRoomSoundsAsync(GameLibrary game, int roomId, int generation)
     {
         Dictionary<int, string> candidates;
-        try { candidates = await Task.Run(() => ScanGenericRoomSounds(game, roomId)); }
+        try
+        {
+            candidates = await Task.Run(() =>
+            {
+                using var turn = UseInspectionCopy(game, out var source);
+                return ScanGenericRoomSounds(source, roomId);
+            });
+        }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or UnauthorizedAccessException)
         { candidates = []; }
         if (generation != _roomMusicUpdateGeneration || !ReferenceEquals(game, _game) || _currentRoomResource?.ResourceId != roomId) return;
@@ -117,8 +124,7 @@ public partial class MainWindow
     /// <summary>Static possible starts: room entry/exit/local/object code and literal calls; no invented runtime variables.</summary>
     private static Dictionary<int, string> ScanGenericRoomSounds(GameLibrary game, int roomId)
     {
-        // Archive readers own seekable streams; background work must not share those of live Play.
-        if (game.V4Archive is not null || game.V4Disks is not null) game = GameFolderScanner.Reopen(game);
+        // Archive readers own seekable streams; background work must not share those of live Play: the caller passes the inspection copy.
         var data = ScummDataSources.For(game);
         var found = new Dictionary<int, List<string>>();
         var cache = new Dictionary<int, ScummScriptDisassembly?>();

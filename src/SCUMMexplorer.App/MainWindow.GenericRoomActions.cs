@@ -72,7 +72,7 @@ public partial class MainWindow
             _genericActionsRoom = roomId;
             _genericRoomScripts.Clear();
             _genericSourceActions.Clear();
-            ReadGenericRoomActions(game, roomId);
+            _ = LoadGenericRoomActionsAsync(game, roomId);
         }
         var namesChanged = RefreshGenericRoomActionWords();
         if (changed || namesChanged || _genericActionsAdvanced != IsAdvancedMode || _genericActionsHost.Children.Count == 0)
@@ -83,22 +83,44 @@ public partial class MainWindow
         UpdateGenericRoomActionAvailability();
     }
 
-    private void ReadGenericRoomActions(GameLibrary game, int room)
+    private sealed record GenericRoomSource(Func<string, string>? Readable, List<(string Label, ScummScriptDisassembly Code)> Scripts,
+        List<GenericSourceAction> Actions, string? Failure);
+
+    // The room's source is read on a worker and published when it is done (30 October 2026: read on the UI thread, Indy 4's first room change held
+    // the window while the inspection copy was made; .verification/indy4-rooms-20261030). The lists stay empty until then.
+    private async Task LoadGenericRoomActionsAsync(GameLibrary game, int room)
     {
+        var source = await Task.Run(() => ReadGenericRoomActions(game, room));
+        if (!ReferenceEquals(_genericActionsGame, game) || _genericActionsRoom != room || !ReferenceEquals(_game, game)) return;
+        _genericReadable = source.Readable;
+        _genericRoomScripts.Clear();
+        _genericRoomScripts.AddRange(source.Scripts);
+        _genericSourceActions.Clear();
+        _genericSourceActions.AddRange(source.Actions);
+        _genericSourceFailure = source.Failure;
+        RefreshGenericRoomActionWords();
+        _genericActionsAdvanced = IsAdvancedMode;
+        BuildGenericRoomActions();
+        UpdateGenericRoomActionAvailability();
+    }
+
+    private GenericRoomSource ReadGenericRoomActions(GameLibrary game, int room)
+    {
+        var scripts = new List<(string Label, ScummScriptDisassembly Code)>();
+        var actions = new List<GenericSourceAction>();
+        var readable = ManiacPreviewText.For(game);
         try
         {
             // Archive/disk readers own seek positions; background scene derivation and
-            // live playback must not share this inspection reader.
-            var sourceGame = game.V4Archive is not null || game.V4Disks is not null
-                ? SCUMMexplorer.Core.Discovery.GameFolderScanner.Reopen(game) : game;
+            // live playback must not share this inspection reader (MainWindow.Inspection.cs).
+            using var turn = UseInspectionCopy(game, out var sourceGame);
             var data = ScummDataSources.For(sourceGame);
             var stored = data.ReadRoom(room);
             var verbs = data.ReadObjectVerbs(room, stored.Objects);
-            _genericReadable = ManiacPreviewText.For(game);
-            string Text(string text) => (_genericReadable?.Invoke(text) ?? text).Replace("@", "", StringComparison.Ordinal).Trim();
+            string Text(string text) => (readable?.Invoke(text) ?? text).Replace("@", "", StringComparison.Ordinal).Trim();
             void Add(string label, Func<ScummScriptDisassembly?> read)
             {
-                try { if (read() is { } code) _genericRoomScripts.Add((label, code)); }
+                try { if (read() is { } code) scripts.Add((label, code)); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { }
             }
             Add("Room entry", () => data.RoomEntryScript(room));
@@ -122,16 +144,15 @@ public partial class MainWindow
                     var source = $"Room {room:00}, object {record.Id}, verb 0x{verb.VerbId:X2}; " +
                         (code is not null ? $"entry +0x{code.EntryOffset:X4}. Direct exploration action; no sentence is composed and the actor does not walk to the object."
                             : "Source unavailable: " + failure);
-                    _genericSourceActions.Add(new(record.Id, verb.VerbId, title, target, code, source, executable));
+                    actions.Add(new(record.Id, verb.VerbId, title, target, code, source, executable));
                 }
             }
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException)
         {
-            _genericRoomScripts.Clear();
-            _genericSourceActions.Clear();
-            _genericSourceFailure = "Room source unavailable: " + ex.Message;
+            return new(readable, [], [], "Room source unavailable: " + ex.Message);
         }
+        return new(readable, scripts, actions, null);
     }
 
     // Native interface verbs can arrive after the room's source has been cached.

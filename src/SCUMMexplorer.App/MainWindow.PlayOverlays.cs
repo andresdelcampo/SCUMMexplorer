@@ -99,7 +99,12 @@ public partial class MainWindow
             _playOverlayRoom = roomId;
             _playOverlayPointer = null;
             _playOverlayHoverKey = null;
-            _playDoorwayTargets = ReadPlayDoorwayTargets(_game, roomId);
+            // Read on a worker (30 October 2026: on the UI thread it waited for the inspection copy, 6.8 s on Indy 4's first room); the overlay and the
+            // doorway rows fill in when the room's code has been read.
+            _playDoorwayTargets = [];
+            _playOverlayNames = [];
+            _playOverlayLocalIndex = [];
+            _ = LoadPlayDoorwayTargetsAsync(_game, roomId);
         }
         if (_playOverlayCanvas.Parent is null)
         {
@@ -221,23 +226,32 @@ public partial class MainWindow
         }
     }
 
-    private Dictionary<int, int[]> ReadPlayDoorwayTargets(GameLibrary game, int roomId)
+    private async Task LoadPlayDoorwayTargetsAsync(GameLibrary game, int roomId)
+    {
+        var read = await Task.Run(() => ReadPlayDoorwayTargets(game, roomId));
+        if (!ReferenceEquals(_playOverlayGame, game) || _playOverlayRoom != roomId) return;
+        (_playDoorwayTargets, _playOverlayNames, _playOverlayLocalIndex) = read;
+        RefreshPlayOverlays();
+        RefreshPlayOverlayLists();
+    }
+
+    private (Dictionary<int, int[]> Targets, Dictionary<int, string> Names, Dictionary<int, int> LocalIndex) ReadPlayDoorwayTargets(GameLibrary game, int roomId)
     {
         var resource = game.Rooms.FirstOrDefault(room => room.ResourceId == roomId);
-        if (resource is null) return [];
         var found = new Dictionary<int, int[]>();
-        _playOverlayNames = [];
-        _playOverlayLocalIndex = [];
+        var names = new Dictionary<int, string>();
+        var localIndex = new Dictionary<int, int>();
+        if (resource is null) return (found, names, localIndex);
         try
         {
-            // Background preparation has its own seekable readers. Never scan an active archive handle concurrently.
-            if (game.V4Archive is not null || game.V4Disks is not null) game = GameFolderScanner.Reopen(game);
+            // Background preparation has its own seekable readers. Never scan an active archive handle concurrently: read through the inspection copy.
+            using var turn = UseInspectionCopy(game, out game);
             var data = ScummDataSources.For(game);
             var room = data.ReadRoom(roomId);
-            _playOverlayNames = room.ObjectNames.ToDictionary(pair => pair.Key, pair => ScummTextDecoder.DecodeGlyphs(pair.Value).Trim().TrimEnd('@').Trim())
+            names = room.ObjectNames.ToDictionary(pair => pair.Key, pair => ScummTextDecoder.DecodeGlyphs(pair.Value).Trim().TrimEnd('@').Trim())
                 .Where(pair => !string.IsNullOrWhiteSpace(pair.Value)).ToDictionary();
             var records = room.Objects;
-            _playOverlayLocalIndex = records.DistinctBy(record => record.Id).ToDictionary(record => record.Id, record => record.LocalIndex);
+            localIndex = records.DistinctBy(record => record.Id).ToDictionary(record => record.Id, record => record.LocalIndex);
             var verbs = data.ReadObjectVerbs(roomId, records);
             var finder = new ScummDoorwayFinder(game, data);
             foreach (var record in records)
@@ -255,6 +269,6 @@ public partial class MainWindow
             }
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or KeyNotFoundException or ArgumentException or NotSupportedException) { }
-        return found;
+        return (found, names, localIndex);
     }
 }

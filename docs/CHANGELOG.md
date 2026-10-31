@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: the first launch no longer freezes the window
+
+Indy 4's first launch held the UI thread for 85 of 87 seconds: the room actions, the doorway overlay and the room sounds each rescanned the whole game (`GameFolderScanner.Reopen`) on every room change, two on the UI thread, up to 56 s under the cutscene derivation's load. One inspection copy per opened game is now made once in the background (`MainWindow.Inspection.cs`), the room actions and doorway targets are read on workers, and the last folder reopens after the window's first render. Play shows at 18.5 s instead of 87 s; the UI is blocked 15 s instead of 85 ([record](../.verification/indy4-rooms-20261030/README.md)). Open: a 5.5 s scan and a 10 s first render on MI2 and Indy 4.
+
 ## 30 October: indexed script arguments
 
 A started script's indexed argument (`local[0x003+0x000]`, `var[0x064+local[0x000]]`) is read at its resolved slot when the script starts, as ScummVM's `getWordVararg` does. Indy 3 Rooms 3 and 13 were the last rooms with an unfollowed item; all 88 EGA rooms now run with nothing unfollowed ([record](../.verification/indy3-rooms-20261030/README.md)).

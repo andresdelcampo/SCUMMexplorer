@@ -90,7 +90,7 @@ Each step names its gate. Steps marked **(shared)** are one piece of engine work
 5. D — 95 of 260 entries begin nothing; derivation takes 140–174 s in the window. E — S8 (shared).
 
 ### Indiana Jones 4
-1. A — **Done 30 October** ([record](../.verification/indy4-rooms-20261030/README.md)): Rooms 76, 77, 87 clean (walks with no box route end where they start, as ScummVM), first-state images and the Room 4 magenta line no longer seen. Open: first launch takes about 68 s.
+1. A — **Done 30 October** ([record](../.verification/indy4-rooms-20261030/README.md)): Rooms 76, 77, 87 clean (walks with no box route end where they start, as ScummVM), first-state images and the Room 4 magenta line no longer seen. First launch (31 October, [record](../.verification/indy4-rooms-20261030/README.md)): the window froze 85 of 87 s because each room change rescanned the game on the UI thread; now one inspection copy, reads on workers, play shows at 18.5 s. Open: a 5.5 s game scan and a 10 s first render on MI2 and Indy 4 (needs a profiler).
 2. B — Ten-room ScummVM comparison not done (shared).
 3. C — Listening, including talkie speech (the CD image has no audio tracks: data, not a gap).
 4. D — 216 of 426 groups begin nothing (shared planner). E — S8 (shared). F — Spanish talkie and floppy seen in the window.

@@ -22,3 +22,18 @@ Not addressed: the inconsistency between a catalog visit's assumed arrival and t
 - Room audit 76, 77, 87: all settle or run to their limit with nothing unfollowed.
 - `ScummIndy4FirstVisitTests.AnArrivalWalkWithNoRouteEndsWhereItStarts`.
 - Full suite: 1831 passed, 0 failed, 5 skipped.
+
+## Addendum, 30–31 October: the first launch froze the window
+
+`LaunchStalls/` (real `MainWindow`, fresh private profile and room cache; a 100 ms UI timer logs gaps, `Dispatcher.Hooks` names every operation over 0.5 s and totals the short ones; `SCUMM_LAUNCH_MODE=reopen` lets the window reopen the game as at startup) and `ComposeTiming/` (headless play-screen compose, alone or beside the derivation and the room cards).
+
+**Finding.** Indy 4's first launch held the UI thread for 85 of its 87 seconds. Not the derivation (24.5 s headless, on workers), not GC (7.8 s paused in all), not `Compose` (0.04 s even under load). The play view's first frame waited in `ShowPlayFrame` → `RefreshPlayOverlays` → `ReadPlayDoorwayTargets`, which, like `ReadGenericRoomActions` and `ScanGenericRoomSounds`, called `GameFolderScanner.Reopen(game)` (a complete rescan of the game, for a reader of its own) on every room change, two of them on the UI thread; under the derivation's load one rescan took up to 56 s.
+
+**Changes.**
+1. `MainWindow.Inspection.cs`: one inspection copy per opened game, reopened once in the background when the game opens; the three readers take turns on it (`UseInspectionCopy`).
+2. The room actions and the doorway targets are read on a worker and published when done (`LoadGenericRoomActionsAsync`, `LoadPlayDoorwayTargetsAsync`). MI CD's dock: 8 room actions and 3 doorway objects after the load, as before.
+3. The last folder reopens on the window's first `ContentRendered` (one-shot) instead of `Loaded`, so the window is on screen before the game's work starts.
+
+**Result (Indy 4, Room 4, fresh profile).** Play view's first frame: 87 s → 18.5 s; UI blocked: 85 s → 15 s. MI CD: first frame 2–3 s, UI never blocked. Full suite 1835 passed.
+
+**Still open.** Two stalls remain for MI2 and Indy 4 only (not MI CD): the synchronous game scan in `OpenGameFolder` (5.5 s) and about 10 s in the first render after the game opens (whatever dispatcher operation is running when it happens; layout itself 0.33 s; not the speech-line naming, ruled out by skipping it; not a single dispatcher operation). Needs a profiler (dotnet-trace or dotnet-stack, not installed). The derivation itself takes about 70 s in the window against 24.5 s headless, because the room cards run beside it; it no longer blocks anything.

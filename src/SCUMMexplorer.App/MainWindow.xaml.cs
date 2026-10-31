@@ -131,7 +131,11 @@ public partial class MainWindow : Window
             .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(MainWindow).Assembly)?.InformationalVersion?.Split('+')[0];
         if (!string.IsNullOrWhiteSpace(release))
             Title = $"SCUMMexplorer · {release}";
-        Loaded += (_, _) => ReopenLastFolder();
+        // After the first render (30 October 2026): opened during Loaded, the game's work became part of the window's first show, which then took
+        // 10 s more on Indy 4 (.verification/indy4-rooms-20261030). ContentRendered can come more than once; only the first reopens.
+        EventHandler? reopen = null;
+        reopen = (_, _) => { ContentRendered -= reopen; ReopenLastFolder(); };
+        ContentRendered += reopen;
         Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); _costumeColorCancellation?.Cancel(); StopRoomPan(); ResetGameAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
@@ -295,6 +299,7 @@ public partial class MainWindow : Window
         // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
         GameStatusButton.Visibility = Visibility.Collapsed;
         _game = game;
+        StartInspectionCopy(game);
         CrashLog.Note($"Opened {game.Title} ({game.Version}{(game.Edition is { Length: > 0 } edition ? ", " + edition : "")}) from {folder}");
         var indexedSnapshot = CurrentModule.ReadObjectSnapshot(game);
         _names = CurrentModule.CreateNames(game);
