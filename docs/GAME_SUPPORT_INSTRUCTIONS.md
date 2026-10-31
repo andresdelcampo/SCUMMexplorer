@@ -53,7 +53,7 @@ How work on a game is done, the same for every game: the rules, what "done" prod
 
 ### 4.2 Choosing what to run
 
-The unit tests named after the change, the family's tests, **one** window check. The full suite (about 6 minutes, with `SCUMM_SOUND_TEST_ROOT` and `SCUMM_INDY3_EGA_TEST_ROOT` set) before committing engine changes; LOOM's tests as the regression when shared code changes.
+The unit tests named after the change, the family's tests, **one** window check. Small fixes are batched (user, 31 October 2026): focused tests while fixing, then for the batch one all-games measurement, one full suite (about 6 minutes, with `SCUMM_SOUND_TEST_ROOT` and `SCUMM_INDY3_EGA_TEST_ROOT` set) and one commit; LOOM's tests as the regression when shared code changes.
 
 ### 4.3 Working with several agents
 

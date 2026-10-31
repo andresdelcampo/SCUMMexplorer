@@ -41,8 +41,8 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.Variable => $"{Target} = {Value}",
         ScummSetupKind.ObjectState => $"object {Target} state {Value}",
         ScummSetupKind.SecondObject => $"object {Target} used with it (held)",
-        ScummSetupKind.ActorCostume => $"actor {Target} in costume {Value}",
-        ScummSetupKind.ActorRoom => $"actor {Target} in Room {Value}",
+        ScummSetupKind.ActorCostume => $"{(Target == "ego" ? "the hero" : Target.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {Target}" : $"actor {Target}")} in costume {Value}",
+        ScummSetupKind.ActorRoom => $"{(Target == "ego" ? "the hero" : Target.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {Target}" : $"actor {Target}")} in Room {Value}",
         ScummSetupKind.CameFrom => $"arrived from Room {Value} ({Target})",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
@@ -135,7 +135,10 @@ public abstract partial class ScummSession
             }
             case ScummSetupKind.ActorCostume or ScummSetupKind.ActorRoom:
             {
-                var actor = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                // The actor: a number, the hero ("ego"), or the actor a variable holds now (Indy 4's var[0x0B6], Sophia).
+                var actor = edit.Target == "ego" ? variables.GetValueOrDefault(_runtime.EgoVariable)
+                    : edit.Target.StartsWith("var[", StringComparison.Ordinal) ? variables.GetValueOrDefault(edit.Target)
+                    : int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (!_runtime.Actors.Contains(actor)) return false;
                 var ego = variables.TryGetValue(_runtime.EgoVariable, out var egoValue) ? (int?)egoValue : null;
                 if (edit.Kind == ScummSetupKind.ActorCostume)

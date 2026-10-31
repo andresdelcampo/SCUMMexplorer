@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: README readiness table with percentages; scene setup reads call arguments and actors held in variables
+
+The README's support matrix is now the roadmap's ten features with one number where one is measured: scenes played the game's own way (LOOM 97% to 100%, Indy 3 84%, Monkey Island 1 86% and 87%, Monkey Island 2 84%, Indy 4 83%, Maniac/Zak 24% beginning) and readable-script names (37% to 81%); the generated matrix stays in REQUIREMENTS §3.1. Scene setup: a called script's locals are its caller's literal arguments, an actor may be held in a variable, a comparison with VAR_ROOM is one with the scene's room; own way 84.1% → 84.4% ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 31 October: an object whose code asks who owns it is given to the hero; class tests of "this object" read right
 
 Indy 3 Room 17's books show their text only when held ("It looks like a first edition"): the setup now gives the picked object to the hero when its code tests the owner of "this object". A class test of "this object" now reads its class list (it read the `[0x007]` of the variable as class 7). Indy 3 own way 80.4% → 84.3%, Indy 4 81.2% → 82.4%; all five copies 83.1% → 84.1%, started at the cutscene 16.9% → 15.9% ([record](../../.verification/scene-setup-20261031/README.md)).

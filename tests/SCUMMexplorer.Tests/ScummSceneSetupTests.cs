@@ -111,6 +111,20 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AChainedScriptsLocalsAreTheArgumentsItsCallerGives()
+    {
+        // Indy 4 Room 7 object 116 verb 0x09: chainScript 206, [0x0074, 0x0009]; local script 206 +0x0007 tests the class of local[0x000], which is
+        // object 116 (class 18 set: "Another cat idol, it looks odd").
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 7, 116, 0x09));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ObjectClass, Target: "116", Value: 18 });
+    }
+
+    [Fact]
     public void TheHatchSceneGoesOnThroughItsRoomsOnceItsStateIsSet()
     {
         // Room 39 object 586 verb 0x0A (the hatch) +0x0000 tests its own state: with state 1 the scene plays its 18 lines through Rooms 41, 42 and 8.

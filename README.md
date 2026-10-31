@@ -38,7 +38,7 @@ SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Revisit 
   - the short and the long self-running demo
 - **LOOM** (CD, VGA, English), from a folder, a `.cue`/`.bin` or an `.iso`, with the voices and music from the disc
 
-Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. The explorer also recognises these classic SCUMM games; the matrix below records their supported features:
+Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. The explorer also recognises these classic SCUMM games; the table below shows how far each one goes:
 
 - **Indiana Jones and the Last Crusade** (EGA and 256 colours)
 - **The Secret of Monkey Island** (VGA, EGA and CD)
@@ -51,31 +51,34 @@ In these games the room picker fills in on its own, and the Costumes tab sits be
 
 ### What each game supports
 
-✔ works, ◐ partly (see the notes under the table), – not supported yet. This table is generated from the code (`GameSupport`) and kept in step by a test. It is what has been checked so far; most browse-only features have been verified against the game data and as pictures, not yet compared line by line with ScummVM.
+✔ works · a percentage where it is measured · – not yet. The columns are the ten features of the [roadmap](docs/ROADMAP.md); the percentages were measured on 1 November 2026 (how, below the table). The full per-feature matrix behind it is in [Requirements](docs/REQUIREMENTS.md), section 3.1.
 
-<!-- support-matrix:start -->
-| Game | Rooms | Objects | Walk boxes | Costumes | Sound | Texts | Scripts | Play | Cutscenes | Status |
+| Game | Rooms | Costumes | Sounds | Scripts | Cutscenes | Interactions | Room sounds | Walk boxes, depth | Game state | Readable scripts |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| **LOOM** EGA English (reference) | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **LOOM** demos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **LOOM** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-<!-- support-matrix:end -->
+| **LOOM** EGA English (reference) | ✔ | ✔ | ✔ | ✔ | 100% | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | 97% | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **LOOM** demos | ✔ | ✔ | ✔ | ✔ | preview | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **LOOM** CD | ✔ | ✔ | ✔ | ✔ | 97% | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | 84% | ✔ | ✔ | ✔ | – | 67% |
+| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | 84% | ✔ | ✔ | ✔ | – | 67% |
+| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | 86% | ✔ | ✔ | ✔ | – | 48% |
+| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | 87% | ✔ | ✔ | ✔ | – | 49% |
+| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | 84% | ✔ | ✔ | ✔ | – | 59% |
+| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 83% | ✔ | ✔ | ✔ | – | 81% |
+| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 44% |
+| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 43% |
+| **Zak McKracken** classic | ✔ | 69% | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 37% |
+| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 37% |
+
+- **Cutscenes**: of the scenes the game's own scripts list, the share that plays the game's own way when picked (its state set up where its code needs it); every other one still plays, started directly at its cutscene. LOOM English plays its hand-checked list of 328 scenes. Maniac Mansion and Zak McKracken: the share that begins at all, on their own track ([records](.verification/scene-setup-20261031/README.md), [LOOM](.verification/loom-editions-20261031/README.md)).
+- **Readable scripts**: the share of object, character and verb references named in the readable view of every script (LOOM: its reviewed names) ([record](.verification/readable-names-20261031/README.md)).
+- **Costumes**: classic Zak McKracken takes 24 of its 35 costumes' colours from the game; the other 11 are labelled estimates.
+- **Sounds**: outside LOOM, not yet listened to by the author. **Walk boxes, depth**: outside LOOM, depth masks not yet compared with ScummVM. **Game state** (–): not needed there; a picked scene sets the state it needs.
 
 <details>
 <summary>Notes on the matrix</summary>
 
-- **Columns.** *Rooms* shows the room pictures (LOOM, both Indiana Jones 3 releases and Monkey Island 1 floppy in their first-visit state), *Texts* is the Game Texts browser, *Scripts* the raw and readable script views, *Play* clicking in a live room with actors and scripts, *Status* the Game Status editor.
+- **Columns.** *Rooms* shows the room pictures in their first-visit state, *Scripts* the raw script views, *Interactions* the room's Interact menu, *Room sounds* the room's Sounds button, *Game state* the Game Status editor. Every game also has the Game Texts browser and can be played through its own interface.
 - **Languages.** A game whose data holds several languages (Monkey Island 1 CD: English, French, German, Italian and Spanish) shows a language list under its name; the game reopens in the chosen language, which is remembered.
 - **Room previews.** Every game shows room backgrounds first. The selector keeps those backgrounds; LOOM EGA additionally fills its artwork gaps. Native first visits still prepare in the background for smoother room opening, and only a finished set is saved to the game/language cache. Selection never replaces a card with live-room artwork.
 - **Deliberate scenes.** Choosing a room in the catalog cancels the previous scene and prepares the new entry quietly. Doorway travel keeps the game's entry scenes. Intros start explicitly: use Room 01's Play Cutscene entry, or the header's Play Game Intro button where the intro is separate. Native startup choices remain yours.

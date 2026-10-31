@@ -17,7 +17,10 @@ Keep the documents tidy (user, 31 October; rule in ROADMAP and CLAUDE.md): when 
 
 ## Next
 
-1. Roadmap work item 1: scenes started at their cutscene that show nothing (Indy 3 4, MI1 5/4, MI2 4, Indy 4 15: 2.9% of all scenes; e.g. Indy 3 Room 13's entry jumps to Room 73; the rest of each game's scenes started at their cutscene also deserve a look).
-2. Then the roadmap's order (one scene engine for every game, readable names, the user's reports, release).
+1. Roadmap work item 1: scenes started at their cutscene (15.6% of the five non-LOOM copies: Indy 3 15.7%, Monkey Island 1 14.0%/13.1%, Monkey Island 2 15.8%, Indy 4 16.9%). What is left is mostly scenes that need several values at once or one-off tests: Indy 3's castle rooms entered under pseudo-room numbers (Room 21), arrivals from pseudo rooms (Indy 4 `var[0x0E0]` = 149, 154, 163), Indy 4's ladder (Sophia in `var[0x0B6]`), Monkey Island 2's item combinations, a scene that only plays when VAR_ROOM is another room (Monkey Island 2's dog, Room 53), "this object" passed to a local script through a variable (Monkey Island 2's coffin, Room 18). Measure with `.verification/scene-setup-20261031/Measure` and `python` over `*-run18.txt`.
+2. LOOM: Room 47's swan prints nothing after the window's room visit (open in ROADMAP); the remaining length differences before shortening the English catalog.
+3. Then the roadmap's order (variables and bits for readable names, the user's reports, release).
 
-Open questions for the user (ask once, in passing): a Cutscenes node in the Advanced tree; the decisions 2, 4, 5, 7 in ROADMAP's "Your checks" and the retests.
+How to work (user, 31 October): batch small fixes; focused tests while fixing, then one all-games measurement, one full suite and one commit per batch. Keep the README's readiness table (percentages) in step when a measured number changes.
+
+Open questions for the user (ask once, in passing): the decisions 2, 4, 5, 7 in ROADMAP's "Your checks" and the retests.

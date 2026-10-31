@@ -146,3 +146,22 @@ Indy 3 Room 17's books: Look (verb 0x09) asks who owns "this object" (+0x0000 `g
 ## A class test of "this object" (31 October, later)
 
 `ifClassOfIs var[0x007], [0x0088]` (Indy 4 Room 40's clothesline, verb 0x09 +0x0000): the class list was cut from the first bracket of the instruction, the one in `var[0x007]`, so every class test of "this object" read as class 7. It now takes the list after the object. Measured (`*-run16.txt`): at the cutscene Indy 3 17.6% → 15.7%, Indy 4 18.8% → 17.6%, the others unchanged; all five copies own way 83.3% → 84.1%, at the cutscene 16.7% → 15.9% (Indy 3 84.3%, Monkey Island 1 86.0% and 86.9%, Monkey Island 2 83.7%, Indy 4 82.4% own way). LOOM unchanged (`../loom-editions-20261031/run5-loom-ega-mt32-en.txt`). Test: `ScummSceneSetupTests.AClassTestOfThisObjectReadsTheClassListNotTheVariable`.
+
+## Call arguments, actors held in variables, VAR_ROOM (1 November, one batch)
+
+Three readings of the trigger's code, measured together (`*-run18.txt`, Indy 3 256 colours `indy3-vga-en-run17.txt`):
+
+1. **A called script's locals are its caller's literal arguments** (Indy 4 Room 7's cat figurine: `chainScript 206, [0x0074, 0x0009]`; local script 206 +0x0007 tests the class of `local[0x000]`, object 116). The trigger's own code now counts as a caller too.
+2. **An actor held in a variable** (`getActorRoom var[0x000], var[0x0B6]`: Sophia in Indy 4) is a setup target, read when the setup is applied.
+3. **A comparison with VAR_ROOM** is one with the scene's room ("is she here").
+
+| Game | Scenes | Own way | At cutscene |
+|---|---|---|---|
+| Indy 3 (EGA; 256 colours the same) | 153 | 84.3% | 15.7% |
+| Monkey Island 1 floppy | 164 | 86.0% | 14.0% |
+| Monkey Island 1 CD | 160 | 86.9% | 13.1% |
+| Monkey Island 2 | 190 | 83.7% → 84.2% | 16.3% → 15.8% |
+| Indy 4 | 426 | 82.4% → 83.1% | 17.6% → 16.9% |
+| **Total** | 1,093 | **84.1% → 84.4%** | **15.9% → 15.6%** |
+
+Tried and taken out again: an actor variable a fresh session has not set yet falling back to the value the boot script gives it (Indy 4's ladder, Room 48 object 583, still starts at its cutscene). Test: `ScummSceneSetupTests.AChainedScriptsLocalsAreTheArgumentsItsCallerGives`.

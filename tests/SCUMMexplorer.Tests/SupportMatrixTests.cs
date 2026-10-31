@@ -3,8 +3,9 @@ using SCUMMexplorer.Core.Domain;
 namespace SCUMMexplorer.Tests;
 
 /// <summary>
-/// The support matrix has one source, <see cref="GameSupport.Families"/>. The README and docs/REQUIREMENTS.md hold a generated copy between
-/// <c>&lt;!-- support-matrix:start --&gt;</c> and <c>&lt;!-- support-matrix:end --&gt;</c>. Run the tests with <c>SCUMM_UPDATE_SUPPORT_MATRIX=1</c> to rewrite both.
+/// The support matrix has one source, <see cref="GameSupport.Families"/>. docs/REQUIREMENTS.md holds a generated copy between
+/// <c>&lt;!-- support-matrix:start --&gt;</c> and <c>&lt;!-- support-matrix:end --&gt;</c>; run the tests with <c>SCUMM_UPDATE_SUPPORT_MATRIX=1</c> to rewrite it.
+/// The README shows a short readiness table with measured percentages instead (user, 31 October 2026), kept by hand from the evidence records.
 /// </summary>
 public class SupportMatrixTests
 {
@@ -19,7 +20,6 @@ public class SupportMatrixTests
     }
 
     [Theory]
-    [InlineData("README.md")]
     [InlineData("docs/REQUIREMENTS.md")]
     public void GeneratedMatrixIsInStepWithTheRegistry(string file)
     {
