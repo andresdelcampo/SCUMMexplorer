@@ -50,7 +50,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 
 What keeps a cell from ✅:
 - **3**: the user has not listened (non-LOOM games); LOOM CD's picture/voice/music timing is the user's run.
-- **5**: every scene begins when picked, but some started directly at their cutscene show nothing (Indy 3 4, Monkey Island 1 6 floppy and 6 CD, Monkey Island 2 15, Indy 4 30); LOOM's other editions and CD use LOOM's own readiness search, not proven for every entry; Maniac/Zak have scenes that begin nothing (their track).
+- **5**: every scene begins when picked, but some started directly at their cutscene show nothing (Indy 3 4, Monkey Island 1 6 floppy and 6 CD, Monkey Island 2 15, Indy 4 29); LOOM's other editions and CD use LOOM's own readiness search, not proven for every entry; Maniac/Zak have scenes that begin nothing (their track).
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: names come only from LOOM's glossary; the other games show variable numbers.
@@ -59,7 +59,7 @@ What keeps a cell from ✅:
 
 | # | Work | Feature | Where |
 |---|---|---|---|
-| 1 | **Scenes started at their cutscene that show nothing**: start them with the locals and state their skipped tests would set (e.g. Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
+| 1 | **Scenes started at their cutscene that show nothing**: what is left needs case-by-case reading (several values at once, script arguments: Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73; Indy 4 has the most, 29). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
 | 2 | **Derivation time**: the setup search adds trial runs (about a minute on the large games); share boots between trials, cache plans per build and data. | 5 | `ScummCutscenePlanner` |
 | 3 | **Readable names for the other games** from their script maps. | 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
 | 4 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
@@ -100,7 +100,7 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 - Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates; listening.
 
 ### Indiana Jones 4
-- 30 scenes started at their cutscene show nothing (work item 1).
+- 29 scenes started at their cutscene show nothing (work item 1).
 - Listening, including talkie speech. Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)

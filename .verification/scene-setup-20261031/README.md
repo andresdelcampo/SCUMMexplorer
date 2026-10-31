@@ -95,3 +95,5 @@ Two changes to the setup search, both generic:
 | Indy 4 | 30 → 38 | 169 → 161 | 35 → 30 |
 
 Every group still begins. `ScummSceneSetupTests.ADoorThatTestsItsOwnStateIsOpenedForItsClose`. Window: Indy 3 Room 23's "Push loose brick" and "Close door" play without breaking the room (short animations without lines; the picture shows Indy by the door afterwards). Runs: `*-run3.txt`, `indy3-ega-run5.txt`.
+
+Then: when no single value makes a scene begin, all candidates are tried together (one value per target) before its cutscene is started directly. Indy 4: 38 → 42 with a setup, 30 → 29 showing nothing; Monkey Island 2 unchanged. What is left (Indy 3 4, Monkey Island 1 6, Monkey Island 2 15, Indy 4 29) has no common pattern: script arguments, values tested in other rooms' scripts, actor placements. Full suite 1842 passed. Runs: `*-run4.txt`.

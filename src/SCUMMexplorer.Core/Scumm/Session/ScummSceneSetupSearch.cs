@@ -69,6 +69,14 @@ public sealed partial class ScummSceneSetupSearch
             }
             if (!changed) break;
         }
+        // A scene that needs several values at once begins with none of them alone (Indy 4: a state and an item together): when it still does not
+        // begin, all candidates are tried together, one value per target (the first found), as a last try before its cutscene is started directly.
+        if (!best.Begun && candidates.Count > 1)
+        {
+            var together = candidates.GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+            var result = _run(trigger, together);
+            if (result.Failure is null && result.Begun) { best = result; kept = together; }
+        }
         var plan = new ScummScenePlan(kept, fresh, best, "");
         return plan with { Note = Describe(plan, candidates.Count) };
     }
