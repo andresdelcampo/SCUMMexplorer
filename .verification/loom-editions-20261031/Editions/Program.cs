@@ -21,6 +21,40 @@ var shared = onLoom
     ? new ScummCutscenePlanner(game, game.V4Archive is { } cd ? () => new LoomExplorationSession(game, cd.ReadIndexedObjects(), completeBoot: false) : () => new LoomExplorationSession(game, snapshot))
     : new ScummCutscenePlanner(game);
 var sharedTriggers = shared.Triggers.GroupBy(t => (t.Room, t.ObjectId, t.VerbId)).ToDictionary(g => g.Key, g => g.First());
+if (Environment.GetEnvironmentVariable("EDITIONS_OTHER_DRAFT") == "1")
+{
+    // Every object with an "any other draft" reaction (verb 0x56), run as LOOM's Interact runs it (Bobbin put at the object, the verb's code run): does a
+    // cutscene begin, how many lines does it print.
+    int objects = 0, begun = 0, withLines = 0;
+    foreach (var room in game.Rooms.Where(r => r.ResourceId is not null))
+    {
+        var id = room.ResourceId!.Value;
+        var records = data.ReadRoom(id).Objects;
+        var verbs = data.ReadObjectVerbs(id, records);
+        foreach (var record in records.Where(r => verbs.GetValueOrDefault(r.Id)?.Any(e => e.VerbId == 0x56) == true))
+        {
+            objects++;
+            try
+            {
+                var s = game.V4Archive is { } cdv ? new LoomExplorationSession(game, cdv.ReadIndexedObjects(), completeBoot: false) : new LoomExplorationSession(game, snapshot);
+                s.VisitRoom(room);
+                // The room's entry scene is left to finish first (no cutscene and no line for 32 frames), as in the window after a visit.
+                for (int f = 0, quiet = 0; f < 6000 && quiet < 32; f++) { quiet = !s.InCutscene && s.Messages.HaveMsg == 0 ? quiet + 1 : 0; s.AdvanceFrame(); }
+                var earlier = s.CutscenesBegun; var log = s.Messages.Log.Count;
+                if (Environment.GetEnvironmentVariable("EDITIONS_NO_HERO") != "1") s.PutHeroAtObject(record.Id);
+                s.ActivateObjectVerb(record.Id, 0x56);
+                var b = false;
+                for (var f = 0; f < 1500; f++) { if (s.InCutscene || s.CutscenesBegun > earlier) b = true; if (b && !s.InCutscene && s.Messages.HaveMsg == 0) break; if (!b && f > 300) break; s.AdvanceFrame(); }
+                var printed = s.Messages.Log.Count - log;
+                if (b) begun++; if (printed > 0) withLines++;
+                Console.WriteLine($"Room {id:00} object {record.Id}: begun {b} printed {printed} {string.Join(" | ", s.Messages.Log.Skip(log).Take(2).Select(m => m.Text.Replace('\n', ' ')))}");
+            }
+            catch (Exception ex) { Console.WriteLine($"Room {id:00} object {record.Id}: {ex.GetType().Name} {ex.Message}"); }
+        }
+    }
+    Console.WriteLine($"OTHER-DRAFT objects {objects}: begun {begun}, with lines {withLines}");
+    return;
+}
 if (Environment.GetEnvironmentVariable("EDITIONS_TRACE") is { Length: > 0 } spec)
 {
     // EDITIONS_TRACE=room,object,verb: LOOM's derived start and the shared engine's candidates, each tried alone.

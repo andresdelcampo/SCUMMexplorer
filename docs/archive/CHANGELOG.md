@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 31 October: LOOM's Interact offers each object's answer to any other draft
+
+Verb 0x56 ("Any other draft") is now in LOOM's Interact: the 61 catalog scenes of that kind were unreachable in every copy but the English reference. 95 objects in the English game have it; all begin (100%), 93 print a line (97.9%). The English reference's room lists drop the matching "Other draft response" entries (now in Interact). Room 47's swan prints nothing in the window (open) ([record](../../.verification/loom-editions-20261031/README.md)).
 ## 31 October: LOOM's other editions and the CD play their scenes through the shared scene engine
 
 LOOM's scanned scenes (every copy but the English reference, and the CD) now take their setup and start from the shared planner (the one Indy 3, Monkey Island and Indy 4 use), run on LOOM's own session; LOOM keeps its titles, lists, voices and playback. The shared setup also stands the hero in the walk box a script waits for (`getActorWalkBox` then compared; Room 10's entry). Every scene begins (LOOM's own path 99.5%); started at their cutscene: EGA copies 7.4% → 3.2%, CD 6.3% → 2.7%; showing nothing: EGA 3.2% → 0.5%, CD 4.5% → 0.9%. Against the English catalog's 238 replays: 100% begin and reach its rooms, 92.0% share its category, 91.2% within 10% of its length. Indy 4 one more own-way scene (Room 76's entry), the other games unchanged ([record](../../.verification/loom-editions-20261031/README.md)).

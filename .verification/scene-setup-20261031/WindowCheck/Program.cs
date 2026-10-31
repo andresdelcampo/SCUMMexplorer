@@ -35,7 +35,7 @@ internal static class Program
         void State(string stage)
         {
             var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
-            Log($"{stage}: room={play?.CurrentRoomId} cutscene={play?.InCutscene} texts=[{string.Join(" / ", play?.Messages.OnScreen.SelectMany(m => m.Lines).Where(l => l.Length > 0).Take(3) ?? [])}]");
+            Log($"{stage}: room={play?.CurrentRoomId} cutscene={play?.InCutscene} texts=[{string.Join(" / ", play?.Messages.OnScreen.SelectMany(m => m.Lines).Where(l => l.Length > 0).Take(3) ?? [])}] printed={play?.Messages.Log.Count} last=[{play?.Messages.Log.LastOrDefault()?.Text.Replace('\n', ' ')}]");
         }
         window.Loaded += async (_, _) =>
         {

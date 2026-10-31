@@ -4011,10 +4011,14 @@ public partial class MainWindow : Window
 
     private void UpdateInteractButton() { ApplyInteract(CurrentRoomControls.ReadInteract()); UpdateGenericActionsSection(); }
 
-    /// <summary>The verbs offered in the menu: look, use or go, and the drafts the object answers (the plumbing verbs stay in Advanced).</summary>
+    /// <summary>
+    /// The verbs offered in the menu: look, use or go, the drafts the object answers, and its answer to any other draft (verb 0x56: every one of the 95 in
+    /// the English game begins a scene, most a "That draft won't work" line, some long ones such as Room 47's; .verification/loom-editions-20261031). The
+    /// plumbing verbs stay in Advanced.
+    /// </summary>
     private IReadOnlyList<ScummObjectVerbEntry> InteractVerbs(ScummRoomObjectRecord record) =>
         _roomVerbs.TryGetValue(record.Id, out var verbs)
-            ? verbs.Where(verb => verb.VerbId is 0x36 or 0x38 || LoomDraftNames.ForVerb(verb.VerbId) is not null)
+            ? verbs.Where(verb => verb.VerbId is 0x36 or 0x38 or 0x56 || LoomDraftNames.ForVerb(verb.VerbId) is not null)
                 .DistinctBy(verb => verb.VerbId).OrderBy(verb => LoomVerbNames.Order(verb.VerbId)).ToArray()
             : [];
 
