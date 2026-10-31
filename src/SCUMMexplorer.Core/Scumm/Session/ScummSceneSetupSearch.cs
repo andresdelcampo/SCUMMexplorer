@@ -101,7 +101,11 @@ public sealed partial class ScummSceneSetupSearch
     public IReadOnlyList<ScummSetupEdit> Candidates(ScummCutscene trigger)
     {
         ArgumentNullException.ThrowIfNull(trigger);
-        var units = trigger.Scripts.Select(label => (label, script: Read(label, trigger))).Where(u => u.script is not null).ToList();
+        // The trigger's own code first (the scan may list only the scripts it reaches: Indy 4's bread, Room 39 object 425, chains to local 208 after
+        // its own owner tests), then the scripts the scan found.
+        var own = trigger.IsRoomEntry ? $"Room {trigger.Room} entry script" : $"Room {trigger.Room} object {trigger.ObjectId} verb 0x{trigger.VerbId:X2}";
+        var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Select(label => (label, script: Read(label, trigger)))
+            .Where(u => u.script is not null).ToList();
         var written = new HashSet<string>();
         foreach (var (_, script) in units)
             foreach (var ins in script!.Instructions)
@@ -150,9 +154,25 @@ public sealed partial class ScummSceneSetupSearch
                         Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState, where));
                         Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState == 0 ? 1 : 0, where));
                         break;
-                    case "getObjectOwner" when parts.Length >= 2 && Literal(parts[1]) is int held && _objectRooms.Value.TryGetValue(held, out var room):
-                        Add(new(ScummSetupKind.Held, held.ToString(CultureInfo.InvariantCulture), 1, where, room));
+                    case "getObjectOwner" when parts.Length >= 2 && Literal(parts[1]) is int held:
+                        // An item no room holds (inventory-only: Indy 4's sandwich makings) is given without a room of its own code.
+                        Add(new(ScummSetupKind.Held, held.ToString(CultureInfo.InvariantCulture), 1, where,
+                            _objectRooms.Value.TryGetValue(held, out var room) ? room : null));
                         break;
+                    case "ifClassOfIs" when ins.Operands.IndexOf('[') is var open and > 0 &&
+                                            (Literal(parts[0]) ?? (objectCode && trigger.ObjectId != 0 && parts[0] == "var[0x007]" ? trigger.ObjectId : null)) is int classed:
+                    {
+                        // ScummVM o5_ifClassOfIs: a class with bit 0x80 must be set, one without must be clear, and the code after the test runs when
+                        // all hold; the scene may sit on either side, so both are tried (Indy 4's cupboard, Room 92 object 1194 +0x0000).
+                        foreach (var item in ins.Operands[(open + 1)..ins.Operands.IndexOf(']', open)].Split(',', StringSplitOptions.TrimEntries))
+                            if (Literal(item) is int cls && (cls & 0x7F) is > 0 and <= 32)
+                            {
+                                var number = cls & 0x7F;
+                                Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? number : -number, where));
+                                Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? -number : number, where));
+                            }
+                        break;
+                    }
                     case "isEqual" or "isNotEqual" or "isLess" or "isGreater" or "isLessEqual" or "isGreaterEqual" or "equalZero" or "notEqualZero":
                     {
                         var tested = parts[0];
@@ -196,12 +216,39 @@ public sealed partial class ScummSceneSetupSearch
     /// The first <c>cutscene</c> instruction in the trigger's scripts, in scan order (the label and the offset), for the last way to show a scene
     /// (<see cref="ScummSession.StartSceneAt"/>); null when none of them holds one.
     /// </summary>
-    public static (string Label, int Offset)? FirstCutscene(GameLibrary game, ScummCutscene trigger)
+    public static (string Label, int Offset, IReadOnlyList<int>? Arguments)? FirstCutscene(GameLibrary game, ScummCutscene trigger)
     {
         ArgumentNullException.ThrowIfNull(trigger);
         var reader = new ScummSceneSetupSearch(game, (_, _) => new(false, [], 0));
         foreach (var label in trigger.Scripts)
-            if (reader.Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start) return (label, start.Offset);
+            if (reader.Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start)
+                return (label, start.Offset, reader.CallArguments(label, trigger));
+        return null;
+    }
+
+    /// <summary>
+    /// The arguments the trigger's own code starts a script with (<c>startScript</c>/<c>chainScript N, [a, b, …]</c>, all literals), so a scene started
+    /// at its cutscene gets the locals its caller would have given it (Indy 3 Room 13's entry starts Script 131 with 0xCB); null when no call has
+    /// literal arguments only.
+    /// </summary>
+    private IReadOnlyList<int>? CallArguments(string label, ScummCutscene trigger)
+    {
+        var target = Regex.Match(label, @"^(?:global script|Room \d+ local script) (\d+)$");
+        if (!target.Success) return null;
+        var id = int.Parse(target.Groups[1].Value, CultureInfo.InvariantCulture);
+        foreach (var caller in trigger.Scripts)
+        {
+            if (Read(caller, trigger) is not { } script) continue;
+            foreach (var ins in script.Instructions.Where(i => i.Operation is "startScript" or "chainScript"))
+            {
+                var open = ins.Operands.IndexOf('[');
+                if (open < 0 || Literal(ins.Operands[..open].Split(',')[0].Trim()) != id) continue;
+                var inside = ins.Operands[(open + 1)..].TrimEnd(']', ' ');
+                if (inside.Length == 0) return [];
+                var values = inside.Split(',', StringSplitOptions.TrimEntries).Select(Literal).ToArray();
+                if (values.All(v => v is not null)) return values.Select(v => v!.Value).ToArray();
+            }
+        }
         return null;
     }
 

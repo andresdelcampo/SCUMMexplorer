@@ -50,7 +50,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 
 What keeps a cell from ✅:
 - **3**: the user has not listened (non-LOOM games); LOOM CD's picture/voice/music timing is the user's run.
-- **5**: every scene begins when picked, but some started directly at their cutscene show nothing (Indy 3 4, Monkey Island 1 6 floppy and 6 CD, Monkey Island 2 12, Indy 4 24); LOOM's other editions and CD use LOOM's own readiness search, not proven for every entry; Maniac/Zak have scenes that begin nothing (their track).
+- **5**: every scene begins when picked, but some started directly at their cutscene show nothing (Indy 3 4 = 2.6%, Monkey Island 1 5 floppy = 3.0% and 4 CD = 2.5%, Monkey Island 2 4 = 2.1%, Indy 4 16 = 3.8%; all five copies 3.0%); LOOM's other editions and CD use LOOM's own readiness search, not proven for every entry; Maniac/Zak have scenes that begin nothing (their track).
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: names come only from LOOM's glossary; the other games show variable numbers.
@@ -59,7 +59,7 @@ What keeps a cell from ✅:
 
 | # | Work | Feature | Where |
 |---|---|---|---|
-| 1 | **Scenes started at their cutscene that show nothing**: what is left needs case-by-case reading (several values at once, script arguments: Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73; Indy 4 has the most, 24). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
+| 1 | **Scenes started at their cutscene that show nothing**: what is left needs case-by-case reading (several values at once, script arguments: Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73; Indy 4 has the most, 16). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
 | 2 | **Derivation time**: the setup search adds trial runs (about a minute on the large games); share boots between trials, cache plans per build and data. | 5 | `ScummCutscenePlanner` |
 | 2b | **One scene engine for every game** (user, 31 October): LOOM's scanned editions and CD (`LoomCutsceneReadiness`) and Maniac/Zak (`ManiacCutsceneSetup`, built on the separate track) onto the shared scene setup (`ScummSceneSetupSearch`), keeping a game-specific setup only where the game needs one (LOOM English's reviewed catalog, Maniac's party selection). LOOM English's 328 reviewed replays are the answer key (first run 31 October: 238 of 238 listed replays begin and reach the catalog's rooms, 219 share its category; the other 90 are shared draft reactions; [record](../.verification/loom-answer-key-20261031/README.md)); scene length matches for 212 of 238 (89%); still to do: the remaining length differences, LOOM's Interact offering the shared "Other draft" reactions, then retire the catalog to titles, draft names and the named sequences; the other LOOM editions; Maniac/Zak: run the shared engine on the English reference and compare each replay (begins, lines, rooms, Bobbin's look); where it matches, the catalog entry is redundant, where it differs, fix the shared engine; in the end only the named sequences (The Elders' trial, the firewood scene, Walk to Room 13, Room 46) stay as reviewed data, carried to the other LOOM editions by room, object name and verb. Before/after counts per game. | 5 | `Loom/Scenes/`, `Core/Maniac/`, `Scumm/Session/` |
 | 3 | **Readable names for the other games** from their script maps. | 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
@@ -92,16 +92,16 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 - Listening (AdLib, PC speaker). Rooms 47, 60, 66 start dark and are shown lit. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
 ### Monkey Island 1 (floppy and CD)
-- 6 scenes started at their cutscene show nothing (work item 1).
+- 5 (floppy) and 4 (CD) scenes started at their cutscene show nothing (work item 1).
 - Listening (the floppy credits music timer is an estimate; CD track 21 is started by no sound); `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
 - Spanish eight-disk copy and the CD's five languages in the window (passed S9 headless only).
 
 ### Monkey Island 2
-- 12 scenes started at their cutscene show nothing (work item 1).
+- 4 scenes started at their cutscene show nothing (work item 1).
 - Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates; listening.
 
 ### Indiana Jones 4
-- 24 scenes started at their cutscene show nothing (work item 1).
+- 16 scenes started at their cutscene show nothing (work item 1).
 - Listening, including talkie speech. Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)

@@ -17,6 +17,8 @@ public enum ScummSetupKind
     ActorCostume,
     /// <summary>An actor put in a room (<c>getActorRoom</c> then compared): a teleport.</summary>
     ActorRoom,
+    /// <summary>An object's class set (Value &gt; 0) or cleared (Value &lt; 0) (<c>ifClassOfIs</c>): an open cupboard, a lit lamp.</summary>
+    ObjectClass,
 }
 
 /// <summary>
@@ -33,6 +35,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.SecondObject => $"object {Target} used with it (held)",
         ScummSetupKind.ActorCostume => $"actor {Target} in costume {Value}",
         ScummSetupKind.ActorRoom => $"actor {Target} in Room {Value}",
+        ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
     } + $" (tested at {Where})";
 }
@@ -86,6 +89,16 @@ public abstract partial class ScummSession
                 var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (_runtime.ObjectStates.GetValueOrDefault(id) == edit.Value) return false;
                 _runtime.SetObjectState(id, (byte)edit.Value);
+                return true;
+            }
+            case ScummSetupKind.ObjectClass:
+            {
+                var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                var bit = 1u << (Math.Abs(edit.Value) - 1);
+                var classes = _runtime.ObjectClasses.GetValueOrDefault(id);
+                var wanted = edit.Value > 0 ? classes | bit : classes & ~bit;
+                if (wanted == classes) return false;
+                _runtime.SetObjectClasses(id, wanted);
                 return true;
             }
             case ScummSetupKind.ActorCostume or ScummSetupKind.ActorRoom:
@@ -148,7 +161,7 @@ public abstract partial class ScummSession
     /// instruction. The tests before it are skipped and its locals start at 0; everything from there on is the game's own code. A room's script
     /// starts only in that room. An exploration action, labelled as such.
     /// </summary>
-    public bool StartSceneAt(string label, int offset)
+    public bool StartSceneAt(string label, int offset, IReadOnlyList<int>? arguments = null)
     {
         ArgumentNullException.ThrowIfNull(label);
         BeforeInput();
@@ -160,7 +173,8 @@ public abstract partial class ScummSession
         var beforeUncertainties = _uncertainties.Count;
         var beforeEvents = _visitEvents.Count;
         _uncertainties.Add($"{label} was started directly at its cutscene (+0x{offset:X4}): an exploration action. The tests before it were skipped and " +
-                           "its local values start at 0, so what it shows may differ from the game's own way to it.");
+                           (arguments is { Count: > 0 } ? $"its locals are the arguments its caller passes ({string.Join(", ", arguments)})" : "its local values start at 0") +
+                           ", so what it shows may differ from the game's own way to it.");
         _visitTrace.Add($"picked scene: {label} started at +0x{offset:X4}");
         LastAction = new ScummObjectActionResult(here, 0, 0, 0, null, null, null, null, [], label);
         _dispatchScope++;
@@ -170,7 +184,7 @@ public abstract partial class ScummSession
             var local = System.Text.RegularExpressions.Regex.Match(label, @"^Room \d+ local script (\d+)$");
             if (global.Success || local.Success)
                 RunStartedScript(int.Parse((global.Success ? global : local).Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture), offset,
-                    new Dictionary<string, ushort>(), 0);
+                    (arguments ?? []).Select((value, index) => (Key: $"local[0x{index:X3}]", Value: (ushort)value)).ToDictionary(p => p.Key, p => p.Value), 0);
             else
             {
                 var verb = System.Text.RegularExpressions.Regex.Match(label, @"^Room \d+ object (\d+) verb 0x([0-9A-F]+)$");

@@ -7,6 +7,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+
+## 31 October: four in five picked scenes now play the game's own way
+
+The setup search reads the trigger's own code first (the scan sometimes listed only the scripts it reaches), tries object classes (`ifClassOfIs`), and gives inventory-only items. Across Indy 3, Monkey Island 1 (both), Monkey Island 2 and Indy 4: scenes played the game's own way 68.3% → 80.9%, scenes showing nothing 4.8% → 3.0% ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 31 October: a picked scene runs to its end when it is a chain of cutscenes
 
 Found against LOOM English's catalog (Room 18's bell: five cutscenes one frame apart): a scene run now ends only after 32 quiet frames (no cutscene, no line) instead of at the first one; versions 1 and 2 unchanged. LOOM: same length as the catalog 84.5% → 89.1% of 238. Scenes showing nothing: Monkey Island 2 7.9% → 6.3%, Indy 4 6.8% → 5.6%; all five copies 5.5% → 4.8% ([record](../../.verification/loom-answer-key-20261031/README.md)).

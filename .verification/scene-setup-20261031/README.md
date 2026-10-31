@@ -101,3 +101,18 @@ Then: when no single value makes a scene begin, all candidates are tried togethe
 ### No duplicates between Interact and the room's cutscene list (31 October, R-8.2b)
 
 A room's Play Cutscene list (LOOM and the shared session) leaves out every scene whose trigger is an action of this room's Interact (same object and verb, read from the entry id: `scumm-r-o-v`, `cd-r-o-v`, LOOM's `Room NN object O Verb 0xVV`); the Advanced whole-game picker still lists all. Interact offers a verb whenever its first instruction decodes (Indy 3's package Open, whose code has a jump target outside the resource, was missing). `WindowCheck` step `l`: LOOM Room 2 keeps the intro and the two "Other draft response" entries (Interact does not offer verb 0x56); Room 18 keeps its draft responses and the scenes played from Room 20; Indy 3 Room 2's list becomes empty, its package now offers Open in Interact.
+
+### Class tests, inventory-only items, and the trigger's own code (31 October, later)
+
+Three generic additions to the setup search: (1) `ifClassOfIs` candidates (an object's class set or cleared, both tried; ScummVM o5_ifClassOfIs: a class with bit 0x80 must be set, one without must be clear), applied by the new `ScummSetupKind.ObjectClass`; (2) an item held that no room holds (inventory-only) is offered without a room; (3) the trigger's own code is always read first, as the scan may list only the scripts it reaches (Indy 4's bread chains to local 208 after its own owner tests). Call-site arguments for a scene started at its cutscene were also added (no measurable change).
+
+| Game | Scenes | Its own way | Started at its cutscene | Shows nothing |
+|---|---|---|---|---|
+| Indy 3 | 153 | 75.2% → 80.4% | 19.6% | 2.6% |
+| Monkey Island 1 floppy | 164 | 75.6% → 84.8% | 15.2% | 3.7% → 3.0% |
+| Monkey Island 1 CD | 160 | 75.6% → 85.6% | 14.4% | 3.8% → 2.5% |
+| Monkey Island 2 | 190 | 61.6% → 81.6% | 18.4% | 6.3% → 2.1% |
+| Indy 4 | 426 | 63.1% → 77.5% | 22.5% | 5.6% → 3.8% |
+| **Total** | 1,093 | 68.3% → **80.9%** | 19.1% | 4.8% → **3.0%** |
+
+LOOM English's answer key unchanged (rooms 100%, category 92.0%, length 89.1%). Full suite 1842 passed. Runs: `*-run10.txt`.

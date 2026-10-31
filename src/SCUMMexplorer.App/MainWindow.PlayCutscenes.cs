@@ -234,7 +234,7 @@ public partial class MainWindow
             if (plan?.Result.Way == ScummPickedStart.AtCutscene && ScummSceneSetupSearch.FirstCutscene(game, trigger) is { } at)
             {
                 if (session.CurrentRoomId != trigger.Room) session.VisitRoom(room);
-                session.StartSceneAt(at.Label, at.Offset);
+                session.StartSceneAt(at.Label, at.Offset, at.Arguments);
                 uncertainties = session.Snapshot.Uncertainties;
             }
             else if (trigger.IsRoomEntry)

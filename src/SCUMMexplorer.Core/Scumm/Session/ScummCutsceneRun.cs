@@ -78,7 +78,7 @@ public static class ScummCutsceneRun
                 earlier = session.CutscenesBegun;
                 traced = session.SessionTrace.Count;
                 logMark = session.Messages.Log.Count;
-                if (ScummSceneSetupSearch.FirstCutscene(game, trigger) is not { } at || !session.StartSceneAt(at.Label, at.Offset))
+                if (ScummSceneSetupSearch.FirstCutscene(game, trigger) is not { } at || !session.StartSceneAt(at.Label, at.Offset, at.Arguments))
                     return new(false, [], 0, "no cutscene the session can start in this room", Way: way);
             }
             else if (!trigger.IsRoomEntry)
