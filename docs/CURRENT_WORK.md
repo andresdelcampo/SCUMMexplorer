@@ -53,7 +53,7 @@ Open before shipping:
 
 ## Scope (31 October 2026)
 
-The user narrowed the product (REQUIREMENTS R-1.14, §8.6; [ROADMAP](ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; Play stays as it is and comes last. Scene setup of §8.6: Indy 3 done 31 October (all 153 groups begin when picked; [record](../.verification/scene-setup-20261031/README.md)); next Monkey Island 1, 2, Indy 4, then interactions (R-8.38). The roadmap board now follows the user's ten features.
+The user narrowed the product (REQUIREMENTS R-1.14, §8.6; [ROADMAP](ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; Play stays as it is and comes last. Scene setup of §8.6 (31 October): every scene of Indy 3, MI1, MI2 and Indy 4 begins when picked; some started at their cutscene show nothing ([record](../.verification/scene-setup-20261031/README.md)); a pick ends a scene still playing. Play Game Intro passes the MI2/MI1 copy protection. Next: interactions (R-8.38), then the at-cutscene quality. The roadmap board now follows the user's ten features.
 
 ## Next work
 

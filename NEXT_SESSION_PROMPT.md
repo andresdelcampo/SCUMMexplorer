@@ -27,7 +27,7 @@ The roadmap board follows the user's ten features (docs/ROADMAP.md; pinned artif
 
 ## Next, in order
 
-1. **Scene setup for the other games (§8.6).** Done for Indy 3 on 31 October (`ScummSceneSetupSearch`, `ScummSession.ApplySceneSetup`/`PickInteraction`/`StartSceneAt`, `ScummCutsceneRun.RunPicked`, `ScummCutscenePlanner.PlanSetup`; [record](.verification/scene-setup-20261031/README.md), harness `Measure`). First look at one setup scene (Room 2 jar, Room 39 hatch) and one at-cutscene scene in the real window (no harness plays a cutscene from the list yet). Then measure Monkey Island 1 (floppy, CD), Monkey Island 2 (watch the derivation time), Indy 4; add candidate kinds where their code needs them.
+1. **Done 31 October:** every scene of Indy 3, MI1 (floppy, CD), MI2, Indy 4 begins when picked (`ScummSceneSetupSearch`, `ScummCutsceneRun.RunPicked`, `ScummCutscenePlanner.PlanSetup`; harnesses `Measure`, `WindowCheck` in `.verification/scene-setup-20261031`); a pick ends a scene still playing; Play Game Intro answers the MI2 and MI1 floppy copy protection (user: no code wheel). Open: at-cutscene starts that show nothing (Indy 3 10, MI1 10, MI2 24, Indy 4 35), a window look at MI1/MI2/Indy 4 scenes.
 2. Interactions in a picked room (R-8.38): Interact (`MainWindow.GenericRoomActions.cs`) offers only objects present and runs `ActivateObjectVerb`; offer every object of the room with every verb that has code and use `PickInteraction` plus the same setup.
 3. Derivation time once the setup adds trials (MI2 140–174 s).
 4. The user's crash and "thin black rooms" reports when they name the game and room. `dotnet-trace` is installed for UI stalls (`--profile dotnet-sampled-thread-time --format Speedscope`, with `LaunchStalls`).

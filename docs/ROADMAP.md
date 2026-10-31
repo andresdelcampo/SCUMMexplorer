@@ -34,16 +34,16 @@ Symbols: ✅ done · 🟡 works but partial or not checked by the user · 🔴 k
 | LOOM EGA English (reference) | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ |
 | LOOM EGA other editions, demos | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
 | LOOM CD | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | ✅ | 🟡 | — | 🟡 |
-| Monkey Island 1 (floppy, CD) | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | — | 🟡 |
-| Monkey Island 2 | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | — | 🟡 |
-| Indiana Jones 4 | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 1 (floppy, CD) | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 2 | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Indiana Jones 4 | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
 | Maniac Mansion (classic, enhanced) | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 | Zak McKracken (classic, enhanced) | ✅ | 🟡 | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
 Why the cells are what they are (31 October 2026):
 - **3 Sounds** 🟡: every non-LOOM game plays its sounds on its devices, but the user has not listened (USER_CHECKS); LOOM CD's picture/voice/music timing is the user's run. Indy 4's CD image has no audio tracks (data).
-- **5 Cutscenes**: Indy 3 ✅ since 31 October: all 153 groups begin when picked (86 the game's own way, 6 its verb run directly, 12 with a setup, 49 started at their cutscene; [record](../.verification/scene-setup-20261031/README.md)). Monkey Island 1, 2, Indy 4, Maniac and Zak still have scenes that begin nothing from a fresh start (37–60%), next in line. LOOM's scanned editions and the CD use LOOM's own readiness search; not every entry is proven to begin.
+- **5 Cutscenes** 🟡 for Indy 3, Monkey Island 1, Monkey Island 2, Indy 4 since 31 October: every scene begins when picked (Indy 3 153, MI1 164 and 160, MI2 190, Indy 4 426), by the game's way, a setup, or started at its cutscene; but some of those started at their cutscene end at once with nothing shown (Indy 3 10, MI1 10, MI2 24, Indy 4 35), and only Indy 3 was looked at in the window (hatch and jar right; the brick shows the wall without Indy) ([record](../.verification/scene-setup-20261031/README.md)). Maniac and Zak still have scenes that begin nothing (their track). LOOM's scanned editions and the CD use LOOM's own readiness search; not every entry is proven to begin. Monkey Island 2's and Monkey Island 1 floppy's intro now pass the copy protection by themselves.
 - **6 Interactions** 🟡 everywhere: the Interact button exists in every live game, but offers only objects present and touchable now, and runs the verb directly; R-8.38 (objects not yet present, the hero put at the object, the second object given) is the next step after 5.
 - **8** 🟡 for the non-LOOM games: hotspots, doorways and walk boxes work; depth masks are read generically and were never compared with ScummVM (R-6.16).
 - **9 Game state** — for Indy 3, Monkey Island 1 and 2, Indy 4: parked; the setup of a picked scene does what Status would be used for. Revisit if the user wants to set state by hand.
@@ -53,7 +53,7 @@ Why the cells are what they are (31 October 2026):
 
 | # | Work | Unlocks | Where in the code |
 |---|---|---|---|
-| 1 | **Scene setup for every game (§8.6).** Engine-layer search (`ScummSceneSetupSearch`): bits, story variables, object states, items held, the second object of a two-object verb, actors' costume and room; the game's sentence script, then the verb run directly, then the cutscene started directly. **Indy 3 done 31 October** (153 of 153). Next: Monkey Island 1, Monkey Island 2, Indy 4, then LOOM's scanned editions and Maniac/Zak. | Feature 5 | `Loom/Scenes/LoomCutsceneReadiness.cs` → `Scumm/Session/`, `ScummCutscenePlanner.cs` |
+| 1 | **Scene setup for every game (§8.6).** Engine-layer search (`ScummSceneSetupSearch`): bits, story variables, object states, items held, the second object of a two-object verb, actors' costume and room; the game's sentence script, then the verb run directly, then the cutscene started directly. **31 October:** every scene of Indy 3, MI1, MI2, Indy 4 begins. Next: the at-cutscene starts that show nothing (start them with the locals and state the skipped tests set), a window look at MI1/MI2/Indy 4, then LOOM's scanned editions and Maniac/Zak. | Feature 5 | `Loom/Scenes/LoomCutsceneReadiness.cs` → `Scumm/Session/`, `ScummCutscenePlanner.cs` |
 | 2 | **Interactions in a picked room (R-8.38).** Compare what each room offers with its objects' verbs that have code; offer the missing ones as exploration actions (hero put next to the object, second object given), using the same setup. | Feature 6 | room lists (`ScummCutsceneIndex`), `ScummSession.StartObjectScript` |
 | 3 | **Derivation time.** The setup search adds trial runs to the background derivation (MI2 already 140–174 s). Share one booted copy between trials; cache plans per build+data (as R-8.21). | Keeps 5 usable | `ScummCutscenePlanner`, `ScummBoundedScriptExecutor` |
 | 4 | **Readable names for the other games** from their script maps. | Feature 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
