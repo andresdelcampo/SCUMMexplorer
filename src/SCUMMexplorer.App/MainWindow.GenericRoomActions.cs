@@ -335,6 +335,10 @@ public partial class MainWindow
             _play.CurrentRoomId == _genericActionsRoom) &&
         (ScummProfile.For(game).EngineVersion > ScummVersion.V2 || _play.InventoryCharactersAvailable);
 
+    // §8.6: where the game's scenes can be picked, an interaction is picked the same way (any time, the state set up, a running scene ended).
+    private bool GenericInteractionCanStart => GenericRoomActions && !_genericActionStarting &&
+        (PlayCutscenes && _playPlanner is not null && PlayCanStartCutscene || GenericRoomActionCanStart);
+
     private bool StillPreviewCanAct => _catalogPreviewOnly && _game is { } still && !UsesManiacCutsceneSetup(still) && !PlayActive && _play is not null && _genericActionsRoom is not null &&
         _currentRoomResource?.ResourceId == _genericActionsRoom;
 
@@ -392,8 +396,21 @@ public partial class MainWindow
         if (InteractButton.IsEnabled) ShowInteractMenu(InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
 
-    private void RunGenericRoomAction(GenericSourceAction action)
+    private async void RunGenericRoomAction(GenericSourceAction action)
     {
+        // R-8.38 (user, 31 Oct 2026): a picked interaction goes the way of a picked scene: the room opened (ending a scene still playing), the state
+        // its code tests set (§8.6), the verb given to the game's sentence script with the hero put at the object, or run directly where it refuses.
+        if (PlayCutscenes && _playPlanner is not null && PlayCanStartCutscene && _genericActionsRoom is int pickedRoom)
+        {
+            var trigger = new ScummCutscene(pickedRoom, action.Object, action.Target, action.Verb,
+                [$"Room {pickedRoom} object {action.Object} verb 0x{action.Verb:X2}"], 0, 0, 0, "");
+            await PlayScummCutsceneAsync(new ScummCutsceneGroup(trigger, []), action.Title);
+            _genericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: picked.", action.Source,
+                _play?.Snapshot.Uncertainties.TakeLast(6).ToArray() ?? [], action.Code);
+            UpdateGenericAssumptions();
+            FillRoomPanel(CurrentRoomControls.Panel());
+            return;
+        }
         if (!GenericRoomActionCanStart || _game is not { } game || _genericActionsRoom is not int roomId ||
             game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is not { } room) return;
         var launch = ++_cutsceneLaunchGeneration;

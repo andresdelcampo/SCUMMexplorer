@@ -50,3 +50,16 @@ Of the 49 started at their cutscene, most print lines or animate (up to 11 lines
 | Indy 4 (`indy4 vga en`) | 426 | 227 | 30 | 169 | 35 |
 
 Every group begins when picked in all five. The at-cutscene starts that end at once (their scene reads locals or state the skipped tests set) are the next quality step; runs: `*-run1.txt`.
+
+## Interactions (31 October, R-8.38)
+
+The Interact button (`InteractionOverview`, the object menu and the Advanced ACTIONS buttons) now lists every object of the room's data with each verb that has code, objects on screen first, the others after; before, only objects on screen were listed. A choice is played the way a picked scene is (`RunGenericRoomAction` → `PlayScummCutsceneAsync` with a one-trigger group): the room opened again when a scene still plays, the setup of §8.6 found and applied, the verb given to the sentence script with the hero put at the object, or run directly where the game refuses. It can be picked whenever a scene can (not only when the player has control).
+
+| Window check (`WindowCheck`, real `MainWindow`) | Result |
+|---|---|
+| Indy 3 Room 2 "Look · junk mail" | "It's just junk mail." |
+| Indy 3 Room 2 "Look · package" (its code tests `bit[0x5DF]`) | the setup sets it; "It's my father's Grail Diary!", Indy at the desk ([picture](window/i-2-68-9.png)) |
+| Indy 3 Room 2 "Pick up · letters" (object 66, another state of the mail) | runs, no line (pick-ups print none) |
+| Monkey Island 1 floppy, Room 28 "Walk to door" (Script 117: the door open and `bit[0x1BE]`) | "Meanwhile^", then LeChuck's ship (Room 70) |
+
+Open: an object that is not in the room yet is not drawn when its response plays (the setup sets only what the code tests); the second object of "Use X with Y" is given only where the verb's code compares it.

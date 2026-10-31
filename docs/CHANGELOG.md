@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: Interact offers every object of the room and plays it like a picked scene
+
+Indy 3, Monkey Island 1 and 2, Indy 4: the Interact button lists every object of the room's data with each verb that has code (on screen first), and a choice goes the way of a picked scene (the room opened again if a scene plays, the state its code tests set, the hero put at the object, the game's sentence script). A pick also ends a scene still playing. Seen in the window: Indy 3's junk mail and package (the Grail Diary scene, after its setup bit), Monkey Island 1's SCUMM Bar exit ("Meanwhile"). ([record](../.verification/scene-setup-20261031/README.md))
+
 ## 31 October: Play Game Intro answers the copy protection
 
 User: "No value on forcing the user to have the wheel." Monkey Island 2's recipe screen (Room 108) and Monkey Island 1 floppy's history quiz (Room 90) are answered by the explorer with the answer the game's own script derives; the Monkey 2 / Lite choice stays the player's. Seen in the real window with no key pressed: prompt, recipe, answer 1412, choice, opening ([record](../.verification/mi2-intro-protection-20261030/README.md), addendum 31 Oct).

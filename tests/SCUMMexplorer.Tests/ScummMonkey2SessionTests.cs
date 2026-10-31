@@ -52,7 +52,7 @@ public sealed class ScummMonkey2SessionTests
         Assert.True(profile.BootEndsWhenPlayerHasControl);
         // Script 131 +0x0067: object 0x484 is "Monkey Island 2" (Regular Mode), 0x485 "Monkey 2 Lite".
         // The floppy releases first ask the recipe copy protection: Script 130 keeps the four digits it expects in var[0x206] (+0x0134).
-        Assert.Equal(new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4), profile.BootInput);
+        Assert.Equal(new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4, ProtectionRoom: 108), profile.BootInput);
         // GID_MONKEY's var[74] = 1225 is the CD release's only.
         Assert.DoesNotContain(profile.EngineVariablesAtStart, item => item.Variable == "var[0x04A]");
 

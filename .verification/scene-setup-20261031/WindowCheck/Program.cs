@@ -44,8 +44,24 @@ internal static class Program
                 Call("OpenGameFolder", args[0]);
                 for (var i = 0; i < 300 && !(bool)Field("_playRoomListsDone")!; i++) await Pump(1);
                 Log($"derivation done={Field("_playRoomListsDone")}");
-                foreach (var spec in args.Skip(2))
+                foreach (var raw in args.Skip(2))
                 {
+                    // i:room,object,verb picks an interaction of the room shown (the Interact menu's choice, RunGenericRoomAction).
+                    if (raw.StartsWith("i:", StringComparison.Ordinal))
+                    {
+                        var parts = raw[2..].Split(',').Select(int.Parse).ToArray();
+                        var actions = (System.Collections.IList)Field("_genericSourceActions")!;
+                        object? action = null;
+                        foreach (var candidate in actions)
+                            if ((int)candidate!.GetType().GetProperty("Object")!.GetValue(candidate)! == parts[1] &&
+                                (int)candidate.GetType().GetProperty("Verb")!.GetValue(candidate)! == parts[2]) action = candidate;
+                        if (action is null) { Log($"{raw}: no such action in the room shown ({Field("_genericActionsRoom")})"); continue; }
+                        Log($"{raw}: interact \"{action.GetType().GetProperty("Title")!.GetValue(action)}\"");
+                        typeof(MainWindow).GetMethod("RunGenericRoomAction", Private)!.Invoke(window, [action]);
+                        for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
+                        continue;
+                    }
+                    var spec = raw;
                     var items = (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null })!;
                     object? picked = null;
                     foreach (var item in items)

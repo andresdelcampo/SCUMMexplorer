@@ -171,7 +171,9 @@ public partial class MainWindow
     /// Plays a scene in the play screen: the room is opened from the list when another is shown (its play visit is a state preview), the running
     /// session is kept, and the room's entry plays again or the object's verb runs directly.
     /// </summary>
-    private async void PlayScummCutscene(ScummCutsceneGroup group)
+    private async void PlayScummCutscene(ScummCutsceneGroup group) => await PlayScummCutsceneAsync(group, null);
+
+    private async Task PlayScummCutsceneAsync(ScummCutsceneGroup group, string? shownTitle)
     {
         var trigger = group.First;
         if (!PlayCanStartCutscene || _game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
@@ -200,7 +202,7 @@ public partial class MainWindow
         if (!PlayActive || _play is not { } session) return;
         if (!PreparePlayCutsceneStartup(game)) return;
         _playPaused = false;
-        var title = GenericCutsceneTitle(trigger);
+        var title = shownTitle ?? GenericCutsceneTitle(trigger);
         // §8.6 (user, 31 Oct 2026): the state the scene needs is set, then it starts the way the plan found works; nothing is refused by the game's rules.
         ScummScenePlan? plan = null;
         if (_playPlanner is { } plannerLazy)

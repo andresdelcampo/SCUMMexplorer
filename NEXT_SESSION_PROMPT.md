@@ -28,7 +28,7 @@ The roadmap board follows the user's ten features (docs/ROADMAP.md; pinned artif
 ## Next, in order
 
 1. **Done 31 October:** every scene of Indy 3, MI1 (floppy, CD), MI2, Indy 4 begins when picked (`ScummSceneSetupSearch`, `ScummCutsceneRun.RunPicked`, `ScummCutscenePlanner.PlanSetup`; harnesses `Measure`, `WindowCheck` in `.verification/scene-setup-20261031`); a pick ends a scene still playing; Play Game Intro answers the MI2 and MI1 floppy copy protection (user: no code wheel). Open: at-cutscene starts that show nothing (Indy 3 10, MI1 10, MI2 24, Indy 4 35), a window look at MI1/MI2/Indy 4 scenes.
-2. Interactions in a picked room (R-8.38): Interact (`MainWindow.GenericRoomActions.cs`) offers only objects present and runs `ActivateObjectVerb`; offer every object of the room with every verb that has code and use `PickInteraction` plus the same setup.
+2. **Done 31 October:** Interact lists every object of the room with each verb that has code and plays a choice like a picked scene (`RunGenericRoomAction` → `PlayScummCutsceneAsync`); window-checked on Indy 3 and MI1. Open: draw an object that is not in the room yet while its response plays (owner back to the room, a drawable state, touchable); LOOM's own Interact the same way; at-cutscene starts that show nothing.
 3. Derivation time once the setup adds trials (MI2 140–174 s).
 4. The user's crash and "thin black rooms" reports when they name the game and room. `dotnet-trace` is installed for UI stalls (`--profile dotnet-sampled-thread-time --format Speedscope`, with `LaunchStalls`).
 5. Release readiness for LOOM.

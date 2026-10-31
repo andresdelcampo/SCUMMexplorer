@@ -63,17 +63,18 @@ public partial class MainWindow
             if (w._genericInteractTarget is int selected && w.GenericObjectActions(selected).Count == 0) w._genericInteractTarget = null;
             var name = w._genericInteractTarget is int target ? w.GenericObjectActions(target).FirstOrDefault()?.Target : null;
             // R-6.39: the overview is upfront; no object has to be selected first.
-            return new(true, w._genericSourceActions.Any(action => action.Executable) && w.GenericRoomActionCanStart, name,
+            return new(true, w._genericSourceActions.Any(action => action.Executable) && w.GenericInteractionCanStart, name,
                 DoubleClickLooks: w._game is { } game && ScummProfile.For(game).DoubleClickLookVerb is not null);
         }
 
         public RoomInteractionOverview? InteractionOverview(bool advanced)
         {
-            if (!w.GenericRoomActions || w._currentRoomResource is null || !w.GenericRoomActionCanStart) return null;
-            // Only objects that are in the room now (the game cannot act on a removed one); the whole list when the scene cannot be read.
-            var present = w._playScreen?.Scene() is { } scene ? ScummRoomOverlays.Objects(scene, w._playDoorwayTargets).Select(item => item.ObjectId).ToHashSet() : null;
+            if (!w.GenericRoomActions || w._currentRoomResource is null || !w.GenericInteractionCanStart) return null;
+            // R-8.35/R-8.38 (user, 31 Oct 2026: explore everything): every object of the room's data with its verbs, whether it is in the room now or
+            // only later; the objects on screen come first. A pick sets the state the verb's code tests (§8.6).
+            var present = w._playScreen?.Scene() is { } scene ? ScummRoomOverlays.Objects(scene, w._playDoorwayTargets).Select(item => item.ObjectId).ToHashSet() : [];
             var objects = w._genericSourceActions.Where(action => action.Executable).Select(action => action.Object).Distinct()
-                .Where(id => present is null || present.Contains(id)).ToArray();
+                .OrderBy(id => present.Contains(id) ? 0 : 1).ToArray();
             if (objects.Length == 0) return null;
             var headings = RoomInteractionRules.NumberRepeats(objects.Select(id => w.GenericObjectActions(id)[0].Target).ToArray());
             var groups = objects.Select((id, index) => new RoomInteractionGroup(headings[index], w._genericInteractTarget == id,
@@ -107,7 +108,7 @@ public partial class MainWindow
         {
             if (w._genericInteractTarget is not int objectId) return null;
             var actions = w.GenericObjectActions(objectId);
-            if (actions.Count == 0 || !w.GenericRoomActionCanStart) return null;
+            if (actions.Count == 0 || !w.GenericInteractionCanStart) return null;
             var heading = (actions[0].Target is { Length: > 0 } name ? name : $"Object {objectId}").ToUpperInvariant();
             return new(heading, actions.Select(action => new RoomInteractionChoice(GenericActionWord(action), advanced ? action.Source : null,
                 () => w.RunGenericRoomAction(action))).ToList());
