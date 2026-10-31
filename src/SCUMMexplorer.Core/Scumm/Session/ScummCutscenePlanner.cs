@@ -59,7 +59,35 @@ public sealed class ScummCutscenePlanner
         if (readableText is not null)
             Triggers = Triggers.Select(t => t with { ObjectName = readableText(t.ObjectName), FirstText = readableText(t.FirstText) }).ToArray();
         Groups = ScummCutsceneIndex.Group(Triggers);
+        Setup = new ScummSceneSetupSearch(game, (trigger, setup) => _pool is null ? ScummCutsceneRun.RunPicked(_game, _newSession, trigger, setup)
+            : _pool.Use(fresh => ScummCutsceneRun.RunPicked(_game, fresh, trigger, setup)));
     }
+
+    /// <summary>The setup search of a picked scene that a fresh start does not begin (§8.6).</summary>
+    public ScummSceneSetupSearch Setup { get; }
+
+    /// <summary>
+    /// The setup of a picked scene (§8.6): none when a fresh start begins it, else the values the search kept (several fresh runs the first time;
+    /// cached). Call off the UI thread.
+    /// </summary>
+    public ScummScenePlan PlanSetup(ScummCutscene trigger)
+    {
+        var fresh = Run(trigger);
+        if (fresh.Begun) return new([], fresh, fresh, "");
+        return _lastResort.GetOrAdd(Key(trigger), _ =>
+        {
+            var plan = Setup.Plan(trigger, fresh);
+            if (plan.Result.Begun) return plan;
+            // R-8.35: nothing made the game's own code begin it, so its cutscene is started directly (with the setup kept, if any).
+            var at = _pool is null ? ScummCutsceneRun.Run(_game, _newSession, trigger, plan.Edits, ScummPickedStart.AtCutscene)
+                : _pool.Use(boot => ScummCutsceneRun.Run(_game, boot, trigger, plan.Edits, ScummPickedStart.AtCutscene));
+            return at.Score > plan.Result.Score
+                ? plan with { Result = at, Note = (plan.Note.Length > 0 ? plan.Note + " " : "") + "Its cutscene is started directly (the tests before it skipped)." }
+                : plan;
+        });
+    }
+
+    private readonly ConcurrentDictionary<(int, int, int), ScummScenePlan> _lastResort = [];
 
     /// <summary>The game's verbs as the titles name them: every text verb the boot left, by the name its script gave it (<c>verbOps name</c>).</summary>
     public ScummCutsceneVerbs Verbs { get; }
@@ -126,8 +154,8 @@ public sealed class ScummCutscenePlanner
 
     /// <summary>Runs the trigger from a fresh start (once; cached).</summary>
     public ScummCutsceneRunResult Run(ScummCutscene trigger) =>
-        _runs.GetOrAdd(Key(trigger), _ => _pool is null ? ScummCutsceneRun.Run(_game, _newSession, trigger)
-            : _pool.Use(fresh => ScummCutsceneRun.Run(_game, fresh, trigger)));
+        _runs.GetOrAdd(Key(trigger), _ => _pool is null ? ScummCutsceneRun.RunPicked(_game, _newSession, trigger)
+            : _pool.Use(fresh => ScummCutsceneRun.RunPicked(_game, fresh, trigger)));
 
     /// <summary>With <see cref="ScummCutsceneStart.SnapshotPerWorker"/>, the boots the pool made so far (at most one per run going on at once); else null.</summary>
     public int? PoolBoots => _pool?.Boots;
@@ -146,8 +174,9 @@ public sealed class ScummCutscenePlanner
     private string RunNote(ScummCutscene trigger) =>
         !TryGetRun(trigger, out var run) ? "Whether a fresh start begins it is still being checked (open the list again in a few seconds)."
         : run.Begun ? "A fresh start begins its cutscene (checked by a headless run" + (run.RoomsEntered.Count > 0 ? $"; it went on to {RoomList(run.RoomsEntered)})." : ").")
+        : Setup.IsReady(trigger) ? "A fresh start did not begin its cutscene in a headless run. " + Setup.Plan(trigger, run).Note
         : "A fresh start did not begin its cutscene in a headless run" + (run.Failure is { } failure ? $" ({failure})" : "") +
-          ": the state its code tests is not reached by the boot, and no start setup is derived for this game yet.";
+          ": the state its code tests is not reached by the boot; its setup is still being worked out.";
 
     /// <summary>The rooms each run entered, keyed "room,object,verb", for saving between runs.</summary>
     public Dictionary<string, int[]> ExportRoomLists() =>

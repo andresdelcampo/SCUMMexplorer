@@ -109,7 +109,8 @@ public partial class MainWindow
                 Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), new ParallelOptions { MaxDegreeOfParallelism = parallel }, group =>
                 {
                     _scanGate.Wait();
-                    planner.Value.Run(group.First);
+                    // §8.6: a scene a fresh start does not begin gets its setup worked out now, so a pick plays it at once.
+                    if (!planner.Value.Run(group.First).Begun) planner.Value.PlanSetup(group.First);
                     CountScanStep(planner);
                 });
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists(), game.Language);
@@ -160,7 +161,7 @@ public partial class MainWindow
                planner.StartNote(first) + " " +
                "Stated start: the running play session (its state is kept), the room entered as a state preview when the session is elsewhere (the hero's arrival is assumed), " +
                (first.IsRoomEntry ? "then the room's entry scripts played again. " :
-                   $"then the object's verb 0x{first.VerbId:X2} run directly: an exploration action, not the game's click (the hero does not walk there, and the object may be untouchable in this state). ") +
+                   $"then the object's verb 0x{first.VerbId:X2} given to the game's sentence script with the hero put at the object (or run directly where the game refuses it): an exploration action, not the game's click. ") +
                "The frames play in the play screen on the game's clock, with its sounds.";
     }
 
@@ -196,10 +197,30 @@ public partial class MainWindow
         if (!PreparePlayCutsceneStartup(game)) return;
         _playPaused = false;
         var title = GenericCutsceneTitle(trigger);
+        // §8.6 (user, 31 Oct 2026): the state the scene needs is set, then it starts the way the plan found works; nothing is refused by the game's rules.
+        ScummScenePlan? plan = null;
+        if (_playPlanner is { } plannerLazy)
+        {
+            try { plan = await Task.Run(() => plannerLazy.Value.PlanSetup(trigger)); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { plan = null; }
+            if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_game, game) || !PlayActive || !ReferenceEquals(_play, session)) return;
+        }
         IReadOnlyList<string> uncertainties;
         try
         {
-            if (trigger.IsRoomEntry)
+            if (plan is { HasEdits: true } && session.ApplySceneSetup(plan.Edits).Count > 0 && !trigger.IsRoomEntry)
+            {
+                // What the room's entry derives from the new state (objects, who stands where) follows it, as in the plan's runs.
+                _sceneSound.StopAll("a picked scene's setup changed the room's state");
+                session.VisitRoom(room);
+            }
+            if (plan?.Result.Way == ScummPickedStart.AtCutscene && ScummSceneSetupSearch.FirstCutscene(game, trigger) is { } at)
+            {
+                if (session.CurrentRoomId != trigger.Room) session.VisitRoom(room);
+                session.StartSceneAt(at.Label, at.Offset);
+                uncertainties = session.Snapshot.Uncertainties;
+            }
+            else if (trigger.IsRoomEntry)
             {
                 // A room opened for the scene has just run its entry (the play visit, as the fresh-start run does); entering it again would run the
                 // entry a second time from the state the first one left, and an entry that marks its first time (Monkey Island CD's Room 19, the
@@ -220,7 +241,10 @@ public partial class MainWindow
                     _sceneSound.StopAll("a cutscene in another room was started from the list");
                     session.VisitRoom(room);
                 }
-                uncertainties = session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId).Uncertainties;
+                if (plan?.Result.Way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+                else session.PickInteraction(trigger.ObjectId, trigger.VerbId,
+                    plan?.Edits.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0);
+                uncertainties = session.Snapshot.Uncertainties;
             }
         }
         catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException or IOException)

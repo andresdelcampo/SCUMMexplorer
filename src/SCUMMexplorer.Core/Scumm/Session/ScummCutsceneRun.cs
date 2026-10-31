@@ -3,13 +3,30 @@ using SCUMMexplorer.Core.Domain;
 namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>What a headless run of a scanned trigger did: whether a cutscene began, the rooms other than the trigger's own it entered, the frames.</summary>
-public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> RoomsEntered, int Frames, string? Failure = null);
+/// <summary>How a picked scene was started (§8.6, R-8.35), in the order they are tried.</summary>
+public enum ScummPickedStart
+{
+    /// <summary>The room's entry, or the verb given to the game's sentence script (<see cref="ScummSession.PickInteraction"/>).</summary>
+    Game,
+    /// <summary>The object's verb code run directly (<see cref="ScummSession.ActivateObjectVerb"/>).</summary>
+    Direct,
+    /// <summary>The script holding the cutscene started at its <c>cutscene</c> (<see cref="ScummSession.StartSceneAt"/>).</summary>
+    AtCutscene,
+}
+
+public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> RoomsEntered, int Frames, string? Failure = null, int Lines = 0,
+    ScummPickedStart Way = ScummPickedStart.Game)
+{
+    /// <summary>Beginning at all outweighs everything; then the rooms the scene went on to and the lines it printed (as LOOM's <c>LoomSceneOutcome</c>).</summary>
+    public int Score => (Begun ? 10000 : 0) + RoomsEntered.Count * 20 + Lines;
+}
 
 /// <summary>
 /// Runs a scanned cutscene trigger headless in a fresh generic session (<see cref="ScummGameSession"/>), as <c>LoomCutsceneRun</c> does for LOOM (S7,
 /// 17 October 2026): the boot to the first playable room, the trigger's room visited as a state preview, then its entry script (the visit) or the
 /// object's verb run directly (an exploration action, not the game's click), and frames until the cutscene and its lines are over (no Escape, so a
-/// scene is not cut short). A load that sits in a branch the run does not take is not seen. No start setup is applied: this is a fresh start.
+/// scene is not cut short). A load that sits in a branch the run does not take is not seen. Without <c>setup</c> this is a fresh start; with it, a picked
+/// scene's setup (§8.6) is applied to the booted session before the room is visited, as if the game had reached that state earlier.
 /// </summary>
 public static class ScummCutsceneRun
 {
@@ -17,7 +34,21 @@ public static class ScummCutsceneRun
     public const int TrialFrames = 600;
 
     /// <param name="newSession">A fresh session booted to the first playable room (each call must give a new one).</param>
-    public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummGameSession> newSession, ScummCutscene trigger)
+    /// <summary>
+    /// A picked trigger (§8.6, R-8.35): the game's own way first (the entry, or the sentence script); when that does not begin the scene (the game's
+    /// own refusals: too dark, out of reach), the verb's code run directly; the fuller of the two.
+    /// </summary>
+    public static ScummCutsceneRunResult RunPicked(GameLibrary game, Func<ScummGameSession> newSession, ScummCutscene trigger,
+        IReadOnlyList<ScummSetupEdit>? setup = null)
+    {
+        var sentence = Run(game, newSession, trigger, setup);
+        if (sentence.Begun || trigger.IsRoomEntry) return sentence;
+        var direct = Run(game, newSession, trigger, setup, ScummPickedStart.Direct);
+        return direct.Score > sentence.Score ? direct : sentence;
+    }
+
+    public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummGameSession> newSession, ScummCutscene trigger,
+        IReadOnlyList<ScummSetupEdit>? setup = null, ScummPickedStart way = ScummPickedStart.Game)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(newSession);
@@ -25,20 +56,35 @@ public static class ScummCutsceneRun
         try
         {
             var session = newSession();
+            if (setup is { Count: > 0 }) session.ApplySceneSetup(setup);
             if (game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return new(false, [], 0, $"Room {trigger.Room} is not in the game's index");
             var earlier = session.CutscenesBegun;
             var traced = session.SessionTrace.Count;
             var mark = session.RoomsEntered.Count;
+            var logMark = session.Messages.Log.Count;
             // An entry trigger in the room the boot ends in plays that room's entry again (its first run was inside the boot's own cutscene).
-            if (trigger.IsRoomEntry) session.EnterRoomAgain(room);
+            if (trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene) session.EnterRoomAgain(room);
             else session.VisitRoom(room);
-            if (!trigger.IsRoomEntry)
+            if (way == ScummPickedStart.AtCutscene)
+            {
+                mark = session.RoomsEntered.Count;
+                earlier = session.CutscenesBegun;
+                traced = session.SessionTrace.Count;
+                logMark = session.Messages.Log.Count;
+                if (ScummSceneSetupSearch.FirstCutscene(game, trigger) is not { } at || !session.StartSceneAt(at.Label, at.Offset))
+                    return new(false, [], 0, "no cutscene the session can start in this room", Way: way);
+            }
+            else if (!trigger.IsRoomEntry)
             {
                 // The rooms the visit itself entered (a pseudo room, an entry that moves on) are not the scene's.
                 mark = session.RoomsEntered.Count;
                 earlier = session.CutscenesBegun;
                 traced = session.SessionTrace.Count;
-                session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+                logMark = session.Messages.Log.Count;
+                // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
+                var second = setup?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
+                if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+                else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second);
             }
             // Only a cutscene begun by a script the trigger's code reaches counts: a room's own background scripts begin cutscenes of their
             // own (Monkey Island's SCUMM Bar and High Street open and close doors through global scripts 25/26, each a short cutscene), and a visit's
@@ -61,7 +107,7 @@ public static class ScummCutsceneRun
                 if (!begun && frame >= TrialFrames) break;
                 session.StepFrame();
             }
-            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame);
+            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame, Lines: session.Messages.Log.Count - logMark, Way: way);
         }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NotSupportedException)
         {

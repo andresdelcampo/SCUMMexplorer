@@ -8,53 +8,64 @@ The product is an **explorer**: pick any room, trigger its interactions and cuts
 
 What this removes from the 30 October plan: the Play sign-off (R-7.7 to R-7.21 stay Proposed and are not a gate), Status beyond v1/v2 (old E5), the ten-room ScummVM comparison per game (spot checks instead), and session snapshots. What it adds: the scene setup of §8.6 for every game, and interactions in a picked room (R-8.38).
 
-## The finish line: six gates per game, in priority order
+## The ten features (the user's list, 31 October 2026)
 
-| Gate | Done when | Who closes it |
+The user's own reading of the roadmap: ten features every game should have, in the order an explorer meets them. A game is finished when all ten are ✅ and the user has tried it.
+
+| # | Feature | Done when |
 |---|---|---|
-| **A. Rooms** | Every room opens in its first-visit state with no gaps and never hangs; black areas explained (source) or fixed. | Agent fixes, user glances |
-| **B. Interactions** | In a room, every object that belongs to it (present or not yet) and each of its verbs with code can be picked and plays, the state set to allow it (R-8.38). | Agent |
-| **C. Cutscenes** | Every scene of the room is offered and plays when picked: its state set up (§8.6), or its code started directly where no setup makes it begin. Nothing hidden (R-8.35). | Agent |
-| **D. Looks and sounds** | The user spot-checked a few rooms, scenes and sounds against the game (ScummVM). | User |
-| **E. Editions** | Every local copy opened in the window once (language, accents, music device). | User |
-| **F. Signed off** | The user tried the game as an explorer and the decisions are made. | User |
+| 1 | **Rooms** | Every room is in the room selector and opens in its first-visit state, no gaps. |
+| 2 | **Costumes** | Every costume is read and shown in the game's palette. |
+| 3 | **Sounds** | Music, effects and CD tracks play on the game's sound devices (PC speaker, AdLib, Roland where the game has it); the user has listened. |
+| 4 | **Scripts available** | Every script can be opened (disassembly). |
+| 5 | **Room cutscenes** | Every cutscene of a room plays from that room when picked (§8.6, R-8.35): its state set up, or its code started directly. The game's intro counts too: Play Game Intro plays it in every game that has one (R-8.5c, R-6.38). |
+| 6 | **Interactions** | The room's Interact button offers every object that belongs to the room, present or not yet, with every verb that has code, and plays it (R-8.38). |
+| 7 | **Room sounds** | The room's Sounds button plays the sounds and music its scripts use (R-6.40). |
+| 8 | **Hotspots, doorways, paths, depth** | Hotspot and doorway overlays, walk boxes, depth masks right for the room. |
+| 9 | **Game state** | A Status window to set the game's state (§12). Optional under the scope: picked scenes set what they need themselves. |
+| 10 | **Readable scripts** | Scripts read as plain language with names for the game's variables, verbs and objects (reverse engineered, `docs/<game>/*_SCRIPT_MAP.md`). |
 
-Symbols: ✅ done · 🟡 works but unchecked or partial · 🔴 known gap · ⬜ not started · — not applicable. Play (§7.1) is not a gate.
+Symbols: ✅ done · 🟡 works but partial or not checked by the user · 🔴 known gap · ⬜ not started · — parked or not applicable. Play through the game's own interface is not a feature here (§7.1, last priority).
 
 ## The board
 
-| Game | A Rooms | B Interactions | C Cutscenes | D Looks/sounds | E Editions | F Signed off |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|
-| LOOM EGA English (reference) | 🟡 | ✅ | ✅ | ✅ | — | 🟡 |
-| LOOM EGA other editions, demos | ✅ | ✅ | 🟡 | 🟡 | 🔴 | 🟡 |
-| LOOM CD | ✅ | ✅ | 🟡 | 🟡 | — | 🟡 |
-| Indiana Jones 3 EGA | ✅ | 🟡 | 🔴 | 🟡 | ✅ | 🟡 |
-| Indiana Jones 3 256 colours | ✅ | 🟡 | 🔴 | 🟡 | ✅ | 🟡 |
-| Monkey Island 1 floppy | ✅ | 🟡 | 🔴 | 🟡 | 🟡 | 🟡 |
-| Monkey Island 1 CD | ✅ | 🟡 | 🔴 | 🟡 | 🟡 | 🟡 |
-| Monkey Island 2 | 🟡 | 🟡 | 🔴 | 🟡 | 🟡 | 🟡 |
-| Indiana Jones 4 | ✅ | 🟡 | 🔴 | 🟡 | 🟡 | 🟡 |
-| Maniac Mansion (classic, enhanced) | 🟡 | 🟡 | 🔴 | 🔴 | 🟡 | 🟡 |
-| Zak McKracken (classic, enhanced) | 🟡 | 🟡 | 🔴 | 🔴 | 🟡 | 🟡 |
+| Game | 1 Rooms | 2 Costumes | 3 Sounds | 4 Scripts | 5 Cutscenes | 6 Interactions | 7 Room sounds | 8 Hotspots… | 9 State | 10 Readable |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| LOOM EGA English (reference) | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| LOOM EGA other editions, demos | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| LOOM CD | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 1 (floppy, CD) | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 2 | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Indiana Jones 4 | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Maniac Mansion (classic, enhanced) | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
+| Zak McKracken (classic, enhanced) | ✅ | 🟡 | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
-B is 🟡 for the non-LOOM games because what a picked room offers today has not been compared with each object's verbs: the room lists hold the responses that contain a cutscene, and the rest is reached only through Play. C is 🔴 where entries begin nothing from a fresh start: Indy 3 58 of 153, Monkey Island 1 60 of 164 (CD 59 of 160), Monkey Island 2 95 of 260, Indy 4 216 of 426 groups, Maniac 20 or 21 of 27 groups (enhanced, classic), Zak 41 of 54.
+Why the cells are what they are (31 October 2026):
+- **3 Sounds** 🟡: every non-LOOM game plays its sounds on its devices, but the user has not listened (USER_CHECKS); LOOM CD's picture/voice/music timing is the user's run. Indy 4's CD image has no audio tracks (data).
+- **5 Cutscenes**: Indy 3 ✅ since 31 October: all 153 groups begin when picked (86 the game's own way, 6 its verb run directly, 12 with a setup, 49 started at their cutscene; [record](../.verification/scene-setup-20261031/README.md)). Monkey Island 1, 2, Indy 4, Maniac and Zak still have scenes that begin nothing from a fresh start (37–60%), next in line. LOOM's scanned editions and the CD use LOOM's own readiness search; not every entry is proven to begin.
+- **6 Interactions** 🟡 everywhere: the Interact button exists in every live game, but offers only objects present and touchable now, and runs the verb directly; R-8.38 (objects not yet present, the hero put at the object, the second object given) is the next step after 5.
+- **8** 🟡 for the non-LOOM games: hotspots, doorways and walk boxes work; depth masks are read generically and were never compared with ScummVM (R-6.16).
+- **9 Game state** — for Indy 3, Monkey Island 1 and 2, Indy 4: parked; the setup of a picked scene does what Status would be used for. Revisit if the user wants to set state by hand.
+- **10 Readable** 🟡: the readable view works for every game, but names come only from LOOM's glossary; the other games show variable numbers. Their script maps (`docs/indy3`, `monkey1`, `monkey2`, `indy4`) hold decoded names to feed it.
 
 ## The work, in order
 
 | # | Work | Unlocks | Where in the code |
 |---|---|---|---|
-| 1 | **Scene setup for every game (§8.6).** Move LOOM's readiness search (`LoomCutsceneReadiness`) to the engine layer and widen what it may set: object states and owners (items given), actors placed and dressed. First Indy 3 (58 groups), measure, then Monkey Island 1, Monkey Island 2, Indy 4. | C for six game groups | `Loom/Scenes/LoomCutsceneReadiness.cs` → `Scumm/Session/`, `ScummCutscenePlanner.cs` |
-| 2 | **Interactions in a picked room (R-8.38).** Compare what each room offers with its objects' verbs that have code; offer the missing ones as exploration actions (hero put next to the object, second object given). | B for every non-LOOM game | room lists (`ScummCutsceneIndex`), `ScummSession.StartObjectScript` |
-| 3 | **Derivation time.** The setup search adds trial runs to the background derivation (MI2 already 140–174 s). Share one booted copy between trials; cache plans per build+data (as R-8.21). | Keeps C usable | `ScummCutscenePlanner`, `ScummBoundedScriptExecutor` |
-| 4 | **The user's reports** as they arrive (the crash log records game and room). | A | — |
-| 5 | **One user pass per game** with [USER_CHECKS](USER_CHECKS.md): a few rooms, scenes and sounds next to ScummVM; each copy opened once. | D, E, F | — |
-| 6 | **Release** (LOOM first): packaging, version, clean-profile first run, Roland without ROMs. | — | `src/SCUMMexplorer.App` |
+| 1 | **Scene setup for every game (§8.6).** Engine-layer search (`ScummSceneSetupSearch`): bits, story variables, object states, items held, the second object of a two-object verb, actors' costume and room; the game's sentence script, then the verb run directly, then the cutscene started directly. **Indy 3 done 31 October** (153 of 153). Next: Monkey Island 1, Monkey Island 2, Indy 4, then LOOM's scanned editions and Maniac/Zak. | Feature 5 | `Loom/Scenes/LoomCutsceneReadiness.cs` → `Scumm/Session/`, `ScummCutscenePlanner.cs` |
+| 2 | **Interactions in a picked room (R-8.38).** Compare what each room offers with its objects' verbs that have code; offer the missing ones as exploration actions (hero put next to the object, second object given), using the same setup. | Feature 6 | room lists (`ScummCutsceneIndex`), `ScummSession.StartObjectScript` |
+| 3 | **Derivation time.** The setup search adds trial runs to the background derivation (MI2 already 140–174 s). Share one booted copy between trials; cache plans per build+data (as R-8.21). | Keeps 5 usable | `ScummCutscenePlanner`, `ScummBoundedScriptExecutor` |
+| 4 | **Readable names for the other games** from their script maps. | Feature 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
+| 5 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
+| 6 | **One user pass per game** with [USER_CHECKS](USER_CHECKS.md): a few rooms, scenes and sounds next to ScummVM; each copy opened once. | 3, sign-off | — |
+| 7 | **Release** (LOOM first): packaging, version, clean-profile first run, Roland without ROMs. | — | `src/SCUMMexplorer.App` |
 
 Optional, when the code is next touched: a ScummVM picture capture for comparisons (the bundled build showed a white window for Indy 3), app structure (`MainWindow.xaml.cs` split, LOOM-keyed code into the LOOM module), profile allow-lists as defaults, worktree housekeeping. Dropped by the scope decision: Status beyond v1/v2, new Play features, session snapshots.
 
 ## Per game: the steps left
 
-Steps marked **(shared)** are one piece of work in the list above. Earlier records stay linked for the facts they hold.
+Steps marked **(shared)** are one piece of work in the list above. Their letters are the 30 October gates: A rooms (features 1, 8), B interactions (6), C cutscenes (5), D looks and sounds (2, 3), E editions, F sign-off. Earlier records stay linked for the facts they hold.
 
 ### LOOM EGA English (reference)
 1. A — Confirm or reproduce: Room 2 skipped cutscene leaving Bobbin small; Rooms 15/18/20 staff notes (fix of 11 October); Room 34 standalone fortress reveal (local 200 +0035).

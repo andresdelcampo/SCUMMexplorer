@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: every Indy 3 cutscene plays when picked (scene setup in the engine)
+
+The user's scope (REQUIREMENTS R-1.14, §8.6): explore everything, the game's rules never forbid a pick. `ScummSceneSetupSearch` (engine layer) finds the state a scene's own code tests (bits, story variables, object states, items held, the second object of a two-object verb, an actor's costume or room) by trial runs, as LOOM's readiness search does; a pick goes through the game's sentence script with the hero put at the object, then the verb run directly, then the cutscene started directly. Indy 3 EGA: all 153 groups begin (86 the game's way, 6 direct, 12 with a setup, 49 at their cutscene; none before began 58). The app applies the plan when a scene is picked. `ScummSceneSetupTests`; full suite 1840 passed ([record](../.verification/scene-setup-20261031/README.md)). Not yet looked at in the real window.
+
 ## 31 October: a held object's verb in another room
 
 "Look at" on an inventory slot in Indy 3 said nothing outside the room the object was taken in: Script 2 measures the ego's distance to the object, and the executor gave a held object its owner's position only in versions 1 and 2. As ScummVM's `getObjectOrActorXY` does in every version, a held object now stands where its owner stands when the owner is in the room (else -1 / 0xFF) for `getDist` and `getActorX`/`getActorY`. `ScummIndy3PlayTests.AHeldObjectsVerbRunsInAnotherRoom` takes the junk mail in Room 2 and looks at it in Room 73 ([record](../.verification/indy3-rooms-20261030/README.md), addendum 31 Oct).

@@ -23,10 +23,12 @@ Harnesses added today: `.verification/mi2-intro-protection-20261030/IntroWindowC
 
 The user narrowed the product (REQUIREMENTS R-1.14 and §8.6, rewritten [ROADMAP](docs/ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; no save/load; Play stays as it is and comes last. Build incrementally.
 
+The roadmap board follows the user's ten features (docs/ROADMAP.md; pinned artifact https://claude.ai/artifact/A1UGbJ2NDy8WnZpSsviVjy updated 31 Oct). Open questions to the user: a Cutscenes node in the Advanced tree; whether Status (feature 9) stays parked for Indy 3, MI1, MI2, Indy 4.
+
 ## Next, in order
 
-1. **Scene setup for every game (§8.6, roadmap item 1), Indy 3 first.** Read `Loom/Scenes/LoomCutsceneReadiness.cs` (the LOOM search: fresh trials, raise one tested story item at a time, keep it when the scene begins or reaches further) and `Scumm/Session/ScummCutscenePlanner.cs`. Move the search to `Scumm/` and widen it to object states and owners (items given), actors placed and dressed. Measure on Indy 3's 58 groups that begin nothing ([record](.verification/indy3-cutscenes-20261017/README.md)), then Monkey Island 1 (Script 117's SCUMM Bar exit: open door, `bit[0x1BE]`), Monkey Island 2, Indy 4. Keep LOOM's behaviour unchanged (before/after on its tests).
-2. Interactions in a picked room (R-8.38): compare what a room offers with its objects' verbs that have code.
+1. **Scene setup for the other games (§8.6).** Done for Indy 3 on 31 October (`ScummSceneSetupSearch`, `ScummSession.ApplySceneSetup`/`PickInteraction`/`StartSceneAt`, `ScummCutsceneRun.RunPicked`, `ScummCutscenePlanner.PlanSetup`; [record](.verification/scene-setup-20261031/README.md), harness `Measure`). First look at one setup scene (Room 2 jar, Room 39 hatch) and one at-cutscene scene in the real window (no harness plays a cutscene from the list yet). Then measure Monkey Island 1 (floppy, CD), Monkey Island 2 (watch the derivation time), Indy 4; add candidate kinds where their code needs them.
+2. Interactions in a picked room (R-8.38): Interact (`MainWindow.GenericRoomActions.cs`) offers only objects present and runs `ActivateObjectVerb`; offer every object of the room with every verb that has code and use `PickInteraction` plus the same setup.
 3. Derivation time once the setup adds trials (MI2 140–174 s).
 4. The user's crash and "thin black rooms" reports when they name the game and room. `dotnet-trace` is installed for UI stalls (`--profile dotnet-sampled-thread-time --format Speedscope`, with `LaunchStalls`).
 5. Release readiness for LOOM.
