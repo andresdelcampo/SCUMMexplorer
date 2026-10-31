@@ -21,7 +21,7 @@ if (Environment.GetEnvironmentVariable("COMPARE_TRACE") is { Length: > 0 } spec)
     session.PickInteraction(p[1], p[2]);
     for (var f = 0; f < 600 && session.CurrentRoomId == p[0]; f++) session.StepFrame();
     Console.WriteLine($"now: room {session.CurrentRoomId}");
-    foreach (var line in session.SessionTrace.Skip(mark).Where(l => l.Contains("load", StringComparison.OrdinalIgnoreCase) || l.Contains("Room 02") || l.StartsWith("picked") || l.Contains("sentence")).Take(25)) Console.WriteLine("  " + line);
+    foreach (var line in session.SessionTrace.Skip(mark).Where(l => Environment.GetEnvironmentVariable("COMPARE_TRACE_ALL") == "1" || l.Contains("load", StringComparison.OrdinalIgnoreCase) || l.Contains("Room 02") || l.StartsWith("picked") || l.Contains("sentence")).Take(60)) Console.WriteLine("  " + line);
     return;
 }
 // COMPARE_LOOM_SESSION=1: the shared planner runs on LOOM's own session (LoomExplorationSession), as the app would play LOOM through it.

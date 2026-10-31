@@ -181,15 +181,21 @@ public sealed partial class ScummSceneSetupSearch
                         Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState, where));
                         Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState == 0 ? 1 : 0, where));
                         break;
+                    case "getObjectOwner" when parts.Length >= 2 && objectCode && trigger.ObjectId != 0 && Literal(parts[1]) is null &&
+                                               VariablePattern().Match(parts[1]) is { Success: true } selfOwner && selfOwner.Value == parts[1] && !written.Contains(parts[1]):
+                        // The owner of "this object" (a variable the sentence script set: Indy 3 var[0x007]): the picked object itself held (Indy 3
+                        // Room 17's books: Look shows the inscription only once the book is held, +0x0000 getObjectOwner then isEqual 0x0F).
+                        Add(new(ScummSetupKind.Held, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), 1, where, trigger.Room));
+                        break;
                     case "getObjectOwner" when parts.Length >= 2 && Literal(parts[1]) is int held:
                         // An item no room holds (inventory-only: Indy 4's sandwich makings) is given without a room of its own code.
                         Add(new(ScummSetupKind.Held, held.ToString(CultureInfo.InvariantCulture), 1, where,
                             _objectRooms.Value.TryGetValue(held, out var room) ? room : null));
                         break;
-                    case "ifClassOfIs" when ins.Operands.IndexOf('[') is var open and > 0 &&
+                    case "ifClassOfIs" when ins.Operands.IndexOf(", [", StringComparison.Ordinal) + 2 is var open and > 1 &&
                                             (Literal(parts[0]) ?? (objectCode && trigger.ObjectId != 0 && parts[0] == "var[0x007]" ? trigger.ObjectId : null)) is int classed:
                     {
-                        // ScummVM o5_ifClassOfIs: a class with bit 0x80 must be set, one without must be clear, and the code after the test runs when
+                        // The list is the bracket after the object (not the one in var[0x007]). ScummVM o5_ifClassOfIs: a class with bit 0x80 must be set, one without must be clear, and the code after the test runs when
                         // all hold; the scene may sit on either side, so both are tried (Indy 4's cupboard, Room 92 object 1194 +0x0000).
                         foreach (var item in ins.Operands[(open + 1)..ins.Operands.IndexOf(']', open)].Split(',', StringSplitOptions.TrimEntries))
                             if (Literal(item) is int cls && (cls & 0x7F) is > 0 and <= 32)

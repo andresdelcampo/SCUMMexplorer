@@ -10,6 +10,19 @@ int? onlyRoom = args.Length > 2 ? int.Parse(args[2]) : null;
 var clock = Stopwatch.StartNew();
 var planner = new ScummCutscenePlanner(game);
 Console.WriteLine($"{planner.Groups.Count} groups, planner ready in {clock.Elapsed.TotalSeconds:F1} s");
+if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 } code)
+{
+    // MEASURE_OBJECT_CODE=room,object,verb(hex): the verb code as the data source decodes it for the planner.
+    var p = code.Split(',');
+    var data = ScummDataSources.For(game);
+    var record = data.ReadRoom(int.Parse(p[0])).Objects.First(o => o.Id == int.Parse(p[1]));
+    foreach (var ins in data.ReadObjectVerb(int.Parse(p[0]), record, Convert.ToInt32(p[2], 16), out var entry)!.Instructions.Take(6))
+        Console.WriteLine($"  {ins.Offset:X4} {ins.Operation} {ins.Operands}");
+    var codePlanner = new ScummCutscenePlanner(game);
+    foreach (var t in codePlanner.Triggers.Where(t => t.Room == int.Parse(p[0]) && t.ObjectId == int.Parse(p[1]) && t.VerbId == Convert.ToInt32(p[2], 16)))
+        foreach (var c in codePlanner.Setup.Candidates(t)) Console.WriteLine($"  candidate {c.Kind} {c.Target} {c.Value}: {c.Describe()}");
+    return;
+}
 if (Environment.GetEnvironmentVariable("MEASURE_VERBS") == "1")
 {
     Console.WriteLine($"verb source: {planner.VerbSource}");

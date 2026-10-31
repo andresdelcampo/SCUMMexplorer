@@ -85,6 +85,32 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ABookLookedAtIsHeldFirstWhenItsCodeAsksWhoOwnsThisObject()
+    {
+        // Indy 3 Room 17 object 241 verb 0x09 +0x0000: getObjectOwner of var[0x007] ("this object"), and only a book already held shows the inscription
+        // (the cutscene at +0x0055); the setup gives the picked book to the hero.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var plan = planner.PlanSetup(Trigger(planner, 17, 241, 0x09));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.Held, Target: "241" });
+    }
+
+    [Fact]
+    public void AClassTestOfThisObjectReadsTheClassListNotTheVariable()
+    {
+        // Indy 4 Room 40 object 462 verb 0x09 +0x0000: ifClassOfIs var[0x007], [0x0088]; the class list is the second bracket (class 8 set), not the
+        // "[0x007]" of the variable (which read as class 7 until 31 October).
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var candidates = planner.Setup.Candidates(Trigger(planner, 40, 462, 0x09));
+        Assert.Contains(candidates, edit => edit is { Kind: ScummSetupKind.ObjectClass, Target: "462", Value: 8 });
+        Assert.DoesNotContain(candidates, edit => edit is { Kind: ScummSetupKind.ObjectClass, Value: 7 or -7 });
+    }
+
+    [Fact]
     public void TheHatchSceneGoesOnThroughItsRoomsOnceItsStateIsSet()
     {
         // Room 39 object 586 verb 0x0A (the hatch) +0x0000 tests its own state: with state 1 the scene plays its 18 lines through Rooms 41, 42 and 8.
