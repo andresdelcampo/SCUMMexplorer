@@ -46,6 +46,16 @@ internal static class Program
                 Log($"derivation done={Field("_playRoomListsDone")}");
                 foreach (var raw in args.Skip(2))
                 {
+                    // r:room opens the room as a pick in the room selector does (a catalog visit).
+                    if (raw.StartsWith("r:", StringComparison.Ordinal))
+                    {
+                        var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                        var resource = game.Rooms.First(r => r.ResourceId == int.Parse(raw[2..]));
+                        var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
+                        Call("SelectRoomWithIntent", resource, Enum.Parse(kind, "Catalog"), true);
+                        for (var i = 1; i <= 4; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); }
+                        continue;
+                    }
                     // i:room,object,verb picks an interaction of the room shown (the Interact menu's choice, RunGenericRoomAction).
                     if (raw.StartsWith("i:", StringComparison.Ordinal))
                     {

@@ -132,10 +132,7 @@ public abstract partial class ScummSession
             ActivateObjectVerb(objectA, verb);
             return;
         }
-        var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : 0;
-        if (ego != 0 && _runtime.Actors[ego].Room == _runtime.CurrentRoom && _currentObjects.FirstOrDefault(item => item.Id == objectA) is { } record &&
-            (record.WalkX, record.WalkY) != (0, 0))
-            _runtime.Actors.Put(ego, record.WalkX, record.WalkY, CurrentPlacement(), ego);
+        PutHeroAtObject(objectA);
         _runtime.Sentences.Add((verb, objectA, objectB));
         _uncertainties.Add($"Object {objectA} verb 0x{verb:X2}{(objectB != 0 ? $" with object {objectB}" : "")} was picked: the hero was put at the object and the " +
                            $"sentence given to the game's sentence script {sentence} (an exploration action, not the player's click).");
@@ -190,6 +187,73 @@ public abstract partial class ScummSession
             _entersRoomLoads--;
         }
         FinishInput(beforeUncertainties, beforeEvents);
+        return true;
+    }
+
+    /// <summary>
+    /// A picked object that is not in the room yet (R-8.36, user 31 October 2026: "if the object is not yet in the room but might be later, doesn't
+    /// matter"): the room is made its owner again (unless the hero holds it), its untouchable class is cleared, a parent object is put in the state
+    /// the object needs (<c>RoomHotspotRules</c>), and a state of 0 becomes its first image when it has one. An object that is a hotspot now is left alone, so one
+    /// shown in its state 0 (a closed door) is never changed. Returns what was changed.
+    /// </summary>
+    public IReadOnlyList<string> BringObjectIntoRoom(int objectId)
+    {
+        var changed = new List<string>();
+        if (_currentObjects.FirstOrDefault(item => item.Id == objectId) is not { } record) return changed;
+        // Present already (owned by the room, touchable, its parent in the right state): left as it is, whatever its state.
+        if (RoomHotspotRules.IsHotspot(record, _currentObjects, Snapshot, _runtime.IsV2 ? (byte)8 : (byte)15)) return changed;
+        if (_runtime.ObjectOwners.TryGetValue(objectId, out var owner) && owner != 0x0F && Array.IndexOf(_runtime.InventorySlots, objectId) < 0)
+        {
+            _runtime.SetObjectOwner(objectId, 0x0F);
+            changed.Add($"object {objectId} given back to the room (owner {owner})");
+        }
+        if (_runtime.ObjectClasses.TryGetValue(objectId, out var classes) && ScummObjectClasses.Has(classes, _runtime.UntouchableClass))
+        {
+            _runtime.SetObjectClasses(objectId, classes & ~(1u << (_runtime.UntouchableClass - 1)));
+            changed.Add($"object {objectId} made touchable (class {_runtime.UntouchableClass} cleared)");
+        }
+        var current = record;
+        for (var steps = 0; current.ParentLocalIndex != 0 && steps < _currentObjects.Count; steps++)
+        {
+            if (_currentObjects.FirstOrDefault(item => item.LocalIndex == current.ParentLocalIndex) is not { } parent) break;
+            if ((_runtime.ObjectStates.GetValueOrDefault(parent.Id) & 0x0F) != current.ParentRequiredState)
+            {
+                _runtime.SetObjectState(parent.Id, (byte)current.ParentRequiredState);
+                changed.Add($"parent object {parent.Id} in state {current.ParentRequiredState}");
+            }
+            current = parent;
+        }
+        if (_runtime.ObjectStates.GetValueOrDefault(objectId) == 0 && record.ImageOffset is not null)
+        {
+            _runtime.SetObjectState(objectId, 1);
+            changed.Add($"object {objectId} shown in state 1");
+        }
+        if (changed.Count > 0)
+            _uncertainties.Add($"Object {objectId} was not in the room; for the picked interaction: {string.Join("; ", changed)} (an exploration action, REQUIREMENTS R-8.36).");
+        return changed;
+    }
+
+    /// <summary>
+    /// The hero teleported to a picked object (R-8.38): put in the current room when elsewhere, at the object's walk point (or under the object when it
+    /// has none), shown, and followed by the camera, so the object's response is said and seen. Returns false when the game has no hero or the object
+    /// is not in the room's data.
+    /// </summary>
+    public bool PutHeroAtObject(int objectId)
+    {
+        var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : 0;
+        if (ego == 0 || _runtime.CurrentRoom is not int room || _currentObjects.FirstOrDefault(item => item.Id == objectId) is not { } record) return false;
+        var (x, y) = (record.WalkX, record.WalkY) != (0, 0) ? (record.WalkX, record.WalkY) : (record.X + record.Width / 2, record.Y + record.Height);
+        var place = CurrentPlacement();
+        var elsewhere = _runtime.Actors[ego].Room != room;
+        _runtime.Actors.Put(ego, x, y, room, place, ego);
+        if (elsewhere)
+        {
+            _runtime.Actors.ShowActorsIn(place);
+            _uncertainties.Add($"The hero (actor {ego}) was not in Room {room:00}; for the picked interaction it was put at object {objectId} (an exploration action, REQUIREMENTS R-8.38).");
+        }
+        _runtime.Camera.Mode = ScummCamera.FollowActor;
+        _runtime.Camera.Follows = ego;
+        _runtime.Camera.MovingToActor = true;
         return true;
     }
 }

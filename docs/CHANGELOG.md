@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: picked objects that are not in the room yet are brought in, and the hero with them
+
+An Interact pick on an object that is not in the room now makes it present (owner, touchable, its parent's state, a first image), and the hero is put at it with the camera following, even in a room the hero never enters at that point of the story (Indy 3 Room 13's trellis: "I think it could hold my weight if I could get to it."). A present object is never changed. ([record](../.verification/scene-setup-20261031/README.md))
+
 ## 31 October: Interact offers every object of the room and plays it like a picked scene
 
 Indy 3, Monkey Island 1 and 2, Indy 4: the Interact button lists every object of the room's data with each verb that has code (on screen first), and a choice goes the way of a picked scene (the room opened again if a scene plays, the state its code tests set, the hero put at the object, the game's sentence script). A pick also ends a scene still playing. Seen in the window: Indy 3's junk mail and package (the Grail Diary scene, after its setup bit), Monkey Island 1's SCUMM Bar exit ("Meanwhile"). ([record](../.verification/scene-setup-20261031/README.md))

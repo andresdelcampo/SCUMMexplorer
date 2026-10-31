@@ -404,7 +404,7 @@ public partial class MainWindow
         {
             var trigger = new ScummCutscene(pickedRoom, action.Object, action.Target, action.Verb,
                 [$"Room {pickedRoom} object {action.Object} verb 0x{action.Verb:X2}"], 0, 0, 0, "");
-            await PlayScummCutsceneAsync(new ScummCutsceneGroup(trigger, []), action.Title);
+            await PlayScummCutsceneAsync(new ScummCutsceneGroup(trigger, []), action.Title, interaction: true);
             _genericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: picked.", action.Source,
                 _play?.Snapshot.Uncertainties.TakeLast(6).ToArray() ?? [], action.Code);
             UpdateGenericAssumptions();

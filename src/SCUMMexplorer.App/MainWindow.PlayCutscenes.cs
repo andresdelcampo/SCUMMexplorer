@@ -173,7 +173,8 @@ public partial class MainWindow
     /// </summary>
     private async void PlayScummCutscene(ScummCutsceneGroup group) => await PlayScummCutsceneAsync(group, null);
 
-    private async Task PlayScummCutsceneAsync(ScummCutsceneGroup group, string? shownTitle)
+    /// <param name="interaction">A pick from Interact (R-8.38): an object that is not in the room yet is brought into it first.</param>
+    private async Task PlayScummCutsceneAsync(ScummCutsceneGroup group, string? shownTitle, bool interaction = false)
     {
         var trigger = group.First;
         if (!PlayCanStartCutscene || _game is not { } game || game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return;
@@ -219,6 +220,12 @@ public partial class MainWindow
                 // What the room's entry derives from the new state (objects, who stands where) follows it, as in the plan's runs.
                 _sceneSound.StopAll("a picked scene's setup changed the room's state");
                 session.VisitRoom(room);
+            }
+            if (interaction && !trigger.IsRoomEntry)
+            {
+                if (session.CurrentRoomId != trigger.Room) session.VisitRoom(room);
+                session.BringObjectIntoRoom(trigger.ObjectId);
+                session.PutHeroAtObject(trigger.ObjectId);
             }
             if (plan?.Result.Way == ScummPickedStart.AtCutscene && ScummSceneSetupSearch.FirstCutscene(game, trigger) is { } at)
             {

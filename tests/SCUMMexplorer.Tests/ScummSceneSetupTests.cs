@@ -78,4 +78,29 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         Assert.Empty(session.ApplySceneSetup([new(ScummSetupKind.Bit, $"bit[0x{bit:X3}]", 1, "test"), new(ScummSetupKind.Variable, variable, 7, "test")]));
         Assert.Equal(1000, session.Snapshot.KnownGlobalVariables[variable]);
     }
+
+    [Fact]
+    public void APickedObjectThatIsNotInTheRoomYetIsBroughtIn()
+    {
+        // R-8.36/R-8.38: an object of the room's data that is not a hotspot at the first visit (owned elsewhere, untouchable, its parent in another state)
+        // becomes one for its picked interaction; one that is present already is left as it is.
+        if (Indy3() is not { } game) return;
+        foreach (var roomId in new[] { 2, 13, 26, 39 })
+        {
+            var session = ScummGameSession.BootForPlay(game, out _);
+            session.VisitRoom(game.Rooms.First(r => r.ResourceId == roomId));
+            var records = ScummDataSources.For(game).ReadRoom(roomId).Objects;
+            bool Present(ScummRoomObjectRecord record) => RoomHotspotRules.IsHotspot(record, records, session.Snapshot);
+            var absent = records.Where(r => r.Width > 0 && r.Height > 0 && (r.X, r.Y) != (0, 0) && !Present(r)).ToList();
+            var present = records.FirstOrDefault(Present);
+            output.WriteLine($"Room {roomId}: absent [{string.Join(", ", absent.Select(r => r.Id))}], present {present?.Id}");
+            if (present is not null) Assert.Empty(session.BringObjectIntoRoom(present.Id));
+            foreach (var record in absent)
+            {
+                var changed = session.BringObjectIntoRoom(record.Id);
+                output.WriteLine($"  object {record.Id}: {string.Join("; ", changed)}");
+                Assert.True(Present(record), $"Room {roomId} object {record.Id} is still not in the room");
+            }
+        }
+    }
 }

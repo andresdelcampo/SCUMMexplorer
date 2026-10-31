@@ -62,4 +62,16 @@ The Interact button (`InteractionOverview`, the object menu and the Advanced ACT
 | Indy 3 Room 2 "Pick up · letters" (object 66, another state of the mail) | runs, no line (pick-ups print none) |
 | Monkey Island 1 floppy, Room 28 "Walk to door" (Script 117: the door open and `bit[0x1BE]`) | "Meanwhile^", then LeChuck's ship (Room 70) |
 
-Open: an object that is not in the room yet is not drawn when its response plays (the setup sets only what the code tests); the second object of "Use X with Y" is given only where the verb's code compares it.
+Open: the second object of "Use X with Y" is given only where the verb's code compares it.
+
+### Objects not in the room yet, and the hero brought to them (31 October)
+
+`ScummSession.BringObjectIntoRoom`: for a picked interaction on an object that is not a hotspot now (`RoomHotspotRules`), the room becomes its owner again (unless the hero holds it), its untouchable class is cleared, a parent object is put in the state it needs, and a state of 0 becomes its first image when it has one. A present object is never changed (a closed door shown in state 0 stays closed). `ScummSession.PutHeroAtObject`: the hero is put in the room at the object's walk point when it is elsewhere, shown, and the camera follows it; `PickInteraction` uses it too.
+
+| Check | Result |
+|---|---|
+| `ScummSceneSetupTests.APickedObjectThatIsNotInTheRoomYetIsBroughtIn` (Indy 3 Rooms 2, 13, 26, 39) | every absent object becomes a hotspot (Room 13: the trellis objects 163, 165; Room 26: 24 objects, one through its parent's state); a present one is left alone |
+| Window, Indy 3 Room 13 (the castle wall, which Indy reaches only later; its entry leaves the room, so the room is a still picture), "Look · trellis" | before: no line (no hero in the room); after: Indy at the trellis, the camera on him, "I think it could hold my weight if I could get to it." ([picture](window/i-13-163-9.png)) |
+| `Measure` Indy 3 again | unchanged: 153 begin, 10 started at their cutscene show nothing |
+
+Seen on the way: Room 13's entry scene, started at its cutscene (it needs Script 52's argument, the outfit), jumps to Room 73: one of the at-cutscene starts to improve.
