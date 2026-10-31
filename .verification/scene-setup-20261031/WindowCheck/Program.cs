@@ -43,6 +43,8 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 await Pump(3);
+                // A slow game (Indy 4) starts its scene derivation later; a game without one (LOOM) never does.
+                for (var i = 0; i < 40 && Field("_playPlanner") is null && Field("_session") is null; i++) await Pump(1);
                 for (var i = 0; i < 300 && Field("_playPlanner") is not null && !(bool)Field("_playRoomListsDone")!; i++) await Pump(1);
                 Log($"derivation done={Field("_playRoomListsDone")}");
                 foreach (var raw in args.Skip(2))

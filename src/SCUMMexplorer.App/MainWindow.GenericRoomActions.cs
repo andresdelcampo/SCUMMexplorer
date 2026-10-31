@@ -159,9 +159,12 @@ public partial class MainWindow
     // Resolve only these small display words again, never the room/scripts/geometry.
     private bool RefreshGenericRoomActionWords()
     {
-        var words = _playFolder == _game?.Key && _play is { PlayerHasControl: true } session && session.CurrentRoomId == _genericActionsRoom
-            ? ScummCutscenePlanner.VerbsOf(session, _genericReadable)
-            : _playPlanner is { IsValueCreated: true } lazy ? lazy.Value.Verbs : ScummCutsceneVerbs.None;
+        // The session's own names where it has them; otherwise the names the planner read once the game showed its verbs (Indy 4's catalog rooms
+        // play before the credits have built the verb area, so their session has none: every action read "Action", 31 October 2026).
+        var sessionWords = _playFolder == _game?.Key && _play is { PlayerHasControl: true } session && session.CurrentRoomId == _genericActionsRoom
+            ? ScummCutscenePlanner.VerbsOf(session, _genericReadable) : ScummCutsceneVerbs.None;
+        var plannerWords = _playPlanner is { IsValueCreated: true } lazy ? lazy.Value.Verbs : ScummCutsceneVerbs.None;
+        var words = ScummCutsceneVerbs.None with { Word = verb => sessionWords.Word?.Invoke(verb) ?? plannerWords.Word?.Invoke(verb) };
         var changed = false;
         for (var index = 0; index < _genericSourceActions.Count; index++)
         {

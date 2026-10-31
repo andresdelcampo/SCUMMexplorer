@@ -10,6 +10,15 @@ int? onlyRoom = args.Length > 2 ? int.Parse(args[2]) : null;
 var clock = Stopwatch.StartNew();
 var planner = new ScummCutscenePlanner(game);
 Console.WriteLine($"{planner.Groups.Count} groups, planner ready in {clock.Elapsed.TotalSeconds:F1} s");
+if (Environment.GetEnvironmentVariable("MEASURE_VERBS") == "1")
+{
+    Console.WriteLine($"verb source: {planner.VerbSource}");
+    foreach (var v in Enumerable.Range(1, 0x80)) if (planner.Verbs.Word?.Invoke(v) is { } w) Console.WriteLine($"  verb 0x{v:X2} = {w}");
+    var boot = ScummGameSession.BootForPlay(game, out _);
+    ScummCutscenePlanner.UntilAVerbIsOn(boot);
+    foreach (var verb in boot.Verbs.Take(20)) Console.WriteLine($"  session verb 0x{verb.VerbId:X2} mode {verb.Mode} name [{verb.Name}] image {verb.ImageObject}");
+    return;
+}
 int fresh = 0, setup = 0, still = 0, n = 0;
 foreach (var group in planner.Groups)
 {

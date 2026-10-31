@@ -44,7 +44,8 @@ public static class ScummCutsceneRun
         var sentence = Run(game, newSession, trigger, setup);
         if (sentence.Begun || trigger.IsRoomEntry) return sentence;
         var direct = Run(game, newSession, trigger, setup, ScummPickedStart.Direct);
-        return direct.Score > sentence.Score ? direct : sentence;
+        // On a tie the verb's own code wins: the sentence script's answer is then the game's refusal ("I can't get there from here", Indy 4's crate).
+        return direct.Score >= sentence.Score ? direct : sentence;
     }
 
     public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummGameSession> newSession, ScummCutscene trigger,
