@@ -36,4 +36,17 @@ Of the 49 started at their cutscene, most print lines or animate (up to 11 lines
 
 - `ScummSceneSetupTests` (new): the jar's second object, the hatch's state and rooms, every Indy 3 group begins when picked, a setup raises only what the session lacks.
 - Full suite: see CHANGELOG.
-- Not done: a look in the real window (Play Cutscene in Indy 3 for one setup scene and one at-cutscene scene), and the other games (Monkey Island 1, 2, Indy 4 next).
+- Real window (`WindowCheck/`, real `MainWindow`, private profile; the scene's Play action from the list): Room 39's hatch plays with object 586 set to state 1 and goes on to Room 41; Room 2's jar used with object 133 says "It seems to be working^" and "Hey! There's a key in here!" ([picture](window/2-71-8.png)); Room 13's brick, started at its cutscene, shows the castle wall without Indy and then loads Room 2 ([picture](window/13-164-8.png)): the at-cutscene start is a fallback of mixed quality.
+- The window check found that a pick was ignored while another scene still played (the hatch's scene runs on for a minute); since 31 October a pick ends the running scene by opening the room again, as a manual room change does (R-8.5a). Maniac and Zak keep their startup rule.
+
+## The other games (31 October, no new code)
+
+| Game | Groups | The game's way or direct | Setup | At the cutscene | Of those, ending at once with no line |
+|---|---|---|---|---|---|
+| Indy 3 EGA | 153 | 92 | 12 | 49 | 10 |
+| Monkey Island 1 floppy (`monkey1 ega en`) | 164 | 105 | 12 | 47 | 10 |
+| Monkey Island 1 CD (`monkey1 vga en`) | 160 | 102 | 12 | 46 | 10 |
+| Monkey Island 2 (`mi2 mt32 en`) | 190 | 100 | 7 | 83 | 24 |
+| Indy 4 (`indy4 vga en`) | 426 | 227 | 30 | 169 | 35 |
+
+Every group begins when picked in all five. The at-cutscene starts that end at once (their scene reads locals or state the skipped tests set) are the next quality step; runs: `*-run1.txt`.

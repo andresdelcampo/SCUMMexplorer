@@ -24,9 +24,11 @@ public partial class MainWindow
     /// <summary>The open game lists its cutscenes from its scripts and plays them in the play screen.</summary>
     private bool PlayCutscenes => _game is { } game && !HasDedicatedSession && ScummProfile.For(game).PlaysThroughVerbs && GameSupport.For(game).Cutscenes;
 
+    // §8.6 (user, 31 Oct 2026: explore everything): a pick while a scene plays ends that scene, as a manual room change does (R-8.5a); only a boot
+    // still running (the opening, a startup choice) keeps the pick waiting.
     private bool PlayCanStartCutscene => PlayCutscenes && !_introPreparing && !_genericActionStarting &&
         (UnansweredManiacCutsceneStartup || _playFolder != _game?.Key || StaticPreviewMayStartScene ||
-            _play is not { InCutscene: true } && _play is not { BootRunning: true });
+            _play is not { BootRunning: true } && (_play is not { InCutscene: true } || !UsesManiacCutsceneSetup(_game!)));
 
     // R-8.5b1 (rule confirmed by the user 20 Oct): a static preview of the other families keeps Play Cutscene; the scene starts from the session the
     // preview was made from (its stated start), whatever that session was doing. Maniac Mansion and Zak keep their own startup rule below.
@@ -179,8 +181,10 @@ public partial class MainWindow
         LeaveAmbientPreview();
         if (!PreparePlayCutsceneStartup(game)) return;
         var visitedForIt = false;
-        if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room)
+        if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room || _play is { InCutscene: true })
         {
+            // A scene still playing is ended by opening the room again (the manual preparation cancels the departed scene, R-8.5a).
+            _sceneSound.StopAll("another scene was picked");
             // Restarting the clock in the same prepared room does not execute entry.
             visitedForIt = _play?.CurrentRoomId != trigger.Room;
             SelectRoomWithIntent(room, RoomOpenKind.Cutscene, reloadSelected: true);
