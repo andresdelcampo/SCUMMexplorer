@@ -295,6 +295,43 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         // there either, CharsetRendererV3 reads the width table); its n tilde is drawn by the tilde glyph 0x7E, which is the one glyph its charset changes.
         Assert.Equal(withoutGlyph, string.Join(" ", found.Keys.Where(code => charset.CharWidth(code) == 0).Order().Select(code => code.ToString("X2"))));
     }
+    /// <summary>
+    /// A held object's code runs in another room (31 October 2026, roadmap gate A): the junk mail on Indy's desk (Room 2 objects 65 to 67, one per state,
+    /// verb 0x0B <c>pickupObject var[0x007]</c>) is taken in Room 2, then "Look at" (0x09) on its inventory slot in the gym (Room 73; Room 1 never rests) runs the copy of its code taken
+    /// from Room 2 (whereIsObject WIO_INVENTORY), whose <c>printEgo</c> line is the object's own. Both rooms are catalog picks, which keep the inventory.
+    /// </summary>
+    [Fact]
+    public void AHeldObjectsVerbRunsInAnotherRoom()
+    {
+        if (Folder() is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var booted = ScummGameSession.BootForPlay(game, out _);
+        var office = booted.PrepareManualRoom(game.Rooms.First(r => r.ResourceId == 2));
+        Assert.True(office.Succeeded, office.Reason);
+        var play = new Player((ScummGameSession)office.Session!, output);
+        play.ClickVerb(0x0B);
+        play.ClickRoom(116, 92);
+        play.ClickRoom(116, 92);
+        Assert.True(play.RunUntil(() => play.Session.Snapshot.Inventory.Any(id => id is >= 65 and <= 67) && play.Session.UserInputOn && !play.Session.InCutscene),
+            "the junk mail reaches the inventory");
+        var mail = play.Session.Snapshot.Inventory.Single(id => id is >= 65 and <= 67);
+        play.Log("mail taken");
+
+        var hall = play.Session.PrepareManualRoom(game.Rooms.First(r => r.ResourceId == 73));
+        Assert.True(hall.Succeeded, hall.Reason);
+        play = new Player((ScummGameSession)hall.Session!, output);
+        Assert.Contains(mail, play.Session.Snapshot.Inventory);
+        play.Log("in Room 73");
+        var expected = mail == 66 ? "It's more junk letters." : mail == 67 ? "It's just papers, nothing important." : "It's just junk mail.";
+        play.ClickVerb(0x09);
+        play.ClickVerb(0x65);
+        if (!play.Session.Messages.OnScreen.Any(message => message.Text.Contains(expected, StringComparison.Ordinal))) play.ClickVerb(0x65);
+        Assert.True(play.RunUntil(() => play.Session.Messages.OnScreen.Any(message => message.Actor == 1 && message.Text.Contains(expected, StringComparison.Ordinal)), 300),
+            $"Indy says the mail's own line \"{expected}\" in Room 73");
+        play.Log("looked at the mail");
+        Assert.DoesNotContain(play.Session.Snapshot.Uncertainties, line => line.Contains($"startObject {mail}", StringComparison.Ordinal));
+    }
+
     [Fact]
     public void TheRightButtonStaysTheAppsAndNeverReachesTheGame()
     {

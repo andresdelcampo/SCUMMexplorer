@@ -1877,6 +1877,21 @@ public sealed partial class ScummBoundedScriptExecutor
     }
 
     /// <summary>
+    /// ScummVM <c>getObjectOrActorXY</c> for an object that is not the room's (owner not 0x0F), every version: <c>whereIsObject</c> finds it
+    /// only in the inventory array (WIO_INVENTORY), and then it stands where its owner stands if that actor is in the current room; otherwise
+    /// -1 (<c>getObjX</c> -1, <c>getObjActToObjActDist</c> 0xFF). Answered is false when the object belongs to the room or its owner's room
+    /// is unknown; Owner is the actor whose position answers, or null for the -1 answer.
+    /// </summary>
+    private static (int? Owner, bool Answered) HeldObjectOwner(int id, ScummScriptRuntimeState runtime)
+    {
+        if (!runtime.ObjectOwners.TryGetValue(id, out var owner) || owner == RoomOwner) return (null, false);
+        if (Array.IndexOf(runtime.InventorySlots, id) < 0 || !runtime.Actors.Contains(owner)) return (null, true);
+        var room = runtime.Actors[owner].Room;
+        if (room is null) return (null, false);
+        return room == runtime.CurrentRoom ? (owner, true) : (null, true);
+    }
+
+    /// <summary>
     /// Applies an actor command to the session's actor table with its operands
     /// resolved now. An operand that cannot be read makes what it sets unknown;
     /// an unknown actor number makes every actor unknown. Values that follow a
@@ -2202,6 +2217,19 @@ public sealed partial class ScummBoundedScriptExecutor
             }
             if (number >= runtime.Actors.Capacity)
             {
+                if (HeldObjectOwner(number, runtime) is (var holder, true))
+                {
+                    if (holder is null) { answer = -1; detail = "known value"; return true; }
+                    var held = runtime.Actors[holder.Value];
+                    if ((operation == "getActorX" ? held.X : held.Y) is not int position)
+                    {
+                        detail = $"{operation} reads object {number}, held by actor {holder}, whose position the preview does not know ({held.Unknown ?? "not known"})";
+                        return false;
+                    }
+                    answer = position;
+                    detail = "known value";
+                    return true;
+                }
                 var (found, point) = FindObjectWalkPoint(number, roomObjects, runtime);
                 if (found && point is null)
                 {
@@ -2315,6 +2343,10 @@ public sealed partial class ScummBoundedScriptExecutor
                 var owner = runtime.ObjectOwners.GetValueOrDefault(number);
                 return runtime.Actors.Contains(owner) ? Locate(owner, runtime.Actors[owner], out unknown) : null;
             }
+            // Version 3 on: whereIsObject finds a held object only in the inventory array, standing where its owner stands (Indy 3's Script 2
+            // +0x0284 measures the ego's distance to the object of "Look at" an inventory slot).
+            if (number >= runtime.Actors.Capacity && HeldObjectOwner(number, runtime) is (var holder, true))
+                return holder is null ? null : Locate(holder.Value, runtime.Actors[holder.Value], out unknown);
             if (number < runtime.Actors.Capacity)
             {
                 // getObjectOrActorXY: an actor counts only in the current room.

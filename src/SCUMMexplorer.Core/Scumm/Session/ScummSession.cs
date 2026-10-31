@@ -440,7 +440,7 @@ public abstract partial class ScummSession
         }
         if (record is null)
         {
-            _uncertainties.Add($"{source}: startObject {objectId}, verb 0x{verbId:X2}: the object is not in Room {_currentRoom.ResourceId:00}; its code runs only if it is held, and inventory code is not modelled.");
+            _uncertainties.Add($"{source}: startObject {objectId}, verb 0x{verbId:X2}: the object is not in Room {_currentRoom.ResourceId:00}; it is not held either, so its code is not found.");
             return;
         }
         if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var locals))

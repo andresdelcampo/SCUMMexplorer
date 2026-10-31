@@ -67,6 +67,18 @@ foreach (var spec in args.Skip(1))
             Console.WriteLine($"prepare Room {p[1]}: {(prepared.Session is null ? "refused: " + prepared.Reason : "live")} after {prepared.Frames} frames");
             if (prepared.Session is ScummGameSession live) Console.WriteLine($"  input script {live.PlayInputScript}, user input {live.UserInputOn}, cutscene {live.InCutscene}");
             break;
+        case "ofind":
+            // ofind:<room>:<text> - object verb code in one room whose instructions contain the text
+            var oroom = int.Parse(p[1]);
+            var ord = data.ReadRoom(oroom);
+            foreach (var (objectId, entries) in data.ReadObjectVerbs(oroom, ord.Objects))
+                foreach (var entry in entries)
+                {
+                    var code = data.ReadObjectVerb(oroom, ord.Objects.First(o => o.Id == objectId), entry.VerbId, out _);
+                    foreach (var i in code.Instructions)
+                        if ($"{i.Operation} {i.Operands}".Contains(p[2])) Console.WriteLine($"object {objectId} verb 0x{entry.VerbId:X2} {i.Offset:X4} {i.Operation} {i.Operands}");
+                }
+            break;
         case "find":
             var needle = spec[5..];
             void Scan(string t, ScummScriptDisassembly? s) { if (s is null) return; foreach (var i in s.Instructions) if ($"{i.Operation} {i.Operands}".Contains(needle)) Console.WriteLine($"{t} {i.Offset:X4} {i.Operation} {i.Operands}"); }

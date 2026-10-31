@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: a held object's verb in another room
+
+"Look at" on an inventory slot in Indy 3 said nothing outside the room the object was taken in: Script 2 measures the ego's distance to the object, and the executor gave a held object its owner's position only in versions 1 and 2. As ScummVM's `getObjectOrActorXY` does in every version, a held object now stands where its owner stands when the owner is in the room (else -1 / 0xFF) for `getDist` and `getActorX`/`getActorY`. `ScummIndy3PlayTests.AHeldObjectsVerbRunsInAnotherRoom` takes the junk mail in Room 2 and looks at it in Room 73 ([record](../.verification/indy3-rooms-20261030/README.md), addendum 31 Oct).
+
 ## 31 October: talkie speech listing read ahead; first-launch numbers
 
 A profile (dotnet-trace) showed the talkie games' scan opening `MONSTER.SOU` once per small read of the speech walk; `ScummSpeechBank.ListSamples` now reads through a 256 KB window. With the earlier inspection-copy change, Indy 4 shows play at 4.5 s and MI2 at 4.2 s after startup (87 s and 18 s before), with about 2 s of UI blocking in total ([record](../.verification/indy4-rooms-20261030/README.md)).
