@@ -231,7 +231,22 @@ public partial class MainWindow
         IReadOnlyList<string> uncertainties;
         try
         {
-            if (plan is { HasEdits: true } && session.ApplySceneSetup(plan.Edits).Count > 0 && !trigger.IsRoomEntry)
+            if (plan is { HasEdits: true } && trigger.IsRoomEntry)
+            {
+                // A room entry reads its setup as the room is entered, and the room was opened before the plan was applied: as in the plan's runs,
+                // the hero first goes to the room it comes from (a "came from" value) and the setup is set, then the room is entered again.
+                if (plan.Edits.FirstOrDefault(edit => edit.Kind == ScummSetupKind.CameFrom) is { } came &&
+                    game.Rooms.FirstOrDefault(r => r.ResourceId == came.Value) is { } from) session.VisitRoom(from);
+                if (session.ApplySceneSetup(plan.Edits).Count > 0 || session.CurrentRoomId != trigger.Room)
+                {
+                    _sceneSound.StopAll("a picked scene's setup changed the room's state");
+                    if (session.CurrentRoomId == trigger.Room) session.EnterRoomAgain(room);
+                    else session.VisitRoom(room);
+                    session.ApplySceneSetup(plan.Edits);
+                    visitedForIt = true;
+                }
+            }
+            else if (plan is { HasEdits: true } && session.ApplySceneSetup(plan.Edits).Count > 0 && !trigger.IsRoomEntry)
             {
                 // What the room's entry derives from the new state (objects, who stands where) follows it, as in the plan's runs.
                 _sceneSound.StopAll("a picked scene's setup changed the room's state");

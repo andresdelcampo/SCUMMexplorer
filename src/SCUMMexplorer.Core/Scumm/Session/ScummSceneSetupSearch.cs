@@ -31,6 +31,7 @@ public sealed partial class ScummSceneSetupSearch
     private readonly Func<ScummCutscene, IReadOnlyList<ScummSetupEdit>?, ScummCutsceneRunResult> _run;
     private readonly ConcurrentDictionary<(int, int, int), Lazy<ScummScenePlan>> _plans = [];
     private readonly Lazy<IReadOnlyDictionary<int, int>> _objectRooms;
+    private readonly Lazy<IReadOnlySet<string>> _roomLeftVariables;
 
     /// <param name="run">A headless run of the trigger from a fresh start with the given setup (<see cref="ScummCutsceneRun.Run"/>).</param>
     public ScummSceneSetupSearch(GameLibrary game, Func<ScummCutscene, IReadOnlyList<ScummSetupEdit>?, ScummCutsceneRunResult> run)
@@ -41,6 +42,28 @@ public sealed partial class ScummSceneSetupSearch
         _data = ScummDataSources.For(game);
         _run = run;
         _objectRooms = new(ObjectRooms);
+        _roomLeftVariables = new(RoomLeftVariables);
+    }
+
+    /// <summary>
+    /// The variables a global script fills with the current room (<c>move var[X] = VAR_ROOM</c>): the game's record of the room the hero left (its exit
+    /// hook runs it as a room is left). A test of one of these against a room number is a test of where the hero came from.
+    /// </summary>
+    private IReadOnlySet<string> RoomLeftVariables()
+    {
+        var found = new HashSet<string>();
+        foreach (var id in _data.GlobalScriptIds())
+        {
+            try
+            {
+                if (_data.GlobalScript(id) is not { } script) continue;
+                foreach (var ins in script.Instructions.Where(i => i.Operation == "move"))
+                    if (ins.Operands.Split(" = ") is [var target, var source] && source.Trim() == ScummVars.Room && VariablePattern().Match(target.Trim()) is { Success: true } m && m.Value == target.Trim())
+                        found.Add(target.Trim());
+            }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { }
+        }
+        return found;
     }
 
     /// <summary>True when the trigger's plan is worked out (so the UI thread can ask without waiting).</summary>
@@ -210,6 +233,9 @@ public sealed partial class ScummSceneSetupSearch
                                 _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null));
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
                             Add(new(ScummSetupKind.Bit, tested, 1, where));
+                        else if (_roomLeftVariables.Value.Contains(tested) && ins.Operation is "isEqual" or "isNotEqual" &&
+                                 _game.Rooms.Any(r => r.ResourceId == value.Value) && value.Value != trigger.Room)
+                            Add(new(ScummSetupKind.CameFrom, tested, value.Value, where, trigger.Room));
                         else if (VariablePattern().Match(tested) is { Success: true } v && tested == v.Value && !written.Contains(tested) &&
                                  int.Parse(v.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstStoryVariable)
                             foreach (var side in sides.Where(v => v > 0).Distinct())

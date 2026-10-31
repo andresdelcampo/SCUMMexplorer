@@ -70,6 +70,21 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ARoomEntryThatTestsWhereTheHeroCameFromIsEnteredFromThatRoom()
+    {
+        // Indy 4 Room 10's entry +0x0148 tests var[0x0E0], which the exit hook (Script 23 +0x0014: var[0x0E0] = VAR_ROOM) fills with the room left;
+        // setting the variable does nothing (the exit hook overwrites it), so the setup visits Room 15 first and the scene's room is entered from it.
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 10, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.True(plan.Result.Begun);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.CameFrom, Target: "var[0x0E0]", Value: 15 });
+    }
+
+    [Fact]
     public void TheHatchSceneGoesOnThroughItsRoomsOnceItsStateIsSet()
     {
         // Room 39 object 586 verb 0x0A (the hatch) +0x0000 tests its own state: with state 1 the scene plays its 18 lines through Rooms 41, 42 and 8.
@@ -97,7 +112,8 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     [Fact]
     public void ASetupRaisesOnlyWhatTheSessionLacks()
     {
-        // Old v3 keeps bit n in bit (n & 15) of global word n >> 4; a bit already set and a variable already non-zero are kept (never lowered).
+        // Old v3 keeps bit n in bit (n & 15) of global word n >> 4; a bit already set is kept (never lowered). A variable is set to the value its test
+        // compares with (31 October: Indy 4 Room 10's entry compares var[0x0E0] with room numbers), and left alone when it already holds it.
         if (Indy3() is not { } game) return;
         var session = ScummGameSession.BootForPlay(game, out _);
         var known = session.Snapshot.KnownGlobalVariables;
@@ -108,8 +124,9 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         known = session.Snapshot.KnownGlobalVariables;
         Assert.NotEqual(0, known[$"var[0x{bit >> 4:X3}]"] & (1 << (bit & 15)));
         Assert.Equal(1000, known[variable]);
-        Assert.Empty(session.ApplySceneSetup([new(ScummSetupKind.Bit, $"bit[0x{bit:X3}]", 1, "test"), new(ScummSetupKind.Variable, variable, 7, "test")]));
-        Assert.Equal(1000, session.Snapshot.KnownGlobalVariables[variable]);
+        Assert.Empty(session.ApplySceneSetup([new(ScummSetupKind.Bit, $"bit[0x{bit:X3}]", 1, "test"), new(ScummSetupKind.Variable, variable, 1000, "test")]));
+        Assert.Single(session.ApplySceneSetup([new(ScummSetupKind.Variable, variable, 7, "test")]));
+        Assert.Equal(7, session.Snapshot.KnownGlobalVariables[variable]);
     }
 
     [Fact]

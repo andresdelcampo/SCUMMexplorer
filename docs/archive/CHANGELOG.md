@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 31 October: scenes that test where the hero came from are entered from that room
+
+A setup now visits the room a scene's code expects the hero to come from (the variable each game's exit hook fills with the room left), sets story variables to the value their test compares with, and the app re-enters a room after an entry's setup. Scenes played their own way: 81.1% → 83.1% of 1,093 (Indy 4 77.9% → 81.2%, Monkey Island 2 81.6% → 83.7%, Monkey Island 1 +1.2% and +1.3%, Indy 3 unchanged); started at the cutscene 18.9% → 16.9%; LOOM unchanged ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 31 October: readable scripts of every game name their verbs
 
 The verb names each game's own `verbOps` give (Indy 3: "Open" … "Pick up", "Talk"; dialogue choices stay unnamed) now show in the other games' readable scripts (`startObject`, `doSentence`): verb references named 0% → 56.8% (Indy 3 57%, MI1 44% and 29%, MI2 61%, Indy 4 80%) ([record](../../.verification/readable-names-20261031/README.md)).

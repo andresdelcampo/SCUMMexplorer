@@ -118,3 +118,23 @@ Three generic additions to the setup search: (1) `ifClassOfIs` candidates (an ob
 LOOM English's answer key unchanged (rooms 100%, category 92.0%, length 89.1%). Full suite 1842 passed. Runs: `*-run10.txt`.
 
 Then: both sides of a comparison are tried (an inequality also tries a value on its other side: Indy 4's closet door needs object 870's state to be non-zero). Indy 4 77.5% → 77.7% played its own way; the others unchanged. A cap of 24 candidates instead of 16 was tried and dropped: Indy 4 78.2%, but its derivation took 223 s against about 180. What is left showing nothing (Indy 3 4, Monkey Island 1 5 and 4, Monkey Island 2 4, Indy 4 16: 3.0% of all scenes) is a long tail of single cases, mostly room entries with many tested values (Indy 4 Rooms 10, 27, 72: 15 to 36 candidates). Runs: `*-run11.txt`, `*-run12.txt`.
+
+## Arriving from another room; variables set to their tested value (31 October, later)
+
+Indy 4 Room 10's entry branches on `var[0x0E0]` (+0x0058 to +0x01A1), the room the hero came from: every game's exit hook copies the room being left there (`move var[X] = VAR_ROOM`: Indy 4 Script 23 +0x0014; Monkey Island 1 and 2, Indy 3 Script 7). Two changes:
+
+1. A **Variable** setup value is now set whenever the session's value differs (it was set only while 0, which a booted session never has for most story variables).
+2. A new setup kind, **came from** (`ScummSetupKind.CameFrom`): a test of a variable a global script fills from `VAR_ROOM` against a room number is "the hero came from that room"; the setup visits that room first, so the game's own exit hook sets the variable as the scene's room is entered. In the app a room entry's setup now re-enters the room after it is applied (before, the room was opened first and its entry never saw the setup; the headless runs always applied it first).
+
+Measured (`*-run14.txt` against `*-run13.txt`): own way (with or without setup) / started at the cutscene.
+
+| Game | Scenes | Own way | At cutscene |
+|---|---|---|---|
+| Indy 3 | 153 | 80.4% → 80.4% | 19.6% → 19.6% |
+| Monkey Island 1 floppy | 164 | 84.8% → 86.0% | 15.2% → 14.0% |
+| Monkey Island 1 CD | 160 | 85.6% → 86.9% | 14.4% → 13.1% |
+| Monkey Island 2 | 190 | 81.6% → 83.7% | 18.4% → 16.3% |
+| Indy 4 | 426 | 77.9% → 81.2% | 22.1% → 18.8% |
+| **Total** | 1,093 | **81.1% → 83.1%** | **18.9% → 16.9%** |
+
+LOOM unchanged (`../loom-editions-20261031/run4-*.txt`: EGA 3.2%, CD 2.7% at the cutscene; answer key 238 of 238). Real window (`WindowCheck 10,0,0`, Indy 4): Room 10's entry, picked from the list, opens on the theatre street and its cutscene begins ([picture](window-camefrom/10-0-0.png)); before the app change it showed no cutscene. Test: `ScummSceneSetupTests.ARoomEntryThatTestsWhereTheHeroCameFromIsEnteredFromThatRoom`.

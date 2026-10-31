@@ -21,6 +21,12 @@ public enum ScummSetupKind
     ObjectClass,
     /// <summary>An actor stood in a walk box of the room (<c>getActorWalkBox</c> then compared): the code waits for the hero to walk there (LOOM Room 10's entry, local script 200).</summary>
     WalkBox,
+    /// <summary>
+    /// The hero came from room <c>Value</c>: the variable <c>Target</c> is the one the game's exit hook fills with the room being left
+    /// (<c>move var[X] = VAR_ROOM</c>; Indy 4 Script 23 +0x0014, Monkey Island and Indy 3 Script 7), so that room is visited first and the scene's room
+    /// entered from it.
+    /// </summary>
+    CameFrom,
 }
 
 /// <summary>
@@ -37,6 +43,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.SecondObject => $"object {Target} used with it (held)",
         ScummSetupKind.ActorCostume => $"actor {Target} in costume {Value}",
         ScummSetupKind.ActorRoom => $"actor {Target} in Room {Value}",
+        ScummSetupKind.CameFrom => $"arrived from Room {Value} ({Target})",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
@@ -47,7 +54,7 @@ public abstract partial class ScummSession
 {
     /// <summary>
     /// Brings the session to a picked scene's setup (R-1.9 exception, §8.6): each value is set only when the session lacks it, so state the session
-    /// already has is kept (a bit is only raised; a variable is set only while it is 0; an object already held stays held). Returns what was set.
+    /// already has is kept (a bit is only raised; a variable is set to the value its test compares with; an object already held stays held). Returns what was set.
     /// Never used by Play or a room's first visit.
     /// </summary>
     public IReadOnlyList<ScummSetupEdit> ApplySceneSetup(IEnumerable<ScummSetupEdit> edits)
@@ -84,7 +91,9 @@ public abstract partial class ScummSession
                 return true;
             }
             case ScummSetupKind.Variable:
-                if (variables.GetValueOrDefault(edit.Target) != 0) return false;
+                // Set whenever it differs: a story variable is compared with a value (Indy 4 Room 10's entry branches on var[0x0E0], the room the hero
+                // came from, which a booted session never has at 0), so "only while it is 0" left most such tests unreachable.
+                if (variables.GetValueOrDefault(edit.Target) == edit.Value) return false;
                 _runtime.SetGlobalVariable(edit.Target, (ushort)edit.Value);
                 return true;
             case ScummSetupKind.ObjectState:
@@ -102,6 +111,16 @@ public abstract partial class ScummSession
                 var wanted = edit.Value > 0 ? classes | bit : classes & ~bit;
                 if (wanted == classes) return false;
                 _runtime.SetObjectClasses(id, wanted);
+                return true;
+            }
+            case ScummSetupKind.CameFrom:
+            {
+                // Only before the scene's room is entered, and only when the variable does not already say so: visiting that room first lets the
+                // game's own exit hook set the variable as the scene's room is entered next.
+                if (edit.Room is int sceneRoom && _runtime.CurrentRoom == sceneRoom) return false;
+                if (variables.GetValueOrDefault(edit.Target) == edit.Value && _runtime.CurrentRoom == edit.Value) return false;
+                if (_game.Rooms.FirstOrDefault(r => r.ResourceId == edit.Value) is not { } from) return false;
+                VisitRoom(from);
                 return true;
             }
             case ScummSetupKind.WalkBox:
