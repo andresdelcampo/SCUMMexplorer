@@ -51,4 +51,4 @@ From `D:\Documents\Personal\Code Projects\SCUMMexplorer`:
 rtk proxy dotnet run --project .verification/source-gaps-20261008/Probe/Probe.csproj -- Games .verification/source-gaps-20261008/out-source
 ```
 
-The harness rebuilds before running and includes the repository failure policy. All 368 relative links in the eight changed Markdown files resolve; `git diff --check` passes. A broad Core/replay/WPF rerun is unnecessary for this source/documentation checkpoint. The exact remaining original-game picture, input and audio comparisons are maintained in [the live dossier](../../docs/loom/FINAL_GAPS_HANDOFF.md).
+The harness rebuilds before running and includes the repository failure policy. All 368 relative links in the eight changed Markdown files resolve; `git diff --check` passes. A broad Core/replay/WPF rerun is unnecessary for this source/documentation checkpoint. The exact remaining original-game picture, input and audio comparisons are maintained in [the live dossier](../../docs/archive/loom/FINAL_GAPS_HANDOFF.md).

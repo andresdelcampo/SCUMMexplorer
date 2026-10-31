@@ -49,4 +49,4 @@ rtk.exe proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj -
 
 ## Where the facts went
 
-[tracker, MonkeyCd block](../../docs/monkey1/SUPPORT_STATUS.md), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), CHANGELOG 17 October.
+[tracker, MonkeyCd block](../../docs/archive/monkey1/SUPPORT_STATUS.md), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), CHANGELOG 17 October.

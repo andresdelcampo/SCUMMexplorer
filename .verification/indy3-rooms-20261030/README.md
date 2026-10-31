@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Item | [Indy 3 tracker](../../docs/indy3/SUPPORT_STATUS.md), S5 open items: "rooms 1, 6, 15 and 13 more never rest within 2400 frames; Script 23's `actorFollowCamera` of an ego in another room (ScummVM `setCameraFollows` loads that room) is not modelled" |
+| Item | [Indy 3 tracker](../../docs/archive/indy3/SUPPORT_STATUS.md), S5 open items: "rooms 1, 6, 15 and 13 more never rest within 2400 frames; Script 23's `actorFollowCamera` of an ego in another room (ScummVM `setCameraFollows` loads that room) is not modelled" |
 | Fixture | `D:\Juegos\Lucas\indy3 ega en` |
 | ScummVM | `camera.cpp` `setCameraFollows`, read on GitHub master 30 October: `if (!a->isInCurrentRoom()) startScene(a->getRoom(), nullptr, 0)`, no version distinction |
 

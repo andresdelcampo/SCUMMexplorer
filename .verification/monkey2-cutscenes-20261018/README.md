@@ -92,5 +92,5 @@ Source only (the bundled ScummVM was not run, per the brief): `imuse/imuse.cpp` 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
 - Script map rows: [`docs/monkey2/MONKEY2_SCRIPT_MAP.md`](../../docs/monkey2/MONKEY2_SCRIPT_MAP.md) (Global scripts 76, 101; Rooms 7, 9, 13, 74, 80; Sounds 176, 182; `getParam`).
-- Tracker and decision log: [`docs/monkey2/SUPPORT_STATUS.md`](../../docs/monkey2/SUPPORT_STATUS.md).
+- Tracker and decision log: [`docs/archive/monkey2/SUPPORT_STATUS.md`](../../docs/archive/monkey2/SUPPORT_STATUS.md).
 - Requirements: R-8.32 and R-8.33 (Proposed) apply; no new row.

@@ -63,4 +63,4 @@ See the final checkpoint for the room samples and remaining comparisons.
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[S5 checkpoint](../../docs/checkpoints/20261017-S5-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries).
+[S5 checkpoint](../../docs/archive/checkpoints/20261017-S5-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries).

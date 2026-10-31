@@ -51,4 +51,4 @@ rtk.exe proxy dotnet test ... --filter "...~Loom|...~Monkey|...~Indy|...~ScummGa
 
 ## Where the facts went
 
-[tracker](../../docs/indy4/SUPPORT_STATUS.md), [script map](../../docs/indy4/INDY4_SCRIPT_MAP.md), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), CHANGELOG 17 October.
+[tracker](../../docs/archive/indy4/SUPPORT_STATUS.md), [script map](../../docs/indy4/INDY4_SCRIPT_MAP.md), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), CHANGELOG 17 October.

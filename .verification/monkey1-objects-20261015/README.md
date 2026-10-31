@@ -77,7 +77,7 @@ Open `Games/monkey1 ega en` in the app (Normal mode) and look at the room cards 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Monkey Island script map](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md) (pseudo rooms, `VAR_ROOM`, bit variables, Rooms 1, 30, 33, 58, 70), [variables and opcode rules](../../docs/engine/SCUMM_SCRIPT_MAP.md) (bit variables v3/v4, pseudo rooms), [object states](../../docs/engine/SCUMM_OBJECT_STATES.md) (v4 first visit), [tracker and decision log (MonkeyFloppy block)](../../docs/monkey1/SUPPORT_STATUS.md).
+[Monkey Island script map](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md) (pseudo rooms, `VAR_ROOM`, bit variables, Rooms 1, 30, 33, 58, 70), [variables and opcode rules](../../docs/engine/SCUMM_SCRIPT_MAP.md) (bit variables v3/v4, pseudo rooms), [object states](../../docs/engine/SCUMM_OBJECT_STATES.md) (v4 first visit), [tracker and decision log (MonkeyFloppy block)](../../docs/archive/monkey1/SUPPORT_STATUS.md).
 
 ## Addendum (15 October, later): depth masks of the 11 October branch merged
 

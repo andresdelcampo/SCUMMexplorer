@@ -1,6 +1,6 @@
 # ZakClassic palette contexts — final integration, 19 October 2026
 
-Baseline `5634143c`; integration `codex/maniaczak-status-polish`. Palette-provider source `97bd82ae` (worker `6b0fe2c`), App `166f6b2` plus actual-window label correction `96dfb06`. Concurrent master changes through `ea89e1ef` are preserved through merges (including `77588bdf`, `8f454be3`, `be8d6e87`, `9beb9f61`). Scope, decisions and remaining limits: [checkpoint](../../docs/checkpoints/20261019-Palettes-ManiacZak.md).
+Baseline `5634143c`; integration `codex/maniaczak-status-polish`. Palette-provider source `97bd82ae` (worker `6b0fe2c`), App `166f6b2` plus actual-window label correction `96dfb06`. Concurrent master changes through `ea89e1ef` are preserved through merges (including `77588bdf`, `8f454be3`, `be8d6e87`, `9beb9f61`). Scope, decisions and remaining limits: [checkpoint](../../docs/archive/checkpoints/20261019-Palettes-ManiacZak.md).
 
 ## Reproduction
 

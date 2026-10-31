@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Items | The S5 leftovers ([monkeycd-objects-20261017](../monkeycd-objects-20261017/README.md)): Room 88 "execution reached an undecoded byte at +0x0000", Room 89 "saveRestoreVerbs subopcode 0x00", Room 99 "Object 1000 is absent from the global state table"; and "the lookout shows for one frame at start" ([checkpoint 20261017](../../docs/checkpoints/20261017-S7-S9-S4b-MonkeyCd.md)) |
+| Items | The S5 leftovers ([monkeycd-objects-20261017](../monkeycd-objects-20261017/README.md)): Room 88 "execution reached an undecoded byte at +0x0000", Room 89 "saveRestoreVerbs subopcode 0x00", Room 99 "Object 1000 is absent from the global state table"; and "the lookout shows for one frame at start" ([checkpoint 20261017](../../docs/archive/checkpoints/20261017-S7-S9-S4b-MonkeyCd.md)) |
 | Fixture | `D:\Juegos\Lucas\monkey1 vga en` (Monkey Island CD, English) |
 | ScummVM | source read on GitHub master, 30 October: `room.cpp` `setupRoomSubBlocks`, `object.cpp` `getState`, `drawObject` |
 

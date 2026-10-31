@@ -1,6 +1,6 @@
 # S4a: the generic session (14 October 2026)
 
-Stage S4a of [GAME_SUPPORT_INSTRUCTIONS](../../docs/GAME_SUPPORT_INSTRUCTIONS.md): split the game-independent part of `LoomExplorationSession` from LOOM's part. Behaviour of LOOM must not change. Plan file: [docs/checkpoints/20261014-S4a.md](../../docs/checkpoints/20261014-S4a.md).
+Stage S4a of [GAME_SUPPORT_INSTRUCTIONS](../../docs/GAME_SUPPORT_INSTRUCTIONS.md): split the game-independent part of `LoomExplorationSession` from LOOM's part. Behaviour of LOOM must not change. Plan file: [docs/archive/checkpoints/20261014-S4a.md](../../docs/archive/checkpoints/20261014-S4a.md).
 
 ## Plan (written before the first move)
 

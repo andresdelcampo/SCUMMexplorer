@@ -22,4 +22,4 @@
 
 The two rows are separate families, not alternate editions of one family. S9 on 18 October 2026 verifies the available references and their compatibility boundaries; it does not claim another language, demo or patched release works. Registry levels remain unchanged. Existing original-game visual/timing/listening uncertainties remain open.
 
-Engine fidelity (18 October): native Script 174 continuation and version lighting are implemented; source and window checks retain puzzle/original-game limits. [Checkpoint](../checkpoints/20261018-Fidelity-ManiacZak.md).
+Engine fidelity (18 October): native Script 174 continuation and version lighting are implemented; source and window checks retain puzzle/original-game limits. [Checkpoint](../archive/checkpoints/20261018-Fidelity-ManiacZak.md).

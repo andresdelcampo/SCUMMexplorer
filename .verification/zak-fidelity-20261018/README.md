@@ -52,7 +52,7 @@ The default diagnostic deliberately samples through the unchanged 6000-frame bou
 
 Two of the five formerly capped starts now finish in each edition. One further actor wait is removed but the surrounding flight sequence still waits for a native object-owner change. On the failed enhanced Room 2 approach, actor 12 reached x=47,112 at frame 6000 while actor 7 stayed at x=456; the corrected native distance avoids that runaway. These are source exploration previews, not earned story routes or original-interpreter timings.
 
-Per-family regression results and own-edition source offsets are in the enhanced/classic scene records added by the worker; final solution/matrix/full-suite/window results are in the [checkpoint](../../docs/checkpoints/20261018-Fidelity-ManiacZak.md).
+Per-family regression results and own-edition source offsets are in the enhanced/classic scene records added by the worker; final solution/matrix/full-suite/window results are in the [checkpoint](../../docs/archive/checkpoints/20261018-Fidelity-ManiacZak.md).
 
 Integrated focused run: **65 passed, zero failed/skipped**, with four-family Play and LOOM EGA/CD safeguards. Solution build: zero warnings/errors. Matrix checks: three passed, levels unchanged. Full suite against master `9430cb5`: **1286 passed, zero failed, five skipped**, 1291 total, **7m37s** (18 October 15:14:14–15:21:52 CEST), with all three external fixture settings. Read-only independent review found no actionable engine/rendering/App issue; four actual-window lighting checks pass in the linked lighting record. Local reports are `test-results/fidelity-focused.trx` and `test-results/maniaczak-fidelity-full.trx`.
 

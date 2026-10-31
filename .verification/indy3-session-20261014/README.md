@@ -53,4 +53,4 @@ None. (A look at `room-73-after-boot.png` against the real game's first room is 
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Indy3 script map](../../docs/indy3/INDY3_SCRIPT_MAP.md), [boot sequence v3](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [variables](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker and decision log](../../docs/indy3/SUPPORT_STATUS.md), Proposed rows R-13.9, R-15.5 and R-15.6 in [REQUIREMENTS](../../docs/REQUIREMENTS.md).
+[Indy3 script map](../../docs/indy3/INDY3_SCRIPT_MAP.md), [boot sequence v3](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [variables](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker and decision log](../../docs/archive/indy3/SUPPORT_STATUS.md), Proposed rows R-13.9, R-15.5 and R-15.6 in [REQUIREMENTS](../../docs/REQUIREMENTS.md).

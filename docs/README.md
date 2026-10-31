@@ -1,6 +1,6 @@
 # Documentation
 
-The root holds five files: this index, [ROADMAP](ROADMAP.md), [REQUIREMENTS](REQUIREMENTS.md), [CHANGELOG](CHANGELOG.md) and [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md). Everything dated or historical is in `archive/`.
+The root holds four files: this index, [ROADMAP](ROADMAP.md), [REQUIREMENTS](REQUIREMENTS.md) and [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md). Everything dated or historical is in `archive/`: the [changelog](archive/CHANGELOG.md), the run checkpoints, the old per-game trackers, earlier plans and handoffs.
 
 ## Engine references
 
@@ -13,13 +13,12 @@ The root holds five files: this index, [ROADMAP](ROADMAP.md), [REQUIREMENTS](REQ
 
 - [LOOM script map](loom/LOOM_SCRIPT_MAP.md): decoded game variables, bits, scripts, verbs and rooms. EGA findings retain their edition and audit dates; CD/VGA roles require evidence from that edition's own scripts.
 - [LOOM cutscene discovery](loom/LOOM_CUTSCENE_DISCOVERY.md): how the cutscene catalog is generated.
-- [LOOM English/Spanish compatibility audit](loom/ENGLISH_COMPAT_2026-10-04.md): dated edition comparisons.
-- [Indy3](indy3/README.md): index, [tracker](indy3/SUPPORT_STATUS.md), [script map](indy3/INDY3_SCRIPT_MAP.md); [conversations](indy3/INDY3_CONVERSATIONS_PLAN.md): conversation export and its source limits.
+- [LOOM English/Spanish compatibility audit](archive/loom/ENGLISH_COMPAT_2026-10-04.md): dated edition comparisons.
+- [Indy3](indy3/README.md): index, [tracker](archive/indy3/SUPPORT_STATUS.md), [script map](indy3/INDY3_SCRIPT_MAP.md); [conversations](indy3/INDY3_CONVERSATIONS_PLAN.md): conversation export and its source limits.
 
 ## Project references
 
 - [Roadmap](ROADMAP.md): the one current-state document: scope, readiness, the ten features per game, what is open, the work in order, the checks only the user can do, the rules.
-- [Changelog](CHANGELOG.md): finished work of the last days, with links to its records; older entries in `archive/`.
 - [Requirements](REQUIREMENTS.md): what the app must do, tagged by engine, version, game and edition scope.
 - [Templates](templates/README.md): the fixed formats for a game's README, tracker, script map and evidence record.
 - [Boot sequence by version](engine/SCUMM_BOOT_SEQUENCE.md): how each SCUMM version starts.

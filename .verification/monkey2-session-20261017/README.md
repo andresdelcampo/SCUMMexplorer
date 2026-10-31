@@ -60,4 +60,4 @@ Optional: compare `room-04-after-boot.png` with the campfire scene at the end of
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Monkey Island 2 script map](../../docs/monkey2/MONKEY2_SCRIPT_MAP.md) (boot rows), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [tracker and decision log](../../docs/monkey2/SUPPORT_STATUS.md), CHANGELOG 17 October.
+[Monkey Island 2 script map](../../docs/monkey2/MONKEY2_SCRIPT_MAP.md) (boot rows), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [tracker and decision log](../../docs/archive/monkey2/SUPPORT_STATUS.md), CHANGELOG 17 October.

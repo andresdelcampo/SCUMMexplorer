@@ -72,7 +72,7 @@ The generic first-visit runner reads the old index and background through the v1
 - Old literal arrival walks use eight-pixel x units and two-pixel y units. A catalog visit converts both nonnegative operands to session pixels, matching the executed opcode; negative sentinel operands suppress the walk. The v2 object's walk point overrides the initial entry placement as the native `o2_loadRoomWithEgo` does.
 - v1/v2 background scripts can change object flags in unloaded rooms. The preview's settling signature watches current-room object state and positions while the complete persistent snapshot retains remote changes. The quiet-frame and bounded ambient rules remain those of R-5.3a.
 
-Engine sources: ScummVM `engines/scumm/object.cpp`, `script_v2.cpp`, `room.cpp`, read 17 October 2026. The gap detector measures black regions under stored image rectangles; an unchanged black region in native background artwork is evidence to investigate, not permission to activate an object or fill pixels. Counts and comparison limits are retained in [the Maniac/Zak S5 checkpoint](../checkpoints/20261017-S5-ManiacZak.md).
+Engine sources: ScummVM `engines/scumm/object.cpp`, `script_v2.cpp`, `room.cpp`, read 17 October 2026. The gap detector measures black regions under stored image rectangles; an unchanged black region in native background artwork is evidence to investigate, not permission to activate an object or fill pixels. Counts and comparison limits are retained in [the Maniac/Zak S5 checkpoint](../archive/checkpoints/20261017-S5-ManiacZak.md).
 
 ## Historical supplied-EGA script evidence
 

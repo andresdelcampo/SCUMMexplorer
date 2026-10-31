@@ -48,4 +48,4 @@ Optional: in Normal mode open `Games/indy3 vga en` rooms 73, 45, 90, 26, 36, 38,
 
 ## Where the facts went
 
-[Indy3 tracker, Indy3Vga block](../../docs/indy3/SUPPORT_STATUS.md), [script map VGA note](../../docs/indy3/INDY3_SCRIPT_MAP.md), CHANGELOG 15 October.
+[Indy3 tracker, Indy3Vga block](../../docs/archive/indy3/SUPPORT_STATUS.md), [script map VGA note](../../docs/indy3/INDY3_SCRIPT_MAP.md), CHANGELOG 15 October.

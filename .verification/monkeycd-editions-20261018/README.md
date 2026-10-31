@@ -64,6 +64,6 @@ Regression on this build (after merging master defbf54e): the Indy4, Monkey (flo
 
 ## Open
 
-- The window cannot open the disc's FRENCH, GERMAN, ITALIAN or SPANISH copy: choosing one is a product decision (a picker or a per-folder entry), not taken here. Tracker note in `docs/monkey1/SUPPORT_STATUS.md` (MonkeyCd).
+- The window cannot open the disc's FRENCH, GERMAN, ITALIAN or SPANISH copy: choosing one is a product decision (a picker or a per-folder entry), not taken here. Tracker note in `docs/archive/monkey1/SUPPORT_STATUS.md` (MonkeyCd).
 - FRENCH, GERMAN and ITALIAN were not run.
 - ScummVM was not run.

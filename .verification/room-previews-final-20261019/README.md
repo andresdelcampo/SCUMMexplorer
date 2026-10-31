@@ -1,6 +1,6 @@
 # Background-first room previews: combined validation, 19 October 2026
 
-Scope: the shared room selector for all supported/readable games, user-confirmed R-5.3b. Baseline master `c0823b04`; integration branch `codex/room-previews-background-first`. Final product source is `4421f0d`, including actor helpers `4efc0ab0` (worker `2c6f1e8`) and completed-cache provider `698028d0` (worker `dd0a934`). Core/tests remain identical to the initial `4348e10` freeze: the final App-only fix was built with BuildProjectReferences=false without rebuilding the backend binaries under the running full suite. No Core/session/opcode behavior is changed. [Run checkpoint](../../docs/checkpoints/20261019-RoomPreviews.md).
+Scope: the shared room selector for all supported/readable games, user-confirmed R-5.3b. Baseline master `c0823b04`; integration branch `codex/room-previews-background-first`. Final product source is `4421f0d`, including actor helpers `4efc0ab0` (worker `2c6f1e8`) and completed-cache provider `698028d0` (worker `dd0a934`). Core/tests remain identical to the initial `4348e10` freeze: the final App-only fix was built with BuildProjectReferences=false without rebuilding the backend binaries under the running full suite. No Core/session/opcode behavior is changed. [Run checkpoint](../../docs/archive/checkpoints/20261019-RoomPreviews.md).
 
 ## Commands
 

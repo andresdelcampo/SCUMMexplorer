@@ -58,4 +58,4 @@ None required. Optional: compare `room-38-after-boot.png` with the lookout at th
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Monkey Island script map, CD section](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [script reference, v5 slots](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker and decision log, MonkeyCd block](../../docs/monkey1/SUPPORT_STATUS.md), CHANGELOG 17 October.
+[Monkey Island script map, CD section](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [script reference, v5 slots](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker and decision log, MonkeyCd block](../../docs/archive/monkey1/SUPPORT_STATUS.md), CHANGELOG 17 October.

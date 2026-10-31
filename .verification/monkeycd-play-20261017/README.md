@@ -111,5 +111,5 @@ The bundled ScummVM was not run (the brief says not to). The same route side by 
 
 - [Script map, CD section](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md): verbs and the input chain (CD), objects and classes (CD), sounds (CD).
 - [Engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), section "Play input, verbs, classes and charsets (v5)".
-- [Tracker and decision log](../../docs/monkey1/SUPPORT_STATUS.md), MonkeyCd block.
+- [Tracker and decision log](../../docs/archive/monkey1/SUPPORT_STATUS.md), MonkeyCd block.
 - Registry: MonkeyCd Objects ✔ and Play ✔ (`GameSupport.Families`; README and REQUIREMENTS tables regenerated).

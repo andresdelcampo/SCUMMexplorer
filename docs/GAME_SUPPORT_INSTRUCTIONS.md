@@ -47,7 +47,7 @@ How work on a game is done, the same for every game: the rules, what "done" prod
 1. **The feature working in the app**, seen in the real window with a harness (`.verification/scene-setup-20261031/WindowCheck` and the others listed in `NEXT_SESSION_PROMPT.md`).
 2. **A test** that fails if the claim becomes false (a registry level is not raised without one).
 3. **Evidence**: `.verification/<topic>-<yyyymmdd>/README.md` in the [evidence format](templates/EVIDENCE_RECORD.md): what was run, the fixture, the numbers, the comparison, differences and uncertainties kept as written. Large captures are not committed.
-4. **Docs**: a `docs/CHANGELOG.md` entry linking the record; decoded facts in the script map or engine file (§5); the finished item's lines removed from `ROADMAP.md` and `NEXT_SESSION_PROMPT.md` in the same commit.
+4. **Docs**: a `docs/archive/CHANGELOG.md` entry linking the record; decoded facts in the script map or engine file (§5); the finished item's lines removed from `ROADMAP.md` and `NEXT_SESSION_PROMPT.md` in the same commit.
 5. **Requirements**: a wrong or missing requirement becomes a `Proposed` row and a mention to the user.
 6. **One commit**: explicit paths, the attribution line, `Games/` untouched.
 
@@ -71,22 +71,22 @@ Where nothing decides, decide and record the decision (what was open, options, c
 
 ### 4.6 Orchestrated runs
 
-An orchestrated run (several agents) plans the items in a checkpoint file `docs/checkpoints/<yyyymmdd>-<topic>.md`, gives each agent the brief of Appendix A, integrates each result as it returns (review against §4.1, tests, fast-forward to `master`), and ends at a clean checkpoint: everything finished merged with tests green, unfinished items recorded with the reason, decisions, proposed requirements and user checks listed. It never continues past its checkpoint on its own.
+An orchestrated run (several agents) plans the items in a checkpoint file `docs/archive/checkpoints/<yyyymmdd>-<topic>.md`, gives each agent the brief of Appendix A, integrates each result as it returns (review against §4.1, tests, fast-forward to `master`), and ends at a clean checkpoint: everything finished merged with tests green, unfinished items recorded with the reason, decisions, proposed requirements and user checks listed. It never continues past its checkpoint on its own.
 
 ## 5. Where things are written
 
-**Do not create other files or headings for these facts.** The `docs/` root holds five files: README, ROADMAP, REQUIREMENTS, CHANGELOG and this one.
+**Do not create other files or headings for these facts.** The `docs/` root holds four files: README, ROADMAP, REQUIREMENTS and this one; everything dated, the changelog included, is in `docs/archive/`.
 
 | What | Where |
 |---|---|
 | The current state: readiness, open work, the user's checks, the rules | `docs/ROADMAP.md` (only the current state; finished work leaves it in the same commit) |
 | What the app must do | `docs/REQUIREMENTS.md` |
-| Finished work, about two recent days | `docs/CHANGELOG.md`; older entries in `docs/archive/CHANGELOG_THROUGH_<date>.md` |
+| Finished work, one entry per item, linking its record | `docs/archive/CHANGELOG.md` (the running log; earlier parts in `docs/archive/CHANGELOG_THROUGH_<date>.md`) |
 | Index of a game | `docs/<game>/README.md` ([template](templates/GAME_README.md)) |
 | Facts about a game's scripts (boot, hooks, variables, bits, scripts, verbs, objects, actors, sounds) | `docs/<game>/<GAME>_SCRIPT_MAP.md` ([template](templates/SCRIPT_MAP.md)): one table per heading, every row with an evidence level, a source and a date |
 | Engine facts true of a SCUMM version | `docs/engine/` (a section per version, each statement with its ScummVM source and date) |
 | Evidence of finished work | `.verification/<topic>-<yyyymmdd>/README.md` with the harness beside it |
-| Plan and result of an orchestrated run | `docs/checkpoints/<yyyymmdd>-<topic>.md` |
+| Plan and result of an orchestrated run | `docs/archive/checkpoints/<yyyymmdd>-<topic>.md` |
 | Anything dated or historical (old plans, reviews, handoffs) | `docs/archive/` |
 
 Rules: decoded facts live once (in the script map or engine file) and are linked, never copied; a fact about how SCUMM v`N` works goes in `docs/engine/`, a fact about what one game does goes in its script map; game folders are one per game, lower case (`maniac` covers classic and enhanced); `docs/loom/LOOM_SCRIPT_MAP.md` keeps its own format. Paths to game data name only a game's folder under `Games` (`D:\Juegos\Lucas`, or `SCUMM_GAMES_ROOT`); never create a `Games` junction in a worktree.

@@ -7,11 +7,11 @@
 | SCUMM version(s) and script dialect | EGA old-v3 (`V3`), CD v4 (`V4`) |
 | Tracker | The LOOM state is tracked in [ROADMAP.md](../ROADMAP.md) |
 | Script map | [LOOM_SCRIPT_MAP.md](LOOM_SCRIPT_MAP.md) |
-| Other notes | [LOOM_CUTSCENE_DISCOVERY.md](LOOM_CUTSCENE_DISCOVERY.md), [FINAL_GAPS_HANDOFF.md](FINAL_GAPS_HANDOFF.md), [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md) |
+| Other notes | [LOOM_CUTSCENE_DISCOVERY.md](LOOM_CUTSCENE_DISCOVERY.md), [FINAL_GAPS_HANDOFF.md](../archive/loom/FINAL_GAPS_HANDOFF.md), [ENGLISH_COMPAT_2026-10-04.md](../archive/loom/ENGLISH_COMPAT_2026-10-04.md) |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |
 
 ## Editions
 
 | Edition / release | Local folder | Differences that matter (opening, scripts, text, graphics, audio) | Checked in S9 |
 |---|---|---|---|
-See [the edition record](../../.verification/editions-20261005/README.md) and [the English/Spanish audit](ENGLISH_COMPAT_2026-10-04.md).
+See [the edition record](../../.verification/editions-20261005/README.md) and [the English/Spanish audit](../archive/loom/ENGLISH_COMPAT_2026-10-04.md).

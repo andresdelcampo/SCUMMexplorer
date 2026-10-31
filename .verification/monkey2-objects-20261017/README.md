@@ -52,4 +52,4 @@ Open Monkey Island 2 (`mi2 talkie en`) in the app, Rooms view: look at Rooms 39,
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Monkey Island 2 script map](../../docs/monkey2/MONKEY2_SCRIPT_MAP.md), [tracker](../../docs/monkey2/SUPPORT_STATUS.md), CHANGELOG 17 October.
+[Monkey Island 2 script map](../../docs/monkey2/MONKEY2_SCRIPT_MAP.md), [tracker](../../docs/archive/monkey2/SUPPORT_STATUS.md), CHANGELOG 17 October.

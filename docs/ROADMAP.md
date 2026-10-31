@@ -1,6 +1,6 @@
 # Roadmap
 
-The one current-state document: the scope, how ready each game is, the ten features and their board, what is open, the work in order, the checks only the user can do, and the rules. Only the current state and open work are here. Finished work is in [CHANGELOG](CHANGELOG.md) and its records under `.verification/`; history is in `docs/archive/` (the former ROADMAP, "Your checks" and earlier roadmaps). What the app must do is in [REQUIREMENTS](REQUIREMENTS.md); how a game is added, in [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md).
+The one current-state document: the scope, how ready each game is, the ten features and their board, what is open, the work in order, the checks only the user can do, and the rules. Only the current state and open work are here. Finished work is in [CHANGELOG](archive/CHANGELOG.md) and its records under `.verification/`; history is in `docs/archive/` (the former ROADMAP, "Your checks" and earlier roadmaps). What the app must do is in [REQUIREMENTS](REQUIREMENTS.md); how a game is added, in [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md).
 
 ## Scope
 
@@ -191,7 +191,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 | Speech: skip the credits, Smith's scene, the ticket taker; each line spoken once, text stays until the voice ends | [play record](../.verification/indy4-play-20261017/README.md) | |
 | Verb area, dialogue lines and newspaper icon next to ScummVM; statue and fire-escape route side by side | [play record](../.verification/indy4-play-20261017/README.md) | |
 | Room 11 · Entry (Sophia's lecture), Room 82 · Entry; titles use the game's verbs | [cutscene record](../.verification/indy4-cutscenes-20261018/README.md) | |
-| Room 4 after the boot: is the magenta line there? | [Indy 4 tracker](indy4/SUPPORT_STATUS.md) | |
+| Room 4 after the boot: is the magenta line there? | [Indy 4 tracker](archive/indy4/SUPPORT_STATUS.md) | |
 | Spanish talkie and floppy in the window | [editions](../.verification/indy4-editions-20261018/README.md) | |
 
 ### Maniac Mansion and Zak McKracken
@@ -200,9 +200,9 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 |---|---|---|
 | Maniac classic: Syd, Bernard, Start, skip the intro, front door and doormat route | [play record](../.verification/maniacclassic-play-20261017/README.md) | |
 | Maniac and Zak: the PCjr/Tandy sounds (never listened to) | Maniac/Zak S3 notes, README | |
-| Classic Maniac Room 18 (six black rectangles), Zak classic Room 44, enhanced 13, 16, 44: black in the real game too? | [S5 checkpoint](checkpoints/20261017-S5-ManiacZak.md) | |
-| Zak Rooms 3 and 33: camera position; Room 19: still picture after about 25 s | [S5 checkpoint](checkpoints/20261017-S5-ManiacZak.md), NEXT_SESSION_PROMPT | |
-| Zak classic costumes with estimated colours: do they look right? | [palette checkpoint](checkpoints/20261019-Palettes-ManiacZak.md) | |
+| Classic Maniac Room 18 (six black rectangles), Zak classic Room 44, enhanced 13, 16, 44: black in the real game too? | [S5 checkpoint](archive/checkpoints/20261017-S5-ManiacZak.md) | |
+| Zak Rooms 3 and 33: camera position; Room 19: still picture after about 25 s | [S5 checkpoint](archive/checkpoints/20261017-S5-ManiacZak.md), NEXT_SESSION_PROMPT | |
+| Zak classic costumes with estimated colours: do they look right? | [palette checkpoint](archive/checkpoints/20261019-Palettes-ManiacZak.md) | |
 | Advanced scrolling in Maniac enhanced: is it sluggish? | NEXT_SESSION_PROMPT | |
 
 ## Product rules
@@ -215,7 +215,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 
 ## Keeping the documents tidy
 
-Rule (user, 31 October 2026): current-state documents (this file, this file, "Your checks" below, `NEXT_SESSION_PROMPT.md`, the per-game trackers) hold only the readiness state and what is open. When a piece of work is done, in the same commit: its result goes to [CHANGELOG](CHANGELOG.md) (one entry, linking its `.verification/<topic>/` record), its line leaves the current-state documents (no "done", "fixed", "closed" or struck-through items left behind), and anything worth keeping that is not in the CHANGELOG or the record goes to `docs/archive/`. The CHANGELOG keeps about two days; older entries move to `docs/archive/CHANGELOG_THROUGH_<date>.md`.
+Rule (user, 31 October 2026): this file and `NEXT_SESSION_PROMPT.md` hold only the readiness state and what is open. When a piece of work is done, in the same commit: its result goes to [the changelog](archive/CHANGELOG.md) (one entry, linking its `.verification/<topic>/` record), its lines leave this file and the handoff (no "done", "fixed" or struck-through items left behind), and anything else worth keeping goes to `docs/archive/`. The `docs/` root keeps four files: README, ROADMAP, REQUIREMENTS, GAME_SUPPORT_INSTRUCTIONS.
 
 ## Preservation and workflow
 

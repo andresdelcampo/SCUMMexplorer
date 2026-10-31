@@ -73,4 +73,4 @@ Open `Games/indy3 ega en` in the app (Normal mode) and look at the room cards an
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Indy3 script map](../../docs/indy3/INDY3_SCRIPT_MAP.md) (Room 6, 73, 92 rows, first-visit facts, open questions), [boot sequence v3](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [display operations](../../docs/engine/SCUMM_SCRIPT_MAP.md), [object states](../../docs/engine/SCUMM_OBJECT_STATES.md), [tracker and decision log](../../docs/indy3/SUPPORT_STATUS.md).
+[Indy3 script map](../../docs/indy3/INDY3_SCRIPT_MAP.md) (Room 6, 73, 92 rows, first-visit facts, open questions), [boot sequence v3](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [display operations](../../docs/engine/SCUMM_SCRIPT_MAP.md), [object states](../../docs/engine/SCUMM_OBJECT_STATES.md), [tracker and decision log](../../docs/archive/indy3/SUPPORT_STATUS.md).

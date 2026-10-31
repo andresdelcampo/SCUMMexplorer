@@ -51,4 +51,4 @@ None required. Optional: look at `room-73-after-boot.png` against the real first
 
 ## Where the facts went
 
-[Indy3 script map, VGA note](../../docs/indy3/INDY3_SCRIPT_MAP.md), [tracker, Indy3Vga block and decision log](../../docs/indy3/SUPPORT_STATUS.md), CHANGELOG 15 October.
+[Indy3 script map, VGA note](../../docs/indy3/INDY3_SCRIPT_MAP.md), [tracker, Indy3Vga block and decision log](../../docs/archive/indy3/SUPPORT_STATUS.md), CHANGELOG 15 October.

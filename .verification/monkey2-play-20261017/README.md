@@ -110,5 +110,5 @@ The bundled ScummVM was not run (the brief says not to). The same route side by 
 
 - [Script map](../../docs/monkey2/MONKEY2_SCRIPT_MAP.md): verbs and the input chain, Woodtick objects, sounds 107, 108, 151.
 - [Engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md), section "Play input, verbs, classes and charsets (v5)": iMUSE jump hooks, text-verb codes.
-- [Tracker and decision log](../../docs/monkey2/SUPPORT_STATUS.md).
+- [Tracker and decision log](../../docs/archive/monkey2/SUPPORT_STATUS.md).
 - Registry: Monkey2 Objects ✔ and Play ✔.

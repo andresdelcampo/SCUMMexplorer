@@ -1,6 +1,6 @@
 # Stable selectors and deliberate scenes: combined acceptance, 19 October 2026
 
-Baseline master `fb3da87b`, integration `codex/manual-room-cutscenes`. Final App source is `98abc9b`; Core/tests stay identical to the initial `273cc39` freeze, including Core policy `b6231d7e` (worker `e586690e`) and selector `ae8007ca` (worker `9dce396`). This run implements user-confirmed R-5.1/R-5.3/R-5.3b and R-8.5a–c, refining R-7.20 so native startup choices belong to explicit opening playback. [Checkpoint](../../docs/checkpoints/20261019-ManualRooms-ManiacZak.md).
+Baseline master `fb3da87b`, integration `codex/manual-room-cutscenes`. Final App source is `98abc9b`; Core/tests stay identical to the initial `273cc39` freeze, including Core policy `b6231d7e` (worker `e586690e`) and selector `ae8007ca` (worker `9dce396`). This run implements user-confirmed R-5.1/R-5.3/R-5.3b and R-8.5a–c, refining R-7.20 so native startup choices belong to explicit opening playback. [Checkpoint](../../docs/archive/checkpoints/20261019-ManualRooms-ManiacZak.md).
 
 ## Focused acceptance
 

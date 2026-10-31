@@ -56,4 +56,4 @@ Read on GitHub `scummvm/scummvm` master, 17 October 2026 (through a fetch agent)
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Indy 4 script map](../../docs/indy4/INDY4_SCRIPT_MAP.md) (boot, Rooms 68 and 4, sounds), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [tracker and decision log](../../docs/indy4/SUPPORT_STATUS.md), CHANGELOG 17 October.
+[Indy 4 script map](../../docs/indy4/INDY4_SCRIPT_MAP.md) (boot, Rooms 68 and 4, sounds), [boot sequence v5](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [tracker and decision log](../../docs/archive/indy4/SUPPORT_STATUS.md), CHANGELOG 17 October.

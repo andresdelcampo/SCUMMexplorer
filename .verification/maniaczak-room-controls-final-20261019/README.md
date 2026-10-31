@@ -1,6 +1,6 @@
 # Room controls and folder audio lifecycle — combined acceptance, 19–23 October 2026
 
-Baseline master `b1f231c5`; integration `codex/room-controls-maniac-zak` in `.worktrees/maniaczak-status-polish`. [Checkpoint](../../docs/checkpoints/20261019-RoomControls-ManiacZak.md). Explicit user requirements are recorded separately in `906966e` before implementation.
+Baseline master `b1f231c5`; integration `codex/room-controls-maniac-zak` in `.worktrees/maniaczak-status-polish`. [Checkpoint](../../docs/archive/checkpoints/20261019-RoomControls-ManiacZak.md). Explicit user requirements are recorded separately in `906966e` before implementation.
 
 ## Source and ownership
 

@@ -5,7 +5,7 @@
 | Families (`GameFamily`) | `Indy3Ega`, `Indy3Vga` |
 | Fixtures (folders under `Games`) | `indy3 ega en` (EGA, English, floppy), `indy3 vga en` (256 colours, English) |
 | SCUMM version(s) and script dialect | EGA: v3 (old bundle, LFL files), `ScummScriptDialect.V3Indy3`; 256 colours: v4 per-room files, `V3Indy3` |
-| Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
+| Tracker | [SUPPORT_STATUS.md](../archive/indy3/SUPPORT_STATUS.md) |
 | Script map | [INDY3_SCRIPT_MAP.md](INDY3_SCRIPT_MAP.md) |
 | Other notes | [INDY3_CONVERSATIONS_PLAN.md](INDY3_CONVERSATIONS_PLAN.md): conversation export and its source limits |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |

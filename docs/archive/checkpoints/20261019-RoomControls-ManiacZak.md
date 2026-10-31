@@ -1,0 +1,45 @@
+# Room controls and audio lifecycle, Maniac/Zak — 19–23 October 2026
+
+## Plan
+
+User requests LOOM-equivalent room cutscene/Interact controls in Normal and Advanced, readable names, native room-card following, effective hotspots/depth/walkboxes/doorways, Advanced room scripts/interactions, one-click Game Status Apply and close, and room Sounds across supported games with no audio leaking across folder changes. These are explicit requirements, recorded before implementation as R-6.17–20, R-8.2a, R-12.14 and R-13.11–12.
+
+Baseline clean master `b1f231c5` includes the other orchestrator's executor allocation and scene-scan improvements. Integration reuses `.worktrees/maniaczak-status-polish` on `codex/room-controls-maniac-zak`. Three isolated worktree agents own room actions/source panels, scene overlays, and audio/status respectively. Parent exclusively owns shared MainWindow XAML/code-behind, Play integration, requirements and final documentation. New additive partials keep ownership disjoint. The overlay worker exclusively owns extracting the existing generic doorway algorithm into ScummDoorwayFinder, with the LOOM API retained as a wrapper; no overlapping engine writer. No other-family support promotions, state forcing, ScummVM execution, user profile/game-data mutation, junction creation or worktree removal.
+
+Read-only diagnosis first; meaningful source tests and serial private-profile WPF checks follow. Only one WPF verification lease at a time. Integrate each completed item, preserve concurrent master, regenerate support matrices, build and run the required full regression with sound/Indy3 EGA/MT-32 roots. Fast-forward master only, refresh normal executable and stop clean. At most two distinct approaches per blocker; retain failures and disclose unavailable cases.
+
+## Done
+
+Requirements and ownership plan recorded in `906966e`. Implemented additive native-room actions/source panels, live-screen overlays, room Sounds and one-click inventory Apply/close. Parent hooks synchronize native room selection without re-entering the room and use the exact Uniform screen transform for input. The original bugs came from LOOM-only state and a separate generic Play image outside the old overlay surface.
+
+Resumed on 22 October after rate limits. The saved 19 October full run completed: **1,701 passed, zero failed, five expected skips**, 8m07s; all nine new overlay cases Passed. Before further acceptance, merged concurrent master `ff65ac0b` into integration (`daf75cd6`), preserving sound polish, speech, globals tracking and play-start guards. Assembled solution build zero warnings/errors, 12.98 seconds; three regenerated-matrix checks pass, 21 ms. Repeated required full suite with all external roots: **1,739 passed, zero failed, five expected skips**, 7m55s; Core/tests stay identical to `daf75cd6` through subsequent App-only fixes. [Combined commands and evidence](../../../.verification/maniaczak-room-controls-final-20261019/README.md).
+
+First serial overlay acceptance passes all four families: native MM outdoor exit and Zak bedroom exit update/reveal the selected card; Zak's native entry continues into Room 16 with its selector and cutscene preserved. Never/Hover/Always hotspots and doorways, native depth masks, walkboxes, camera geometry and unchanged runtime state pass. One Zak harness sampled too late and missed transient Room 02; its failed packet is retained, and frame-by-frame observation passes without changing the product. Screenshot review then found low-contrast new controls and a legacy preview refresh overwriting live Advanced Hotspots rows. App-only theme and widget-ownership fixes, plus immediate option refresh hooks, are integrated; targeted final reruns follow.
+
+Initial audio/status acceptance passes all four supplied families: actual Normal Sounds popups, one-click grant/close, reopened Undo, unchanged Apply/close and stale-batch rejection. Actual LOOM Sound 13 rendering loads audio and is stopped/deleted on folder switch; synthetic late completion remains silent. Final audio follow-ups preserve generic CD menu visibility and bind/cancel render tasks to their original game, including the concurrently merged timing paths. No listening/timing equivalence is claimed.
+
+Final acceptance uses identical production source `bde49369` in all three workers. Actual action/menu windows pass for MM Classic (24.83s), MM Enhanced (53.67s), Zak Classic (49.88s) and Zak Enhanced (49.00s): Normal/Advanced scene menus, actual launch rows, native direct TV/drawer effects without sentence input, and Advanced raw source/relationships. The MMe route also verifies returning to LOOM restores its existing Interact UI. Final overlay reruns pass for all four (7.53/7.67/9.17/9.25s); inspected captures confirm native HOTSPOTS and separate DOORWAYS rows survive depth/walkbox changes. Audio/status reruns pass for all four in 32.82s, including device changes, atomic Apply/close/Undo and stale rejection. A gated old render cannot publish after replacement-game attachment; native LOOM Sound 13 folder retirement passes in 3.13s. All owned windows/processes are closed and the verification lease released.
+
+Final assembled solution build: zero warnings/errors, 7.52s. Regenerated matrix checks: three passed, zero failed/skipped, 21ms. No support levels change; ZakClassic Costumes remains Partial at 24 derived / 11 estimated palettes. Source remains `bde49369`, with Core/tests identical to the full-suite freeze `daf75cd6`. Final evidence commits are `4ef117ea` (actions), `01ceacc2` (overlays), and `57ddc388`/`f9013ef3` (audio/status).
+
+## Not done and why
+
+Generic Advanced inspection offers raw source and links; the only existing readable presenter encodes LOOM actor/variable meanings and is not reused for Maniac/Zak. No generic readable formatter is claimed. The exact fresh unanswered-Maniac-party-menu to explicit scene path remains without end-to-end window proof; the narrow existing R-8.34 fingerprinted preparation and all partial-choice guards are retained. Two telescope attempts establish direct dispatch but not its guarded scene outcome; successful native TV/drawer effects provide the direct-Interact acceptance instead. Failed preparations and harness assumptions remain in the worker records.
+
+Cutscene lists remain source-derived rather than hand-validated. Direct Interact requires actual native control in the live displayed room; a static manual preview stays inspectable without autoplaying entry or answering startup. Static scene launching uses the existing reviewed Maniac startup preparation only where appropriate, preserving partial user choices and excluding a retained active cutscene. Sound scans follow literal calls/source-bound arguments to depth four; computed/deeper calls remain unresolved and disclosed in Advanced. Native sound events supplement those possible associations.
+
+## Decisions made
+
+Use native data/session snapshots and existing explicit action paths. Direct Interact is an exploration action, not sentence gameplay. Normal content stays readable; technical provenance stays Advanced. Source relationships remain distinct from executed routes. The existing bounded manual-entry fallback remains intact.
+
+## Proposed requirements and user checks
+
+No approval gate: the listed rules are explicitly requested. Optional checks: walk through a native MM outdoor exit or Zak bedroom exit and observe the selected card follow; independently toggle Hotspots/Doorways and Advanced depth/walkboxes; compare Normal/Advanced scenes in MM Room 26 or Zak Room 16; grant an item with Apply and close, then reopen for Undo. For listening, play LOOM Sound 13 with AdLib and change to a Maniac folder while it plays. Listening fidelity and complete earned game routes remain separate acceptance.
+
+## Cost and next run
+
+Three isolated implementation agents, resumed as three verification agents after rate limits, plus parent integration. Windows were serialized under an exclusive lease. Shared-source fixes stay App-only after the merged backend freeze. Current requirements and support notes remain in REQUIREMENTS; no redundant tracker is created. Changelog keeps 22–23 October active, moving the prior 18–20 October entries into an optional archive with adjusted relative links (30 dated entries and 37 link targets preserved). Stop at this checkpoint with no automatic next feature.
+
+## Promotion
+
+On 23 October, integration merged master again: already up to date at `ff65ac0b`, with both checkouts clean. Master fast-forwarded to `79b481b8`. The normal App build on master succeeded with zero warnings/errors in 6.77s, refreshing `Exe/Debug/SCUMMexplorer.exe`. This final documentation-only promotion record is committed and fast-forwarded separately; product source remains identical to `bde49369`, and Core/tests to `daf75cd6`. Worktrees are retained; no user app or game data was changed.

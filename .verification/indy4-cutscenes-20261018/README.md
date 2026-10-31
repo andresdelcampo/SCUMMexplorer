@@ -105,5 +105,5 @@ Source only (the bundled ScummVM was not run, per the brief): `string.cpp` `hand
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
 - Scene rows: [`docs/indy4/INDY4_SCRIPT_MAP.md`](../../docs/indy4/INDY4_SCRIPT_MAP.md) (Rooms 1, 11, 82, 10 (S7); "skips to the verbs").
-- Tracker and decision log: [`docs/indy4/SUPPORT_STATUS.md`](../../docs/indy4/SUPPORT_STATUS.md).
+- Tracker and decision log: [`docs/archive/indy4/SUPPORT_STATUS.md`](../../docs/archive/indy4/SUPPORT_STATUS.md).
 - Requirements: R-8.32 and R-8.33 (Proposed) apply; no new row.

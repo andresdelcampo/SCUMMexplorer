@@ -35,7 +35,7 @@ The shared rules above apply through the v1 dialect and `ScummV1DataSource`: fix
 
 ## SCUMM v2 (Maniac Mansion Enhanced, Zak McKracken Enhanced)
 
-The shared rules above apply through `ScummV2DataSource`, with counts and directories read from the index. S4b acceptance for both enhanced fixtures, their explicit input/timing assumptions and the remaining later-stage work are recorded in [the Maniac/Zak checkpoint](../checkpoints/20261017-S4b-ManiacZak.md).
+The shared rules above apply through `ScummV2DataSource`, with counts and directories read from the index. S4b acceptance for both enhanced fixtures, their explicit input/timing assumptions and the remaining later-stage work are recorded in [the Maniac/Zak checkpoint](../archive/checkpoints/20261017-S4b-ManiacZak.md).
 
 ## SCUMM v3 (LOOM EGA, Indiana Jones and the Last Crusade EGA)
 

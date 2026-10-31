@@ -5,7 +5,7 @@
 | Families (`GameFamily`) | `MonkeyFloppy`, `MonkeyCd` |
 | Fixtures (folders under `Games`) | `monkey1 ega en` (floppy, four disks, 256 colours), `monkey1 vga en` (CD), also `monkey1 ega es`, `monkey1 vga es` (both floppies) |
 | SCUMM version(s) and script dialect | floppy: v4 (`V4`); CD: v5 (`V5`) |
-| Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
+| Tracker | [SUPPORT_STATUS.md](../archive/monkey1/SUPPORT_STATUS.md) |
 | Script map | [MONKEY1_SCRIPT_MAP.md](MONKEY1_SCRIPT_MAP.md) |
 | Other notes | none |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |

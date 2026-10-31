@@ -43,7 +43,7 @@ No new engine behavior changed; source comparison reuses S7 script_v2.cpp review
 
 ## Differences and uncertainties kept
 
-Comparison remains source/explorer evidence only; no ScummVM executable ran. Reuse [S7 record](../zakclassic-cutscenes-20261018/README.md) and [S7 checkpoint](../../docs/checkpoints/20261018-S7-ManiacZak.md) for source comparison and real-window results. Classic eleven estimated costume colours, S5 original-game visual acceptance, darkness/flashlight/walking limits, five capped S7 previews and user timing/listening checks remain unchanged. No data/profile mutation, seed, catalog, forced story state or junction. Registry unchanged because no missing feature was implemented and no alternate edition was verified. Next edition checks require an actual additional Classic copy; no new user retest is needed for this test/document-only pass.
+Comparison remains source/explorer evidence only; no ScummVM executable ran. Reuse [S7 record](../zakclassic-cutscenes-20261018/README.md) and [S7 checkpoint](../../docs/archive/checkpoints/20261018-S7-ManiacZak.md) for source comparison and real-window results. Classic eleven estimated costume colours, S5 original-game visual acceptance, darkness/flashlight/walking limits, five capped S7 previews and user timing/listening checks remain unchanged. No data/profile mutation, seed, catalog, forced story state or junction. Registry unchanged because no missing feature was implemented and no alternate edition was verified. Next edition checks require an actual additional Classic copy; no new user retest is needed for this test/document-only pass.
 
 ## User checks (exact steps and where; none if none)
 

@@ -1,6 +1,6 @@
 # Room overlays, Advanced panel and Game Status across the live games, 24 October 2026
 
-Request (20 October): bring hotspots, depth areas, walk boxes, separate doorways, the Advanced right panel and one-click Game Status to every live game, LOOM as reference. Maniac/Zak was already merged to master by the Codex orchestrator (`71d55e98`, checkpoint `docs/checkpoints/20261019-RoomControls-ManiacZak.md`); this record surveys the other verb-based games on that merged master, with no local copy of the Codex work.
+Request (20 October): bring hotspots, depth areas, walk boxes, separate doorways, the Advanced right panel and one-click Game Status to every live game, LOOM as reference. Maniac/Zak was already merged to master by the Codex orchestrator (`71d55e98`, checkpoint `docs/archive/checkpoints/20261019-RoomControls-ManiacZak.md`); this record surveys the other verb-based games on that merged master, with no local copy of the Codex work.
 
 ## Method
 

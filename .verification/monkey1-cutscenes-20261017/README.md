@@ -93,5 +93,5 @@ Source only (the bundled ScummVM was not run, per the brief): as the Indy3 S7 re
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
 - Scene rows: [`docs/monkey1/MONKEY1_SCRIPT_MAP.md`](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md) (Global scripts 25/26, 60, 117; Rooms 19, 28, 33, 37).
-- Tracker and decision log: [`docs/monkey1/SUPPORT_STATUS.md`](../../docs/monkey1/SUPPORT_STATUS.md) (MonkeyFloppy).
+- Tracker and decision log: [`docs/archive/monkey1/SUPPORT_STATUS.md`](../../docs/archive/monkey1/SUPPORT_STATUS.md) (MonkeyFloppy).
 - Requirements: R-8.32 and R-8.33 (Proposed) now name MonkeyFloppy; no new row.

@@ -75,4 +75,4 @@ Follow the action files/family records in the app and check physical mouse feel,
 
 ## Where facts went
 
-[S6 checkpoint](../../docs/checkpoints/20261017-S6-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [requirements](../../docs/REQUIREMENTS.md).
+[S6 checkpoint](../../docs/archive/checkpoints/20261017-S6-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [requirements](../../docs/REQUIREMENTS.md).

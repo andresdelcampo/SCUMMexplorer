@@ -27,4 +27,4 @@ App artifact: `Exe\Debug\SCUMMexplorer.exe` (beside `SCUMMexplorer.dll`). Test a
 
 Full suite: **1125 passed, 0 failed, 5 skipped, 1130 total**, reported duration **5 m 7 s**. The command exited 0 with all three fixture variables above set. Skipped tests are not counted as verified behavior.
 
-No ScummVM executable was run. No Games junction was created and no worktree was removed. Original-game visual, listening and timing comparisons are not claimed. S5, S6, S7 and S9 remain next work; see the [checkpoint](../../docs/checkpoints/20261017-S4b-ManiacZak.md).
+No ScummVM executable was run. No Games junction was created and no worktree was removed. Original-game visual, listening and timing comparisons are not claimed. S5, S6, S7 and S9 remain next work; see the [checkpoint](../../docs/archive/checkpoints/20261017-S4b-ManiacZak.md).

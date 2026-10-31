@@ -89,5 +89,5 @@ Source only (the bundled ScummVM was not run, per the brief): as the floppy and 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
 - Scene rows: [`docs/monkey1/MONKEY1_SCRIPT_MAP.md`](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md), CD section (Global scripts (CD): 60; Rooms (CD): 33, 19, the verb 0x50 entries).
-- Tracker and decision log: [`docs/monkey1/SUPPORT_STATUS.md`](../../docs/monkey1/SUPPORT_STATUS.md) (MonkeyCd).
+- Tracker and decision log: [`docs/archive/monkey1/SUPPORT_STATUS.md`](../../docs/archive/monkey1/SUPPORT_STATUS.md) (MonkeyCd).
 - Requirements: R-8.32 and R-8.33 (Proposed) apply; no new row.

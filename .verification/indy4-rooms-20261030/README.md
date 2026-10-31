@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Items | [ROADMAP](../../docs/ROADMAP.md) / [tracker](../../docs/indy4/SUPPORT_STATUS.md): "Rooms 76, 77, 87 have an unfollowed camera-after-walk item"; "the play view still draws each object's first-state image"; "a magenta line crosses Room 4's picture after the boot" |
+| Items | [ROADMAP](../../docs/ROADMAP.md) / [tracker](../../docs/archive/indy4/SUPPORT_STATUS.md): "Rooms 76, 77, 87 have an unfollowed camera-after-walk item"; "the play view still draws each object's first-state image"; "a magenta line crosses Room 4's picture after the boot" |
 | Fixture | `D:\Juegos\Lucas\indy4 vga en` |
 | Tools | `../indy4-objects-20261017/RoomAudit`, `../indy3-castle-20261030/SourceDump` (`visit:`, `box:`, `v:` modes added), `../monkeycd-rooms-20261030/StartFrames` |
 

@@ -5,7 +5,7 @@
 | Families (`GameFamily`) | `Monkey2` |
 | Fixtures (folders under `Games`) | `mi2 talkie en` and `mi2 talkie es` (talkie), `mi2 mt32 en`, `mi2 sb16 en`, `mi2 classic es` (floppy releases) |
 | SCUMM version(s) and script dialect | v5 (`V5`) |
-| Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
+| Tracker | [SUPPORT_STATUS.md](../archive/monkey2/SUPPORT_STATUS.md) |
 | Script map | [MONKEY2_SCRIPT_MAP.md](MONKEY2_SCRIPT_MAP.md) |
 | Other notes | none |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |

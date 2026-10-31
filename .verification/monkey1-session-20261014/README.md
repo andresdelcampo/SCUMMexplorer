@@ -58,4 +58,4 @@ None required. (A look at `room-33-after-boot.png` against the real game's first
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Monkey Island script map](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md), [boot sequence v4](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [variables and opcode rules](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker and decision log (MonkeyFloppy block)](../../docs/monkey1/SUPPORT_STATUS.md), Proposed rows R-3.15, R-15.7 and R-15.8 in [REQUIREMENTS](../../docs/REQUIREMENTS.md).
+[Monkey Island script map](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md), [boot sequence v4](../../docs/engine/SCUMM_BOOT_SEQUENCE.md), [variables and opcode rules](../../docs/engine/SCUMM_SCRIPT_MAP.md), [tracker and decision log (MonkeyFloppy block)](../../docs/archive/monkey1/SUPPORT_STATUS.md), Proposed rows R-3.15, R-15.7 and R-15.8 in [REQUIREMENTS](../../docs/REQUIREMENTS.md).

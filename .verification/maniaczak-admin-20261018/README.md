@@ -47,4 +47,4 @@ Open Game Status after startup, search for an item, choose a pictured Maniac rec
 
 ## Where the facts went
 
-[Requirements](../../docs/REQUIREMENTS.md), [checkpoint](../../docs/checkpoints/20261018-Admin-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [dedicated handoff](../../NEXT_SESSION_PROMPT_MANIAC_ZAK.md).
+[Requirements](../../docs/REQUIREMENTS.md), [checkpoint](../../docs/archive/checkpoints/20261018-Admin-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [dedicated handoff](../../NEXT_SESSION_PROMPT_MANIAC_ZAK.md).

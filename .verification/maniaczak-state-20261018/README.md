@@ -58,4 +58,4 @@ Open a checked Maniac copy, make native party choices, lift the mat and take the
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Checkpoint](../../docs/checkpoints/20261018-S8-ManiacZak.md), [Maniac map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [Zak map](../../docs/zak/ZAK_SCRIPT_MAP.md), family trackers, engine object-state notes and Proposed REQUIREMENTS §12.1. Four family evidence records use the fixed template.
+[Checkpoint](../../docs/archive/checkpoints/20261018-S8-ManiacZak.md), [Maniac map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [Zak map](../../docs/zak/ZAK_SCRIPT_MAP.md), family trackers, engine object-state notes and Proposed REQUIREMENTS §12.1. Four family evidence records use the fixed template.

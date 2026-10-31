@@ -1,6 +1,6 @@
 # Maniac/Zak labels and fidelity integration — 19 October 2026
 
-Baseline clean master `ce405e7b`; integration branch `codex/maniaczak-status-polish`. Production source is frozen at `aa1cee45`; later commits contain records only. Scope and remaining limits are in the [checkpoint](../../docs/checkpoints/20261019-LabelsFidelity-ManiacZak.md). No support levels change. Both generated support matrices are regenerated and checked rather than manually edited.
+Baseline clean master `ce405e7b`; integration branch `codex/maniaczak-status-polish`. Production source is frozen at `aa1cee45`; later commits contain records only. Scope and remaining limits are in the [checkpoint](../../docs/archive/checkpoints/20261019-LabelsFidelity-ManiacZak.md). No support levels change. Both generated support matrices are regenerated and checked rather than manually edited.
 
 ## Required commands
 

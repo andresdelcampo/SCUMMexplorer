@@ -107,4 +107,4 @@ User check: play from Room 4, click the statue and watch the credits in Room 5 (
 
 ## Where the facts went
 
-[Script map](../../docs/indy4/INDY4_SCRIPT_MAP.md) (input chain, verbs, objects, rooms), [tracker and decision log](../../docs/indy4/SUPPORT_STATUS.md), [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md) (talkie speech, v5), CHANGELOG 18 October.
+[Script map](../../docs/indy4/INDY4_SCRIPT_MAP.md) (input chain, verbs, objects, rooms), [tracker and decision log](../../docs/archive/indy4/SUPPORT_STATUS.md), [engine notes](../../docs/engine/SCUMM_SCRIPT_MAP.md) (talkie speech, v5), CHANGELOG 18 October.

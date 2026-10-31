@@ -74,4 +74,4 @@ State-gated starts get no invented prerequisites. Normal mode hides entries whos
 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
-[Checkpoint](../../docs/checkpoints/20261018-S7-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [requirements](../../docs/REQUIREMENTS.md). Family records contain the full census and three source proof transcripts.
+[Checkpoint](../../docs/archive/checkpoints/20261018-S7-ManiacZak.md), [Maniac and Zak support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries), [requirements](../../docs/REQUIREMENTS.md). Family records contain the full census and three source proof transcripts.

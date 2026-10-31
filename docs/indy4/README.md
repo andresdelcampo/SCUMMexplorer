@@ -5,7 +5,7 @@
 | Families (`GameFamily`) | `Indy4` |
 | Fixtures (folders under `Games`) | `indy4 vga en`, `indy4 talkie vga es`, `indy4 classic vga es` |
 | SCUMM version(s) and script dialect | v5 (`V5`) |
-| Tracker | [SUPPORT_STATUS.md](SUPPORT_STATUS.md) |
+| Tracker | [SUPPORT_STATUS.md](../archive/indy4/SUPPORT_STATUS.md) |
 | Script map | [INDY4_SCRIPT_MAP.md](INDY4_SCRIPT_MAP.md) |
 | Other notes | none |
 | Engine facts used | [resource formats](../engine/SCUMM_RESOURCE_FORMATS.md), [script reference](../engine/SCUMM_SCRIPT_MAP.md), [boot sequence](../engine/SCUMM_BOOT_SEQUENCE.md) |

@@ -47,4 +47,4 @@ The integrated sequential real-window checks are recorded in the [enhanced Zak w
 
 ## Where the facts went
 
-[Catalog checkpoint](../../docs/checkpoints/20261018-Catalog-ManiacZak.md), [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). The parent owns shared registry/matrix and final full-suite integration.
+[Catalog checkpoint](../../docs/archive/checkpoints/20261018-Catalog-ManiacZak.md), [Maniac script map](../../docs/maniac/MANIAC_SCRIPT_MAP.md), [support requirements](../../docs/REQUIREMENTS.md#maniac-and-zak-support-boundaries). The parent owns shared registry/matrix and final full-suite integration.
