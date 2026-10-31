@@ -34,6 +34,7 @@ int catSame = 0, helpers = 0, sharedCode = 0;
 var thresholds = new[] { 60, 100, 150, 200, 300, 400, 600 };
 var runRule = new int[thresholds.Length];
 var catLog = new List<string>();
+var frameLog = new List<string>();
 int n = 0, found = 0, begun = 0, roomsSame = 0, roomsMore = 0, roomsFewer = 0;
 var ways = new Dictionary<string, int>();
 foreach (var replay in catalog.EnumerateArray())
@@ -69,6 +70,8 @@ foreach (var replay in catalog.EnumerateArray())
     // The catalog's rule (R-8.9) applied to the run: another room reached, or a long silent animation (no line, at least T frames).
     for (var t = 0; t < thresholds.Length; t++)
         if ((plan.Result.RoomsEntered.Any(r => r != room) || plan.Result.Lines == 0 && plan.Result.Frames >= thresholds[t] ? "Scenes" : "Dialogue and reactions") == expectedCategory) runRule[t]++;
+    var catalogFrames = replay.GetProperty("frames").GetInt32();
+    frameLog.Add($"{catalogFrames}	{plan.Result.Frames}	{plan.Result.Lines}	{id}");
     catLog.Add($"{expectedCategory}	{plan.Result.Lines}	{plan.Result.Frames}	{plan.Result.RoomsEntered.Count}	{id}");
     if (match == "same") roomsSame++; else if (match == "more") roomsMore++; else roomsFewer++;
     if (way != "own" || match != "same")
@@ -77,5 +80,6 @@ foreach (var replay in catalog.EnumerateArray())
 }
 Console.WriteLine("run-based category agreement by silent-frames threshold: " + string.Join(", ", thresholds.Select((t, i) => $"{t}: {runRule[i]}")));
 File.WriteAllLines("../categories.tsv", catLog);
+File.WriteAllLines("../frames.tsv", frameLog);
 Console.WriteLine($"replays {Math.Min(n, max)}: found {found}, begin {begun}; " + string.Join(", ", ways.OrderBy(w => w.Key).Select(w => $"{w.Key} {w.Value}")) +
                   $"; rooms same {roomsSame}, more {roomsMore}, fewer {roomsFewer}; category same {catSame}; not grouped: shared helper {helpers}, shared code {sharedCode}");

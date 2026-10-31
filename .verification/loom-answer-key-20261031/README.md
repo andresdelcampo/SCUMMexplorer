@@ -26,6 +26,16 @@ The shared engine (`ScummCutscenePlanner` on a `ScummGameSession`, the path Indy
 
 The catalog's titles are not compared: they use LOOM's verb and draft names (`LoomCutsceneVerbs`), which the generic engine does not have.
 
+## Scene length (frames, the catalog less its 32 idle frames)
+
+Within 5 frames 192, within 10% 9, within 50% 6, further 31: 201 of 238 (84%) play essentially the same scene. The 37 others play another branch or end differently: much shorter in the engine (Room 18's looks at 369 and 371: 84 and 154 frames against 536 and 567; Room 04's walk responses), much longer (Room 23's draft reactions at the workers: 41 lines against a short reaction). Likely the start state the catalog's replays had (Bobbin's look and staff, actors, camera); `frames.tsv` lists them.
+
+## What retiring the catalog needs
+
+1. The 37 length differences fixed in the shared engine (start state derived, not recorded).
+2. LOOM's Interact offering the shared draft reactions ("Other draft response", verb 0x56: 61 of the 90 not listed as scenes), so nothing becomes unreachable.
+3. Then the catalog shrinks to reviewed data the engine cannot derive: titles and draft names, the named sequences, Room 46's recipe.
+
 ## Next
 
 - The named sequences (The Elders' trial, the firewood scene, Walk to Room 13, Room 46's recipe) and the catalog's start states (Bobbin's look and staff, the camera) are what the shared engine cannot produce yet; they are the reviewed data to keep.
