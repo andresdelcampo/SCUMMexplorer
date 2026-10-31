@@ -51,9 +51,13 @@ Open before shipping:
 3. First run on a clean profile (user will try): no last folder, no MT-32 ROM folder, welcome text; Roland must fail gracefully without ROMs.
 4. Update the unit tests' per-edition expectations if more editions are added (`known-editions.json`, `dotnet run --project .verification/known-editions/Make`).
 
+## Scope (31 October 2026)
+
+The user narrowed the product (REQUIREMENTS R-1.14, §8.6; [ROADMAP](ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; Play stays as it is and comes last. Next engine work: the scene setup of §8.6 for every game, starting with Indy 3.
+
 ## Next work
 
-No automatic next feature. The user is collecting issues from their own testing and will supply a list; work from that list, one step at a time. Candidates meanwhile, in order of visible effect:
+Follow [ROADMAP](ROADMAP.md) "The work, in order" (scene setup for every game first), plus the user's reports as they arrive. Older candidates:
 1. Capture and fix the crash and the black-rooms report once the user names the game and room.
 2. ~~Monkey Island 2 copy-protection / opening-cutscene blocking~~ (fixed 30 October; retest in USER_CHECKS).
 3. ~~Known MI CD and Indy 4 room items~~ (done 30 October).
@@ -63,7 +67,7 @@ No automatic next feature. The user is collecting issues from their own testing 
 
 - Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot.
 - Cutscene launches set missing story state, actors, room state and costume (REQUIREMENTS 8.5, R-8.26 to R-8.31); `LoomCutsceneReadiness` implements this partly for LOOM. The approved late-room exception runs reviewed actual source prerequisites when absent (the fingerprinted English Room 46 recipe); do not generalize it by guessing story bits.
-- Costumes persist until source changes them. Derive actor look, placement and scene starts from own-edition scripts; no forced costumes/flags/boxes, one-off teleports or room-specific engine hacks. Label estimates and picker assumptions.
+- Costumes persist until source changes them. Derive actor look, placement and scene starts from own-edition scripts; no room-specific engine hacks. Rooms' first visits and Play never force costumes, flags or positions; a scene or interaction the user picks may (teleport, dress, give items, set the flags its code tests: R-1.9, §8.6), generically and listed in Advanced. Label estimates and picker assumptions.
 - Single click walks/uses through source scripts; double click also looks. Stored-art cycling is inspection only. Source responses and touchability govern navigation.
 - Normal mode shows artwork, game text and concise controls. Technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches; keep window subtitles short.
 - Source execution, prepared Core/WPF checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, earned prerequisites or timing.

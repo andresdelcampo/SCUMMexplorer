@@ -4,16 +4,16 @@ Written 30 October 2026 (roadmap E2). The checks only you can do, one short list
 
 Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If the app crashes, the log is in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` (a forced close or a crash no handler saw is logged as `…-unclean-exit.log` at the next start).
 
-## Decisions waiting for you (gate G)
+## Decisions waiting for you (gate F)
 
 | # | Question | Where it comes from | Answer |
 |---|---|---|---|
-| 1 | The Play rules for verb games, R-7.7 to R-7.18 (and R-7.19 to R-7.21 for Maniac/Zak), R-8.32 to R-8.34 (cutscene lists): confirm, or say what to change. | REQUIREMENTS §7.1, §8 (Proposed) | |
+| 1 | The Play rules for verb games, R-7.7 to R-7.18 (and R-7.19 to R-7.21 for Maniac/Zak), R-8.32 to R-8.34 (cutscene lists): confirm, or say what to change. | REQUIREMENTS §7.1, §8 (Proposed) | 31 Oct: not needed. Play is the lowest priority and not a sign-off condition (R-1.14); R-8.32 to R-8.34 give way to §8.6. |
 | 2 | A picked room whose entry leaves it (MI2's campfire, Room 4): a Normal-mode hint pointing to Play Game Intro, or let the boot room play its settled boot state? | R-8.5b vs R-5.3a | |
-| 3 | Restart and save/load keys (Indy 3 F5, `VAR_MAINMENU_KEY`): refused as now, or working? | NEXT_SESSION_PROMPT | |
+| 3 | Restart and save/load keys (Indy 3 F5, `VAR_MAINMENU_KEY`): refused as now, or working? | NEXT_SESSION_PROMPT | 31 Oct: moot, nothing is saved or loaded (R-1.14). |
 | 4 | Indy 3's cursor: ScummVM's 16 × 16 cross-hair is used; the game draws a different one. Acceptable? | R-1.5, Indy 3 tracker | |
 | 5 | Indy 3: count `printEgo` lines as first texts (changes the text columns)? | CURRENT_WORK | |
-| 6 | Is a script-derived cutscene list (◐) the finish line for every game except LOOM English, or should some get a hand-checked list? | ROADMAP gate D | |
+| 6 | Is a script-derived cutscene list (◐) the finish line for every game except LOOM English, or should some get a hand-checked list? | ROADMAP gate D | 31 Oct: every listed scene should play when picked, with its state set up (§8.6); no hand-checked lists. |
 | 7 | Indy 3 castle Rooms 20, 28, 32: guards can start a confrontation at any moment, so the catalog shows a still picture (R-8.5b). Make such rooms live anyway? | [record](../.verification/indy3-castle-20261030/README.md) | |
 
 ## LOOM

@@ -19,16 +19,16 @@ The user said "keep making fixes, no need to ask": take the next roadmap item, f
 
 Harnesses added today: `.verification/mi2-intro-protection-20261030/IntroWindowCheck` (real window, Play Game Intro, keys), `IntroProbe`; `.verification/monkeycd-rooms-20261030/StartFrames` (real window, pick a room, rooms per frame, picture), `BlockDump`; `.verification/indy3-castle-20261030/SourceDump` (any game: `g:`, `e:`, `l:`, `v:` object verbs, `o:`, `find:`, `box:`, `visit:`, `prep:`).
 
-## Scope question (31 October, waiting for the user)
+## Scope (decided 31 October)
 
-The user asked whether the scope (a fully playable game per title) can be lowered toward the original idea: a static explorer that replays interactions and cutscenes. Proposed: keep the script engine (scenes are scripts, so it is needed anyway); replace the generic start planner E4 with session snapshots (save any moment of your own play or a catalog pick, start scenes and interactions from it); make Play a means, not a gate, for the non-LOOM games (drop E5 and the R-7.x sign-off, lighter C/F passes); gate B as spot checks. Do not start E4 or E5 before the user answers; rewrite ROADMAP's gates if they agree.
+The user narrowed the product (REQUIREMENTS R-1.14 and §8.6, rewritten [ROADMAP](docs/ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; no save/load; Play stays as it is and comes last. Build incrementally.
 
 ## Next, in order
 
-1. ~~Gate A leftovers~~ done 31 October: held objects' verbs work in another room (`getDist` owner position in every version); Rooms 1 and 15 never rest (crowds; not a bug).
-2. The user's crash and "thin black rooms" reports once they name the game and room (the crash log now records them).
-3. First launch is fixed (Indy 4 play at 4.5 s). `dotnet-trace` is installed (global tool): `--profile dotnet-sampled-thread-time --format Speedscope` with `LaunchStalls` finds UI stalls; remember App.xaml's StartupUri opens a second window under `app.Run()`.
-4. Shared engine work E3 (a working ScummVM capture for picture comparisons), E4 (generic cutscene start planner), then E5 (Status beyond v1/v2) if the user wants it.
-5. Release readiness for LOOM (packaging, version, clean-profile first run).
+1. **Scene setup for every game (§8.6, roadmap item 1), Indy 3 first.** Read `Loom/Scenes/LoomCutsceneReadiness.cs` (the LOOM search: fresh trials, raise one tested story item at a time, keep it when the scene begins or reaches further) and `Scumm/Session/ScummCutscenePlanner.cs`. Move the search to `Scumm/` and widen it to object states and owners (items given), actors placed and dressed. Measure on Indy 3's 58 groups that begin nothing ([record](.verification/indy3-cutscenes-20261017/README.md)), then Monkey Island 1 (Script 117's SCUMM Bar exit: open door, `bit[0x1BE]`), Monkey Island 2, Indy 4. Keep LOOM's behaviour unchanged (before/after on its tests).
+2. Interactions in a picked room (R-8.38): compare what a room offers with its objects' verbs that have code.
+3. Derivation time once the setup adds trials (MI2 140–174 s).
+4. The user's crash and "thin black rooms" reports when they name the game and room. `dotnet-trace` is installed for UI stalls (`--profile dotnet-sampled-thread-time --format Speedscope`, with `LaunchStalls`).
+5. Release readiness for LOOM.
 
-Ask the user, once, for the answers in USER_CHECKS (seven decisions, the retests) if they have not given them.
+Decisions 1, 3 and 6 in USER_CHECKS were answered by the scope decision; 2, 4, 5 and 7 and the retests are still open: ask once if the user has not given them.
