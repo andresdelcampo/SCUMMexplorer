@@ -146,7 +146,12 @@ internal abstract class GameModuleBase : IGameModule
     public virtual IGameVoice Voice => NoVoice.Instance;
     public virtual bool VoicesEnabled { get; set; } = true;
     public virtual bool UpdateRoomSounds(GameResource? room) => false;
-    public virtual GameNames CreateNames(GameLibrary game) => new(LoomGlossary.Load(game), null, "the hero");
+    // The verb names the game's own verbOps give (LoomGlossary.VerbName); a game module with reviewed names gives its own.
+    public virtual GameNames CreateNames(GameLibrary game)
+    {
+        var glossary = LoomGlossary.Load(game);
+        return new(glossary, glossary.VerbName, "the hero");
+    }
     public virtual string? ScriptKind(GameResource resource) => null;
     public virtual Action? ScriptPlayback(int? scriptId) => null;
     public virtual bool HasDedicatedSession => false;

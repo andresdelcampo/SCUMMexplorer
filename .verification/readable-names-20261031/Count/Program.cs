@@ -28,27 +28,31 @@ foreach (var folder in args)
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException or NotSupportedException or ArgumentException) { }
     }
-    (int ObjNamed, int ObjBare, int ActorBare) Measure(LoomGlossary glossary)
+    (int ObjNamed, int ObjBare, int ActorBare, int VerbNamed, int VerbBare) Measure(LoomGlossary glossary, Func<int, string?>? verbs)
     {
-        int named = 0, bare = 0, actors = 0;
+        int named = 0, bare = 0, actors = 0, verbNamed = 0, verbBare = 0;
         foreach (var script in scripts)
         {
             string text;
-            try { text = new LoomScriptPresenter(glossary).Present(script); }
+            try { text = new LoomScriptPresenter(glossary, verbs, "the hero").Present(script); }
             catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException or ArgumentException) { continue; }
             var body = text.Split("\nNames used", 2)[0];
             named += Regex.Matches(body, @"\bobject \d+ “").Count;
             bare += Regex.Matches(body, @"\bobject \d+(?! “)\b").Count;
             actors += Regex.Matches(body, @"\bactor \d+\b").Count;
+            verbNamed += Regex.Matches(body, "verb \"").Count;
+            verbBare += Regex.Matches(body, @"\bverb 0x[0-9A-F]{2}\b(?!:)").Count;
         }
-        return (named, bare, actors);
+        return (named, bare, actors, verbNamed, verbBare);
     }
     var before = LoomGlossary.Load(game);
     typeof(LoomGlossary).GetField("_pendingGame", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(before, null);
-    var b = Measure(before);
-    var a = Measure(LoomGlossary.Load(game));
+    var b = Measure(before, null);
+    var after = LoomGlossary.Load(game);
+    var a = Measure(after, after.VerbName);
     string P(int n, int total) => total == 0 ? "-" : $"{100.0 * n / total:F1}%";
     var actorRefsBefore = b.ActorBare;
     Console.WriteLine($"{Path.GetFileName(folder.TrimEnd('/', '\\'))}: {scripts.Count} scripts; object references named {P(b.ObjNamed, b.ObjNamed + b.ObjBare)} -> {P(a.ObjNamed, a.ObjNamed + a.ObjBare)} " +
-                      $"({a.ObjNamed} of {a.ObjNamed + a.ObjBare}); actor references named {P(actorRefsBefore - b.ActorBare, actorRefsBefore)} -> {P(actorRefsBefore - a.ActorBare, actorRefsBefore)} ({actorRefsBefore - a.ActorBare} of {actorRefsBefore})");
+                      $"({a.ObjNamed} of {a.ObjNamed + a.ObjBare}); actor references named {P(actorRefsBefore - b.ActorBare, actorRefsBefore)} -> {P(actorRefsBefore - a.ActorBare, actorRefsBefore)} ({actorRefsBefore - a.ActorBare} of {actorRefsBefore}); " +
+                      $"verb references named {P(b.VerbNamed, b.VerbNamed + b.VerbBare)} -> {P(a.VerbNamed, a.VerbNamed + a.VerbBare)} ({a.VerbNamed} of {a.VerbNamed + a.VerbBare})");
 }

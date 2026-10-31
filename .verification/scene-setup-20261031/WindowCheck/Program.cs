@@ -83,11 +83,14 @@ internal static class Program
                     if (raw.StartsWith("s:", StringComparison.Ordinal))
                     {
                         var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
-                        var script = game.AllScripts.First(r => r.ScriptRoom is null && r.ResourceId == int.Parse(raw[2..]));
+                        // s:id:text logs only the lines that contain the text.
+                        var parts = raw.Split(':', 3);
+                        var script = game.AllScripts.First(r => r.ScriptRoom is null && r.ResourceId == int.Parse(parts[1]));
                         Call("SelectResourceInTree", script);
                         await Pump(3);
                         var shown = ((System.Windows.Controls.TextBox)window.FindName("ScriptOutput")).Text;
-                        foreach (var line in shown.Split('\n').Take(22)) Log("  | " + line.TrimEnd());
+                        var lines = shown.Split('\n');
+                        foreach (var line in parts.Length > 2 ? lines.Where(l => l.Contains(parts[2], StringComparison.Ordinal)).Take(12) : lines.Take(22)) Log("  | " + line.TrimEnd());
                         Capture(raw.Replace(':', '-'));
                         continue;
                     }

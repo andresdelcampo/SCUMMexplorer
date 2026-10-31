@@ -28,22 +28,23 @@ public sealed partial class LoomGlossary
             catch (Exception ex) when (ex is InvalidDataException or IOException or NotSupportedException or ArgumentException) { }
         }
         var named = new List<(int Actor, string Name, string Scope, string Where)>();
+        var verbs = new List<(int Actor, string Name, string Scope, string Where)>();
         void Scan(Func<ScummScriptDisassembly?> read, string scope, string label)
         {
             ScummScriptDisassembly? script;
             try { script = read(); }
             catch (Exception ex) when (ex is InvalidDataException or IOException or NotSupportedException or ArgumentException) { return; }
             if (script is null) return;
-            foreach (var ins in script.Instructions.Where(i => i.Operation == "actorOps"))
+            foreach (var ins in script.Instructions.Where(i => i.Operation is "actorOps" or "verbOps"))
             {
                 var first = ins.Operands.Split(',', 2)[0].Trim();
                 if (!first.StartsWith("0x", StringComparison.Ordinal) ||
                     !int.TryParse(first.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var actor)) continue;
-                if (ActorNameRegex().Match(ins.Operands) is not { Success: true } m) continue;
+                if ((ins.Operation == "actorOps" ? ActorNameRegex() : VerbNameRegex()).Match(ins.Operands) is not { Success: true } m) continue;
                 var name = m.Groups[1].Value.Trim();
                 // A name with control codes or no letter (a placeholder) is not a name.
                 if (name.Length == 0 || name.Contains('\\') || !name.Any(char.IsLetter)) continue;
-                named.Add((actor, name, scope, $"{label} +0x{ins.Offset:X4}"));
+                (ins.Operation == "actorOps" ? named : verbs).Add((actor, name, scope, $"{label} +0x{ins.Offset:X4}"));
             }
         }
         foreach (var id in data.GlobalScriptIds()) Scan(() => data.GlobalScript(id), $"script:{id}", $"global script {id}");
@@ -63,6 +64,12 @@ public sealed partial class LoomGlossary
             var first = scoped.First();
             rows.Add((first.Actor, first.Actor, new(first.Name, GlossaryEvidence.Decoded, $"actorOps actorName at {first.Where}"), first.Scope));
         }
+        foreach (var verb in verbs.GroupBy(n => n.Actor))
+        {
+            var scopes = verb.Select(n => n.Scope).Distinct().Count();
+            var top = verb.GroupBy(n => n.Name).Select(g => (Name: g.Key, Scopes: g.Select(n => n.Scope).Distinct().Count())).OrderByDescending(g => g.Scopes).First();
+            if (top.Scopes * 3 >= scopes * 2) _verbNames[verb.Key] = top.Name;
+        }
         foreach (var actor in named.GroupBy(n => n.Actor))
         {
             var scopes = actor.Select(n => n.Scope).Distinct().Count();
@@ -73,6 +80,21 @@ public sealed partial class LoomGlossary
                     $"actorOps actorName in {top.Scopes} of the {scopes} scripts that name actor {actor.Key} (first at {top.First}); numbers are reused, so a script that names it otherwise uses its own"), null));
         }
     }
+
+    /// <summary>
+    /// A verb's name in this game (<c>verbOps N, [… name "…"]</c>): the name given in at least two thirds of the scripts that name the verb (dialogue
+    /// choices reuse their numbers for every line, so they stay unnamed); null otherwise.
+    /// </summary>
+    public string? VerbName(int verb)
+    {
+        EnsureGameNames();
+        return _verbNames.TryGetValue(verb, out var name) ? name : null;
+    }
+
+    private readonly Dictionary<int, string> _verbNames = [];
+
+    [GeneratedRegex(@"(?:^|; |\[)name, ""([^""]*)""")]
+    private static partial Regex VerbNameRegex();
 
     [GeneratedRegex("actorName, \"([^\"]*)\"")]
     private static partial Regex ActorNameRegex();

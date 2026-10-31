@@ -27,6 +27,20 @@ public sealed class GameNamesReadableTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Indy3VerbsAreNamedFromItsVerbOps()
+    {
+        var folder = Path.Combine(TestGames.Root, "indy3 ega en");
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var glossary = LoomGlossary.Load(new GameFolderScanner().Scan(folder));
+        var named = Enumerable.Range(1, 0x7F).Select(v => (v, glossary.VerbName(v))).Where(p => p.Item2 is not null).ToList();
+        foreach (var (verb, name) in named) output.WriteLine($"verb 0x{verb:X2} = {name}");
+        // The interface verbs are named (Open, Close, Pick up ...); dialogue choices (verbs 0x78-0x7B) reuse their numbers for every line and stay unnamed; the fist-fight verbs 0x7C/0x7D keep one name each.
+        Assert.Contains(named, p => p.Item2 == "Open");
+        Assert.DoesNotContain(named, p => p.v is >= 0x78 and <= 0x7B);
+        Assert.Contains(named, p => p is (0x0B, "Pick up"));
+    }
+
+    [Fact]
     public void Monkey2NamesItsHeroGameWide()
     {
         var folder = Path.Combine(TestGames.Root, "mi2 mt32 en");

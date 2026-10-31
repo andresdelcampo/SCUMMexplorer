@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 31 October: readable scripts of every game name their verbs
+
+The verb names each game's own `verbOps` give (Indy 3: "Open" … "Pick up", "Talk"; dialogue choices stay unnamed) now show in the other games' readable scripts (`startObject`, `doSentence`): verb references named 0% → 56.8% (Indy 3 57%, MI1 44% and 29%, MI2 61%, Indy 4 80%) ([record](../../.verification/readable-names-20261031/README.md)).
 ## 31 October: readable scripts of every game name their objects and actors
 
 The readable view of Indy 3, Monkey Island 1 (both), Monkey Island 2 and Indy 4 now names objects (each room's stored name) and actors (`actorOps … actorName`, per script, with a game-wide reading where one name dominates). Object references named 0% → 76.1%, actor references 0% → 62.7% across 13,131 scripts (Indy 3 51%/75%, MI1 65%/39% and 70%/39%, MI2 79%/50%, Indy 4 85%/79%) ([record](../../.verification/readable-names-20261031/README.md)).
