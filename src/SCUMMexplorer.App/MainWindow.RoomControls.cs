@@ -153,6 +153,25 @@ public partial class MainWindow
                 items.Where(item => item.Start is not null).Select(item => (item.Title, IsAdvancedMode ? item.Note : null, item.Start!)));
     }
 
+    /// <summary>
+    /// The room, object and verb a cutscene entry's id names (<c>scumm-r-o-v</c>, <c>cd-r-o-v</c>, LOOM's catalog <c>Room NN object O Verb 0xVV</c>);
+    /// null for a room entry, the intro or a named sequence.
+    /// </summary>
+    internal static (int Room, int Object, int Verb)? CutsceneTrigger(string id)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(id, @"^(?:scumm|cd)-(\d+)-(\d+)-(\d+)$");
+        if (m.Success && int.Parse(m.Groups[2].Value) != 0) return (int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), int.Parse(m.Groups[3].Value));
+        m = System.Text.RegularExpressions.Regex.Match(id, @"^Room (\d+) object (\d+) Verb 0x([0-9A-F]+)$");
+        return m.Success ? (int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), Convert.ToInt32(m.Groups[3].Value, 16)) : null;
+    }
+
+    /// <summary>
+    /// R-8.2b (user, 31 October 2026): a room's Play Cutscene list leaves out the scenes that are an action of this room's Interact (the same object and
+    /// verb), which offers them already; room entries, the intro, named sequences and scenes started in another room stay.
+    /// </summary>
+    private static bool OfferedByInteract(string id, int room, Func<int, int, bool> interactHas) =>
+        CutsceneTrigger(id) is { } t && t.Room == room && interactHas(t.Object, t.Verb);
+
     private static RoomCutsceneEntry ToEntry(CutscenePickerItem item) => new(item.Title, item.Category, item.Note, item.Play, item.Status);
 
     private sealed class NoRoomControls : IRoomControlProvider

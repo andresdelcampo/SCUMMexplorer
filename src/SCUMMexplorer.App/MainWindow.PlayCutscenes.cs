@@ -144,7 +144,9 @@ public partial class MainWindow
         try { planner = lazy.Value; }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { return []; }
         // R-6.36 (user, 24 Oct): Normal lists every entry Advanced lists for the room; no fresh-start-run filter, no mode filter.
-        return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value))
+        return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value) &&
+                !OfferedByInteract($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", room.Value,
+                    (objectId, verbId) => GenericObjectActions(objectId).Any(action => action.Verb == verbId)))
             .Select(group => ($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", new CutscenePickerItem(
                 GenericCutsceneTitle(group.First) +
                 (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),

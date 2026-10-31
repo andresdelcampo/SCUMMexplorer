@@ -3,6 +3,10 @@
 The running log of finished work, newest first, each entry linking its record under `.verification/`. The current state is in [ROADMAP](../ROADMAP.md); what the app must do in [REQUIREMENTS](../REQUIREMENTS.md). Earlier parts: `CHANGELOG_THROUGH_2026-10-17.md`, `CHANGELOG_THROUGH_2026-10-20.md` in this folder.
 
 
+
+## 31 October: no duplicates between Interact and Play Cutscene
+
+User: keep Interact complete, remove the duplicates from the cutscene lists. A room's Play Cutscene list now leaves out the scenes that are actions of the room's Interact; room entries, the intro, named sequences, actions Interact does not offer and scenes started elsewhere stay; the Advanced whole-game picker lists everything. Interact offers every verb whose code starts decoding (Indy 3's package Open was missing). REQUIREMENTS R-8.2b, R-8.36 (one scene engine for every game), R-8.38 ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 31 October: fewer scenes have to be started at their cutscene
 
 The setup search now tries a picked object's own states when its code tests "this object" through a variable (Indy 3 `ifState var[0x007]`, Monkey Island 2 `getObjectState … var[0x007]`), offers inventory-only second objects, and applies the setup again after the room's entry (which may reset it). Scenes that showed nothing when started at their cutscene: Indy 3 10 → 4, Monkey Island 1 10 → 6 (floppy and CD), Monkey Island 2 24 → 15, Indy 4 35 → 29 (with a last try of all candidates together); every scene still begins ([record](../../.verification/scene-setup-20261031/README.md)).

@@ -139,8 +139,9 @@ public partial class MainWindow
                     var title = $"Action · {target}";
                     // Initialization/default table entries are source plumbing, not user verbs.
                     // Their complete code remains inspectable in Advanced.
-                    var executable = verb.VerbId < 250 && code is { UndecodedOffset: null } &&
-                        code.Instructions.Any(i => i.Offset == code.EntryOffset);
+                    // R-8.38: offered whenever its first instruction decodes; a decode note further on (Indy 3's package Open: a jump target outside
+                    // the resource) does not hide it, the session runs what it decodes and the note stays in Advanced.
+                    var executable = verb.VerbId < 250 && code is not null && code.Instructions.Any(i => i.Offset == code.EntryOffset);
                     var source = $"Room {room:00}, object {record.Id}, verb 0x{verb.VerbId:X2}; " +
                         (code is not null ? $"entry +0x{code.EntryOffset:X4}. Direct exploration action; no sentence is composed and the actor does not walk to the object."
                             : "Source unavailable: " + failure);

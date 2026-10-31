@@ -65,6 +65,26 @@ internal static class Program
                         Log($"  absent with verbs: [{string.Join(", ", absent)}]");
                         continue;
                     }
+                    // x:object lists the window's source actions of one object (executable or not).
+                    if (raw.StartsWith("x:", StringComparison.Ordinal))
+                    {
+                        foreach (var action in (System.Collections.IEnumerable)Field("_genericSourceActions")!)
+                        {
+                            var t = action!.GetType();
+                            if ((int)t.GetProperty("Object")!.GetValue(action)! != int.Parse(raw[2..])) continue;
+                            Log($"  verb 0x{(int)t.GetProperty("Verb")!.GetValue(action)!:X2} executable={t.GetProperty("Executable")!.GetValue(action)} {t.GetProperty("Source")!.GetValue(action)}");
+                        }
+                        continue;
+                    }
+                    // l lists the room's Play Cutscene entries (the room controls' own state).
+                    if (raw == "l")
+                    {
+                        var controls = typeof(MainWindow).GetProperty("CurrentRoomControls", Private)!.GetValue(window)!;
+                        var room = (int?)((SCUMMexplorer.Core.Domain.GameResource?)Field("_currentRoomResource"))?.ResourceId;
+                        var state = (RoomControlState)controls.GetType().GetMethod("ReadState")!.Invoke(controls, [room, false])!;
+                        Log($"  room {room} cutscenes ({state.RoomCutscenes.Count}): {string.Join(" | ", state.RoomCutscenes.Select(e => e.Title))}");
+                        continue;
+                    }
                     // o lists the Interact overview (every game, the room controls' own); c:group,choice runs one of its choices.
                     if (raw == "o" || raw.StartsWith("c:", StringComparison.Ordinal))
                     {

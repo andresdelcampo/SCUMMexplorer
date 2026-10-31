@@ -498,12 +498,16 @@ public partial class MainWindow
         return items;
     }
 
+    // The room's Interact choices (LOOM's verbs of each object of the room shown).
+    private bool LoomInteractHas(int objectId, int verbId) =>
+        _currentRoomObjectRecords.FirstOrDefault(record => record.Id == objectId) is { } record && InteractVerbs(record).Any(verb => verb.VerbId == verbId);
+
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
         if (ScannedCutscenes)
         {
-            var items = CdCutsceneItems(roomId).Select(choice => choice.Item).ToList();
+            var items = CdCutsceneItems(roomId).Where(choice => !OfferedByInteract(choice.Id, roomId, LoomInteractHas)).Select(choice => choice.Item).ToList();
             if (_game?.Id == GameId.LoomVga && CdIntroPlaysIn(roomId)) items.Insert(0, CdIntroItem());
             // The EGA opening (script 044) is not a scanned trigger; it plays in the rooms OpeningSource names, so Room 01 (the title) is never an empty list.
             else if (_game?.Id == GameId.Loom && roomId is 1 or 2 or 53)
@@ -512,7 +516,7 @@ public partial class MainWindow
         }
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
         var starts = (_replayCatalog?.Membership ?? []).ToDictionary(m => m.Id, m => m.StartRoom);
-        return PlayableCutsceneItems(ids).Select(choice =>
+        return PlayableCutsceneItems(ids).Where(choice => !OfferedByInteract(choice.Id, roomId, LoomInteractHas)).Select(choice =>
             starts.TryGetValue(choice.Id, out var start) && start != roomId
                 ? choice.Item with { Title = choice.Item.Title + $" (played from Room {start:00})" }
                 : choice.Item).ToList();
