@@ -34,7 +34,7 @@ internal static class Program
         async Task Pump(double seconds) { var until = clock.Elapsed.TotalSeconds + seconds; while (clock.Elapsed.TotalSeconds < until) await Task.Delay(20); }
         void State(string stage)
         {
-            var play = (ScummGameSession?)Field("_play");
+            var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
             Log($"{stage}: room={play?.CurrentRoomId} cutscene={play?.InCutscene} texts=[{string.Join(" / ", play?.Messages.OnScreen.SelectMany(m => m.Lines).Where(l => l.Length > 0).Take(3) ?? [])}]");
         }
         window.Loaded += async (_, _) =>
@@ -42,10 +42,46 @@ internal static class Program
             try
             {
                 Call("OpenGameFolder", args[0]);
-                for (var i = 0; i < 300 && !(bool)Field("_playRoomListsDone")!; i++) await Pump(1);
+                await Pump(3);
+                for (var i = 0; i < 300 && Field("_playPlanner") is not null && !(bool)Field("_playRoomListsDone")!; i++) await Pump(1);
                 Log($"derivation done={Field("_playRoomListsDone")}");
                 foreach (var raw in args.Skip(2))
                 {
+                    // a lists (LOOM) the objects with verbs that are not hotspots now: what the Interact overview adds since 31 October.
+                    if (raw == "a")
+                    {
+                        var session = Field("_session");
+                        var snapshot = session?.GetType().GetProperty("Snapshot")!.GetValue(session);
+                        var records = (System.Collections.IEnumerable)Field("_currentRoomObjectRecords")!;
+                        var absent = new List<string>();
+                        foreach (ScummRoomObjectRecord record in records)
+                        {
+                            var verbs = (System.Collections.ICollection)Call("InteractVerbs", record)!;
+                            if (verbs.Count == 0 || (record.X, record.Y) == (0, 0) || snapshot is null) continue;
+                            if (!(bool)Call("IsVerbHotspotAvailable", record, snapshot)!) absent.Add(record.Id.ToString());
+                        }
+                        Log($"  absent with verbs: [{string.Join(", ", absent)}]");
+                        continue;
+                    }
+                    // o lists the Interact overview (every game, the room controls' own); c:group,choice runs one of its choices.
+                    if (raw == "o" || raw.StartsWith("c:", StringComparison.Ordinal))
+                    {
+                        var controls = typeof(MainWindow).GetProperty("CurrentRoomControls", Private)!.GetValue(window)!;
+                        var overview = (RoomInteractionOverview?)controls.GetType().GetMethod("InteractionOverview")!.Invoke(controls, [false]);
+                        if (overview is null) { Log($"{raw}: no Interact overview"); continue; }
+                        if (raw == "o")
+                        {
+                            for (var g = 0; g < overview.Groups.Count; g++)
+                                Log($"  [{g}] {overview.Groups[g].Heading}: {string.Join(", ", overview.Groups[g].Choices.Select(c => c.Label))}");
+                            continue;
+                        }
+                        var at = raw[2..].Split(',').Select(int.Parse).ToArray();
+                        var choice = overview.Groups[at[0]].Choices[at[1]];
+                        Log($"{raw}: {overview.Groups[at[0]].Heading} · {choice.Label}");
+                        choice.Run();
+                        for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
+                        continue;
+                    }
                     // r:room opens the room as a pick in the room selector does (a catalog visit).
                     if (raw.StartsWith("r:", StringComparison.Ordinal))
                     {

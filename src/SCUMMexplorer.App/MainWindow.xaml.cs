@@ -1903,6 +1903,8 @@ public partial class MainWindow : Window
         // A verb run from the interaction menu has no scene start of its own, so the speakers its lines need (an actor who is not in the
         // room shows nothing) are placed as the catalog's start setup does: only the derived actor placements, never a pickup or a scene.
         var speakerNotes = play ? CurrentModule.SpeakersForDirectVerb(sourceRoom, record.Id, verb.VerbId) : [];
+        // R-8.38: an object picked from Interact that is not in the room now is brought into it first (a present object is never changed).
+        if (play) speakerNotes = [.. speakerNotes, .. _session.BringObjectIntoRoom(record.Id)];
         var action = _session.ActivateObjectVerb(record.Id, verb.VerbId);
         UpdateSessionSound();
         StatusText.Text = action.DestinationRoomId is int destination

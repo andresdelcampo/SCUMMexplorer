@@ -75,3 +75,7 @@ Open: the second object of "Use X with Y" is given only where the verb's code co
 | `Measure` Indy 3 again | unchanged: 153 begin, 10 started at their cutscene show nothing |
 
 Seen on the way: Room 13's entry scene, started at its cutscene (it needs Script 52's argument, the outfit), jumps to Room 73: one of the at-cutscene starts to improve.
+
+### LOOM's Interact (31 October)
+
+LOOM keeps its own Interact (its verbs: Use/go, Look at, the drafts), now with the same rule: every object of the room with a LOOM verb is listed, those the pointer can pick now first, then those that are in the room only at other points of the story; a pick on one of those is brought in first (`BringObjectIntoRoom`). Picks during a scene stay closed (LOOM's playback works differently). `WindowCheck` (steps `r:`, `a`, `o`, `c:`): the overview of Rooms 2 and 17 is unchanged before and after; rooms with objects not present at the first visit: 8 (254), 10 (295), 18 (370, 371), 24 (433), 28 (465, 468, 469, 473 to 475), 34 (561, 587) of the 16 rooms looked at. Room 18 now offers "sphere" and "crystal 2": Look at the sphere plays the crystal-ball vision (Room 19, [picture](window-loom-after/c-5-0.png)); Look at crystal 2 plays in the glassmakers' room and goes on to Room 20 ([picture](window-loom-after/c-6-0.png)).

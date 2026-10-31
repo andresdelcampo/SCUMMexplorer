@@ -77,11 +77,14 @@ public partial class MainWindow
             return new(true, w._session is not null && !w.SessionInScene && InteractableObjects().Any(), name, DoubleClickLooks: true);
         }
 
-        /// <summary>The room's objects the game's pointer can pick now and that answer a verb, in directory order.</summary>
+        /// <summary>
+        /// The room's objects that answer a verb: those the game's pointer can pick now first, then those that are in the room only at other points of
+        /// the story (R-8.35/R-8.38, user 31 October 2026: explore everything; a pick brings such an object in), each group in directory order.
+        /// </summary>
         private IEnumerable<ScummRoomObjectRecord> InteractableObjects() =>
             w._session is not { } session ? [] :
-            w._currentRoomObjectRecords.OrderBy(item => item.LocalIndex)
-                .Where(record => w.IsVerbHotspotAvailable(record, session.Snapshot) && w.InteractVerbs(record).Count > 0);
+            w._currentRoomObjectRecords.Where(record => w.InteractVerbs(record).Count > 0 && (record.X, record.Y) != (0, 0))
+                .OrderBy(record => w.IsVerbHotspotAvailable(record, session.Snapshot) ? 0 : 1).ThenBy(item => item.LocalIndex);
 
         public RoomInteractionOverview? InteractionOverview(bool advanced)
         {

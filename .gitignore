@@ -50,3 +50,7 @@ Exe/
 !.verification/room-viewport/followup-20260927-03/geometry-check.txt
 .verification/scene-setup-20261031/window/
 .verification/mi2-intro-protection-20261030/window-hands-off/
+.verification/scene-setup-20261031/window-loom-before/
+.verification/scene-setup-20261031/window-loom-after/profile/
+.verification/scene-setup-20261031/window-loom-after/room-cache/
+.verification/scene-setup-20261031/window-mi1/

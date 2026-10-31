@@ -2,6 +2,10 @@
 
 Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
 
+## 31 October: LOOM's Interact lists every object of the room
+
+Objects with a LOOM verb that are in the room only at other points of the story are listed after those present, and a pick brings them in: in Room 18 "Look at sphere" plays the crystal-ball vision (Room 19). Lists of rooms without such objects are unchanged ([record](../.verification/scene-setup-20261031/README.md)).
+
 ## 31 October: picked objects that are not in the room yet are brought in, and the hero with them
 
 An Interact pick on an object that is not in the room now makes it present (owner, touchable, its parent's state, a first image), and the hero is put at it with the camera following, even in a room the hero never enters at that point of the story (Indy 3 Room 13's trellis: "I think it could hold my weight if I could get to it."). A present object is never changed. ([record](../.verification/scene-setup-20261031/README.md))
