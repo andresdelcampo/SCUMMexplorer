@@ -10,6 +10,8 @@ Read `docs/ROADMAP.md` (the seven gates per game and the steps left), `docs/USER
 - Indy 4 Rooms 76, 77, 87: an at-once walk with no box route ends where it started (ScummVM `walkActor`); first-state images and Room 4's magenta line no longer seen.
 - Indy 3: castle Rooms 20, 28, 32 explained (cut-away plan, guards that can start a fight; decision 7 in USER_CHECKS); `getActorWidth`; `actorFollowCamera` into another room loads it in version 3 too.
 
+- 30–31 October, later: indexed script arguments (all 88 Indy 3 rooms clean), first-launch freeze fixed (one inspection copy, room reads on workers, reopen after first render).
+
 ## How to work
 
 The user said "keep making fixes, no need to ask": take the next roadmap item, fix, check through the real window where it shows, run the relevant tests (full suite before committing engine changes, about 8 minutes, `SCUMM_SOUND_TEST_ROOT` must be the LOOM folder `D:\Juegos\Lucas\loom ega mt32 en`), commit each item separately, update the roadmap, CURRENT_WORK, CHANGELOG and the game's tracker. Stop only for product decisions (gate G). Read ScummVM's source on GitHub (raw.githubusercontent.com) before porting engine behaviour. Edit files with the Edit tool or UTF-8 Python, never PowerShell `Get-Content`/`WriteAllText` (it damaged "§" once).
@@ -18,9 +20,9 @@ Harnesses added today: `.verification/mi2-intro-protection-20261030/IntroWindowC
 
 ## Next, in order
 
-1. Gate A leftovers: Indy 3 Rooms 1, 15 (never settle: crowds) and 13/3 (Script 131 +0x0038 starts 132 with unknown arguments; Room 3 entry +0x006F); Indy 3 inventory objects run no verb code of their own.
+1. Gate A leftovers: Indy 3 Rooms 1 and 15 never rest (crowds; not a bug); the Indy 3 held-object note looks stale (the play path already uses `InventoryRooms`), confirm with a cross-room play test.
 2. The user's crash and "thin black rooms" reports once they name the game and room (the crash log now records them).
-3. Indy 4's 68 s first launch (cutscene derivation 34 s; lever: change tracking in the executor's variable sync).
+3. MI2 and Indy 4 first launch: a 5.5 s synchronous scan in `OpenGameFolder` and a 10 s first render remain (`.verification/indy4-rooms-20261030/LaunchStalls`, `SCUMM_LAUNCH_MODE=reopen`); ask the user before installing a profiler (download).
 4. Shared engine work E3 (a working ScummVM capture for picture comparisons), E4 (generic cutscene start planner), then E5 (Status beyond v1/v2) if the user wants it.
 5. Release readiness for LOOM (packaging, version, clean-profile first run).
 

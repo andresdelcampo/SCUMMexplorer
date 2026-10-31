@@ -26,7 +26,7 @@ Everything here is open. Items marked **user-reported** come from the user's own
 - Static previews such as MI2's campfire: a hint is needed (R-8.5b vs R-5.3a); the user must decide.
 - Requirements R-7.7 to R-7.18, R-3.15, R-15.7, R-15.8, R-8.32, R-8.33 and R-12.7 to R-12.10 are still Proposed, awaiting the user's confirmation.
 - Depth masks and stored object images of the browsed games (R-6.16) not yet compared with ScummVM.
-- Performance: Indy 4's first launch takes about 68 s (cutscene list derivation 34 s); the next lever is change tracking in the executor's variable sync.
+- Performance (31 October, [record](../.verification/indy4-rooms-20261030/README.md)): the first launch no longer freezes the window for most of a minute (Indy 4: play at 18.5 s, UI blocked 15 s instead of 85). Open on MI2 and Indy 4: a 5.5 s synchronous game scan and a 10 s first render after opening, which needs a profiler (dotnet-trace, not installed; installing it is a download).
 
 ### Per game
 
