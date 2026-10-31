@@ -117,4 +117,22 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
         Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ObjectState, Target: "323", Value: 1 });
     }
+
+    [Fact]
+    public void ADerivationKeptBetweenLaunchesNeedsNoNewRuns()
+    {
+        // ScenePlanCache (31 October 2026): the runs and plans saved as JSON and loaded into a new planner make every scene derived without running it.
+        if (Indy3() is not { } game) return;
+        var first = new ScummCutscenePlanner(game);
+        var jar = Trigger(first, 2, 71, 0x08);
+        var plan = first.PlanSetup(jar);
+        var json = System.Text.Json.JsonSerializer.Serialize(first.ExportScenes().ToList());
+        var kept = System.Text.Json.JsonSerializer.Deserialize<List<ScummCutscenePlanner.SavedScene>>(json)!;
+        var second = new ScummCutscenePlanner(game);
+        second.ImportScenes(kept);
+        Assert.True(second.IsDerived(jar));
+        var again = second.PlanSetup(jar);
+        Assert.Equal(plan.Result.Way, again.Result.Way);
+        Assert.Equal(plan.Edits.Select(e => e.Describe()), again.Edits.Select(e => e.Describe()));
+    }
 }

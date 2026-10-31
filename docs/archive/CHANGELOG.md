@@ -8,6 +8,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+
+## 31 October: scene lists ready in a minute, and in seconds on later launches
+
+The background scene derivation runs every scene first (the room lists and Play Cutscene buttons are then ready) and works out the setup plans afterwards; everything derived is kept between launches of the same build and game data. Indy 4 in the real window: room lists ready after 58 s on a first launch (282 s before), 9 s on the next ([record](../../.verification/derivation-time-20261031/README.md)).
 ## 31 October: four in five picked scenes now play the game's own way
 
 The setup search reads the trigger's own code first (the scan sometimes listed only the scripts it reaches), tries object classes (`ifClassOfIs`), and gives inventory-only items. Across Indy 3, Monkey Island 1 (both), Monkey Island 2 and Indy 4: scenes played the game's own way 68.3% → 80.9%, scenes showing nothing 4.8% → 3.0% ([record](../../.verification/scene-setup-20261031/README.md)).

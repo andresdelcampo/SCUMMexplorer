@@ -73,6 +73,8 @@ public partial class MainWindow
         _playRoomListsDone = false;
         if (!PlayCutscenes) return;
         _playSavedRoomLists = _roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath, game.Language) : null;
+        // Read now: the flag holds only while the game is being opened, and the derivation below runs later.
+        var keptScenes = _roomCardsMayUseCache ? ScenePlanCache.Load(game.FolderPath, game.Language) : null;
         // A game read from one archive or disk set shares its reader between sessions, so the scan and each background worker read from their own
         // copy of the game (their own reader), never the play session's: Monkey Island floppy, 164 runs, 109 s on one thread, 36 s on eight
         // (17 October 2026; more workers were slower), and a scan through the play session's reader while it played lost 11 groups. A file-per-room
@@ -99,6 +101,8 @@ public partial class MainWindow
             {
                 var groups = planner.Value.Groups;
                 if (!ReferenceEquals(_playPlanner, planner)) return;
+                // A later launch of the same build and data starts from the kept derivation (ScenePlanCache): only what is missing is derived.
+                if (keptScenes is not null) planner.Value.ImportScenes(keptScenes);
                 _scanTotal = groups.Count;
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) UpdatePlaybackControls(); });
                 // Each run starts from a copy of a boot (ScummBootSnapshot, 18 October 2026), not from a boot of its own (Monkey Island 2 booted 260 times
@@ -108,15 +112,25 @@ public partial class MainWindow
                 // workers were added, so that eight took longer than four (CutsceneList prun, 16-core machine: Monkey Island 2 1/2/4/8 workers 30/20/26/56 s,
                 // Indy 4 2/4/8 workers 51/42/75 s; the same lists whatever the count). Record: .verification/executor-alloc-20261019/README.md.
                 var parallel = Math.Max(1, ownReader ? Math.Min(4, Environment.ProcessorCount / 2) : Environment.ProcessorCount / 2);
-                Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), new ParallelOptions { MaxDegreeOfParallelism = parallel }, group =>
+                var options = new ParallelOptions { MaxDegreeOfParallelism = parallel };
+                Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(groups, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), options, group =>
                 {
                     _scanGate.Wait();
-                    // §8.6: a scene a fresh start does not begin gets its setup worked out now, so a pick plays it at once.
-                    if (!planner.Value.Run(group.First).Begun) planner.Value.PlanSetup(group.First);
+                    planner.Value.Run(group.First);
                     CountScanStep(planner);
                 });
+                // The room lists are known once every scene has run: the Play Cutscene buttons are ready now, before the setup plans below.
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists(), game.Language);
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) { _playRoomListsDone = true; UpdatePlaybackControls(); } });
+                // §8.6, second phase: the setup of each scene a fresh start does not begin, so a later pick plays it at once (a pick before that works
+                // its plan out on the spot); kept for later launches (ScenePlanCache).
+                var unplanned = groups.Where(group => !planner.Value.IsDerived(group.First)).ToList();
+                Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(unplanned, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), options, group =>
+                {
+                    _scanGate.Wait();
+                    if (ReferenceEquals(_playPlanner, planner)) planner.Value.PlanSetup(group.First);
+                });
+                if (ReferenceEquals(_playPlanner, planner)) ScenePlanCache.Save(game.FolderPath, game.Language, planner.Value.ExportScenes());
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException)
             {

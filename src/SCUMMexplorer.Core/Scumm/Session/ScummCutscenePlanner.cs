@@ -192,11 +192,35 @@ public sealed class ScummCutscenePlanner
     private string RunNote(ScummCutscene trigger) =>
         !TryGetRun(trigger, out var run) ? "Whether a fresh start begins it is still being checked (open the list again in a few seconds)."
         : run.Begun ? "A fresh start begins its cutscene (checked by a headless run" + (run.RoomsEntered.Count > 0 ? $"; it went on to {RoomList(run.RoomsEntered)})." : ").")
-        : Setup.IsReady(trigger) ? "A fresh start did not begin its cutscene in a headless run. " + Setup.Plan(trigger, run).Note
+        : _lastResort.TryGetValue(Key(trigger), out var known) ? "A fresh start did not begin its cutscene in a headless run. " + known.Note
         : "A fresh start did not begin its cutscene in a headless run" + (run.Failure is { } failure ? $" ({failure})" : "") +
           ": the state its code tests is not reached by the boot; its setup is still being worked out.";
 
     /// <summary>The rooms each run entered, keyed "room,object,verb", for saving between runs.</summary>
+    /// <summary>One scene's derived results, for keeping between launches (its fresh run and, when a fresh start does not begin it, its setup plan).</summary>
+    public sealed record SavedScene(int Room, int ObjectId, int VerbId, ScummCutsceneRunResult Run, ScummScenePlan? Plan);
+
+    /// <summary>Everything derived so far: the runs and the plans (31 October 2026: later launches start from them instead of deriving again).</summary>
+    public IReadOnlyList<SavedScene> ExportScenes() =>
+        _runs.Select(pair => new SavedScene(pair.Key.Item1, pair.Key.Item2, pair.Key.Item3, pair.Value,
+            _lastResort.TryGetValue(pair.Key, out var plan) ? plan : null)).ToList();
+
+    /// <summary>Results kept from an earlier launch of the same build and game data; a scene already derived in this launch keeps its own.</summary>
+    public void ImportScenes(IEnumerable<SavedScene> saved)
+    {
+        ArgumentNullException.ThrowIfNull(saved);
+        foreach (var scene in saved)
+        {
+            var key = (scene.Room, scene.ObjectId, scene.VerbId);
+            _runs.TryAdd(key, scene.Run);
+            if (scene.Plan is { } plan) _lastResort.TryAdd(key, plan);
+        }
+    }
+
+    /// <summary>Whether the scene's derivation is complete: its run is known and, when that does not begin it, its plan too.</summary>
+    public bool IsDerived(ScummCutscene trigger) =>
+        TryGetRun(trigger, out var run) && (run.Begun || _lastResort.ContainsKey(Key(trigger)));
+
     public Dictionary<string, int[]> ExportRoomLists() =>
         _runs.ToDictionary(pair => $"{pair.Key.Item1},{pair.Key.Item2},{pair.Key.Item3}", pair => pair.Value.RoomsEntered.ToArray());
 

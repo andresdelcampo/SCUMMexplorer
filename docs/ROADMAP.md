@@ -60,7 +60,6 @@ What keeps a cell from ✅:
 | # | Work | Feature | Where |
 |---|---|---|---|
 | 1 | **Scenes started at their cutscene that show nothing**: what is left needs case-by-case reading (several values at once, script arguments: Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73; Indy 4 has the most, 16). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
-| 2 | **Derivation time**: the setup search adds trial runs (about a minute on the large games); share boots between trials, cache plans per build and data. | 5 | `ScummCutscenePlanner` |
 | 2b | **One scene engine for every game** (user, 31 October): LOOM's scanned editions and CD (`LoomCutsceneReadiness`) and Maniac/Zak (`ManiacCutsceneSetup`, built on the separate track) onto the shared scene setup (`ScummSceneSetupSearch`), keeping a game-specific setup only where the game needs one (LOOM English's reviewed catalog, Maniac's party selection). LOOM English's 328 reviewed replays are the answer key (first run 31 October: 238 of 238 listed replays begin and reach the catalog's rooms, 219 share its category; the other 90 are shared draft reactions; [record](../.verification/loom-answer-key-20261031/README.md)); scene length matches for 212 of 238 (89%); still to do: the remaining length differences, LOOM's Interact offering the shared "Other draft" reactions, then retire the catalog to titles, draft names and the named sequences; the other LOOM editions; Maniac/Zak: run the shared engine on the English reference and compare each replay (begins, lines, rooms, Bobbin's look); where it matches, the catalog entry is redundant, where it differs, fix the shared engine; in the end only the named sequences (The Elders' trial, the firewood scene, Walk to Room 13, Room 46) stay as reviewed data, carried to the other LOOM editions by room, object name and verb. Before/after counts per game. | 5 | `Loom/Scenes/`, `Core/Maniac/`, `Scumm/Session/` |
 | 3 | **Readable names for the other games** from their script maps. | 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
 | 4 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
@@ -74,7 +73,6 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 ### All games
 - **User-reported, not yet reproduced:** thin black rooms (game and room not named); a crash (the crash log in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` records the next one).
 - Scenes started directly at their cutscene that show nothing (work item 1; [record](../.verification/scene-setup-20261031/README.md)).
-- The background scene derivation takes about a minute on the large games (work item 2).
 - Browsed games' object note and status text vary between runs of the same build.
 - Static previews such as MI2's campfire: a hint is needed (decision 2 below).
 - Depth masks and stored object images of the non-LOOM games (R-6.16) not compared with ScummVM.
