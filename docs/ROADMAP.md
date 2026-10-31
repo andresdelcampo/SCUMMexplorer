@@ -61,6 +61,7 @@ What keeps a cell from ✅:
 |---|---|---|---|
 | 1 | **Scenes started at their cutscene that show nothing**: what is left needs case-by-case reading (several values at once, script arguments: Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73; Indy 4 has the most, 29). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
 | 2 | **Derivation time**: the setup search adds trial runs (about a minute on the large games); share boots between trials, cache plans per build and data. | 5 | `ScummCutscenePlanner` |
+| 2b | **One scene engine for every game** (user, 31 October): LOOM's scanned editions and CD (`LoomCutsceneReadiness`) and Maniac/Zak (`ManiacCutsceneSetup`, built on the separate track) onto the shared scene setup (`ScummSceneSetupSearch`), keeping a game-specific setup only where the game needs one (LOOM English's reviewed catalog, Maniac's party selection). Before/after counts per game. | 5 | `Loom/Scenes/`, `Core/Maniac/`, `Scumm/Session/` |
 | 3 | **Readable names for the other games** from their script maps. | 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
 | 4 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
 | 5 | **One user pass per game** with "Your checks" below: listening, a few rooms next to ScummVM, each copy opened once. | 3, sign-off | — |
