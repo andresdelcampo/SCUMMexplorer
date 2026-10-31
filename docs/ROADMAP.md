@@ -90,7 +90,7 @@ Steps marked **(shared)** are one piece of work in the list above. Their letters
 3. E — Spanish eight-disk copy; the CD's five languages in the window.
 
 ### Monkey Island 2
-1. A — Copy protection in Play Game Intro fixed 30 October, retest pending ([record](../.verification/mi2-intro-protection-20261030/README.md)). Decide the static-preview question (Room 4 campfire, decision 2).
+1. A — Copy protection in Play Game Intro answered by the explorer since 31 October (no code wheel; seen in the real window), your retest pending ([record](../.verification/mi2-intro-protection-20261030/README.md)). Decide the static-preview question (Room 4 campfire, decision 2).
 2. C — 95 of 260 entries begin nothing (shared setup); derivation takes 140–174 s (item 3).
 3. B — Interactions (shared). D — iMUSE hooks are labelled estimates; listening pending. Rooms 104–106 keep colour-0 image holders (accepted).
 

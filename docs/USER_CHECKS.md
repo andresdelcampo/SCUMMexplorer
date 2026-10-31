@@ -58,7 +58,7 @@ Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If th
 
 | Check | Steps | Result |
 |---|---|---|
-| **Retest (fixed 30 Oct):** a floppy copy (`mi2 mt32 en`), Play Game Intro: the prompt on two lines, the recipe names its disease and ingredients, your wheel answer is accepted and the opening plays | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
+| **Retest (31 Oct):** a floppy copy (`mi2 mt32 en`), Play Game Intro: the protection screen passes by itself (no code wheel), you choose Monkey Island 2 or Lite, the opening plays | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
 | Long talk lines in LOOM CD, Monkey Island and Indy 4 now wrap as in the game (version 4 and later): any line that looks wrongly broken? | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
 | Roland and AdLib: Woodtick music (107) loops, pauses with Space; Largo's theme (151) at the bridge | [play record](../.verification/monkey2-play-20261017/README.md) | |
 | Route next to ScummVM: sign, dialogue order, inventory icon, verb colours; right click on the sign | [play record](../.verification/monkey2-play-20261017/README.md) | |

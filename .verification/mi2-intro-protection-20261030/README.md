@@ -33,3 +33,13 @@ The headless play boot answers the protection itself (labelled assumed input, `S
 
 - The player still needs the code wheel; the app does not show the answer (it would be a shortcut, R-1.12). Advanced could show it as the game's own value; not done.
 - Line wrapping now applies to every version 4 and 5 game (LOOM CD, Monkey Island 1 floppy and CD, MI2, Indy 4). Long talk lines there were cut before; the user's look at a few long lines is in [USER_CHECKS](../../docs/USER_CHECKS.md).
+
+## Addendum, 31 October: the copy protection is answered by the explorer
+
+User, 31 October: "No value on forcing the user to have the wheel - it is an explorer app. Should be able to bypass it." Play Game Intro now answers the protection screen itself, as the catalog boot always did: while the game is in its protection room (`ScummBootInputPlan.ProtectionRoom`: Monkey Island 2 Room 108, the room ScummVM's `startScene` ties to the protection; Monkey Island 1 floppy Room 90) and quiet for 30 frames, the continue key is pressed until the game's own script has derived the answer (`var[0x206]`, `var[0x10A]`), then its digits are typed once through the game's input script. Nothing after the answer is assumed: the Monkey 2 / Lite choice stays the player's. (ScummVM's own switch, `copy_protection` off, makes reads of `var[490]` return `var[518]` for Monkey Island 2 DOS, `script.cpp readVar`; the explorer keeps the game's screens and types the answer instead, so the recipe is still seen.)
+
+| Check | Result |
+|---|---|
+| `IntroWindowCheck "mi2 mt32 en" ../window-hands-off hands-off` (real `MainWindow`, no key pressed) | prompt (+2 s), recipe "RECIPE FOR GOUT" (+8 s), answer 1412 typed by the explorer (+10 s: "MIX 14 … WITH 12 …"), the choice screen ([h3-choice](window-hands-off/h3-choice.png)); after one click on the full game the opening plays in Room 87 ("Guybrush Threepwood." …) |
+| `IntroProbe "monkey1 ega en"` | the history quiz in Room 90 passes by itself at frame 130; the opening goes on in Room 10 |
+| `ScummMonkey2IntroTests` (rewritten: no input from the test) and every `Intro` test | 27 passed |

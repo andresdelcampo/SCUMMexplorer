@@ -9,7 +9,8 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Scumm;
 
-// Usage: IntroWindowCheck <game folder> <output folder>
+// Usage: IntroWindowCheck <game folder> <output folder> [hands-off]
+// hands-off (31 October 2026): no key is pressed; Play Game Intro answers the copy protection itself, and only the full-game box is clicked.
 // 30 October 2026 (MI2 opening blocked at the copy protection, user report of 28 October): the real MainWindow opens the game, presses the header's
 // Play Game Intro, lets the real clock run, then presses Enter as a keyboard event through the window's own handlers. Logs the play state and the
 // texts on screen and saves pictures. Private profile and room cache in the output folder.
@@ -64,6 +65,18 @@ internal static class Program
                 Log($"opened; intro button visible={intro.Visibility} enabled={intro.IsEnabled} caption={intro.Content}");
                 intro.Focus();
                 intro.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, intro));
+                if (args.Length > 2 && args[2] == "hands-off")
+                {
+                    for (var i = 1; i <= 12; i++) { await Pump(2); State($"hands off +{i * 2}s"); if (i == 2) Capture("h1-prompt"); if (i == 4) Capture("h2-recipe"); }
+                    Capture("h3-choice");
+                    var auto = (ScummGameSession)Field("_play")!;
+                    Log("trace: " + string.Join(" | ", auto.SessionTrace.Where(line => line.StartsWith("intro:", StringComparison.Ordinal))));
+                    var chosen = auto.ClickScreen(24, 64, out var why);
+                    Log($"clicked the full-game box: {(chosen is null ? "refused: " + why : "delivered")}");
+                    for (var i = 1; i <= 8; i++) { await Pump(3); State($"after the choice +{i * 3}s"); }
+                    Capture("h4-after-choice");
+                    return;
+                }
                 for (var i = 1; i <= 4; i++) { await Pump(2); State($"intro +{i * 2}s"); }
                 Capture("1-intro-waiting");
                 Press(Key.Enter);

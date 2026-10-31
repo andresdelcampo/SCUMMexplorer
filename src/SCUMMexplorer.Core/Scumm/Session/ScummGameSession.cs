@@ -123,6 +123,7 @@ public sealed class ScummGameSession : ScummSession
         var state = base.AdvanceFrame();
         if (!_introPlaying) return state;
         _introFrames++;
+        AnswerIntroProtection();
         if (!BootGoesOn && (!_waitsForControl || PlayerHasControl || _pending.Count == 0))
         {
             _introPlaying = false;
@@ -130,6 +131,30 @@ public sealed class ScummGameSession : ScummSession
             BootReport = new(_introFrames, false, CurrentRoomId, _roomsEntered.ToArray());
         }
         return Snapshot;
+    }
+
+    private int _protectionWait;
+    private bool _protectionAnswered;
+
+    /// <summary>
+    /// The copy protection in Play Game Intro (user, 31 October 2026): while the game shows its protection screen (<see cref="ScummBootInputPlan.ProtectionRoom"/>;
+    /// ScummVM ties Monkey Island 2's to Room 108, room.cpp <c>startScene</c>) and waits, the continue key is pressed until the game's own script has
+    /// derived the answer, then the answer's digits are typed once, as the boot does. Keys only, through the game's input script; nothing after the
+    /// answer is assumed (the Monkey 2 Lite choice stays the player's).
+    /// </summary>
+    private void AnswerIntroProtection()
+    {
+        if (_bootKeys.Count > 0) { PressKey(_bootKeys.Dequeue()); return; }
+        if (_protectionAnswered || _bootInput is not { ProtectionRoom: int room } plan || _currentRoom?.ResourceId != room) return;
+        // A few frames of quiet after each key, so the game's waiting script reads it and draws its next screen.
+        if (++_protectionWait < 30) return;
+        _protectionWait = 0;
+        var answer = plan.AnswerVariable is null ? 0 : _runtime.GlobalVariables.GetValueOrDefault(plan.AnswerVariable);
+        if (answer == 0) { PressKey(plan.ContinueKey); return; }
+        foreach (var digit in answer.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(plan.AnswerDigits, '0')) _bootKeys.Enqueue(digit);
+        _protectionAnswered = true;
+        _uncertainties.Add($"The copy-protection screen of Room {room:00} was answered by the explorer with {plan.AnswerVariable} = {answer}, the answer the game's own script derived.");
+        _visitTrace.Add($"intro: the copy protection answered with the digits of {plan.AnswerVariable} = {answer}");
     }
 
     protected override void ManualNavigationBegan()

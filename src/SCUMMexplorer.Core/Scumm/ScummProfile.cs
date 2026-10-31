@@ -19,7 +19,11 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <paramref name="AnswerDigits"/> (S9 Monkey2, 18 October 2026): the number of digits the question reads, so an answer below 1000 is typed with its leading
 /// zeros (Monkey Island 2 floppy Script 130 +0x015C starts its place value at 1000: four digits). 0 types the number as it is.
 /// </remarks>
-public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13, int? ClickObject = null, int AnswerDigits = 0);
+/// <remarks>
+/// <paramref name="ProtectionRoom"/> (user, 31 October 2026: "No value on forcing the user to have the wheel, it is an explorer app"): the room of the game's
+/// copy-protection screen, which Play Game Intro answers by itself as the boot does (keys only; a choice such as Monkey 2 Lite stays the player's).
+/// </remarks>
+public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13, int? ClickObject = null, int AnswerDigits = 0, int? ProtectionRoom = null);
 
 public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Dialect)
 {
@@ -223,12 +227,12 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
                     || GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced),
             ExtraTimerVariables = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
-            BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]")
+            BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]", ProtectionRoom: 90)
                 // Monkey Island 2 (S4b, 17 October 2026): Script 130 +0x034A waits for the choice between "Monkey Island 2" (object 1156, Script 131 +0x0067:
                 // bit[0x237] = 0, "Regular Mode") and "Monkey 2 Lite" (object 1157); the explorer takes the full game (§4.5), labelled as assumed input.
                 // S9 Monkey2 (18 October 2026): the floppy releases first ask the recipe copy protection (Script 128 "PRESS ENTER", then Script 130 keeps the
                 // expected four digits in var[0x206] at +0x0134 before it waits); the talkie skips it and never writes var[0x206].
-                : GameSupport.FamilyOf(game) == GameFamily.Monkey2 ? new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4)
+                : GameSupport.FamilyOf(game) == GameFamily.Monkey2 ? new ScummBootInputPlan("var[0x206]", ClickObject: 0x484, AnswerDigits: 4, ProtectionRoom: 108)
                 : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
             BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
