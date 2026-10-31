@@ -4,6 +4,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+
+## 31 October: a Cutscenes branch in the resource tree
+
+Like the sounds: every playable scene of the game, the ones Interact offers included, grouped by the room it starts in; selecting one plays it. Seen in the window: Indy 3 153 scenes, LOOM English 332 (REQUIREMENTS R-8.2c).
 ## 31 October: no duplicates between Interact and Play Cutscene
 
 User: keep Interact complete, remove the duplicates from the cutscene lists. A room's Play Cutscene list now leaves out the scenes that are actions of the room's Interact; room entries, the intro, named sequences, actions Interact does not offer and scenes started elsewhere stay; the Advanced whole-game picker lists everything. Interact offers every verb whose code starts decoding (Indy 3's package Open was missing). REQUIREMENTS R-8.2b, R-8.36 (one scene engine for every game), R-8.38 ([record](../../.verification/scene-setup-20261031/README.md)).

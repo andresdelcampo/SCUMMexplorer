@@ -505,6 +505,7 @@ public partial class MainWindow : Window
         }
 
         if (CurrentModule.ExtraResourceGroup(game) is { } extra) ResourceTree.Items.Add(extra);
+        ResourceTree.Items.Add(CutsceneTreeGroup());
 
         PopulateRoomCards(game);
         PopulateCostumeCards(game);
@@ -1041,8 +1042,42 @@ public partial class MainWindow : Window
         RefreshPlayOverlayLists();
     }
 
+    /// <summary>
+    /// R-5.2a (user, 31 October 2026): the tree's `Cutscenes` branch, like its sounds: every scene of the game, scenes triggered by an object's action
+    /// included (the room's Play Cutscene list leaves those to Interact, R-8.2b), grouped by the room it starts in. The list is derived in the background
+    /// after the game opens, so the branch fills when it is expanded; selecting an entry plays it.
+    /// </summary>
+    private TreeViewItem CutsceneTreeGroup()
+    {
+        var node = new TreeViewItem { Header = "Cutscenes", IsExpanded = false };
+        node.Items.Add(new TreeViewItem { Header = "…" });
+        node.Expanded += (_, e) =>
+        {
+            if (!ReferenceEquals(e.OriginalSource, node)) return;
+            var entries = CurrentRoomControls.GlobalCutscenes(true).Entries.Where(entry => entry.Start is not null).ToList();
+            node.Items.Clear();
+            node.Header = $"Cutscenes  ({entries.Count})";
+            if (entries.Count == 0) { node.Items.Add(new TreeViewItem { Header = "None listed yet (the scenes are found in the background); expand again in a moment" }); return; }
+            // "Game" (the intro, named sequences without a room) first, then the rooms in number order.
+            foreach (var room in entries.GroupBy(entry => System.Text.RegularExpressions.Regex.Match(entry.Title, @"^Room (\d+)") is { Success: true } m ? $"Room {m.Groups[1].Value}" : "Game")
+                         .OrderBy(group => group.Key == "Game" ? -1 : int.Parse(group.Key[5..], System.Globalization.CultureInfo.InvariantCulture)))
+            {
+                var roomNode = new TreeViewItem { Header = $"{room.Key}  ({room.Count()})", IsExpanded = false };
+                foreach (var entry in room)
+                    roomNode.Items.Add(new TreeViewItem { Header = entry.Title, ToolTip = IsAdvancedMode ? entry.Note : entry.Category, Tag = entry });
+                node.Items.Add(roomNode);
+            }
+        };
+        return node;
+    }
+
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
+        if (e.NewValue is TreeViewItem { Tag: RoomCutsceneEntry scene })
+        {
+            scene.Start?.Invoke();
+            return;
+        }
         if (_followingPlayRoom)
         {
             if (e.NewValue is TreeViewItem { Tag: GameResource nativeRoom }) _selectedResource = nativeRoom;

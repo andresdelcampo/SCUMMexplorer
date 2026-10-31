@@ -76,6 +76,17 @@ internal static class Program
                         }
                         continue;
                     }
+                    // t expands the tree's Cutscenes branch and lists its room groups.
+                    if (raw == "t")
+                    {
+                        var tree = (System.Windows.Controls.TreeView)window.FindName("ResourceTree");
+                        var branch = tree.Items.OfType<System.Windows.Controls.TreeViewItem>().FirstOrDefault(i => i.Header?.ToString()?.StartsWith("Cutscenes") == true);
+                        if (branch is null) { Log("  no Cutscenes branch"); continue; }
+                        branch.IsExpanded = true;
+                        await Pump(0.5);
+                        Log($"  {branch.Header}: {string.Join(" | ", branch.Items.OfType<System.Windows.Controls.TreeViewItem>().Take(8).Select(i => i.Header))}");
+                        continue;
+                    }
                     // l lists the room's Play Cutscene entries (the room controls' own state).
                     if (raw == "l")
                     {
