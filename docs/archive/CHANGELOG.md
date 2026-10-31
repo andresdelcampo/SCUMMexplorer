@@ -2,6 +2,10 @@
 
 The running log of finished work, newest first, each entry linking its record under `.verification/`. The current state is in [ROADMAP](../ROADMAP.md); what the app must do in [REQUIREMENTS](../REQUIREMENTS.md). Earlier parts: `CHANGELOG_THROUGH_2026-10-17.md`, `CHANGELOG_THROUGH_2026-10-20.md` in this folder.
 
+
+## 31 October: fewer scenes have to be started at their cutscene
+
+The setup search now tries a picked object's own states when its code tests "this object" through a variable (Indy 3 `ifState var[0x007]`, Monkey Island 2 `getObjectState … var[0x007]`), offers inventory-only second objects, and applies the setup again after the room's entry (which may reset it). Scenes that showed nothing when started at their cutscene: Indy 3 10 → 4, Monkey Island 1 10 → 6 (floppy and CD), Monkey Island 2 24 → 15, Indy 4 35 → 30; every scene still begins ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 31 October: Indy 4's actions show their verb names; documents tidied
 
 Interact's actions in Indy 4 read "Action" for every verb: its catalog rooms play before the credits build the verb area, so the session had no verb names; the window now takes the names the cutscene planner read once the game showed its verbs. When the game's sentence script and the verb's own code answer equally, the verb's own code is kept (the sentence's answer was the game's refusal). Seen in the window: Monkey Island 2 "Look at sign" ("Help wanted^"), Indy 4 Room 10's crate with Push, Pull, Look at, Walk to.

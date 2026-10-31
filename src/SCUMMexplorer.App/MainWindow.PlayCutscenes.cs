@@ -220,6 +220,8 @@ public partial class MainWindow
                 // What the room's entry derives from the new state (objects, who stands where) follows it, as in the plan's runs.
                 _sceneSound.StopAll("a picked scene's setup changed the room's state");
                 session.VisitRoom(room);
+                // As the plan's runs do: again after the visit, for what the room's entry reset.
+                session.ApplySceneSetup(plan.Edits);
             }
             if (interaction && !trigger.IsRoomEntry)
             {

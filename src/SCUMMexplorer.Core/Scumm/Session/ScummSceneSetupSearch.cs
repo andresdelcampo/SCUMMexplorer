@@ -118,6 +118,11 @@ public sealed partial class ScummSceneSetupSearch
                     case "getObjectState" when parts.Length >= 2 && Literal(parts[1]) is int obj:
                         stateOf[parts[0]] = obj;
                         break;
+                    case "getObjectState" when parts.Length >= 2 && objectCode && trigger.ObjectId != 0 && VariablePattern().Match(parts[1]) is { Success: true } self &&
+                                               self.Value == parts[1] && !written.Contains(parts[1]):
+                        // Version 5: the state of "this object" read through a variable the sentence script set (Monkey Island 2: var[0x007]).
+                        stateOf[parts[0]] = trigger.ObjectId;
+                        break;
                     case "getActorCostume" when parts.Length >= 2 && Literal(parts[1]) is int dressed:
                         costumeOf[parts[0]] = dressed;
                         break;
@@ -129,6 +134,13 @@ public sealed partial class ScummSceneSetupSearch
                         // ScummVM jumps when the test is false, so the scene may sit on either side: both values are tried.
                         Add(new(ScummSetupKind.ObjectState, obj.ToString(CultureInfo.InvariantCulture), state, where));
                         Add(new(ScummSetupKind.ObjectState, obj.ToString(CultureInfo.InvariantCulture), state == 0 ? 1 : 0, where));
+                        break;
+                    case "ifState" or "ifNotState" when parts.Length >= 2 && Literal(parts[1]) is int ownState && objectCode && trigger.ObjectId != 0 &&
+                                                        VariablePattern().Match(parts[0]) is { Success: true } held && held.Value == parts[0] && !written.Contains(parts[0]):
+                        // Object code that tests the state of a variable it does not set (Indy 3: var[0x007], "this object", which the sentence script
+                        // sets, Script 2 +0x010A): the picked object's own states are tried; the trial runs keep only what makes the scene begin.
+                        Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState, where));
+                        Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState == 0 ? 1 : 0, where));
                         break;
                     case "getObjectOwner" when parts.Length >= 2 && Literal(parts[1]) is int held && _objectRooms.Value.TryGetValue(held, out var room):
                         Add(new(ScummSetupKind.Held, held.ToString(CultureInfo.InvariantCulture), 1, where, room));
@@ -144,8 +156,10 @@ public sealed partial class ScummSceneSetupSearch
                             Add(new(ScummSetupKind.ActorCostume, dressedActor.ToString(CultureInfo.InvariantCulture), value.Value, where));
                         else if (roomOf.TryGetValue(tested, out var placedActor))
                             Add(new(ScummSetupKind.ActorRoom, placedActor.ToString(CultureInfo.InvariantCulture), value.Value, where));
-                        else if (objectCode && tested == "local[0x000]" && value.Value != 0 && _objectRooms.Value.TryGetValue(value.Value, out var withRoom))
-                            Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where, withRoom));
+                        else if (objectCode && tested == "local[0x000]" && value.Value != 0)
+                            // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
+                            Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
+                                _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null));
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
                             Add(new(ScummSetupKind.Bit, tested, 1, where));
                         else if (VariablePattern().Match(tested) is { Success: true } v && tested == v.Value && !written.Contains(tested) &&

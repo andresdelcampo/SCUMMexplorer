@@ -66,6 +66,9 @@ public static class ScummCutsceneRun
             // An entry trigger in the room the boot ends in plays that room's entry again (its first run was inside the boot's own cutscene).
             if (trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene) session.EnterRoomAgain(room);
             else session.VisitRoom(room);
+            // Again after the visit: the room's entry may have reset what the setup set (Indy 3 Room 23's entry closes its doors, whose Close tests
+            // state 1); only what the session lacks is set, so values the entry derived from the setup stay.
+            if (setup is { Count: > 0 }) session.ApplySceneSetup(setup);
             if (way == ScummPickedStart.AtCutscene)
             {
                 mark = session.RoomsEntered.Count;

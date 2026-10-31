@@ -103,4 +103,18 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
             }
         }
     }
+
+    [Fact]
+    public void ADoorThatTestsItsOwnStateIsOpenedForItsClose()
+    {
+        // Room 23 object 323 verb 0x02 +0x0000 ifState var[0x007], 0x01: "this object", which the sentence script sets; the room's entry closes its
+        // doors, so the setup is applied again after the visit. The scene then begins the game's own way, not at its cutscene.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var plan = planner.PlanSetup(Trigger(planner, 23, 323, 0x02));
+        output.WriteLine(plan.Note);
+        Assert.True(plan.Result.Begun);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ObjectState, Target: "323", Value: 1 });
+    }
 }

@@ -16,7 +16,7 @@ Keep the documents tidy (user, 31 October; rule in ROADMAP and CLAUDE.md): when 
 
 ## Next
 
-1. Roadmap work item 1: scenes started at their cutscene that show nothing (Indy 3 10, MI1 10, MI2 24, Indy 4 35; e.g. Indy 3 Room 13's entry jumps to Room 73).
+1. Roadmap work item 1: scenes started at their cutscene that show nothing (Indy 3 4, MI1 6, MI2 15, Indy 4 30; e.g. Indy 3 Room 13's entry jumps to Room 73; the rest of each game's scenes started at their cutscene also deserve a look).
 2. Then the roadmap's order (derivation time, readable names, the user's reports, release).
 
 Open questions for the user (ask once, in passing): a Cutscenes node in the Advanced tree; the decisions 2, 4, 5, 7 in ROADMAP's "Your checks" and the retests.

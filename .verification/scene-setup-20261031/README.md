@@ -79,3 +79,19 @@ Seen on the way: Room 13's entry scene, started at its cutscene (it needs Script
 ### LOOM's Interact (31 October)
 
 LOOM keeps its own Interact (its verbs: Use/go, Look at, the drafts), now with the same rule: every object of the room with a LOOM verb is listed, those the pointer can pick now first, then those that are in the room only at other points of the story; a pick on one of those is brought in first (`BringObjectIntoRoom`). Picks during a scene stay closed (LOOM's playback works differently). `WindowCheck` (steps `r:`, `a`, `o`, `c:`): the overview of Rooms 2 and 17 is unchanged before and after; rooms with objects not present at the first visit: 8 (254), 10 (295), 18 (370, 371), 24 (433), 28 (465, 468, 469, 473 to 475), 34 (561, 587) of the 16 rooms looked at. Room 18 now offers "sphere" and "crystal 2": Look at the sphere plays the crystal-ball vision (Room 19, [picture](window-loom-after/c-5-0.png)); Look at crystal 2 plays in the glassmakers' room and goes on to Room 20 ([picture](window-loom-after/c-6-0.png)).
+
+### Fewer scenes started at their cutscene (31 October, later)
+
+Two changes to the setup search, both generic:
+1. Object code that tests the state of a variable it does not set (`ifState var[0x007], 1` in Indy 3, `getObjectState var[0x000], var[0x007]` in Monkey Island 2: "this object", which the sentence script sets) now tries the picked object's own states. The second object of a two-object verb is offered even when no room holds it (an inventory-only item).
+2. The setup is applied again after the room is visited (`ScummCutsceneRun`, and the app's pick): a room's entry can reset what the setup set (Indy 3 Room 23's entry closes its doors). Only what the session lacks is set.
+
+| Game | With a setup | Started at their cutscene | Of those, showing nothing |
+|---|---|---|---|
+| Indy 3 EGA | 12 → 23 | 49 → 38 | 10 → 4 |
+| Monkey Island 1 floppy | 12 → 18 | 47 → 41 | 10 → 6 |
+| Monkey Island 1 CD | 12 → 18 | 46 → 40 | 10 → 6 |
+| Monkey Island 2 | 7 → 17 | 83 → 73 | 24 → 15 |
+| Indy 4 | 30 → 38 | 169 → 161 | 35 → 30 |
+
+Every group still begins. `ScummSceneSetupTests.ADoorThatTestsItsOwnStateIsOpenedForItsClose`. Window: Indy 3 Room 23's "Push loose brick" and "Close door" play without breaking the room (short animations without lines; the picture shows Indy by the door afterwards). Runs: `*-run3.txt`, `indy3-ega-run5.txt`.
