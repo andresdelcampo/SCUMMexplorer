@@ -33,6 +33,9 @@ public static class ScummCutsceneRun
     public const int EndFrames = 6000;
     public const int TrialFrames = 600;
 
+    /// <summary>Frames with no cutscene and no line after which a begun scene is over (the idle tail of LOOM English's reviewed replays).</summary>
+    public const int QuietFrames = 32;
+
     /// <param name="newSession">A fresh session booted to the first playable room (each call must give a new one).</param>
     /// <summary>
     /// A picked trigger (§8.6, R-8.35): the game's own way first (the entry, or the sentence script); when that does not begin the scene (the game's
@@ -96,6 +99,10 @@ public static class ScummCutsceneRun
             var reached = trigger.Scripts.Select(ScriptKey).Where(key => key is not null).ToHashSet();
             var begun = false;
             var frame = 0;
+            var quiet = 0;
+            // Versions 1 and 2 (Maniac Mansion, Zak McKracken: recurring background cutscenes) keep ending at the first quiet frame until they move
+            // onto the shared scene setup (ROADMAP 2b); their fidelity tests pin it.
+            var quietNeeded = ScummProfile.For(game).EngineVersion <= ScummVersion.V2 ? 1 : QuietFrames;
             for (; frame < EndFrames; frame++)
             {
                 if (!begun && session.CutscenesBegun > earlier)
@@ -107,11 +114,14 @@ public static class ScummCutsceneRun
                         RoomOf(line["cutscene at ".Length..]) is int at && at != trigger.Room && session.RoomsEntered.Skip(mark).Contains(at));
                     earlier = session.CutscenesBegun;
                 }
-                if (begun && !session.InCutscene && session.Messages.HaveMsg == 0) break;
+                // A scene may be a chain of cutscenes (LOOM Room 18's bell: Script 62, then Room 20's, then Scripts 58 and 59, one frame apart): it is
+                // over only after QuietFrames frames with no cutscene and no line, as LOOM English's reviewed replays were run (31 October 2026).
+                quiet = begun && !session.InCutscene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
+                if (quiet >= quietNeeded) break;
                 if (!begun && frame >= TrialFrames) break;
                 session.StepFrame();
             }
-            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame, Lines: session.Messages.Log.Count - logMark, Way: way);
+            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way);
         }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NotSupportedException)
         {

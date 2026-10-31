@@ -6,6 +6,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+
+## 31 October: a picked scene runs to its end when it is a chain of cutscenes
+
+Found against LOOM English's catalog (Room 18's bell: five cutscenes one frame apart): a scene run now ends only after 32 quiet frames (no cutscene, no line) instead of at the first one; versions 1 and 2 unchanged. LOOM: same length as the catalog 84.5% → 89.1% of 238. Scenes showing nothing: Monkey Island 2 7.9% → 6.3%, Indy 4 6.8% → 5.6%; all five copies 5.5% → 4.8% ([record](../../.verification/loom-answer-key-20261031/README.md)).
 ## 31 October: LOOM English's catalog fixes the shared scene engine
 
 The shared engine (used by Indy 3, Monkey Island, Indy 4) was run on LOOM English and compared with its 328 hand-reviewed replays. All 238 replays it lists begin; the other 90 are shared draft reactions (Interact actions by design). Two generic fixes: the hero is put at the object on every path of a pick (LOOM picks left Bobbin in the boot's room, so its scenes loaded Room 2 at the end), and a scene's category comes from its run (another room reached, or 100 frames without a line). Rooms reached as the catalog: 185 → 238 of 238; category: 212 → 219 ([record](../../.verification/loom-answer-key-20261031/README.md)).

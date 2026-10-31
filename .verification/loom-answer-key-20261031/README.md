@@ -30,6 +30,10 @@ The catalog's titles are not compared: they use LOOM's verb and draft names (`Lo
 
 Within 5 frames 192, within 10% 9, within 50% 6, further 31: 201 of 238 (84%) play essentially the same scene. The 37 others play another branch or end differently: much shorter in the engine (Room 18's looks at 369 and 371: 84 and 154 frames against 536 and 567; Room 04's walk responses), much longer (Room 23's draft reactions at the workers: 41 lines against a short reaction). Likely the start state the catalog's replays had (Bobbin's look and staff, actors, camera); `frames.tsv` lists them.
 
+### After the quiet-frames fix
+
+Shared cause found by tracing Room 18's look at the bell (catalog 536 frames, engine 84): the scene is a chain of cutscenes one frame apart (Script 62, Room 20's local 207, Scripts 58 and 59), and the run stopped when the first ended. `ScummCutsceneRun` now ends a begun scene only after 32 frames with no cutscene and no line (the catalog's idle tail); versions 1 and 2 keep the first quiet frame (their fidelity tests pin it). Length within 10%: 201 → 212 of 238 (84.5% → 89.1%); rooms 100%, category 92.0% unchanged. Of the 20 still far off: Room 4's walk responses (3) are shorter because a pick teleports Bobbin (by design); Room 23's draft reactions (12) pick up about 40 lines of the workers' background talk; Rooms 30 to 32 and 51 (5) are single cases. Other games after the fix (showing nothing): Monkey Island 2 15 → 12, Indy 4 29 → 24; Monkey Island 1 one more scene with a setup.
+
 ## What retiring the catalog needs
 
 1. The 37 length differences fixed in the shared engine (start state derived, not recorded).
