@@ -13,8 +13,8 @@ What this removes from the 30 October plan: the Play sign-off (R-7.7 to R-7.21 s
 | Gate | Done when | Who closes it |
 |---|---|---|
 | **A. Rooms** | Every room opens in its first-visit state with no gaps and never hangs; black areas explained (source) or fixed. | Agent fixes, user glances |
-| **B. Interactions** | In a picked room, each object's verbs with code of their own can be triggered and answer as in the game (R-8.38). | Agent |
-| **C. Cutscenes** | Every list entry plays when picked, with the state it needs set up (§8.6), or Advanced says why not. | Agent |
+| **B. Interactions** | In a room, every object that belongs to it (present or not yet) and each of its verbs with code can be picked and plays, the state set to allow it (R-8.38). | Agent |
+| **C. Cutscenes** | Every scene of the room is offered and plays when picked: its state set up (§8.6), or its code started directly where no setup makes it begin. Nothing hidden (R-8.35). | Agent |
 | **D. Looks and sounds** | The user spot-checked a few rooms, scenes and sounds against the game (ScummVM). | User |
 | **E. Editions** | Every local copy opened in the window once (language, accents, music device). | User |
 | **F. Signed off** | The user tried the game as an explorer and the decisions are made. | User |
