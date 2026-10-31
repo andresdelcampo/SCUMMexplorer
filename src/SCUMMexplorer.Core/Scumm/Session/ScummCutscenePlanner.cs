@@ -163,6 +163,24 @@ public sealed class ScummCutscenePlanner
     /// <summary>The run when it is done already (so a caller on the UI thread can ask without waiting).</summary>
     public bool TryGetRun(ScummCutscene trigger, out ScummCutsceneRunResult run) => _runs.TryGetValue(Key(trigger), out run!);
 
+    /// <summary>Frames without a line from which a run that stays in its room counts as a scene (a long silent animation).</summary>
+    public const int SilentSceneFrames = 100;
+
+    /// <summary>
+    /// The scene's category from its run once the run is known (31 October 2026, measured against LOOM English's 328 reviewed replays, whose rule
+    /// R-8.9 this is): a scene when the run reaches another room or plays at least <see cref="SilentSceneFrames"/> frames without a line; dialogue and
+    /// reactions otherwise. Agrees with the catalog for 219 of 238 replays, the static rule (<see cref="ScummCutsceneGroup.IsScene"/>, used until the
+    /// run is known) for 212. The rest are LOOM conventions a generic rule cannot know (a silent Use is a scene there).
+    /// </summary>
+    public bool IsScene(ScummCutsceneGroup group)
+    {
+        ArgumentNullException.ThrowIfNull(group);
+        if (!TryGetRun(group.First, out var run)) return group.IsScene;
+        var shown = run.Begun || !_lastResort.TryGetValue(Key(group.First), out var plan) ? run : plan.Result;
+        if (!shown.Begun) return group.IsScene;
+        return shown.RoomsEntered.Count > 0 || shown.Lines == 0 && shown.Frames >= SilentSceneFrames;
+    }
+
     /// <summary>Whether a run of the scene was in this room at some point (its own room always counts).</summary>
     public bool PlaysIn(ScummCutsceneGroup group, int room) =>
         group.First.Room == room || group.Others.Any(o => o.Room == room) || TryGetRun(group.First, out var run) && run.RoomsEntered.Contains(room);

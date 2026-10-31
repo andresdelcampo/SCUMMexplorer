@@ -127,12 +127,15 @@ public abstract partial class ScummSession
     public void PickInteraction(int objectA, int verb, int objectB = 0)
     {
         var sentence = _runtime.IsV2 ? 0 : _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
+        // The hero is put at the object on every path (LOOM has no sentence script: left in the boot's room, the scene's own actorFollowCamera of
+        // the hero would start that room's scene, Script 3 +0x001B; found by the comparison with LOOM English's catalog, 31 October 2026).
+        // Not yet for versions 1 and 2: Maniac Mansion and Zak McKracken keep their own scene setup until they move onto this one (ROADMAP 2b).
+        if (!_runtime.IsV2) PutHeroAtObject(objectA);
         if (sentence == 0)
         {
             ActivateObjectVerb(objectA, verb);
             return;
         }
-        PutHeroAtObject(objectA);
         _runtime.Sentences.Add((verb, objectA, objectB));
         _uncertainties.Add($"Object {objectA} verb 0x{verb:X2}{(objectB != 0 ? $" with object {objectB}" : "")} was picked: the hero was put at the object and the " +
                            $"sentence given to the game's sentence script {sentence} (an exploration action, not the player's click).");
@@ -240,6 +243,7 @@ public abstract partial class ScummSession
     /// </summary>
     public bool PutHeroAtObject(int objectId)
     {
+        if (_runtime.IsV2) return false;
         var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : 0;
         if (ego == 0 || _runtime.CurrentRoom is not int room || _currentObjects.FirstOrDefault(item => item.Id == objectId) is not { } record) return false;
         var (x, y) = (record.WalkX, record.WalkY) != (0, 0) ? (record.WalkX, record.WalkY) : (record.X + record.Width / 2, record.Y + record.Height);

@@ -87,6 +87,7 @@ public static class ScummCutsceneRun
                 logMark = session.Messages.Log.Count;
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
                 var second = setup?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
+                if (way == ScummPickedStart.Direct) session.PutHeroAtObject(trigger.ObjectId);
                 if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
                 else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second);
             }

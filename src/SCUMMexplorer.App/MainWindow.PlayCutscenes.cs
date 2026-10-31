@@ -150,7 +150,7 @@ public partial class MainWindow
             .Select(group => ($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", new CutscenePickerItem(
                 GenericCutsceneTitle(group.First) +
                 (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
-                group.IsScene ? "Scenes" : "Dialogue and reactions", PlayCutsceneNote(planner, group), () => PlayScummCutscene(group)))).ToList();
+                planner.IsScene(group) ? "Scenes" : "Dialogue and reactions", PlayCutsceneNote(planner, group), () => PlayScummCutscene(group)))).ToList();
     }
 
     /// <summary>The note behind an entry (R-8.13): the source, what is possible rather than certain, the fresh-start run and the stated start.</summary>
