@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 31 October: readable scripts of every game name their objects and actors
+
+The readable view of Indy 3, Monkey Island 1 (both), Monkey Island 2 and Indy 4 now names objects (each room's stored name) and actors (`actorOps … actorName`, per script, with a game-wide reading where one name dominates). Object references named 0% → 76.1%, actor references 0% → 62.7% across 13,131 scripts (Indy 3 51%/75%, MI1 65%/39% and 70%/39%, MI2 79%/50%, Indy 4 85%/79%) ([record](../../.verification/readable-names-20261031/README.md)).
 ## 31 October: LOOM's Interact offers each object's answer to any other draft
 
 Verb 0x56 ("Any other draft") is now in LOOM's Interact: the 61 catalog scenes of that kind were unreachable in every copy but the English reference. 95 objects in the English game have it; all begin (100%), 93 print a line (97.9%). The English reference's room lists drop the matching "Other draft response" entries (now in Interact). Room 47's swan prints nothing in the window (open) ([record](../../.verification/loom-editions-20261031/README.md)).

@@ -79,6 +79,24 @@ internal static class Program
                         continue;
                     }
                     // t expands the tree's Cutscenes branch and lists its room groups.
+                    // s:id opens a global script's page and logs the first lines of what it shows (the readable view by default).
+                    if (raw.StartsWith("s:", StringComparison.Ordinal))
+                    {
+                        var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                        var script = game.AllScripts.First(r => r.ScriptRoom is null && r.ResourceId == int.Parse(raw[2..]));
+                        Call("SelectResourceInTree", script);
+                        await Pump(3);
+                        var shown = ((System.Windows.Controls.TextBox)window.FindName("ScriptOutput")).Text;
+                        foreach (var line in shown.Split('\n').Take(22)) Log("  | " + line.TrimEnd());
+                        Capture(raw.Replace(':', '-'));
+                        continue;
+                    }
+                    // w:seconds waits (a room's entry scene finishing before a pick).
+                    if (raw.StartsWith("w:", StringComparison.Ordinal))
+                    {
+                        for (var i = 0; i < int.Parse(raw[2..]); i += 3) { await Pump(3); State($"{raw} +{i + 3}s"); }
+                        continue;
+                    }
                     if (raw == "t")
                     {
                         var tree = (System.Windows.Controls.TreeView)window.FindName("ResourceTree");

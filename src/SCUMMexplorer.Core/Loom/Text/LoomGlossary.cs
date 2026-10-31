@@ -84,6 +84,8 @@ public sealed partial class LoomGlossary
             }
         }
         if (cd) glossary.ReadCdNames(game!);
+        // Every other game: the names its own data stores, read the first time a name is asked for.
+        if (engineOnly && !cd) glossary._pendingGame = game;
         return glossary;
     }
 
@@ -131,20 +133,45 @@ public sealed partial class LoomGlossary
                 : null);
     }
 
+    private GameLibrary? _pendingGame;
+    private readonly object _pendingGate = new();
+
+    private void EnsureGameNames()
+    {
+        if (_pendingGame is null) return;
+        lock (_pendingGate)
+        {
+            if (_pendingGame is not { } game) return;
+            ReadGameNames(game);
+            _pendingGame = null;
+        }
+    }
+
     public GlossaryEntry? Script(int id) => Find("script", id);
     /// <summary>Actor numbers are reused from scene to scene; a name with a scope (for example <c>script:42</c>) applies only inside that script and wins over the general one.</summary>
-    public GlossaryEntry? Actor(int id, params string?[] scopes) =>
-        scopes.Where(scope => scope is not null).Select(scope => Find("actor", id, scope)).FirstOrDefault(entry => entry is not null) ?? Find("actor", id);
+    public GlossaryEntry? Actor(int id, params string?[] scopes)
+    {
+        EnsureGameNames();
+        return scopes.Where(scope => scope is not null).Select(scope => Find("actor", id, scope)).FirstOrDefault(entry => entry is not null) ?? Find("actor", id);
+    }
+
     public GlossaryEntry? Room(int id) => Find("room", id);
     public GlossaryEntry? Sound(int id) => Find("sound", id);
 
     /// <summary>The name stored in the game for a room object (object numbers are unique across rooms).</summary>
-    public GlossaryEntry? Object(int room, int id) =>
-        _objects.TryGetValue(id, out var found) && (room <= 0 || found.Room == room)
+    public GlossaryEntry? Object(int room, int id)
+    {
+        EnsureGameNames();
+        return _objects.TryGetValue(id, out var found) && (room <= 0 || found.Room == room)
             ? new GlossaryEntry(found.Name, GlossaryEvidence.Decoded, $"the name stored in Room {found.Room:00}'s data") : null;
+    }
 
     /// <summary>The room that holds an object, when the game's data names it.</summary>
-    public int? ObjectRoom(int id) => _objects.TryGetValue(id, out var found) ? found.Room : null;
+    public int? ObjectRoom(int id)
+    {
+        EnsureGameNames();
+        return _objects.TryGetValue(id, out var found) ? found.Room : null;
+    }
 
     private GlossaryEntry? Find(string kind, int index, string? scope = null)
     {
