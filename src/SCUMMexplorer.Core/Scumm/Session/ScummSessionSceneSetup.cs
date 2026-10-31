@@ -19,6 +19,8 @@ public enum ScummSetupKind
     ActorRoom,
     /// <summary>An object's class set (Value &gt; 0) or cleared (Value &lt; 0) (<c>ifClassOfIs</c>): an open cupboard, a lit lamp.</summary>
     ObjectClass,
+    /// <summary>An actor stood in a walk box of the room (<c>getActorWalkBox</c> then compared): the code waits for the hero to walk there (LOOM Room 10's entry, local script 200).</summary>
+    WalkBox,
 }
 
 /// <summary>
@@ -35,6 +37,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.SecondObject => $"object {Target} used with it (held)",
         ScummSetupKind.ActorCostume => $"actor {Target} in costume {Value}",
         ScummSetupKind.ActorRoom => $"actor {Target} in Room {Value}",
+        ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
     } + $" (tested at {Where})";
@@ -101,6 +104,16 @@ public abstract partial class ScummSession
                 _runtime.SetObjectClasses(id, wanted);
                 return true;
             }
+            case ScummSetupKind.WalkBox:
+            {
+                // Only in the scene's room, and a few frames later: the waiting script first notes the box the hero stands in and then waits for it
+                // to change (LOOM Room 10's local script 200 +0x0001 to +0x000A), as the walk there would change it.
+                if (edit.Room is int boxRoom && _runtime.CurrentRoom != boxRoom) return false;
+                var actor = edit.Target == "ego" ? variables.GetValueOrDefault(_runtime.EgoVariable) : int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                if (_deferredBoxPuts.Any(d => d.Actor == actor && d.Box == edit.Value)) return false;
+                _deferredBoxPuts.Add((actor, edit.Value, BoxPutDelayFrames));
+                return true;
+            }
             case ScummSetupKind.ActorCostume or ScummSetupKind.ActorRoom:
             {
                 var actor = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
@@ -129,6 +142,63 @@ public abstract partial class ScummSession
                 return true;
             }
         }
+    }
+
+    /// <summary>
+    /// Stands an actor of the current room in walk box <paramref name="box"/> (the box's middle, or the nearest point of it), as a walk there would leave
+    /// it. A box that is only a line (a doorway) holds no standing actor: the actor then starts a walk to a box whose route crosses it, so the frames
+    /// step it through. False before the room is entered or when the actor is elsewhere or already in the box.
+    /// </summary>
+    private const int BoxPutDelayFrames = 4;
+    private readonly List<(int Actor, int Box, int Frames)> _deferredBoxPuts = [];
+
+    /// <summary>Counts down the walk-box placements of a picked scene's setup and makes those that are due (called at the start of each frame).</summary>
+    protected void StepDeferredBoxPuts()
+    {
+        for (var i = _deferredBoxPuts.Count - 1; i >= 0; i--)
+        {
+            var (actor, box, frames) = _deferredBoxPuts[i];
+            if (frames > 1) { _deferredBoxPuts[i] = (actor, box, frames - 1); continue; }
+            _deferredBoxPuts.RemoveAt(i);
+            PutActorInBox(actor, box);
+        }
+    }
+
+    private bool PutActorInBox(int actor, int box)
+    {
+        var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) ? (int?)egoValue : null;
+        // The hero may be elsewhere (a picked room's entry): it is brought in, a teleport; another actor must be in the room already.
+        if (_runtime.WalkBoxes is not { } boxes || _runtime.CurrentRoom is not int room || !_runtime.Actors.Contains(actor) ||
+            _runtime.Actors[actor].Room != room && actor != ego || _runtime.Actors[actor].Room == room && _runtime.Actors[actor].WalkBox == box ||
+            boxes.Coordinates(box) is not { } shape) return false;
+        var (x, y) = (shape.Corners.Sum(c => c.X) / 4, shape.Corners.Sum(c => c.Y) / 4);
+        if (!boxes.Contains(box, x, y)) (_, x, y) = ScummWalkBoxSet.ClosestPointOnBox(shape, x, y);
+        var start = (_runtime.Actors[actor].X, _runtime.Actors[actor].Y, _runtime.Actors[actor].WalkBox);
+        var place = CurrentPlacement();
+        var elsewhere = _runtime.Actors[actor].Room != room;
+        _runtime.Actors.Put(actor, x, y, room, place, ego);
+        if (elsewhere) { _runtime.Actors.ShowActorsIn(place); start = (x, y, _runtime.Actors[actor].WalkBox); }
+        if (_runtime.Actors[actor].WalkBox != box)
+        {
+            _runtime.Actors.Put(actor, start.X, start.Y, room, place, ego);
+            var from = start.WalkBox ?? 0;
+            foreach (var target in boxes.Boxes.Where(b => b.Index != box && (boxes.GetFlags(b.Index) & ScummWalkBox.InvisibleFlag) == 0))
+            {
+                var route = new List<int> { from };
+                for (var hop = 0; hop < 24 && route[^1] != target.Index; hop++)
+                {
+                    var next = boxes.GetNextBox(route[^1], target.Index);
+                    if (next < 0 || route.Contains(next)) break;
+                    route.Add(next);
+                }
+                if (route[^1] != target.Index || !route.Contains(box)) continue;
+                _runtime.Actors.Walk(actor, target.Corners.Sum(c => c.X) / 4, target.Corners.Sum(c => c.Y) / 4, place,
+                    $"Picked scene's setup: actor {actor} walks across walk box {box}");
+                break;
+            }
+        }
+        _visitTrace.Add($"picked scene's setup: actor {actor} put in walk box {box} at ({_runtime.Actors[actor].X}, {_runtime.Actors[actor].Y})");
+        return true;
     }
 
     /// <summary>

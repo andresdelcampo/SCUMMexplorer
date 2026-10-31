@@ -11,12 +11,13 @@ Keep the documents tidy (user, 31 October; rule in ROADMAP and CLAUDE.md): when 
 ## Harnesses
 
 - `.verification/scene-setup-20261031/Measure` (headless: every scene group of a game, fresh run, setup search, at-cutscene start; `MEASURE_TRIALS=1`, `MEASURE_DIRECT=1`, `MEASURE_VERBS=1`).
-- `.verification/scene-setup-20261031/WindowCheck` (real `MainWindow`: `room,object,verb` plays a listed scene; `r:room` opens a room; `o` lists Interact; `c:group,choice` runs one; `i:room,object,verb` an action; `a` LOOM objects with verbs not present).
+- `.verification/loom-editions-20261031/Editions` (headless: LOOM's scanned scenes on LOOM's own path and on the shared engine; `EDITIONS_LOOM_SESSION=1`, `EDITIONS_TRACE=room,object,verb`); `.verification/loom-answer-key-20261031/Compare` (the English catalog as the answer key; `COMPARE_LOOM_SESSION=1`).
+- `.verification/scene-setup-20261031/WindowCheck` (real `MainWindow`: `room,object,verb` plays a listed scene, LOOM's scanned lists included; `r:room` opens a room; `o` lists Interact; `c:group,choice` runs one; `i:room,object,verb` an action; `a` LOOM objects with verbs not present).
 - `.verification/mi2-intro-protection-20261030/IntroWindowCheck` (`hands-off`), `IntroProbe`; `.verification/indy3-castle-20261030/SourceDump` (`g:`, `e:`, `l:`, `v:`, `o:`, `ofind:`, `find:`, `box:`, `visit:`, `prep:`); `.verification/monkeycd-rooms-20261030/StartFrames`.
 
 ## Next
 
-1. Roadmap work item 1: scenes started at their cutscene that show nothing (Indy 3 4, MI1 5/4, MI2 4, Indy 4 16: 3.0% of all scenes; e.g. Indy 3 Room 13's entry jumps to Room 73; the rest of each game's scenes started at their cutscene also deserve a look).
+1. Roadmap work item 1: scenes started at their cutscene that show nothing (Indy 3 4, MI1 5/4, MI2 4, Indy 4 15: 2.9% of all scenes; e.g. Indy 3 Room 13's entry jumps to Room 73; the rest of each game's scenes started at their cutscene also deserve a look).
 2. Then the roadmap's order (one scene engine for every game, readable names, the user's reports, release).
 
 Open questions for the user (ask once, in passing): a Cutscenes node in the Advanced tree; the decisions 2, 4, 5, 7 in ROADMAP's "Your checks" and the retests.

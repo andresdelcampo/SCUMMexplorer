@@ -74,6 +74,7 @@ public partial class MainWindow
         {
             w._cdVoice.Stop();
             w._cdSetupPlanner = null;
+            w._loomScenePlanner = null;
             w._cdSavedRoomLists = null;
             w._cdRoomListsDone = false;
         }
@@ -273,6 +274,40 @@ public partial class MainWindow
 
     private IReadOnlyList<ScummCutsceneGroup>? _cdCutsceneGroups;
     private Lazy<LoomCdSceneSetupPlanner>? _cdSetupPlanner;
+    /// <summary>
+    /// The shared scene engine (<see cref="ScummCutscenePlanner"/>, the one Indy 3, Monkey Island and Indy 4 use; ROADMAP 2b, R-8.36) on LOOM's own session:
+    /// how each scanned scene is set up and started. Measured against the English catalog's 238 reviewed replays: all begin and reach the catalog's rooms,
+    /// 91% within 10% of its length (.verification/loom-editions-20261031). <see cref="_cdSetupPlanner"/> keeps only the room lists.
+    /// </summary>
+    private Lazy<ScummCutscenePlanner>? _loomScenePlanner;
+
+    /// <summary>
+    /// The shared planner over fresh LOOM sessions. The EGA game is a file per room and shares one copy; the CD reads one disc image, so each worker boots from
+    /// its own copy of the game (as the generic path does for archive games).
+    /// </summary>
+    private static Lazy<ScummCutscenePlanner> NewLoomScenePlanner(GameLibrary game)
+    {
+        if (game.V4Archive is null)
+        {
+            var snapshot = new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(game.FolderPath, "00.LFL"));
+            return new(() => new ScummCutscenePlanner(game, () => new LoomExplorationSession(game, snapshot)));
+        }
+        GameLibrary Copy() => GameFolderScanner.Reopen(game);
+        return new(() =>
+        {
+            GameLibrary? first = Copy();
+            var scanned = first;
+            return new ScummCutscenePlanner(scanned, () =>
+            {
+                var copy = Interlocked.Exchange(ref first, null) ?? Copy();
+                return new LoomExplorationSession(copy, copy.V4Archive!.ReadIndexedObjects(), completeBoot: false);
+            }, start: ScummCutsceneStart.SnapshotPerWorker);
+        });
+    }
+
+    /// <summary>The shared planner's own trigger for a LOOM scan trigger (same room, object and verb; the two scans list the same triggers).</summary>
+    private static ScummCutscene SharedTrigger(ScummCutscenePlanner planner, ScummCutscene t) =>
+        planner.Triggers.FirstOrDefault(c => c.Room == t.Room && c.ObjectId == t.ObjectId && c.VerbId == t.VerbId) ?? t;
     /// <summary>Room lists saved by an earlier run (same build and game data), used until the background runs finish.</summary>
     private Dictionary<string, int[]>? _cdSavedRoomLists;
     private bool _cdRoomListsDone;
@@ -325,6 +360,8 @@ public partial class MainWindow
             return new LoomCdSceneSetupPlanner(game, LoomCutsceneVerbs.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game), data);
         });
         _cdSetupPlanner = planner;
+        var shared = NewLoomScenePlanner(game);
+        _loomScenePlanner = shared;
         _cdRoomListsDone = seed is not null;
         _scanDone = 0; _scanTotal = 0;
         if (!_sceneSound.IsPreparing) _scanGate.Set();
@@ -349,17 +386,16 @@ public partial class MainWindow
                     });
                     CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                     Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
-                    foreach (var group in groups) { _scanGate.Wait(); planner.Value.Derive(group.First); planner.Value.VisitedRooms(group.First); CountScanStep(planner); }
+                    foreach (var group in groups) { _scanGate.Wait(); PlanWithSharedEngine(planner.Value, shared.Value, group.First); CountScanStep(planner); }
                     CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                     return;
                 }
-                _scanTotal = seed is not null ? groups.Count : groups.Count * 2; // the setups, then (without the shipped lists) the runs
-                foreach (var group in groups) { _scanGate.Wait(); planner.Value.Derive(group.First); CountScanStep(planner); }
+                _scanTotal = groups.Count; // a setup per scene, whose run gives its rooms too (the shipped lists already hold them)
+                foreach (var group in groups) { _scanGate.Wait(); PlanWithSharedEngine(planner.Value, shared.Value, group.First, rooms: seed is null); CountScanStep(planner); }
                 // The shipped lists already hold the rooms each scene plays out in; only the start setups (for the notes and for playing) are derived.
                 if (seed is not null) return;
                 // Then the rooms each scene plays out in, so the room's own "Play Cutscene" list has them (the EGA list does, through the catalog's membership).
                 if (game.V4Archive is not null) planner.Value.IntroRooms();
-                foreach (var group in groups) { _scanGate.Wait(); planner.Value.VisitedRooms(group.First); CountScanStep(planner); }
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                 Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
             }
@@ -367,10 +403,25 @@ public partial class MainWindow
         });
     }
 
-    private string CdSetupNote(ScummCutscene trigger) =>
-        _cdSetupPlanner is not { IsValueCreated: true } lazy || !lazy.Value.TryGet(trigger, out var setup)
-            ? "Whether a fresh start begins it is still being checked (open the list again in a few seconds). "
-            : setup == LoomCdStartSetup.None ? "A fresh start begins its cutscene (checked by a headless run). " : setup.Describe() + " ";
+    /// <summary>
+    /// The shared engine's plan for a scene (<see cref="ScummCutscenePlanner.PlanSetup"/>), and the rooms its run went through recorded for the room lists
+    /// (unless a fresh run or the shipped lists already gave them).
+    /// </summary>
+    private static ScummScenePlan PlanWithSharedEngine(LoomCdSceneSetupPlanner lists, ScummCutscenePlanner shared, ScummCutscene trigger, bool rooms = true)
+    {
+        var plan = shared.PlanSetup(SharedTrigger(shared, trigger));
+        if (rooms && !lists.TryGetVisitedRooms(trigger, out _) && plan.Result.Begun) lists.RecordFreshRun(trigger, plan.Result.RoomsEntered);
+        return plan;
+    }
+
+    private string CdSetupNote(ScummCutscene trigger)
+    {
+        if (_loomScenePlanner is not { IsValueCreated: true } lazy || !lazy.Value.IsDerived(SharedTrigger(lazy.Value, trigger)))
+            return "How it starts is still being worked out (open the list again in a few seconds). ";
+        var plan = lazy.Value.PlanSetup(SharedTrigger(lazy.Value, trigger));
+        return plan.Result.Way == ScummPickedStart.AtCutscene ? "Its own code does not begin from here, so its cutscene is started directly. " + plan.Note + " "
+            : plan.Note.Length == 0 ? "A fresh start begins its cutscene (checked by a headless run). " : plan.Note + " ";
+    }
 
     /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="ScummCutsceneIndex"/>).</summary>
     private IReadOnlyList<ScummCutsceneGroup> CdCutsceneGroups() =>
@@ -394,7 +445,7 @@ public partial class MainWindow
                CdSetupNote(first) +
                "Stated start: the running exploration session (state kept, a fresh post-boot session if none), the room opened from the catalog (Bobbin's arrival is assumed), " +
                (first.IsRoomEntry ? "then the room's entry script plays on the clock. " :
-                $"then the object's verb 0x{first.VerbId:X2} run directly: an exploration action, not the game's click (Bobbin does not walk there, the object may be untouchable in this state, and a draft response does not simulate casting the draft). ") +
+                $"then Bobbin is put at the object and its verb 0x{first.VerbId:X2} runs: an exploration action, not the game's click (the walk is not played, and a draft response does not simulate casting the draft). ") +
                "The frames play on the playback clock at the game's frame rate" + (_game?.Id == GameId.LoomVga ? "; voices play from the disc as a click's would." : ".");
     }
 
@@ -421,24 +472,39 @@ public partial class MainWindow
         if (!ScannedCutscenes || _game is null || !CanStartCutscene ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == trigger.Room) is not { } room) return;
         var vga = _game.V4Archive;
+        // The shared engine's plan (ROADMAP 2b): worked out in the background; a pick before that works it out now (a few seconds).
+        var shared = (_loomScenePlanner ??= NewLoomScenePlanner(_game)).Value;
+        var sharedTrigger = SharedTrigger(shared, trigger);
+        ScummScenePlan plan;
+        var previousCursor = System.Windows.Input.Mouse.OverrideCursor;
+        System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+        try { plan = shared.PlanSetup(sharedTrigger); }
+        finally { System.Windows.Input.Mouse.OverrideCursor = previousCursor; }
         StopScenePlayback();
         _cdVoice.Stop();
-        // Single scenes keep the running story/status, including later actor and staff state.
-        // Only missing source prerequisites run unseen; explicit sequences/restart own their fresh starts.
-        var setup = _cdSetupPlanner?.Value.Derive(trigger) ?? LoomCdStartSetup.None;
+        // Single scenes keep the running story/status, including later actor and staff state: the plan only raises what the session lacks (§8.6).
         var session = _session is { BootRunning: false } ? _session
             : _session = vga is not null ? new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false)
             : new LoomExplorationSession(_game, _indexedObjectSnapshot!, soundCard: SoundCard);
-        setup = LoomCdSceneSetupPlanner.Adapt(setup, session);
-        var useSetup = setup is { Plays: true, HasSteps: true };
-        if (useSetup) LoomCdSceneSetupPlanner.ApplyBefore(session, _game, setup.Before);
         if (vga is not null) _cdVoice.Attach(vga.Disc, session);
         var before = (session.CutscenesBegun, session.EgoPuts);
+        if (plan.HasEdits) session.ApplySceneSetup(plan.Edits);
         session.VisitRoom(room);
-        if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
+        // Again after the visit: the room's entry may reset what the setup set; a walk box is stood in only now, in the scene's room.
+        if (plan.HasEdits) session.ApplySceneSetup(plan.Edits);
         var speakerNotes = trigger.IsRoomEntry ? [] : PlaceSpeakersForDirectVerb(room, trigger.ObjectId, trigger.VerbId);
-        var storyNotes = PrepareStoryState(session, trigger.Room, trigger.ObjectId, trigger.VerbId, LoomCutsceneReadiness.ScriptIds(trigger.Scripts));
-        var action = trigger.IsRoomEntry ? null : session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+        ScummObjectActionResult? action = null;
+        if (plan.Result.Way == ScummPickedStart.AtCutscene)
+        {
+            if (ScummSceneSetupSearch.FirstCutscene(_game, sharedTrigger) is { } at) session.StartSceneAt(at.Label, at.Offset, at.Arguments);
+        }
+        else if (!trigger.IsRoomEntry)
+        {
+            // LOOM has no sentence script: a pick puts Bobbin at the object and runs its verb (as ScummSession.PickInteraction does); the direct way runs it where he stands.
+            if (plan.Result.Way == ScummPickedStart.Game) session.PutHeroAtObject(trigger.ObjectId);
+            action = session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+        }
+        IReadOnlyList<string> storyNotes = plan.Note.Length == 0 ? [] : [plan.Note];
         var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
         if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)
         {

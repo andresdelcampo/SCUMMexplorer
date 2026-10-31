@@ -24,7 +24,10 @@ if (Environment.GetEnvironmentVariable("COMPARE_TRACE") is { Length: > 0 } spec)
     foreach (var line in session.SessionTrace.Skip(mark).Where(l => l.Contains("load", StringComparison.OrdinalIgnoreCase) || l.Contains("Room 02") || l.StartsWith("picked") || l.Contains("sentence")).Take(25)) Console.WriteLine("  " + line);
     return;
 }
-var planner = new ScummCutscenePlanner(game);
+// COMPARE_LOOM_SESSION=1: the shared planner runs on LOOM's own session (LoomExplorationSession), as the app would play LOOM through it.
+var onLoom = Environment.GetEnvironmentVariable("COMPARE_LOOM_SESSION") == "1";
+var lflSnapshot = onLoom ? new SCUMMexplorer.Core.Scumm.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")) : null;
+var planner = onLoom ? new ScummCutscenePlanner(game, () => new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, lflSnapshot!)) : new ScummCutscenePlanner(game);
 var triggers = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).GroupBy(t => (t.Room, t.ObjectId, t.VerbId)).ToDictionary(g => g.Key, g => g.First());
 var groupOf = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others).Select(t => ((t.Room, t.ObjectId, t.VerbId), g))).GroupBy(p => p.Item1).ToDictionary(p => p.Key, p => p.First().g);
 // Every trigger the scan saw, shared helpers included (Group leaves those out), for telling "left out as a shared helper" from "not found".
@@ -79,7 +82,7 @@ foreach (var replay in catalog.EnumerateArray())
                           (plan.HasEdits ? $" | setup: {string.Join("; ", plan.Edits.Select(e => e.Describe()))}" : ""));
 }
 Console.WriteLine("run-based category agreement by silent-frames threshold: " + string.Join(", ", thresholds.Select((t, i) => $"{t}: {runRule[i]}")));
-File.WriteAllLines("../categories.tsv", catLog);
-File.WriteAllLines("../frames.tsv", frameLog);
+File.WriteAllLines(onLoom ? "../categories-loom-session.tsv" : "../categories.tsv", catLog);
+File.WriteAllLines(onLoom ? "../frames-loom-session.tsv" : "../frames.tsv", frameLog);
 Console.WriteLine($"replays {Math.Min(n, max)}: found {found}, begin {begun}; " + string.Join(", ", ways.OrderBy(w => w.Key).Select(w => $"{w.Key} {w.Value}")) +
                   $"; rooms same {roomsSame}, more {roomsMore}, fewer {roomsFewer}; category same {catSame}; not grouped: shared helper {helpers}, shared code {sharedCode}");

@@ -26,9 +26,9 @@ public sealed class ScummBootSnapshotTests(ITestOutputHelper output)
         return File.Exists(Path.Combine(path, marker)) ? new GameFolderScanner().Scan(path) : null;
     }
 
-    private static (ScummCutsceneRunResult Result, IReadOnlyList<string> Trace, int Room) RunTraced(GameLibrary game, Func<ScummGameSession> start, ScummCutscene trigger)
+    private static (ScummCutsceneRunResult Result, IReadOnlyList<string> Trace, int Room) RunTraced(GameLibrary game, Func<ScummSession> start, ScummCutscene trigger)
     {
-        ScummGameSession? session = null;
+        ScummSession? session = null;
         var result = ScummCutsceneRun.Run(game, () => session = start(), trigger);
         return (result, session!.SessionTrace.ToArray(), session.CurrentRoomId ?? -1);
     }

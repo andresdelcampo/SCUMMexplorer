@@ -20,17 +20,17 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public sealed class ScummBootSnapshot
 {
-    private readonly ScummGameSession _frozen;
+    private readonly ScummSession _frozen;
     private readonly HashSet<object> _shared;
 
-    private ScummBootSnapshot(ScummGameSession frozen, HashSet<object> shared)
+    private ScummBootSnapshot(ScummSession frozen, HashSet<object> shared)
     {
         _frozen = frozen;
         _shared = shared;
     }
 
     /// <summary>Keeps a copy of the session as it is now; the session itself may go on being used.</summary>
-    public static ScummBootSnapshot Of(ScummGameSession session)
+    public static ScummBootSnapshot Of(ScummSession session)
     {
         ArgumentNullException.ThrowIfNull(session);
         var shared = ObjectGraphCopy.Reachable(session.SessionGame);
@@ -38,13 +38,13 @@ public sealed class ScummBootSnapshot
     }
 
     /// <summary>A new session in the snapshot's state, independent of the snapshot and of every other copy.</summary>
-    public ScummGameSession Start() => ObjectGraphCopy.Copy(_frozen, _shared);
+    public ScummSession Start() => ObjectGraphCopy.Copy(_frozen, _shared);
 
     /// <summary>
     /// A factory of fresh sessions that boots once (the first call, through <paramref name="boot"/>) and gives a copy of that boot every time after.
     /// Thread-safe: the boot runs once, and copies may be made on several threads. For games whose readers may be shared between threads.
     /// </summary>
-    public static Func<ScummGameSession> Shared(Func<ScummGameSession> boot)
+    public static Func<ScummSession> Shared(Func<ScummSession> boot)
     {
         ArgumentNullException.ThrowIfNull(boot);
         var snapshot = new Lazy<ScummBootSnapshot>(() => Of(boot()), LazyThreadSafetyMode.ExecutionAndPublication);
@@ -58,7 +58,7 @@ public sealed class ScummBootSnapshot
 /// or boots a new one when every snapshot is in use, and gives it back when it ends. So there are at most as many boots as runs going on at once, and no
 /// snapshot (nor its copy of the game) serves two runs at the same time, whichever threads the runs are on.
 /// </summary>
-public sealed class ScummBootSnapshotPool(Func<ScummGameSession> boot)
+public sealed class ScummBootSnapshotPool(Func<ScummSession> boot)
 {
     private readonly ConcurrentBag<ScummBootSnapshot> _free = [];
     private int _boots;
@@ -67,7 +67,7 @@ public sealed class ScummBootSnapshotPool(Func<ScummGameSession> boot)
     public int Boots => _boots;
 
     /// <summary>Runs <paramref name="run"/> with a factory of fresh sessions copied from a snapshot that nothing else uses meanwhile.</summary>
-    public T Use<T>(Func<Func<ScummGameSession>, T> run)
+    public T Use<T>(Func<Func<ScummSession>, T> run)
     {
         ArgumentNullException.ThrowIfNull(run);
         if (!_free.TryTake(out var snapshot))

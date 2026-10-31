@@ -29,7 +29,7 @@ public sealed class ScummCutscenePlanner
     // Cutscene snapshot (18 October 2026): the runs start from copies of one boot, not from a boot each (Monkey Island 2: 260 boots of about 0.9 s).
 
     private readonly GameLibrary _game;
-    private readonly Func<ScummGameSession> _newSession;
+    private readonly Func<ScummSession> _newSession;
     private readonly ScummBootSnapshotPool? _pool;
     private readonly ConcurrentDictionary<(int, int, int), ScummCutsceneRunResult> _runs = [];
 
@@ -39,7 +39,7 @@ public sealed class ScummCutscenePlanner
     /// first call); <see cref="ScummCutsceneStart.SnapshotPerWorker"/> when each call of <paramref name="newSession"/> reads its own copy of the game;
     /// <see cref="ScummCutsceneStart.BootPerRun"/> calls it for every run, as before 18 October 2026.
     /// </param>
-    public ScummCutscenePlanner(GameLibrary game, Func<ScummGameSession>? newSession = null, string? preparationNote = null,
+    public ScummCutscenePlanner(GameLibrary game, Func<ScummSession>? newSession = null, string? preparationNote = null,
         Func<string, string>? readableText = null, ScummCutsceneStart start = ScummCutsceneStart.SharedSnapshot)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -108,7 +108,7 @@ public sealed class ScummCutscenePlanner
     /// player has control and no cutscene is open, within <see cref="VerbFrameLimit"/> frames. The session is the planner's own (it serves only for the
     /// names); the scenes' runs still start from the boot. A boot that shows a verb is left as it is (null). S7 Indy4, 18 October 2026.
     /// </summary>
-    public static string? UntilAVerbIsOn(ScummGameSession session)
+    public static string? UntilAVerbIsOn(ScummSession session)
     {
         ArgumentNullException.ThrowIfNull(session);
         if (session.Verbs.Any(verb => verb.Mode == 1)) return null;

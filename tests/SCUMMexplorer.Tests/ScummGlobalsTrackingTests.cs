@@ -61,7 +61,7 @@ public sealed class ScummGlobalsTrackingTests
         return File.Exists(Path.Combine(path, marker)) ? new GameFolderScanner().Scan(path) : null;
     }
 
-    private static string State(ScummGameSession session)
+    private static string State(ScummSession session)
     {
         var snapshot = session.Snapshot;
         return string.Join("\n",

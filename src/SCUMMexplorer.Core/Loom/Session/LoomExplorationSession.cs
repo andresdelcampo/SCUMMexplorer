@@ -355,6 +355,8 @@ public sealed partial class LoomExplorationSession : ScummSession
             ? EnterRoom(room, "Room selected again manually; native entry state was prepared offscreen (exploration preview).")
             : VisitRoom(room, preserveStaffLevel: true);
 
+    public override ScummSessionSnapshot VisitRoom(GameResource room) => VisitRoom(room, null, false);
+
     public ScummSessionSnapshot VisitRoom(GameResource room, ScummObjectActionResult? reachedAction = null, bool preserveStaffLevel = false)
     {
         ArgumentNullException.ThrowIfNull(room);

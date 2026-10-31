@@ -37,6 +37,39 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ARoomThatWaitsForTheHeroToWalkIntoABoxGetsHimThere()
+    {
+        // LOOM Room 10's entry starts local script 200, which notes Bobbin's walk box (+0x0001) and waits for it to change; box 3 (+0x0032 isEqual
+        // local[0x000], 0x0003) begins the scene. The shared engine stands the hero in box 3 a few frames after the room is entered.
+        var folder = Path.Combine(TestGames.Root, TestGames.LoomRelative);
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 10, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.False(plan.Base.Begun);
+        Assert.True(plan.Result.Begun);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.WalkBox, Value: 3 });
+    }
+
+    [Fact]
+    public void ThePlannerRunsOnLoomsOwnSession()
+    {
+        // ROADMAP 2b: LOOM's scanned scenes play through the shared planner on LOOM's own session (the app's LoomExplorationSession), with the same
+        // walk-box start for Room 10's entry as on the generic session.
+        var folder = Path.Combine(TestGames.Root, TestGames.LoomRelative);
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+        var planner = new ScummCutscenePlanner(game, () => new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, snapshot));
+        var plan = planner.PlanSetup(Trigger(planner, 10, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.True(plan.Result.Begun);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.WalkBox, Value: 3 });
+    }
+
+    [Fact]
     public void TheHatchSceneGoesOnThroughItsRoomsOnceItsStateIsSet()
     {
         // Room 39 object 586 verb 0x0A (the hatch) +0x0000 tests its own state: with state 1 the scene plays its 18 lines through Rooms 41, 42 and 8.

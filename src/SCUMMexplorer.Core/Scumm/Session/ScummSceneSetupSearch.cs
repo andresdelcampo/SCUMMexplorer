@@ -120,6 +120,7 @@ public sealed partial class ScummSceneSetupSearch
             var stateOf = new Dictionary<string, int>();
             var costumeOf = new Dictionary<string, int>();
             var roomOf = new Dictionary<string, int>();
+            var boxOf = new Dictionary<string, string>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             foreach (var ins in script!.Instructions)
             {
@@ -137,6 +138,9 @@ public sealed partial class ScummSceneSetupSearch
                         break;
                     case "getActorCostume" when parts.Length >= 2 && Literal(parts[1]) is int dressed:
                         costumeOf[parts[0]] = dressed;
+                        break;
+                    case "getActorWalkBox" when parts.Length >= 2 && (Literal(parts[1])?.ToString(CultureInfo.InvariantCulture) ?? Ego(parts[1])) is { } boxed:
+                        boxOf[parts[0]] = boxed;
                         break;
                     case "getActorRoom" when parts.Length >= 2 && Literal(parts[1]) is int placed:
                         roomOf[parts[0]] = placed;
@@ -191,6 +195,13 @@ public sealed partial class ScummSceneSetupSearch
                                 Add(new(ScummSetupKind.ObjectState, stateObject.ToString(CultureInfo.InvariantCulture), side, where));
                         else if (costumeOf.TryGetValue(tested, out var dressedActor))
                             Add(new(ScummSetupKind.ActorCostume, dressedActor.ToString(CultureInfo.InvariantCulture), value.Value, where));
+                        else if (boxOf.TryGetValue(tested, out var boxedActor))
+                        {
+                            // A script that waits for the hero to walk into a box (LOOM Room 10's local script 200: getActorWalkBox of actor 1, then
+                            // isEqual 3): the box it waits for, the actor stood in it after the room is entered.
+                            if (ins.Operation is "isEqual" or "isNotEqual" && value.Value > 0)
+                                Add(new(ScummSetupKind.WalkBox, boxedActor, value.Value, where, trigger.Room));
+                        }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
                             Add(new(ScummSetupKind.ActorRoom, placedActor.ToString(CultureInfo.InvariantCulture), value.Value, where));
                         else if (objectCode && tested == "local[0x000]" && value.Value != 0)
@@ -296,6 +307,9 @@ public sealed partial class ScummSceneSetupSearch
         }
         return rooms;
     }
+
+    /// <summary>"ego" for the variable that holds the hero's actor number (<c>VAR_EGO</c>), so a setup stands whoever the hero is; null otherwise.</summary>
+    private static string? Ego(string text) => text == ScummVars.Ego ? "ego" : null;
 
     private static int? Literal(string text) =>
         text.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(text.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value) ? value : null;

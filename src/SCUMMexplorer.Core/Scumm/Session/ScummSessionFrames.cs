@@ -78,6 +78,7 @@ public abstract partial class ScummSession
     protected void StepOneFrame()
     {
         _inventoryStatusFrame++;
+        StepDeferredBoxPuts();
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
         // processActors ends the previous frame: animateCostume steps the limbs of the actors in the room.
@@ -401,7 +402,40 @@ public abstract partial class ScummSession
     /// <summary>Visits a room a reached load names, with the action that led there (the derived session may add its own set-up around the visit).</summary>
     protected abstract ScummSessionSnapshot VisitReachedRoom(GameResource target, ScummObjectActionResult action);
 
+    /// <summary>
+    /// Opens a room from the catalog: entered from the state the session has, its entry scripts run. A game's session says how the hero arrives;
+    /// by itself the room is only entered (a state preview).
+    /// </summary>
+    public virtual ScummSessionSnapshot VisitRoom(GameResource room)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        _uncertainties.StartStep();
+        return EnterRoom(room, $"Room {room.ResourceId:00} opened from the catalog (an exploration action; state preview).");
+    }
+
     /// <summary>Continues every pending script by one frame; a derived session adds its own per-frame work.</summary>
     public virtual ScummSessionSnapshot AdvanceFrame() => AdvanceOneFrame();
+
+    /// <summary>
+    /// <see cref="AdvanceFrame"/> for a caller that does not read the frame's snapshot (the cutscene runs, the planner's verb search):
+    /// the same frame, without copying the session's states, variables and lists into a snapshot nobody reads. A session that adds per-frame work of its own
+    /// in <see cref="AdvanceFrame"/> (LOOM's staff verbs) leaves it out here.
+    /// </summary>
+    public void StepFrame() => StepOneFrame();
+
+    /// <summary>
+    /// Plays a room's entry again (S7, 17 October 2026, to play a room's entry cutscene): a room the session is not in is visited as
+    /// <see cref="VisitRoom"/> does; the room it is in is loaded again as a <c>loadRoom</c> of the current room would (ScummVM <c>startScene</c>: the
+    /// exit code, then the entry hook and entry script from the state the session has). An exploration action and a state preview, never a reached outcome.
+    /// </summary>
+    public ScummSessionSnapshot EnterRoomAgain(GameResource room)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        if (_currentRoom?.ResourceId != room.ResourceId) return VisitRoom(room);
+        _uncertainties.StartStep();
+        var label = $"Room {room.ResourceId:00} entered again to play its entry scripts (an exploration action, as a loadRoom of the current room would; state preview).";
+        _uncertainties.Add(label);
+        return EnterRoom(room, label);
+    }
 }
 

@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 31 October: LOOM's other editions and the CD play their scenes through the shared scene engine
+
+LOOM's scanned scenes (every copy but the English reference, and the CD) now take their setup and start from the shared planner (the one Indy 3, Monkey Island and Indy 4 use), run on LOOM's own session; LOOM keeps its titles, lists, voices and playback. The shared setup also stands the hero in the walk box a script waits for (`getActorWalkBox` then compared; Room 10's entry). Every scene begins (LOOM's own path 99.5%); started at their cutscene: EGA copies 7.4% → 3.2%, CD 6.3% → 2.7%; showing nothing: EGA 3.2% → 0.5%, CD 4.5% → 0.9%. Against the English catalog's 238 replays: 100% begin and reach its rooms, 92.0% share its category, 91.2% within 10% of its length. Indy 4 one more own-way scene (Room 76's entry), the other games unchanged ([record](../../.verification/loom-editions-20261031/README.md)).
 ## 31 October: scene lists ready in a minute, and in seconds on later launches
 
 The background scene derivation runs every scene first (the room lists and Play Cutscene buttons are then ready) and works out the setup plans afterwards; everything derived is kept between launches of the same build and game data. Indy 4 in the real window: room lists ready after 58 s on a first launch (282 s before), 9 s on the next ([record](../../.verification/derivation-time-20261031/README.md)).

@@ -46,7 +46,9 @@ internal static class Program
                 // A slow game (Indy 4) starts its scene derivation later; a game without one (LOOM) never does.
                 for (var i = 0; i < 40 && Field("_playPlanner") is null && Field("_session") is null; i++) await Pump(1);
                 for (var i = 0; i < 300 && Field("_playPlanner") is not null && !(bool)Field("_playRoomListsDone")!; i++) await Pump(1);
-                Log($"derivation done={Field("_playRoomListsDone")}");
+                // LOOM's scanned editions (31 October: on the shared engine) derive in LOOM's own code; wait for their room lists.
+                for (var i = 0; i < 300 && Field("_cdSetupPlanner") is not null && !(bool)Field("_cdRoomListsDone")!; i++) await Pump(1);
+                Log($"derivation done={Field("_playRoomListsDone")}, LOOM lists={Field("_cdRoomListsDone")}");
                 foreach (var raw in args.Skip(2))
                 {
                     // a lists (LOOM) the objects with verbs that are not hotspots now: what the Interact overview adds since 31 October.
@@ -142,14 +144,17 @@ internal static class Program
                     }
                     var spec = raw;
                     var items = (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null })!;
+                    // LOOM's list: PlayableCutsceneItems, ids cd-room-object-verb.
+                    if (items.Count == 0) items = (System.Collections.IList)Call("PlayableCutsceneItems", new object?[] { null })!;
                     object? picked = null;
                     foreach (var item in items)
-                        if ((string)item!.GetType().GetField("Item1")!.GetValue(item)! == "scumm-" + spec.Replace(',', '-')) picked = item.GetType().GetField("Item2")!.GetValue(item);
+                        if ((string)item!.GetType().GetField("Item1")!.GetValue(item)! is var id && (id == "scumm-" + spec.Replace(',', '-') || id == "cd-" + spec.Replace(',', '-')))
+                            picked = item.GetType().GetField("Item2")!.GetValue(item);
                     if (picked is null) { Log($"{spec}: not in the list"); continue; }
                     Log($"{spec}: playing \"{picked.GetType().GetProperty("Title")!.GetValue(picked)}\"");
                     ((Action)picked.GetType().GetProperty("Play")!.GetValue(picked)!).Invoke();
                     for (var i = 1; i <= 8; i++) { await Pump(1.5); State($"{spec} +{i * 1.5:F1}s"); if (i == 3) Capture($"{spec.Replace(',', '-')}"); }
-                    var play = (ScummGameSession?)Field("_play");
+                    var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
                     Log($"{spec} setup: {string.Join(" | ", play?.Snapshot.Uncertainties.Where(u => u.Contains("setup") || u.Contains("picked") || u.Contains("started directly")).TakeLast(3) ?? [])}");
                 }
             }

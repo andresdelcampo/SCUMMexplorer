@@ -41,7 +41,7 @@ public static class ScummCutsceneRun
     /// A picked trigger (§8.6, R-8.35): the game's own way first (the entry, or the sentence script); when that does not begin the scene (the game's
     /// own refusals: too dark, out of reach), the verb's code run directly; the fuller of the two.
     /// </summary>
-    public static ScummCutsceneRunResult RunPicked(GameLibrary game, Func<ScummGameSession> newSession, ScummCutscene trigger,
+    public static ScummCutsceneRunResult RunPicked(GameLibrary game, Func<ScummSession> newSession, ScummCutscene trigger,
         IReadOnlyList<ScummSetupEdit>? setup = null)
     {
         var sentence = Run(game, newSession, trigger, setup);
@@ -51,7 +51,7 @@ public static class ScummCutsceneRun
         return direct.Score >= sentence.Score ? direct : sentence;
     }
 
-    public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummGameSession> newSession, ScummCutscene trigger,
+    public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummSession> newSession, ScummCutscene trigger,
         IReadOnlyList<ScummSetupEdit>? setup = null, ScummPickedStart way = ScummPickedStart.Game)
     {
         ArgumentNullException.ThrowIfNull(game);
