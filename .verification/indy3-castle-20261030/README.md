@@ -18,4 +18,4 @@ No code change. The Room 20 card thumbnail looks entirely black in the window (t
 
 ## Question for the user (gate G)
 
-Should a room whose guards can start a confrontation at any time (Indy 3 castle) be live from the catalog, with that risk, instead of a still picture? Today R-8.5b keeps it still. Listed in [USER_CHECKS](../../docs/USER_CHECKS.md).
+Should a room whose guards can start a confrontation at any time (Indy 3 castle) be live from the catalog, with that risk, instead of a still picture? Today R-8.5b keeps it still. Listed in [ROADMAP (Your checks)](../../docs/ROADMAP.md).

@@ -1,36 +1,22 @@
 # Next session
 
-Read `docs/ROADMAP.md` (the seven gates per game and the steps left), `docs/USER_CHECKS.md` (what only the user can check or decide) and `docs/CURRENT_WORK.md`. Maniac Mansion and Zak McKracken stay with their own orchestrator (`NEXT_SESSION_PROMPT_MANIAC_ZAK.md`).
-
-## Done on 30 October 2026 (all on master, not pushed)
-
-- Roadmap and per-game user checks; crash log in the shipped app (`%LOCALAPPDATA%\SCUMMexplorer\crash-logs`); Sound ◐ for the ten non-LOOM rows until the user's listening check.
-- MI2 floppy copy protection answerable in Play Game Intro: strings inside strings resolve; talk lines wrap from version 4 on (ScummVM `displayDialog`/`addLinebreaks`).
-- MI1 CD Rooms 88 (empty entry block), 89, 99 (icon-holder room the game never enters), lookout frame: closed.
-- Indy 4 Rooms 76, 77, 87: an at-once walk with no box route ends where it started (ScummVM `walkActor`); first-state images and Room 4's magenta line no longer seen.
-- Indy 3: castle Rooms 20, 28, 32 explained (cut-away plan, guards that can start a fight; decision 7 in USER_CHECKS); `getActorWidth`; `actorFollowCamera` into another room loads it in version 3 too.
-
-- 31 October: a held object's Look at works in another room (Indy 3 Script 2 `getDist`, ScummVM `getObjectOrActorXY`).
-- 30–31 October, later: indexed script arguments (all 88 Indy 3 rooms clean), first-launch freeze fixed (one inspection copy, room reads on workers, reopen after first render).
+Read `docs/ROADMAP.md`: scope, readiness, the ten features and the board, what is open, the work in order, the user's checks and the rules. Maniac Mansion and Zak McKracken stay with their own orchestrator (`NEXT_SESSION_PROMPT_MANIAC_ZAK.md`). What was done lately is in `docs/CHANGELOG.md`, not here.
 
 ## How to work
 
-The user said "keep making fixes, no need to ask": take the next roadmap item, fix, check through the real window where it shows, run the relevant tests (full suite before committing engine changes, about 8 minutes, `SCUMM_SOUND_TEST_ROOT` must be the LOOM folder `D:\Juegos\Lucas\loom ega mt32 en`), commit each item separately, update the roadmap, CURRENT_WORK, CHANGELOG and the game's tracker. Stop only for product decisions (gate G). Read ScummVM's source on GitHub (raw.githubusercontent.com) before porting engine behaviour. Edit files with the Edit tool or UTF-8 Python, never PowerShell `Get-Content`/`WriteAllText` (it damaged "§" once).
+The user: "you choose what to do next ... don't wait for me". Take the next item of the roadmap's "The work, in order", easiest first when they are alike; fix it, check it in the real window where it shows, run the relevant tests (the full suite before committing engine changes, about 6 minutes, with `SCUMM_SOUND_TEST_ROOT` = `D:\Juegos\Lucas\loom ega mt32 en` and `SCUMM_INDY3_EGA_TEST_ROOT` = `D:\Juegos\Lucas\indy3 ega en`), commit each item separately. Mark a board cell ✅ only when it works in the app (no progress on paper). Stop only for product decisions. Read ScummVM's source on GitHub (raw.githubusercontent.com) before porting engine behaviour. Edit files with the Edit tool or UTF-8 Python, never PowerShell `Get-Content`/`WriteAllText`.
 
-Harnesses added today: `.verification/mi2-intro-protection-20261030/IntroWindowCheck` (real window, Play Game Intro, keys), `IntroProbe`; `.verification/monkeycd-rooms-20261030/StartFrames` (real window, pick a room, rooms per frame, picture), `BlockDump`; `.verification/indy3-castle-20261030/SourceDump` (any game: `g:`, `e:`, `l:`, `v:` object verbs, `o:`, `find:`, `box:`, `visit:`, `prep:`).
+Keep the documents tidy (user, 31 October; rule in ROADMAP and CLAUDE.md): when an item is done, its result goes to the CHANGELOG and its record, and its lines leave `docs/ROADMAP.md`, this file and the trackers in the same commit; nothing "done" stays in current-state documents. The user works from `docs/ROADMAP.md` directly (no artifact).
 
-## Scope (decided 31 October)
+## Harnesses
 
-The user narrowed the product (REQUIREMENTS R-1.14 and §8.6, rewritten [ROADMAP](docs/ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; no save/load; Play stays as it is and comes last. Build incrementally.
+- `.verification/scene-setup-20261031/Measure` (headless: every scene group of a game, fresh run, setup search, at-cutscene start; `MEASURE_TRIALS=1`, `MEASURE_DIRECT=1`, `MEASURE_VERBS=1`).
+- `.verification/scene-setup-20261031/WindowCheck` (real `MainWindow`: `room,object,verb` plays a listed scene; `r:room` opens a room; `o` lists Interact; `c:group,choice` runs one; `i:room,object,verb` an action; `a` LOOM objects with verbs not present).
+- `.verification/mi2-intro-protection-20261030/IntroWindowCheck` (`hands-off`), `IntroProbe`; `.verification/indy3-castle-20261030/SourceDump` (`g:`, `e:`, `l:`, `v:`, `o:`, `ofind:`, `find:`, `box:`, `visit:`, `prep:`); `.verification/monkeycd-rooms-20261030/StartFrames`.
 
-The roadmap board follows the user's ten features (docs/ROADMAP.md; pinned artifact https://claude.ai/artifact/A1UGbJ2NDy8WnZpSsviVjy updated 31 Oct). Open questions to the user: a Cutscenes node in the Advanced tree; whether Status (feature 9) stays parked for Indy 3, MI1, MI2, Indy 4.
+## Next
 
-## Next, in order
+1. Roadmap work item 1: scenes started at their cutscene that show nothing (Indy 3 10, MI1 10, MI2 24, Indy 4 35; e.g. Indy 3 Room 13's entry jumps to Room 73).
+2. Then the roadmap's order (derivation time, readable names, the user's reports, release).
 
-1. **Done 31 October:** every scene of Indy 3, MI1 (floppy, CD), MI2, Indy 4 begins when picked (`ScummSceneSetupSearch`, `ScummCutsceneRun.RunPicked`, `ScummCutscenePlanner.PlanSetup`; harnesses `Measure`, `WindowCheck` in `.verification/scene-setup-20261031`); a pick ends a scene still playing; Play Game Intro answers the MI2 and MI1 floppy copy protection (user: no code wheel). Open: at-cutscene starts that show nothing (Indy 3 10, MI1 10, MI2 24, Indy 4 35), a window look at MI1/MI2/Indy 4 scenes.
-2. **Done 31 October:** Interact lists every object of the room with each verb that has code and plays a choice like a picked scene (`RunGenericRoomAction` → `PlayScummCutsceneAsync`); window-checked on Indy 3 and MI1. Objects not in the room yet are brought in and the hero teleported (`BringObjectIntoRoom`, `PutHeroAtObject`). LOOM's Interact lists every object too (window-checked, Room 18). Open: a window look at MI2 and Indy 4 interactions; at-cutscene starts that show nothing (e.g. Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73).
-3. Derivation time once the setup adds trials (MI2 140–174 s).
-4. The user's crash and "thin black rooms" reports when they name the game and room. `dotnet-trace` is installed for UI stalls (`--profile dotnet-sampled-thread-time --format Speedscope`, with `LaunchStalls`).
-5. Release readiness for LOOM.
-
-Decisions 1, 3 and 6 in USER_CHECKS were answered by the scope decision; 2, 4, 5 and 7 and the retests are still open: ask once if the user has not given them.
+Open questions for the user (ask once, in passing): a Cutscenes node in the Advanced tree; the decisions 2, 4, 5, 7 in ROADMAP's "Your checks" and the retests.

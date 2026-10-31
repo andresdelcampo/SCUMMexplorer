@@ -1,84 +1,70 @@
 # Current work
 
-Rewritten 28 October 2026. This is the single plan, known-gaps list and session handoff. Finished work and its validation are in [CHANGELOG](CHANGELOG.md); the long per-checkpoint status log that used to fill this file (14–26 October, S4a to S9, Maniac/Zak checkpoints) is kept verbatim in [archive/CURRENT_WORK_LOG_THROUGH_2026-10-28.md](archive/CURRENT_WORK_LOG_THROUGH_2026-10-28.md) and only needs digging for history. Per-game detail lives in the trackers (`docs/<game>/SUPPORT_STATUS.md`); the support matrix is generated from `GameSupport` (README, REQUIREMENTS).
+The current state only: how ready each game is, what is open, the rules. Finished work leaves this file as soon as it is done: its result goes to [CHANGELOG](CHANGELOG.md) (with its record under `.verification/`), and its history to `docs/archive/`. Earlier versions of this file: [archive/CURRENT_WORK_BEFORE_TIDY_2026-10-31.md](archive/CURRENT_WORK_BEFORE_TIDY_2026-10-31.md), [archive/CURRENT_WORK_LOG_THROUGH_2026-10-28.md](archive/CURRENT_WORK_LOG_THROUGH_2026-10-28.md). The plan and the per-game board are in [ROADMAP](ROADMAP.md).
 
-## Where things stand
+## Scope
+
+REQUIREMENTS R-1.14 and §8.6 (user, 31 October 2026): an explorer. Pick any room and trigger any of its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; the game's rules never forbid a pick. Playing through the game's own interface stays as it is and comes last.
+
+## Readiness
 
 | Family | State |
 |---|---|
-| LOOM EGA English (Roland), other EGA editions, demos, LOOM CD | Reference quality: live interaction, actors, scripts, scene playback, Game Status, audio. Cutscenes ◐ except the English reference's hand-validated catalog. |
-| Indy 3 (EGA, 256 colours), Monkey Island 1 (floppy, CD), Monkey Island 2, Indy 4 | Generic session `ScummGameSession`: first-visit rooms, played through their own verbs, sound, script-derived cutscene lists (◐). Staged S4b to S9 work done 14–20 October. |
-| Maniac Mansion and Zak McKracken (enhanced, classic) | Played through native verbs, Status, inventory editor, room controls, cutscene lists (◐). Run by a separate orchestrator ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); Zak classic Costumes ◐. |
-| Other folders under `Games` (Spanish/other-language Indy 4 and MI editions, Indy 3 demo, LOOM Kixx) | Open as browse-only or passed only S9 checks; not individually reviewed in the window. |
+| LOOM EGA English (Roland), other EGA editions, demos, LOOM CD | Reference quality: live interaction, actors, scripts, scene playback, Game Status, audio. Interact lists every object of the room. Cutscenes ◐ except the English reference's hand-validated catalog. |
+| Indy 3, Monkey Island 1 (floppy, CD), Monkey Island 2, Indy 4 | Every room, costume and script; every listed scene begins when picked (its state set up, or started at its cutscene); Interact offers every object of the room with its verbs. Some scenes started at their cutscene show nothing; sound not yet listened to by the user. |
+| Maniac Mansion and Zak McKracken (enhanced, classic) | Played through native verbs, Status, inventory editor, room controls, cutscene lists (◐). Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope is not yet applied there. |
+| Other folders under `Games` | Browse-only or passed only S9 checks; not reviewed in the window. |
 
-Architecture (26–28 October): LOOM-specific App code moved to `App/Loom/` behind `IGameModule` (`GameModuleBase`, `GameModules`, `RoomSource`/`RoomLoad`, `IGameVoice`). A new game's module derives from `GameModuleBase` and is added to `GameModules`. Still LOOM-keyed in shared code: `DecodeBrowsedOldV3Room`, the session toggle, the live-session sound/clock code, the gallery's speaker names. They move to module hooks with the second live EGA game. Every such move needs a before/after run of `.verification/game-module-20261026/Check`.
+Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. Still LOOM-keyed in shared code: `DecodeBrowsedOldV3Room`, the session toggle, the live-session sound/clock code, the gallery's speaker names; every such move needs a before/after run of `.verification/game-module-20261026/Check`.
 
-## Known gaps (open points)
+## Open
 
-Everything here is open. Items marked **user-reported** come from the user's own play on 28 October and are **not yet investigated or reproduced**; a list of more issues is coming from the user's testing.
+### All games
 
-### All games / unspecified
-
-- **User-reported:** some games showed thin black rooms (rooms with black bands or gaps). Which games and rooms is not yet recorded.
-- **User-reported:** a crash with no stack trace captured. Cause unknown. Next time: capture the trace (harness failures log under `Exe/HarnessFailures/`; the shipped app has no crash log).
-- Browsed games' object note and status text vary between runs of the same build (race with the background first visit; Zak, MI2 seen). Not new.
-- Cutscenes are ◐ for every game except LOOM EGA English: lists are script-derived, not validated against the original game. Open: check the CD's run-based category against the bundled ScummVM (19 of 98 scenes called dialogue).
-- Static previews such as MI2's campfire: a hint is needed (R-8.5b vs R-5.3a); the user must decide.
-- Requirements R-7.7 to R-7.18, R-3.15, R-15.7, R-15.8, R-8.32, R-8.33 and R-12.7 to R-12.10 are still Proposed, awaiting the user's confirmation.
-- Depth masks and stored object images of the browsed games (R-6.16) not yet compared with ScummVM.
-- Performance (31 October, [record](../.verification/indy4-rooms-20261030/README.md)): first launch fixed. Indy 4 shows play at 4.5 s (87 s before), MI2 at 4.2 s; the UI is blocked about 2 s in total. Causes: room reads rescanning the game on the UI thread, and the talkie speech walk opening `MONSTER.SOU` thousands of times. The background cutscene derivation still takes about a minute.
+- **User-reported, not yet reproduced:** thin black rooms (game and room not named); a crash (the crash log in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` records the next one).
+- Scenes started directly at their cutscene that show nothing (Indy 3 10, Monkey Island 1 10, Monkey Island 2 24, Indy 4 35): they need the locals or state the skipped tests set ([record](../.verification/scene-setup-20261031/README.md)).
+- The background scene derivation takes about a minute on the large games (it now also works out each scene's setup).
+- Browsed games' object note and status text vary between runs of the same build.
+- Static previews such as MI2's campfire: a hint is needed (decision 2 in [USER_CHECKS](USER_CHECKS.md)).
+- Depth masks and stored object images of the non-LOOM games (R-6.16) not compared with ScummVM.
 
 ### Per game
 
 | Game | Open |
 |---|---|
-| **Monkey Island 2** | Fixed 30 October, retest pending: in Play Game Intro the floppy copies' recipe screen lost the recipe's name and ingredients (strings inside strings) and the prompt ran off screen (no talk-line wrapping from version 4 on); both are engine fixes ([record](../.verification/mi2-intro-protection-20261030/README.md)). The player still needs the code wheel. |
-| **Monkey Island 1 CD** | Done 30 October ([record](../.verification/monkeycd-rooms-20261030/README.md)): Room 88 (empty entry block) and 89 run with nothing unfollowed; Room 99 is an icon-holder room the game never enters (objects past the 1000-object table), refused with that reason; the lookout frame at start no longer occurs. |
-| **Monkey Island 1** (all) | Spanish eight-disk and CD language folders passed S9 only; no real-window look at every edition. |
-| **Indy 4** | 30 October ([record](../.verification/indy4-rooms-20261030/README.md)): Rooms 76, 77, 87 run with nothing unfollowed (a walk with no box route now ends where it started, as ScummVM's `walkActor`); the play view's first-state images and Room 4's magenta line are no longer seen. CD has no audio tracks (data). |
-| **Indy 3** | Gate A closed 31 October (held objects' verbs in any room). Play uses a 16 × 16 cross-hair from ScummVM; the drawn one differs. Offer: count `printEgo` lines as first texts (changes text columns). |
-| **Maniac Mansion / Zak** | Retained black rectangles, Zak camera placement, old-actor alignment and shown-lit previews in S5 (original-game visual acceptance open). Native darkness/flashlight, flight timer and bus approaches, and several unproved paths. Zak classic: 24 derived / 11 estimated palettes, Costumes ◐. Preparation to reach states is labelled exploration, not earned play. |
-| **v5 audio** | Script-driven hooks beyond those followed; speech and named tracks not yet heard/seen by the user. |
-| **LOOM** | Shaping's canonical label, exact reverse draft names and unidentified story roles remain uncertain. Room 34 standalone fortress reveal unresolved (local 200 +0035). Room 2 skipped cutscene could leave Bobbin small (not reproduced). Room 15/18/20 staff notes (fix applied 11 October, still unconfirmed by the user). CD picture/voice/music timing has no automatable check; it belongs to the user's manual run. |
+| **Indy 3** | 16 × 16 cross-hair from ScummVM; the drawn one differs (decision 4). `printEgo` lines as first texts (decision 5). Rooms 47, 60, 66 start dark and are shown lit. |
+| **Monkey Island 1** | Spanish eight-disk and CD language folders passed S9 only. |
+| **Monkey Island 2** | The user's retest of Play Game Intro. iMUSE hooks are labelled estimates. |
+| **Indy 4** | Talkie speech not yet heard by the user. |
+| **Maniac Mansion / Zak** | Black rectangles, Zak camera placement, old-actor alignment, shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic 11 estimated palettes. |
+| **LOOM** | Shaping's canonical label, reverse draft names and story roles uncertain. Room 34 standalone fortress reveal (local 200 +0035). Room 2 skipped cutscene could leave Bobbin small (not reproduced). Room 15/18/20 staff notes unconfirmed by the user. CD picture/voice/music timing is the user's manual run. |
 
-## Release readiness (LOOM and all its variants)
+## Release readiness (LOOM first)
 
-Done: editions recognised from the bytes of specific LFL files (R-3.1, R-3.9), first-launch scan with percentage, Italian review, LICENSE (GPL-3.0-or-later) and player README.
+Ready: editions recognised from the bytes of specific LFL files (R-3.1, R-3.9), first-launch scan with percentage, LICENSE (GPL-3.0-or-later), player README.
 
-Open before shipping:
-1. Look at each edition in the real window (Italian, plain English, the two demos, the Roland copies); Italian accents on screen are unseen.
-2. Release build and packaging: no publish settings, version number or installer; decide the distribution (zip, framework-dependent or self-contained).
-3. First run on a clean profile (user will try): no last folder, no MT-32 ROM folder, welcome text; Roland must fail gracefully without ROMs.
-4. Update the unit tests' per-edition expectations if more editions are added (`known-editions.json`, `dotnet run --project .verification/known-editions/Make`).
-
-## Scope (31 October 2026)
-
-The user narrowed the product (REQUIREMENTS R-1.14, §8.6; [ROADMAP](ROADMAP.md)): pick any room and trigger its interactions and cutscenes at any time without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; Play stays as it is and comes last. Scene setup of §8.6 (31 October): every scene of Indy 3, MI1, MI2 and Indy 4 begins when picked; some started at their cutscene show nothing ([record](../.verification/scene-setup-20261031/README.md)); a pick ends a scene still playing. Play Game Intro passes the MI2/MI1 copy protection. Next: interactions (R-8.38), then the at-cutscene quality. The roadmap board now follows the user's ten features.
-
-## Next work
-
-Follow [ROADMAP](ROADMAP.md) "The work, in order" (scene setup for every game first), plus the user's reports as they arrive. Older candidates:
-1. Capture and fix the crash and the black-rooms report once the user names the game and room.
-2. ~~Monkey Island 2 copy-protection / opening-cutscene blocking~~ (fixed 30 October; retest in USER_CHECKS).
-3. ~~Known MI CD and Indy 4 room items~~ (done 30 October).
-4. Release readiness list.
+Open:
+1. Each edition seen once in the real window (Italian accents, plain English, the two demos, the Roland copies).
+2. Release build and packaging: publish settings, version number, distribution (zip, framework-dependent or self-contained).
+3. First run on a clean profile; Roland without ROMs fails gracefully.
+4. Per-edition test expectations if editions are added (`known-editions.json`, `.verification/known-editions/Make`).
 
 ## Product rules
 
-- Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot.
-- Cutscene launches set missing story state, actors, room state and costume (REQUIREMENTS 8.5, R-8.26 to R-8.31); `LoomCutsceneReadiness` implements this partly for LOOM. The approved late-room exception runs reviewed actual source prerequisites when absent (the fingerprinted English Room 46 recipe); do not generalize it by guessing story bits.
-- Costumes persist until source changes them. Derive actor look, placement and scene starts from own-edition scripts; no room-specific engine hacks. Rooms' first visits and Play never force costumes, flags or positions; a scene or interaction the user picks may (teleport, dress, give items, set the flags its code tests: R-1.9, §8.6), generically and listed in Advanced. Label estimates and picker assumptions.
-- Single click walks/uses through source scripts; double click also looks. Stored-art cycling is inspection only. Source responses and touchability govern navigation.
-- Normal mode shows artwork, game text and concise controls. Technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches; keep window subtitles short.
-- Source execution, prepared Core/WPF checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, earned prerequisites or timing.
-- Compatibility checks cover plausible version differences for the changed feature (detection, formats/scripts, text/fonts, graphics or audio); reuse the [edition analysis](../.verification/editions-20261005/README.md) and pick only relevant checks. English Roland stays the LOOM reference.
+- Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state.
+- A scene or interaction the user picks may get the state its own code tests (teleport, costume, items, flags, an object brought into the room), derived generically from its scripts and listed in Advanced (R-1.9, §8.6). Rooms' first visits and Play never force anything. No room-specific engine hacks; label estimates and picker assumptions.
+- Normal mode shows artwork, game text and concise controls; technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches.
+- Source execution, prepared checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, prerequisites or timing.
+- Compatibility checks cover plausible version differences for the changed feature; reuse the [edition analysis](../.verification/editions-20261005/README.md). English Roland stays the LOOM reference.
+
+## Keeping the documents tidy
+
+Rule (user, 31 October 2026): current-state documents (this file, [ROADMAP](ROADMAP.md), [USER_CHECKS](USER_CHECKS.md), `NEXT_SESSION_PROMPT.md`, the per-game trackers) hold only the readiness state and what is open. When a piece of work is done, in the same commit: its result goes to [CHANGELOG](CHANGELOG.md) (one entry, linking its `.verification/<topic>/` record), its line leaves the current-state documents (no "done", "fixed", "closed" or struck-through items left behind), and anything worth keeping that is not in the CHANGELOG or the record goes to `docs/archive/`. The CHANGELOG keeps about two days; older entries move to `docs/archive/CHANGELOG_THROUGH_<date>.md`.
 
 ## Preservation and workflow
 
-Read [CLAUDE.md](../CLAUDE.md) for layout, engine facts and build instructions; all shell commands go through RTK. Preserve game data, ROMs, saves, running applications and `%LOCALAPPDATA%\SCUMMexplorer`. Use focused checks and isolated output/profile directories; do not repeat broad audits without a relevant failure. Keep failed evidence and uncertainty. [Verification index](../.verification/README.md).
-
-Commit finished tasks separately with explicit paths. Update this file for current state and CHANGELOG for completed results. Create or message another task only with direct human authorization.
+Read [CLAUDE.md](../CLAUDE.md) for layout, engine facts and build instructions; all shell commands go through RTK. Preserve game data, ROMs, saves, running applications and `%LOCALAPPDATA%\SCUMMexplorer`. Use focused checks and isolated output/profile directories. Commit finished tasks separately with explicit paths. [Verification index](../.verification/README.md).
 
 ## Parked
 
-M5/secrets guide, Indy expansion/later games, demo carrier rooms, broad performance, optional General MIDI/card archaeology, cleanup/worktree proposals ([historical review](archive/CLEANUP_REVIEW.md)). Earlier-session detail on v5 audio, depth masks and browse-only games is in the archived log.
+M5/secrets guide, Indy expansion/later games, demo carrier rooms, optional General MIDI/card archaeology, Status windows for Indy 3/MI1/MI2/Indy 4, new Play features, session save/load ([historical review](archive/CLEANUP_REVIEW.md)).

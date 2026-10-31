@@ -55,4 +55,4 @@ The parent/UI agent owns the four real-window checks and image inspection. Core 
 
 ## Documentation
 
-Parent owns REQUIREMENTS, support notes, CURRENT_WORK, checkpoint, handoff and generated matrices; this record supplies source and automated evidence for that integration.
+Parent owns REQUIREMENTS, support notes, ROADMAP, checkpoint, handoff and generated matrices; this record supplies source and automated evidence for that integration.

@@ -1,5 +1,7 @@
 # Documentation
 
+The root holds five files: this index, [ROADMAP](ROADMAP.md), [REQUIREMENTS](REQUIREMENTS.md), [CHANGELOG](CHANGELOG.md) and [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md). Everything dated or historical is in `archive/`.
+
 ## Engine references
 
 - [SCUMM script reference](engine/SCUMM_SCRIPT_MAP.md): engine variables and script behavior, with explicit SCUMM version scope.
@@ -16,8 +18,8 @@
 
 ## Project references
 
-- [Roadmap](ROADMAP.md): per game, the seven gates to the finish line and the steps left (audit of 30 October 2026).
-- [User checks](USER_CHECKS.md): the checks and decisions only the user can do, one short list per game.
+- [Roadmap](ROADMAP.md): the one current-state document: scope, readiness, the ten features per game, what is open, the work in order, the checks only the user can do, the rules.
+- [Changelog](CHANGELOG.md): finished work of the last days, with links to its records; older entries in `archive/`.
 - [Requirements](REQUIREMENTS.md): what the app must do, tagged by engine, version, game and edition scope.
 - [Templates](templates/README.md): the fixed formats for a game's README, tracker, script map and evidence record.
 - [Boot sequence by version](engine/SCUMM_BOOT_SEQUENCE.md): how each SCUMM version starts.

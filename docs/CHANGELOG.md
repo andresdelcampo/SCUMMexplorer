@@ -1,6 +1,12 @@
 # Changelog
 
-Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [CURRENT_WORK](CURRENT_WORK.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
+Recent changes: 28–30 October 2026. Current support and acceptance limits belong in [REQUIREMENTS](REQUIREMENTS.md); current work and handoff are in [ROADMAP](ROADMAP.md). [Earlier entries through 20 October](archive/CHANGELOG_THROUGH_2026-10-20.md) are optional history, not startup reading. Retain roughly the latest two calendar days here.
+
+## 31 October: Indy 4's actions show their verb names; documents tidied
+
+Interact's actions in Indy 4 read "Action" for every verb: its catalog rooms play before the credits build the verb area, so the session had no verb names; the window now takes the names the cutscene planner read once the game showed its verbs. When the game's sentence script and the verb's own code answer equally, the verb's own code is kept (the sentence's answer was the game's refusal). Seen in the window: Monkey Island 2 "Look at sign" ("Help wanted^"), Indy 4 Room 10's crate with Push, Pull, Look at, Walk to.
+
+Documents (user): ROADMAP, ROADMAP, ROADMAP (Your checks) and NEXT_SESSION_PROMPT now hold only readiness and open work; finished work lives here and in its records; the earlier versions are in `docs/archive/*_BEFORE_TIDY_2026-10-31.md`. The rule is in ROADMAP and CLAUDE.md. The roadmap artifact is retired; the user works from `docs/ROADMAP.md`.
 
 ## 31 October: LOOM's Interact lists every object of the room
 
@@ -44,7 +50,7 @@ A started script's indexed argument (`local[0x003+0x000]`, `var[0x064+local[0x00
 
 ## 30 October: Indy 4 room items; Indy 3 castle rooms explained
 
-Indy 4: a walk taken to end at once with no box route now ends where it started (ScummVM `walkActor`, as the stepped walk already did), so Room 76's catalog visit keeps the ego and camera and follows the parrot's local script 214; Rooms 77 and 87 were already clean; the first-state images and Room 4's magenta line are no longer seen ([record](../.verification/indy4-rooms-20261030/README.md)). Indy 3 castle Rooms 20, 28, 32: black by the game's cut-away design and still pictures because guards can start a confrontation (R-8.5b); decision 7 in USER_CHECKS ([record](../.verification/indy3-castle-20261030/README.md)).
+Indy 4: a walk taken to end at once with no box route now ends where it started (ScummVM `walkActor`, as the stepped walk already did), so Room 76's catalog visit keeps the ego and camera and follows the parrot's local script 214; Rooms 77 and 87 were already clean; the first-state images and Room 4's magenta line are no longer seen ([record](../.verification/indy4-rooms-20261030/README.md)). Indy 3 castle Rooms 20, 28, 32: black by the game's cut-away design and still pictures because guards can start a confrontation (R-8.5b); decision 7 in ROADMAP (Your checks) ([record](../.verification/indy3-castle-20261030/README.md)).
 
 ## 30 October: Monkey Island CD Rooms 88, 89, 99 and the lookout frame
 
@@ -56,7 +62,7 @@ User report (28 October): the MI2 opening stopped at the copy protection. The ex
 
 ## 30 October: roadmap, crash log, honest matrix
 
-[ROADMAP](ROADMAP.md) (seven gates per game), `CrashLog` in the shipped app (`%LOCALAPPDATA%\SCUMMexplorer\crash-logs`, last actions, unclean-exit log), Sound ◐ for the ten non-LOOM rows until the user's listening check, and [USER_CHECKS](USER_CHECKS.md).
+[ROADMAP](ROADMAP.md) (seven gates per game), `CrashLog` in the shipped app (`%LOCALAPPDATA%\SCUMMexplorer\crash-logs`, last actions, unclean-exit log), Sound ◐ for the ten non-LOOM rows until the user's listening check, and [ROADMAP (Your checks)](ROADMAP.md).
 
 ## 28 October: format rules replace the last game-id capability lists
 

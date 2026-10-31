@@ -64,7 +64,7 @@ Latest run: the explicitly requested engine-fidelity pass, [20261018-Fidelity-Ma
 
 Scope: ManiacClassic, ManiacEnhanced, ZakClassic, ZakEnhanced only. Another orchestrator owns LOOM, Indy3 and Monkey Island. Do not edit `NEXT_SESSION_PROMPT.md`.
 
-Read `docs/GAME_SUPPORT_INSTRUCTIONS.md` in full, `CLAUDE.md`, `docs/CURRENT_WORK.md`, `docs/checkpoints/20261018-Fidelity-ManiacZak.md`, the S8/S9 and retained S5/S6/S7 checkpoints, and the Maniac/Zak trackers before resuming. Follow the latest checkpoint's verified result; historical stage paragraphs below preserve their dated scope and are superseded where the fidelity checkpoint says so. Do not infer original-game visual acceptance from zero detector findings, bounded Play routes or a cutscene beginning.
+Read `docs/GAME_SUPPORT_INSTRUCTIONS.md` in full, `CLAUDE.md`, `docs/ROADMAP.md`, `docs/checkpoints/20261018-Fidelity-ManiacZak.md`, the S8/S9 and retained S5/S6/S7 checkpoints, and the Maniac/Zak trackers before resuming. Follow the latest checkpoint's verified result; historical stage paragraphs below preserve their dated scope and are superseded where the fidelity checkpoint says so. Do not infer original-game visual acceptance from zero detector findings, bounded Play routes or a cutscene beginning.
 
 Roadmap: S4b–S7 bounded implementations are complete; S9 available-copy checks are complete with alternate copies missing; the explicitly requested S8 inventory editor is complete. Preserve the current classic costume distinction and labelled estimates. Remaining visual/engine limitations require their own bounded request; no automatic new work or seed generation.
 

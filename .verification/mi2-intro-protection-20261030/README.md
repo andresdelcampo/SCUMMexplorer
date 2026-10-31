@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Item | User report, 28 October: "the copy protection blocks play of the game's initial cutscene, and the protection screen itself is not shown" ([CURRENT_WORK](../../docs/CURRENT_WORK.md), [ROADMAP](../../docs/ROADMAP.md) gate A) |
+| Item | User report, 28 October: "the copy protection blocks play of the game's initial cutscene, and the protection screen itself is not shown" ([ROADMAP](../../docs/ROADMAP.md), [ROADMAP](../../docs/ROADMAP.md) gate A) |
 | Fixtures | `D:\Juegos\Lucas\mi2 mt32 en` (floppy, English), `mi2 classic es` (floppy, Spanish); the talkies ask no protection |
 | Base | master `5e6763e3` |
 | ScummVM | not run; the behaviour is read from ScummVM's source (`string.cpp`: `convertStringMessage`, `displayDialog`, `CharsetRenderer::addLinebreaks`) |
@@ -32,7 +32,7 @@ The headless play boot answers the protection itself (labelled assumed input, `S
 ## Open
 
 - The player still needs the code wheel; the app does not show the answer (it would be a shortcut, R-1.12). Advanced could show it as the game's own value; not done.
-- Line wrapping now applies to every version 4 and 5 game (LOOM CD, Monkey Island 1 floppy and CD, MI2, Indy 4). Long talk lines there were cut before; the user's look at a few long lines is in [USER_CHECKS](../../docs/USER_CHECKS.md).
+- Line wrapping now applies to every version 4 and 5 game (LOOM CD, Monkey Island 1 floppy and CD, MI2, Indy 4). Long talk lines there were cut before; the user's look at a few long lines is in [ROADMAP (Your checks)](../../docs/ROADMAP.md).
 
 ## Addendum, 31 October: the copy protection is answered by the explorer
 

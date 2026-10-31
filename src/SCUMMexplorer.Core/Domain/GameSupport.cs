@@ -73,7 +73,7 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.LoomEgaDemo, "**LOOM** demos", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.LoomCd, "**LOOM** CD", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         // Sound ◐ for every non-LOOM row (30 October 2026, roadmap E2): ✔ means "listened to by the user" (REQUIREMENTS §3.1, S3), and each
-        // tracker records that check as pending. Raise a row back to ✔ when the user reports its listening check (docs/USER_CHECKS.md).
+        // tracker records that check as pending. Raise a row back to ✔ when the user reports its listening check (docs/ROADMAP.md).
         // S7 Indy3Ega and Indy3Vga (17 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummIndy3CutsceneTests).
         Row_(GameFamily.Indy3Ega, "**Indiana Jones 3** EGA", [F, F, F, F, P, F, F, F, P, N], Explore, ExplorePreview),
         // S6 Indy3Vga (16 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy3VgaPlayTests).

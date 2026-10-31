@@ -1,105 +1,226 @@
-# Roadmap: what is left to finish each game
+# Roadmap
 
-Rewritten 31 October 2026 after the user's scope decision (REQUIREMENTS R-1.14, §8.6); first written 30 October from an audit of the code, the tests, the per-game trackers and the user-reported gaps. This file answers one question: **what has to happen, per game, before we can call it finished?** The procedure for a step stays in [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md); what the app must do stays in [REQUIREMENTS](REQUIREMENTS.md).
+The one current-state document: the scope, how ready each game is, the ten features and their board, what is open, the work in order, the checks only the user can do, and the rules. Only the current state and open work are here. Finished work is in [CHANGELOG](CHANGELOG.md) and its records under `.verification/`; history is in `docs/archive/` (the former ROADMAP, "Your checks" and earlier roadmaps). What the app must do is in [REQUIREMENTS](REQUIREMENTS.md); how a game is added, in [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md).
 
-## The scope (31 October 2026)
+## Scope
 
-The product is an **explorer**: pick any room, trigger its interactions and cutscenes at any time, without playing to them. Teleports and magic costume changes are fine; nothing is saved or loaded. Playing a game through its own interface stays as it works today and comes last. Work is incremental: one step and one game group at a time.
+REQUIREMENTS R-1.14 and §8.6 (user, 31 October 2026): an explorer. Pick any room and trigger any of its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; the game's rules never forbid a pick. Playing through the game's own interface stays as it is and comes last.
 
-What this removes from the 30 October plan: the Play sign-off (R-7.7 to R-7.21 stay Proposed and are not a gate), Status beyond v1/v2 (old E5), the ten-room ScummVM comparison per game (spot checks instead), and session snapshots. What it adds: the scene setup of §8.6 for every game, and interactions in a picked room (R-8.38).
+## Readiness
 
-## The ten features (the user's list, 31 October 2026)
+| Family | State |
+|---|---|
+| LOOM EGA English (Roland), other EGA editions, demos, LOOM CD | Reference quality: live interaction, actors, scripts, scene playback, Game Status, audio. Interact lists every object of the room. Cutscenes ◐ except the English reference's hand-validated catalog. |
+| Indy 3, Monkey Island 1 (floppy, CD), Monkey Island 2, Indy 4 | Every room, costume and script; every listed scene begins when picked (its state set up, or started at its cutscene); Interact offers every object of the room with its verbs. Some scenes started at their cutscene show nothing; sound not yet listened to by the user. |
+| Maniac Mansion and Zak McKracken (enhanced, classic) | Played through native verbs, Status, inventory editor, room controls, cutscene lists (◐). Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope is not yet applied there. |
+| Other folders under `Games` | Browse-only or passed only S9 checks; not reviewed in the window. |
 
-The user's own reading of the roadmap: ten features every game should have, in the order an explorer meets them. A game is finished when all ten are ✅ and the user has tried it.
+Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. Still LOOM-keyed in shared code: `DecodeBrowsedOldV3Room`, the session toggle, the live-session sound/clock code, the gallery's speaker names; every such move needs a before/after run of `.verification/game-module-20261026/Check`.
+
+## The ten features
 
 | # | Feature | Done when |
 |---|---|---|
 | 1 | **Rooms** | Every room is in the room selector and opens in its first-visit state, no gaps. |
 | 2 | **Costumes** | Every costume is read and shown in the game's palette. |
-| 3 | **Sounds** | Music, effects and CD tracks play on the game's sound devices (PC speaker, AdLib, Roland where the game has it); the user has listened. |
-| 4 | **Scripts available** | Every script can be opened (disassembly). |
-| 5 | **Room cutscenes** | Every cutscene of a room plays from that room when picked (§8.6, R-8.35): its state set up, or its code started directly. The game's intro counts too: Play Game Intro plays it in every game that has one (R-8.5c, R-6.38). |
-| 6 | **Interactions** | The room's Interact button offers every object that belongs to the room, present or not yet, with every verb that has code, and plays it (R-8.38). |
+| 3 | **Sounds** | Music, effects and CD tracks play on the game's sound devices; the user has listened. |
+| 4 | **Scripts available** | Every script can be opened. |
+| 5 | **Cutscenes** | Every cutscene of a room plays from that room when picked, and the game's intro through Play Game Intro (§8.6, R-8.35). |
+| 6 | **Interactions** | Interact offers every object of the room, present or not yet, with every verb that has code, and plays it (R-8.38). |
 | 7 | **Room sounds** | The room's Sounds button plays the sounds and music its scripts use (R-6.40). |
-| 8 | **Hotspots, doorways, paths, depth** | Hotspot and doorway overlays, walk boxes, depth masks right for the room. |
-| 9 | **Game state** | A Status window to set the game's state (§12). Optional under the scope: picked scenes set what they need themselves. |
-| 10 | **Readable scripts** | Scripts read as plain language with names for the game's variables, verbs and objects (reverse engineered, `docs/<game>/*_SCRIPT_MAP.md`). |
+| 8 | **Hotspots, doorways, paths, depth** | Overlays, walk boxes and depth masks right for the room. |
+| 9 | **Game state** | A Status window (§12). Parked for Indy 3, Monkey Island 1 and 2, Indy 4: a picked scene sets what it needs. |
+| 10 | **Readable scripts** | Scripts read as plain language with names for the game's variables, verbs and objects. |
 
-Symbols: ✅ done · 🟡 works but partial or not checked by the user · 🔴 known gap · ⬜ not started · — parked or not applicable. Play through the game's own interface is not a feature here (§7.1, last priority).
+✅ done · 🟡 works, partial or not checked by the user · 🔴 known gap · — parked.
 
 ## The board
 
-| Game | 1 Rooms | 2 Costumes | 3 Sounds | 4 Scripts | 5 Cutscenes | 6 Interactions | 7 Room sounds | 8 Hotspots… | 9 State | 10 Readable |
+| Game | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| LOOM EGA English (reference) | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| LOOM EGA English (reference) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | LOOM EGA other editions, demos | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
 | LOOM CD | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
-| Monkey Island 1 (floppy, CD) | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
-| Monkey Island 2 | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
-| Indiana Jones 4 | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | 🟡 | — | 🟡 |
+| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 1 (floppy, CD) | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 2 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Indiana Jones 4 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
 | Maniac Mansion (classic, enhanced) | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 | Zak McKracken (classic, enhanced) | ✅ | 🟡 | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
-Why the cells are what they are (31 October 2026):
-- **3 Sounds** 🟡: every non-LOOM game plays its sounds on its devices, but the user has not listened (USER_CHECKS); LOOM CD's picture/voice/music timing is the user's run. Indy 4's CD image has no audio tracks (data).
-- **5 Cutscenes** 🟡 for Indy 3, Monkey Island 1, Monkey Island 2, Indy 4 since 31 October: every scene begins when picked (Indy 3 153, MI1 164 and 160, MI2 190, Indy 4 426), by the game's way, a setup, or started at its cutscene; but some of those started at their cutscene end at once with nothing shown (Indy 3 10, MI1 10, MI2 24, Indy 4 35), and only Indy 3 was looked at in the window (hatch and jar right; the brick shows the wall without Indy) ([record](../.verification/scene-setup-20261031/README.md)). Maniac and Zak still have scenes that begin nothing (their track). LOOM's scanned editions and the CD use LOOM's own readiness search; not every entry is proven to begin. Monkey Island 2's and Monkey Island 1 floppy's intro now pass the copy protection by themselves.
-- **6 Interactions** 🟡: since 31 October the Interact button of Indy 3, MI1, MI2 and Indy 4 lists every object of the room (on screen first, then those that come later) with each verb that has code, and plays a choice like a picked scene (state set up, hero put at the object, the game's sentence script); seen in the window for Indy 3 (junk mail, the package's Grail Diary scene) and MI1 (the SCUMM Bar door's "Meanwhile"). An object not in the room yet is brought in and the hero teleported to it (Indy 3 Room 13's trellis, seen in the window). LOOM's Interact lists every object with a LOOM verb too (Room 18's sphere: the crystal-ball vision). Still open: MI2 and Indy 4 not looked at; Maniac/Zak keep their own Interact.
-- **8** 🟡 for the non-LOOM games: hotspots, doorways and walk boxes work; depth masks are read generically and were never compared with ScummVM (R-6.16).
-- **9 Game state** — for Indy 3, Monkey Island 1 and 2, Indy 4: parked; the setup of a picked scene does what Status would be used for. Revisit if the user wants to set state by hand.
-- **10 Readable** 🟡: the readable view works for every game, but names come only from LOOM's glossary; the other games show variable numbers. Their script maps (`docs/indy3`, `monkey1`, `monkey2`, `indy4`) hold decoded names to feed it.
+What keeps a cell from ✅:
+- **3**: the user has not listened (non-LOOM games); LOOM CD's picture/voice/music timing is the user's run.
+- **5**: every scene begins when picked, but some started directly at their cutscene show nothing (Indy 3 10, Monkey Island 1 10, Monkey Island 2 24, Indy 4 35); LOOM's other editions and CD use LOOM's own readiness search, not proven for every entry; Maniac/Zak have scenes that begin nothing (their track).
+- **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
+- **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
+- **10**: names come only from LOOM's glossary; the other games show variable numbers.
 
 ## The work, in order
 
-| # | Work | Unlocks | Where in the code |
+| # | Work | Feature | Where |
 |---|---|---|---|
-| 1 | **Scene setup for every game (§8.6).** Engine-layer search (`ScummSceneSetupSearch`): bits, story variables, object states, items held, the second object of a two-object verb, actors' costume and room; the game's sentence script, then the verb run directly, then the cutscene started directly. **31 October:** every scene of Indy 3, MI1, MI2, Indy 4 begins. Next: the at-cutscene starts that show nothing (start them with the locals and state the skipped tests set), a window look at MI1/MI2/Indy 4, then LOOM's scanned editions and Maniac/Zak. | Feature 5 | `Loom/Scenes/LoomCutsceneReadiness.cs` → `Scumm/Session/`, `ScummCutscenePlanner.cs` |
-| 2 | **Interactions in a picked room (R-8.38).** **31 October:** every object and verb offered and played through the scene setup (Indy 3, MI1, MI2, Indy 4). Objects not in the room yet brought in, the hero teleported to them; LOOM's Interact lists every object too. Next: a window look at MI2 and Indy 4. | Feature 6 | room lists (`ScummCutsceneIndex`), `ScummSession.StartObjectScript` |
-| 3 | **Derivation time.** The setup search adds trial runs to the background derivation (MI2 already 140–174 s). Share one booted copy between trials; cache plans per build+data (as R-8.21). | Keeps 5 usable | `ScummCutscenePlanner`, `ScummBoundedScriptExecutor` |
-| 4 | **Readable names for the other games** from their script maps. | Feature 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
-| 5 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
-| 6 | **One user pass per game** with [USER_CHECKS](USER_CHECKS.md): a few rooms, scenes and sounds next to ScummVM; each copy opened once. | 3, sign-off | — |
-| 7 | **Release** (LOOM first): packaging, version, clean-profile first run, Roland without ROMs. | — | `src/SCUMMexplorer.App` |
+| 1 | **Scenes started at their cutscene that show nothing**: start them with the locals and state their skipped tests would set (e.g. Indy 3 Room 13's entry needs Script 52's argument and jumps to Room 73). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
+| 2 | **Derivation time**: the setup search adds trial runs (about a minute on the large games); share boots between trials, cache plans per build and data. | 5 | `ScummCutscenePlanner` |
+| 3 | **Readable names for the other games** from their script maps. | 10 | `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
+| 4 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
+| 5 | **One user pass per game** with "Your checks" below: listening, a few rooms next to ScummVM, each copy opened once. | 3, sign-off | — |
+| 6 | **Release**, LOOM first: packaging, version, clean-profile first run, Roland without ROMs. | — | `src/SCUMMexplorer.App` |
 
-Optional, when the code is next touched: a ScummVM picture capture for comparisons (the bundled build showed a white window for Indy 3), app structure (`MainWindow.xaml.cs` split, LOOM-keyed code into the LOOM module), profile allow-lists as defaults, worktree housekeeping. Dropped by the scope decision: Status beyond v1/v2, new Play features, session snapshots.
+Optional, when the code is next touched: a ScummVM picture capture, splitting `MainWindow.xaml.cs`, profile allow-lists as defaults, worktree housekeeping.
 
-## Per game: the steps left
+## Open
 
-Steps marked **(shared)** are one piece of work in the list above. Their letters are the 30 October gates: A rooms (features 1, 8), B interactions (6), C cutscenes (5), D looks and sounds (2, 3), E editions, F sign-off. Earlier records stay linked for the facts they hold.
+### All games
+- **User-reported, not yet reproduced:** thin black rooms (game and room not named); a crash (the crash log in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` records the next one).
+- Scenes started directly at their cutscene that show nothing (work item 1; [record](../.verification/scene-setup-20261031/README.md)).
+- The background scene derivation takes about a minute on the large games (work item 2).
+- Browsed games' object note and status text vary between runs of the same build.
+- Static previews such as MI2's campfire: a hint is needed (decision 2 below).
+- Depth masks and stored object images of the non-LOOM games (R-6.16) not compared with ScummVM.
 
 ### LOOM EGA English (reference)
-1. A — Confirm or reproduce: Room 2 skipped cutscene leaving Bobbin small; Rooms 15/18/20 staff notes (fix of 11 October); Room 34 standalone fortress reveal (local 200 +0035).
-2. F — Settle the open naming uncertainties (Shaping's canonical label, reverse draft names) or accept them as labelled. Release (work item 6).
+- Your checks: Room 2 skipped cutscene leaving Bobbin small (not reproduced); Rooms 15/18/20 staff notes; Room 34 standalone fortress reveal (local 200 +0035).
+- Shaping's canonical label, reverse draft names and story roles: settle or accept as labelled. Release (work item 6).
 
-### LOOM EGA other editions and demos
-1. C — Scanned lists already use LOOM's readiness; the shared setup (item 1) widens it to actors and object states.
-2. E — Open each copy in the window once: Italian (accents never seen on screen), plain English, French, German, v1.2, both demos.
-
-### LOOM CD
-1. C — Check the run-based category against ScummVM (19 of 98 scenes are called dialogue). D — The user's run of picture, voice and music timing.
+### LOOM EGA other editions, demos, LOOM CD
+- Each copy opened once in the window (Italian accents, plain English, French, German, v1.2, both demos).
+- CD: the scene categories against ScummVM (19 of 98 scenes called dialogue); your picture/voice/music timing run.
 
 ### Indiana Jones 3 (EGA and 256 colours)
-1. A — **Closed 31 October**: castle Rooms 20, 28, 32 explained (decision 7 in USER_CHECKS); all 88 rooms run with nothing unfollowed; Rooms 1 and 15 never rest (crowds, as the game); a held object's verb works in any room ([record](../.verification/indy3-rooms-20261030/README.md)). Possibly the user's "thin black rooms". Rooms 47, 60, 66 start dark and are shown lit.
-2. C — 58 of 153 entries begin nothing from a fresh start: the first game for the shared setup (item 1). Their code tests an open door, the students' scene, story bits ([record](../.verification/indy3-cutscenes-20261017/README.md)).
-3. B — Interactions in a picked room (shared, item 2).
-4. D — Spot checks; AdLib and PC speaker listening.
+- 10 scenes started at their cutscene show nothing (work item 1).
+- Listening (AdLib, PC speaker). Rooms 47, 60, 66 start dark and are shown lit. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
-### Monkey Island 1 floppy and CD
-1. C — 60 of 164 (CD 59 of 160) entries begin nothing (shared setup). Example: Script 117, the first SCUMM Bar exit, tests the open door and `bit[0x1BE]` ([record](../.verification/monkey1-cutscenes-20261017/README.md)).
-2. B — Interactions (shared). D — Listening (floppy credits timer is an estimate; CD track 21 started by no sound); `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
-3. E — Spanish eight-disk copy; the CD's five languages in the window.
+### Monkey Island 1 (floppy and CD)
+- 10 scenes started at their cutscene show nothing (work item 1).
+- Listening (the floppy credits music timer is an estimate; CD track 21 is started by no sound); `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
+- Spanish eight-disk copy and the CD's five languages in the window (passed S9 headless only).
 
 ### Monkey Island 2
-1. A — Copy protection in Play Game Intro answered by the explorer since 31 October (no code wheel; seen in the real window), your retest pending ([record](../.verification/mi2-intro-protection-20261030/README.md)). Decide the static-preview question (Room 4 campfire, decision 2).
-2. C — 95 of 260 entries begin nothing (shared setup); derivation takes 140–174 s (item 3).
-3. B — Interactions (shared). D — iMUSE hooks are labelled estimates; listening pending. Rooms 104–106 keep colour-0 image holders (accepted).
+- 24 scenes started at their cutscene show nothing (work item 1).
+- Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates; listening.
 
 ### Indiana Jones 4
-1. C — 216 of 426 groups begin nothing (shared setup): the largest gap.
-2. B — Interactions (shared). D — Listening, including talkie speech. E — Spanish talkie and floppy.
+- 35 scenes started at their cutscene show nothing (work item 1).
+- Listening, including talkie speech. Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
-Run by their own orchestrator ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies to them too once the user tells that track.
-1. A — Zak Room 19 and similar never settle (a still picture after about 25 s); black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); old-actor offsets.
-2. C — 6 or 7 of 27 (Maniac) and 13 of 54 (Zak) groups start: the shared setup replaces "state-gated triggers get no invented prerequisites".
-3. D — Zak classic's 11 estimated costume colours; PCjr/Tandy never listened to.
+Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies once the user tells that track.
+- Scenes that begin nothing (Maniac 20–21 of 27 groups, Zak 41 of 54): the shared scene setup.
+- Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours; PCjr/Tandy never listened to.
+
+## Release readiness (LOOM first)
+
+Ready: editions recognised from the bytes of specific LFL files (R-3.1, R-3.9), first-launch scan with percentage, LICENSE (GPL-3.0-or-later), player README.
+
+Open:
+1. Each edition seen once in the real window (Italian accents, plain English, the two demos, the Roland copies).
+2. Release build and packaging: publish settings, version number, distribution (zip, framework-dependent or self-contained).
+3. First run on a clean profile; Roland without ROMs fails gracefully.
+4. Per-edition test expectations if editions are added (`known-editions.json`, `.verification/known-editions/Make`).
+
+## Your checks
+
+The checks only you can do, one short list per game, gathered from about 115 evidence records that each ended with their own "user checks". Each line links the record that has the exact steps. When you do one, write the date and the result in its last column (or tell the session); a passing listening check raises that game's Sound cell back to ✔ in `GameSupport.Families`, a failing one becomes an open item in this file.
+
+Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If the app crashes, the log is in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` (a forced close or a crash no handler saw is logged as `…-unclean-exit.log` at the next start).
+
+### Decisions waiting for you
+
+Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREMENTS R-1.14); the numbers of the others stay as they were.
+
+| # | Question | Where it comes from | Answer |
+|---|---|---|---|
+| 2 | A picked room whose entry leaves it (MI2's campfire, Room 4): a Normal-mode hint pointing to Play Game Intro, or let the boot room play its settled boot state? | R-8.5b vs R-5.3a | |
+| 4 | Indy 3's cursor: ScummVM's 16 × 16 cross-hair is used; the game draws a different one. Acceptable? | R-1.5, Indy 3 tracker | |
+| 5 | Indy 3: count `printEgo` lines as first texts (changes the text columns)? | ROADMAP | |
+| 7 | Indy 3 castle Rooms 20, 28, 32: guards can start a confrontation at any moment, so the catalog shows a still picture (R-8.5b). Make such rooms live anyway? | [record](../.verification/indy3-castle-20261030/README.md) | |
+
+### LOOM
+
+| Check | Steps | Result |
+|---|---|---|
+| Room 2: skip the cutscene, is Bobbin the right size afterwards? | ROADMAP, known gaps | |
+| Rooms 15, 18, 20: staff notes after the 11 October fix | ROADMAP | |
+| Each other EGA copy once in the window: Italian (accents), plain English, French, German, v1.2, both demos | ROADMAP, release list | |
+| LOOM CD: picture, voice and music timing in a few scenes | ROADMAP | |
+| LOOM CD intro: "LucasArts Entertainment Company" now shows on two lines (ScummVM's v4 wrapping rule); same as the real game? | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
+| First run on a clean profile; Roland with no ROM folder | ROADMAP, release list | |
+
+### Indiana Jones 3 (EGA and 256 colours)
+
+| Check | Steps | Result |
+|---|---|---|
+| Listen in play: Room 73 onwards, AdLib then PC speaker | [play record](../.verification/indy3-play-20261015/README.md), [sound polish](../.verification/sound-polish-20261019/README.md) | |
+| Room 73 · Turn off light switch, Room 22 · Entry, Room 80 · Entry: start as in the game? Esc and Space work? | [cutscene record](../.verification/indy3-cutscenes-20261017/README.md) | |
+| Rooms 20, 28, 32: the castle's cut-away plan shows only the section around Indy (decoded, Script 25). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
+| Rooms 6, 18, 78, 80: their pictures now come from the moment their scene leaves them (the game follows Indy into the next room). Do they look right? | [record](../.verification/indy3-rooms-20261030/README.md) | |
+| The same in the 256-colour copy, and the Spanish copies' accents | [editions](../.verification/indy3-editions-20261017/README.md) | |
+
+### Monkey Island 1 floppy
+
+| Check | Steps | Result |
+|---|---|---|
+| Listen and time play from the dock (Room 33): music per room, door sounds, credits music | [play record](../.verification/monkey1-play-20261016/README.md) | |
+| Room 33 · Look at poster, Room 37 · Entry, Room 19 · Entry | [cutscene record](../.verification/monkey1-cutscenes-20261017/README.md) | |
+| Spanish eight-disk copy in play | [editions](../.verification/monkey1-editions-20261017/README.md) | |
+
+### Monkey Island 1 CD
+
+| Check | Steps | Result |
+|---|---|---|
+| Room 38 to the dock: CD track 22 loops, each music stops when you leave, door creak plays | [play record](../.verification/monkeycd-play-20261017/README.md) | |
+| Verb colours, rubber-chicken icon (Room 29) and cursor next to ScummVM; right click on the poster | [play record](../.verification/monkeycd-play-20261017/README.md) | |
+| Room 19 · Entry (spoken text, disc music), Room 37 · Entry | [cutscene record](../.verification/monkeycd-cutscenes-20261017/README.md) | |
+| French, German, Italian, Spanish in the window (language picker) | [editions](../.verification/monkeycd-editions-20261019/README.md) | |
+
+### Monkey Island 2
+
+| Check | Steps | Result |
+|---|---|---|
+| **Retest (31 Oct):** a floppy copy (`mi2 mt32 en`), Play Game Intro: the protection screen passes by itself (no code wheel), you choose Monkey Island 2 or Lite, the opening plays | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
+| Long talk lines in LOOM CD, Monkey Island and Indy 4 now wrap as in the game (version 4 and later): any line that looks wrongly broken? | [record](../.verification/mi2-intro-protection-20261030/README.md) | |
+| Roland and AdLib: Woodtick music (107) loops, pauses with Space; Largo's theme (151) at the bridge | [play record](../.verification/monkey2-play-20261017/README.md) | |
+| Route next to ScummVM: sign, dialogue order, inventory icon, verb colours; right click on the sign | [play record](../.verification/monkey2-play-20261017/README.md) | |
+| Room 74 · voodoo key (LeChuck on the beat?), Room 13 · Entry, Room 09 · Talk to barkeeper | [cutscene record](../.verification/monkey2-cutscenes-20261018/README.md) | |
+| Spanish floppy: recipe screen passes, Spanish verbs with accents | [editions](../.verification/monkey2-editions-20261018/README.md) | |
+
+### Indiana Jones 4
+
+| Check | Steps | Result |
+|---|---|---|
+| Speech: skip the credits, Smith's scene, the ticket taker; each line spoken once, text stays until the voice ends | [play record](../.verification/indy4-play-20261017/README.md) | |
+| Verb area, dialogue lines and newspaper icon next to ScummVM; statue and fire-escape route side by side | [play record](../.verification/indy4-play-20261017/README.md) | |
+| Room 11 · Entry (Sophia's lecture), Room 82 · Entry; titles use the game's verbs | [cutscene record](../.verification/indy4-cutscenes-20261018/README.md) | |
+| Room 4 after the boot: is the magenta line there? | [Indy 4 tracker](indy4/SUPPORT_STATUS.md) | |
+| Spanish talkie and floppy in the window | [editions](../.verification/indy4-editions-20261018/README.md) | |
+
+### Maniac Mansion and Zak McKracken
+
+| Check | Steps | Result |
+|---|---|---|
+| Maniac classic: Syd, Bernard, Start, skip the intro, front door and doormat route | [play record](../.verification/maniacclassic-play-20261017/README.md) | |
+| Maniac and Zak: the PCjr/Tandy sounds (never listened to) | Maniac/Zak S3 notes, README | |
+| Classic Maniac Room 18 (six black rectangles), Zak classic Room 44, enhanced 13, 16, 44: black in the real game too? | [S5 checkpoint](checkpoints/20261017-S5-ManiacZak.md) | |
+| Zak Rooms 3 and 33: camera position; Room 19: still picture after about 25 s | [S5 checkpoint](checkpoints/20261017-S5-ManiacZak.md), NEXT_SESSION_PROMPT | |
+| Zak classic costumes with estimated colours: do they look right? | [palette checkpoint](checkpoints/20261019-Palettes-ManiacZak.md) | |
+| Advanced scrolling in Maniac enhanced: is it sluggish? | NEXT_SESSION_PROMPT | |
+
+## Product rules
+
+- Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state.
+- A scene or interaction the user picks may get the state its own code tests (teleport, costume, items, flags, an object brought into the room), derived generically from its scripts and listed in Advanced (R-1.9, §8.6). Rooms' first visits and Play never force anything. No room-specific engine hacks; label estimates and picker assumptions.
+- Normal mode shows artwork, game text and concise controls; technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches.
+- Source execution, prepared checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, prerequisites or timing.
+- Compatibility checks cover plausible version differences for the changed feature; reuse the [edition analysis](../.verification/editions-20261005/README.md). English Roland stays the LOOM reference.
+
+## Keeping the documents tidy
+
+Rule (user, 31 October 2026): current-state documents (this file, this file, "Your checks" below, `NEXT_SESSION_PROMPT.md`, the per-game trackers) hold only the readiness state and what is open. When a piece of work is done, in the same commit: its result goes to [CHANGELOG](CHANGELOG.md) (one entry, linking its `.verification/<topic>/` record), its line leaves the current-state documents (no "done", "fixed", "closed" or struck-through items left behind), and anything worth keeping that is not in the CHANGELOG or the record goes to `docs/archive/`. The CHANGELOG keeps about two days; older entries move to `docs/archive/CHANGELOG_THROUGH_<date>.md`.
+
+## Preservation and workflow
+
+Read [CLAUDE.md](../CLAUDE.md) for layout, engine facts and build instructions; all shell commands go through RTK. Preserve game data, ROMs, saves, running applications and `%LOCALAPPDATA%\SCUMMexplorer`. Use focused checks and isolated output/profile directories. Commit finished tasks separately with explicit paths. [Verification index](../.verification/README.md).
+
+## Parked
+
+M5/secrets guide, Indy expansion/later games, demo carrier rooms, optional General MIDI/card archaeology, Status windows for Indy 3/MI1/MI2/Indy 4, new Play features, session save/load ([historical review](archive/CLEANUP_REVIEW.md)).
