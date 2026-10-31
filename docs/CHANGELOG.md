@@ -6,7 +6,7 @@ Recent changes: 28–30 October 2026. Current support and acceptance limits belo
 
 Interact's actions in Indy 4 read "Action" for every verb: its catalog rooms play before the credits build the verb area, so the session had no verb names; the window now takes the names the cutscene planner read once the game showed its verbs. When the game's sentence script and the verb's own code answer equally, the verb's own code is kept (the sentence's answer was the game's refusal). Seen in the window: Monkey Island 2 "Look at sign" ("Help wanted^"), Indy 4 Room 10's crate with Push, Pull, Look at, Walk to.
 
-Documents (user): ROADMAP, ROADMAP, ROADMAP (Your checks) and NEXT_SESSION_PROMPT now hold only readiness and open work; finished work lives here and in its records; the earlier versions are in `docs/archive/*_BEFORE_TIDY_2026-10-31.md`. The rule is in ROADMAP and CLAUDE.md. The roadmap artifact is retired; the user works from `docs/ROADMAP.md`.
+Documents (user): CURRENT_WORK and USER_CHECKS were merged into ROADMAP, the one current-state document; it and NEXT_SESSION_PROMPT hold only readiness and open work, finished work lives here and in its records, the earlier versions are in `docs/archive/`. The `docs/` root keeps five files. GAME_SUPPORT_INSTRUCTIONS was rewritten for the explorer scope (its ground rules no longer forbid a picked scene's setup; units of work are the ROADMAP's ten features); its S1 to S9 stage playbooks, still used by the Maniac/Zak track, are in `docs/archive/GAME_SUPPORT_INSTRUCTIONS_STAGES_2026-10-14.md`. The rule is in ROADMAP and CLAUDE.md. The roadmap artifact is retired.
 
 ## 31 October: LOOM's Interact lists every object of the room
 
