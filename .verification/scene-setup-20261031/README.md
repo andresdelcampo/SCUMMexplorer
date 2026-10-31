@@ -116,3 +116,5 @@ Three generic additions to the setup search: (1) `ifClassOfIs` candidates (an ob
 | **Total** | 1,093 | 68.3% → **80.9%** | 19.1% | 4.8% → **3.0%** |
 
 LOOM English's answer key unchanged (rooms 100%, category 92.0%, length 89.1%). Full suite 1842 passed. Runs: `*-run10.txt`.
+
+Then: both sides of a comparison are tried (an inequality also tries a value on its other side: Indy 4's closet door needs object 870's state to be non-zero). Indy 4 77.5% → 77.7% played its own way; the others unchanged. A cap of 24 candidates instead of 16 was tried and dropped: Indy 4 78.2%, but its derivation took 223 s against about 180. What is left showing nothing (Indy 3 4, Monkey Island 1 5 and 4, Monkey Island 2 4, Indy 4 16: 3.0% of all scenes) is a long tail of single cases, mostly room entries with many tested values (Indy 4 Rooms 10, 27, 72: 15 to 36 candidates). Runs: `*-run11.txt`, `*-run12.txt`.

@@ -178,8 +178,17 @@ public sealed partial class ScummSceneSetupSearch
                         var tested = parts[0];
                         var value = ins.Operation is "equalZero" or "notEqualZero" ? 1 : parts.Length >= 2 && Literal(parts[1]) is int c ? c : (int?)null;
                         if (value is null) break;
+                        // Both sides of the test (ScummVM jumps when it is false, and the scene may be on either side): the constant and, for an
+                        // inequality, a value on its other side (Indy 4's closet door, Room 65 object 875: getObjectState then isNotEqual 0, so state 1).
+                        var sides = ins.Operation switch
+                        {
+                            "isLess" or "isGreater" or "isLessEqual" or "isGreaterEqual" => new[] { value.Value, value.Value + 1, value.Value - 1 },
+                            "equalZero" or "notEqualZero" => [1, 0],
+                            _ => [value.Value, value.Value == 0 ? 1 : 0],
+                        };
                         if (stateOf.TryGetValue(tested, out var stateObject))
-                            Add(new(ScummSetupKind.ObjectState, stateObject.ToString(CultureInfo.InvariantCulture), value.Value, where));
+                            foreach (var side in sides.Where(v => v >= 0).Distinct())
+                                Add(new(ScummSetupKind.ObjectState, stateObject.ToString(CultureInfo.InvariantCulture), side, where));
                         else if (costumeOf.TryGetValue(tested, out var dressedActor))
                             Add(new(ScummSetupKind.ActorCostume, dressedActor.ToString(CultureInfo.InvariantCulture), value.Value, where));
                         else if (roomOf.TryGetValue(tested, out var placedActor))
@@ -191,8 +200,9 @@ public sealed partial class ScummSceneSetupSearch
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
                             Add(new(ScummSetupKind.Bit, tested, 1, where));
                         else if (VariablePattern().Match(tested) is { Success: true } v && tested == v.Value && !written.Contains(tested) &&
-                                 int.Parse(v.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstStoryVariable && value.Value != 0)
-                            Add(new(ScummSetupKind.Variable, tested, value.Value, where));
+                                 int.Parse(v.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstStoryVariable)
+                            foreach (var side in sides.Where(v => v > 0).Distinct())
+                                Add(new(ScummSetupKind.Variable, tested, side, where));
                         break;
                     }
                 }
