@@ -749,6 +749,7 @@ public abstract partial class ScummSession
                 _runtime.CurrentRoom ?? NullRoom, _runtime.Camera.Mode));
             _cutscenes.Push((0, _executing.Count > 0 ? _executing[^1] : null));
             CutscenesBegun++;
+            _hurried.Clear();
             _visitTrace.Add($"cutscene at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} (native v1/v2 scope)");
             _overrides.Remove(_cutscenes.Count);
             _runtime.SetGlobalVariable(ScummVars.V2.CursorState, 200);
@@ -765,6 +766,7 @@ public abstract partial class ScummSession
             return "cutscene arguments depend on unknown variables";
         _cutscenes.Push((arguments.GetValueOrDefault("local[0x000]"), _executing.Count > 0 ? _executing[^1] : null));
         CutscenesBegun++;
+        _hurried.Clear();
         _overrides.Remove(_cutscenes.Count);
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneStartScriptVariable, out var startScript))
         {

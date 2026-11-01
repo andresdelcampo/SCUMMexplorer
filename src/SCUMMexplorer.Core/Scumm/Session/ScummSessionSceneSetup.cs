@@ -50,6 +50,8 @@ public enum ScummSetupKind
     /// Monkey Island 1's sword on Room 36's dogs). Applying it gives the object; the run visits that room (<see cref="ScummSetupEdit.PlayRoom"/>).
     /// </summary>
     PlayedIn,
+    /// <summary>One bit of a version 1/2 object's state set (Value &gt; 0) or cleared (Value &lt; 0): 8 open/on, 4 locked, 2 untouchable, 1 pickupable.</summary>
+    ObjectStateBit,
 }
 
 /// <summary>
@@ -77,6 +79,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ScriptRunning => $"script {Target} running",
         ScummSetupKind.PlayedIn => $"object {Target} held and used in Room {Value}",
+        ScummSetupKind.ObjectStateBit => $"object {Target} {Math.Abs(Value) switch { 8 => Value > 0 ? "open (on)" : "closed (off)", 4 => Value > 0 ? "locked" : "unlocked", 2 => Value > 0 ? "untouchable" : "touchable", _ => Value > 0 ? "pickupable" : "not pickupable" }}",
         ScummSetupKind.CameraX => $"the camera at x {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
@@ -134,6 +137,15 @@ public abstract partial class ScummSession
                 var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (_runtime.ObjectStates.GetValueOrDefault(id) == edit.Value) return false;
                 _runtime.SetObjectState(id, (byte)edit.Value);
+                return true;
+            }
+            case ScummSetupKind.ObjectStateBit:
+            {
+                var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                var state = _runtime.ObjectStates.GetValueOrDefault(id);
+                var wanted = edit.Value > 0 ? state | edit.Value : state & ~-edit.Value;
+                if (wanted == state) return false;
+                _runtime.SetObjectState(id, (byte)wanted);
                 return true;
             }
             case ScummSetupKind.ObjectClass:
@@ -359,8 +371,8 @@ public abstract partial class ScummSession
         var sentence = _runtime.IsV2 ? 0 : _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
         // The hero is put at the object on every path (LOOM has no sentence script: left in the boot's room, the scene's own actorFollowCamera of
         // the hero would start that room's scene, Script 3 +0x001B; found by the comparison with LOOM English's catalog, 31 October 2026).
-        // Not yet for versions 1 and 2: Maniac Mansion and Zak McKracken keep their own scene setup until they move onto this one (ROADMAP 2b).
-        if (!_runtime.IsV2) PutHeroAtObject(objectA);
+        // Versions 1 and 2 too since 1 November 2026 (Maniac Mansion and Zak McKracken on the shared scene setup, ROADMAP 2b).
+        PutHeroAtObject(objectA);
         if (sentence == 0)
         {
             ActivateObjectVerb(objectA, verb);
@@ -422,6 +434,22 @@ public abstract partial class ScummSession
         }
         FinishInput(beforeUncertainties, beforeEvents);
         return true;
+    }
+
+    private readonly HashSet<int> _hurried = [];
+
+    /// <summary>The shortest timer a picked scene hurries (600 jiffies, ten seconds); shorter pauses belong to the scene.</summary>
+    protected const int HurryFromJiffies = 600;
+
+    /// <summary>
+    /// Until the next cutscene begins, the given scripts do not wait out a <c>delay</c> (a picked scene's timer: Maniac Mansion's Script 139 waits
+    /// seven minutes before Ed's round, Script 148 a minute after the kids go in); the time passes at once, an exploration action noted as such.
+    /// </summary>
+    public void HurryUntilCutscene(IEnumerable<int> scripts)
+    {
+        ArgumentNullException.ThrowIfNull(scripts);
+        _hurried.Clear();
+        _hurried.UnionWith(scripts);
     }
 
     /// <summary>A script a picked scene's setup wants running (<see cref="ScummSetupKind.ScriptRunning"/>), started from its first instruction.</summary>
@@ -490,7 +518,6 @@ public abstract partial class ScummSession
     /// </summary>
     public bool PutHeroAtObject(int objectId)
     {
-        if (_runtime.IsV2) return false;
         var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : 0;
         if (ego == 0 || _runtime.CurrentRoom is not int room || _currentObjects.FirstOrDefault(item => item.Id == objectId) is not { } record) return false;
         var (x, y) = (record.WalkX, record.WalkY) != (0, 0) ? (record.WalkX, record.WalkY) : (record.X + record.Width / 2, record.Y + record.Height);

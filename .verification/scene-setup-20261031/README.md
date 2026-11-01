@@ -250,3 +250,23 @@ No scene moved the other way. LOOM unchanged. Real window (`WindowCheck 30,402,8
 Indy 3's Grail Diary (Room 2 object 68, Open) picks its page by `VAR_ROOM_RESOURCE` (+0x002E to +0x005B: rooms 18, 62, 48, 81, `loadRoom` of the page), which the session never set for versions 3 to 5. ScummVM's `startScene` (room.cpp) sets `VAR(VAR_ROOM_RESOURCE) = _roomResource` (the real room, also for a pseudo room) before the entry script; vars.cpp gives it number 22 for versions 3 to 6 and 36 for version 2. The session now sets it as a room is entered (and to the null room when there is none). The "used in another room" setup reads it as it reads VAR_ROOM, also where both sides of the test lead on (each room tried in turn, last, with the values already kept and then alone). The diary now opens on its Room 18 page; it then waits for the player (`var[0x072]`), so the headless run reaches its frame limit.
 
 `*-run31.txt` against `*-run30.txt`: Indy 3 92.8% → 93.5% own way (the diary), Monkey Island 2 91.6% → 92.1% (the ship's horn, Room 48 object 552); the others unchanged; all five 92.9% → 93.0%, at the cutscene 7.1% → 7.0%, showing nothing 12 → 11. LOOM unchanged (`../loom-editions-20261031/run15-*.txt`). Test: `TheGrailDiaryOpensOnAPageInARoomItsCodeNames`.
+
+## Maniac Mansion and Zak McKracken on the shared scene setup (1 November, seventh batch)
+
+`Measure` now starts Maniac Mansion after the reviewed party selection, as the app does (`ManiacCutsceneSetup`), also in its trial mode, which tries pairs for up to four candidates. Baseline (`*-run1.txt`): Maniac 6/7 of 27 fresh, 20 started at the cutscene; Zak 13 of 54 fresh, 30 at the cutscene, 7 beginning nothing. Changes, each generic:
+
+1. **Version 1/2 object states** (`ScummSetupKind.ObjectStateBit`): o2_ifState tests one bit (8 open/on, 4 locked, 2 untouchable, 1 pickupable) and jumps when it is as named, the opposite of version 3 on; `var[0x009]` (VAR_ACTIVE_OBJECT1) is "this object". Maniac Room 1's front door, Walk to (+0x005B): the door must be open.
+2. **Once-only flags**: a variable the code only sets to constants (`move var[0x08A], 1` after `isEqual var[0x08A], 0`) is state, not scratch; it is tried at its tested value, 0 included.
+3. **Timed scenes**: a run waits for a literal `delay` before the cutscene (Maniac's Script 148, 3600 jiffies after the kids go in), and while a picked scene has not begun the timers of ten seconds or more of its own scripts (those the scan lists and those on the way to its cutscene) end at once (`ScummSession.HurryUntilCutscene`, noted as an exploration action; the app's pick does the same): Room 36's door starts Script 139, which waits seven minutes before Ed's round (Script 140).
+4. **The hero put at the picked object** in versions 1 and 2 too.
+5. **Slashed labels**: versions 1 and 2 label object code `Room 08 / Object 208 / Verb 0xFD`, which the run did not read as the scene's own, so no version 2 object scene counted as begun its own way (Zak's 7 that began nothing: the drunk at the airport, Room 8, and others).
+
+| Copy | Scenes | Own way | At the cutscene | Begin nothing |
+|---|---|---|---|---|
+| Maniac Mansion classic (`mmansion ega en`) | 27 | 26% → 52% (14) | 74% → 48% (13) | 0 |
+| Maniac Mansion enhanced (`mmansionE ega es`) | 27 | 26% → 52% (14) | 74% → 48% (13) | 0 |
+| Zak McKracken classic (`zak ega en`) | 54 | 31% → 54% (29) | 56% → 46% (25) | 7 → 0 |
+| Zak McKracken enhanced (`zakE ega en`) | 54 | 31% → 54% (29) | 56% → 46% (25) | 7 → 0 |
+
+The other five copies unchanged (`*-run32.txt`, `*-run33.txt` against `*-run31.txt`), LOOM unchanged (`../loom-editions-20261031/run16-*.txt`, `run17-*.txt`). Real window: a Maniac pick waits for the party selection ("Please select two other kids"), the app's startup rule, so the harness cannot play it; checked headless. Final numbers `*-run7.txt` (with the ten-second threshold; shorter pauses belong to the scene and run as the game times them, which Maniac's own cutscene tests pin). Zak's fidelity tests pin frame counts: Room 2's entry 646 → 547 (its long timer passes for a pick), Room 14 object 55 905 → 710 (a pick puts the hero at the object instead of walking him there); both still reach Room 16. Tests: `ManiacsFrontDoorIsOpenedAndItsTimedSceneHurried`, `AVersionTwoObjectSceneIsCountedByItsSlashedLabel`. Next for versions 1 and 2: `getBitVar` tests (Maniac Script 139 +0x0038), the pairs of values the timers' loops wait for.
+

@@ -77,16 +77,16 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 | **LOOM** demos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 | **LOOM** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | – |
-| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
-| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ◐ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
+| **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Zak McKracken** classic | ✔ | ✔ | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
 <!-- support-matrix:end -->
 
 Maniac/Zak edition coverage at the [18 October S9 checkpoint](archive/checkpoints/20261018-S9-ManiacZak.md): classic English Maniac, enhanced Spanish Maniac, classic English Zak and enhanced English Zak only. There is one local copy per family; no additional language, demo or revision within a family was available to establish compatibility. These checks do not raise the existing feature levels.

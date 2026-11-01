@@ -28,6 +28,7 @@ public sealed partial class ScummSceneSetupSearch
 
     private readonly GameLibrary _game;
     private readonly IScummDataSource _data;
+    private readonly bool _isV2;
     private readonly Func<ScummCutscene, IReadOnlyList<ScummSetupEdit>?, ScummCutsceneRunResult> _run;
     private readonly ConcurrentDictionary<(int, int, int), Lazy<ScummScenePlan>> _plans = [];
     private readonly Lazy<IReadOnlyDictionary<int, int>> _objectRooms;
@@ -40,6 +41,7 @@ public sealed partial class ScummSceneSetupSearch
         ArgumentNullException.ThrowIfNull(run);
         _game = game;
         _data = ScummDataSources.For(game);
+        _isV2 = ScummProfile.For(game).EngineVersion <= ScummVersion.V2;
         _run = run;
         _objectRooms = new(ObjectRooms);
         _roomLeftVariables = new(RoomLeftVariables);
@@ -176,9 +178,13 @@ public sealed partial class ScummSceneSetupSearch
         var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Concat(between).Select(label => (label, script: Read(label, trigger)))
             .Where(u => u.script is not null).ToList();
         var written = new HashSet<string>();
+        var flagged = new HashSet<string>();
         foreach (var (_, script) in units)
             foreach (var ins in script!.Instructions)
-                if (WrittenVariable(ins) is { } key) written.Add(key);
+                if (WrittenVariable(ins) is { } key) (IsFlagWrite(ins) ? flagged : written).Add(key);
+        // A variable the code only ever sets to constants is a flag (Maniac Mansion's front door, Room 1 object 61 +0x005F: isEqual var[0x08A], 0,
+        // then move var[0x08A], 1: its scene plays the first time), state to set, not scratch.
+        flagged.ExceptWith(written);
         var found = new List<(ScummSetupEdit Edit, int Rank)>();
         // Values beside a compared constant (not the constant itself), kept only for a variable compared with nothing else.
         var beside = new HashSet<ScummSetupEdit>();
@@ -238,6 +244,15 @@ public sealed partial class ScummSceneSetupSearch
                     case "move" when !objectCode && trigger.ObjectId != 0 && !trigger.IsRoomEntry && ins.Operands.Split(" = ") is [var into, var from] &&
                                      from.Trim() == ThisObject && into.Trim().StartsWith("local[", StringComparison.Ordinal):
                         selfLocals.Add(into.Trim());
+                        break;
+                    case "ifState" when _isV2 && parts.Length >= 2 && V2StateBit(parts[1]) is (int mask, bool on) &&
+                                        (Known(parts[0]) ?? (objectCode && trigger.ObjectId != 0 && parts[0] == ScummVars.V2.ActiveObject1 ? trigger.ObjectId : null)) is int stateObject:
+                        // Versions 1 and 2 test one bit of the state (o2_ifState: open, locked, touchable, pickupable) and jump when it is as named, the
+                        // opposite of version 3 on (Maniac Mansion's front door, Room 1 object 61 Walk to +0x005B: ifState var[0x009], IntrinsicOff
+                        // jumps away, so the door must be open); var[0x009] is "this object" (VAR_ACTIVE_OBJECT1).
+                        operation = "equalZero";
+                        Add(new(ScummSetupKind.ObjectStateBit, stateObject.ToString(CultureInfo.InvariantCulture), on ? mask : -mask, where), 1);
+                        Add(new(ScummSetupKind.ObjectStateBit, stateObject.ToString(CultureInfo.InvariantCulture), on ? -mask : mask, where), 0);
                         break;
                     case "isScriptRunning" when parts.Length >= 2 && Literal(parts[1]) is int checkedScript:
                         runningOf[parts[0]] = checkedScript;
@@ -397,7 +412,7 @@ public sealed partial class ScummSceneSetupSearch
                             // The other side of an equality is a value beside the constant, not 0 (Indy 3 Room 24's first aid kit, +0x0000 isEqual
                             // var[0x0C1], 1000: the scene plays only below full health).
                             foreach (var side in (ins.Operation is "isEqual" or "isNotEqual" ? [value.Value, value.Value > 1 ? value.Value - 1 : value.Value + 1] : sides)
-                                         .Where(v => v > 0).Distinct())
+                                         .Where(v => v > 0 || flagged.Contains(tested)).Distinct())
                             {
                                 var variable = new ScummSetupEdit(ScummSetupKind.Variable, tested, side, where);
                                 if (ins.Operation is "isEqual" or "isNotEqual" && side != value.Value)
@@ -435,6 +450,20 @@ public sealed partial class ScummSceneSetupSearch
         return found.OrderBy(f => f.Rank == 3 ? 1 : f.Rank).ToList();
     }
 
+    /// <summary>A version 1/2 named state (ScummVM o2_ifState masks): its bit and whether the name means the bit set.</summary>
+    private static (int Mask, bool On)? V2StateBit(string name) => name switch
+    {
+        "IntrinsicOn" => (8, true), "IntrinsicOff" => (8, false),
+        "Locked" => (4, true), "Unlocked" => (4, false),
+        "Untouchable" => (2, true), "Touchable" => (2, false),
+        "Pickupable" => (1, true), "Unpickupable" => (1, false),
+        _ => null,
+    };
+
+    /// <summary>A move of a literal into a variable (<c>move var[X] = 0x0001</c>, version 1/2 <c>move var[X], 0x0001</c>).</summary>
+    private static bool IsFlagWrite(ScummScriptInstruction ins) =>
+        ins.Operation == "move" && ins.Operands.Split(new[] { " = ", ", " }, 2, StringSplitOptions.None) is [_, var value] && Literal(value.Trim()) is not null;
+
     private static string? WrittenVariable(ScummScriptInstruction ins)
     {
         // The first operand of an assignment, an arithmetic step or a get* query is written.
@@ -459,6 +488,27 @@ public sealed partial class ScummSceneSetupSearch
                 return (label, start.Offset, reader.CallArguments(label, trigger));
         return null;
     }
+
+    private static readonly ConcurrentDictionary<(GameLibrary, int, int, int), int> Delays = new();
+
+    /// <summary>
+    /// The jiffies the script holding the trigger's first cutscene waits before it (literal <c>delay</c> instructions before the <c>cutscene</c>), so a
+    /// run waits for a timed scene; 0 when there is none.
+    /// </summary>
+    public static int DelayBeforeCutscene(GameLibrary game, ScummCutscene trigger) =>
+        Delays.GetOrAdd((game, trigger.Room, trigger.ObjectId, trigger.VerbId), _ =>
+        {
+            var reader = new ScummSceneSetupSearch(game, (_, _) => new(false, [], 0));
+            if (FirstCutscene(game, trigger) is not { } at || reader.Read(at.Label, trigger) is not { } script) return 0;
+            var total = 0;
+            foreach (var ins in script.Instructions.TakeWhile(i => i.Offset < at.Offset).Where(i => i.Operation == "delay"))
+            {
+                var operand = ins.Operands.Trim();
+                if (Literal(operand) is int hex) total += hex;
+                else if (int.TryParse(operand, NumberStyles.Integer, CultureInfo.InvariantCulture, out var plain)) total += plain;
+            }
+            return Math.Min(total, 2 * 3600);
+        });
 
     /// <summary>
     /// The arguments the trigger's own code starts a script with (<c>startScript</c>/<c>chainScript N, [a, b, …]</c>), so a scene started at its

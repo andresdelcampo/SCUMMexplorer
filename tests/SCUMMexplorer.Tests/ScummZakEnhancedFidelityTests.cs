@@ -11,8 +11,10 @@ public sealed class ScummZakEnhancedFidelityTests(ITestOutputHelper output)
         ? new ScummCutscenePlanner(new GameFolderScanner().Scan(Folder)) : null);
 
     [Theory]
-    [InlineData(2, 0, 0, 646)]
-    [InlineData(14, 55, 11, 905)] // Native row-search walking shortens this approach by two frames.
+    // 1 November 2026 (shared scene setup for versions 1 and 2): the entry's long timer passes at once for a pick (646 → 547 frames), and a pick
+    // puts the hero at the object instead of walking him there (905 → 710).
+    [InlineData(2, 0, 0, 547)]
+    [InlineData(14, 55, 11, 710)] // Native row-search walking shortened the former walking approach by two frames.
     public void CorrectNativeActorApproachLetsFormerlyCappedSceneFinish(int room, int obj, int verb, int expectedFrames)
     {
         if (Planner.Value is not { } planner) return;

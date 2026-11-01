@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Scumm;
 
 // Usage: Measure <game folder> [max groups] [filter room]
@@ -8,7 +9,10 @@ var game = new GameFolderScanner().Scan(args[0]);
 var limit = args.Length > 1 ? int.Parse(args[1]) : int.MaxValue;
 int? onlyRoom = args.Length > 2 ? int.Parse(args[2]) : null;
 var clock = Stopwatch.StartNew();
-var planner = new ScummCutscenePlanner(game);
+// Maniac Mansion starts its scenes after the reviewed party selection, as the app does (ManiacCutsceneSetup, 1 November 2026).
+var maniac = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
+var planner = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game) : new ScummCutscenePlanner(game);
+Func<ScummSession> newRun = maniac ? () => SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.NewSession(game) : () => ScummGameSession.BootForPlay(game, out _);
 Console.WriteLine($"{planner.Groups.Count} groups, planner ready in {clock.Elapsed.TotalSeconds:F1} s");
 if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 } code)
 {
@@ -41,7 +45,7 @@ foreach (var group in planner.Groups)
     var run = planner.Run(t);
     if (Environment.GetEnvironmentVariable("MEASURE_DIRECT") == "1")
     {
-        var d = ScummCutsceneRun.Run(game, () => ScummGameSession.BootForPlay(game, out _), t, null, ScummPickedStart.Direct);
+        var d = ScummCutsceneRun.Run(game, newRun, t, null, ScummPickedStart.Direct);
         if (d.Begun != run.Begun) Console.WriteLine($"DIFF Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2}: direct {d.Begun} ({d.Failure}), picked {run.Begun} way={run.Way} ({run.Failure})");
         if (run.Begun) fresh++;
         continue;
@@ -54,9 +58,17 @@ foreach (var group in planner.Groups)
         Console.WriteLine($"  fresh: begun {run.Begun} rooms [{string.Join(",", run.RoomsEntered)}] lines {run.Lines} frames {run.Frames} failure {run.Failure}");
         foreach (var c in candidates)
         {
-            var r1 = ScummCutsceneRun.Run(game, () => ScummGameSession.BootForPlay(game, out _), t, [c]);
+            var r1 = ScummCutsceneRun.RunPicked(game, newRun, t, [c]);
             Console.WriteLine($"  trial {c.Describe()}: begun {r1.Begun} rooms [{string.Join(",", r1.RoomsEntered)}] lines {r1.Lines} frames {r1.Frames} failure {r1.Failure}");
         }
+        // Pairs, for a few candidates (a scene that needs two values at once).
+        if (candidates.Count is > 1 and <= 4)
+            for (var i = 0; i < candidates.Count; i++)
+                for (var j = i + 1; j < candidates.Count; j++)
+                {
+                    var r2 = ScummCutsceneRun.RunPicked(game, newRun, t, [candidates[i], candidates[j]]);
+                    Console.WriteLine($"  pair {candidates[i].Describe()} + {candidates[j].Describe()}: begun {r2.Begun} rooms [{string.Join(",", r2.RoomsEntered)}] lines {r2.Lines}");
+                }
     }
     var plan = planner.PlanSetup(t);
     var took = (clock.Elapsed - start).TotalSeconds;

@@ -206,6 +206,35 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ManiacsFrontDoorIsOpenedAndItsTimedSceneHurried()
+    {
+        // Maniac Mansion Room 1 object 61 Walk to: ifState var[0x009], IntrinsicOff jumps away (v2: the door must be open), then Script 148 waits
+        // 3600 jiffies before its cutscene; Room 36's door starts Script 139, whose seven-minute timer leads to Script 140. Both play the game's way.
+        var folder = Path.Combine(TestGames.Root, "mmansion ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(new GameFolderScanner().Scan(folder));
+        var door = planner.PlanSetup(Trigger(planner, 1, 61, 0x0D));
+        output.WriteLine(door.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, door.Result.Way);
+        Assert.Contains(door.Edits, edit => edit is { Kind: ScummSetupKind.ObjectStateBit, Target: "61", Value: 8 });
+        var round = planner.PlanSetup(Trigger(planner, 36, 124, 0x0D));
+        Assert.NotEqual(ScummPickedStart.AtCutscene, round.Result.Way);
+    }
+
+    [Fact]
+    public void AVersionTwoObjectSceneIsCountedByItsSlashedLabel()
+    {
+        // Zak McKracken Room 8 object 208 (the drunk, verb 0xFD): versions 1 and 2 label object code "Room 08 / Object 208 / Verb 0xFD"; its
+        // cutscene now counts as the scene's own.
+        var folder = Path.Combine(TestGames.Root, "zak ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 8, 208, 0xFD));
+        Assert.True(plan.Result.Begun);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+    }
+
+    [Fact]
     public void TheGrailDiaryOpensOnAPageInARoomItsCodeNames()
     {
         // Indy 3 Room 2 object 68 Open: the page shown depends on VAR_ROOM_RESOURCE (+0x002E: rooms 18, 62, 48, 81), which startScene sets

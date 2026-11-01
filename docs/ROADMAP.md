@@ -11,7 +11,7 @@ REQUIREMENTS R-1.14 and §8.6 (user, 31 October 2026): an explorer. Pick any roo
 | Family | State |
 |---|---|
 | LOOM EGA English (Roland), other EGA editions, demos, LOOM CD | Reference quality: live interaction, actors, scripts, scene playback, Game Status, audio. Interact lists every object of the room. Cutscenes ◐ except the English reference's hand-validated catalog. |
-| Indy 3, Monkey Island 1 (floppy, CD), Monkey Island 2, Indy 4 | Every room, costume and script; every listed scene begins when picked (its state set up, or started at its cutscene); Interact offers every object of the room with its verbs. Some scenes started at their cutscene show nothing; sound not yet listened to by the user. |
+| Indy 3, Monkey Island 1 (floppy, CD), Monkey Island 2, Indy 4 | Every room, costume and script; every listed scene begins when picked (its state set up, or started at its cutscene); Interact offers every object of the room with its verbs. Some scenes started at their cutscene show nothing. |
 | Maniac Mansion and Zak McKracken (enhanced, classic) | Played through native verbs, Status, inventory editor, room controls, cutscene lists (◐). Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope is not yet applied there. |
 | Other folders under `Games` | Browse-only or passed only S9 checks; not reviewed in the window. |
 
@@ -40,17 +40,16 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | LOOM EGA English (reference) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | LOOM EGA other editions, demos | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| LOOM CD | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
-| Monkey Island 1 (floppy, CD) | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
-| Monkey Island 2 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
-| Indiana Jones 4 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
-| Maniac Mansion (classic, enhanced) | ✅ | ✅ | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
-| Zak McKracken (classic, enhanced) | ✅ | 🟡 | 🟡 | ✅ | 🔴 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
+| LOOM CD | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| Indiana Jones 3 (EGA, 256 colours) | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 1 (floppy, CD) | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Monkey Island 2 | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Indiana Jones 4 | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | — | 🟡 |
+| Maniac Mansion (classic, enhanced) | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
+| Zak McKracken (classic, enhanced) | ✅ | 🟡 | ✅ | ✅ | 🟡 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
 What keeps a cell from ✅:
-- **3**: the user has not listened (non-LOOM games); LOOM CD's picture/voice/music timing is the user's run.
-- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 6.5%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 7.9%, Indy 4 5.6% (7.0% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac/Zak have scenes that begin nothing (their track).
+- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 6.5%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 7.9%, Indy 4 5.6% (7.0% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 48% (Maniac, both) and 46% (Zak, both) started at the cutscene.
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (80%, 64% and 57% of references); their variables and bits keep numbers (the script maps hold few rows to turn into data; most of what stays unnamed has no name in the game's data: image-only objects, actors no script names).
@@ -63,7 +62,7 @@ What keeps a cell from ✅:
 | 2b | **One scene engine for every game** (user, 31 October): Maniac/Zak (`ManiacCutsceneSetup`, built on the separate track) onto the shared scene setup (`ScummSceneSetupSearch`), keeping a game-specific setup only where the game needs one (LOOM English's reviewed catalog, Maniac's party selection). LOOM English's 328 reviewed replays are the answer key (first run 31 October: 238 of 238 listed replays begin and reach the catalog's rooms, 219 share its category; the other 90 are shared draft reactions; [record](../.verification/loom-answer-key-20261031/README.md)); scene length within 10% for 217 of 238 (91.2%, on LOOM's own session); LOOM's other editions and the CD play their scanned scenes through the shared engine, and every LOOM copy's Interact offers the draft reactions ([record](../.verification/loom-editions-20261031/README.md)); still to do: the remaining length differences, then retire the catalog to titles, draft names and the named sequences; Maniac/Zak: run the shared engine on the English reference and compare each replay (begins, lines, rooms, Bobbin's look); where it matches, the catalog entry is redundant, where it differs, fix the shared engine; in the end only the named sequences (The Elders' trial, the firewood scene, Walk to Room 13, Room 46) stay as reviewed data, carried to the other LOOM editions by room, object name and verb. Before/after counts per game. | 5 | `Loom/Scenes/`, `Core/Maniac/`, `Scumm/Session/` |
 | 3 | **Readable names for the other games**: objects, actors and verbs are named from each game's data ([record](../.verification/readable-names-20261031/README.md)); still to do: variables and bits from their script maps (reviewed rows as data, as LOOM's glossary). | 10 | `LoomGlossary`, `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
 | 4 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
-| 5 | **One user pass per game** with "Your checks" below: listening, a few rooms next to ScummVM, each copy opened once. | 3, sign-off | — |
+| 5 | **One user pass per game** with "Your checks" below: a few rooms next to ScummVM, each copy opened once. | 3, sign-off | — |
 | 6 | **Release**, LOOM first: packaging, version, clean-profile first run, Roland without ROMs. | — | `src/SCUMMexplorer.App` |
 
 Optional, when the code is next touched: a ScummVM picture capture, splitting `MainWindow.xaml.cs`, profile allow-lists as defaults, worktree housekeeping.
@@ -87,25 +86,25 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 
 ### Indiana Jones 3 (EGA and 256 colours)
 - 4 scenes started at their cutscene show nothing (work item 1).
-- Listening (AdLib, PC speaker). Rooms 47, 60, 66 start dark and are shown lit. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
+- Rooms 47, 60, 66 start dark and are shown lit. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
 ### Monkey Island 1 (floppy and CD)
 - 1 (floppy) and 1 (CD) scene started at its cutscene shows nothing (work item 1).
-- Listening (the floppy credits music timer is an estimate; CD track 21 is started by no sound); `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
+- `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
 - Spanish eight-disk copy and the CD's five languages in the window (passed S9 headless only).
 
 ### Monkey Island 2
 - 1 scene started at its cutscene shows nothing (work item 1).
-- Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates; listening.
+- Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates.
 
 ### Indiana Jones 4
 - 5 scenes started at their cutscene show nothing (work item 1).
-- Listening, including talkie speech. Spanish talkie and floppy in the window.
+- Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
 Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies once the user tells that track.
-- Scenes that begin nothing (Maniac 20–21 of 27 groups, Zak 41 of 54): the shared scene setup.
-- Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours; PCjr/Tandy never listened to.
+- Scenes started at their cutscene (Maniac 13 of 27, Zak 25 of 54; work item 1); a Maniac pick in the window waits for the party selection (the startup rule), so it is checked headless only.
+- Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours.
 
 ## Release readiness (LOOM first)
 
@@ -119,7 +118,7 @@ Open:
 
 ## Your checks
 
-The checks only you can do, one short list per game, gathered from about 115 evidence records that each ended with their own "user checks". Each line links the record that has the exact steps. When you do one, write the date and the result in its last column (or tell the session); a passing listening check raises that game's Sound cell back to ✔ in `GameSupport.Families`, a failing one becomes an open item in this file.
+The checks only you can do, one short list per game, gathered from about 115 evidence records that each ended with their own "user checks". Each line links the record that has the exact steps. When you do one, write the date and the result in its last column (or tell the session); a failing one becomes an open item in this file.
 
 Game folders are under `D:\Juegos\Lucas`. Roland needs the ROMs in `mt32`. If the app crashes, the log is in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` (a forced close or a crash no handler saw is logged as `…-unclean-exit.log` at the next start).
 
@@ -149,7 +148,6 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 
 | Check | Steps | Result |
 |---|---|---|
-| Listen in play: Room 73 onwards, AdLib then PC speaker | [play record](../.verification/indy3-play-20261015/README.md), [sound polish](../.verification/sound-polish-20261019/README.md) | |
 | Room 73 · Turn off light switch, Room 22 · Entry, Room 80 · Entry: start as in the game? Esc and Space work? | [cutscene record](../.verification/indy3-cutscenes-20261017/README.md) | |
 | Rooms 20, 28, 32: the castle's cut-away plan shows only the section around Indy (decoded, Script 25). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
 | Rooms 6, 18, 78, 80: their pictures now come from the moment their scene leaves them (the game follows Indy into the next room). Do they look right? | [record](../.verification/indy3-rooms-20261030/README.md) | |
@@ -159,7 +157,6 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 
 | Check | Steps | Result |
 |---|---|---|
-| Listen and time play from the dock (Room 33): music per room, door sounds, credits music | [play record](../.verification/monkey1-play-20261016/README.md) | |
 | Room 33 · Look at poster, Room 37 · Entry, Room 19 · Entry | [cutscene record](../.verification/monkey1-cutscenes-20261017/README.md) | |
 | Spanish eight-disk copy in play | [editions](../.verification/monkey1-editions-20261017/README.md) | |
 
@@ -198,7 +195,6 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 | Check | Steps | Result |
 |---|---|---|
 | Maniac classic: Syd, Bernard, Start, skip the intro, front door and doormat route | [play record](../.verification/maniacclassic-play-20261017/README.md) | |
-| Maniac and Zak: the PCjr/Tandy sounds (never listened to) | Maniac/Zak S3 notes, README | |
 | Classic Maniac Room 18 (six black rectangles), Zak classic Room 44, enhanced 13, 16, 44: black in the real game too? | [S5 checkpoint](archive/checkpoints/20261017-S5-ManiacZak.md) | |
 | Zak Rooms 3 and 33: camera position; Room 19: still picture after about 25 s | [S5 checkpoint](archive/checkpoints/20261017-S5-ManiacZak.md), NEXT_SESSION_PROMPT | |
 | Zak classic costumes with estimated colours: do they look right? | [palette checkpoint](archive/checkpoints/20261019-Palettes-ManiacZak.md) | |

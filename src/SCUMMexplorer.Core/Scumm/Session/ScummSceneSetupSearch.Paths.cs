@@ -118,6 +118,20 @@ public sealed partial class ScummSceneSetupSearch
         return calls.Keys.Where(label => found.Contains(label) && label != own && !trigger.Scripts.Contains(label)).ToList();
     }
 
+    /// <summary>
+    /// The scripts a trigger's scene runs through: those the scan lists and those on the way from the trigger's code to its cutscene's script
+    /// (Maniac Mansion's Room 36 door starts Script 139, whose timer leads to the cutscene's Script 140).
+    /// </summary>
+    public static IReadOnlyList<string> SceneScripts(GameLibrary game, ScummCutscene trigger)
+    {
+        ArgumentNullException.ThrowIfNull(trigger);
+        var reader = new ScummSceneSetupSearch(game, (_, _) => new(false, [], 0));
+        var own = trigger.IsRoomEntry ? $"Room {trigger.Room} entry script" : $"Room {trigger.Room} object {trigger.ObjectId} verb 0x{trigger.VerbId:X2}";
+        var scene = FirstCutscene(game, trigger)?.Label;
+        var between = reader.OnTheWay(own, trigger, scene, out var toward);
+        return trigger.Scripts.Concat(between).Concat(toward).Distinct().ToArray();
+    }
+
     /// <summary>Whether a test falls through (holds) when its tested value is <paramref name="value"/>, as ScummVM's o5 comparisons read; null when unknown.</summary>
     private static bool? Holds(string operation, int? constant, int value) => operation switch
     {

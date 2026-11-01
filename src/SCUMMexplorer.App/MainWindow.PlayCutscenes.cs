@@ -229,6 +229,8 @@ public partial class MainWindow
             if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_game, game) || !PlayActive || !ReferenceEquals(_play, session)) return;
         }
         IReadOnlyList<string> uncertainties;
+        // The scene's own scripts do not wait out their timers until it begins (as the plan's runs: Maniac Mansion's Script 139, seven minutes).
+        if (plan?.Result.Way != ScummPickedStart.AtCutscene) session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger));
         try
         {
             if (plan is { HasEdits: true } && trigger.IsRoomEntry)

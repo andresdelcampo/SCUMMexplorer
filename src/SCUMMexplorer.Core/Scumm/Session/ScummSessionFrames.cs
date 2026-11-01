@@ -43,6 +43,13 @@ public abstract partial class ScummSession
         foreach (var item in _pending)
         {
             if (item.Frame.Delay is not int delay) continue;
+            // A picked scene's own scripts do not wait out their long timers (HurryUntilCutscene): time passes for them at once. A pause under
+            // ten seconds (600 jiffies) is part of the scene and runs as the game times it.
+            if (_hurried.Count > 0 && item.ScriptNumber is int hurried && _hurried.Contains(hurried) && delay >= HurryFromJiffies)
+            {
+                _uncertainties.Add($"{item.Frame.Label} waited {delay} jiffies (delay); for the picked scene that time passed at once (an exploration action).");
+                delay = counted;
+            }
             delay -= counted;
             item.Frame.Delay = delay < 0 ? null : delay;
             if (delay < 0) _visitTrace.Add($"{item.Frame.Label}'s delay ends; it runs again at +0x{item.Offset:X4}");

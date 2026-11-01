@@ -100,6 +100,11 @@ public static class ScummCutsceneRun
             // own (Monkey Island's SCUMM Bar and High Street open and close doors through global scripts 25/26, each a short cutscene), and a visit's
             // entry may still be in its own. A cutscene begun by a room the trigger led to (its entry or local scripts) is the scene going on there.
             var reached = trigger.Scripts.Select(ScriptKey).Where(key => key is not null).ToHashSet();
+            // A scene whose script waits before its cutscene (Maniac Mansion's Script 148: delay 3600, a minute after the kids go in) is waited for:
+            // at most one frame per jiffy of the delay.
+            var wait = way == ScummPickedStart.AtCutscene ? 0 : ScummSceneSetupSearch.DelayBeforeCutscene(game, trigger);
+            // The scene's own scripts do not wait out their timers (Maniac Mansion's Script 139: seven minutes before Ed's round).
+            if (way != ScummPickedStart.AtCutscene) session.HurryUntilCutscene(HurriedScripts(game, trigger));
             var begun = false;
             var frame = 0;
             var quiet = 0;
@@ -121,7 +126,7 @@ public static class ScummCutsceneRun
                 // over only after QuietFrames frames with no cutscene and no line, as LOOM English's reviewed replays were run (31 October 2026).
                 quiet = begun && !session.InCutscene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
                 if (quiet >= quietNeeded) break;
-                if (!begun && frame >= TrialFrames) break;
+                if (!begun && frame >= TrialFrames + wait) break;
                 session.StepFrame();
             }
             return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way);
@@ -134,11 +139,14 @@ public static class ScummCutsceneRun
 
     /// <summary>
     /// A script's identity in both the scan's labels (<c>global script 25</c>, <c>Room 35 local script 207</c>, <c>Room 28 object 322 verb 0x02</c>,
-    /// <c>Room 35 entry script</c>) and the session trace's (<c>Script 25</c>, <c>Room 07 local script 200</c>, <c>Room 77 Object 845 Verb 0x0A</c>):
+    /// <c>Room 35 entry script</c>) and the session trace's (<c>Script 25</c>, <c>Room 07 local script 200</c>, <c>Room 77 Object 845 Verb 0x0A</c>,
+    /// versions 1 and 2 <c>Room 08 / Object 208 / Verb 0xFD</c>):
     /// global scripts by number, local scripts by room and number, objects by id, the entry by room. Null for a label of another shape.
     /// </summary>
     internal static string? ScriptKey(string label)
     {
+        // Versions 1 and 2 label object code "Room 08 / Object 208 / Verb 0xFD" (Zak McKracken).
+        label = label.Replace(" / ", " ", StringComparison.Ordinal);
         var match = System.Text.RegularExpressions.Regex.Match(label,
             @"^(?:Room (?<room>\d+) (?:(?<entry>entry)|local script (?<script>\d+)|[Oo]bject (?<object>\d+))|(?:global script|Script) (?<script>\d+))");
         if (!match.Success) return null;
@@ -147,6 +155,11 @@ public static class ScummCutsceneRun
         var script = int.Parse(match.Groups["script"].Value, System.Globalization.CultureInfo.InvariantCulture);
         return match.Groups["room"].Success ? $"local {int.Parse(match.Groups["room"].Value, System.Globalization.CultureInfo.InvariantCulture)}/{script}" : $"global {script}";
     }
+
+    /// <summary>The numbers of the global and local scripts a trigger's scene runs through (its scan labels), whose timers a pick hurries.</summary>
+    public static IReadOnlyList<int> HurriedScripts(GameLibrary game, ScummCutscene trigger) =>
+        ScummSceneSetupSearch.SceneScripts(game, trigger).Select(label => System.Text.RegularExpressions.Regex.Match(label, @"^(?:global script|Room \d+ local script) (\d+)$"))
+            .Where(m => m.Success).Select(m => int.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture)).Distinct().ToArray();
 
     /// <summary>The room of a room-owned script's label (<c>Room 12 local script 200</c>), else null.</summary>
     internal static int? RoomOf(string label) =>
