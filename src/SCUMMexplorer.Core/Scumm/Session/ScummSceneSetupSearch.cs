@@ -120,8 +120,12 @@ public sealed partial class ScummSceneSetupSearch
         }
         foreach (var other in elsewhere.TakeWhile(_ => !best.Begun))
         {
-            var result = _run(trigger, [other]);
-            if (result.Failure is null && result.Begun) { best = result; kept = [other]; }
+            // With the values kept so far (the diary's bit[0x5DF]), then alone.
+            foreach (var trial in kept.Count > 0 ? [[.. kept, other], [other]] : new List<ScummSetupEdit>[] { [other] })
+            {
+                var result = _run(trigger, trial);
+                if (result.Failure is null && result.Begun) { best = result; kept = trial; break; }
+            }
         }
         var plan = new ScummScenePlan(kept, fresh, best, "");
         return plan with { Note = Describe(plan, candidates.Count + elsewhere.Count) };
@@ -371,11 +375,12 @@ public sealed partial class ScummSceneSetupSearch
                         else if (tested == ScummVars.WalkToObject && value.Value > 0 && ins.Operation is "isEqual" or "isNotEqual" && trigger.IsRoomEntry)
                             // The door the hero came in by (VAR_WALKTO_OBJ, set while loadRoomWithEgo enters the room).
                             Add(new(ScummSetupKind.EnteredBy, tested, value.Value, where, trigger.Room), value.Value);
-                        else if (tested == ScummVars.Room && value.Value is > 0 and < 0x80 && value.Value != trigger.Room && !trigger.IsRoomEntry &&
-                                 ins.Operation is "isEqual" or "isNotEqual" && guard is bool inRoom && Holds(ins.Operation, value.Value, value.Value) == inRoom &&
+                        else if (tested is ScummVars.Room or ScummVars.RoomResource && value.Value is > 0 and < 0x80 && value.Value != trigger.Room && !trigger.IsRoomEntry &&
+                                 ins.Operation is "isEqual" or "isNotEqual" && (guard is not bool inRoom || Holds(ins.Operation, value.Value, value.Value) == inRoom) &&
                                  _game.Rooms.Any(r => r.ResourceId == value.Value))
                             // The verb plays its scene only in another room (Monkey Island 1 Room 30's sword, +0x0000 isEqual VAR_ROOM, 0x24: used on
-                            // the dogs of Room 36): the object held and used there.
+                            // the dogs of Room 36): the object held and used there. Also where both sides lead on (Indy 3's Grail Diary, Room 2 object
+                            // 68 Open, +0x002E: VAR_ROOM_RESOURCE compared with the four rooms that have a page), each room tried in turn.
                             Add(new(ScummSetupKind.PlayedIn, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), value.Value, where, trigger.Room), value.Value);
                         else if (tested == ScummVars.Room && value.Value >= 0x80 && ins.Operation is "isEqual" or "isNotEqual")
                             // The room under a pseudo room number (Indy 3 Room 21's entry: isEqual VAR_ROOM, 0x81): applied only where the game maps it here.

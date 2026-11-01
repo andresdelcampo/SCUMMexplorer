@@ -206,6 +206,20 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void TheGrailDiaryOpensOnAPageInARoomItsCodeNames()
+    {
+        // Indy 3 Room 2 object 68 Open: the page shown depends on VAR_ROOM_RESOURCE (+0x002E: rooms 18, 62, 48, 81), which startScene sets
+        // (var 22); the diary held and opened in Room 18, with bit[0x5DF] kept.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var plan = planner.PlanSetup(Trigger(planner, 2, 68, 0x01));
+        output.WriteLine(plan.Note);
+        Assert.True(plan.Result.Begun);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.PlayedIn, Target: "68", Value: 18 });
+    }
+
+    [Fact]
     public void ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant()
     {
         // Indy 4 Room 72's peg (verb 0x06) is used with object 934; the sentence script refuses it (Script 9: the peg has no class 1 to 3), so the

@@ -244,3 +244,9 @@ Measured together (`*-run30.txt` against `*-run27.txt`; `*-run28.txt` and `*-run
 | **Total** | 1,093 | **91.7% → 92.9%** | **8.3% → 7.1%** | 14 → 12 |
 
 No scene moved the other way. LOOM unchanged. Real window (`WindowCheck 30,402,8`, Monkey Island 1 floppy, private profile): the pick opens Room 36 with Guybrush at the mansion and the dogs, "On those helpless dogs?", then "That's inhumane!" ([picture](window-elsewhere/30-402-8.png)). Tests: `AVerbThatPlaysOnlyInAnotherRoomIsUsedThereWithTheObjectHeld`, `ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant`.
+
+## VAR_ROOM_RESOURCE (1 November, sixth batch)
+
+Indy 3's Grail Diary (Room 2 object 68, Open) picks its page by `VAR_ROOM_RESOURCE` (+0x002E to +0x005B: rooms 18, 62, 48, 81, `loadRoom` of the page), which the session never set for versions 3 to 5. ScummVM's `startScene` (room.cpp) sets `VAR(VAR_ROOM_RESOURCE) = _roomResource` (the real room, also for a pseudo room) before the entry script; vars.cpp gives it number 22 for versions 3 to 6 and 36 for version 2. The session now sets it as a room is entered (and to the null room when there is none). The "used in another room" setup reads it as it reads VAR_ROOM, also where both sides of the test lead on (each room tried in turn, last, with the values already kept and then alone). The diary now opens on its Room 18 page; it then waits for the player (`var[0x072]`), so the headless run reaches its frame limit.
+
+`*-run31.txt` against `*-run30.txt`: Indy 3 92.8% → 93.5% own way (the diary), Monkey Island 2 91.6% → 92.1% (the ship's horn, Room 48 object 552); the others unchanged; all five 92.9% → 93.0%, at the cutscene 7.1% → 7.0%, showing nothing 12 → 11. LOOM unchanged (`../loom-editions-20261031/run15-*.txt`). Test: `TheGrailDiaryOpensOnAPageInARoomItsCodeNames`.

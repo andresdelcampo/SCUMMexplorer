@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: VAR_ROOM_RESOURCE, and Indy 3's Grail Diary opens on its page
+
+The session now sets `VAR_ROOM_RESOURCE` (variable 22 in versions 3 to 5) to the real room's number as a room is entered, as ScummVM's `startScene` does (version 2 already had its own). The "used in another room" setup also reads it, and also where each side of the test leads on, trying the rooms in turn with the values already kept: Indy 3's Grail Diary (Room 2 object 68, Open) shows its page in Room 18, and Monkey Island 2's ship's horn plays its own way. Own way 92.9% → 93.0% (Indy 3 93.5%, Monkey Island 2 92.1%); at the cutscene 7.1% → 7.0%; showing nothing 12 → 11; LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run31.txt`).
+
 ## 1 November: the second object in a direct run, scenes used in another room, a variable tried beside its constant
 
 A verb run directly now gets the second object of "Use X with Y" as its `local[0x000]` (the sentence scripts' `startObject A, verb, [B, verb]`), where the game's sentence script refuses the pair (Indy 4 Script 9: object A needs class 1 to 3): Indy 4's peg, Sophia and pulley; Monkey Island 2's key. Indy 4's totem pole and sentry statue now begin the game's own way through the kept-value change. A verb whose code plays only when VAR_ROOM is another room is used there with the object held (`ScummSetupKind.PlayedIn`, a last try of its own): Monkey Island 1's sword on Room 36's dogs, Monkey Island 2's dog in Room 8. A story variable compared for equality also tries a value beside the constant when nothing else compares it (Indy 3's first aid kit below full health); a kept value gives way to another of its variable while the scene has not begun. Played the game's own way 91.7% → 92.9% (Indy 3 92.8%, Monkey Island 1 91.5% and 91.9%, Monkey Island 2 91.6%, Indy 4 94.4%); at the cutscene 8.3% → 7.1%; showing nothing 14 → 12; LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run30.txt`).

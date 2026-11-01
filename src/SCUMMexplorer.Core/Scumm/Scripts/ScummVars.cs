@@ -82,6 +82,8 @@ public static class ScummVars
     public const string WalkToObject = "var[0x026]";
     /// <summary><c>VAR_ROOM</c>: the room the game is in.</summary>
     public const string Room = "var[0x004]";
+    /// <summary><c>VAR_ROOM_RESOURCE</c> (vars.cpp: 22 for v3 to v5): the resource number of the room shown.</summary>
+    public const string RoomResource = "var[0x016]";
     /// <summary><c>VAR_OVERRIDE</c>: 1 after an aborted cutscene, 0 otherwise.</summary>
     public const string Override = "var[0x005]";
     /// <summary><c>VAR_TMR_1</c>..<c>VAR_TMR_3</c>: jiffies the frame loop adds every frame.</summary>

@@ -105,7 +105,9 @@ public abstract partial class ScummSession
         // startScene (room.cpp): VAR_ROOM is the number the script loaded; a pseudo room (0x80 and up, o5_pseudoRoom) loads its real room under that number.
         var loadedNumber = load?.TargetId is int number && number >= 0x80 && _runtime.PseudoRooms.GetValueOrDefault(number) == room.ResourceId ? number : room.ResourceId!.Value;
         _runtime.SetGlobalVariable(ScummVars.Room, (ushort)loadedNumber);
-        if (_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.V2.RoomResource, (ushort)room.ResourceId!.Value);
+        // VAR_ROOM_RESOURCE: the real room's number (startScene, room.cpp; var 22 for versions 3 to 5, 36 for version 2). Indy 3's Grail Diary
+        // shows a page by it (Room 2 object 68 Open, +0x002E).
+        _runtime.SetGlobalVariable(_runtime.IsV2 ? ScummVars.V2.RoomResource : ScummVars.RoomResource, (ushort)room.ResourceId!.Value);
         if (loadedNumber != room.ResourceId)
             _visitTrace.Add($"Room {room.ResourceId:00} entered as pseudo room {loadedNumber} (VAR_ROOM = {loadedNumber})");
         _roomSize = (roomWidth, roomData.Height);
@@ -168,7 +170,7 @@ public abstract partial class ScummSession
         _runtime.RoomCameraBounds = _runtime.CameraRange = null;
         _roomSize = null;
         _runtime.SetGlobalVariable(ScummVars.Room, NullRoom);
-        if (_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.V2.RoomResource, NullRoom);
+        _runtime.SetGlobalVariable(_runtime.IsV2 ? ScummVars.V2.RoomResource : ScummVars.RoomResource, NullRoom);
         _visitTrace.Add($"{load.SourceLabel} +0x{load.Offset:X4}: room {NullRoom} (no room) {when}");
     }
 

@@ -50,7 +50,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 
 What keeps a cell from ✅:
 - **3**: the user has not listened (non-LOOM games); LOOM CD's picture/voice/music timing is the user's run.
-- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 7.2%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 8.4%, Indy 4 5.6% (7.1% of all five copies), some of them showing nothing, no line and no other room (Indy 3 4, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac/Zak have scenes that begin nothing (their track).
+- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 6.5%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 7.9%, Indy 4 5.6% (7.0% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac/Zak have scenes that begin nothing (their track).
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (76%, 63% and 57% of references); their variables and bits keep numbers.
