@@ -186,8 +186,10 @@ public abstract partial class ScummSession
                 if (edit.Room is int xRoom && _runtime.CurrentRoom != xRoom) return false;
                 var heroNumber = variables.TryGetValue(_runtime.EgoVariable, out var heroValue) ? (int?)heroValue : null;
                 var mover = edit.Target == "ego" ? heroNumber ?? 0 : int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
-                if (!_runtime.Actors.Contains(mover) || _runtime.Actors[mover].Room != _runtime.CurrentRoom || _runtime.Actors[mover].X == edit.Value) return false;
-                _runtime.Actors.Put(mover, edit.Value, _runtime.Actors[mover].Y, _runtime.CurrentRoom, CurrentPlacement(), heroNumber);
+                // Versions 1 and 2 read actor x in units of 8 pixels (o2_getActorX; Zak McKracken Room 10's purple button waits for x past 50).
+                var x = _runtime.IsV2 ? edit.Value * 8 : edit.Value;
+                if (!_runtime.Actors.Contains(mover) || _runtime.Actors[mover].Room != _runtime.CurrentRoom || _runtime.Actors[mover].X == x) return false;
+                _runtime.Actors.Put(mover, x, _runtime.Actors[mover].Y, _runtime.CurrentRoom, CurrentPlacement(), heroNumber);
                 return true;
             }
             case ScummSetupKind.ScriptRunning:
