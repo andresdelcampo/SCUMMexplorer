@@ -165,3 +165,24 @@ Three readings of the trigger's code, measured together (`*-run18.txt`, Indy 3 2
 | **Total** | 1,093 | **84.1% → 84.4%** | **15.9% → 15.6%** |
 
 Tried and taken out again: an actor variable a fresh session has not set yet falling back to the value the boot script gives it (Indy 4's ladder, Room 48 object 583, still starts at its cutscene). Test: `ScummSceneSetupTests.AChainedScriptsLocalsAreTheArgumentsItsCallerGives`.
+
+## Which side of a test leads to the cutscene; how the room is entered; who holds what (1 November, second batch)
+
+Changes to the setup search (`ScummSceneSetupSearch`) and the session (`ScummSession`), measured together (`*-run23.txt`, LOOM `../loom-editions-20261031/run9-*.txt`; `*-run19.txt` to `*-run22.txt` are the steps):
+
+1. **The side of each test that leads on to the scene** (`ScummSceneSetupSearch.Paths.cs`): the script holding the scene's first `cutscene`, and each script that calls it, is read as a graph of its jumps; a test from which only falling through, or only its branch, reaches the cutscene (or the call) is a guard. ScummVM's `jumpRelative(cond)` jumps when the condition is false (o5 `isLess` and the like compare the constant with the variable: `b < a`), so the value on the scene's side is known. Values on that side are tried first and then together; values on the other side last, and never in the combined try. Indy 4 Room 27 begins with "came from Room 75" and `var[0x0EE]` = 3 ([picture](window-guards/27-0-0.png), the real window: Indy and Sophia outside, its cutscene running).
+2. **Scripts on the way to the cutscene**: the scan lists the scripts a scene reaches; the scripts the trigger's code starts (literal numbers, three calls deep) that lead to the cutscene's script are read too (Monkey Island 2 Room 56's entry starts local 200, whose bits decide whether local 207 runs: with `bit[0x0D2]` it plays 22 lines, still started at its cutscene; it showed nothing).
+3. **How the room is entered**: `VAR_WALKTO_OBJ` (variable 38) is now the door object while `loadRoomWithEgo` enters a room, 0 afterwards, as ScummVM's `o5_loadRoomWithEgo` sets it (versions 3 to 5). New setup values: the room entered under a **pseudo room number** (`EnteredAs`, a test of VAR_ROOM against 0x80 and up), the hero **coming in by an object** (`EnteredBy`, a test of `VAR_WALKTO_OBJ`; object scenes also get the doors their room's entry tests), and the room entered **without the hero** (the hero in Room 0: Monkey Island 2 Room 72). Indy 3 Room 21's corridor scene needs the door 311, which no literal arrival uses: the setup brings the hero in by it. Indy 3 Room 82's entry sets the grail chamber up by the door: its two object scenes lost their fresh start with the port and get it back through the door value.
+4. **Who holds what**: an owner test against another actor gives the object to that actor (`OwnedBy`, only on the way to the cutscene: Indy 3 Room 82's cracked seal, the Grail held by Elsa).
+5. **Readings**: a variable read again no longer keeps its earlier meaning (Indy 4 Room 44: "object 529 state 44" became "actor 2 in Room 44"); a walk box read inside an expression; a variable indexed by a literal (`bit[0x057+0x007]` is `bit[0x05E]`, Indy 4 Room 67's rope ladder).
+
+| Game | Scenes | Own way | At cutscene | Showing nothing (no line, no other room) |
+|---|---|---|---|---|
+| Indy 3 (EGA; 256 colours the same) | 153 | 84.3% → 88.9% | 15.7% → 11.1% | 9 → 4 |
+| Monkey Island 1 floppy | 164 | 86.0% → 87.2% | 14.0% → 12.8% | 6 → 5 |
+| Monkey Island 1 CD | 160 | 86.9% → 88.1% | 13.1% → 11.9% | 4 → 3 |
+| Monkey Island 2 | 190 | 84.2% → 88.9% | 15.8% → 11.1% | 6 → 3 |
+| Indy 4 | 426 | 83.1% → 90.6% | 16.9% → 9.4% | 19 → 11 |
+| **Total** | 1,093 | **84.4% → 89.2%** | **15.6% → 10.8%** | 44 → 26 |
+
+LOOM on the shared engine: at the cutscene EGA English 3.2% → 0.9%, CD 2.7% → 0.4%; the English answer key unchanged (`../loom-answer-key-20261031/compare-run7-loom-session.txt`: 238 of 238 begin, same rooms, 219 same category). What is left showing nothing: walk-offs that wait on the hero's walk box and position (Indy 4 Room 44's local script 203: box 1 left of x 84, an exit), VAR_ROOM tested against another room (Monkey Island 2's dog, Room 53, plays only in Room 8), music-synchronised waits. Tests (`ScummSceneSetupTests`): `AVariableReadAgainIsTestedForWhatItHoldsNow`, `ARoomEntryThatTestsAPseudoRoomNumberIsEnteredUnderIt`, `ACorridorSceneIsEnteredByTheDoorItsEntryAsksFor`, `AnObjectAnotherActorMustHoldIsGivenToThatActor`, `TheScriptsOnTheWayToTheCutsceneAreReadForTheirTests`; Indy 4 Room 10 now comes from Room 12 (tested on the way to its cutscene) where it came from Room 15. Tools: `summarise.py <run> <previous run>` in this folder; `MEASURE_SCRIPTS=1` prints a trigger's scripts and its cutscene; SourceDump `arr:<room>` lists the decoded arrivals into a room.

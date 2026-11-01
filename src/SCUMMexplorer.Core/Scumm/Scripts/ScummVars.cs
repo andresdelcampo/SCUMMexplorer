@@ -75,6 +75,11 @@ public static class ScummVars
     public const string SoundCard = "var[0x030]";
     /// <summary><c>VAR_VIDEOMODE</c> (variable 49): 13 EGA, 19 VGA, 4 CGA.</summary>
     public const string VideoMode = "var[0x031]";
+    /// <summary>
+    /// <c>VAR_WALKTO_OBJ</c> (variable 38, versions 3 to 5): while <c>o5_loadRoomWithEgo</c> enters a room, the object the hero comes in by (a door);
+    /// 0 again once the room is entered.
+    /// </summary>
+    public const string WalkToObject = "var[0x026]";
     /// <summary><c>VAR_ROOM</c>: the room the game is in.</summary>
     public const string Room = "var[0x004]";
     /// <summary><c>VAR_OVERRIDE</c>: 1 after an aborted cutscene, 0 otherwise.</summary>

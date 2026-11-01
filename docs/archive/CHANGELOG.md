@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: scene setup reads which side of a test leads to the cutscene, how the room is entered and who holds what
+
+The setup search reads the jumps of the scripts on the way to a scene's cutscene (also those the scan does not list): values on the side of a test that leads to it are tried first and together, those on the other side last. `VAR_WALKTO_OBJ` is now set while `loadRoomWithEgo` enters a room (ScummVM `o5_loadRoomWithEgo`); new setup values: the room entered under a pseudo room number, by a door, or without the hero, and an object held by another actor. Played the game's own way: 84.4% → 89.2% of 1,093 scenes (Indy 3 88.9%, Monkey Island 1 87.2% and 88.1%, Monkey Island 2 88.9%, Indy 4 90.6%); started at the cutscene 15.6% → 10.8%, showing nothing 44 → 26; LOOM on the shared engine 3.2% → 0.9% (EGA) and 2.7% → 0.4% (CD) at the cutscene, its answer key unchanged ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 1 November: README readiness table with percentages; scene setup reads call arguments and actors held in variables
 
 The README's support matrix is now the roadmap's ten features with one number where one is measured: scenes played the game's own way (LOOM 97% to 100%, Indy 3 84%, Monkey Island 1 86% and 87%, Monkey Island 2 84%, Indy 4 83%, Maniac/Zak 24% beginning) and readable-script names (37% to 81%); the generated matrix stays in REQUIREMENTS §3.1. Scene setup: a called script's locals are its caller's literal arguments, an actor may be held in a variable, a comparison with VAR_ROOM is one with the scene's room; own way 84.1% → 84.4% ([record](../../.verification/scene-setup-20261031/README.md)).

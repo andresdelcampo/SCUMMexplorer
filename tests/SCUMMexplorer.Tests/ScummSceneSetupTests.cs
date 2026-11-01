@@ -73,7 +73,7 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     public void ARoomEntryThatTestsWhereTheHeroCameFromIsEnteredFromThatRoom()
     {
         // Indy 4 Room 10's entry +0x0148 tests var[0x0E0], which the exit hook (Script 23 +0x0014: var[0x0E0] = VAR_ROOM) fills with the room left;
-        // setting the variable does nothing (the exit hook overwrites it), so the setup visits Room 15 first and the scene's room is entered from it.
+        // setting the variable does nothing (the exit hook overwrites it), so the setup visits a room it tests first and the scene's room is entered from it.
         var folder = Path.Combine(TestGames.Root, "indy4 vga en");
         if (!Directory.Exists(folder)) return;
         var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
@@ -81,7 +81,8 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         output.WriteLine(plan.Note);
         Assert.True(plan.Result.Begun);
         Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
-        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.CameFrom, Target: "var[0x0E0]", Value: 15 });
+        // Since 1 November the arrival tested on the way to the cutscene is tried first (Room 12, +0x01A1); Room 15 begins it too.
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.CameFrom, Target: "var[0x0E0]", Value: 12 or 15 });
     }
 
     [Fact]
@@ -108,6 +109,74 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         var candidates = planner.Setup.Candidates(Trigger(planner, 40, 462, 0x09));
         Assert.Contains(candidates, edit => edit is { Kind: ScummSetupKind.ObjectClass, Target: "462", Value: 8 });
         Assert.DoesNotContain(candidates, edit => edit is { Kind: ScummSetupKind.ObjectClass, Value: 7 or -7 });
+    }
+
+    [Fact]
+    public void AVariableReadAgainIsTestedForWhatItHoldsNow()
+    {
+        // Indy 4 Room 44's entry reads object 529's state into var[0x000] (+0x0311), later Sophia's room (+0x032F getActorRoom var[0x000], 0x02) and
+        // compares that with VAR_ROOM (+0x0333): the candidate is actor 2 in the room, not "object 529 state 44".
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var candidates = planner.Setup.Candidates(Trigger(planner, 44, 0, 0));
+        Assert.Contains(candidates, edit => edit is { Kind: ScummSetupKind.ActorRoom, Target: "2", Value: 44 });
+        Assert.DoesNotContain(candidates, edit => edit is { Kind: ScummSetupKind.ObjectState, Target: "529", Value: 44 });
+    }
+
+    [Fact]
+    public void ARoomEntryThatTestsAPseudoRoomNumberIsEnteredUnderIt()
+    {
+        // Indy 3 Room 21's entry tells its uses apart by VAR_ROOM (+0x001C isEqual VAR_ROOM, 0x81, and 0x82, 0x83): each is a setup candidate, and a
+        // session given one enters the room under that number.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var candidates = planner.Setup.Candidates(Trigger(planner, 21, 0, 0));
+        Assert.Contains(candidates, edit => edit is { Kind: ScummSetupKind.EnteredAs, Value: 0x82 });
+        var session = ScummGameSession.BootForPlay(game, out _);
+        Assert.Single(session.ApplySceneSetup([candidates.First(edit => edit is { Kind: ScummSetupKind.EnteredAs, Value: 0x82 })]));
+        session.VisitRoom(game.Rooms.First(r => r.ResourceId == 21));
+        Assert.Equal(0x82, session.Snapshot.KnownGlobalVariables.GetValueOrDefault(ScummVars.Room));
+    }
+
+    [Fact]
+    public void ACorridorSceneIsEnteredByTheDoorItsEntryAsksFor()
+    {
+        // Indy 3 Room 21's entry +0x00DB compares VAR_WALKTO_OBJ (var[0x026], which o5_loadRoomWithEgo sets while the room is entered) with the
+        // door 311; only then does it set object 314 to state 1, which local script 200 tests before its cutscene. No literal arrival uses that door.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var plan = planner.PlanSetup(Trigger(planner, 21, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.EnteredBy, Value: 311 });
+    }
+
+    [Fact]
+    public void AnObjectAnotherActorMustHoldIsGivenToThatActor()
+    {
+        // Indy 3 Room 82's cracked seal, Look (+0x0000 getObjectOwner of the Grail, 873; +0x0005 isEqual 3): the cutscene plays when Elsa (actor 3)
+        // holds it, not the hero.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var plan = planner.PlanSetup(Trigger(planner, 82, 864, 0x09));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.OwnedBy, Target: "873", Value: 3 });
+    }
+
+    [Fact]
+    public void TheScriptsOnTheWayToTheCutsceneAreReadForTheirTests()
+    {
+        // Monkey Island 2 Room 56's entry starts local script 200, whose bit tests decide whether local 207 runs; the scan lists only 207 and
+        // global script 25 (the scripts the scene reaches), so 200's tests were never candidates and the scene showed nothing.
+        var folder = Path.Combine(TestGames.Root, "mi2 mt32 en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var trigger = Trigger(planner, 56, 0, 0);
+        Assert.Contains(planner.Setup.Candidates(trigger), edit => edit is { Kind: ScummSetupKind.Bit, Target: "bit[0x0D2]" });
+        // With bit[0x0D2] it plays its lines (22, started at its cutscene); before, it showed nothing.
+        Assert.True(planner.PlanSetup(trigger).Result.Lines > 0);
     }
 
     [Fact]

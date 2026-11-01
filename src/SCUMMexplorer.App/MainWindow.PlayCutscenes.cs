@@ -246,11 +246,14 @@ public partial class MainWindow
                     visitedForIt = true;
                 }
             }
-            else if (plan is { HasEdits: true } && session.ApplySceneSetup(plan.Edits).Count > 0 && !trigger.IsRoomEntry)
+            else if (plan is { HasEdits: true } && !trigger.IsRoomEntry &&
+                     (session.ApplySceneSetup(plan.Edits).Count > 0 | (session.CurrentRoomId == trigger.Room && session.PrepareEntry(plan.Edits))))
             {
-                // What the room's entry derives from the new state (objects, who stands where) follows it, as in the plan's runs.
+                // What the room's entry derives from the new state (objects, who stands where) follows it, as in the plan's runs; a setup about how
+                // the room is entered (the door, a pseudo room number) enters it again when the session is in it already.
                 _sceneSound.StopAll("a picked scene's setup changed the room's state");
-                session.VisitRoom(room);
+                if (session.CurrentRoomId == trigger.Room) session.EnterRoomAgain(room);
+                else session.VisitRoom(room);
                 // As the plan's runs do: again after the visit, for what the room's entry reset.
                 session.ApplySceneSetup(plan.Edits);
             }

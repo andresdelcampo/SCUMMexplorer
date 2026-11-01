@@ -48,6 +48,10 @@ public abstract partial class ScummSession
             }
             else _runtime.Actors.ForgetAll($"{load!.SourceLabel} +0x{load.Offset:X4} moves the ego, whose actor number (var[0x001]) is unknown");
         }
+        // o5_loadRoomWithEgo: VAR(VAR_WALKTO_OBJ) = obj; startScene(...); VAR(VAR_WALKTO_OBJ) = 0 (versions 3 to 5): the entry code can tell which door
+        // the hero came in by (Indy 3 Room 21's entry +0x00DB).
+        var walkTo = withEgo is not null && !_runtime.IsV2 && withEgo.ResolvedArguments![0] is int door and > 0 ? door : (int?)null;
+        if (walkTo is int byObject) _runtime.SetGlobalVariable(ScummVars.WalkToObject, (ushort)byObject);
         if (_currentRoom is not null)
         {
             RunGlobalHook(ScummVars.ExitScript, "before room exit", estimatedLoad);
@@ -121,6 +125,7 @@ public abstract partial class ScummSession
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
         if (_runtime.IsV2) RunIndexedScript(5, 0, null, 0, pathEstimated: estimatedLoad); // room.cpp: fixed v1/v2 entry hook, after embedded entry.
         RunGlobalHook(ScummVars.EntryScript2, "after room entry", estimatedLoad);
+        if (walkTo is not null) _runtime.SetGlobalVariable(ScummVars.WalkToObject, 0);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);
         else if (load is { Operation: "actorFollowCamera", ResolvedArguments: [int followed] }) FollowActorAfterEntry(load, followed);

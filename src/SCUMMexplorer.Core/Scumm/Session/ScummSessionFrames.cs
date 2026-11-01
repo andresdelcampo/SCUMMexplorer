@@ -435,6 +435,24 @@ public abstract partial class ScummSession
         _uncertainties.StartStep();
         var label = $"Room {room.ResourceId:00} entered again to play its entry scripts (an exploration action, as a loadRoom of the current room would; state preview).";
         _uncertainties.Add(label);
+        // A picked scene's setup may want the room loaded under a pseudo room number (its entry code reads VAR_ROOM), or the hero to come in by an
+        // object (VAR_WALKTO_OBJ, as loadRoomWithEgo sets it).
+        var number = room.ResourceId!.Value;
+        if (WantedPseudoRoom is int pseudo && _runtime.PseudoRooms.GetValueOrDefault(pseudo) == room.ResourceId)
+        {
+            WantedPseudoRoom = null;
+            number = pseudo;
+        }
+        if (WantedArrivalObject is int door)
+        {
+            WantedArrivalObject = null;
+            return EnterRoom(room, label, new ScummScriptEvent(0, "explorer visit", 0, ScummScriptEventKind.RoomLoaded, "loadRoomWithEgo",
+                $"the hero brought in by object {door} for a picked scene", ResourceKind.Room, number, ScummScriptEventCertainty.Conditional,
+                ResolvedArguments: [door, number, -1, -1]));
+        }
+        if (number != room.ResourceId)
+            return EnterRoom(room, label, new ScummScriptEvent(0, "explorer visit", 0, ScummScriptEventKind.RoomLoaded, "loadRoom",
+                $"load of pseudo room {number} for a picked scene", ResourceKind.Room, number, ScummScriptEventCertainty.Conditional, ResolvedArguments: [number]));
         return EnterRoom(room, label);
     }
 }

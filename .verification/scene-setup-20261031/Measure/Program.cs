@@ -63,6 +63,8 @@ foreach (var group in planner.Groups)
     if (plan.Result.Begun) setup++; else still++;
     Console.WriteLine($"{(plan.Result.Begun ? (plan.Result.Way == ScummPickedStart.AtCutscene ? "ATCUT" : "SETUP") : "STILL")} Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} ({t.ObjectName}) {took:F1} s, {candidates.Count} candidates: " +
                       $"{string.Join(" | ", candidates.Select(c => c.Describe()))}");
+    if (Environment.GetEnvironmentVariable("MEASURE_SCRIPTS") == "1")
+        Console.WriteLine($"      scripts: {string.Join(" | ", t.Scripts)}; cutscene: {ScummSceneSetupSearch.FirstCutscene(game, t)}");
     Console.WriteLine($"      result: way {plan.Result.Way} lines {plan.Result.Lines} rooms [{string.Join(",", plan.Result.RoomsEntered)}] frames {plan.Result.Frames}");
     if (plan.HasEdits) Console.WriteLine($"      kept: {string.Join("; ", plan.Edits.Select(e => e.Describe()))}; rooms [{string.Join(",", plan.Result.RoomsEntered)}] lines {plan.Result.Lines}");
 }

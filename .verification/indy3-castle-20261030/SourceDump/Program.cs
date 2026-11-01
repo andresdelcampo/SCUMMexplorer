@@ -40,6 +40,10 @@ foreach (var spec in args.Skip(1))
             Console.WriteLine("  ego: " + booted.Actors.FirstOrDefault(a => a.Number == 1));
             foreach (var u in booted.Snapshot.Uncertainties.Where(u => u.Contains("Camera") || u.Contains("ego"))) Console.WriteLine("  ? " + u);
             break;
+        case "arr":
+            // arr:<room>: the decoded loadRoomWithEgo arrivals into a room (1 November 2026)
+            foreach (var item in ScummEgoArrivalIndex.For(game).Into(int.Parse(p[1]))) Console.WriteLine($"  from {item.SourceRoom}: {item.Describe()} loaded as {item.LoadedNumber}");
+            break;
         case "box":
             // box:<room>:<x>:<y>[:<object>] - the boxes that hold a point (and an object's walk point), and the matrix's next box between them
             var broom = int.Parse(p[1]);

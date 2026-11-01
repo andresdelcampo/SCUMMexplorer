@@ -448,6 +448,12 @@ public sealed class ScummGameSession : ScummSession
         var arrival = $"Room {roomId:00} selected without playing the route to it (state preview): its entry scripts ran from the state the boot left.";
         _runtime.Messages.RouteSkipped($"Room {roomId:00} was entered without its route, so prints on the route to it did not run");
         var arrivals = ScummEgoArrivalIndex.For(_game);
+        if (WantedHeroAway)
+        {
+            WantedHeroAway = false;
+            _uncertainties.Add($"A picked scene's setup wants Room {roomId:00} entered without the hero (its code tests that he is in no room).");
+            return EnterWithoutEgo(room, arrival, arrivals);
+        }
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return EnterWithoutEgo(room, arrival, arrivals);
         var candidates = arrivals.Into(roomId);
         if (candidates.Count == 0)
@@ -461,6 +467,19 @@ public sealed class ScummGameSession : ScummSession
         // within it, so it is a candidate only when the room has no other.
         var fromElsewhere = candidates.Where(item => item.SourceRoom != roomId).ToArray();
         var pool = fromPrevious.Length > 0 ? fromPrevious : fromElsewhere.Length > 0 ? fromElsewhere : candidates.ToArray();
+        // A picked scene's setup that wants the hero to come in by one object takes the arrivals through it (whichever room they come from).
+        var byDoor = WantedArrivalObject is int door ? candidates.Where(item => item.ObjectId == door).ToArray() : [];
+        if (byDoor.Length > 0)
+        {
+            pool = byDoor;
+            WantedArrivalObject = null;
+        }
+        // A picked scene's setup that wants the room loaded under one pseudo room number takes the arrivals that load it so.
+        if (WantedPseudoRoom is int wanted && (byDoor.Length > 0 ? pool : candidates).Where(item => item.LoadedNumber == wanted).ToArray() is { Length: > 0 } underIt)
+        {
+            pool = underIt;
+            WantedPseudoRoom = null;
+        }
         var choices = pool.GroupBy(item => item.PlacementKey).Select(group => group.ToArray()).ToArray();
         var index = 0;
         string how;
@@ -473,6 +492,15 @@ public sealed class ScummGameSession : ScummSession
         }
         var chosen = choices[index];
         var first = chosen[0];
+        // A picked scene's setup wants the hero to come in by an object no literal arrival uses (Indy 3 Room 21's corridor door 311, entered only
+        // through variables): the chosen arrival comes in by that object (its walk point, VAR_WALKTO_OBJ), a teleport the setup labels.
+        if (WantedArrivalObject is int through && ScummDataSources.For(_game).ReadRoom(roomId).Objects.Any(item => item.Id == through))
+        {
+            WantedArrivalObject = null;
+            first = first with { ObjectId = through, WalkX = -1, WalkY = -1 };
+            chosen = [first];
+            how += $"; a picked scene's setup brings the hero in by object {through}";
+        }
         var label = $"Assumed arrival: the ego enters as {string.Join(" or ", chosen.Select(item => item.Describe()))} would bring it in ({how}). " +
                     "Which route led here was not played; the arrival is a possible outcome, not a reached one.";
         var load = new ScummScriptEvent(0, first.Source, first.Offset, ScummScriptEventKind.RoomLoaded, "loadRoomWithEgo",
@@ -491,7 +519,9 @@ public sealed class ScummGameSession : ScummSession
         var roomId = room.ResourceId!.Value;
         var numbers = arrivals.PseudoNumbersOf(roomId).Where(number => _runtime.PseudoRooms.GetValueOrDefault(number) == roomId).ToArray();
         if (numbers.Length == 0) return EnterRoom(room, arrival);
-        var index = numbers.Length == 1 ? 0 : _runtime.Random.Pick($"pseudo room of Room {roomId:00}", 0, numbers.Length - 1).Value;
+        var wantedAt = WantedPseudoRoom is int wanted ? Array.IndexOf(numbers, wanted) : -1;
+        if (wantedAt >= 0) WantedPseudoRoom = null;
+        var index = wantedAt >= 0 ? wantedAt : numbers.Length == 1 ? 0 : _runtime.Random.Pick($"pseudo room of Room {roomId:00}", 0, numbers.Length - 1).Value;
         var number = numbers[index];
         var label = $"Assumed pseudo room: Room {roomId:00} is loaded as pseudo room {number} (VAR_ROOM), " +
                     (numbers.Length == 1 ? "the only number the game's pseudoRoom instructions give it" : $"a seeded pick {index + 1} of {numbers.Length} among {string.Join(", ", numbers)}") +

@@ -77,7 +77,8 @@ public sealed partial class ScummSceneSetupSearch
 
     private ScummScenePlan Search(ScummCutscene trigger, ScummCutsceneRunResult fresh)
     {
-        var candidates = Candidates(trigger).Take(MaxCandidates).ToList();
+        var ranked = Ranked(trigger);
+        var candidates = ranked.Select(r => r.Edit).Take(MaxCandidates).ToList();
         var best = fresh;
         var kept = new List<ScummSetupEdit>();
         for (var pass = 0; pass < 2; pass++)
@@ -94,9 +95,18 @@ public sealed partial class ScummSceneSetupSearch
         }
         // A scene that needs several values at once begins with none of them alone (Indy 4: a state and an item together): when it still does not
         // begin, all candidates are tried together, one value per target (the first found), as a last try before its cutscene is started directly.
+        // First the values on the scene's side of every test that guards the way to its cutscene (Indy 4 Room 44: the room's variable and the
+        // objects its branch tests, together), then all.
+        var guards = ranked.Where(r => r.Rank == 0).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+        if (!best.Begun && guards.Count > 1)
+        {
+            var result = _run(trigger, guards);
+            if (result.Failure is null && result.Begun) { best = result; kept = guards; }
+        }
         if (!best.Begun && candidates.Count > 1)
         {
-            var together = candidates.GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+            // Values known to lead away from the scene are left out.
+            var together = ranked.Take(MaxCandidates).Where(r => r.Rank < 2).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
             var result = _run(trigger, together);
             if (result.Failure is null && result.Begun) { best = result; kept = together; }
         }
@@ -121,29 +131,49 @@ public sealed partial class ScummSceneSetupSearch
     /// zero test), an object's state (<c>ifState</c>/<c>ifNotState</c>, or <c>getObjectState</c> into a variable then compared), and an object asked for
     /// its owner (given to the hero). Variables the same code writes are its own scratch, not state to set.
     /// </summary>
-    public IReadOnlyList<ScummSetupEdit> Candidates(ScummCutscene trigger)
+    public IReadOnlyList<ScummSetupEdit> Candidates(ScummCutscene trigger) => Ranked(trigger).Select(r => r.Edit).ToList();
+
+    /// <summary>
+    /// The candidates with their rank (1 November 2026): 0 for a value on the side of a test that leads on to the scene's cutscene, 2 for one on the
+    /// side that leads away from it, 1 for the rest; ordered by rank, then code order.
+    /// </summary>
+    private List<(ScummSetupEdit Edit, int Rank)> Ranked(ScummCutscene trigger)
     {
         ArgumentNullException.ThrowIfNull(trigger);
         // The trigger's own code first (the scan may list only the scripts it reaches: Indy 4's bread, Room 39 object 425, chains to local 208 after
         // its own owner tests), then the scripts the scan found.
         var own = trigger.IsRoomEntry ? $"Room {trigger.Room} entry script" : $"Room {trigger.Room} object {trigger.ObjectId} verb 0x{trigger.VerbId:X2}";
-        var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Select(label => (label, script: Read(label, trigger)))
+        (string Label, int Offset)? cutscene = null;
+        foreach (var label in trigger.Scripts)
+            if (Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start) { cutscene = (label, start.Offset); break; }
+        // Then the scripts on the way from the trigger's code to the cutscene's script that the scan does not list.
+        var between = OnTheWay(own, trigger, cutscene?.Label, out var toward);
+        var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Concat(between).Select(label => (label, script: Read(label, trigger)))
             .Where(u => u.script is not null).ToList();
         var written = new HashSet<string>();
         foreach (var (_, script) in units)
             foreach (var ins in script!.Instructions)
                 if (WrittenVariable(ins) is { } key) written.Add(key);
-        var found = new List<ScummSetupEdit>();
-        void Add(ScummSetupEdit edit)
+        var found = new List<(ScummSetupEdit Edit, int Rank)>();
+        bool? guard = null;
+        var operation = "";
+        int? constant = null;
+        // tested: the value the test sees once the edit is applied (null when the edit is not the tested value itself).
+        void Add(ScummSetupEdit edit, int? tested = null)
         {
-            if (!found.Any(f => f.Kind == edit.Kind && f.Target == edit.Target && f.Value == edit.Value)) found.Add(edit);
+            var rank = guard is bool need && tested is int v && Holds(operation, constant, v) is bool holds ? holds == need ? 0 : 2 : 1;
+            var at = found.FindIndex(f => f.Edit.Kind == edit.Kind && f.Edit.Target == edit.Target && f.Edit.Value == edit.Value);
+            if (at < 0) found.Add((edit, rank));
+            else if (rank < found[at].Rank) found[at] = (found[at].Edit, rank);
         }
         foreach (var (label, script) in units)
         {
+            var guardSides = GuardSides(label, script!, cutscene, toward, trigger);
             var stateOf = new Dictionary<string, int>();
             var costumeOf = new Dictionary<string, string>();
             var roomOf = new Dictionary<string, string>();
             var boxOf = new Dictionary<string, string>();
+            var ownerOf = new Dictionary<string, int>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             // A script the trigger's code starts or chains to with literal arguments reads them as its locals (Indy 4 Room 7's cat figurine:
             // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116).
@@ -154,7 +184,16 @@ public sealed partial class ScummSceneSetupSearch
             foreach (var ins in script!.Instructions)
             {
                 var where = $"{label} +0x{ins.Offset:X4}";
-                var parts = ins.Operands.Split(',', StringSplitOptions.TrimEntries);
+                var parts = ins.Operands.Split(',', StringSplitOptions.TrimEntries).Select(Flatten).ToArray();
+                // A variable written again no longer holds what it held (Indy 4 Room 44's entry reads an object's state into var[0x000], then
+                // Sophia's room: the later comparison is about her).
+                if (WrittenVariable(ins) is { } rewritten)
+                {
+                    stateOf.Remove(rewritten); costumeOf.Remove(rewritten); roomOf.Remove(rewritten); boxOf.Remove(rewritten); ownerOf.Remove(rewritten);
+                }
+                guard = guardSides.TryGetValue(ins.Offset, out var need) ? need : null;
+                operation = ins.Operation;
+                constant = parts.Length >= 2 && Literal(parts[1]) is int k ? k : parts.Length >= 2 && parts[1] == ScummVars.Room ? trigger.Room : null;
                 switch (ins.Operation)
                 {
                     case "getObjectState" when parts.Length >= 2 && Known(parts[1]) is int obj:
@@ -171,21 +210,26 @@ public sealed partial class ScummSceneSetupSearch
                     case "getActorWalkBox" when parts.Length >= 2 && (Literal(parts[1])?.ToString(CultureInfo.InvariantCulture) ?? Ego(parts[1])) is { } boxed:
                         boxOf[parts[0]] = boxed;
                         break;
+                    case "expression" when ExpressionWalkBox().Match(ins.Operands) is { Success: true } boxed &&
+                                           (Literal(boxed.Groups[2].Value)?.ToString(CultureInfo.InvariantCulture) ?? Ego(boxed.Groups[2].Value)) is { } inBox:
+                        // The same read inside an expression (Indy 4 Room 44's local script 203 +0x0012: local[0x001] = getActorWalkBox(…, 0x01)).
+                        boxOf[boxed.Groups[1].Value] = inBox;
+                        break;
                     case "getActorRoom" when parts.Length >= 2 && Actor(parts[1]) is { } placed:
                         roomOf[parts[0]] = placed;
                         break;
                     case "ifState" or "ifNotState" when parts.Length >= 2 && Literal(parts[1]) is int state &&
                                                         Known(parts[0]) is int obj:
                         // ScummVM jumps when the test is false, so the scene may sit on either side: both values are tried.
-                        Add(new(ScummSetupKind.ObjectState, obj.ToString(CultureInfo.InvariantCulture), state, where));
-                        Add(new(ScummSetupKind.ObjectState, obj.ToString(CultureInfo.InvariantCulture), state == 0 ? 1 : 0, where));
+                        Add(new(ScummSetupKind.ObjectState, obj.ToString(CultureInfo.InvariantCulture), state, where), state);
+                        Add(new(ScummSetupKind.ObjectState, obj.ToString(CultureInfo.InvariantCulture), state == 0 ? 1 : 0, where), state == 0 ? 1 : 0);
                         break;
                     case "ifState" or "ifNotState" when parts.Length >= 2 && Literal(parts[1]) is int ownState && objectCode && trigger.ObjectId != 0 &&
                                                         VariablePattern().Match(parts[0]) is { Success: true } held && held.Value == parts[0] && !written.Contains(parts[0]):
                         // Object code that tests the state of a variable it does not set (Indy 3: var[0x007], "this object", which the sentence script
                         // sets, Script 2 +0x010A): the picked object's own states are tried; the trial runs keep only what makes the scene begin.
-                        Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState, where));
-                        Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState == 0 ? 1 : 0, where));
+                        Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState, where), ownState);
+                        Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState == 0 ? 1 : 0, where), ownState == 0 ? 1 : 0);
                         break;
                     case "getObjectOwner" when parts.Length >= 2 && objectCode && trigger.ObjectId != 0 && Literal(parts[1]) is null &&
                                                VariablePattern().Match(parts[1]) is { Success: true } selfOwner && selfOwner.Value == parts[1] && !written.Contains(parts[1]):
@@ -194,6 +238,7 @@ public sealed partial class ScummSceneSetupSearch
                         Add(new(ScummSetupKind.Held, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), 1, where, trigger.Room));
                         break;
                     case "getObjectOwner" when parts.Length >= 2 && Known(parts[1]) is int held:
+                        ownerOf[parts[0]] = held;
                         // An item no room holds (inventory-only: Indy 4's sandwich makings) is given without a room of its own code.
                         Add(new(ScummSetupKind.Held, held.ToString(CultureInfo.InvariantCulture), 1, where,
                             _objectRooms.Value.TryGetValue(held, out var room) ? room : null));
@@ -207,8 +252,9 @@ public sealed partial class ScummSceneSetupSearch
                             if (Literal(item) is int cls && (cls & 0x7F) is > 0 and <= 32)
                             {
                                 var number = cls & 0x7F;
-                                Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? number : -number, where));
-                                Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? -number : number, where));
+                                // The first holds the test's condition for this class (tested 1), the second breaks it (0).
+                                Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? number : -number, where), 1);
+                                Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? -number : number, where), 0);
                             }
                         break;
                     }
@@ -228,39 +274,61 @@ public sealed partial class ScummSceneSetupSearch
                             "equalZero" or "notEqualZero" => [1, 0],
                             _ => [value.Value, value.Value == 0 ? 1 : 0],
                         };
-                        if (stateOf.TryGetValue(tested, out var stateObject))
+                        if (ownerOf.TryGetValue(tested, out var ownedObject))
+                        {
+                            // Owned by another actor (Indy 3 Room 82's cracked seal, +0x0005: the Grail's owner is 3, Elsa); 15 is the room. Only on
+                            // the way to the cutscene (an owner test of the hero is the "held" value already).
+                            if (ins.Operation is "isEqual" or "isNotEqual" && value.Value is > 0 and < 15 &&
+                                guard is bool toScene && Holds(ins.Operation, value.Value, value.Value) == toScene)
+                                Add(new(ScummSetupKind.OwnedBy, ownedObject.ToString(CultureInfo.InvariantCulture), value.Value, where), value.Value);
+                        }
+                        else if (stateOf.TryGetValue(tested, out var stateObject))
                             foreach (var side in sides.Where(v => v >= 0).Distinct())
-                                Add(new(ScummSetupKind.ObjectState, stateObject.ToString(CultureInfo.InvariantCulture), side, where));
+                                Add(new(ScummSetupKind.ObjectState, stateObject.ToString(CultureInfo.InvariantCulture), side, where), side);
                         else if (costumeOf.TryGetValue(tested, out var dressedActor))
-                            Add(new(ScummSetupKind.ActorCostume, dressedActor, value.Value, where));
+                            Add(new(ScummSetupKind.ActorCostume, dressedActor, value.Value, where), value.Value);
                         else if (boxOf.TryGetValue(tested, out var boxedActor))
                         {
                             // A script that waits for the hero to walk into a box (LOOM Room 10's local script 200: getActorWalkBox of actor 1, then
                             // isEqual 3): the box it waits for, the actor stood in it after the room is entered.
                             if (ins.Operation is "isEqual" or "isNotEqual" && value.Value > 0)
-                                Add(new(ScummSetupKind.WalkBox, boxedActor, value.Value, where, trigger.Room));
+                                Add(new(ScummSetupKind.WalkBox, boxedActor, value.Value, where, trigger.Room), value.Value);
                         }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
-                            Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where));
+                            Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
                         else if (objectCode && tested == "local[0x000]" && value.Value != 0)
                             // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
                             Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
-                                _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null));
+                                _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);
+                        else if (tested == ScummVars.WalkToObject && value.Value > 0 && ins.Operation is "isEqual" or "isNotEqual" && trigger.IsRoomEntry)
+                            // The door the hero came in by (VAR_WALKTO_OBJ, set while loadRoomWithEgo enters the room).
+                            Add(new(ScummSetupKind.EnteredBy, tested, value.Value, where, trigger.Room), value.Value);
+                        else if (tested == ScummVars.Room && value.Value >= 0x80 && ins.Operation is "isEqual" or "isNotEqual")
+                            // The room under a pseudo room number (Indy 3 Room 21's entry: isEqual VAR_ROOM, 0x81): applied only where the game maps it here.
+                            Add(new(ScummSetupKind.EnteredAs, ScummVars.Room, value.Value, where, trigger.Room), value.Value);
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
-                            Add(new(ScummSetupKind.Bit, tested, 1, where));
+                            Add(new(ScummSetupKind.Bit, tested, 1, where), 1);
                         else if (_roomLeftVariables.Value.Contains(tested) && ins.Operation is "isEqual" or "isNotEqual" &&
                                  _game.Rooms.Any(r => r.ResourceId == value.Value) && value.Value != trigger.Room)
-                            Add(new(ScummSetupKind.CameFrom, tested, value.Value, where, trigger.Room));
+                            Add(new(ScummSetupKind.CameFrom, tested, value.Value, where, trigger.Room), value.Value);
                         else if (VariablePattern().Match(tested) is { Success: true } v && tested == v.Value && !written.Contains(tested) &&
                                  int.Parse(v.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstStoryVariable)
                             foreach (var side in sides.Where(v => v > 0).Distinct())
-                                Add(new(ScummSetupKind.Variable, tested, side, where));
+                                Add(new(ScummSetupKind.Variable, tested, side, where), side);
                         break;
                     }
                 }
             }
         }
-        return found;
+        // An object's scene may depend on how its room was entered: the doors the room's entry compares VAR_WALKTO_OBJ with (Indy 3 Room 82's
+        // entry +0x0072: the grail chamber set up differently by door 861 or 862) are tried last.
+        if (!trigger.IsRoomEntry && Read($"Room {trigger.Room} entry script", trigger) is { } entry)
+            foreach (var ins in entry.Instructions.Where(i => i.Operation is "isEqual" or "isNotEqual"))
+                if (ins.Operands.Split(',', StringSplitOptions.TrimEntries) is [var tested, var door, ..] && tested == ScummVars.WalkToObject &&
+                    Literal(door) is int byDoor and > 0 &&
+                    !found.Any(f => f.Edit.Kind == ScummSetupKind.EnteredBy && f.Edit.Value == byDoor))
+                    found.Add((new(ScummSetupKind.EnteredBy, tested, byDoor, $"Room {trigger.Room} entry script +0x{ins.Offset:X4}", trigger.Room), 1));
+        return found.OrderBy(f => f.Rank).ToList();
     }
 
     private static string? WrittenVariable(ScummScriptInstruction ins)
@@ -366,6 +434,18 @@ public sealed partial class ScummSceneSetupSearch
 
     private static int? Literal(string text) =>
         text.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(text.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value) ? value : null;
+
+    /// <summary>A variable indexed by a literal (<c>bit[0x057+0x007]</c>, Indy 4 Room 67's rope ladder) as the one it names (<c>bit[0x05E]</c>).</summary>
+    private static string Flatten(string operand) =>
+        LiteralIndexed().Match(operand) is { Success: true } m
+            ? $"{m.Groups[1].Value}[0x{int.Parse(m.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) + int.Parse(m.Groups[3].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]"
+            : operand;
+
+    [GeneratedRegex(@"^(bit|var|local)\[0x([0-9A-F]+)\+0x([0-9A-F]+)\]$")]
+    private static partial Regex LiteralIndexed();
+
+    [GeneratedRegex(@"^(\S+), \[getActorWalkBox\([^,]+, ([^)]+)\)\]$")]
+    private static partial Regex ExpressionWalkBox();
 
     [GeneratedRegex(@"^bit\[0x[0-9A-F]+\]")]
     private static partial Regex BitPattern();
