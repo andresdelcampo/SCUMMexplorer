@@ -63,7 +63,7 @@ In these games the room picker fills in on its own, and the Costumes tab sits be
 | **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | 94% | ✔ | ✔ | ✔ | – | 68% |
 | **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | 91% | ✔ | ✔ | ✔ | – | 49% |
 | **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | 92% | ✔ | ✔ | ✔ | – | 50% |
-| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | 92% | ✔ | ✔ | ✔ | – | 60% |
+| **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | 93% | ✔ | ✔ | ✔ | – | 60% |
 | **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 95% | ✔ | ✔ | ✔ | – | 84% |
 | **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | 67% | ✔ | ✔ | ✔ | ✔ | 44% |
 | **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | 67% | ✔ | ✔ | ✔ | ✔ | 43% |

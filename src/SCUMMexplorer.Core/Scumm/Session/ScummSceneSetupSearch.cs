@@ -129,6 +129,15 @@ public sealed partial class ScummSceneSetupSearch
                 var swappedResult = _run(trigger, swapped);
                 if (swappedResult.Failure is null && swappedResult.Begun) { best = swappedResult; kept = swapped; }
             }
+            // Then with each value left out, one at a time: a value that does not belong to the scene's way can stop it (Zak McKracken Room 44's
+            // handler, object 655: the sentence values begin it, the object itself held or the room entered as 133 do not).
+            foreach (var left in together)
+            {
+                if (best.Begun) break;
+                var without = together.Where(c => c != left).ToList();
+                var withoutResult = _run(trigger, without);
+                if (withoutResult.Failure is null && withoutResult.Begun) { best = withoutResult; kept = without; }
+            }
         }
         foreach (var other in elsewhere.TakeWhile(_ => !best.Begun))
         {
@@ -311,7 +320,7 @@ public sealed partial class ScummSceneSetupSearch
                         Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState, where), ownState);
                         Add(new(ScummSetupKind.ObjectState, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), ownState == 0 ? 1 : 0, where), ownState == 0 ? 1 : 0);
                         break;
-                    case "getObjectOwner" when parts.Length >= 2 && objectCode && trigger.ObjectId != 0 && Literal(parts[1]) is null &&
+                    case "getObjectOwner" when parts.Length >= 2 && objectCode && trigger.ObjectId != 0 && Literal(parts[1]) is null && !V2Handler(trigger) &&
                                                VariablePattern().Match(parts[1]) is { Success: true } selfOwner && selfOwner.Value == parts[1] && !written.Contains(parts[1]):
                         // The owner of "this object" (a variable the sentence script set: Indy 3 var[0x007]): the picked object itself held (Indy 3
                         // Room 17's books: Look shows the inscription only once the book is held, +0x0000 getObjectOwner then isEqual 0x0F).
@@ -416,7 +425,13 @@ public sealed partial class ScummSceneSetupSearch
                         {
                             // Which kid is the hero (Maniac Mansion Room 17's piano, +0x0018: isGreaterEqual var[0x000], 2, else "I can't play that
                             // thing!"): a hero switch to an actor on the scene's side, as the game's own kid switch does.
-                            foreach (var side in sides.Where(v => v is > 0 and < 32).Distinct())
+                            // An equality's other side is another kid: the numbers next to it (Zak McKracken Room 44's object 655, +0x0049: isEqual
+                            // var[0x000], 1 answers "Sorry, mate, you're not my type!"; another kid's gift plays the scene).
+                            // Only where the tested kid is known to lead away (the neighbours would crowd out other values otherwise).
+                            var heroes = ins.Operation is "isEqual" or "isNotEqual" && guard is bool awayCheck &&
+                                         Holds(ins.Operation, value.Value, value.Value) != awayCheck
+                                ? [value.Value, value.Value + 1, value.Value - 1] : sides;
+                            foreach (var side in heroes.Where(v => v is > 0 and < 32).Distinct())
                                 if (guard is not bool toHero || Holds(ins.Operation, value.Value, side) == toHero)
                                     Add(new(ScummSetupKind.HeroIs, tested, side, where, trigger.Room), side);
                         }
@@ -437,8 +452,8 @@ public sealed partial class ScummSceneSetupSearch
                         }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
                             Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
-                        else if ((objectCode && (tested == "local[0x000]" || _isV2 && tested == ScummVars.V2.ActiveObject2) || Argument(tested) == SecondObjectArgument) &&
-                                 value.Value != 0)
+                        else if ((objectCode && (tested == "local[0x000]" || _isV2 && tested == ScummVars.V2.ActiveObject2 && !V2Handler(trigger)) ||
+                                  Argument(tested) == SecondObjectArgument) && value.Value != 0)
                             // Versions 1 and 2 keep the second object in VAR_ACTIVE_OBJECT2 (Zak McKracken Room 21's sand pile, +0x003F: isEqual var[0x00A], 0x44).
                             // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
                             Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
@@ -514,6 +529,12 @@ public sealed partial class ScummSceneSetupSearch
         // A value that lets more of the scene run (3) keeps its place among the others (1) in the search.
         return found.OrderBy(f => f.Rank == 3 ? 1 : f.Rank).ToList();
     }
+
+    /// <summary>
+    /// A version 1/2 background handler (verbs 0xFA and up are not sentence verbs): its <c>var[0x009]</c> is the object of the sentence it waits for,
+    /// not "this object" (Zak McKracken Room 44's object 655: getObjectOwner of var[0x009], the object given).
+    /// </summary>
+    private bool V2Handler(ScummCutscene trigger) => _isV2 && trigger.VerbId >= 0xFA;
 
     /// <summary>A version 1/2 named state (ScummVM o2_ifState masks): its bit and whether the name means the bit set.</summary>
     private static (int Mask, bool On)? V2StateBit(string name) => name switch

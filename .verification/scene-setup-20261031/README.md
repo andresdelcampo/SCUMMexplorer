@@ -309,3 +309,12 @@ What is left in Maniac Mansion and Zak McKracken (1 November, read and left): in
 
 Zak's background object handlers (verb 0xFD) loop and wait for a sentence in the version 2 sentence variables: Room 18's flyer (+0x009F `isEqual var[0x008], 3`: Give; `var[0x009]` the object given, held by the hero; `var[0x00A]`, actor 8, the guard: "Our flag! Thank you!"). In object code of versions 1 and 2, a test of `VAR_ACTIVE_VERB`, `VAR_ACTIVE_OBJECT1` or `VAR_ACTIVE_OBJECT2` against a literal on the scene's side is now a setup value (and the object given is held). `*-run17.txt`: Zak 38 → 40 of 54 (74%, both: the flyer, Room 10's viewscreen); Maniac unchanged. Read and left: Zak Room 5's drop slot wants "some other" small object than the three it names; Room 14's markings chain through Scripts 28, 82 and 133.
 
+## The combined try with a value left out (1 November, fourteenth batch)
+
+1. After the combined try and the swaps, the combination is retried with each value left out, one at a time: Monkey Island 2 Room 56's entry now begins its own way (92.1% → 92.6%, `mi2-mt32-en-run41.txt`).
+2. Version 2 background handlers (verbs 0xFA and up): `var[0x009]` is the object given (no "this object held" value) and `var[0x00A]` the actor it goes to (no second-object value).
+3. A hero test whose tested kid leads away also offers the kids next to it (Zak Room 44's object 655: Zak gets "Sorry, mate, you're not my type!"). Offered everywhere it crowded out other values (Zak Room 30's boom box, `*-run18.txt`), so it is limited to that case (`*-run19.txt`: Maniac and Zak unchanged).
+4. `Measure`'s trials start as the planner's runs do (into control after the boot), so `MEASURE_COMBO` results match the search.
+
+Zak Room 44's object 655 still starts at its cutscene: its handler also walks the hero to actor 10, who is not in the room. The other copies unchanged (`*-run40.txt`), LOOM unchanged (`../loom-editions-20261031/run23-*.txt`).
+

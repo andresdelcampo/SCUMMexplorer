@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: the combined try with a value left out
+
+When the combined try of all values fails, it is now also retried with each value left out, one at a time (a value off the scene's way can stop it). In version 2 background handlers `var[0x009]` is the object given, not "this object", and `var[0x00A]` the actor it goes to, not a second object; a hero test whose kid leads away also offers the kids next to it. Monkey Island 2 92.1% → 92.6% (Room 56's entry); the other copies, Maniac, Zak and LOOM unchanged. Measure's trials now start as the planner's runs do. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run40.txt`, `*-run41.txt`, `*-run19.txt`).
+
 ## 1 November: version 2 sentence handlers
 
 Zak McKracken's background object handlers (verb 0xFD) wait for a sentence in the version 2 sentence variables: the active verb (`var[0x008]`, 3 for Give), the object given (`var[0x009]`, held) and the actor it goes to (`var[0x00A]`). The setup search now offers those as values. Zak 70% → 74% played its own way (both: Room 18's flyer, Room 10's viewscreen); Maniac unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run17.txt`).

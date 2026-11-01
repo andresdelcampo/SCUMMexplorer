@@ -12,7 +12,13 @@ var clock = Stopwatch.StartNew();
 // Maniac Mansion starts its scenes after the reviewed party selection, as the app does (ManiacCutsceneSetup, 1 November 2026).
 var maniac = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
 var planner = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game) : new ScummCutscenePlanner(game);
-Func<ScummSession> newRun = maniac ? () => SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.NewSession(game) : () => ScummGameSession.BootForPlay(game, out _);
+Func<ScummSession> newRun = () =>
+{
+    // As the planner's runs start: Maniac's party start, then into control when the boot ends inside a cutscene.
+    ScummSession session = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.NewSession(game) : ScummGameSession.BootForPlay(game, out _);
+    ScummCutscenePlanner.IntoControl(session);
+    return session;
+};
 Console.WriteLine($"{planner.Groups.Count} groups, planner ready in {clock.Elapsed.TotalSeconds:F1} s");
 if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 } code)
 {
