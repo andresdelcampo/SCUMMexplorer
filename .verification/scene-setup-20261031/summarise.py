@@ -11,7 +11,9 @@ def read(g, r):
         if l.startswith("ATCUT"):
             key = l[6:].split(" (")[0]
             at.add(key)
-            if i + 1 < len(lines) and re.search(r"lines 0 rooms \[\]", lines[i + 1]): nothing.add(key)
+            # The result line follows, after the scripts line when MEASURE_SCRIPTS=1.
+            result = next((r for r in lines[i + 1:i + 3] if r.strip().startswith("result:")), "")
+            if re.search(r"lines 0 rooms \[\]", result): nothing.add(key)
     done = lines[-1].startswith("fresh start")
     return groups, at, nothing, done
 tg = ta = tn = 0

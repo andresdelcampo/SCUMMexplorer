@@ -205,3 +205,22 @@ Measured together (`*-run26.txt`, LOOM `../loom-editions-20261031/run12-*.txt`; 
 | **Total** | 1,093 | **89.2% → 90.3%** | **10.8% → 9.7%** | 26 → 14 |
 
 LOOM unchanged (EGA 0.9%, CD 0.4% at the cutscene; answer key `../loom-answer-key-20261031/compare-run8-loom-session.txt`: 238 of 238, same rooms, 219 same category). Of the 14 showing nothing, several animate without a line (Indy 3 Room 62's doors are drawn and sounded) or wait on two values at once (Indy 4 Room 44: a bit, then the hero's walk box and x). Tests: `AWaitForTheHeroToWalkPastAPointStandsHimThere`, `ASceneStartedAtItsCutsceneGetsTheValuesThatLetItsLinesRun`.
+
+## "This object" passed to a script, a script that must be running, a wait for the camera (1 November, fourth batch)
+
+Measured together (`*-run27.txt`, LOOM `../loom-editions-20261031/run13-*.txt`):
+
+1. **Call arguments that are not literals**: the arguments a trigger's code passes to the script it starts or chains to are read as that script's locals when they are "this object" (`var[0x007]` in object code: the picked object) or the verb's second object (`local[0x000]` in object code: a second-object value). A local the script sets to `var[0x007]` is "this object" too (Indy 4 Script 63 +0x0005). Monkey Island 2 Room 18's coffin, Close: `startScript 203, [var[0x007]]`, whose local 203 closes it only in state 1; Indy 4 Room 3's door (Script 63, state 1) and Room 43's X marks the spot (`chainScript 210, [0x0206, local[0x000]]`: dug with object 1001). A scene started at its cutscene gets "this object" as its local too. The bracket of a call's argument list was cut at the argument's own bracket (`[var[0x007]]`), which hid every such argument.
+2. **A script that must be running** (`ScummSetupKind.ScriptRunning`: `isScriptRunning` then compared, only on the scene's side): started in the scene's room. Indy 3 Room 32's painting starts Script 115 only while Script 114 runs.
+3. **A wait for the camera** (`ScummSetupKind.CameraX`: `VAR_CAMERA_POS_X` compared, only on the scene's side): the hero stood at that x and the camera taken to him. Indy 3 Room 86's local script 201 loops until the camera is left of x 0x186; the knight's scene now plays its 11 lines the game's own way.
+
+| Game | Scenes | Own way | At cutscene | Showing nothing |
+|---|---|---|---|---|
+| Indy 3 (EGA; 256 colours the same) | 153 | 89.5% → 92.2% | 10.5% → 7.8% | 4 → 4 |
+| Monkey Island 1 floppy | 164 | 88.4% → 89.6% | 11.6% → 10.4% | 1 → 1 |
+| Monkey Island 1 CD | 160 | 89.4% → 90.6% | 10.6% → 9.4% | 1 → 1 |
+| Monkey Island 2 | 190 | 88.9% → 90.5% | 11.1% → 9.5% | 2 → 2 |
+| Indy 4 | 426 | 92.3% → 93.2% | 7.7% → 6.8% | 6 → 6 |
+| **Total** | 1,093 | **90.3% → 91.7%** | **9.7% → 8.3%** | 14 → 14 |
+
+No scene moved the other way. LOOM unchanged (EGA 0.9%, CD 0.4% at the cutscene). `summarise.py` now finds the result line after the scripts line (`MEASURE_SCRIPTS=1`). Seen and left: Monkey Island 1 Room 14's cooking pot starts its scene only in debug mode (`notEqualZero var[0x027]`, `VAR_DEBUGMODE`); scenes that play only when VAR_ROOM is another room (Monkey Island 1 Room 30's sword in Room 36, Monkey Island 2 Room 53's dog in Room 8) are the next step. Tests: `ThisObjectPassedToAScriptIsThePickedObject`, `TheSecondObjectPassedToAScriptIsGivenToTheHero`, `AScriptThatMustBeRunningIsStartedAndACameraWaitIsMet`.

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: "this object" passed to a script, a script that must be running, a wait for the camera
+
+The scene setup reads the arguments a trigger's code passes to the script it starts: "this object" (`var[0x007]`) is the picked object and the verb's second object (`local[0x000]`) is a second-object value (Monkey Island 2's coffin, Indy 4's door and its X marks the spot); a local set to "this object" counts too. Two new setup values: a script that must be running (`isScriptRunning`, started in the scene's room: Indy 3 Room 32's painting needs Script 114) and the camera past a point (`VAR_CAMERA_POS_X`, the hero stood there: Indy 3 Room 86's knight). Played the game's own way 90.3% → 91.7% of 1,093 scenes (Indy 3 92.2%, Monkey Island 1 89.6% and 90.6%, Monkey Island 2 90.5%, Indy 4 93.2%); at the cutscene 9.7% → 8.3%; showing nothing 14 (unchanged); LOOM unchanged. The README's Sounds column now marks the games you have not listened to (◐), as the roadmap's board does. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run27.txt`).
+
 ## 1 November: scenes that re-enter their room, wait for the hero to walk past a point, or go on after their cutscene
 
 The setup now re-enters a room whose entry tests that the hero came from it (or from a pseudo room), puts the hero in a room before its entry, and stands an actor at the x position a script waits for (a branch back counts as a wait). A scene started at its cutscene also gets the values that let the rest of it run (Monkey Island 2's Wally speaks). Own way 89.2% → 90.3% (Indy 3 89.5%, Monkey Island 1 88.4% and 89.4%, Monkey Island 2 88.9%, Indy 4 92.3%); at the cutscene 10.8% → 9.7%; showing nothing 26 → 14; LOOM and its answer key unchanged ([record](../../.verification/scene-setup-20261031/README.md)).

@@ -41,6 +41,10 @@ public enum ScummSetupKind
     OwnedBy,
     /// <summary>An actor of the scene's room stood at x <c>Value</c> (a script waits for it to walk past a point: <c>getActorX</c> then compared).</summary>
     ActorX,
+    /// <summary>Global or room script <c>Target</c> running when the scene starts (<c>isScriptRunning</c> then compared): started in the scene's room.</summary>
+    ScriptRunning,
+    /// <summary>The camera at x <c>Value</c> (a script waits for <c>VAR_CAMERA_POS_X</c> to pass a point): the hero stood there and the camera taken to him.</summary>
+    CameraX,
 }
 
 /// <summary>
@@ -63,6 +67,8 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.OwnedBy => $"object {Target} owned by actor {Value}",
         ScummSetupKind.ActorX => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} at x {Value}",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
+        ScummSetupKind.ScriptRunning => $"script {Target} running",
+        ScummSetupKind.CameraX => $"the camera at x {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
     } + $" (tested at {Where})";
@@ -161,6 +167,26 @@ public abstract partial class ScummSession
                 var mover = edit.Target == "ego" ? heroNumber ?? 0 : int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (!_runtime.Actors.Contains(mover) || _runtime.Actors[mover].Room != _runtime.CurrentRoom || _runtime.Actors[mover].X == edit.Value) return false;
                 _runtime.Actors.Put(mover, edit.Value, _runtime.Actors[mover].Y, _runtime.CurrentRoom, CurrentPlacement(), heroNumber);
+                return true;
+            }
+            case ScummSetupKind.ScriptRunning:
+            {
+                // Only in the scene's room, after its entry (a room's script runs only there; the entry would end a local one).
+                var number = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                if (edit.Room is int runRoom && _runtime.CurrentRoom != runRoom || IsScriptRunning(number).Running) return false;
+                return StartScriptForSetup(number);
+            }
+            case ScummSetupKind.CameraX:
+            {
+                // Only in the scene's room: the hero stood at that x and the camera taken to him (it follows him there, as his walk would take it).
+                if (edit.Room is int cameraRoom && _runtime.CurrentRoom != cameraRoom) return false;
+                var hero = variables.TryGetValue(_runtime.EgoVariable, out var heroActor) ? (int?)heroActor : null;
+                if (hero is not int walker || !_runtime.Actors.Contains(walker) || _runtime.Actors[walker].Room != _runtime.CurrentRoom ||
+                    variables.GetValueOrDefault(ScummVars.CameraPosX) == edit.Value) return false;
+                _runtime.Actors.Put(walker, edit.Value, _runtime.Actors[walker].Y, _runtime.CurrentRoom, CurrentPlacement(), hero);
+                _runtime.Camera.Mode = ScummCamera.FollowActor;
+                _runtime.Camera.Follows = walker;
+                _runtime.Camera.MovingToActor = true;
                 return true;
             }
             case ScummSetupKind.OwnedBy:
@@ -386,6 +412,22 @@ public abstract partial class ScummSession
         }
         FinishInput(beforeUncertainties, beforeEvents);
         return true;
+    }
+
+    /// <summary>A script a picked scene's setup wants running (<see cref="ScummSetupKind.ScriptRunning"/>), started from its first instruction.</summary>
+    private bool StartScriptForSetup(int number)
+    {
+        BeforeInput();
+        var beforeUncertainties = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        _visitTrace.Add($"picked scene's setup: script {number} started");
+        LastAction = new ScummObjectActionResult(_runtime.CurrentRoom ?? 0, 0, 0, 0, null, null, null, null, [], $"script {number}");
+        _dispatchScope++;
+        try { RunStartedScript(number, 0, null, 0); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException) { _uncertainties.Add($"Script {number}: {ex.Message}"); return false; }
+        finally { _dispatchScope--; }
+        FinishInput(beforeUncertainties, beforeEvents);
+        return IsScriptRunning(number).Running;
     }
 
     /// <summary>

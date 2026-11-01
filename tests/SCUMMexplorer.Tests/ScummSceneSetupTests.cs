@@ -167,6 +167,47 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ThisObjectPassedToAScriptIsThePickedObject()
+    {
+        // Monkey Island 2 Room 18, Close coffin: startScript 203, [var[0x007]]; local 203 reads the state of local[0x000] and closes it only in state 1.
+        var folder = Path.Combine(TestGames.Root, "mi2 mt32 en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 18, 182, 0x03));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ObjectState, Target: "182", Value: 1 });
+    }
+
+    [Fact]
+    public void TheSecondObjectPassedToAScriptIsGivenToTheHero()
+    {
+        // Indy 4 Room 43, X marks the spot: chainScript 210, [0x0206, local[0x000]]; local 210 digs only when local[0x001] is object 1001.
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 43, 518, 0x08));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.SecondObject, Target: "1001" });
+    }
+
+    [Fact]
+    public void AScriptThatMustBeRunningIsStartedAndACameraWaitIsMet()
+    {
+        // Indy 3 Room 32's painting (object 489 verb 0x0A) starts Script 115 only while Script 114 runs; Room 86's local script 201 waits for the
+        // camera to be left of x 0x186 before its cutscene.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var painting = planner.PlanSetup(Trigger(planner, 32, 489, 0x0A));
+        Assert.Equal(ScummPickedStart.Game, painting.Result.Way);
+        Assert.Contains(painting.Edits, edit => edit is { Kind: ScummSetupKind.ScriptRunning, Target: "114" });
+        var knight = planner.PlanSetup(Trigger(planner, 86, 0, 0));
+        Assert.Equal(ScummPickedStart.Game, knight.Result.Way);
+        Assert.Contains(knight.Edits, edit => edit is { Kind: ScummSetupKind.CameraX, Value: 389 });
+    }
+
+    [Fact]
     public void ASceneStartedAtItsCutsceneGetsTheValuesThatLetItsLinesRun()
     {
         // Monkey Island 2 Room 79, Wally: local script 207 starts with its cutscene; its first lines follow notEqualZero bit[0x237] (+0x0037).

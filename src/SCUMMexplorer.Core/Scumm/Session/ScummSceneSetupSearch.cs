@@ -185,13 +185,20 @@ public sealed partial class ScummSceneSetupSearch
             var boxOf = new Dictionary<string, string>();
             var ownerOf = new Dictionary<string, int>();
             var xOf = new Dictionary<string, string>();
+            var runningOf = new Dictionary<string, int>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
-            // A script the trigger's code starts or chains to with literal arguments reads them as its locals (Indy 4 Room 7's cat figurine:
-            // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116).
-            var arguments = label == own ? null : CallArguments(label, trigger);
-            int? Known(string operand) => Literal(operand) ??
-                (arguments is not null && LocalPattern().Match(operand) is { Success: true } local && local.Value == operand &&
-                 int.Parse(local.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) is var index && index < arguments.Count ? arguments[index] : null);
+            // A script the trigger's code starts or chains to reads its arguments as its locals: literals (Indy 4 Room 7's cat figurine:
+            // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116), "this object" (Monkey Island 2's
+            // coffin, Room 18: startScript 203, [var[0x007]]) and the second object of a two-object verb (Indy 4 Room 43: chainScript 210,
+            // [0x0206, local[0x000]], whose local[0x001] is compared with the shovel).
+            var arguments = label == own ? null : CallOperands(label, trigger);
+            // Locals that hold "this object" (Indy 4 Script 63 +0x0005: move local[0x000] = var[0x007] when no argument gave one).
+            var selfLocals = new HashSet<string>();
+            string? Argument(string operand) =>
+                arguments is not null && LocalPattern().Match(operand) is { Success: true } local && local.Value == operand &&
+                int.Parse(local.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) is var index && index < arguments.Count ? arguments[index] : null;
+            int? Known(string operand) => Literal(operand) ?? (Argument(operand) is { } given ? Resolve(given, trigger) : null) ??
+                (selfLocals.Contains(operand) ? trigger.ObjectId : null);
             foreach (var ins in script!.Instructions)
             {
                 var where = $"{label} +0x{ins.Offset:X4}";
@@ -201,6 +208,7 @@ public sealed partial class ScummSceneSetupSearch
                 if (WrittenVariable(ins) is { } rewritten)
                 {
                     stateOf.Remove(rewritten); costumeOf.Remove(rewritten); roomOf.Remove(rewritten); boxOf.Remove(rewritten); ownerOf.Remove(rewritten); xOf.Remove(rewritten);
+                    runningOf.Remove(rewritten);
                 }
                 guard = guardSides.TryGetValue(ins.Offset, out var need) ? need : null;
                 afterCutscene = moreScene.Contains(ins.Offset);
@@ -208,6 +216,13 @@ public sealed partial class ScummSceneSetupSearch
                 constant = parts.Length >= 2 && Literal(parts[1]) is int k ? k : parts.Length >= 2 && parts[1] == ScummVars.Room ? trigger.Room : null;
                 switch (ins.Operation)
                 {
+                    case "move" when !objectCode && trigger.ObjectId != 0 && !trigger.IsRoomEntry && ins.Operands.Split(" = ") is [var into, var from] &&
+                                     from.Trim() == ThisObject && into.Trim().StartsWith("local[", StringComparison.Ordinal):
+                        selfLocals.Add(into.Trim());
+                        break;
+                    case "isScriptRunning" when parts.Length >= 2 && Literal(parts[1]) is int checkedScript:
+                        runningOf[parts[0]] = checkedScript;
+                        break;
                     case "getObjectState" when parts.Length >= 2 && Known(parts[1]) is int obj:
                         stateOf[parts[0]] = obj;
                         break;
@@ -259,7 +274,7 @@ public sealed partial class ScummSceneSetupSearch
                             _objectRooms.Value.TryGetValue(held, out var room) ? room : null));
                         break;
                     case "ifClassOfIs" when ins.Operands.IndexOf(", [", StringComparison.Ordinal) + 2 is var open and > 1 &&
-                                            (Known(parts[0]) ?? (objectCode && trigger.ObjectId != 0 && parts[0] == "var[0x007]" ? trigger.ObjectId : null)) is int classed:
+                                            (Known(parts[0]) ?? (objectCode && trigger.ObjectId != 0 && parts[0] == "var[0x007]" ? trigger.ObjectId : null)) is int classed and > 0:
                     {
                         // The list is the bracket after the object (not the one in var[0x007]). ScummVM o5_ifClassOfIs: a class with bit 0x80 must be set, one without must be clear, and the code after the test runs when
                         // all hold; the scene may sit on either side, so both are tried (Indy 4's cupboard, Room 92 object 1194 +0x0000).
@@ -317,9 +332,24 @@ public sealed partial class ScummSceneSetupSearch
                                 if (guard is bool toScene && Holds(ins.Operation, value.Value, side) == toScene)
                                     Add(new(ScummSetupKind.ActorX, acrossActor, side, where, trigger.Room), side);
                         }
+                        else if (runningOf.TryGetValue(tested, out var runningScript))
+                        {
+                            // A script that must be running (Indy 3 Room 32's painting, object 489 verb 0x0A: isScriptRunning 114, then the
+                            // cutscene's Script 115 only while it runs): only on the way to the cutscene, started in the scene's room.
+                            if (guard is bool toScene && Holds(ins.Operation, value.Value, 1) == toScene)
+                                Add(new(ScummSetupKind.ScriptRunning, runningScript.ToString(CultureInfo.InvariantCulture), 1, where, trigger.Room), 1);
+                        }
+                        else if (tested == ScummVars.CameraPosX)
+                        {
+                            // A wait for the camera to scroll past a point (Indy 3 Room 86's local script 201 +0x0026: isGreater VAR_CAMERA_POS_X,
+                            // 0x186, back until it holds): the camera taken there, on the scene's side only.
+                            foreach (var side in sides.Where(v => v > 0).Distinct())
+                                if (guard is bool toScene && Holds(ins.Operation, value.Value, side) == toScene)
+                                    Add(new(ScummSetupKind.CameraX, ScummVars.CameraPosX, side, where, trigger.Room), side);
+                        }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
                             Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
-                        else if (objectCode && tested == "local[0x000]" && value.Value != 0)
+                        else if ((objectCode && tested == "local[0x000]" || Argument(tested) == SecondObjectArgument) && value.Value != 0)
                             // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
                             Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
                                 _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);
@@ -383,11 +413,29 @@ public sealed partial class ScummSceneSetupSearch
     }
 
     /// <summary>
-    /// The arguments the trigger's own code starts a script with (<c>startScript</c>/<c>chainScript N, [a, b, …]</c>, all literals), so a scene started
-    /// at its cutscene gets the locals its caller would have given it (Indy 3 Room 13's entry starts Script 131 with 0xCB); null when no call has
-    /// literal arguments only.
+    /// The arguments the trigger's own code starts a script with (<c>startScript</c>/<c>chainScript N, [a, b, …]</c>), so a scene started at its
+    /// cutscene gets the locals its caller would have given it (Indy 3 Room 13's entry starts Script 131 with 0xCB): literals and "this object" (the
+    /// picked object); the second object of a two-object verb is not known here and is 0. Null when no call gives arguments the reading knows.
     /// </summary>
-    private IReadOnlyList<int>? CallArguments(string label, ScummCutscene trigger)
+    private IReadOnlyList<int>? CallArguments(string label, ScummCutscene trigger) =>
+        CallOperands(label, trigger)?.Select(operand => Resolve(operand, trigger) ?? 0).ToArray();
+
+    /// <summary>The operand of a call argument that is the second object of the trigger's two-object verb (its code's <c>local[0x000]</c>).</summary>
+    private const string SecondObjectArgument = "second object";
+
+    /// <summary>The variable the sentence script sets to "this object" before an object's verb code runs (Indy 3, Monkey Island 2, Indy 4).</summary>
+    private const string ThisObject = "var[0x007]";
+
+    /// <summary>A call argument's value: a literal, or "this object" (the picked object); null for the second object or anything else.</summary>
+    private static int? Resolve(string operand, ScummCutscene trigger) =>
+        Literal(operand) ?? (operand == ThisObject && trigger.ObjectId != 0 && !trigger.IsRoomEntry ? trigger.ObjectId : null);
+
+    /// <summary>
+    /// The operands of the first call of the script <paramref name="label"/> by the trigger's code (its own, then the scripts the scan lists) whose
+    /// arguments are all known: literals, "this object" (<c>var[0x007]</c> in object code) and the verb's second object (<c>local[0x000]</c> in
+    /// object code, returned as <see cref="SecondObjectArgument"/>).
+    /// </summary>
+    private IReadOnlyList<string>? CallOperands(string label, ScummCutscene trigger)
     {
         var target = Regex.Match(label, @"^(?:global script|Room \d+ local script) (\d+)$");
         if (!target.Success) return null;
@@ -397,14 +445,18 @@ public sealed partial class ScummSceneSetupSearch
         foreach (var caller in new[] { own }.Concat(trigger.Scripts.Where(label => label != own)))
         {
             if (Read(caller, trigger) is not { } script) continue;
+            var objectCode = caller.Contains(" object ", StringComparison.Ordinal);
             foreach (var ins in script.Instructions.Where(i => i.Operation is "startScript" or "chainScript"))
             {
                 var open = ins.Operands.IndexOf('[');
                 if (open < 0 || Literal(ins.Operands[..open].Split(',')[0].Trim()) != id) continue;
-                var inside = ins.Operands[(open + 1)..].TrimEnd(']', ' ');
+                // Only the list's own closing bracket (an argument may be var[0x007]).
+                var inside = ins.Operands[(open + 1)..].TrimEnd() is var list && list.EndsWith(']') ? list[..^1] : ins.Operands[(open + 1)..];
                 if (inside.Length == 0) return [];
-                var values = inside.Split(',', StringSplitOptions.TrimEntries).Select(Literal).ToArray();
-                if (values.All(v => v is not null)) return values.Select(v => v!.Value).ToArray();
+                var values = inside.Split(',', StringSplitOptions.TrimEntries)
+                    .Select(operand => Literal(operand) is not null || objectCode && operand == ThisObject ? operand
+                        : objectCode && operand == "local[0x000]" ? SecondObjectArgument : null).ToArray();
+                if (values.All(v => v is not null)) return values!;
             }
         }
         return null;
