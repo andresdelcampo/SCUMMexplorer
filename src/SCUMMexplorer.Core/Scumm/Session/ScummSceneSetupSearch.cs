@@ -401,10 +401,10 @@ public sealed partial class ScummSceneSetupSearch
                             // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
                             Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
                                 _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);
-                        else if (tested == ScummVars.WalkToObject && value.Value > 0 && ins.Operation is "isEqual" or "isNotEqual" && trigger.IsRoomEntry)
+                        else if (!_isV2 && tested == ScummVars.WalkToObject && value.Value > 0 && ins.Operation is "isEqual" or "isNotEqual" && trigger.IsRoomEntry)
                             // The door the hero came in by (VAR_WALKTO_OBJ, set while loadRoomWithEgo enters the room).
                             Add(new(ScummSetupKind.EnteredBy, tested, value.Value, where, trigger.Room), value.Value);
-                        else if (tested is ScummVars.Room or ScummVars.RoomResource && value.Value is > 0 and < 0x80 && value.Value != trigger.Room && !trigger.IsRoomEntry &&
+                        else if ((tested == ScummVars.Room || tested == (_isV2 ? ScummVars.V2.RoomResource : ScummVars.RoomResource)) && value.Value is > 0 and < 0x80 && value.Value != trigger.Room && !trigger.IsRoomEntry &&
                                  ins.Operation is "isEqual" or "isNotEqual" && (guard is not bool inRoom || Holds(ins.Operation, value.Value, value.Value) == inRoom) &&
                                  _game.Rooms.Any(r => r.ResourceId == value.Value))
                             // The verb plays its scene only in another room (Monkey Island 1 Room 30's sword, +0x0000 isEqual VAR_ROOM, 0x24: used on
@@ -450,7 +450,7 @@ public sealed partial class ScummSceneSetupSearch
         }
         // An object's scene may depend on how its room was entered: the doors the room's entry compares VAR_WALKTO_OBJ with (Indy 3 Room 82's
         // entry +0x0072: the grail chamber set up differently by door 861 or 862) are tried last.
-        if (!trigger.IsRoomEntry && Read($"Room {trigger.Room} entry script", trigger) is { } entry)
+        if (!_isV2 && !trigger.IsRoomEntry && Read($"Room {trigger.Room} entry script", trigger) is { } entry)
             foreach (var ins in entry.Instructions.Where(i => i.Operation is "isEqual" or "isNotEqual"))
                 if (ins.Operands.Split(',', StringSplitOptions.TrimEntries) is [var tested, var door, ..] && tested == ScummVars.WalkToObject &&
                     Literal(door) is int byDoor and > 0 &&
@@ -609,14 +609,17 @@ public sealed partial class ScummSceneSetupSearch
         return rooms;
     }
 
-    /// <summary>"ego" for the variable that holds the hero's actor number (<c>VAR_EGO</c>), so a setup stands whoever the hero is; null otherwise.</summary>
-    private static string? Ego(string text) => text == ScummVars.Ego ? "ego" : null;
+    /// <summary>
+    /// "ego" for the variable that holds the hero's actor number (<c>VAR_EGO</c>: var 1 in versions 3 to 5, var 0 in versions 1 and 2, where var 1 is
+    /// scratch), so a setup stands whoever the hero is; null otherwise.
+    /// </summary>
+    private string? Ego(string text) => text == (_isV2 ? ScummVars.V2.Ego : ScummVars.Ego) ? "ego" : null;
 
     /// <summary>
     /// The actor an operand names: a number, "ego", or a global variable that holds the actor's number (Indy 4 var[0x0B6], Sophia), read when the
     /// setup is applied; null for anything else (a local, an expression).
     /// </summary>
-    private static string? Actor(string text) =>
+    private string? Actor(string text) =>
         Literal(text)?.ToString(CultureInfo.InvariantCulture) ?? Ego(text) ??
         (text.StartsWith("var[", StringComparison.Ordinal) && VariablePattern().Match(text) is { Success: true } m && m.Value == text
             ? text : null);

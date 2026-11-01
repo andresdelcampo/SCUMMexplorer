@@ -67,8 +67,8 @@ In these games the room picker fills in on its own, and the Costumes tab sits be
 | **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 94% | ✔ | ✔ | ✔ | – | 84% |
 | **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | 63% | ✔ | ✔ | ✔ | ✔ | 44% |
 | **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | 63% | ✔ | ✔ | ✔ | ✔ | 43% |
-| **Zak McKracken** classic | ✔ | 69% | ✔ | ✔ | 63% | ✔ | ✔ | ✔ | ✔ | 37% |
-| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | 63% | ✔ | ✔ | ✔ | ✔ | 37% |
+| **Zak McKracken** classic | ✔ | 69% | ✔ | ✔ | 65% | ✔ | ✔ | ✔ | ✔ | 37% |
+| **Zak McKracken** enhanced | ✔ | ✔ | ✔ | ✔ | 65% | ✔ | ✔ | ✔ | ✔ | 37% |
 
 - **Cutscenes**: of the scenes the game's own scripts list, the share that plays the game's own way when picked (its state set up where its code needs it); every other one still plays, started directly at its cutscene. LOOM English plays its hand-checked list of 328 scenes. Maniac Mansion and Zak McKracken measured the same way since 1 November (before: the share that began at all) ([records](.verification/scene-setup-20261031/README.md), [LOOM](.verification/loom-editions-20261031/README.md)).
 - **Readable scripts**: the share of object, character and verb references named in the readable view of every script (LOOM: its reviewed names) ([record](.verification/readable-names-20261031/README.md)).
