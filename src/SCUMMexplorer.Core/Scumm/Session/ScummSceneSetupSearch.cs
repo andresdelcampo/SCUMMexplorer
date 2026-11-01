@@ -467,6 +467,12 @@ public sealed partial class ScummSceneSetupSearch
                     Literal(door) is int byDoor and > 0 &&
                     !found.Any(f => f.Edit.Kind == ScummSetupKind.EnteredBy && f.Edit.Value == byDoor))
                     found.Add((new(ScummSetupKind.EnteredBy, tested, byDoor, $"Room {trigger.Room} entry script +0x{ins.Offset:X4}", trigger.Room), 1));
+        // A room the game uses under several pseudo room numbers (Zak McKracken's airports: Room 8 as 141 to 148): an object's scene may not care which,
+        // but one arrival's entry begins a cut-away (as 144, Script 140, the Room 16 "meanwhile"), so each number is tried, after the other values.
+        if (!trigger.IsRoomEntry)
+            foreach (var number in ScummEgoArrivalIndex.For(_game).PseudoNumbersOf(trigger.Room).Distinct())
+                if (!found.Any(f => f.Edit.Kind == ScummSetupKind.EnteredAs && f.Edit.Value == number))
+                    found.Add((new(ScummSetupKind.EnteredAs, ScummVars.Room, number, $"Room {trigger.Room} arrivals", trigger.Room), 1));
         // A value beside a constant gives way to the variable's other values that do not lead away (Indy 4 Room 27's entry: var[0x0EE] = 3, on
         // the scene's side of its tests against 1 and 2 as well).
         found.RemoveAll(f => beside.Contains(f.Edit) &&

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: a room entered under each of its pseudo numbers; runs start once the player has control
+
+For an object scene in a room the game uses under several pseudo room numbers, the search also tries entering it under each (Zak McKracken's airport, Room 8 as 141 to 145: entered as 144 its arrival starts the Room 16 cut-away; Indy 3 Room 17's books now play their own way). The planner's runs start once the player has control when a boot ends inside a cutscene (the game's own skips taken, then five seconds of control). Indy 3 93.5% → 94.1%; all five copies 93.1% → 93.2%; Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run38.txt`, `*-run15.txt`).
+
 ## 1 November: the hero switched to the kid a scene needs
 
 A test of who the hero is (`VAR_EGO` against an actor number) becomes a setup value: the hero switched to that actor in the scene's room, as the game's own kid switch does (Maniac Mansion Room 17's piano: only a musician plays it, Syd; Zak McKracken Room 43's scroll). Played the game's own way: Maniac 63% → 67% (both), Zak 65% → 67% (both); the other copies and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run14.txt`, `*-run37.txt`).

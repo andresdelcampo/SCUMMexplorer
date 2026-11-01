@@ -291,3 +291,10 @@ A story variable was tried only at non-zero values (and at 0 for a flag). Now 0 
 
 What is left in Maniac Mansion and Zak McKracken (1 November, read and left): input screens (Maniac's keypad, Script 44, for the wall safe and the radio; the phone's dial pad; Zak's telephone dial, Script 13), where starting at the cutscene is the right fallback; Zak's flight sequences (Rooms 10, 11: the entry plays the flight and moves on to Room 1); per-kid state kept in variables indexed by the hero's number (Zak's ticket at the airport gate, Script 115 +0x0000: `var[0x09A + hero]`); Zak's airport (Room 8), whose visit is carried to Room 16 by a cut-away that is not a timer delay. Tried and dropped: holding other scripts' long timers while a pick waits (no change: that cut-away is not a delay).
 
+## Pseudo numbers of a room, and runs that start in control (1 November, eleventh batch)
+
+1. Zak's airport (Room 8) is entered under one of its pseudo numbers (141 to 145), picked at random among its arrivals; as 144 its entry starts Script 140, the Room 16 "meanwhile", which carried every Room 8 pick away. The search now offers each pseudo number of an object scene's room (`EnteredAs`, from `ScummEgoArrivalIndex.PseudoNumbersOf`), after the other values. Entered as 141 the gate answers "I need a ticket first" (a per-kid value through an indirect variable, Script 115 +0x0000), so it stays started at its cutscene; Indy 3 Room 17's books (Open, local script 200) now play their own way.
+2. `ScummCutscenePlanner.IntoControl`: a boot that ends inside a cutscene is run on (Esc where the game allows) until the player has had control for 300 frames, before the runs start. Zak's boot ends in control, so no change measured there.
+
+`*-run38.txt`: Indy 3 93.5% → 94.1% (both copies); the other copies unchanged; Maniac and Zak unchanged (`*-run15.txt`); LOOM unchanged (`../loom-editions-20261031/run21-*.txt`).
+

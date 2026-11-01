@@ -45,7 +45,10 @@ public sealed class ScummCutscenePlanner
         ArgumentNullException.ThrowIfNull(game);
         _game = game;
         PreparationNote = preparationNote;
-        var boot = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
+        var booted0 = newSession ?? (() => ScummGameSession.BootForPlay(game, out _));
+        // A boot still inside the game's intro (Zak McKracken: Script 1 plays on through Rooms 46 to 56 and the Room 16 "meanwhile") would carry
+        // every run away: the runs start once the player has control, the game's own skips (Esc) taken where it allows them (1 November 2026).
+        Func<ScummSession> boot = () => { var session = booted0(); IntoControl(session); return session; };
         _newSession = start switch
         {
             ScummCutsceneStart.SharedSnapshot => ScummBootSnapshot.Shared(boot),
@@ -119,6 +122,27 @@ public sealed class ScummCutscenePlanner
     /// player has control and no cutscene is open, within <see cref="VerbFrameLimit"/> frames. The session is the planner's own (it serves only for the
     /// names); the scenes' runs still start from the boot. A boot that shows a verb is left as it is (null). S7 Indy4, 18 October 2026.
     /// </summary>
+    /// <summary>
+    /// A session still in a cutscene after its boot is run on, Esc pressed each time the game allows a skip, until the player has control and no
+    /// cutscene is open (at most <see cref="VerbFrameLimit"/> frames); a session already in control is left as it is.
+    /// </summary>
+    public static void IntoControl(ScummSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        if (!session.InCutscene) return;
+        // The intro's tail may begin another cutscene a few seconds after control returns (Zak McKracken's Script 140, the Room 16 "meanwhile"):
+        // control must hold for SettleFrames frames in a row.
+        for (int frame = 0, settled = 0; frame < VerbFrameLimit && settled < SettleFrames; frame++)
+        {
+            if (session.CutsceneSkippable) session.PressKey(0x1B);
+            session.StepFrame();
+            settled = session.InCutscene || !session.UserInputOn ? 0 : settled + 1;
+        }
+    }
+
+    /// <summary>Frames of player control in a row after which an intro's tail is over (five seconds).</summary>
+    public const int SettleFrames = 300;
+
     public static string? UntilAVerbIsOn(ScummSession session)
     {
         ArgumentNullException.ThrowIfNull(session);
