@@ -50,6 +50,8 @@ public enum ScummSetupKind
     /// Monkey Island 1's sword on Room 36's dogs). Applying it gives the object; the run visits that room (<see cref="ScummSetupEdit.PlayRoom"/>).
     /// </summary>
     PlayedIn,
+    /// <summary>Variable A of <c>Target</c> ("A|B") set equal to variable B (Value 1) or to B + 1 (Value 0), read when applied.</summary>
+    VariableMatch,
     /// <summary>The hero switched to actor <c>Value</c> (a kid switch: Maniac Mansion's piano wants a musician), in the scene's room.</summary>
     HeroIs,
     /// <summary>One bit of a version 1/2 object's state set (Value &gt; 0) or cleared (Value &lt; 0): 8 open/on, 4 locked, 2 untouchable, 1 pickupable.</summary>
@@ -81,6 +83,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ScriptRunning => $"script {Target} running",
         ScummSetupKind.HeroIs => $"the hero is actor {Value}",
+        ScummSetupKind.VariableMatch => $"{Target.Split('|')[0]} {(Value == 1 ? "equal to" : "different from")} {Target.Split('|')[1]}",
         ScummSetupKind.PlayedIn => $"object {Target} held and used in Room {Value}",
         ScummSetupKind.ObjectStateBit => $"object {Target} {Math.Abs(Value) switch { 8 => Value > 0 ? "open (on)" : "closed (off)", 4 => Value > 0 ? "locked" : "unlocked", 2 => Value > 0 ? "untouchable" : "touchable", _ => Value > 0 ? "pickupable" : "not pickupable" }}",
         ScummSetupKind.CameraX => $"the camera at x {Value}",
@@ -140,6 +143,15 @@ public abstract partial class ScummSession
                 var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (_runtime.ObjectStates.GetValueOrDefault(id) == edit.Value) return false;
                 _runtime.SetObjectState(id, (byte)edit.Value);
+                return true;
+            }
+            case ScummSetupKind.VariableMatch:
+            {
+                var pair = edit.Target.Split('|');
+                var other = variables.GetValueOrDefault(pair[1]);
+                var current = variables.GetValueOrDefault(pair[0]);
+                if (edit.Value == 1 ? current == other : current != other) return false;
+                _runtime.SetGlobalVariable(pair[0], (ushort)(edit.Value == 1 ? other : other + 1));
                 return true;
             }
             case ScummSetupKind.HeroIs:

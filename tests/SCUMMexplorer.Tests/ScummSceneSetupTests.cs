@@ -235,6 +235,22 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void TwoVariablesComparedAndAValueSwappedIntoTheCombinedTry()
+    {
+        // Zak McKracken Room 12's loose dirt: isNotEqual var[0x093], var[0x0EA] (the squirrel) needs the two to differ; Room 27's tram needs the
+        // token, object 451 on, pseudo room 185 and the tram locked together (the combined try with the lock swapped in).
+        var folder = Path.Combine(TestGames.Root, "zak ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var dirt = planner.PlanSetup(Trigger(planner, 12, 267, 0x0B));
+        Assert.NotEqual(ScummPickedStart.AtCutscene, dirt.Result.Way);
+        Assert.Contains(dirt.Edits, edit => edit is { Kind: ScummSetupKind.VariableMatch, Value: 0 });
+        var tram = planner.PlanSetup(Trigger(planner, 27, 445, 0x0B));
+        output.WriteLine(tram.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, tram.Result.Way);
+    }
+
+    [Fact]
     public void ThePianoIsPlayedByAKidWhoCanPlayIt()
     {
         // Maniac Mansion Room 17's piano (verb 0x0B, +0x0018: isGreaterEqual var[0x000], 2, else "I can't play that thing!"): the hero switched

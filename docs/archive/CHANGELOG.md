@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: two variables compared; the combined try with values swapped in
+
+The setup search reads a comparison of two story variables (set equal, or one past: Zak McKracken Room 12's loose dirt, the squirrel) and, when the combined try of all values fails, retries it with each target's other values swapped in (Zak Room 27's tram: the token, object 451 on, pseudo room 185 and the tram locked). Played the game's own way: Zak 67% → 70% (both), Indy 4 94.6% → 95.3%; all five copies 93.2% → 93.5%; Maniac and LOOM unchanged. `Measure` has `MEASURE_COMBO` (candidates by index, run together). Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run39.txt`, `*-run16.txt`).
+
 ## 1 November: a room entered under each of its pseudo numbers; runs start once the player has control
 
 For an object scene in a room the game uses under several pseudo room numbers, the search also tries entering it under each (Zak McKracken's airport, Room 8 as 141 to 145: entered as 144 its arrival starts the Room 16 cut-away; Indy 3 Room 17's books now play their own way). The planner's runs start once the player has control when a boot ends inside a cutscene (the game's own skips taken, then five seconds of control). Indy 3 93.5% → 94.1%; all five copies 93.1% → 93.2%; Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run38.txt`, `*-run15.txt`).

@@ -61,6 +61,13 @@ foreach (var group in planner.Groups)
             var r1 = ScummCutsceneRun.RunPicked(game, newRun, t, [c]);
             Console.WriteLine($"  trial {c.Describe()}: begun {r1.Begun} rooms [{string.Join(",", r1.RoomsEntered)}] lines {r1.Lines} frames {r1.Frames} failure {r1.Failure}");
         }
+        // MEASURE_COMBO=0,2,5: one run with those candidates together (by their index in the list above).
+        if (Environment.GetEnvironmentVariable("MEASURE_COMBO") is { Length: > 0 } combo)
+        {
+            var picked = combo.Split(',').Select(int.Parse).Where(i => i < candidates.Count).Select(i => candidates[i]).ToList();
+            var rc = ScummCutsceneRun.RunPicked(game, newRun, t, picked);
+            Console.WriteLine($"  combo {string.Join(" + ", picked.Select(c => c.Describe()))}: begun {rc.Begun} rooms [{string.Join(",", rc.RoomsEntered)}] lines {rc.Lines} frames {rc.Frames}");
+        }
         // Pairs, for a few candidates (a scene that needs two values at once).
         if (candidates.Count is > 1 and <= 4)
             for (var i = 0; i < candidates.Count; i++)

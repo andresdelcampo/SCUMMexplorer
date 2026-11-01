@@ -298,3 +298,10 @@ What is left in Maniac Mansion and Zak McKracken (1 November, read and left): in
 
 `*-run38.txt`: Indy 3 93.5% → 94.1% (both copies); the other copies unchanged; Maniac and Zak unchanged (`*-run15.txt`); LOOM unchanged (`../loom-editions-20261031/run21-*.txt`).
 
+## Two variables compared; the combined try with values swapped in (1 November, twelfth batch)
+
+1. `ScummSetupKind.VariableMatch`: an equality test of two story variables (Zak Room 12's loose dirt, +0x0052 `isNotEqual var[0x093], var[0x0EA]`, else "Not with a vicious squirrel in my way") sets the first equal to the second, or to it + 1, as the scene's side needs (read when applied).
+2. When the combined try (one value per target, the first found) does not begin a scene, it is retried with each target's other values swapped in, one at a time: Zak Room 27's tram needs the token (object 61), object 451 on, pseudo room 185 and the tram locked; the first-found value was unlocked. `Measure`: `MEASURE_COMBO=i,j,…` runs the listed candidates together (trial mode).
+
+`*-run39.txt`: Indy 4 94.6% → 95.3% (the funnel, Room 36; the dark jungle paths, Room 76), the other copies unchanged; Zak 36 → 38 of 54 (70%, both: the loose dirt, the tram; `*-run16.txt`); Maniac unchanged; LOOM unchanged (`../loom-editions-20261031/run22-*.txt`). Read and left: Zak Room 44 object 655 is a sentence handler that needs the game's Give as the active verb. Test: `TwoVariablesComparedAndAValueSwappedIntoTheCombinedTry`.
+

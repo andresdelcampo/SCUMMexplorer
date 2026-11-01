@@ -119,6 +119,16 @@ public sealed partial class ScummSceneSetupSearch
             var together = ranked.Take(MaxCandidates).Where(r => r.Rank != 2).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
             var result = _run(trigger, together);
             if (result.Failure is null && result.Begun) { best = result; kept = together; }
+            // Then each target's other values swapped in, one at a time (Zak McKracken Room 27's tram: the token, object 451 on and pseudo room
+            // 185 together, with the tram locked rather than unlocked).
+            foreach (var other in ranked.Take(MaxCandidates).Where(r => r.Rank != 2).Select(r => r.Edit).Where(c => !together.Contains(c)))
+            {
+                if (best.Begun) break;
+                var swapped = together.Select(c => c.Kind == other.Kind && c.Target == other.Target ? other : c).ToList();
+                if (!swapped.Contains(other)) continue;
+                var swappedResult = _run(trigger, swapped);
+                if (swappedResult.Failure is null && swappedResult.Begun) { best = swappedResult; kept = swapped; }
+            }
         }
         foreach (var other in elsewhere.TakeWhile(_ => !best.Begun))
         {
@@ -335,7 +345,21 @@ public sealed partial class ScummSceneSetupSearch
                         // isEqual var[0x004]: is she here).
                         var value = ins.Operation is "equalZero" or "notEqualZero" ? 1 : parts.Length >= 2 && Literal(parts[1]) is int c ? c
                             : parts.Length >= 2 && parts[1] == ScummVars.Room ? trigger.Room : (int?)null;
-                        if (value is null) break;
+                        if (value is null)
+                        {
+                            // Two story variables compared (Zak McKracken Room 12's loose dirt, +0x0052: isNotEqual var[0x093], var[0x0EA], else "Not
+                            // with a vicious squirrel in my way"): the first set equal to the second, or one past it, as the scene's side needs.
+                            if (ins.Operation is "isEqual" or "isNotEqual" && parts.Length >= 2 && StoryVariable(tested) && !written.Contains(tested) &&
+                                VariablePattern().Match(parts[1]) is { Success: true } other && other.Value == parts[1])
+                                foreach (var equal in new[] { true, false })
+                                {
+                                    var holds = ins.Operation == "isEqual" ? equal : !equal;
+                                    var rank = guard is bool toPair ? holds == toPair ? 0 : 2 : 1;
+                                    var edit = new ScummSetupEdit(ScummSetupKind.VariableMatch, $"{tested}|{parts[1]}", equal ? 1 : 0, where);
+                                    if (!found.Any(f => f.Edit == edit)) found.Add((edit, rank));
+                                }
+                            break;
+                        }
                         // Both sides of the test (ScummVM jumps when it is false, and the scene may be on either side): the constant and, for an
                         // inequality, a value on its other side (Indy 4's closet door, Room 65 object 875: getObjectState then isNotEqual 0, so state 1).
                         var sides = ins.Operation switch
@@ -494,6 +518,11 @@ public sealed partial class ScummSceneSetupSearch
     /// <summary>A move of a literal into a variable (<c>move var[X] = 0x0001</c>, version 1/2 <c>move var[X], 0x0001</c>).</summary>
     private static bool IsFlagWrite(ScummScriptInstruction ins) =>
         ins.Operation == "move" && ins.Operands.Split(new[] { " = ", ", " }, 2, StringSplitOptions.None) is [_, var value] && Literal(value.Trim()) is not null;
+
+    /// <summary>A global variable from <see cref="FirstStoryVariable"/> up (a story variable, not the engine's own).</summary>
+    private static bool StoryVariable(string text) =>
+        VariablePattern().Match(text) is { Success: true } m && m.Value == text &&
+        int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstStoryVariable;
 
     private static string? WrittenVariable(ScummScriptInstruction ins)
     {
