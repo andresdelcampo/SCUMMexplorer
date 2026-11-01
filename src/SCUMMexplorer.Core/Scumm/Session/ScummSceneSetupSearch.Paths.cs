@@ -12,9 +12,15 @@ public sealed partial class ScummSceneSetupSearch
     /// Indy 4 Room 44's entry tests <c>var[0x07A]</c> against 502 to 510 in turn and plays its scene on one branch only: that value is the one to try.
     /// </summary>
     private Dictionary<int, bool> GuardSides(string label, ScummScriptDisassembly script, (string Label, int Offset)? cutscene, IReadOnlySet<string> toward,
-        ScummCutscene trigger)
+        ScummCutscene trigger) => GuardSides(label, script, cutscene, toward, trigger, out _);
+
+    /// <param name="more">The tests after the cutscene instruction in its own script whose branch jumps forward over a block: falling through runs
+    /// more of the scene (Monkey Island 2 Room 79, Wally: notEqualZero bit[0x237] +0x0037 skips his first lines), for a start at the cutscene.</param>
+    private Dictionary<int, bool> GuardSides(string label, ScummScriptDisassembly script, (string Label, int Offset)? cutscene, IReadOnlySet<string> toward,
+        ScummCutscene trigger, out HashSet<int> more)
     {
         var sides = new Dictionary<int, bool>();
+        more = [];
         if (cutscene is not { } scene) return sides;
         var instructions = script.Instructions;
         var index = new Dictionary<int, int>();
@@ -60,9 +66,15 @@ public sealed partial class ScummSceneSetupSearch
         {
             if (instructions[i].Operation == "jumpRelative" || Branch(i) is not int branch || !reaches.Contains(i)) continue;
             var through = reaches.Contains(i + 1);
-            var jumped = reaches.Contains(branch);
+            // A branch back is a wait (Monkey Island 1 Room 72's local script 201: getActorX, isGreater, back to +0x0000 until the hero has walked
+            // past): going round again is not the way on.
+            var jumped = branch > i && reaches.Contains(branch);
             if (through != jumped) sides[instructions[i].Offset] = through;
         }
+        if (label == scene.Label)
+            for (var i = 0; i + 1 < instructions.Count; i++)
+                if (instructions[i].Offset > scene.Offset && instructions[i].Operation != "jumpRelative" && Branch(i) is int over && over > i + 1)
+                    more.Add(instructions[i].Offset);
         return sides;
     }
 

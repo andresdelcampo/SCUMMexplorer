@@ -456,6 +456,16 @@ public sealed class ScummGameSession : ScummSession
         }
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return EnterWithoutEgo(room, arrival, arrivals);
         var candidates = arrivals.Into(roomId);
+        if (candidates.Count == 0 && WantedHeroIn == roomId)
+        {
+            WantedHeroIn = null;
+            // o5_loadRoomWithEgo's putActor(room) before startScene, with no decoded arrival to take the place from: the hero keeps his position.
+            var before = _runtime.Actors[ego];
+            _runtime.Actors.Put(ego, before.X, before.Y, roomId, CurrentPlacement(), ego);
+            var put = $"A picked scene's setup puts the hero in Room {roomId:00} before its entry (its code tests that he is there); no decoded arrival brings him in.";
+            _uncertainties.Add(put);
+            return EnterRoom(room, $"{arrival} {put}");
+        }
         if (candidates.Count == 0)
         {
             _uncertainties.Add($"Room {roomId:00} has no decoded loadRoomWithEgo with literal operands that brings the ego into it, so the ego is not placed in it.");

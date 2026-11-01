@@ -106,7 +106,7 @@ public sealed partial class ScummSceneSetupSearch
         if (!best.Begun && candidates.Count > 1)
         {
             // Values known to lead away from the scene are left out.
-            var together = ranked.Take(MaxCandidates).Where(r => r.Rank < 2).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+            var together = ranked.Take(MaxCandidates).Where(r => r.Rank != 2).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
             var result = _run(trigger, together);
             if (result.Failure is null && result.Begun) { best = result; kept = together; }
         }
@@ -134,8 +134,16 @@ public sealed partial class ScummSceneSetupSearch
     public IReadOnlyList<ScummSetupEdit> Candidates(ScummCutscene trigger) => Ranked(trigger).Select(r => r.Edit).ToList();
 
     /// <summary>
+    /// The values on the scene's side of the tests that guard the way to its cutscene, and of those after it that let more of it run (rank 3), one per
+    /// target (1 November 2026), for a start at the cutscene.
+    /// </summary>
+    public IReadOnlyList<ScummSetupEdit> GuardValues(ScummCutscene trigger) =>
+        Ranked(trigger).Where(r => r.Rank is 0 or 3).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+
+    /// <summary>
     /// The candidates with their rank (1 November 2026): 0 for a value on the side of a test that leads on to the scene's cutscene, 2 for one on the
-    /// side that leads away from it, 1 for the rest; ordered by rank, then code order.
+    /// side that leads away from it, 3 for one that lets more of the scene run after its cutscene instruction, 1 for the rest; ordered by rank (3 as
+    /// 1), then code order.
     /// </summary>
     private List<(ScummSetupEdit Edit, int Rank)> Ranked(ScummCutscene trigger)
     {
@@ -156,24 +164,27 @@ public sealed partial class ScummSceneSetupSearch
                 if (WrittenVariable(ins) is { } key) written.Add(key);
         var found = new List<(ScummSetupEdit Edit, int Rank)>();
         bool? guard = null;
+        var afterCutscene = false;
         var operation = "";
         int? constant = null;
         // tested: the value the test sees once the edit is applied (null when the edit is not the tested value itself).
         void Add(ScummSetupEdit edit, int? tested = null)
         {
-            var rank = guard is bool need && tested is int v && Holds(operation, constant, v) is bool holds ? holds == need ? 0 : 2 : 1;
+            var rank = guard is bool need && tested is int v && Holds(operation, constant, v) is bool holds ? holds == need ? 0 : 2
+                : afterCutscene && tested is int after && Holds(operation, constant, after) == true ? 3 : 1;
             var at = found.FindIndex(f => f.Edit.Kind == edit.Kind && f.Edit.Target == edit.Target && f.Edit.Value == edit.Value);
             if (at < 0) found.Add((edit, rank));
             else if (rank < found[at].Rank) found[at] = (found[at].Edit, rank);
         }
         foreach (var (label, script) in units)
         {
-            var guardSides = GuardSides(label, script!, cutscene, toward, trigger);
+            var guardSides = GuardSides(label, script!, cutscene, toward, trigger, out var moreScene);
             var stateOf = new Dictionary<string, int>();
             var costumeOf = new Dictionary<string, string>();
             var roomOf = new Dictionary<string, string>();
             var boxOf = new Dictionary<string, string>();
             var ownerOf = new Dictionary<string, int>();
+            var xOf = new Dictionary<string, string>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             // A script the trigger's code starts or chains to with literal arguments reads them as its locals (Indy 4 Room 7's cat figurine:
             // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116).
@@ -189,9 +200,10 @@ public sealed partial class ScummSceneSetupSearch
                 // Sophia's room: the later comparison is about her).
                 if (WrittenVariable(ins) is { } rewritten)
                 {
-                    stateOf.Remove(rewritten); costumeOf.Remove(rewritten); roomOf.Remove(rewritten); boxOf.Remove(rewritten); ownerOf.Remove(rewritten);
+                    stateOf.Remove(rewritten); costumeOf.Remove(rewritten); roomOf.Remove(rewritten); boxOf.Remove(rewritten); ownerOf.Remove(rewritten); xOf.Remove(rewritten);
                 }
                 guard = guardSides.TryGetValue(ins.Offset, out var need) ? need : null;
+                afterCutscene = moreScene.Contains(ins.Offset);
                 operation = ins.Operation;
                 constant = parts.Length >= 2 && Literal(parts[1]) is int k ? k : parts.Length >= 2 && parts[1] == ScummVars.Room ? trigger.Room : null;
                 switch (ins.Operation)
@@ -214,6 +226,9 @@ public sealed partial class ScummSceneSetupSearch
                                            (Literal(boxed.Groups[2].Value)?.ToString(CultureInfo.InvariantCulture) ?? Ego(boxed.Groups[2].Value)) is { } inBox:
                         // The same read inside an expression (Indy 4 Room 44's local script 203 +0x0012: local[0x001] = getActorWalkBox(…, 0x01)).
                         boxOf[boxed.Groups[1].Value] = inBox;
+                        break;
+                    case "getActorX" when parts.Length >= 2 && (Literal(parts[1])?.ToString(CultureInfo.InvariantCulture) ?? Ego(parts[1])) is { } across:
+                        xOf[parts[0]] = across;
                         break;
                     case "getActorRoom" when parts.Length >= 2 && Actor(parts[1]) is { } placed:
                         roomOf[parts[0]] = placed;
@@ -294,6 +309,14 @@ public sealed partial class ScummSceneSetupSearch
                             if (ins.Operation is "isEqual" or "isNotEqual" && value.Value > 0)
                                 Add(new(ScummSetupKind.WalkBox, boxedActor, value.Value, where, trigger.Room), value.Value);
                         }
+                        else if (xOf.TryGetValue(tested, out var acrossActor))
+                        {
+                            // A wait for the actor to walk past a point (Monkey Island 1 Room 72's local script 201: getActorX of the hero, then
+                            // isGreater 0xB4): only on the way to the cutscene, the actor stood on the scene's side.
+                            foreach (var side in sides.Where(v => v > 0).Distinct())
+                                if (guard is bool toScene && Holds(ins.Operation, value.Value, side) == toScene)
+                                    Add(new(ScummSetupKind.ActorX, acrossActor, side, where, trigger.Room), side);
+                        }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
                             Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
                         else if (objectCode && tested == "local[0x000]" && value.Value != 0)
@@ -309,7 +332,9 @@ public sealed partial class ScummSceneSetupSearch
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
                             Add(new(ScummSetupKind.Bit, tested, 1, where), 1);
                         else if (_roomLeftVariables.Value.Contains(tested) && ins.Operation is "isEqual" or "isNotEqual" &&
-                                 _game.Rooms.Any(r => r.ResourceId == value.Value) && value.Value != trigger.Room)
+                                 (_game.Rooms.Any(r => r.ResourceId == value.Value) || value.Value >= 0x80) &&
+                                 (value.Value != trigger.Room || trigger.IsRoomEntry))
+                            // A room, a pseudo room (Indy 4 Room 57's entry: 163), or the scene's own room left and entered again (Room 33).
                             Add(new(ScummSetupKind.CameFrom, tested, value.Value, where, trigger.Room), value.Value);
                         else if (VariablePattern().Match(tested) is { Success: true } v && tested == v.Value && !written.Contains(tested) &&
                                  int.Parse(v.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstStoryVariable)
@@ -328,7 +353,8 @@ public sealed partial class ScummSceneSetupSearch
                     Literal(door) is int byDoor and > 0 &&
                     !found.Any(f => f.Edit.Kind == ScummSetupKind.EnteredBy && f.Edit.Value == byDoor))
                     found.Add((new(ScummSetupKind.EnteredBy, tested, byDoor, $"Room {trigger.Room} entry script +0x{ins.Offset:X4}", trigger.Room), 1));
-        return found.OrderBy(f => f.Rank).ToList();
+        // A value that lets more of the scene run (3) keeps its place among the others (1) in the search.
+        return found.OrderBy(f => f.Rank == 3 ? 1 : f.Rank).ToList();
     }
 
     private static string? WrittenVariable(ScummScriptInstruction ins)

@@ -9,6 +9,9 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: scenes that re-enter their room, wait for the hero to walk past a point, or go on after their cutscene
+
+The setup now re-enters a room whose entry tests that the hero came from it (or from a pseudo room), puts the hero in a room before its entry, and stands an actor at the x position a script waits for (a branch back counts as a wait). A scene started at its cutscene also gets the values that let the rest of it run (Monkey Island 2's Wally speaks). Own way 89.2% → 90.3% (Indy 3 89.5%, Monkey Island 1 88.4% and 89.4%, Monkey Island 2 88.9%, Indy 4 92.3%); at the cutscene 10.8% → 9.7%; showing nothing 26 → 14; LOOM and its answer key unchanged ([record](../../.verification/scene-setup-20261031/README.md)).
 ## 1 November: scene setup reads which side of a test leads to the cutscene, how the room is entered and who holds what
 
 The setup search reads the jumps of the scripts on the way to a scene's cutscene (also those the scan does not list): values on the side of a test that leads to it are tried first and together, those on the other side last. `VAR_WALKTO_OBJ` is now set while `loadRoomWithEgo` enters a room (ScummVM `o5_loadRoomWithEgo`); new setup values: the room entered under a pseudo room number, by a door, or without the hero, and an object held by another actor. Played the game's own way: 84.4% → 89.2% of 1,093 scenes (Indy 3 88.9%, Monkey Island 1 87.2% and 88.1%, Monkey Island 2 88.9%, Indy 4 90.6%); started at the cutscene 15.6% → 10.8%, showing nothing 44 → 26; LOOM on the shared engine 3.2% → 0.9% (EGA) and 2.7% → 0.4% (CD) at the cutscene, its answer key unchanged ([record](../../.verification/scene-setup-20261031/README.md)).

@@ -153,6 +153,33 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AWaitForTheHeroToWalkPastAPointStandsHimThere()
+    {
+        // Monkey Island 1 Room 72's local script 201 loops (+0x0000 to +0x0006: getActorX of the hero, isGreater 0xB4, back) until he is left of
+        // x 180, then its cutscene; the loop's way back is not the way on, so x 179 is the value on the scene's side.
+        var folder = Path.Combine(TestGames.Root, "monkey1 ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 72, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ActorX, Value: 179 });
+    }
+
+    [Fact]
+    public void ASceneStartedAtItsCutsceneGetsTheValuesThatLetItsLinesRun()
+    {
+        // Monkey Island 2 Room 79, Wally: local script 207 starts with its cutscene; its first lines follow notEqualZero bit[0x237] (+0x0037).
+        var folder = Path.Combine(TestGames.Root, "mi2 mt32 en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 79, 777, 0x0A));
+        Assert.Equal(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.True(plan.Result.Lines > 0);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.Bit, Target: "bit[0x237]" });
+    }
+
+    [Fact]
     public void AnObjectAnotherActorMustHoldIsGivenToThatActor()
     {
         // Indy 3 Room 82's cracked seal, Look (+0x0000 getObjectOwner of the Grail, 873; +0x0005 isEqual 3): the cutscene plays when Elsa (actor 3)

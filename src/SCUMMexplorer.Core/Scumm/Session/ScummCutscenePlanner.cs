@@ -79,10 +79,21 @@ public sealed class ScummCutscenePlanner
             var plan = Setup.Plan(trigger, fresh);
             if (plan.Result.Begun) return plan;
             // R-8.35: nothing made the game's own code begin it, so its cutscene is started directly (with the setup kept, if any).
-            var at = _pool is null ? ScummCutsceneRun.Run(_game, _newSession, trigger, plan.Edits, ScummPickedStart.AtCutscene)
-                : _pool.Use(boot => ScummCutsceneRun.Run(_game, boot, trigger, plan.Edits, ScummPickedStart.AtCutscene));
+            ScummCutsceneRunResult AtCutscene(IReadOnlyList<ScummSetupEdit> edits) => _pool is null
+                ? ScummCutsceneRun.Run(_game, _newSession, trigger, edits, ScummPickedStart.AtCutscene)
+                : _pool.Use(boot => ScummCutsceneRun.Run(_game, boot, trigger, edits, ScummPickedStart.AtCutscene));
+            var edits = plan.Edits;
+            var at = AtCutscene(edits);
+            // The tests after the cutscene instruction still run: the values on the scene's side of them, with what was kept (Monkey Island 2
+            // Room 79: Wally's lines follow notEqualZero bit[0x237], +0x0037, after the cutscene at +0x0000).
+            var guards = Setup.GuardValues(trigger).Where(g => !edits.Any(e => e.Kind == g.Kind && e.Target == g.Target)).ToList();
+            if (guards.Count > 0 && AtCutscene([.. edits, .. guards]) is { Failure: null } guarded && guarded.Score > at.Score)
+            {
+                at = guarded;
+                edits = [.. edits, .. guards];
+            }
             return at.Score > plan.Result.Score
-                ? plan with { Result = at, Note = (plan.Note.Length > 0 ? plan.Note + " " : "") + "Its cutscene is started directly (the tests before it skipped)." }
+                ? plan with { Edits = edits, Result = at, Note = (plan.Note.Length > 0 ? plan.Note + " " : "") + "Its cutscene is started directly (the tests before it skipped)." }
                 : plan;
         });
     }

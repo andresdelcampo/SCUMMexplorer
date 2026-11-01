@@ -39,6 +39,8 @@ public enum ScummSetupKind
     EnteredBy,
     /// <summary>Object <c>Target</c> owned by actor <c>Value</c> (<c>getObjectOwner</c> compared with an actor: Indy 3's Grail held by Elsa, actor 3).</summary>
     OwnedBy,
+    /// <summary>An actor of the scene's room stood at x <c>Value</c> (a script waits for it to walk past a point: <c>getActorX</c> then compared).</summary>
+    ActorX,
 }
 
 /// <summary>
@@ -59,6 +61,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.EnteredAs => $"the room entered as pseudo room {Value}",
         ScummSetupKind.EnteredBy => $"the hero comes in by object {Value}",
         ScummSetupKind.OwnedBy => $"object {Target} owned by actor {Value}",
+        ScummSetupKind.ActorX => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} at x {Value}",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
@@ -134,7 +137,10 @@ public abstract partial class ScummSession
                 // game's own exit hook set the variable as the scene's room is entered next.
                 if (edit.Room is int sceneRoom && _runtime.CurrentRoom == sceneRoom) return false;
                 if (variables.GetValueOrDefault(edit.Target) == edit.Value && _runtime.CurrentRoom == edit.Value) return false;
-                if (_game.Rooms.FirstOrDefault(r => r.ResourceId == edit.Value) is not { } from) return false;
+                // A pseudo room number is visited as its real room under that number (the exit hook then copies the number).
+                var real = edit.Value >= 0x80 && _runtime.PseudoRooms.TryGetValue(edit.Value, out var mapped) ? mapped : edit.Value;
+                if (_game.Rooms.FirstOrDefault(r => r.ResourceId == real) is not { } from) return false;
+                if (real != edit.Value) WantedPseudoRoom = edit.Value;
                 VisitRoom(from);
                 return true;
             }
@@ -145,6 +151,16 @@ public abstract partial class ScummSession
                                                   _runtime.PseudoRooms.GetValueOrDefault(edit.Value) != pseudoOf)) return false;
                 if (WantedPseudoRoom == edit.Value) return false;
                 WantedPseudoRoom = edit.Value;
+                return true;
+            }
+            case ScummSetupKind.ActorX:
+            {
+                // Only in the scene's room, after its entry (the waiting script reads the position frame by frame).
+                if (edit.Room is int xRoom && _runtime.CurrentRoom != xRoom) return false;
+                var heroNumber = variables.TryGetValue(_runtime.EgoVariable, out var heroValue) ? (int?)heroValue : null;
+                var mover = edit.Target == "ego" ? heroNumber ?? 0 : int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                if (!_runtime.Actors.Contains(mover) || _runtime.Actors[mover].Room != _runtime.CurrentRoom || _runtime.Actors[mover].X == edit.Value) return false;
+                _runtime.Actors.Put(mover, edit.Value, _runtime.Actors[mover].Y, _runtime.CurrentRoom, CurrentPlacement(), heroNumber);
                 return true;
             }
             case ScummSetupKind.OwnedBy:
@@ -181,6 +197,10 @@ public abstract partial class ScummSession
                 // room without him, as a loadRoom rather than a loadRoomWithEgo would.
                 if (edit.Kind == ScummSetupKind.ActorRoom && edit.Value == 0 && actor == ego && !WantedHeroAway && _runtime.Actors[actor].Room != 0)
                     WantedHeroAway = true;
+                // The hero in a room he is not in yet (Monkey Island 1 Room 72's entry, +0x002C: getActorRoom of the hero compared with VAR_ROOM):
+                // the next visit of that room puts him in it before its entry, as loadRoomWithEgo would, where no decoded arrival brings him.
+                if (edit.Kind == ScummSetupKind.ActorRoom && edit.Value > 0 && actor == ego && _runtime.CurrentRoom != edit.Value)
+                    WantedHeroIn = edit.Value;
                 if (edit.Kind == ScummSetupKind.ActorCostume)
                 {
                     if (_runtime.Actors[actor].Look.Costume == edit.Value) return false;
@@ -218,6 +238,9 @@ public abstract partial class ScummSession
 
     /// <summary>True when a picked scene's setup wants its room entered without the hero (<see cref="ScummSetupKind.ActorRoom"/> 0 for the hero), until used.</summary>
     protected bool WantedHeroAway { get; set; }
+
+    /// <summary>The room a picked scene's setup wants the hero in as it is entered (<see cref="ScummSetupKind.ActorRoom"/> for the hero), until a visit uses it.</summary>
+    protected int? WantedHeroIn { get; set; }
 
     /// <summary>
     /// Readies the next entry of the scene's room for a setup's values about how it is entered (<see cref="ScummSetupKind.EnteredBy"/>,

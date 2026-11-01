@@ -59,12 +59,12 @@ In these games the room picker fills in on its own, and the Costumes tab sits be
 | **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | 99% | ✔ | ✔ | ✔ | ✔ | ✔ |
 | **LOOM** demos | ✔ | ✔ | ✔ | ✔ | preview | ✔ | ✔ | ✔ | ✔ | ✔ |
 | **LOOM** CD | ✔ | ✔ | ✔ | ✔ | 99% | ✔ | ✔ | ✔ | ✔ | ✔ |
-| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | 89% | ✔ | ✔ | ✔ | – | 67% |
-| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | 89% | ✔ | ✔ | ✔ | – | 67% |
-| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | 87% | ✔ | ✔ | ✔ | – | 48% |
-| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | 88% | ✔ | ✔ | ✔ | – | 49% |
+| **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | 90% | ✔ | ✔ | ✔ | – | 67% |
+| **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | 90% | ✔ | ✔ | ✔ | – | 67% |
+| **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | 88% | ✔ | ✔ | ✔ | – | 48% |
+| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | 89% | ✔ | ✔ | ✔ | – | 49% |
 | **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | 89% | ✔ | ✔ | ✔ | – | 59% |
-| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 91% | ✔ | ✔ | ✔ | – | 81% |
+| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 92% | ✔ | ✔ | ✔ | – | 81% |
 | **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 44% |
 | **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 43% |
 | **Zak McKracken** classic | ✔ | 69% | ✔ | ✔ | 24% | ✔ | ✔ | ✔ | ✔ | 37% |

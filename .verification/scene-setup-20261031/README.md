@@ -186,3 +186,22 @@ Changes to the setup search (`ScummSceneSetupSearch`) and the session (`ScummSes
 | **Total** | 1,093 | **84.4% → 89.2%** | **15.6% → 10.8%** | 44 → 26 |
 
 LOOM on the shared engine: at the cutscene EGA English 3.2% → 0.9%, CD 2.7% → 0.4%; the English answer key unchanged (`../loom-answer-key-20261031/compare-run7-loom-session.txt`: 238 of 238 begin, same rooms, 219 same category). What is left showing nothing: walk-offs that wait on the hero's walk box and position (Indy 4 Room 44's local script 203: box 1 left of x 84, an exit), VAR_ROOM tested against another room (Monkey Island 2's dog, Room 53, plays only in Room 8), music-synchronised waits. Tests (`ScummSceneSetupTests`): `AVariableReadAgainIsTestedForWhatItHoldsNow`, `ARoomEntryThatTestsAPseudoRoomNumberIsEnteredUnderIt`, `ACorridorSceneIsEnteredByTheDoorItsEntryAsksFor`, `AnObjectAnotherActorMustHoldIsGivenToThatActor`, `TheScriptsOnTheWayToTheCutsceneAreReadForTheirTests`; Indy 4 Room 10 now comes from Room 12 (tested on the way to its cutscene) where it came from Room 15. Tools: `summarise.py <run> <previous run>` in this folder; `MEASURE_SCRIPTS=1` prints a trigger's scripts and its cutscene; SourceDump `arr:<room>` lists the decoded arrivals into a room.
+
+## Re-entering a room, standing the hero where a script waits, and the rest of a scene started at its cutscene (1 November, third batch)
+
+Measured together (`*-run26.txt`, LOOM `../loom-editions-20261031/run12-*.txt`; `*-run24.txt` and `*-run25.txt` are the steps):
+
+1. **Came from the room itself or a pseudo room**: an entry that tests the room just left against its own number (Indy 4 Rooms 33, 35, 55: the hero went out and came back) is entered again; one that tests a pseudo room number (Indy 4 Room 57: 163) visits its real room under that number first.
+2. **The hero put in the room before its entry** where no decoded arrival brings him (the hero's room compared with VAR_ROOM), as `loadRoomWithEgo`'s `putActor(room)` does; and **an actor stood at an x position** a script waits for (`ActorX`: `getActorX` then compared, only on the scene's side). A **branch back** is a wait, not the way on: Monkey Island 1 Room 72's local script 201 loops until Guybrush is left of x 180, so x 179 is the value (both floppy and CD now play it their own way).
+3. **A scene started at its cutscene** also gets the values that guard the way to it and those that let more of it run after its `cutscene` instruction (a test whose branch jumps forward over a block): Monkey Island 2 Room 79, Wally, now speaks 6 lines (`notEqualZero bit[0x237]`, +0x0037); started there before, it showed nothing.
+
+| Game | Scenes | Own way | At cutscene | Showing nothing |
+|---|---|---|---|---|
+| Indy 3 (EGA; 256 colours the same) | 153 | 88.9% → 89.5% | 11.1% → 10.5% | 4 → 4 |
+| Monkey Island 1 floppy | 164 | 87.2% → 88.4% | 12.8% → 11.6% | 5 → 1 |
+| Monkey Island 1 CD | 160 | 88.1% → 89.4% | 11.9% → 10.6% | 3 → 1 |
+| Monkey Island 2 | 190 | 88.9% → 88.9% | 11.1% → 11.1% | 3 → 2 |
+| Indy 4 | 426 | 90.6% → 92.3% | 9.4% → 7.7% | 11 → 6 |
+| **Total** | 1,093 | **89.2% → 90.3%** | **10.8% → 9.7%** | 26 → 14 |
+
+LOOM unchanged (EGA 0.9%, CD 0.4% at the cutscene; answer key `../loom-answer-key-20261031/compare-run8-loom-session.txt`: 238 of 238, same rooms, 219 same category). Of the 14 showing nothing, several animate without a line (Indy 3 Room 62's doors are drawn and sounded) or wait on two values at once (Indy 4 Room 44: a bit, then the hero's walk box and x). Tests: `AWaitForTheHeroToWalkPastAPointStandsHimThere`, `ASceneStartedAtItsCutsceneGetsTheValuesThatLetItsLinesRun`.
