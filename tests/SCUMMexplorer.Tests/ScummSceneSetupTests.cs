@@ -235,6 +235,20 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ThePianoIsPlayedByAKidWhoCanPlayIt()
+    {
+        // Maniac Mansion Room 17's piano (verb 0x0B, +0x0018: isGreaterEqual var[0x000], 2, else "I can't play that thing!"): the hero switched
+        // to actor 2, as the game's kid switch does.
+        var folder = Path.Combine(TestGames.Root, "mmansion ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 17, 365, 0x0B));
+        output.WriteLine(plan.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.HeroIs, Value: 2 });
+    }
+
+    [Fact]
     public void AVersionTwoSecondObjectIsReadFromActiveObject2()
     {
         // Zak McKracken Room 21's sand pile (verb 0x0B, +0x003F: isEqual var[0x00A], 0x44): versions 1 and 2 keep the second object in

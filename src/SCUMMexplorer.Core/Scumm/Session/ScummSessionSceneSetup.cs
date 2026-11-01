@@ -50,6 +50,8 @@ public enum ScummSetupKind
     /// Monkey Island 1's sword on Room 36's dogs). Applying it gives the object; the run visits that room (<see cref="ScummSetupEdit.PlayRoom"/>).
     /// </summary>
     PlayedIn,
+    /// <summary>The hero switched to actor <c>Value</c> (a kid switch: Maniac Mansion's piano wants a musician), in the scene's room.</summary>
+    HeroIs,
     /// <summary>One bit of a version 1/2 object's state set (Value &gt; 0) or cleared (Value &lt; 0): 8 open/on, 4 locked, 2 untouchable, 1 pickupable.</summary>
     ObjectStateBit,
 }
@@ -78,6 +80,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.ActorX => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} at x {Value}",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ScriptRunning => $"script {Target} running",
+        ScummSetupKind.HeroIs => $"the hero is actor {Value}",
         ScummSetupKind.PlayedIn => $"object {Target} held and used in Room {Value}",
         ScummSetupKind.ObjectStateBit => $"object {Target} {Math.Abs(Value) switch { 8 => Value > 0 ? "open (on)" : "closed (off)", 4 => Value > 0 ? "locked" : "unlocked", 2 => Value > 0 ? "untouchable" : "touchable", _ => Value > 0 ? "pickupable" : "not pickupable" }}",
         ScummSetupKind.CameraX => $"the camera at x {Value}",
@@ -137,6 +140,21 @@ public abstract partial class ScummSession
                 var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (_runtime.ObjectStates.GetValueOrDefault(id) == edit.Value) return false;
                 _runtime.SetObjectState(id, (byte)edit.Value);
+                return true;
+            }
+            case ScummSetupKind.HeroIs:
+            {
+                // Only in the scene's room: the new hero stands where the hero stood, shown, the camera on them.
+                if (edit.Room is int heroRoom && _runtime.CurrentRoom != heroRoom) return false;
+                var current = variables.TryGetValue(_runtime.EgoVariable, out var egoNow) ? egoNow : 0;
+                if (current == edit.Value || !_runtime.Actors.Contains(edit.Value) || !_runtime.Actors.Contains(current)) return false;
+                var place = CurrentPlacement();
+                var (heroX, heroY) = (_runtime.Actors[current].X, _runtime.Actors[current].Y);
+                _runtime.SetGlobalVariable(_runtime.EgoVariable, (ushort)edit.Value);
+                _runtime.Actors.Put(edit.Value, heroX, heroY, _runtime.CurrentRoom, place, edit.Value);
+                _runtime.Actors.ShowActorsIn(place);
+                _runtime.Camera.Mode = ScummCamera.FollowActor;
+                _runtime.Camera.Follows = edit.Value;
                 return true;
             }
             case ScummSetupKind.ObjectStateBit:

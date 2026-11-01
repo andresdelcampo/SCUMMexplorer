@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: the hero switched to the kid a scene needs
+
+A test of who the hero is (`VAR_EGO` against an actor number) becomes a setup value: the hero switched to that actor in the scene's room, as the game's own kid switch does (Maniac Mansion Room 17's piano: only a musician plays it, Syd; Zak McKracken Room 43's scroll). Played the game's own way: Maniac 63% → 67% (both), Zak 65% → 67% (both); the other copies and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run14.txt`, `*-run37.txt`).
+
 ## 1 November: a variable at 0 where a guard needs it
 
 The setup search now also tries 0 for a story variable when 0 is on the scene's side of a test that guards the way to it (Indy 4 Room 28's flashlight: `isNotEqual var[0x0D3], 0` prints "I don't need it now"; at 0 the light goes on and its 12-line scene plays). Indy 4 94.4% → 94.6% own way; all five copies 93.0% → 93.1%; Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run36.txt`).

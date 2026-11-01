@@ -378,6 +378,14 @@ public sealed partial class ScummSceneSetupSearch
                             if (guard is not bool toBit || Holds(ins.Operation, value.Value, 1) == toBit)
                                 Add(new(ScummSetupKind.Bit, readBit, 1, where), 1);
                         }
+                        else if (tested == (_isV2 ? ScummVars.V2.Ego : ScummVars.Ego))
+                        {
+                            // Which kid is the hero (Maniac Mansion Room 17's piano, +0x0018: isGreaterEqual var[0x000], 2, else "I can't play that
+                            // thing!"): a hero switch to an actor on the scene's side, as the game's own kid switch does.
+                            foreach (var side in sides.Where(v => v is > 0 and < 32).Distinct())
+                                if (guard is not bool toHero || Holds(ins.Operation, value.Value, side) == toHero)
+                                    Add(new(ScummSetupKind.HeroIs, tested, side, where, trigger.Room), side);
+                        }
                         else if (runningOf.TryGetValue(tested, out var runningScript))
                         {
                             // A script that must be running (Indy 3 Room 32's painting, object 489 verb 0x0A: isScriptRunning 114, then the

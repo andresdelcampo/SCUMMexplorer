@@ -285,3 +285,7 @@ Then: a stood actor's x is scaled by 8 in versions 1 and 2, where `getActorX` re
 
 A story variable was tried only at non-zero values (and at 0 for a flag). Now 0 is also tried when it is on the scene's side of a guarding test: Indy 4 Room 28's flashlight (Use, +0x0014 `isNotEqual var[0x0D3], 0`: falling through prints "I don't need it now"; the branch lights it and chains to local script 229, 12 lines). `*-run36.txt`: Indy 4 94.4% → 94.6%, the other copies unchanged; Maniac and Zak unchanged (`*-run12.txt`); LOOM unchanged (`../loom-editions-20261031/run19-*.txt`).
 
+## The hero switched to the kid a scene needs (1 November, tenth batch)
+
+`ScummSetupKind.HeroIs`: a test of `VAR_EGO` (version-aware) against an actor number, on the scene's side, switches the hero to that actor in the scene's room (the hero variable, the actor put where the hero stood, the camera on them), as Maniac Mansion's and Zak McKracken's kid switch does. Maniac Room 17's piano (+0x0018 `isGreaterEqual var[0x000], 2`, else "I can't play that thing!") plays with Syd (actor 2); Zak Room 43's scroll too. `*-run14.txt`: Maniac 17 → 18 of 27 (67%, both), Zak 35 → 36 of 54 (67%, both); the other copies unchanged (`*-run37.txt`); LOOM unchanged (`../loom-editions-20261031/run20-*.txt`). Tried and dropped: per-kid bits (`getBitVar … , var[0x000]`, Zak Script 121) read as base + the hero's number: none is on a remaining scene's way. Test: `ThePianoIsPlayedByAKidWhoCanPlayIt`.
+
