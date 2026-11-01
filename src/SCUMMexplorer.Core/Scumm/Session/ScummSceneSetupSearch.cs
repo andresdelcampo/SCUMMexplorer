@@ -368,6 +368,16 @@ public sealed partial class ScummSceneSetupSearch
                             "equalZero" or "notEqualZero" => [1, 0],
                             _ => [value.Value, value.Value == 0 ? 1 : 0],
                         };
+                        if (_isV2 && objectCode && tested is ScummVars.V2.ActiveVerb or ScummVars.V2.ActiveObject1 or ScummVars.V2.ActiveObject2 &&
+                            ins.Operation is "isEqual" or "isNotEqual" && value.Value > 0 && (guard is not bool toSentence || Holds(ins.Operation, value.Value, value.Value) == toSentence))
+                        {
+                            // A version 1/2 sentence handler (Zak McKracken Room 18's flyer, verb 0xFD +0x009F: isEqual var[0x008], 3, then the object
+                            // given, var[0x009], and the actor it is given to, var[0x00A]): the sentence it waits for, the object given held.
+                            Add(new(ScummSetupKind.Variable, tested, value.Value, where), value.Value);
+                            if (tested == ScummVars.V2.ActiveObject1)
+                                Add(new(ScummSetupKind.Held, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
+                                    _objectRooms.Value.TryGetValue(value.Value, out var givenRoom) ? givenRoom : null));
+                        }
                         if (ownerOf.TryGetValue(tested, out var ownedObject))
                         {
                             // Owned by another actor (Indy 3 Room 82's cracked seal, +0x0005: the Grail's owner is 3, Elsa); 15 is the room. Only on

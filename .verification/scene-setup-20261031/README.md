@@ -305,3 +305,7 @@ What is left in Maniac Mansion and Zak McKracken (1 November, read and left): in
 
 `*-run39.txt`: Indy 4 94.6% → 95.3% (the funnel, Room 36; the dark jungle paths, Room 76), the other copies unchanged; Zak 36 → 38 of 54 (70%, both: the loose dirt, the tram; `*-run16.txt`); Maniac unchanged; LOOM unchanged (`../loom-editions-20261031/run22-*.txt`). Read and left: Zak Room 44 object 655 is a sentence handler that needs the game's Give as the active verb. Test: `TwoVariablesComparedAndAValueSwappedIntoTheCombinedTry`.
 
+## Version 2 sentence handlers (1 November, thirteenth batch)
+
+Zak's background object handlers (verb 0xFD) loop and wait for a sentence in the version 2 sentence variables: Room 18's flyer (+0x009F `isEqual var[0x008], 3`: Give; `var[0x009]` the object given, held by the hero; `var[0x00A]`, actor 8, the guard: "Our flag! Thank you!"). In object code of versions 1 and 2, a test of `VAR_ACTIVE_VERB`, `VAR_ACTIVE_OBJECT1` or `VAR_ACTIVE_OBJECT2` against a literal on the scene's side is now a setup value (and the object given is held). `*-run17.txt`: Zak 38 → 40 of 54 (74%, both: the flyer, Room 10's viewscreen); Maniac unchanged. Read and left: Zak Room 5's drop slot wants "some other" small object than the three it names; Room 14's markings chain through Scripts 28, 82 and 133.
+

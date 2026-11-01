@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: version 2 sentence handlers
+
+Zak McKracken's background object handlers (verb 0xFD) wait for a sentence in the version 2 sentence variables: the active verb (`var[0x008]`, 3 for Give), the object given (`var[0x009]`, held) and the actor it goes to (`var[0x00A]`). The setup search now offers those as values. Zak 70% → 74% played its own way (both: Room 18's flyer, Room 10's viewscreen); Maniac unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run17.txt`).
+
 ## 1 November: two variables compared; the combined try with values swapped in
 
 The setup search reads a comparison of two story variables (set equal, or one past: Zak McKracken Room 12's loose dirt, the squirrel) and, when the combined try of all values fails, retries it with each target's other values swapped in (Zak Room 27's tram: the token, object 451 on, pseudo room 185 and the tram locked). Played the game's own way: Zak 67% → 70% (both), Indy 4 94.6% → 95.3%; all five copies 93.2% → 93.5%; Maniac and LOOM unchanged. `Measure` has `MEASURE_COMBO` (candidates by index, run together). Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run39.txt`, `*-run16.txt`).
