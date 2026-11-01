@@ -45,6 +45,25 @@ foreach (var folder in args)
         }
         return (named, bare, actors, verbNamed, verbBare);
     }
+    if (Environment.GetEnvironmentVariable("COUNT_SAMPLE") is { Length: > 0 } kind)
+    {
+        // COUNT_SAMPLE=actor|object|verb: the unnamed references of that kind by number, with an example line each (1 November 2026).
+        var glossary = LoomGlossary.Load(game);
+        var pattern = kind switch { "object" => @"\bobject (\d+)(?! “)\b", "verb" => @"\bverb (0x[0-9A-F]{2})\b(?!:)", _ => @"\bactor (\d+)\b" };
+        var found = new Dictionary<string, (int Count, string Example)>();
+        foreach (var script in scripts)
+        {
+            string text;
+            try { text = new LoomScriptPresenter(glossary, glossary.VerbName, "the hero").Present(script); }
+            catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException or ArgumentException) { continue; }
+            foreach (var line in text.Split("\nNames used", 2)[0].Split('\n'))
+                foreach (Match m in Regex.Matches(line, pattern))
+                    found[m.Groups[1].Value] = found.TryGetValue(m.Groups[1].Value, out var f) ? (f.Count + 1, f.Example) : (1, $"{script.Context}: {line.Trim()}");
+        }
+        foreach (var (key, (count, example)) in found.OrderByDescending(f => f.Value.Count).Take(25))
+            Console.WriteLine($"  {kind} {key}: {count}  e.g. {(example.Length > 160 ? example[..160] : example)}");
+        continue;
+    }
     var before = LoomGlossary.Load(game);
     typeof(LoomGlossary).GetField("_pendingGame", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(before, null);
     var b = Measure(before, null);

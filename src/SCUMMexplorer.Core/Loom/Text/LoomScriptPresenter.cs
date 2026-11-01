@@ -17,6 +17,9 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
 
     private enum Role { Number, Actor, Object, Room, Script, Sound, Verb }
 
+    /// <summary>An operand that is an actor when its number is below the actor count, otherwise an object (ScummVM <c>objIsActor</c>).</summary>
+    private static Role ActorOrObject(string operand) => Literal(operand) < NumActors ? Role.Actor : Role.Object;
+
     private readonly Dictionary<string, (GlossaryEntry Entry, string Ref)> _used = new();
     private readonly Dictionary<int, int> _loopEnds = new();
     private readonly HashSet<int> _openLoops = [];
@@ -254,7 +257,8 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 case "walkActorTo": return $"{Value(a[0], Role.Actor)} walks to ({Value(a[1])}, {Value(a[2])})";
                 case "walkActorToObject": return $"{Value(a[0], Role.Actor)} walks to {Value(a[1], Role.Object)}";
                 case "walkActorToActor": return $"{Value(a[0], Role.Actor)} walks to {Value(a[1], Role.Actor)} (stopping {Value(a[2])} away)";
-                case "faceActor": return $"{Value(a[0], Role.Actor)} turns to face {Value(a[1], Role.Object)}";
+                // ScummVM getObjOrActorName/getDist: a number below the actor count is an actor (Indy 3: getDist of object 1, Indy).
+                case "faceActor": return $"{Value(a[0], Role.Actor)} turns to face {Value(a[1], ActorOrObject(a[1]))}";
                 case "animateActor": return $"{Value(a[0], Role.Actor)}: {Animation(a[1])}";
                 case "actorFollowCamera": return $"the camera follows {Value(a[0], Role.Actor)}";
                 case "setCameraAt": return $"the camera jumps to x={Value(a[0])}";
@@ -297,7 +301,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 case "getActorMoving": return $"{Value(a[0])} = whether {Value(a[1], Role.Actor)} is moving";
                 case "getActorElevation": return $"{Value(a[0])} = elevation of {Value(a[1], Role.Actor)}";
                 case "getActorWidth": return $"{Value(a[0])} = width of {Value(a[1], Role.Actor)}";
-                case "getDist": return $"{Value(a[0])} = distance between {Value(a[1], Role.Object)} and {Value(a[2], Role.Object)}";
+                case "getDist": return $"{Value(a[0])} = distance between {Value(a[1], ActorOrObject(a[1]))} and {Value(a[2], ActorOrObject(a[2]))}";
                 case "findObject": return $"{Value(a[0])} = the object at ({Value(a[1])}, {Value(a[2])})";
                 case "getObjectOwner": return $"{Value(a[0])} = owner of {Value(a[1], Role.Object)}";
                 case "setVarRange": return $"fill {Value(a[0])} with {a[1].Replace("count=", "")} values";

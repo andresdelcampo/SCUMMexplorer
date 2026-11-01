@@ -27,6 +27,20 @@ What stays unnamed: objects whose data stores no name (or an empty one), actors 
 
 Real window (`WindowCheck s:118`, Indy 3 EGA, private profile): the script page's readable view shows "0034  Indy: costume 10; …", "Marcus", "Henry", "Elsa" ([picture](window/s-118.png)). Verbs in the window (`WindowCheck s:1:verb`, `s:2:verb`): Script 1 +0x0569 "do the sentence: verb "Walk to" object 834 "locker room"", Script 2 +0x010F "run verb "Give" of local 1 with local 2". Runs `count-run1.txt` (objects, actors), `count-run2.txt` (with verbs). Test: `GameNamesReadableTests`.
 
+## Costumes, and actors in getDist and faceActor (1 November)
+
+Monkey Island 1 names few actors (`actorName` mostly for Guybrush and placeholders) and reuses actors 3 to 10 from scene to scene, so a number-wide name rarely holds. A costume belongs to one character more surely: the name given to the actor wearing a costume (in a script or room that gives that actor one costume) names the costume when it is given in at least two thirds of those places, and a script or room that dresses an actor in it without naming the actor uses it (`LoomGlossaryGameNames.cs`). Example: Script 143 +0x0172, actor 7 in costume 75, "Herman Toothrot" in 7 of 7 scripts. `getDist` and `faceActor` now read a number below the actor count as an actor (ScummVM `objIsActor`), as class tests already did. `Count` has a sample mode (`COUNT_SAMPLE=actor|object|verb`: unnamed references by number, an example each).
+
+| Game | Objects named | Actors named | Verbs named | Together (README) |
+|---|---|---|---|---|
+| Indy 3 EGA | 53.5% (662 of 1,237) | 74.5% → 74.9% | 57.0% | 67% → 68% |
+| Monkey Island 1 floppy | 66.4% | 39.0% → 40.6% | 43.5% | 48% → 49% |
+| Monkey Island 1 CD | 71.6% | 39.2% → 40.9% | 29.2% | 49% → 50% |
+| Monkey Island 2 | 80.3% | 50.1% → 50.7% | 60.9% | 59% → 60% |
+| Indy 4 | 91.4% | 79.3% → 81.0% | 79.6% | 81% → 84% |
+
+Objects named rise where "object 1" to "object 12" were actors (they now count as actor references). Run: `count-run3.txt`. Tests: `GameNamesReadableTests.AnActorUnnamedInItsScriptIsNamedByTheCostumeItWears`, `ADistanceToASmallNumberIsADistanceToAnActor`.
+
 ## Not done
 
-- Variable and bit names for the other games: their script maps (`docs/<game>/*_SCRIPT_MAP.md`) would need reviewed rows turned into data, as LOOM's glossary is.
+- Variable and bit names for the other games: their script maps (`docs/<game>/*_SCRIPT_MAP.md`) hold 13 to 56 rows each, mostly engine variables that already have names, so there is little to turn into data. What stays unnamed is mostly what the game's data does not name: image-only objects (drawn or set to a state, with no stored name) and actors no script names.

@@ -29,6 +29,7 @@ public sealed partial class LoomGlossary
         }
         var named = new List<(int Actor, string Name, string Scope, string Where)>();
         var verbs = new List<(int Actor, string Name, string Scope, string Where)>();
+        var dressed = new List<(int Actor, int Costume, string Scope, string Where)>();
         void Scan(Func<ScummScriptDisassembly?> read, string scope, string label)
         {
             ScummScriptDisassembly? script;
@@ -40,6 +41,8 @@ public sealed partial class LoomGlossary
                 var first = ins.Operands.Split(',', 2)[0].Trim();
                 if (!first.StartsWith("0x", StringComparison.Ordinal) ||
                     !int.TryParse(first.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var actor)) continue;
+                if (ins.Operation == "actorOps" && CostumeRegex().Match(ins.Operands) is { Success: true } costume)
+                    dressed.Add((actor, int.Parse(costume.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture), scope, $"{label} +0x{ins.Offset:X4}"));
                 if ((ins.Operation == "actorOps" ? ActorNameRegex() : VerbNameRegex()).Match(ins.Operands) is not { Success: true } m) continue;
                 var name = m.Groups[1].Value.Trim();
                 // A name with control codes or no letter (a placeholder) is not a name.
@@ -64,6 +67,22 @@ public sealed partial class LoomGlossary
             var first = scoped.First();
             rows.Add((first.Actor, first.Actor, new(first.Name, GlossaryEvidence.Decoded, $"actorOps actorName at {first.Where}"), first.Scope));
         }
+        // A costume belongs to one character more surely than an actor number does (Monkey Island 1 reuses actors 3 to 10 from scene to scene):
+        // the name given to the actor wearing a costume, in a script or room that gives that actor one costume, names the costume when it is given
+        // in at least two thirds of those places; a script or room that dresses an actor in it without naming the actor then uses it (1 November 2026).
+        var costumeOf = dressed.GroupBy(d => (d.Actor, d.Scope)).Where(g => g.Select(d => d.Costume).Distinct().Count() == 1)
+            .ToDictionary(g => g.Key, g => g.First());
+        var costumeNames = named.Where(n => costumeOf.ContainsKey((n.Actor, n.Scope)))
+            .Select(n => (Costume: costumeOf[(n.Actor, n.Scope)].Costume, n.Name, n.Scope, n.Where)).GroupBy(n => n.Costume)
+            .Select(g => (Costume: g.Key, Scopes: g.Select(n => n.Scope).Distinct().Count(),
+                Top: g.GroupBy(n => n.Name).Select(t => (Name: t.Key, Scopes: t.Select(n => n.Scope).Distinct().Count(), First: t.First().Where))
+                    .OrderByDescending(t => t.Scopes).First()))
+            .Where(c => c.Top.Scopes * 3 >= c.Scopes * 2).ToDictionary(c => c.Costume, c => c);
+        var namedScopes = named.Select(n => (n.Actor, n.Scope)).ToHashSet();
+        foreach (var ((actor, scope), dress) in costumeOf)
+            if (!namedScopes.Contains((actor, scope)) && costumeNames.TryGetValue(dress.Costume, out var worn))
+                rows.Add((actor, actor, new(worn.Top.Name, GlossaryEvidence.Decoded,
+                    $"costume {dress.Costume} at {dress.Where}, worn by the actor named \"{worn.Top.Name}\" in {worn.Top.Scopes} of the {worn.Scopes} scripts that name its wearer (first at {worn.Top.First})"), scope));
         foreach (var verb in verbs.GroupBy(n => n.Actor))
         {
             var scopes = verb.Select(n => n.Scope).Distinct().Count();
@@ -95,6 +114,9 @@ public sealed partial class LoomGlossary
 
     [GeneratedRegex(@"(?:^|; |\[)name, ""([^""]*)""")]
     private static partial Regex VerbNameRegex();
+
+    [GeneratedRegex(@"(?:\[|; )costume, 0x([0-9A-F]+)(?:;|\])")]
+    private static partial Regex CostumeRegex();
 
     [GeneratedRegex("actorName, \"([^\"]*)\"")]
     private static partial Regex ActorNameRegex();

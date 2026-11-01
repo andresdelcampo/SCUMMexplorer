@@ -41,6 +41,41 @@ public sealed class GameNamesReadableTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AnActorUnnamedInItsScriptIsNamedByTheCostumeItWears()
+    {
+        // 1 November 2026: Monkey Island 1 reuses actors 3 to 10 and names few of them; a costume belongs to one character, so a script that dresses
+        // an actor in a costume another script names its wearer by gives that actor the name.
+        var folder = Path.Combine(TestGames.Root, "monkey1 ega en");
+        if (!Directory.Exists(folder)) return;
+        var glossary = LoomGlossary.Load(new GameFolderScanner().Scan(folder));
+        var byCostume = Enumerable.Range(1, 200).SelectMany(script => Enumerable.Range(2, 11).Select(actor => (script, actor, entry: glossary.Actor(actor, $"script:{script}"))))
+            .Where(f => f.entry?.Source.StartsWith("costume ", StringComparison.Ordinal) == true).ToList();
+        foreach (var (script, actor, entry) in byCostume.Take(10)) output.WriteLine($"script {script} actor {actor}: {entry!.Name} ({entry.Source})");
+        // Global script 143 +0x0172 dresses actor 7 in costume 75, which seven scripts name "Herman Toothrot".
+        Assert.Equal("Herman Toothrot", glossary.Actor(7, "script:143")?.Name);
+    }
+
+    [Fact]
+    public void ADistanceToASmallNumberIsADistanceToAnActor()
+    {
+        // ScummVM getDist/objIsActor: a number below the actor count is an actor (Indy 3: getDist var[0x000], 0x01, 0x04 reads Indy, not object 1).
+        var folder = Path.Combine(TestGames.Root, "indy3 ega en");
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var glossary = LoomGlossary.Load(game);
+        var data = ScummDataSources.For(game);
+        var scripts = data.GlobalScriptIds().Select(id => data.GlobalScript(id))
+            .Concat(game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).Distinct()
+                .SelectMany(room => data.RoomLocalScriptIds(room).Select(local => data.RoomLocalScript(room, local))));
+        var script = scripts.First(s => s?.Instructions.Any(i => i.Operation == "getDist" &&
+            System.Text.RegularExpressions.Regex.IsMatch(i.Operands, @", 0x0*1(,|$)")) == true)!;
+        var text = new LoomScriptPresenter(glossary).Present(script);
+        output.WriteLine(string.Join('\n', text.Split('\n').Where(line => line.Contains("distance"))));
+        Assert.DoesNotContain("distance between object 1 ", text);
+        Assert.Contains("distance between", text);
+    }
+
+    [Fact]
     public void Monkey2NamesItsHeroGameWide()
     {
         var folder = Path.Combine(TestGames.Root, "mi2 mt32 en");

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: actors named by the costume they wear; getDist and faceActor read actors
+
+An actor a script or room dresses in a costume without naming it takes the name scripts give that costume's wearer, when one name is given in at least two thirds of them (Monkey Island 1's Script 143: actor 7 in costume 75 is "Herman Toothrot", named so in 7 of 7 scripts); a script's own `actorName` still wins. `getDist` and `faceActor` read a number below the actor count as an actor, as ScummVM's `objIsActor` does (Indy 3: "distance between object 1 and object 4" now names both actors). Readable share (objects, actors and verbs together): Indy 3 67% → 68%, Monkey Island 1 48% → 49% (floppy) and 49% → 50% (CD), Monkey Island 2 59% → 60%, Indy 4 81% → 84%. Record: [readable names](../../.verification/readable-names-20261031/README.md) (`count-run3.txt`).
+
 ## 1 November: LOOM's Interact puts Bobbin at the object (Room 47's swan speaks)
 
 LOOM's Interact ran a verb where things stood; after a room visit that leaves Bobbin out of the room (Room 47), his answer to "Any other draft" ("That draft won't work on her.") showed nothing, as ScummVM's `actorTalk` shows nothing for an actor not in the current room. Interact now puts Bobbin at the object first, as a picked scene does (R-8.38). Real window: the swan's line shows; Room 62's wheel unchanged. Record: [LOOM editions](../../.verification/loom-editions-20261031/README.md).
