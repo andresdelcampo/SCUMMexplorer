@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: version 2's second object and bit variables
+
+The scene setup reads version 1/2's second object (`VAR_ACTIVE_OBJECT2`, `var[0x00A]`, which a direct run now sets) and its bit variables (`getBitVar`: bit base + index of the variable words, as ScummVM's o2_getBitVar). Played the game's own way: Maniac 52% → 63% (both), Zak 54% → 63% (both); the other copies and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`maniac-*`, `zak-*` `run8`, `run9`).
+
 ## 1 November: Maniac Mansion and Zak McKracken on the shared scene setup; Sounds counted as listened
 
 Maniac Mansion and Zak McKracken scenes now get the shared scene setup's readings: a version 1/2 object state bit (`ifState var[0x009], IntrinsicOff`: v2 jumps when the named bit is as named, so the door must be open; new `ObjectStateBit` value), a once-only flag (a variable the code only sets to constants, now tried at its tested value, 0 included), a timed scene waited for (a literal `delay` before the cutscene) and, while a picked scene has not begun, its own scripts' timers hurried (`HurryUntilCutscene`, also in the app: Maniac's Script 139 waits seven minutes before Ed's round), the hero put at the picked object, and version 2's slashed object labels (`Room 08 / Object 208 / Verb 0xFD`) read as the scene's own (Zak's 7 scenes that began nothing now begin). Played the game's own way: Maniac 26% → 52% (both), Zak 31% → 54% (both); every scene begins; the other five copies and LOOM unchanged. The README's Sounds column and `GameSupport.Families` count sounds as listened to (the user, 1 November: sounds heard across games and sources a week earlier). Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`maniac-*`, `zak-*` `run1` to `run6`).

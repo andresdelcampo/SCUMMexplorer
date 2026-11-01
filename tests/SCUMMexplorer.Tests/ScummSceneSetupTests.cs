@@ -235,6 +235,20 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AVersionTwoSecondObjectIsReadFromActiveObject2()
+    {
+        // Zak McKracken Room 21's sand pile (verb 0x0B, +0x003F: isEqual var[0x00A], 0x44): versions 1 and 2 keep the second object in
+        // VAR_ACTIVE_OBJECT2; the setup gives object 0x44 and the direct run sets the variable.
+        var folder = Path.Combine(TestGames.Root, "zak ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 21, 391, 0x0B));
+        output.WriteLine(plan.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.SecondObject, Target: "68" });
+    }
+
+    [Fact]
     public void TheGrailDiaryOpensOnAPageInARoomItsCodeNames()
     {
         // Indy 3 Room 2 object 68 Open: the page shown depends on VAR_ROOM_RESOURCE (+0x002E: rooms 18, 62, 48, 81), which startScene sets

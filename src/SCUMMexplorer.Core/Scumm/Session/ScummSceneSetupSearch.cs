@@ -211,6 +211,7 @@ public sealed partial class ScummSceneSetupSearch
             var ownerOf = new Dictionary<string, int>();
             var xOf = new Dictionary<string, string>();
             var runningOf = new Dictionary<string, int>();
+            var bitOf = new Dictionary<string, string>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             // A script the trigger's code starts or chains to reads its arguments as its locals: literals (Indy 4 Room 7's cat figurine:
             // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116), "this object" (Monkey Island 2's
@@ -233,7 +234,7 @@ public sealed partial class ScummSceneSetupSearch
                 if (WrittenVariable(ins) is { } rewritten)
                 {
                     stateOf.Remove(rewritten); costumeOf.Remove(rewritten); roomOf.Remove(rewritten); boxOf.Remove(rewritten); ownerOf.Remove(rewritten); xOf.Remove(rewritten);
-                    runningOf.Remove(rewritten);
+                    runningOf.Remove(rewritten); bitOf.Remove(rewritten);
                 }
                 guard = guardSides.TryGetValue(ins.Offset, out var need) ? need : null;
                 afterCutscene = moreScene.Contains(ins.Offset);
@@ -253,6 +254,11 @@ public sealed partial class ScummSceneSetupSearch
                         operation = "equalZero";
                         Add(new(ScummSetupKind.ObjectStateBit, stateObject.ToString(CultureInfo.InvariantCulture), on ? mask : -mask, where), 1);
                         Add(new(ScummSetupKind.ObjectStateBit, stateObject.ToString(CultureInfo.InvariantCulture), on ? -mask : mask, where), 0);
+                        break;
+                    case "getBitVar" when parts.Length >= 3 && Literal(parts[1]) is int bitBase && Literal(parts[2]) is int bitIndex:
+                        // ScummVM o2_getBitVar: bit (base + index) of the variable words, word n >> 4, bit n & 15, as old version 3 packs its bits
+                        // (Maniac Mansion Script 139 +0x0038: getBitVar var[0x001], 0x0B00, 0x13).
+                        bitOf[parts[0]] = $"bit[0x{bitBase + bitIndex:X3}]";
                         break;
                     case "isScriptRunning" when parts.Length >= 2 && Literal(parts[1]) is int checkedScript:
                         runningOf[parts[0]] = checkedScript;
@@ -366,6 +372,12 @@ public sealed partial class ScummSceneSetupSearch
                                 if (guard is bool toScene && Holds(ins.Operation, value.Value, side) == toScene)
                                     Add(new(ScummSetupKind.ActorX, acrossActor, side, where, trigger.Room), side);
                         }
+                        else if (bitOf.TryGetValue(tested, out var readBit))
+                        {
+                            // A bit is only ever raised by a setup: tried at 1 unless only 0 leads on.
+                            if (guard is not bool toBit || Holds(ins.Operation, value.Value, 1) == toBit)
+                                Add(new(ScummSetupKind.Bit, readBit, 1, where), 1);
+                        }
                         else if (runningOf.TryGetValue(tested, out var runningScript))
                         {
                             // A script that must be running (Indy 3 Room 32's painting, object 489 verb 0x0A: isScriptRunning 114, then the
@@ -383,7 +395,9 @@ public sealed partial class ScummSceneSetupSearch
                         }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
                             Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
-                        else if ((objectCode && tested == "local[0x000]" || Argument(tested) == SecondObjectArgument) && value.Value != 0)
+                        else if ((objectCode && (tested == "local[0x000]" || _isV2 && tested == ScummVars.V2.ActiveObject2) || Argument(tested) == SecondObjectArgument) &&
+                                 value.Value != 0)
+                            // Versions 1 and 2 keep the second object in VAR_ACTIVE_OBJECT2 (Zak McKracken Room 21's sand pile, +0x003F: isEqual var[0x00A], 0x44).
                             // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
                             Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
                                 _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);

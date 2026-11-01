@@ -413,7 +413,7 @@ public abstract partial class ScummSession
                 // Direct exploration bypasses walking/input, but must not reuse another object's context.
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveVerb, checked((ushort)verbId));
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject1, checked((ushort)objectId));
-                _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, 0);
+                _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, checked((ushort)objectB));
             }
             var locals = objectB != 0 && !_runtime.IsV2
                 ? new Dictionary<string, ushort> { ["local[0x000]"] = checked((ushort)objectB), ["local[0x001]"] = checked((ushort)verbId) }

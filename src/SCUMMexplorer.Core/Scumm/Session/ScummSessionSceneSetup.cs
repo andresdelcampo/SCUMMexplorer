@@ -375,7 +375,7 @@ public abstract partial class ScummSession
         PutHeroAtObject(objectA);
         if (sentence == 0)
         {
-            ActivateObjectVerb(objectA, verb);
+            ActivateObjectVerb(objectA, verb, objectB);
             return;
         }
         _runtime.Sentences.Add((verb, objectA, objectB));
