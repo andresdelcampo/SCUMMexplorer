@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: a variable at 0 where a guard needs it
+
+The setup search now also tries 0 for a story variable when 0 is on the scene's side of a test that guards the way to it (Indy 4 Room 28's flashlight: `isNotEqual var[0x0D3], 0` prints "I don't need it now"; at 0 the light goes on and its 12-line scene plays). Indy 4 94.4% → 94.6% own way; all five copies 93.0% → 93.1%; Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run36.txt`).
+
 ## 1 November: version 2's second object and bit variables
 
 The scene setup reads version 1/2's second object (`VAR_ACTIVE_OBJECT2`, `var[0x00A]`, which a direct run now sets) and its bit variables (`getBitVar`: bit base + index of the variable words, as ScummVM's o2_getBitVar). The hero's variable is version-aware (`var[0x000]` in versions 1 and 2, where `var[0x001]` is scratch), as are `VAR_ROOM_RESOURCE` and the door a room is entered by (none in version 2). Played the game's own way: Maniac 52% → 63% (both), Zak 54% → 65% (both); the other copies and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`maniac-*`, `zak-*` `run8`, `run9`).

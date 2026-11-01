@@ -426,7 +426,10 @@ public sealed partial class ScummSceneSetupSearch
                             // The other side of an equality is a value beside the constant, not 0 (Indy 3 Room 24's first aid kit, +0x0000 isEqual
                             // var[0x0C1], 1000: the scene plays only below full health).
                             foreach (var side in (ins.Operation is "isEqual" or "isNotEqual" ? [value.Value, value.Value > 1 ? value.Value - 1 : value.Value + 1] : sides)
-                                         .Where(v => v > 0 || flagged.Contains(tested)).Distinct())
+                                         // 0 for a flag, or where the scene's side of a guard needs it (Indy 4 Room 28's flashlight, +0x0014:
+                                         // isNotEqual var[0x0D3], 0 prints "I don't need it now"; the way on needs 0).
+                                         .Where(v => v > 0 || flagged.Contains(tested) || guard is bool zeroSide && Holds(ins.Operation, value.Value, v) == zeroSide)
+                                         .Distinct())
                             {
                                 var variable = new ScummSetupEdit(ScummSetupKind.Variable, tested, side, where);
                                 if (ins.Operation is "isEqual" or "isNotEqual" && side != value.Value)

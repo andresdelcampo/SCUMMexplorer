@@ -281,3 +281,7 @@ Then (`*-run11.txt`): the hero's variable is version-aware (`VAR_EGO` is `var[0x
 
 Then: a stood actor's x is scaled by 8 in versions 1 and 2, where `getActorX` reads x in units of 8 pixels (the session's own o2 `getActorX` divides by 8; Zak Room 10's purple button waits for x past 50). No measured change: that room's visit moves on to Room 1, so the hero is not there to stand. Read and left: several remaining Maniac and Zak scenes wait for the player's input on a screen of their own (Zak's telephone, Room 1: the dial, Script 13; Maniac's wall safe: the combination, Script 44), where starting at the cutscene is the right fallback; Maniac's stereo and contract (Script 61) depend on tapes, object states and the tentacle's room.
 
+## A variable at 0 where a guard needs it (1 November, ninth batch)
+
+A story variable was tried only at non-zero values (and at 0 for a flag). Now 0 is also tried when it is on the scene's side of a guarding test: Indy 4 Room 28's flashlight (Use, +0x0014 `isNotEqual var[0x0D3], 0`: falling through prints "I don't need it now"; the branch lights it and chains to local script 229, 12 lines). `*-run36.txt`: Indy 4 94.4% → 94.6%, the other copies unchanged; Maniac and Zak unchanged (`*-run12.txt`); LOOM unchanged (`../loom-editions-20261031/run19-*.txt`).
+
