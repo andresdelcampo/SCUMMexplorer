@@ -378,13 +378,22 @@ public abstract partial class ScummSession
     }
 
 
-    public ScummObjectActionResult ActivateObjectVerb(int objectId, int verbId)
+    /// <param name="objectB">The second object of a two-object verb (Use X with Y), passed as the code's <c>local[0x000]</c> with the verb in
+    /// <c>local[0x001]</c>, as the sentence scripts' <c>startObject A, verb, [B, verb]</c> do (Indy 4 Script 2 +0x0520, Indy 3 Script 2 +0x0335); 0 for none.</param>
+    public ScummObjectActionResult ActivateObjectVerb(int objectId, int verbId, int objectB = 0)
     {
         BeforeInput();
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before activating an object verb.");
-        var record = _currentObjects.FirstOrDefault(item => item.Id == objectId) ??
-                     throw new InvalidDataException($"Object {objectId} has no code record in Room {sourceRoomId:00}.");
+        // A held object's code is the copy of the room it was taken from (ScummVM getOBCDFromObject: the inventory's copy).
+        var codeRoom = sourceRoomId;
+        var record = _currentObjects.FirstOrDefault(item => item.Id == objectId);
+        if (record is null && Array.IndexOf(_runtime.InventorySlots, objectId) >= 0 && _runtime.InventoryRooms.TryGetValue(objectId, out var takenFrom))
+        {
+            codeRoom = takenFrom;
+            record = _data.ReadRoom(takenFrom).Objects.FirstOrDefault(item => item.Id == objectId);
+        }
+        if (record is null) throw new InvalidDataException($"Object {objectId} has no code record in Room {sourceRoomId:00}.");
         _uncertainties.StartStep();
         var beforeUncertainties = _uncertainties.Count;
         var beforeEvents = _visitEvents.Count;
@@ -397,7 +406,7 @@ public abstract partial class ScummSession
         _entersRoomLoads++;
         try
         {
-            script = _data.ReadObjectVerb(_currentRoom.ResourceId!.Value, record, verbId, out _);
+            script = _data.ReadObjectVerb(codeRoom, record, verbId, out _);
             if (_runtime.IsV2 && verbId is not (250 or 253 or 254))
             {
                 // o2_doSentence sub1 binds the active invocation before runObjectScript.
@@ -406,7 +415,11 @@ public abstract partial class ScummSession
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject1, checked((ushort)objectId));
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, 0);
             }
-            run = RunScript(script, _currentObjects, 0, null, 0, keepState: true);
+            var locals = objectB != 0 && !_runtime.IsV2
+                ? new Dictionary<string, ushort> { ["local[0x000]"] = checked((ushort)objectB), ["local[0x001]"] = checked((ushort)verbId) }
+                : null;
+            if (locals is not null) _uncertainties.Add($"Object {objectB} was passed as the second object (local[0x000]), as the sentence script's startObject does.");
+            run = RunScript(script, _currentObjects, 0, locals, 0, keepState: true);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {

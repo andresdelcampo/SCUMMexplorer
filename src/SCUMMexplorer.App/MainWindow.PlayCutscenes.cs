@@ -285,14 +285,16 @@ public partial class MainWindow
             }
             else
             {
-                if (session.CurrentRoomId != trigger.Room)
+                // A verb that plays only in another room is used there, the object held (ScummSetupKind.PlayedIn).
+                var playRoom = ScummSetupEdit.PlayRoom(plan?.Edits) is int other && game.Rooms.FirstOrDefault(r => r.ResourceId == other) is { } otherRoom ? otherRoom : room;
+                if (session.CurrentRoomId != playRoom.ResourceId)
                 {
                     _sceneSound.StopAll("a cutscene in another room was started from the list");
-                    session.VisitRoom(room);
+                    session.VisitRoom(playRoom);
                 }
-                if (plan?.Result.Way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
-                else session.PickInteraction(trigger.ObjectId, trigger.VerbId,
-                    plan?.Edits.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0);
+                var second = plan?.Edits.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
+                if (plan?.Result.Way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
+                else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second);
                 uncertainties = session.Snapshot.Uncertainties;
             }
         }

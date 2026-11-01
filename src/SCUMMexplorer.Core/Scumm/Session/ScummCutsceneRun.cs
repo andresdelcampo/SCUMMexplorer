@@ -67,8 +67,11 @@ public static class ScummCutsceneRun
             var mark = session.RoomsEntered.Count;
             var logMark = session.Messages.Log.Count;
             // An entry trigger in the room the boot ends in plays that room's entry again (its first run was inside the boot's own cutscene).
+            // A verb that plays only in another room is used there, the object held (ScummSetupKind.PlayedIn).
+            var playIn = !trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene && ScummSetupEdit.PlayRoom(setup) is int other &&
+                         game.Rooms.FirstOrDefault(r => r.ResourceId == other) is { } otherRoom ? otherRoom : room;
             if (trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene) session.EnterRoomAgain(room);
-            else session.VisitRoom(room);
+            else session.VisitRoom(playIn);
             // Again after the visit: the room's entry may have reset what the setup set (Indy 3 Room 23's entry closes its doors, whose Close tests
             // state 1); only what the session lacks is set, so values the entry derived from the setup stay.
             if (setup is { Count: > 0 }) session.ApplySceneSetup(setup);
@@ -90,7 +93,7 @@ public static class ScummCutsceneRun
                 logMark = session.Messages.Log.Count;
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
                 var second = setup?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
-                if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+                if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
                 else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second);
             }
             // Only a cutscene begun by a script the trigger's code reaches counts: a room's own background scripts begin cutscenes of their

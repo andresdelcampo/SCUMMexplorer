@@ -224,3 +224,23 @@ Measured together (`*-run27.txt`, LOOM `../loom-editions-20261031/run13-*.txt`):
 | **Total** | 1,093 | **90.3% → 91.7%** | **9.7% → 8.3%** | 14 → 14 |
 
 No scene moved the other way. LOOM unchanged (EGA 0.9%, CD 0.4% at the cutscene). `summarise.py` now finds the result line after the scripts line (`MEASURE_SCRIPTS=1`). Seen and left: Monkey Island 1 Room 14's cooking pot starts its scene only in debug mode (`notEqualZero var[0x027]`, `VAR_DEBUGMODE`); scenes that play only when VAR_ROOM is another room (Monkey Island 1 Room 30's sword in Room 36, Monkey Island 2 Room 53's dog in Room 8) are the next step. Tests: `ThisObjectPassedToAScriptIsThePickedObject`, `TheSecondObjectPassedToAScriptIsGivenToTheHero`, `AScriptThatMustBeRunningIsStartedAndACameraWaitIsMet`.
+
+## The second object in a direct run, scenes used in another room, a variable beside its constant (1 November, fifth batch)
+
+Measured together (`*-run30.txt` against `*-run27.txt`; `*-run28.txt` and `*-run29.txt` are the steps, LOOM `../loom-editions-20261031/run14-*.txt`):
+
+1. **The second object in a direct run**: `ActivateObjectVerb(A, verb, B)` gives the verb's code `local[0x000]` = B and `local[0x001]` = the verb, as the sentence scripts' `startObject A, verb, [B, verb]` (Indy 4 Script 2 +0x0520). The game's own way can refuse a pair the explorer picks: Indy 4's sentence script calls Script 9, which accepts "Use A with B" only when A has class 1, 2 or 3, so the peg (Room 72), Sophia (Room 97) and the pulley (Room 50) were refused and their direct run lacked B (Indy 4's totem pole and sentry statue begin the game's own way through 4 below). The app's pick passes it too.
+2. **Used in another room** (`ScummSetupKind.PlayedIn`): an object verb whose test of VAR_ROOM against another room leads to its scene is played in that room with the object held (its code read from the room it lies in; `ActivateObjectVerb` reads a held object's code from there). It is a last try of its own, after the other values: Indy 4 Room 76's lamp also tests Room 77 on a later branch, and visiting it first misled the search. Monkey Island 1 Room 30's sword ("On those helpless dogs?", Room 36) and Monkey Island 2 Room 53's dog (Room 8) now play their own way.
+3. **A story variable beside its constant**: an equality test also tries a value beside the constant (constant − 1), so a scene on its unequal side can be reached (Indy 3 Room 24's first aid kit: `isEqual var[0x0C1], 1000` prints "I'll save it for when I need it"; at 999, "I feel much better now"). Only for a variable compared with nothing else that leads on (Indy 4 Rooms 27 and 65 compare `var[0x0EE]` with 1, 2 and 3), and never in place of a constant the code compares with.
+4. **A kept value gives way**: while a scene has not begun, a later value of the same target may replace the one kept (it printed a line but did not begin the scene).
+
+| Game | Scenes | Own way | At cutscene | Showing nothing |
+|---|---|---|---|---|
+| Indy 3 (EGA; 256 colours the same) | 153 | 92.2% → 92.8% | 7.8% → 7.2% | 4 → 4 |
+| Monkey Island 1 floppy | 164 | 89.6% → 91.5% | 10.4% → 8.5% | 1 → 1 |
+| Monkey Island 1 CD | 160 | 90.6% → 91.9% | 9.4% → 8.1% | 1 → 1 |
+| Monkey Island 2 | 190 | 90.5% → 91.6% | 9.5% → 8.4% | 2 → 1 |
+| Indy 4 | 426 | 93.2% → 94.4% | 6.8% → 5.6% | 6 → 5 |
+| **Total** | 1,093 | **91.7% → 92.9%** | **8.3% → 7.1%** | 14 → 12 |
+
+No scene moved the other way. LOOM unchanged. Real window (`WindowCheck 30,402,8`, Monkey Island 1 floppy, private profile): the pick opens Room 36 with Guybrush at the mansion and the dogs, "On those helpless dogs?", then "That's inhumane!" ([picture](window-elsewhere/30-402-8.png)). Tests: `AVerbThatPlaysOnlyInAnotherRoomIsUsedThereWithTheObjectHeld`, `ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant`.

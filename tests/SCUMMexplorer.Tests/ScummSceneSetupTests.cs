@@ -193,6 +193,40 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AVerbThatPlaysOnlyInAnotherRoomIsUsedThereWithTheObjectHeld()
+    {
+        // Monkey Island 1 Room 30's sword, Use (+0x0000 isEqual VAR_ROOM, 0x24): "On those helpless dogs?" only in Room 36.
+        var folder = Path.Combine(TestGames.Root, "monkey1 ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 30, 402, 0x08));
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.PlayedIn, Target: "402", Value: 36 });
+    }
+
+    [Fact]
+    public void ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant()
+    {
+        // Indy 4 Room 72's peg (verb 0x06) is used with object 934; the sentence script refuses it (Script 9: the peg has no class 1 to 3), so the
+        // verb's code is run directly with the second object as local[0x000], as startObject passes it. Indy 3 Room 24's first aid kit plays only
+        // when var[0x0C1] is not 1000.
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (Directory.Exists(folder))
+        {
+            var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+            var plan = planner.PlanSetup(Trigger(planner, 72, 992, 0x06));
+            Assert.Equal(ScummPickedStart.Direct, plan.Result.Way);
+            Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.SecondObject, Target: "934" });
+        }
+        if (Indy3() is not { } game) return;
+        var indy3 = new ScummCutscenePlanner(game);
+        var kit = indy3.PlanSetup(Trigger(indy3, 24, 360, 0x08));
+        Assert.NotEqual(ScummPickedStart.AtCutscene, kit.Result.Way);
+        Assert.Contains(kit.Edits, edit => edit is { Kind: ScummSetupKind.Variable, Target: "var[0x0C1]", Value: 999 });
+    }
+
+    [Fact]
     public void AScriptThatMustBeRunningIsStartedAndACameraWaitIsMet()
     {
         // Indy 3 Room 32's painting (object 489 verb 0x0A) starts Script 115 only while Script 114 runs; Room 86's local script 201 waits for the

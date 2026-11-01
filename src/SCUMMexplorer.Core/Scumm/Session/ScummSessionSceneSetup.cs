@@ -45,6 +45,11 @@ public enum ScummSetupKind
     ScriptRunning,
     /// <summary>The camera at x <c>Value</c> (a script waits for <c>VAR_CAMERA_POS_X</c> to pass a point): the hero stood there and the camera taken to him.</summary>
     CameraX,
+    /// <summary>
+    /// The verb used in Room <c>Value</c>, not the object's own room, with object <c>Target</c> held (its code compares VAR_ROOM with that room:
+    /// Monkey Island 1's sword on Room 36's dogs). Applying it gives the object; the run visits that room (<see cref="ScummSetupEdit.PlayRoom"/>).
+    /// </summary>
+    PlayedIn,
 }
 
 /// <summary>
@@ -53,6 +58,9 @@ public enum ScummSetupKind
 /// </summary>
 public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Value, string Where, int? Room = null)
 {
+    /// <summary>The room a setup's scene is played in when it is not the trigger's own (<see cref="ScummSetupKind.PlayedIn"/>); null otherwise.</summary>
+    public static int? PlayRoom(IEnumerable<ScummSetupEdit>? edits) => edits?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.PlayedIn)?.Value;
+
     public string Describe() => Kind switch
     {
         ScummSetupKind.Bit => $"{Target} = 1",
@@ -68,6 +76,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.ActorX => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} at x {Value}",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ScriptRunning => $"script {Target} running",
+        ScummSetupKind.PlayedIn => $"object {Target} held and used in Room {Value}",
         ScummSetupKind.CameraX => $"the camera at x {Value}",
         ScummSetupKind.ObjectClass => Value > 0 ? $"object {Target} in class {Value}" : $"object {Target} out of class {-Value}",
         _ => $"object {Target} held",
@@ -241,6 +250,7 @@ public abstract partial class ScummSession
             }
             default:
             {
+                // Held, SecondObject and PlayedIn: the object given to the hero (its code that of the room it lies in).
                 var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (Array.IndexOf(_runtime.InventorySlots, id) >= 0) return false;
                 var ego = variables.GetValueOrDefault(_runtime.EgoVariable);
