@@ -1940,6 +1940,9 @@ public partial class MainWindow : Window
         var speakerNotes = play ? CurrentModule.SpeakersForDirectVerb(sourceRoom, record.Id, verb.VerbId) : [];
         // R-8.38: an object picked from Interact that is not in the room now is brought into it first (a present object is never changed).
         if (play) speakerNotes = [.. speakerNotes, .. _session.BringObjectIntoRoom(record.Id)];
+        // R-8.38: the hero put at the object, as a picked scene does (ScummSession.PickInteraction): a line Bobbin speaks shows nothing while he is
+        // in another room (ScummVM actorTalk), as Room 47's swan answering any other draft did after a room visit.
+        if (play) _session.PutHeroAtObject(record.Id);
         var action = _session.ActivateObjectVerb(record.Id, verb.VerbId);
         UpdateSessionSound();
         StatusText.Text = action.DestinationRoomId is int destination

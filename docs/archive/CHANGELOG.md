@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 1 November: LOOM's Interact puts Bobbin at the object (Room 47's swan speaks)
+
+LOOM's Interact ran a verb where things stood; after a room visit that leaves Bobbin out of the room (Room 47), his answer to "Any other draft" ("That draft won't work on her.") showed nothing, as ScummVM's `actorTalk` shows nothing for an actor not in the current room. Interact now puts Bobbin at the object first, as a picked scene does (R-8.38). Real window: the swan's line shows; Room 62's wheel unchanged. Record: [LOOM editions](../../.verification/loom-editions-20261031/README.md).
+
 ## 1 November: VAR_ROOM_RESOURCE, and Indy 3's Grail Diary opens on its page
 
 The session now sets `VAR_ROOM_RESOURCE` (variable 22 in versions 3 to 5) to the real room's number as a room is entered, as ScummVM's `startScene` does (version 2 already had its own). The "used in another room" setup also reads it, and also where each side of the test leads on, trying the rooms in turn with the values already kept: Indy 3's Grail Diary (Room 2 object 68, Open) shows its page in Room 18, and Monkey Island 2's ship's horn plays its own way. Own way 92.9% → 93.0% (Indy 3 93.5%, Monkey Island 2 92.1%); at the cutscene 7.1% → 7.0%; showing nothing 12 → 11; LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run31.txt`).
