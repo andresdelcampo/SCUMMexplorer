@@ -44,3 +44,11 @@ Shared cause found by tracing Room 18's look at the bell (catalog 536 frames, en
 
 - The named sequences (The Elders' trial, the firewood scene, Walk to Room 13, Room 46's recipe) and the catalog's start states (Bobbin's look and staff, the camera) are what the shared engine cannot produce yet; they are the reviewed data to keep.
 - Run the same comparison for LOOM's other editions by matching each English replay to their scan by room, object name and verb.
+
+## Tried and dropped: ending a scene apart from the room's background (1 November)
+
+Room 23's draft reactions at the workers (12 of the 21 scenes more than 10% off) run about 640 frames longer than the catalog: the workers' talk (Room 23 local script 212) goes on in a cutscene of its own and keeps the run from its 32 quiet frames. Three rules for "background", each measured with `Compare` (`COMPARE_LOOM_SESSION=1`) against 217 of 238 within 10%:
+1. A line from any script the scene's scan does not reach: 193; global helpers that print the scene's lines (Scripts 16 and 18) were counted as background.
+2. Only the room's own local scripts the scan does not reach: 200; Rooms 8, 9, 28 and 41 lose lines of local scripts their scene starts (Room 41 object 633: 1,335 → 93 frames); Room 23 unchanged, its talk being inside a cutscene.
+3. What runs before the pick (its frames' cutscenes and its lines): 213; Room 23 unchanged (the talk starts again after the pick), Room 35's draft reactions cut short (338 → 46 frames).
+None kept. Telling the room's ambient talk from the scene needs the catalog's own end point or a reading of which script ends the reaction; until then Room 23's reactions stay long (their lines and rooms are right).
