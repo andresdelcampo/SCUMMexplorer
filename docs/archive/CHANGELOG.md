@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 2 November: a wait for the player to skip answered
+
+The input feeder also answers a version 1/2 wait for the player to skip (a test of `VAR_KEYPRESS` against `VAR_CUTSCENEEXIT_KEY`): the exit key pressed on the keyboard. Zak 78% → 80% (both: the plane lands, Room 11's object 263); Maniac and the other copies unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run25.txt`).
+
 ## 2 November: actors stood in the room once the pick has put the hero there
 
 The setup values that stand actors in the scene's room (x position, walk box, next to another, camera, hero switch) are applied again right after the pick, in the headless runs and the app: the hero enters some rooms only when the pick puts him at the object. Zak 76% → 78% (both: Room 10's purple button, the hero past x 50 on the plane); the other copies, Maniac and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run24.txt`, `*-run45.txt`).

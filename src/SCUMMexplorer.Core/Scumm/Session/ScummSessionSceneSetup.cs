@@ -517,6 +517,20 @@ public abstract partial class ScummSession
             var at = instructions.ToList().FindIndex(ins => ins.Offset == item.Offset);
             if (at < 0) continue;
             while (at < instructions.Count && instructions[at].Operation == "breakHere") at++;
+            // A wait for the player to skip (versions 1/2: Zak McKracken's flight, Room 11 object 263 +0x0027: isEqual VAR_CLICK_AREA, 4, then
+            // isEqual VAR_KEYPRESS, VAR_CUTSCENEEXIT_KEY): the exit key pressed on the keyboard.
+            if (_runtime.IsV2 && instructions.Skip(at).Take(3).Any(ins => ins.Operation == "isEqual" &&
+                    ins.Operands.StartsWith($"{ScummVars.V2.Keypress}, {ScummVars.V2.CutsceneExitKey}", StringComparison.Ordinal)))
+            {
+                var exitKey = _runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.CutsceneExitKey);
+                if (_runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.Keypress) != exitKey)
+                {
+                    _runtime.SetGlobalVariable(ScummVars.V2.ClickArea, 4);
+                    _runtime.SetGlobalVariable(ScummVars.V2.Keypress, (ushort)exitKey);
+                    _uncertainties.Add($"{item.Frame.Label} waited for the player to skip; for the picked scene the exit key was pressed (an exploration action).");
+                }
+                continue;
+            }
             // A wait on a bit the input screen sets when it is done (Zak McKracken's telephone, Script 13 +0x0033: getBitVar var[0x001], 0x05BE,
             // 0x00, then equalZero back): the bit set (versions 1/2 and old v3 pack bit n into word n >> 4).
             if (at + 1 < instructions.Count && instructions[at].Operation == "getBitVar" && instructions[at + 1].Operation == "equalZero" &&
