@@ -1,0 +1,818 @@
+164 groups, planner ready in 0,8 s
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x08E] = 1 (tested at Room 1 entry script +0x0003): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 130 (tested at Room 1 entry script +0x0066): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x215] = 1 (tested at Room 1 entry script +0x0084): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 131 (tested at Room 1 entry script +0x00A3): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x210] = 1 (tested at Room 1 entry script +0x00D1): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 132 (tested at Room 1 entry script +0x00EC): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x216] = 1 (tested at Room 1 entry script +0x00FB): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 in class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 out of class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x169] = 1 (tested at Room 1 entry script +0x0137): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 01 object 0 verb 0x00 () 3,1 s, 10 candidates: var[0x08E] = 1 (tested at Room 1 entry script +0x0003) | the room entered as pseudo room 130 (tested at Room 1 entry script +0x0066) | bit[0x215] = 1 (tested at Room 1 entry script +0x0084) | the room entered as pseudo room 131 (tested at Room 1 entry script +0x00A3) | bit[0x210] = 1 (tested at Room 1 entry script +0x00D1) | the room entered as pseudo room 132 (tested at Room 1 entry script +0x00EC) | bit[0x216] = 1 (tested at Room 1 entry script +0x00FB) | object 843 in class 6 (tested at global script 93 +0x0118) | object 843 out of class 6 (tested at global script 93 +0x0118) | bit[0x169] = 1 (tested at Room 1 entry script +0x0137)
+      scripts: Room 1 local script 200 | global script 93; cutscene: (Room 1 local script 200, 29, System.Int32[])
+      result: way AtCutscene lines 2 rooms [33] frames 13
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 89 state 1 (tested at Room 7 object 89 verb 0x09 +0x0000): begun True rooms [] lines 2 frames 56 failure 
+  trial object 80 held (tested at Room 7 object 89 verb 0x09 +0x0006): begun False rooms [] lines 1 frames 600 failure 
+  trial object 89 state 0 (tested at Room 7 object 89 verb 0x09 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 07 object 89 verb 0x09 (drawer) 0,4 s, 3 candidates: object 89 state 1 (tested at Room 7 object 89 verb 0x09 +0x0000) | object 80 held (tested at Room 7 object 89 verb 0x09 +0x0006) | object 89 state 0 (tested at Room 7 object 89 verb 0x09 +0x0000)
+      scripts: Room 7 object 89 verb 0x09; cutscene: (Room 7 object 89 verb 0x09, 18, )
+      result: way Game lines 2 rooms [] frames 56
+      kept: object 89 state 1 (tested at Room 7 object 89 verb 0x09 +0x0000); rooms [] lines 2
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 96 state 1 (tested at Room 8 object 96 verb 0x09 +0x0000): begun True rooms [] lines 3 frames 57 failure 
+  trial object 96 in class 18 (tested at Room 8 object 96 verb 0x09 +0x0006): begun False rooms [] lines 1 frames 600 failure 
+  trial object 96 state 0 (tested at Room 8 object 96 verb 0x09 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+  trial object 96 out of class 18 (tested at Room 8 object 96 verb 0x09 +0x0006): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 08 object 96 verb 0x09 (chest) 0,6 s, 4 candidates: object 96 state 1 (tested at Room 8 object 96 verb 0x09 +0x0000) | object 96 in class 18 (tested at Room 8 object 96 verb 0x09 +0x0006) | object 96 state 0 (tested at Room 8 object 96 verb 0x09 +0x0000) | object 96 out of class 18 (tested at Room 8 object 96 verb 0x09 +0x0006)
+      scripts: Room 8 object 96 verb 0x09; cutscene: (Room 8 object 96 verb 0x09, 15, )
+      result: way Game lines 3 rooms [] frames 57
+      kept: object 96 state 1 (tested at Room 8 object 96 verb 0x09 +0x0000); rooms [] lines 3
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 131 state 0 (tested at Room 11 entry script +0x006A): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 7 (tested at Room 11 local script 204 +0x0006): begun True rooms [] lines 1 frames 171 failure 
+  trial bit[0x1B4] = 1 (tested at Room 11 entry script +0x0042): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x212] = 1 (tested at Room 11 entry script +0x0053): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x168] = 1 (tested at Room 11 entry script +0x0086): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 in class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 out of class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial object 131 state 1 (tested at Room 11 entry script +0x006A): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 11 object 0 verb 0x00 () 1,1 s, 8 candidates: object 131 state 0 (tested at Room 11 entry script +0x006A) | the hero in walk box 7 (tested at Room 11 local script 204 +0x0006) | bit[0x1B4] = 1 (tested at Room 11 entry script +0x0042) | bit[0x212] = 1 (tested at Room 11 entry script +0x0053) | bit[0x168] = 1 (tested at Room 11 entry script +0x0086) | object 843 in class 6 (tested at global script 93 +0x0118) | object 843 out of class 6 (tested at global script 93 +0x0118) | object 131 state 1 (tested at Room 11 entry script +0x006A)
+      scripts: Room 11 local script 205 | Room 11 local script 206 | global script 93; cutscene: (Room 11 local script 205, 0, )
+      result: way Game lines 1 rooms [] frames 171
+      kept: the hero in walk box 7 (tested at Room 11 local script 204 +0x0006); rooms [] lines 1
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+ATCUT Room 14 object 176 verb 0x04 (cooking pot) 0,0 s, 0 candidates: 
+      scripts: global script 105; cutscene: (global script 105, 0, System.Int32[])
+      result: way AtCutscene lines 7 rooms [0,87] frames 266
+  fresh: begun False rooms [] lines 2 frames 600 failure 
+  trial object 843 in class 6 (tested at Room 15 object 163 verb 0x08 +0x006D): begun False rooms [] lines 2 frames 600 failure 
+  trial object 892 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x008F): begun True rooms [] lines 1 frames 24 failure 
+  trial object 846 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0000): begun True rooms [] lines 1 frames 24 failure 
+  trial the hero in costume 1 (tested at Room 15 object 163 verb 0x08 +0x0011): begun False rooms [] lines 2 frames 600 failure 
+  trial object 193 out of class 24 (tested at Room 15 object 163 verb 0x08 +0x0043): begun False rooms [] lines 2 frames 600 failure 
+  trial object 193 in class 24 (tested at Room 15 object 163 verb 0x08 +0x0043): begun False rooms [] lines 2 frames 600 failure 
+  trial object 800 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0059): begun True rooms [] lines 1 frames 24 failure 
+  trial object 843 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0066): begun True rooms [] lines 1 frames 24 failure 
+  trial object 844 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0082): begun True rooms [] lines 1 frames 24 failure 
+  trial object 163 out of class 6 (tested at Room 15 object 163 verb 0x08 +0x009C): begun False rooms [] lines 2 frames 600 failure 
+  trial object 163 in class 6 (tested at Room 15 object 163 verb 0x08 +0x009C): begun False rooms [] lines 2 frames 600 failure 
+  trial object 843 out of class 6 (tested at Room 15 object 163 verb 0x08 +0x006D): begun False rooms [] lines 2 frames 600 failure 
+SETUP Room 15 object 163 verb 0x08 (rock on top of note) 2,0 s, 12 candidates: object 843 in class 6 (tested at Room 15 object 163 verb 0x08 +0x006D) | object 892 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x008F) | object 846 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0000) | the hero in costume 1 (tested at Room 15 object 163 verb 0x08 +0x0011) | object 193 out of class 24 (tested at Room 15 object 163 verb 0x08 +0x0043) | object 193 in class 24 (tested at Room 15 object 163 verb 0x08 +0x0043) | object 800 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0059) | object 843 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0066) | object 844 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x0082) | object 163 out of class 6 (tested at Room 15 object 163 verb 0x08 +0x009C) | object 163 in class 6 (tested at Room 15 object 163 verb 0x08 +0x009C) | object 843 out of class 6 (tested at Room 15 object 163 verb 0x08 +0x006D)
+      scripts: Room 15 object 163 verb 0x08 | global script 44; cutscene: (Room 15 object 163 verb 0x08, 7, )
+      result: way Game lines 1 rooms [] frames 24
+      kept: object 892 used with it (held) (tested at Room 15 object 163 verb 0x08 +0x008F); rooms [] lines 1
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 256 out of class 24 (tested at Room 18 object 161 verb 0x08 +0x004D): begun False rooms [] lines 1 frames 600 failure 
+  trial object 582 used with it (held) (tested at Room 18 object 161 verb 0x08 +0x0089): begun True rooms [] lines 2 frames 124 failure 
+  trial object 842 used with it (held) (tested at Room 18 object 161 verb 0x08 +0x0000): begun True rooms [] lines 2 frames 124 failure 
+  trial object 256 in class 24 (tested at Room 18 object 161 verb 0x08 +0x004D): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 18 object 161 verb 0x08 (tree) 0,5 s, 4 candidates: object 256 out of class 24 (tested at Room 18 object 161 verb 0x08 +0x004D) | object 582 used with it (held) (tested at Room 18 object 161 verb 0x08 +0x0089) | object 842 used with it (held) (tested at Room 18 object 161 verb 0x08 +0x0000) | object 256 in class 24 (tested at Room 18 object 161 verb 0x08 +0x004D)
+      scripts: Room 18 object 161 verb 0x08; cutscene: (Room 18 object 161 verb 0x08, 86, )
+      result: way Game lines 2 rooms [] frames 124
+      kept: object 582 used with it (held) (tested at Room 18 object 161 verb 0x08 +0x0089); rooms [] lines 2
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 582 used with it (held) (tested at Room 18 object 256 verb 0x08 +0x001F): begun True rooms [] lines 0 frames 42 failure 
+  trial object 842 used with it (held) (tested at Room 18 object 256 verb 0x08 +0x000C): begun True rooms [] lines 0 frames 42 failure 
+SETUP Room 18 object 256 verb 0x08 (strong branch) 0,2 s, 2 candidates: object 582 used with it (held) (tested at Room 18 object 256 verb 0x08 +0x001F) | object 842 used with it (held) (tested at Room 18 object 256 verb 0x08 +0x000C)
+      scripts: Room 18 local script 202; cutscene: (Room 18 local script 202, 0, System.Int32[])
+      result: way Game lines 0 rooms [] frames 42
+      kept: object 582 used with it (held) (tested at Room 18 object 256 verb 0x08 +0x001F); rooms [] lines 0
+  fresh: begun False rooms [] lines 23 frames 600 failure 
+  trial object 1 used with it (held) (tested at Room 19 object 265 verb 0x08 +0x0000): begun False rooms [] lines 23 frames 600 failure 
+  trial object 105 used with it (held) (tested at Room 19 object 265 verb 0x08 +0x0005): begun True rooms [7] lines 23 frames 659 failure 
+  trial var[0x102] = 1 (tested at Room 19 object 265 verb 0x08 +0x0059): begun False rooms [] lines 23 frames 600 failure 
+  trial bit[0x18F] = 1 (tested at Room 19 object 265 verb 0x08 +0x0090): begun False rooms [] lines 23 frames 600 failure 
+  trial object 183 held (tested at Room 19 object 265 verb 0x08 +0x0095): begun False rooms [] lines 23 frames 600 failure 
+SETUP Room 19 object 265 verb 0x08 (cannon nozzle) 0,6 s, 5 candidates: object 1 used with it (held) (tested at Room 19 object 265 verb 0x08 +0x0000) | object 105 used with it (held) (tested at Room 19 object 265 verb 0x08 +0x0005) | var[0x102] = 1 (tested at Room 19 object 265 verb 0x08 +0x0059) | bit[0x18F] = 1 (tested at Room 19 object 265 verb 0x08 +0x0090) | object 183 held (tested at Room 19 object 265 verb 0x08 +0x0095)
+      scripts: Room 19 object 265 verb 0x08 | global script 104; cutscene: (Room 19 object 265 verb 0x08, 12, )
+      result: way Game lines 23 rooms [7] frames 659
+      kept: object 105 used with it (held) (tested at Room 19 object 265 verb 0x08 +0x0005); rooms [7] lines 23
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x18E] = 1 (tested at Room 20 entry script +0x008B): begun True rooms [33] lines 15 frames 401 failure 
+  trial var[0x08E] = 20 (tested at Room 20 entry script +0x0042): begun False rooms [] lines 0 frames 600 failure 
+  trial object 271 out of class 6 (tested at Room 20 entry script +0x0054): begun False rooms [] lines 0 frames 600 failure 
+  trial object 271 in class 6 (tested at Room 20 entry script +0x0054): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 20 object 0 verb 0x00 () 0,5 s, 4 candidates: bit[0x18E] = 1 (tested at Room 20 entry script +0x008B) | var[0x08E] = 20 (tested at Room 20 entry script +0x0042) | object 271 out of class 6 (tested at Room 20 entry script +0x0054) | object 271 in class 6 (tested at Room 20 entry script +0x0054)
+      scripts: Room 20 local script 202; cutscene: (Room 20 local script 202, 0, System.Int32[])
+      result: way Game lines 15 rooms [33] frames 401
+      kept: bit[0x18E] = 1 (tested at Room 20 entry script +0x008B); rooms [33] lines 15
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x224] = 1 (tested at Room 25 entry script +0x004C): begun False rooms [] lines 0 frames 600 failure 
+  trial arrived from Room 27 (var[0x065]) (tested at Room 25 entry script +0x002F): begun False rooms [] lines 0 frames 600 failure 
+  trial object 321 held (tested at Room 25 entry script +0x0040): begun False rooms [] lines 23 frames 600 failure 
+  trial object 307 state 1 (tested at Room 25 entry script +0x0074): begun False rooms [] lines 0 frames 600 failure 
+  trial object 307 state 0 (tested at Room 25 entry script +0x0074): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x160] = 1 (tested at Room 25 entry script +0x007D): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x17F] = 1 (tested at Room 25 entry script +0x0088): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x061] = 1 (tested at Room 25 entry script +0x0093): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at Room 25 local script 202 +0x0653): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 25 local script 202 +0x0658): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x00B] = 1 (tested at Room 25 local script 202 +0x065F): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x162] = 1 (tested at Room 25 local script 202 +0x06C1): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 25 local script 202 +0x0728): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x00C] = 1 (tested at Room 25 local script 202 +0x072F): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 25 local script 202 +0x0775): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 25 local script 202 +0x07A6): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x00E] = 1 (tested at Room 25 local script 202 +0x07AD): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0B2] = 4 (tested at global script 102 +0x012B): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0B2] = 5 (tested at global script 102 +0x012B): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0B2] = 3 (tested at global script 102 +0x012B): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0B2] = 2 (tested at global script 102 +0x0153): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1FC] = 1 (tested at Room 25 local script 213 +0x020E): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B4] = 1 (tested at Room 25 local script 213 +0x0213): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1FD] = 1 (tested at Room 25 local script 213 +0x02A6): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at Room 25 local script 213 +0x0396): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1FF] = 1 (tested at Room 25 local script 213 +0x0CB3): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x200] = 1 (tested at Room 25 local script 213 +0x0D03): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1FE] = 1 (tested at Room 25 local script 213 +0x0D5A): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x207] = 1 (tested at Room 25 local script 213 +0x0DBF): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x201] = 1 (tested at Room 25 local script 213 +0x0E36): begun False rooms [] lines 0 frames 600 failure 
+  trial object 783 held (tested at Room 25 local script 200 +0x0060): begun False rooms [] lines 8 frames 600 failure 
+  trial bit[0x166] = 1 (tested at Room 25 local script 200 +0x00A4): begun False rooms [] lines 0 frames 600 failure 
+  trial arrived from Room 6 (var[0x065]) (tested at Room 25 local script 200 +0x00A9): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 25 object 0 verb 0x00 () 4,1 s, 33 candidates: bit[0x224] = 1 (tested at Room 25 entry script +0x004C) | arrived from Room 27 (var[0x065]) (tested at Room 25 entry script +0x002F) | object 321 held (tested at Room 25 entry script +0x0040) | object 307 state 1 (tested at Room 25 entry script +0x0074) | object 307 state 0 (tested at Room 25 entry script +0x0074) | bit[0x160] = 1 (tested at Room 25 entry script +0x007D) | bit[0x17F] = 1 (tested at Room 25 entry script +0x0088) | bit[0x061] = 1 (tested at Room 25 entry script +0x0093) | var[0x0C1] = 1 (tested at Room 25 local script 202 +0x0653) | var[0x0C1] = 120 (tested at Room 25 local script 202 +0x0658) | bit[0x00B] = 1 (tested at Room 25 local script 202 +0x065F) | bit[0x162] = 1 (tested at Room 25 local script 202 +0x06C1) | var[0x0C1] = 121 (tested at Room 25 local script 202 +0x0728) | bit[0x00C] = 1 (tested at Room 25 local script 202 +0x072F) | var[0x0C1] = 122 (tested at Room 25 local script 202 +0x0775) | var[0x0C1] = 123 (tested at Room 25 local script 202 +0x07A6) | bit[0x00E] = 1 (tested at Room 25 local script 202 +0x07AD) | var[0x0B2] = 4 (tested at global script 102 +0x012B) | var[0x0B2] = 5 (tested at global script 102 +0x012B) | var[0x0B2] = 3 (tested at global script 102 +0x012B) | var[0x0B2] = 2 (tested at global script 102 +0x0153) | bit[0x1FC] = 1 (tested at Room 25 local script 213 +0x020E) | bit[0x1B4] = 1 (tested at Room 25 local script 213 +0x0213) | bit[0x1FD] = 1 (tested at Room 25 local script 213 +0x02A6) | var[0x0C1] = 124 (tested at Room 25 local script 213 +0x0396) | bit[0x1FF] = 1 (tested at Room 25 local script 213 +0x0CB3) | bit[0x200] = 1 (tested at Room 25 local script 213 +0x0D03) | bit[0x1FE] = 1 (tested at Room 25 local script 213 +0x0D5A) | bit[0x207] = 1 (tested at Room 25 local script 213 +0x0DBF) | bit[0x201] = 1 (tested at Room 25 local script 213 +0x0E36) | object 783 held (tested at Room 25 local script 200 +0x0060) | bit[0x166] = 1 (tested at Room 25 local script 200 +0x00A4) | arrived from Room 6 (var[0x065]) (tested at Room 25 local script 200 +0x00A9)
+      scripts: Room 25 local script 202 | global script 102 | Room 25 local script 204 | Room 25 local script 214 | Room 25 local script 213; cutscene: (Room 25 local script 202, 111, )
+      result: way AtCutscene lines 219 rooms [] frames 6000
+      kept: object 321 held (tested at Room 25 entry script +0x0040); rooms [] lines 219
+  fresh: begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at global script 92 +0x07B1): begun False rooms [] lines 2 frames 600 failure 
+  trial object 843 in class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 2 frames 600 failure 
+  trial object 843 out of class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x17C] = 1 (tested at global script 92 +0x0021): begun False rooms [] lines 2 frames 600 failure 
+  trial object 164 held and used in Room 11 (tested at global script 92 +0x0049): begun False rooms [] lines 2 frames 600 failure 
+  trial object 164 held and used in Room 40 (tested at global script 92 +0x00DF): begun False rooms [] lines 2 frames 600 failure 
+  trial object 164 held and used in Room 80 (tested at global script 92 +0x0154): begun False rooms [] lines 3 frames 600 failure 
+  trial object 164 held and used in Room 12 (tested at global script 92 +0x015E): begun False rooms [] lines 3 frames 600 failure 
+  trial the room entered as pseudo room 132 (tested at global script 92 +0x0255): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x1B4] = 1 (tested at global script 92 +0x025C): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x16A] = 1 (tested at global script 92 +0x0482): begun False rooms [] lines 2 frames 600 failure 
+  trial object 321 held (tested at global script 92 +0x0783): begun False rooms [] lines 6 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at global script 92 +0x07B6): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at global script 92 +0x097C): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at global script 92 +0x0A52): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x104] = 2 (tested at global script 92 +0x0A59): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at global script 92 +0x0D16): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x170] = 1 (tested at global script 92 +0x0E34): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x171] = 1 (tested at global script 92 +0x0E89): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x173] = 1 (tested at global script 92 +0x0E8E): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x172] = 1 (tested at global script 92 +0x0FA7): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x231] = 1 (tested at global script 92 +0x1010): begun False rooms [] lines 2 frames 600 failure 
+  trial object 277 held (tested at global script 92 +0x10CD): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x175] = 1 (tested at global script 92 +0x10D9): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x174] = 1 (tested at global script 92 +0x1146): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 125 (tested at global script 92 +0x129C): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 126 (tested at global script 92 +0x12A9): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 127 (tested at global script 92 +0x12B6): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 128 (tested at global script 92 +0x12C3): begun False rooms [] lines 2 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at global script 92 +0x1263): begun False rooms [] lines 2 frames 600 failure 
+ATCUT Room 25 object 164 verb 0x0D (Herman Toothrot) 4,6 s, 30 candidates: var[0x0C1] = 1 (tested at global script 92 +0x07B1) | object 843 in class 6 (tested at global script 93 +0x0118) | object 843 out of class 6 (tested at global script 93 +0x0118) | bit[0x17C] = 1 (tested at global script 92 +0x0021) | object 164 held and used in Room 11 (tested at global script 92 +0x0049) | object 164 held and used in Room 40 (tested at global script 92 +0x00DF) | object 164 held and used in Room 80 (tested at global script 92 +0x0154) | object 164 held and used in Room 12 (tested at global script 92 +0x015E) | the room entered as pseudo room 132 (tested at global script 92 +0x0255) | bit[0x1B4] = 1 (tested at global script 92 +0x025C) | bit[0x16A] = 1 (tested at global script 92 +0x0482) | object 321 held (tested at global script 92 +0x0783) | var[0x0C1] = 120 (tested at global script 92 +0x07B6) | var[0x0C1] = 121 (tested at global script 92 +0x097C) | var[0x0C1] = 122 (tested at global script 92 +0x0A52) | var[0x104] = 2 (tested at global script 92 +0x0A59) | var[0x0C1] = 123 (tested at global script 92 +0x0D16) | bit[0x170] = 1 (tested at global script 92 +0x0E34) | bit[0x171] = 1 (tested at global script 92 +0x0E89) | bit[0x173] = 1 (tested at global script 92 +0x0E8E) | bit[0x172] = 1 (tested at global script 92 +0x0FA7) | bit[0x231] = 1 (tested at global script 92 +0x1010) | object 277 held (tested at global script 92 +0x10CD) | bit[0x175] = 1 (tested at global script 92 +0x10D9) | bit[0x174] = 1 (tested at global script 92 +0x1146) | var[0x0C1] = 125 (tested at global script 92 +0x129C) | var[0x0C1] = 126 (tested at global script 92 +0x12A9) | var[0x0C1] = 127 (tested at global script 92 +0x12B6) | var[0x0C1] = 128 (tested at global script 92 +0x12C3) | var[0x0C1] = 124 (tested at global script 92 +0x1263)
+      scripts: global script 93; cutscene: (global script 93, 5, )
+      result: way AtCutscene lines 1 rooms [] frames 31
+      kept: object 321 held (tested at global script 92 +0x0783); rooms [] lines 1
+  fresh: begun False rooms [6] lines 600 frames 600 failure 
+  trial bit[0x17F] = 1 (tested at Room 25 object 308 verb 0x0A +0x0003): begun True rooms [0,70] lines 4 frames 87 failure 
+SETUP Room 25 object 308 verb 0x0A (jungle) 0,1 s, 1 candidates: bit[0x17F] = 1 (tested at Room 25 object 308 verb 0x0A +0x0003)
+      scripts: global script 168; cutscene: (global script 168, 0, System.Int32[])
+      result: way Game lines 4 rooms [0,70] frames 87
+      kept: bit[0x17F] = 1 (tested at Room 25 object 308 verb 0x0A +0x0003); rooms [0,70] lines 4
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x061] = 1 (tested at Room 25 local script 203 +0x0011): begun False rooms [] lines 0 frames 600 failure 
+  trial object 800 used with it (held) (tested at Room 25 local script 203 +0x00B1): begun False rooms [] lines 0 frames 600 failure 
+  trial object 738 used with it (held) (tested at Room 25 local script 203 +0x0000): begun True rooms [] lines 0 frames 25 failure 
+  trial object 156 state 1 (tested at Room 25 local script 203 +0x003D): begun False rooms [] lines 0 frames 600 failure 
+  trial object 156 state 0 (tested at Room 25 local script 203 +0x003D): begun False rooms [] lines 0 frames 600 failure 
+  trial object 721 used with it (held) (tested at Room 25 local script 203 +0x01AD): begun False rooms [] lines 0 frames 600 failure 
+  trial object 391 used with it (held) (tested at Room 25 local script 203 +0x01EB): begun False rooms [] lines 0 frames 600 failure 
+  trial object 317 used with it (held) (tested at Room 25 local script 203 +0x0250): begun False rooms [] lines 0 frames 600 failure 
+  trial object 497 used with it (held) (tested at Room 25 local script 203 +0x0285): begun False rooms [] lines 0 frames 600 failure 
+  trial object 273 used with it (held) (tested at Room 25 local script 203 +0x02C8): begun False rooms [] lines 0 frames 600 failure 
+  trial object 274 used with it (held) (tested at Room 25 local script 203 +0x0325): begun False rooms [] lines 0 frames 600 failure 
+  trial object 275 used with it (held) (tested at Room 25 local script 203 +0x0332): begun False rooms [] lines 0 frames 600 failure 
+  trial object 298 used with it (held) (tested at Room 25 local script 203 +0x033F): begun False rooms [] lines 0 frames 600 failure 
+  trial object 299 used with it (held) (tested at Room 25 local script 203 +0x034C): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x069] = 1 (tested at global script 101 +0x0200): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1C2] = 1 (tested at global script 101 +0x038A): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x200] = 1 (tested at global script 101 +0x038F): begun False rooms [] lines 0 frames 600 failure 
+  trial object 310 held and used in Room 70 (tested at global script 108 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 8 (tested at global script 108 +0x000C): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 9 (tested at global script 108 +0x0018): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 12 (tested at global script 108 +0x0024): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1AA] = 1 (tested at global script 108 +0x0030): begun False rooms [] lines 0 frames 600 failure 
+  trial object 860 used with it (held) (tested at Room 25 local script 203 +0x0029): begun False rooms [] lines 0 frames 600 failure 
+  trial object 277 used with it (held) (tested at Room 25 local script 203 +0x0036): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 25 object 310 verb 0x50 (friendly natives) 2,4 s, 24 candidates: bit[0x061] = 1 (tested at Room 25 local script 203 +0x0011) | object 800 used with it (held) (tested at Room 25 local script 203 +0x00B1) | object 738 used with it (held) (tested at Room 25 local script 203 +0x0000) | object 156 state 1 (tested at Room 25 local script 203 +0x003D) | object 156 state 0 (tested at Room 25 local script 203 +0x003D) | object 721 used with it (held) (tested at Room 25 local script 203 +0x01AD) | object 391 used with it (held) (tested at Room 25 local script 203 +0x01EB) | object 317 used with it (held) (tested at Room 25 local script 203 +0x0250) | object 497 used with it (held) (tested at Room 25 local script 203 +0x0285) | object 273 used with it (held) (tested at Room 25 local script 203 +0x02C8) | object 274 used with it (held) (tested at Room 25 local script 203 +0x0325) | object 275 used with it (held) (tested at Room 25 local script 203 +0x0332) | object 298 used with it (held) (tested at Room 25 local script 203 +0x033F) | object 299 used with it (held) (tested at Room 25 local script 203 +0x034C) | var[0x069] = 1 (tested at global script 101 +0x0200) | bit[0x1C2] = 1 (tested at global script 101 +0x038A) | bit[0x200] = 1 (tested at global script 101 +0x038F) | object 310 held and used in Room 70 (tested at global script 108 +0x0000) | the hero in walk box 8 (tested at global script 108 +0x000C) | the hero in walk box 9 (tested at global script 108 +0x0018) | the hero in walk box 12 (tested at global script 108 +0x0024) | bit[0x1AA] = 1 (tested at global script 108 +0x0030) | object 860 used with it (held) (tested at Room 25 local script 203 +0x0029) | object 277 used with it (held) (tested at Room 25 local script 203 +0x0036)
+      scripts: Room 25 local script 203 | global script 101 | global script 108 | Room 25 local script 205; cutscene: (Room 25 local script 203, 184, System.Int32[])
+      result: way Game lines 0 rooms [] frames 25
+      kept: object 738 used with it (held) (tested at Room 25 local script 203 +0x0000); rooms [] lines 0
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1AA] = 1 (tested at Room 25 object 311 verb 0x02 +0x0000): begun True rooms [] lines 0 frames 2 failure 
+  trial object 311 held and used in Room 70 (tested at global script 108 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 8 (tested at global script 108 +0x000C): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 9 (tested at global script 108 +0x0018): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 12 (tested at global script 108 +0x0024): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 25 object 311 verb 0x02 (head of the navigator) 0,5 s, 5 candidates: bit[0x1AA] = 1 (tested at Room 25 object 311 verb 0x02 +0x0000) | object 311 held and used in Room 70 (tested at global script 108 +0x0000) | the hero in walk box 8 (tested at global script 108 +0x000C) | the hero in walk box 9 (tested at global script 108 +0x0018) | the hero in walk box 12 (tested at global script 108 +0x0024)
+      scripts: global script 108; cutscene: (global script 108, 53, System.Int32[])
+      result: way Game lines 0 rooms [] frames 2
+      kept: bit[0x1AA] = 1 (tested at Room 25 object 311 verb 0x02 +0x0000); rooms [] lines 0
+  fresh: begun False rooms [] lines 2 frames 600 failure 
+  trial object 312 held and used in Room 70 (tested at Room 25 object 312 verb 0x08 +0x006E): begun True rooms [] lines 2 frames 35 failure 
+  trial object 312 in class 6 (tested at Room 25 object 312 verb 0x08 +0x0075): begun False rooms [] lines 2 frames 600 failure 
+  trial the hero in costume 51 (tested at Room 25 object 312 verb 0x08 +0x000A): begun False rooms [] lines 2 frames 600 failure 
+  trial object 312 held and used in Room 77 (tested at global script 138 +0x0078): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x1C5] = 1 (tested at global script 138 +0x009C): begun False rooms [] lines 2 frames 600 failure 
+  trial bit[0x165] = 1 (tested at Room 25 object 312 verb 0x08 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1AA] = 1 (tested at Room 25 object 312 verb 0x08 +0x0069): begun False rooms [] lines 1 frames 600 failure 
+  trial object 312 out of class 6 (tested at Room 25 object 312 verb 0x08 +0x0075): begun False rooms [] lines 2 frames 600 failure 
+SETUP Room 25 object 312 verb 0x08 (necklace on navigator) 1,1 s, 8 candidates: object 312 held and used in Room 70 (tested at Room 25 object 312 verb 0x08 +0x006E) | object 312 in class 6 (tested at Room 25 object 312 verb 0x08 +0x0075) | the hero in costume 51 (tested at Room 25 object 312 verb 0x08 +0x000A) | object 312 held and used in Room 77 (tested at global script 138 +0x0078) | bit[0x1C5] = 1 (tested at global script 138 +0x009C) | bit[0x165] = 1 (tested at Room 25 object 312 verb 0x08 +0x0000) | bit[0x1AA] = 1 (tested at Room 25 object 312 verb 0x08 +0x0069) | object 312 out of class 6 (tested at Room 25 object 312 verb 0x08 +0x0075)
+      scripts: Room 25 object 312 verb 0x08 | global script 138; cutscene: (Room 25 object 312 verb 0x08, 126, )
+      result: way Game lines 2 rooms [] frames 35
+      kept: object 312 held and used in Room 70 (tested at Room 25 object 312 verb 0x08 +0x006E); rooms [] lines 2
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x120] = 1 (tested at Room 25 object 963 verb 0x09 +0x0020): begun True rooms [] lines 2 frames 50 failure 
+SETUP Room 25 object 963 verb 0x09 (hut) 0,1 s, 1 candidates: var[0x120] = 1 (tested at Room 25 object 963 verb 0x09 +0x0020)
+      scripts: Room 25 object 963 verb 0x09; cutscene: (Room 25 object 963 verb 0x09, 37, )
+      result: way Game lines 2 rooms [] frames 50
+      kept: var[0x120] = 1 (tested at Room 25 object 963 verb 0x09 +0x0020); rooms [] lines 2
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 316 state 1 (tested at Room 27 object 316 verb 0x0A +0x0000): begun True rooms [25,6] lines 5775 frames 6000 failure 
+  trial object 314 in class 6 (tested at Room 27 object 316 verb 0x0A +0x0006): begun False rooms [] lines 0 frames 600 failure 
+  trial object 321 held (tested at Room 27 object 316 verb 0x0A +0x000F): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x163] = 1 (tested at Room 27 object 316 verb 0x0A +0x002D): begun False rooms [] lines 0 frames 600 failure 
+  trial object 316 state 0 (tested at Room 27 object 316 verb 0x0A +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial object 314 out of class 6 (tested at Room 27 object 316 verb 0x0A +0x0006): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 27 object 316 verb 0x0A (loose board) 2,4 s, 6 candidates: object 316 state 1 (tested at Room 27 object 316 verb 0x0A +0x0000) | object 314 in class 6 (tested at Room 27 object 316 verb 0x0A +0x0006) | object 321 held (tested at Room 27 object 316 verb 0x0A +0x000F) | bit[0x163] = 1 (tested at Room 27 object 316 verb 0x0A +0x002D) | object 316 state 0 (tested at Room 27 object 316 verb 0x0A +0x0000) | object 314 out of class 6 (tested at Room 27 object 316 verb 0x0A +0x0006)
+      scripts: Room 27 object 316 verb 0x0A | Room 27 local script 200 | global script 99; cutscene: (Room 27 object 316 verb 0x0A, 33, )
+      result: way Game lines 5994 rooms [6] frames 6000
+      kept: object 316 state 1 (tested at Room 27 object 316 verb 0x0A +0x0000); bit[0x163] = 1 (tested at Room 27 object 316 verb 0x0A +0x002D); rooms [6] lines 5994
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 322 state 1 (tested at Room 28 object 322 verb 0x02 +0x0000): begun True rooms [] lines 0 frames 5 failure 
+  trial object 322 state 0 (tested at Room 28 object 322 verb 0x02 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial object 437 out of class 11 (tested at global script 26 +0x001E): begun False rooms [] lines 0 frames 600 failure 
+  trial object 437 in class 11 (tested at global script 26 +0x001E): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 28 object 322 verb 0x02 (door) 0,5 s, 4 candidates: object 322 state 1 (tested at Room 28 object 322 verb 0x02 +0x0000) | object 322 state 0 (tested at Room 28 object 322 verb 0x02 +0x0000) | object 437 out of class 11 (tested at global script 26 +0x001E) | object 437 in class 11 (tested at global script 26 +0x001E)
+      scripts: Room 28 object 322 verb 0x02 | global script 26; cutscene: (Room 28 object 322 verb 0x02, 6, )
+      result: way Game lines 0 rooms [] frames 5
+      kept: object 322 state 1 (tested at Room 28 object 322 verb 0x02 +0x0000); rooms [] lines 0
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 322 state 1 (tested at Room 28 object 322 verb 0x0A +0x0000): begun True rooms [0,70,72,33] lines 38 frames 950 failure 
+  trial object 322 state 0 (tested at Room 28 object 322 verb 0x0A +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1BE] = 1 (tested at Room 28 object 322 verb 0x0A +0x0009): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 28 object 322 verb 0x0A (door) 0,5 s, 3 candidates: object 322 state 1 (tested at Room 28 object 322 verb 0x0A +0x0000) | object 322 state 0 (tested at Room 28 object 322 verb 0x0A +0x0000) | bit[0x1BE] = 1 (tested at Room 28 object 322 verb 0x0A +0x0009)
+      scripts: global script 117; cutscene: (global script 117, 0, System.Int32[])
+      result: way Game lines 38 rooms [0,70,72,33] frames 950
+      kept: object 322 state 1 (tested at Room 28 object 322 verb 0x0A +0x0000); rooms [0,70,72,33] lines 38
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 323 state 1 (tested at Room 28 object 323 verb 0x0A +0x0000): begun True rooms [41] lines 0 frames 9 failure 
+  trial object 323 state 0 (tested at Room 28 object 323 verb 0x0A +0x0000): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 28 object 323 verb 0x0A (door) 0,2 s, 2 candidates: object 323 state 1 (tested at Room 28 object 323 verb 0x0A +0x0000) | object 323 state 0 (tested at Room 28 object 323 verb 0x0A +0x0000)
+      scripts: Room 28 local script 218; cutscene: (Room 28 local script 218, 0, System.Int32[])
+      result: way Game lines 0 rooms [41] frames 9
+      kept: object 323 state 1 (tested at Room 28 object 323 verb 0x0A +0x0000); rooms [41] lines 0
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 683 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0016): begun True rooms [] lines 1 frames 29 failure 
+  trial object 331 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0060): begun False rooms [] lines 1 frames 600 failure 
+  trial object 378 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0099): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 28 object 329 verb 0x08 (fireplace) 0,4 s, 3 candidates: object 683 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0016) | object 331 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0060) | object 378 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0099)
+      scripts: Room 28 object 329 verb 0x08; cutscene: (Room 28 object 329 verb 0x08, 29, )
+      result: way Game lines 1 rooms [] frames 29
+      kept: object 683 used with it (held) (tested at Room 28 object 329 verb 0x08 +0x0016); rooms [] lines 1
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 586 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0020): begun False rooms [] lines 5 frames 600 failure 
+  trial object 721 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0000): begun False rooms [] lines 5 frames 600 failure 
+  trial object 729 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0010): begun False rooms [] lines 5 frames 600 failure 
+  trial var[0x0C4] = 1 (tested at Room 28 local script 220 +0x001F): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C4] = 2 (tested at Room 28 local script 220 +0x013A): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C6] = 3 (tested at Room 28 local script 220 +0x0141): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C7] = 3 (tested at Room 28 local script 220 +0x016C): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C4] = 3 (tested at Room 28 local script 220 +0x01B7): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x054] = 1 (tested at Room 28 local script 220 +0x01DA): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x055] = 1 (tested at Room 28 local script 220 +0x020D): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at Room 28 local script 220 +0x03C9): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 28 local script 220 +0x03CE): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C6] = 1 (tested at Room 28 local script 220 +0x09C2): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C6] = 2 (tested at Room 28 local script 220 +0x0A28): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C7] = 1 (tested at Room 28 local script 220 +0x0B08): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C7] = 2 (tested at Room 28 local script 220 +0x0B6D): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C8] = 1 (tested at Room 28 local script 220 +0x0C36): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C8] = 2 (tested at Room 28 local script 220 +0x0C9A): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x057] = 1 (tested at Room 28 local script 220 +0x0CFF): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x15D] = 1 (tested at Room 28 local script 220 +0x0D6A): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 28 local script 220 +0x0E35): begun False rooms [] lines 1 frames 600 failure 
+  trial object 402 held (tested at Room 28 local script 220 +0x0E41): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 28 local script 220 +0x1048): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 28 local script 220 +0x145C): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at Room 28 local script 220 +0x14FF): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 125 (tested at Room 28 local script 220 +0x1588): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 126 (tested at Room 28 local script 220 +0x161E): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 128 (tested at Room 28 local script 220 +0x1697): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 127 (tested at Room 28 local script 220 +0x197B): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C3] = 1 (tested at Room 28 local script 220 +0x0264): begun False rooms [] lines 1 frames 600 failure 
+ATCUT Room 28 object 332 verb 0x50 (important-looking pirates) 8,5 s, 30 candidates: object 586 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0020) | object 721 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0000) | object 729 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0010) | var[0x0C4] = 1 (tested at Room 28 local script 220 +0x001F) | var[0x0C4] = 2 (tested at Room 28 local script 220 +0x013A) | var[0x0C6] = 3 (tested at Room 28 local script 220 +0x0141) | var[0x0C7] = 3 (tested at Room 28 local script 220 +0x016C) | var[0x0C4] = 3 (tested at Room 28 local script 220 +0x01B7) | bit[0x054] = 1 (tested at Room 28 local script 220 +0x01DA) | bit[0x055] = 1 (tested at Room 28 local script 220 +0x020D) | var[0x0C1] = 1 (tested at Room 28 local script 220 +0x03C9) | var[0x0C1] = 122 (tested at Room 28 local script 220 +0x03CE) | var[0x0C6] = 1 (tested at Room 28 local script 220 +0x09C2) | var[0x0C6] = 2 (tested at Room 28 local script 220 +0x0A28) | var[0x0C7] = 1 (tested at Room 28 local script 220 +0x0B08) | var[0x0C7] = 2 (tested at Room 28 local script 220 +0x0B6D) | var[0x0C8] = 1 (tested at Room 28 local script 220 +0x0C36) | var[0x0C8] = 2 (tested at Room 28 local script 220 +0x0C9A) | bit[0x057] = 1 (tested at Room 28 local script 220 +0x0CFF) | bit[0x15D] = 1 (tested at Room 28 local script 220 +0x0D6A) | var[0x0C1] = 120 (tested at Room 28 local script 220 +0x0E35) | object 402 held (tested at Room 28 local script 220 +0x0E41) | var[0x0C1] = 121 (tested at Room 28 local script 220 +0x1048) | var[0x0C1] = 123 (tested at Room 28 local script 220 +0x145C) | var[0x0C1] = 124 (tested at Room 28 local script 220 +0x14FF) | var[0x0C1] = 125 (tested at Room 28 local script 220 +0x1588) | var[0x0C1] = 126 (tested at Room 28 local script 220 +0x161E) | var[0x0C1] = 128 (tested at Room 28 local script 220 +0x1697) | var[0x0C1] = 127 (tested at Room 28 local script 220 +0x197B) | var[0x0C3] = 1 (tested at Room 28 local script 220 +0x0264)
+      scripts: Room 28 local script 220; cutscene: (Room 28 local script 220, 690, System.Int32[])
+      result: way AtCutscene lines 1 rooms [] frames 22
+      kept: object 586 used with it (held) (tested at Room 28 object 332 verb 0x50 +0x0020); rooms [] lines 1
+  fresh: begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at global script 90 +0x01D4): begun False rooms [82] lines 1 frames 600 failure 
+  trial bit[0x179] = 1 (tested at Room 28 object 344 verb 0x09 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x223] = 1 (tested at global script 4 +0x0000): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06E] = 1 (tested at global script 4 +0x000C): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0B5] = 1 (tested at global script 4 +0x0011): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06C] = 1 (tested at global script 4 +0x001E): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06B] = 10 (tested at global script 4 +0x0028): begun False rooms [82] lines 1 frames 600 failure 
+  trial bit[0x1E2] = 1 (tested at global script 4 +0x016C): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x112] = 1 (tested at global script 4 +0x018D): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06B] = 13 (tested at global script 4 +0x0381): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06C] = 7 (tested at global script 4 +0x0388): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06B] = 8 (tested at global script 4 +0x03B8): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06B] = 3 (tested at global script 4 +0x03CF): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06D] = 1 (tested at global script 4 +0x03EC): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06B] = 1 (tested at global script 4 +0x03FE): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x165] = 1 (tested at global script 4 +0x0487): begun False rooms [82] lines 1 frames 600 failure 
+  trial bit[0x177] = 1 (tested at global script 90 +0x0049): begun False rooms [82] lines 1 frames 600 failure 
+  trial bit[0x178] = 1 (tested at global script 90 +0x0090): begun False rooms [82] lines 1 frames 600 failure 
+  trial bit[0x1F8] = 1 (tested at global script 90 +0x0125): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at global script 90 +0x01D9): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at global script 90 +0x01EA): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at global script 90 +0x01FB): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at global script 90 +0x051F): begun False rooms [82] lines 1 frames 600 failure 
+  trial actor 6 in Room 28 (tested at Room 28 local script 202 +0x003F): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at global script 90 +0x056B): begun False rooms [82] lines 1 frames 600 failure 
+  trial var[0x06C] = 323 (tested at Room 28 local script 202 +0x001C): begun False rooms [82] lines 1 frames 600 failure 
+ATCUT Room 28 object 344 verb 0x09 (pirate) 2,9 s, 26 candidates: var[0x0C1] = 1 (tested at global script 90 +0x01D4) | bit[0x179] = 1 (tested at Room 28 object 344 verb 0x09 +0x0000) | bit[0x223] = 1 (tested at global script 4 +0x0000) | var[0x06E] = 1 (tested at global script 4 +0x000C) | var[0x0B5] = 1 (tested at global script 4 +0x0011) | var[0x06C] = 1 (tested at global script 4 +0x001E) | var[0x06B] = 10 (tested at global script 4 +0x0028) | bit[0x1E2] = 1 (tested at global script 4 +0x016C) | var[0x112] = 1 (tested at global script 4 +0x018D) | var[0x06B] = 13 (tested at global script 4 +0x0381) | var[0x06C] = 7 (tested at global script 4 +0x0388) | var[0x06B] = 8 (tested at global script 4 +0x03B8) | var[0x06B] = 3 (tested at global script 4 +0x03CF) | var[0x06D] = 1 (tested at global script 4 +0x03EC) | var[0x06B] = 1 (tested at global script 4 +0x03FE) | var[0x165] = 1 (tested at global script 4 +0x0487) | bit[0x177] = 1 (tested at global script 90 +0x0049) | bit[0x178] = 1 (tested at global script 90 +0x0090) | bit[0x1F8] = 1 (tested at global script 90 +0x0125) | var[0x0C1] = 120 (tested at global script 90 +0x01D9) | var[0x0C1] = 121 (tested at global script 90 +0x01EA) | var[0x0C1] = 122 (tested at global script 90 +0x01FB) | var[0x0C1] = 123 (tested at global script 90 +0x051F) | actor 6 in Room 28 (tested at Room 28 local script 202 +0x003F) | var[0x0C1] = 124 (tested at global script 90 +0x056B) | var[0x06C] = 323 (tested at Room 28 local script 202 +0x001C)
+      scripts: global script 4; cutscene: (global script 4, 489, )
+      result: way AtCutscene lines 2 rooms [] frames 23
+      kept: var[0x0C1] = 1 (tested at global script 90 +0x01D4); var[0x06B] = 13 (tested at global script 4 +0x0381); var[0x06C] = 7 (tested at global script 4 +0x0388); var[0x06D] = 1 (tested at global script 4 +0x03EC); var[0x165] = 1 (tested at global script 4 +0x0487); rooms [] lines 2
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 381 state 1 (tested at Room 29 object 381 verb 0x02 +0x0000): begun True rooms [] lines 0 frames 5 failure 
+  trial object 381 state 0 (tested at Room 29 object 381 verb 0x02 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial object 452 out of class 11 (tested at global script 26 +0x001E): begun False rooms [] lines 0 frames 600 failure 
+  trial object 452 in class 11 (tested at global script 26 +0x001E): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 29 object 381 verb 0x02 (door) 0,4 s, 4 candidates: object 381 state 1 (tested at Room 29 object 381 verb 0x02 +0x0000) | object 381 state 0 (tested at Room 29 object 381 verb 0x02 +0x0000) | object 452 out of class 11 (tested at global script 26 +0x001E) | object 452 in class 11 (tested at global script 26 +0x001E)
+      scripts: Room 29 object 381 verb 0x02 | global script 26; cutscene: (Room 29 object 381 verb 0x02, 6, )
+      result: way Game lines 0 rooms [] frames 5
+      kept: object 381 state 1 (tested at Room 29 object 381 verb 0x02 +0x0000); rooms [] lines 0
+  fresh: begun False rooms [] lines 4 frames 600 failure 
+  trial object 401 state 1 (tested at Room 30 object 401 verb 0x02 +0x0000): begun True rooms [] lines 1 frames 33 failure 
+  trial object 401 state 0 (tested at Room 30 object 401 verb 0x02 +0x0000): begun False rooms [] lines 4 frames 600 failure 
+  trial object 446 out of class 11 (tested at global script 26 +0x001E): begun False rooms [] lines 4 frames 600 failure 
+  trial object 446 in class 11 (tested at global script 26 +0x001E): begun False rooms [] lines 4 frames 600 failure 
+SETUP Room 30 object 401 verb 0x02 (door) 0,3 s, 4 candidates: object 401 state 1 (tested at Room 30 object 401 verb 0x02 +0x0000) | object 401 state 0 (tested at Room 30 object 401 verb 0x02 +0x0000) | object 446 out of class 11 (tested at global script 26 +0x001E) | object 446 in class 11 (tested at global script 26 +0x001E)
+      scripts: Room 30 object 401 verb 0x02 | global script 26; cutscene: (Room 30 object 401 verb 0x02, 6, )
+      result: way Game lines 1 rooms [] frames 33
+      kept: object 401 state 1 (tested at Room 30 object 401 verb 0x02 +0x0000); rooms [] lines 1
+  fresh: begun False rooms [] lines 4 frames 600 failure 
+  trial object 401 state 1 (tested at Room 30 object 401 verb 0x0A +0x0000): begun True rooms [34] lines 7 frames 155 failure 
+  trial object 401 state 0 (tested at Room 30 object 401 verb 0x0A +0x0000): begun False rooms [] lines 4 frames 600 failure 
+  trial object 402 held (tested at Room 30 local script 204 +0x0005): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x062] = 1 (tested at Room 30 local script 204 +0x0011): begun False rooms [] lines 4 frames 600 failure 
+  trial object 410 held (tested at Room 30 local script 204 +0x001B): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x063] = 1 (tested at Room 30 local script 204 +0x0027): begun False rooms [] lines 4 frames 600 failure 
+  trial actor 11 in Room 30 (tested at Room 30 local script 204 +0x0051): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x144] = 1 (tested at Room 30 local script 204 +0x02EA): begun False rooms [] lines 5 frames 600 failure 
+  trial bit[0x135] = 1 (tested at Room 30 local script 211 +0x0020): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C6] = 1 (tested at Room 30 local script 211 +0x00FA): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x01C] = 1 (tested at Room 30 local script 211 +0x01DE): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x065] = 1 (tested at Room 30 local script 211 +0x01E3): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x140] = 1 (tested at Room 30 local script 211 +0x01E8): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x1A4] = 1 (tested at Room 30 local script 211 +0x0251): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x138] = 1 (tested at Room 30 local script 211 +0x0256): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x1C8] = 1 (tested at Room 30 local script 211 +0x02B3): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x05F] = 1 (tested at Room 30 local script 211 +0x02B8): begun False rooms [] lines 4 frames 600 failure 
+  trial object 893 held (tested at Room 30 local script 211 +0x02BF): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x055] = 1 (tested at Room 30 local script 211 +0x02CB): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x1C9] = 1 (tested at Room 30 local script 211 +0x032D): begun False rooms [] lines 4 frames 600 failure 
+  trial object 889 held (tested at Room 30 local script 211 +0x0332): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at Room 30 local script 211 +0x0442): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 30 local script 211 +0x0447): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x069] = 1 (tested at Room 30 local script 211 +0x045B): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x1DF] = 1 (tested at Room 30 local script 211 +0x0460): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 100 (tested at Room 30 local script 211 +0x0465): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 101 (tested at Room 30 local script 211 +0x0465): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 99 (tested at Room 30 local script 211 +0x0465): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x136] = 1 (tested at Room 30 local script 211 +0x0481): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 30 local script 211 +0x066C): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 30 local script 211 +0x0700): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 75 (tested at Room 30 local script 211 +0x0733): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 76 (tested at Room 30 local script 211 +0x0733): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 74 (tested at Room 30 local script 211 +0x0733): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x137] = 1 (tested at Room 30 local script 211 +0x0759): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x066] = 1 (tested at Room 30 local script 211 +0x0AC4): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x059] = 1 (tested at Room 30 local script 211 +0x1139): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 30 local script 211 +0x114B): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x217] = 1 (tested at Room 30 local script 211 +0x1157): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 125 (tested at Room 30 local script 211 +0x188C): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at Room 30 local script 211 +0x1AEA): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C2] = 1 (tested at Room 30 local script 211 +0x1B09): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 126 (tested at Room 30 local script 211 +0x1BD2): begun False rooms [] lines 4 frames 600 failure 
+  trial var[0x0C1] = 127 (tested at Room 30 local script 211 +0x1C1B): begun False rooms [] lines 4 frames 600 failure 
+  trial object 401 out of class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 4 frames 600 failure 
+  trial object 401 in class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 4 frames 600 failure 
+  trial object 11 in class 22 (tested at global script 64 +0x029F): begun False rooms [] lines 4 frames 600 failure 
+  trial object 11 out of class 22 (tested at global script 64 +0x029F): begun False rooms [] lines 4 frames 600 failure 
+  trial the room entered as pseudo room 209 (tested at global script 64 +0x02EF): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x21B] = 1 (tested at global script 64 +0x0305): begun False rooms [] lines 4 frames 600 failure 
+  trial bit[0x222] = 1 (tested at global script 64 +0x0316): begun False rooms [] lines 4 frames 600 failure 
+  trial object 502 state 0 (tested at global script 64 +0x0321): begun False rooms [] lines 4 frames 600 failure 
+  trial object 502 state 1 (tested at global script 64 +0x0321): begun False rooms [] lines 4 frames 600 failure 
+  trial object 401 held and used in Room 61 (tested at global script 64 +0x0347): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 30 object 401 verb 0x0A (door) 4,7 s, 54 candidates: object 401 state 1 (tested at Room 30 object 401 verb 0x0A +0x0000) | object 401 state 0 (tested at Room 30 object 401 verb 0x0A +0x0000) | object 402 held (tested at Room 30 local script 204 +0x0005) | bit[0x062] = 1 (tested at Room 30 local script 204 +0x0011) | object 410 held (tested at Room 30 local script 204 +0x001B) | bit[0x063] = 1 (tested at Room 30 local script 204 +0x0027) | actor 11 in Room 30 (tested at Room 30 local script 204 +0x0051) | bit[0x144] = 1 (tested at Room 30 local script 204 +0x02EA) | bit[0x135] = 1 (tested at Room 30 local script 211 +0x0020) | var[0x0C6] = 1 (tested at Room 30 local script 211 +0x00FA) | bit[0x01C] = 1 (tested at Room 30 local script 211 +0x01DE) | bit[0x065] = 1 (tested at Room 30 local script 211 +0x01E3) | bit[0x140] = 1 (tested at Room 30 local script 211 +0x01E8) | bit[0x1A4] = 1 (tested at Room 30 local script 211 +0x0251) | bit[0x138] = 1 (tested at Room 30 local script 211 +0x0256) | bit[0x1C8] = 1 (tested at Room 30 local script 211 +0x02B3) | bit[0x05F] = 1 (tested at Room 30 local script 211 +0x02B8) | object 893 held (tested at Room 30 local script 211 +0x02BF) | bit[0x055] = 1 (tested at Room 30 local script 211 +0x02CB) | bit[0x1C9] = 1 (tested at Room 30 local script 211 +0x032D) | object 889 held (tested at Room 30 local script 211 +0x0332) | var[0x0C1] = 1 (tested at Room 30 local script 211 +0x0442) | var[0x0C1] = 120 (tested at Room 30 local script 211 +0x0447) | var[0x069] = 1 (tested at Room 30 local script 211 +0x045B) | bit[0x1DF] = 1 (tested at Room 30 local script 211 +0x0460) | var[0x0C2] = 100 (tested at Room 30 local script 211 +0x0465) | var[0x0C2] = 101 (tested at Room 30 local script 211 +0x0465) | var[0x0C2] = 99 (tested at Room 30 local script 211 +0x0465) | bit[0x136] = 1 (tested at Room 30 local script 211 +0x0481) | var[0x0C1] = 121 (tested at Room 30 local script 211 +0x066C) | var[0x0C1] = 122 (tested at Room 30 local script 211 +0x0700) | var[0x0C2] = 75 (tested at Room 30 local script 211 +0x0733) | var[0x0C2] = 76 (tested at Room 30 local script 211 +0x0733) | var[0x0C2] = 74 (tested at Room 30 local script 211 +0x0733) | bit[0x137] = 1 (tested at Room 30 local script 211 +0x0759) | bit[0x066] = 1 (tested at Room 30 local script 211 +0x0AC4) | bit[0x059] = 1 (tested at Room 30 local script 211 +0x1139) | var[0x0C1] = 123 (tested at Room 30 local script 211 +0x114B) | bit[0x217] = 1 (tested at Room 30 local script 211 +0x1157) | var[0x0C1] = 125 (tested at Room 30 local script 211 +0x188C) | var[0x0C1] = 124 (tested at Room 30 local script 211 +0x1AEA) | var[0x0C2] = 1 (tested at Room 30 local script 211 +0x1B09) | var[0x0C1] = 126 (tested at Room 30 local script 211 +0x1BD2) | var[0x0C1] = 127 (tested at Room 30 local script 211 +0x1C1B) | object 401 out of class 6 (tested at global script 25 +0x0010) | object 401 in class 6 (tested at global script 25 +0x0010) | object 11 in class 22 (tested at global script 64 +0x029F) | object 11 out of class 22 (tested at global script 64 +0x029F) | the room entered as pseudo room 209 (tested at global script 64 +0x02EF) | bit[0x21B] = 1 (tested at global script 64 +0x0305) | bit[0x222] = 1 (tested at global script 64 +0x0316) | object 502 state 0 (tested at global script 64 +0x0321) | object 502 state 1 (tested at global script 64 +0x0321) | object 401 held and used in Room 61 (tested at global script 64 +0x0347)
+      scripts: Room 30 local script 204 | Room 30 local script 211 | global script 25 | global script 26 | global script 64; cutscene: (Room 30 local script 204, 72, System.Int32[])
+      result: way Game lines 7 rooms [34] frames 155
+      kept: object 401 state 1 (tested at Room 30 object 401 verb 0x0A +0x0000); rooms [34] lines 7
+  fresh: begun False rooms [] lines 5 frames 600 failure 
+  trial object 402 held and used in Room 36 (tested at Room 30 object 402 verb 0x08 +0x0000): begun True rooms [] lines 2 frames 41 failure 
+SETUP Room 30 object 402 verb 0x08 (sword) 0,1 s, 1 candidates: object 402 held and used in Room 36 (tested at Room 30 object 402 verb 0x08 +0x0000)
+      scripts: Room 30 object 402 verb 0x08; cutscene: (Room 30 object 402 verb 0x08, 7, )
+      result: way Game lines 2 rooms [] frames 41
+      kept: object 402 held and used in Room 36 (tested at Room 30 object 402 verb 0x08 +0x0000); rooms [] lines 2
+  fresh: begun False rooms [] lines 5 frames 600 failure 
+  trial bit[0x049] = 1 (tested at Room 30 local script 202 +0x0056): begun False rooms [] lines 5 frames 600 failure 
+  trial object 403 state 0 (tested at global script 25 +0x000A): begun False rooms [] lines 5 frames 600 failure 
+  trial object 403 state 1 (tested at global script 25 +0x000A): begun False rooms [] lines 5 frames 600 failure 
+  trial object 403 out of class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 5 frames 600 failure 
+  trial object 403 in class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 5 frames 600 failure 
+  trial actor 11 in Room 30 (tested at Room 30 object 404 verb 0x06 +0x0004): begun False rooms [] lines 5 frames 600 failure 
+  trial bit[0x140] = 1 (tested at Room 30 local script 202 +0x0075): begun False rooms [] lines 5 frames 600 failure 
+ATCUT Room 30 object 404 verb 0x06 (handle) 1,0 s, 7 candidates: bit[0x049] = 1 (tested at Room 30 local script 202 +0x0056) | object 403 state 0 (tested at global script 25 +0x000A) | object 403 state 1 (tested at global script 25 +0x000A) | object 403 out of class 6 (tested at global script 25 +0x0010) | object 403 in class 6 (tested at global script 25 +0x0010) | actor 11 in Room 30 (tested at Room 30 object 404 verb 0x06 +0x0004) | bit[0x140] = 1 (tested at Room 30 local script 202 +0x0075)
+      scripts: Room 30 local script 202 | global script 25 | global script 26; cutscene: (Room 30 local script 202, 127, System.Int32[])
+      result: way AtCutscene lines 2 rooms [] frames 33
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 889 used with it (held) (tested at Room 31 object 415 verb 0x08 +0x0000): begun True rooms [] lines 0 frames 7 failure 
+  trial script 204 running (tested at Room 31 object 415 verb 0x08 +0x000B): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 31 object 415 verb 0x08 (cell) 0,2 s, 2 candidates: object 889 used with it (held) (tested at Room 31 object 415 verb 0x08 +0x0000) | script 204 running (tested at Room 31 object 415 verb 0x08 +0x000B)
+      scripts: Room 31 local script 206; cutscene: (Room 31 local script 206, 0, System.Int32[])
+      result: way Game lines 0 rooms [] frames 7
+      kept: object 889 used with it (held) (tested at Room 31 object 415 verb 0x08 +0x0000); rooms [] lines 0
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0F7] = 2 (tested at Room 35 local script 210 +0x0034): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0F7] = 1 (tested at Room 35 local script 210 +0x0034): begun False rooms [] lines 1 frames 600 failure 
+ATCUT Room 35 object 457 verb 0x09 (clock) 0,4 s, 2 candidates: var[0x0F7] = 2 (tested at Room 35 local script 210 +0x0034) | var[0x0F7] = 1 (tested at Room 35 local script 210 +0x0034)
+      scripts: Room 35 local script 210; cutscene: (Room 35 local script 210, 151, System.Int32[])
+      result: way AtCutscene lines 1 rooms [] frames 26
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 889 used with it (held) (tested at Room 35 object 461 verb 0x08 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0EA] = 1 (tested at Room 35 local script 215 +0x0019): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0EA] = 2 (tested at Room 35 local script 215 +0x0059): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0EA] = 3 (tested at Room 35 local script 215 +0x0096): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0EA] = 4 (tested at Room 35 local script 215 +0x00F4): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0EA] = 5 (tested at Room 35 local script 215 +0x014F): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 35 object 461 verb 0x08 (rat) 1,0 s, 6 candidates: object 889 used with it (held) (tested at Room 35 object 461 verb 0x08 +0x0000) | var[0x0EA] = 1 (tested at Room 35 local script 215 +0x0019) | var[0x0EA] = 2 (tested at Room 35 local script 215 +0x0059) | var[0x0EA] = 3 (tested at Room 35 local script 215 +0x0096) | var[0x0EA] = 4 (tested at Room 35 local script 215 +0x00F4) | var[0x0EA] = 5 (tested at Room 35 local script 215 +0x014F)
+      scripts: Room 35 local script 215; cutscene: (Room 35 local script 215, 0, System.Int32[])
+      result: way Direct lines 1 rooms [] frames 60
+      kept: object 889 used with it (held) (tested at Room 35 object 461 verb 0x08 +0x0000); rooms [] lines 1
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 331 used with it (held) (tested at Room 36 local script 201 +0x0009): begun True rooms [] lines 0 frames 64 failure 
+  trial object 331 in class 6 (tested at Room 36 local script 201 +0x0062): begun False rooms [] lines 1 frames 600 failure 
+  trial object 331 out of class 6 (tested at Room 36 local script 201 +0x0062): begun False rooms [] lines 1 frames 600 failure 
+  trial object 378 used with it (held) (tested at Room 36 local script 201 +0x01E8): begun False rooms [] lines 1 frames 600 failure 
+  trial object 670 used with it (held) (tested at Room 36 local script 201 +0x0216): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x00F] = 1 (tested at Room 36 object 475 verb 0x50 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 36 object 475 verb 0x50 (deadly piranha poodles) 0,6 s, 6 candidates: object 331 used with it (held) (tested at Room 36 local script 201 +0x0009) | object 331 in class 6 (tested at Room 36 local script 201 +0x0062) | object 331 out of class 6 (tested at Room 36 local script 201 +0x0062) | object 378 used with it (held) (tested at Room 36 local script 201 +0x01E8) | object 670 used with it (held) (tested at Room 36 local script 201 +0x0216) | bit[0x00F] = 1 (tested at Room 36 object 475 verb 0x50 +0x0000)
+      scripts: Room 36 local script 201; cutscene: (Room 36 local script 201, 16, System.Int32[])
+      result: way Game lines 8 rooms [] frames 91
+      kept: object 331 used with it (held) (tested at Room 36 local script 201 +0x0009); object 331 in class 6 (tested at Room 36 local script 201 +0x0062); rooms [] lines 8
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1C1] = 1 (tested at Room 38 local script 200 +0x0007): begun False rooms [] lines 0 frames 600 failure 
+  trial object 497 held (tested at Room 38 entry script +0x0028): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C3] = 3 (tested at Room 38 local script 200 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C3] = 4 (tested at Room 38 local script 200 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C3] = 2 (tested at Room 38 local script 200 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x074] = 1 (tested at Room 38 local script 200 +0x0048): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 38 object 0 verb 0x00 () 0,6 s, 6 candidates: bit[0x1C1] = 1 (tested at Room 38 local script 200 +0x0007) | object 497 held (tested at Room 38 entry script +0x0028) | var[0x0C3] = 3 (tested at Room 38 local script 200 +0x0000) | var[0x0C3] = 4 (tested at Room 38 local script 200 +0x0000) | var[0x0C3] = 2 (tested at Room 38 local script 200 +0x0000) | bit[0x074] = 1 (tested at Room 38 local script 200 +0x0048)
+      scripts: Room 38 local script 203; cutscene: (Room 38 local script 203, 0, )
+      result: way AtCutscene lines 26 rooms [33] frames 615
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C3] = 3 (tested at Room 38 local script 202 +0x0005): begun True rooms [] lines 1 frames 26 failure 
+  trial var[0x0C3] = 4 (tested at Room 38 local script 202 +0x0005): begun True rooms [] lines 1 frames 26 failure 
+  trial bit[0x1CB] = 1 (tested at Room 38 local script 202 +0x0011): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x075] = 1 (tested at Room 38 local script 202 +0x00DB): begun True rooms [] lines 2 frames 53 failure 
+  trial bit[0x06F] = 1 (tested at Room 38 local script 202 +0x02C1): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at Room 38 local script 202 +0x031A): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x06C] = 1 (tested at Room 38 local script 202 +0x0333): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x06D] = 1 (tested at Room 38 local script 202 +0x03EB): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x06E] = 1 (tested at Room 38 local script 202 +0x03F2): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x073] = 1 (tested at Room 38 local script 202 +0x05E7): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 38 local script 202 +0x06D1): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 38 local script 202 +0x0822): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 38 local script 202 +0x08C9): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 38 local script 202 +0x08E8): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at Room 38 local script 202 +0x09D9): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 125 (tested at Room 38 local script 202 +0x0A0C): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 126 (tested at Room 38 local script 202 +0x0A19): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x071] = 1 (tested at Room 38 local script 202 +0x0AFB): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x072] = 1 (tested at Room 38 local script 202 +0x0B6A): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C3] = 2 (tested at Room 38 local script 202 +0x0005): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 38 object 498 verb 0x0D (lookout) 1,6 s, 20 candidates: var[0x0C3] = 3 (tested at Room 38 local script 202 +0x0005) | var[0x0C3] = 4 (tested at Room 38 local script 202 +0x0005) | bit[0x1CB] = 1 (tested at Room 38 local script 202 +0x0011) | bit[0x075] = 1 (tested at Room 38 local script 202 +0x00DB) | bit[0x06F] = 1 (tested at Room 38 local script 202 +0x02C1) | var[0x0C1] = 1 (tested at Room 38 local script 202 +0x031A) | bit[0x06C] = 1 (tested at Room 38 local script 202 +0x0333) | bit[0x06D] = 1 (tested at Room 38 local script 202 +0x03EB) | bit[0x06E] = 1 (tested at Room 38 local script 202 +0x03F2) | bit[0x073] = 1 (tested at Room 38 local script 202 +0x05E7) | var[0x0C1] = 120 (tested at Room 38 local script 202 +0x06D1) | var[0x0C1] = 121 (tested at Room 38 local script 202 +0x0822) | var[0x0C1] = 122 (tested at Room 38 local script 202 +0x08C9) | var[0x0C1] = 123 (tested at Room 38 local script 202 +0x08E8) | var[0x0C1] = 124 (tested at Room 38 local script 202 +0x09D9) | var[0x0C1] = 125 (tested at Room 38 local script 202 +0x0A0C) | var[0x0C1] = 126 (tested at Room 38 local script 202 +0x0A19) | bit[0x071] = 1 (tested at Room 38 local script 202 +0x0AFB) | bit[0x072] = 1 (tested at Room 38 local script 202 +0x0B6A) | var[0x0C3] = 2 (tested at Room 38 local script 202 +0x0005)
+      scripts: Room 38 local script 202; cutscene: (Room 38 local script 202, 15, System.Int32[])
+      result: way Game lines 1 rooms [] frames 26
+      kept: var[0x0C3] = 3 (tested at Room 38 local script 202 +0x0005); rooms [] lines 1
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 509 state 0 (tested at Room 39 local script 204 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial object 510 state 0 (tested at Room 39 local script 204 +0x0006): begun False rooms [] lines 0 frames 600 failure 
+  trial object 507 state 0 (tested at Room 39 local script 204 +0x000C): begun False rooms [] lines 0 frames 600 failure 
+  trial object 508 state 0 (tested at Room 39 local script 204 +0x0012): begun False rooms [] lines 0 frames 600 failure 
+  trial object 311 held (tested at Room 39 entry script +0x007B): begun False rooms [] lines 0 frames 600 failure 
+  trial object 509 state 1 (tested at Room 39 local script 204 +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial object 510 state 1 (tested at Room 39 local script 204 +0x0006): begun False rooms [] lines 0 frames 600 failure 
+  trial object 507 state 1 (tested at Room 39 local script 204 +0x000C): begun False rooms [] lines 0 frames 600 failure 
+  trial object 508 state 1 (tested at Room 39 local script 204 +0x0012): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 39 object 0 verb 0x00 () 1,4 s, 9 candidates: object 509 state 0 (tested at Room 39 local script 204 +0x0000) | object 510 state 0 (tested at Room 39 local script 204 +0x0006) | object 507 state 0 (tested at Room 39 local script 204 +0x000C) | object 508 state 0 (tested at Room 39 local script 204 +0x0012) | object 311 held (tested at Room 39 entry script +0x007B) | object 509 state 1 (tested at Room 39 local script 204 +0x0000) | object 510 state 1 (tested at Room 39 local script 204 +0x0006) | object 507 state 1 (tested at Room 39 local script 204 +0x000C) | object 508 state 1 (tested at Room 39 local script 204 +0x0012)
+      scripts: global script 106 | Room 39 local script 202; cutscene: (global script 106, 0, )
+      result: way AtCutscene lines 0 rooms [0] frames 1
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 297 state 0 (tested at Room 40 entry script +0x0051): begun False rooms [] lines 0 frames 600 failure 
+  trial object 297 state 1 (tested at Room 40 entry script +0x0051): begun False rooms [] lines 0 frames 600 failure 
+  trial object 567 state 1 (tested at Room 40 entry script +0x006C): begun False rooms [] lines 0 frames 600 failure 
+  trial object 567 state 0 (tested at Room 40 entry script +0x006C): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 in class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 out of class 6 (tested at global script 93 +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x16B] = 1 (tested at Room 40 entry script +0x0083): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 40 object 0 verb 0x00 () 0,9 s, 7 candidates: object 297 state 0 (tested at Room 40 entry script +0x0051) | object 297 state 1 (tested at Room 40 entry script +0x0051) | object 567 state 1 (tested at Room 40 entry script +0x006C) | object 567 state 0 (tested at Room 40 entry script +0x006C) | object 843 in class 6 (tested at global script 93 +0x0118) | object 843 out of class 6 (tested at global script 93 +0x0118) | bit[0x16B] = 1 (tested at Room 40 entry script +0x0083)
+      scripts: Room 40 local script 202 | global script 93; cutscene: (Room 40 local script 202, 29, System.Int32[])
+      result: way AtCutscene lines 5 rooms [] frames 115
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 324 state 1 (tested at Room 41 entry script +0x0042): begun False rooms [] lines 0 frames 600 failure 
+  trial object 378 held (tested at Room 41 entry script +0x002D): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x130] = 1 (tested at Room 41 entry script +0x0084): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x064] = 1 (tested at Room 41 local script 202 +0x000E): begun False rooms [] lines 0 frames 600 failure 
+  trial object 378 in class 6 (tested at Room 41 local script 202 +0x001C): begun False rooms [] lines 0 frames 600 failure 
+  trial object 378 out of class 6 (tested at Room 41 local script 202 +0x001C): begun False rooms [] lines 0 frames 600 failure 
+  trial object 324 state 0 (tested at Room 41 entry script +0x0042): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 41 object 0 verb 0x00 () 1,0 s, 7 candidates: object 324 state 1 (tested at Room 41 entry script +0x0042) | object 378 held (tested at Room 41 entry script +0x002D) | bit[0x130] = 1 (tested at Room 41 entry script +0x0084) | bit[0x064] = 1 (tested at Room 41 local script 202 +0x000E) | object 378 in class 6 (tested at Room 41 local script 202 +0x001C) | object 378 out of class 6 (tested at Room 41 local script 202 +0x001C) | object 324 state 0 (tested at Room 41 entry script +0x0042)
+      scripts: Room 41 local script 202; cutscene: (Room 41 local script 202, 0, )
+      result: way AtCutscene lines 0 rooms [] frames 3
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 630 used with it (held) (tested at Room 41 object 380 verb 0x08 +0x0063): begun True rooms [] lines 2 frames 53 failure 
+  trial object 333 used with it (held) (tested at Room 41 object 380 verb 0x08 +0x003F): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 41 object 380 verb 0x08 (barrel) 0,2 s, 2 candidates: object 630 used with it (held) (tested at Room 41 object 380 verb 0x08 +0x0063) | object 333 used with it (held) (tested at Room 41 object 380 verb 0x08 +0x003F)
+      scripts: Room 41 local script 215; cutscene: (Room 41 local script 215, 0, System.Int32[])
+      result: way Game lines 2 rooms [] frames 53
+      kept: object 630 used with it (held) (tested at Room 41 object 380 verb 0x08 +0x0063); rooms [] lines 2
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C3] = 3 (tested at Room 42 local script 200 +0x0079): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C3] = 4 (tested at Room 42 local script 200 +0x0079): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C3] = 2 (tested at Room 42 local script 200 +0x0079): begun False rooms [] lines 1 frames 600 failure 
+ATCUT Room 42 object 585 verb 0x0A (ladder) 0,9 s, 3 candidates: var[0x0C3] = 3 (tested at Room 42 local script 200 +0x0079) | var[0x0C3] = 4 (tested at Room 42 local script 200 +0x0079) | var[0x0C3] = 2 (tested at Room 42 local script 200 +0x0079)
+      scripts: Room 42 local script 200; cutscene: (Room 42 local script 200, 63, System.Int32[])
+      result: way AtCutscene lines 44 rooms [83] frames 1187
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 632 state 1 (tested at Room 53 object 632 verb 0x0A +0x0000): begun True rooms [] lines 15 frames 1471 failure 
+  trial object 632 state 0 (tested at Room 53 object 632 verb 0x0A +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial object 630 held (tested at Room 53 local script 210 +0x0056): begun False rooms [] lines 0 frames 600 failure 
+  trial object 889 held (tested at Room 53 local script 210 +0x0471): begun False rooms [] lines 0 frames 600 failure 
+  trial object 891 held (tested at Room 53 local script 210 +0x047D): begun False rooms [] lines 0 frames 600 failure 
+  trial object 890 held (tested at Room 53 local script 210 +0x0489): begun False rooms [] lines 0 frames 600 failure 
+  trial object 892 held (tested at Room 53 local script 210 +0x0495): begun False rooms [] lines 0 frames 600 failure 
+  trial object 632 out of class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 0 frames 600 failure 
+  trial object 632 in class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 53 object 632 verb 0x0A (door) 1,1 s, 9 candidates: object 632 state 1 (tested at Room 53 object 632 verb 0x0A +0x0000) | object 632 state 0 (tested at Room 53 object 632 verb 0x0A +0x0000) | object 630 held (tested at Room 53 local script 210 +0x0056) | object 889 held (tested at Room 53 local script 210 +0x0471) | object 891 held (tested at Room 53 local script 210 +0x047D) | object 890 held (tested at Room 53 local script 210 +0x0489) | object 892 held (tested at Room 53 local script 210 +0x0495) | object 632 out of class 6 (tested at global script 25 +0x0010) | object 632 in class 6 (tested at global script 25 +0x0010)
+      scripts: Room 53 local script 210 | global script 26 | global script 25; cutscene: (Room 53 local script 210, 0, System.Int32[])
+      result: way Game lines 18 rooms [] frames 1493
+      kept: object 632 state 1 (tested at Room 53 object 632 verb 0x0A +0x0000); object 630 held (tested at Room 53 local script 210 +0x0056); object 632 in class 6 (tested at global script 25 +0x0010); rooms [] lines 18
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 893 out of class 6 (tested at Room 53 object 886 verb 0x0A +0x000C): begun False rooms [] lines 1 frames 600 failure 
+  trial object 893 held (tested at Room 53 object 886 verb 0x0A +0x0000): begun False rooms [] lines 1 frames 600 failure 
+  trial object 890 held (tested at Room 53 object 886 verb 0x0A +0x0021): begun False rooms [] lines 1 frames 600 failure 
+  trial object 884 held (tested at Room 53 local script 211 +0x01A1): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C7] = 1 (tested at Room 53 local script 212 +0x0393): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at Room 53 local script 212 +0x0453): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 53 local script 212 +0x0458): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 53 local script 212 +0x0467): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 53 local script 212 +0x0476): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 53 local script 212 +0x0485): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at Room 53 local script 212 +0x0494): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x110] = 1 (tested at Room 53 local script 212 +0x0583): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x110] = 2 (tested at Room 53 local script 212 +0x05DA): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x110] = 3 (tested at Room 53 local script 212 +0x0624): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x110] = 4 (tested at Room 53 local script 212 +0x069E): begun False rooms [] lines 1 frames 600 failure 
+  trial object 888 state 0 (tested at global script 25 +0x000A): begun False rooms [] lines 1 frames 600 failure 
+  trial object 888 state 1 (tested at global script 25 +0x000A): begun False rooms [] lines 1 frames 600 failure 
+  trial object 888 out of class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 1 frames 600 failure 
+  trial object 888 in class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 1 frames 600 failure 
+  trial object 893 in class 6 (tested at Room 53 object 886 verb 0x0A +0x000C): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 53 object 886 verb 0x0A (gaping hole) 2,3 s, 20 candidates: object 893 out of class 6 (tested at Room 53 object 886 verb 0x0A +0x000C) | object 893 held (tested at Room 53 object 886 verb 0x0A +0x0000) | object 890 held (tested at Room 53 object 886 verb 0x0A +0x0021) | object 884 held (tested at Room 53 local script 211 +0x01A1) | var[0x0C7] = 1 (tested at Room 53 local script 212 +0x0393) | var[0x0C1] = 1 (tested at Room 53 local script 212 +0x0453) | var[0x0C1] = 120 (tested at Room 53 local script 212 +0x0458) | var[0x0C1] = 121 (tested at Room 53 local script 212 +0x0467) | var[0x0C1] = 122 (tested at Room 53 local script 212 +0x0476) | var[0x0C1] = 123 (tested at Room 53 local script 212 +0x0485) | var[0x0C1] = 124 (tested at Room 53 local script 212 +0x0494) | var[0x110] = 1 (tested at Room 53 local script 212 +0x0583) | var[0x110] = 2 (tested at Room 53 local script 212 +0x05DA) | var[0x110] = 3 (tested at Room 53 local script 212 +0x0624) | var[0x110] = 4 (tested at Room 53 local script 212 +0x069E) | object 888 state 0 (tested at global script 25 +0x000A) | object 888 state 1 (tested at global script 25 +0x000A) | object 888 out of class 6 (tested at global script 25 +0x0010) | object 888 in class 6 (tested at global script 25 +0x0010) | object 893 in class 6 (tested at Room 53 object 886 verb 0x0A +0x000C)
+      scripts: Room 53 local script 211 | Room 53 local script 212 | global script 25 | global script 26; cutscene: (Room 53 local script 211, 0, System.Int32[])
+      result: way Game lines 18 rooms [] frames 927
+      kept: object 893 out of class 6 (tested at Room 53 object 886 verb 0x0A +0x000C); object 893 held (tested at Room 53 object 886 verb 0x0A +0x0000); object 890 held (tested at Room 53 object 886 verb 0x0A +0x0021); object 884 held (tested at Room 53 local script 211 +0x01A1); var[0x0C7] = 1 (tested at Room 53 local script 212 +0x0393); var[0x0C1] = 1 (tested at Room 53 local script 212 +0x0453); var[0x110] = 1 (tested at Room 53 local script 212 +0x0583); object 888 state 0 (tested at global script 25 +0x000A); rooms [] lines 18
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 215 (tested at Room 58 object 669 verb 0x0A +0x0036): begun True rooms [] lines 1 frames 72 failure 
+  trial object 449 held (tested at Room 58 object 669 verb 0x0A +0x003D): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 207 (tested at Room 58 object 669 verb 0x0A +0x0064): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 208 (tested at Room 58 object 669 verb 0x0A +0x0076): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 209 (tested at Room 58 object 669 verb 0x0A +0x0088): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 210 (tested at Room 58 object 669 verb 0x0A +0x009A): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 211 (tested at Room 58 object 669 verb 0x0A +0x00AC): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 212 (tested at Room 58 object 669 verb 0x0A +0x00BE): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 213 (tested at Room 58 object 669 verb 0x0A +0x00D0): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 205 (tested at Room 58 object 669 verb 0x0A +0x00E2): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 216 (tested at Room 58 object 669 verb 0x0A +0x00F4): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 217 (tested at Room 58 object 669 verb 0x0A +0x0106): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 220 (tested at Room 58 object 669 verb 0x0A +0x0118): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 201 (tested at Room 58 object 669 verb 0x0A +0x0000): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 202 (tested at Room 58 object 669 verb 0x0A +0x0012): begun False rooms [] lines 0 frames 600 failure 
+  trial the room entered as pseudo room 204 (tested at Room 58 object 669 verb 0x0A +0x0024): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x191] = 1 (tested at Room 58 object 669 verb 0x0A +0x0049): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 58 object 669 verb 0x0A (path) 2,4 s, 17 candidates: the room entered as pseudo room 215 (tested at Room 58 object 669 verb 0x0A +0x0036) | object 449 held (tested at Room 58 object 669 verb 0x0A +0x003D) | the room entered as pseudo room 207 (tested at Room 58 object 669 verb 0x0A +0x0064) | the room entered as pseudo room 208 (tested at Room 58 object 669 verb 0x0A +0x0076) | the room entered as pseudo room 209 (tested at Room 58 object 669 verb 0x0A +0x0088) | the room entered as pseudo room 210 (tested at Room 58 object 669 verb 0x0A +0x009A) | the room entered as pseudo room 211 (tested at Room 58 object 669 verb 0x0A +0x00AC) | the room entered as pseudo room 212 (tested at Room 58 object 669 verb 0x0A +0x00BE) | the room entered as pseudo room 213 (tested at Room 58 object 669 verb 0x0A +0x00D0) | the room entered as pseudo room 205 (tested at Room 58 object 669 verb 0x0A +0x00E2) | the room entered as pseudo room 216 (tested at Room 58 object 669 verb 0x0A +0x00F4) | the room entered as pseudo room 217 (tested at Room 58 object 669 verb 0x0A +0x0106) | the room entered as pseudo room 220 (tested at Room 58 object 669 verb 0x0A +0x0118) | the room entered as pseudo room 201 (tested at Room 58 object 669 verb 0x0A +0x0000) | the room entered as pseudo room 202 (tested at Room 58 object 669 verb 0x0A +0x0012) | the room entered as pseudo room 204 (tested at Room 58 object 669 verb 0x0A +0x0024) | bit[0x191] = 1 (tested at Room 58 object 669 verb 0x0A +0x0049)
+      scripts: Room 58 local script 200; cutscene: (Room 58 local script 200, 0, System.Int32[])
+      result: way Game lines 1 rooms [] frames 72
+      kept: the room entered as pseudo room 215 (tested at Room 58 object 669 verb 0x0A +0x0036); rooms [] lines 1
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 907 used with it (held) (tested at Room 59 object 924 verb 0x08 +0x0000): begun True rooms [85,10,0,89] lines 94 frames 6000 failure 
+  trial bit[0x219] = 1 (tested at global script 129 +0x00F9): begun False rooms [] lines 1 frames 600 failure 
+  trial object 924 held and used in Room 43 (tested at global script 134 +0x0019): begun False rooms [] lines 1 frames 600 failure 
+  trial object 924 held and used in Room 83 (tested at global script 148 +0x0046): begun False rooms [] lines 1 frames 600 failure 
+  trial object 924 held and used in Room 32 (tested at global script 148 +0x0059): begun False rooms [] lines 6 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at global script 135 +0x02AF): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at global script 135 +0x02B9): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at global script 135 +0x02E4): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x1B4] = 1 (tested at global script 135 +0x0389): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at global script 135 +0x06AA): begun False rooms [] lines 1 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at global script 135 +0x06D8): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 59 object 924 verb 0x08 (LeChuck) 4,6 s, 11 candidates: object 907 used with it (held) (tested at Room 59 object 924 verb 0x08 +0x0000) | bit[0x219] = 1 (tested at global script 129 +0x00F9) | object 924 held and used in Room 43 (tested at global script 134 +0x0019) | object 924 held and used in Room 83 (tested at global script 148 +0x0046) | object 924 held and used in Room 32 (tested at global script 148 +0x0059) | var[0x0C1] = 1 (tested at global script 135 +0x02AF) | var[0x0C1] = 120 (tested at global script 135 +0x02B9) | var[0x0C1] = 121 (tested at global script 135 +0x02E4) | bit[0x1B4] = 1 (tested at global script 135 +0x0389) | var[0x0C1] = 122 (tested at global script 135 +0x06AA) | var[0x0C1] = 123 (tested at global script 135 +0x06D8)
+      scripts: global script 129 | global script 134 | global script 148 | global script 135; cutscene: (global script 129, 39, System.Int32[])
+      result: way Game lines 94 rooms [85,10,0,89] frames 6000
+      kept: object 907 used with it (held) (tested at Room 59 object 924 verb 0x08 +0x0000); rooms [85,10,0,89] lines 94
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial script 64 running (tested at Room 61 entry script +0x0077): begun False rooms [] lines 0 frames 600 failure 
+  trial arrived from Room 85 (var[0x065]) (tested at Room 61 entry script +0x0037): begun False rooms [] lines 0 frames 600 failure 
+  trial arrived from Room 209 (var[0x065]) (tested at Room 61 entry script +0x0041): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x059] = 1 (tested at Room 61 entry script +0x0055): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x145] = 1 (tested at global script 121 +0x00CA): begun False rooms [] lines 0 frames 600 failure 
+ATCUT Room 61 object 0 verb 0x00 () 0,6 s, 5 candidates: script 64 running (tested at Room 61 entry script +0x0077) | arrived from Room 85 (var[0x065]) (tested at Room 61 entry script +0x0037) | arrived from Room 209 (var[0x065]) (tested at Room 61 entry script +0x0041) | bit[0x059] = 1 (tested at Room 61 entry script +0x0055) | bit[0x145] = 1 (tested at global script 121 +0x00CA)
+      scripts: global script 121; cutscene: (global script 121, 0, System.Int32[])
+      result: way AtCutscene lines 14 rooms [44] frames 442
+  fresh: begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x11A] = 1 (tested at global script 113 +0x0057): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x11A] = 5 (tested at global script 113 +0x0153): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial bit[0x130] = 1 (tested at global script 61 +0x0090): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at global script 61 +0x0260): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at global script 61 +0x0265): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at global script 61 +0x0300): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at global script 61 +0x0343): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial the hero in costume 1 (tested at global script 61 +0x0393): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial the hero in costume 68 (tested at global script 61 +0x043C): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at global script 61 +0x0528): begun False rooms [44,62] lines 2 frames 600 failure 
+  trial bit[0x014] = 1 (tested at global script 113 +0x0006): begun True rooms [62,44] lines 2 frames 56 failure 
+SETUP Room 61 object 720 verb 0x0A (Sword Master) 1,5 s, 11 candidates: var[0x11A] = 1 (tested at global script 113 +0x0057) | var[0x11A] = 5 (tested at global script 113 +0x0153) | bit[0x130] = 1 (tested at global script 61 +0x0090) | var[0x0C1] = 1 (tested at global script 61 +0x0260) | var[0x0C1] = 120 (tested at global script 61 +0x0265) | var[0x0C1] = 121 (tested at global script 61 +0x0300) | var[0x0C1] = 122 (tested at global script 61 +0x0343) | the hero in costume 1 (tested at global script 61 +0x0393) | the hero in costume 68 (tested at global script 61 +0x043C) | var[0x0C1] = 123 (tested at global script 61 +0x0528) | bit[0x014] = 1 (tested at global script 113 +0x0006)
+      scripts: global script 113 | global script 61; cutscene: (global script 113, 82, System.Int32[])
+      result: way Game lines 2 rooms [62,44] frames 56
+      kept: bit[0x014] = 1 (tested at global script 113 +0x0006); rooms [62,44] lines 2
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 410 used with it (held) (tested at Room 64 object 726 verb 0x08 +0x0000): begun True rooms [] lines 8 frames 435 failure 
+  trial bit[0x056] = 1 (tested at Room 64 object 726 verb 0x08 +0x0007): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 64 object 726 verb 0x08 (X) 0,2 s, 2 candidates: object 410 used with it (held) (tested at Room 64 object 726 verb 0x08 +0x0000) | bit[0x056] = 1 (tested at Room 64 object 726 verb 0x08 +0x0007)
+      scripts: Room 64 local script 200; cutscene: (Room 64 local script 200, 0, System.Int32[])
+      result: way Game lines 8 rooms [] frames 435
+      kept: object 410 used with it (held) (tested at Room 64 object 726 verb 0x08 +0x0000); rooms [] lines 8
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial arrived from Room 12 (var[0x065]) (tested at Room 65 entry script +0x007A): begun True rooms [] lines 0 frames 41 failure 
+  trial bit[0x1AA] = 1 (tested at Room 65 entry script +0x0084): begun True rooms [] lines 0 frames 15 failure 
+  trial bit[0x218] = 1 (tested at Room 65 local script 202 +0x0074): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 8 (tested at global script 108 +0x000C): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 9 (tested at global script 108 +0x0018): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 12 (tested at global script 108 +0x0024): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 65 object 0 verb 0x00 () 0,6 s, 6 candidates: arrived from Room 12 (var[0x065]) (tested at Room 65 entry script +0x007A) | bit[0x1AA] = 1 (tested at Room 65 entry script +0x0084) | bit[0x218] = 1 (tested at Room 65 local script 202 +0x0074) | the hero in walk box 8 (tested at global script 108 +0x000C) | the hero in walk box 9 (tested at global script 108 +0x0018) | the hero in walk box 12 (tested at global script 108 +0x0024)
+      scripts: Room 65 local script 202 | Room 65 local script 203 | Room 65 local script 200 | global script 108; cutscene: (Room 65 local script 202, 0, System.Int32[])
+      result: way Game lines 0 rooms [] frames 41
+      kept: arrived from Room 12 (var[0x065]) (tested at Room 65 entry script +0x007A); rooms [] lines 0
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 277 used with it (held) (tested at Room 69 object 744 verb 0x08 +0x0000): begun True rooms [12] lines 4 frames 171 failure 
+SETUP Room 69 object 744 verb 0x08 (gigantic monkey ear) 0,1 s, 1 candidates: object 277 used with it (held) (tested at Room 69 object 744 verb 0x08 +0x0000)
+      scripts: global script 91; cutscene: (global script 91, 0, System.Int32[])
+      result: way Game lines 4 rooms [12] frames 171
+      kept: object 277 used with it (held) (tested at Room 69 object 744 verb 0x08 +0x0000); rooms [12] lines 4
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x17F] = 1 (tested at Room 70 entry script +0x0053): begun True rooms [] lines 2 frames 47 failure 
+  trial object 783 held (tested at Room 70 entry script +0x0047): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B4] = 1 (tested at Room 70 entry script +0x0097): begun False rooms [] lines 0 frames 600 failure 
+  trial object 746 state 0 (tested at Room 70 entry script +0x00BA): begun False rooms [] lines 0 frames 600 failure 
+  trial object 746 state 1 (tested at Room 70 entry script +0x00BA): begun False rooms [] lines 0 frames 600 failure 
+  trial object 312 held (tested at Room 70 entry script +0x00DB): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1AA] = 1 (tested at Room 70 entry script +0x00F3): begun True rooms [] lines 0 frames 15 failure 
+  trial bit[0x1B5] = 1 (tested at Room 70 local script 204 +0x0064): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B6] = 1 (tested at Room 70 local script 204 +0x0170): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at Room 70 local script 204 +0x01E1): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 70 local script 204 +0x01E6): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 70 local script 204 +0x0237): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B7] = 1 (tested at Room 70 local script 204 +0x0253): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 70 local script 204 +0x0309): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 70 local script 204 +0x0316): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 124 (tested at Room 70 local script 204 +0x0342): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B9] = 1 (tested at Room 70 local script 204 +0x06B5): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B8] = 1 (tested at Room 70 local script 204 +0x06BA): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1BA] = 1 (tested at Room 70 local script 204 +0x0809): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x116] = 1 (tested at Room 70 local script 204 +0x0B0B): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1BC] = 1 (tested at Room 70 local script 205 +0x025F): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1BB] = 1 (tested at Room 70 local script 205 +0x04BD): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1BD] = 1 (tested at Room 70 local script 205 +0x050C): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 8 (tested at global script 108 +0x000C): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 9 (tested at global script 108 +0x0018): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in walk box 12 (tested at global script 108 +0x0024): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 70 object 0 verb 0x00 () 2,7 s, 26 candidates: bit[0x17F] = 1 (tested at Room 70 entry script +0x0053) | object 783 held (tested at Room 70 entry script +0x0047) | bit[0x1B4] = 1 (tested at Room 70 entry script +0x0097) | object 746 state 0 (tested at Room 70 entry script +0x00BA) | object 746 state 1 (tested at Room 70 entry script +0x00BA) | object 312 held (tested at Room 70 entry script +0x00DB) | bit[0x1AA] = 1 (tested at Room 70 entry script +0x00F3) | bit[0x1B5] = 1 (tested at Room 70 local script 204 +0x0064) | bit[0x1B6] = 1 (tested at Room 70 local script 204 +0x0170) | var[0x0C1] = 1 (tested at Room 70 local script 204 +0x01E1) | var[0x0C1] = 120 (tested at Room 70 local script 204 +0x01E6) | var[0x0C1] = 121 (tested at Room 70 local script 204 +0x0237) | bit[0x1B7] = 1 (tested at Room 70 local script 204 +0x0253) | var[0x0C1] = 122 (tested at Room 70 local script 204 +0x0309) | var[0x0C1] = 123 (tested at Room 70 local script 204 +0x0316) | var[0x0C1] = 124 (tested at Room 70 local script 204 +0x0342) | bit[0x1B9] = 1 (tested at Room 70 local script 204 +0x06B5) | bit[0x1B8] = 1 (tested at Room 70 local script 204 +0x06BA) | bit[0x1BA] = 1 (tested at Room 70 local script 204 +0x0809) | var[0x116] = 1 (tested at Room 70 local script 204 +0x0B0B) | bit[0x1BC] = 1 (tested at Room 70 local script 205 +0x025F) | bit[0x1BB] = 1 (tested at Room 70 local script 205 +0x04BD) | bit[0x1BD] = 1 (tested at Room 70 local script 205 +0x050C) | the hero in walk box 8 (tested at global script 108 +0x000C) | the hero in walk box 9 (tested at global script 108 +0x0018) | the hero in walk box 12 (tested at global script 108 +0x0024)
+      scripts: Room 70 local script 204 | Room 70 local script 205 | Room 70 local script 200 | global script 108; cutscene: (Room 70 local script 204, 16, )
+      result: way Game lines 2 rooms [] frames 47
+      kept: bit[0x17F] = 1 (tested at Room 70 entry script +0x0053); rooms [] lines 2
+  fresh: begun False rooms [65] lines 0 frames 600 failure 
+  trial object 783 held (tested at Room 70 object 745 verb 0x0A +0x0006): begun True rooms [0,25] lines 10 frames 252 failure 
+  trial bit[0x17F] = 1 (tested at Room 70 object 745 verb 0x0A +0x0012): begun False rooms [65] lines 0 frames 600 failure 
+SETUP Room 70 object 745 verb 0x0A (cave) 0,3 s, 2 candidates: object 783 held (tested at Room 70 object 745 verb 0x0A +0x0006) | bit[0x17F] = 1 (tested at Room 70 object 745 verb 0x0A +0x0012)
+      scripts: global script 167; cutscene: (global script 167, 0, System.Int32[])
+      result: way Game lines 10 rooms [0,25] frames 252
+      kept: object 783 held (tested at Room 70 object 745 verb 0x0A +0x0006); rooms [0,25] lines 10
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial the hero in Room 72 (tested at Room 72 entry script +0x002C): begun False rooms [] lines 0 frames 600 failure 
+  trial the hero at x 179 (tested at Room 72 local script 201 +0x0006): begun True rooms [] lines 0 frames 1 failure 
+  trial object 759 held (tested at Room 72 entry script +0x0046): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 72 object 0 verb 0x00 () 0,3 s, 3 candidates: the hero in Room 72 (tested at Room 72 entry script +0x002C) | the hero at x 179 (tested at Room 72 local script 201 +0x0006) | object 759 held (tested at Room 72 entry script +0x0046)
+      scripts: Room 72 local script 201; cutscene: (Room 72 local script 201, 13, System.Int32[])
+      result: way Game lines 0 rooms [] frames 1
+      kept: the hero at x 179 (tested at Room 72 local script 201 +0x0006); rooms [] lines 0
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial the hero at x 151 (tested at Room 74 local script 203 +0x0006): begun True rooms [] lines 1 frames 21 failure 
+  trial bit[0x13C] = 1 (tested at Room 74 entry script +0x0023): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 74 object 0 verb 0x00 () 0,2 s, 2 candidates: the hero at x 151 (tested at Room 74 local script 203 +0x0006) | bit[0x13C] = 1 (tested at Room 74 entry script +0x0023)
+      scripts: Room 74 local script 203; cutscene: (Room 74 local script 203, 13, System.Int32[])
+      result: way Game lines 1 rooms [] frames 21
+      kept: the hero at x 151 (tested at Room 74 local script 203 +0x0006); rooms [] lines 1
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial object 781 state 0 (tested at Room 75 object 781 verb 0x08 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+  trial object 749 used with it (held) (tested at Room 75 object 781 verb 0x08 +0x000C): begun True rooms [] lines 54 frames 102 failure 
+  trial object 781 state 1 (tested at Room 75 object 781 verb 0x08 +0x0000): begun False rooms [] lines 1 frames 600 failure 
+  trial object 781 out of class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 1 frames 600 failure 
+  trial object 781 in class 6 (tested at global script 25 +0x0010): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 75 object 781 verb 0x08 (glowing crate) 0,7 s, 5 candidates: object 781 state 0 (tested at Room 75 object 781 verb 0x08 +0x0000) | object 749 used with it (held) (tested at Room 75 object 781 verb 0x08 +0x000C) | object 781 state 1 (tested at Room 75 object 781 verb 0x08 +0x0000) | object 781 out of class 6 (tested at global script 25 +0x0010) | object 781 in class 6 (tested at global script 25 +0x0010)
+      scripts: Room 75 object 781 verb 0x08 | global script 25; cutscene: (Room 75 object 781 verb 0x08, 19, )
+      result: way Game lines 55 rooms [] frames 105
+      kept: object 749 used with it (held) (tested at Room 75 object 781 verb 0x08 +0x000C); object 781 in class 6 (tested at global script 25 +0x0010); rooms [] lines 55
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial arrived from Room 70 (var[0x065]) (tested at Room 77 entry script +0x0067): begun True rooms [] lines 1 frames 6000 failure 
+  trial bit[0x13D] = 1 (tested at Room 77 entry script +0x0032): begun False rooms [] lines 0 frames 600 failure 
+  trial object 803 in class 6 (tested at Room 77 entry script +0x0037): begun False rooms [] lines 0 frames 600 failure 
+  trial object 803 out of class 6 (tested at Room 77 entry script +0x0037): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x165] = 1 (tested at global script 75 +0x0047): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1B3] = 1 (tested at global script 75 +0x00C4): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 1 (tested at global script 75 +0x0243): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at global script 75 +0x0248): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1C5] = 1 (tested at global script 138 +0x009C): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 77 object 0 verb 0x00 () 2,1 s, 9 candidates: arrived from Room 70 (var[0x065]) (tested at Room 77 entry script +0x0067) | bit[0x13D] = 1 (tested at Room 77 entry script +0x0032) | object 803 in class 6 (tested at Room 77 entry script +0x0037) | object 803 out of class 6 (tested at Room 77 entry script +0x0037) | bit[0x165] = 1 (tested at global script 75 +0x0047) | bit[0x1B3] = 1 (tested at global script 75 +0x00C4) | var[0x0C1] = 1 (tested at global script 75 +0x0243) | var[0x0C1] = 120 (tested at global script 75 +0x0248) | bit[0x1C5] = 1 (tested at global script 138 +0x009C)
+      scripts: global script 75 | global script 138; cutscene: (global script 75, 0, System.Int32[])
+      result: way Game lines 27 rooms [70] frames 117
+      kept: arrived from Room 70 (var[0x065]) (tested at Room 77 entry script +0x0067); bit[0x1B3] = 1 (tested at global script 75 +0x00C4); rooms [70] lines 27
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial object 783 held (tested at Room 78 entry script +0x0051): begun True rooms [] lines 5 frames 126 failure 
+  trial var[0x0C1] = 1 (tested at Room 78 local script 201 +0x023E): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 78 object 0 verb 0x00 () 0,2 s, 2 candidates: object 783 held (tested at Room 78 entry script +0x0051) | var[0x0C1] = 1 (tested at Room 78 local script 201 +0x023E)
+      scripts: Room 78 local script 201; cutscene: (Room 78 local script 201, 52, System.Int32[])
+      result: way Game lines 5 rooms [] frames 126
+      kept: object 783 held (tested at Room 78 entry script +0x0051); rooms [] lines 5
+  fresh: begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x089] = 1 (tested at Room 80 entry script +0x0088): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x21D] = 1 (tested at Room 80 entry script +0x0098): begun False rooms [] lines 0 frames 600 failure 
+  trial object 843 held (tested at Room 80 local script 202 +0x0007): begun False rooms [] lines 1 frames 600 failure 
+  trial bit[0x16A] = 1 (tested at Room 80 local script 202 +0x0090): begun False rooms [] lines 1 frames 600 failure 
+  trial object 843 in class 6 (tested at Room 80 local script 202 +0x0095): begun False rooms [] lines 1 frames 600 failure 
+  trial object 843 out of class 6 (tested at Room 80 local script 202 +0x0095): begun False rooms [] lines 1 frames 600 failure 
+SETUP Room 80 object 0 verb 0x00 () 0,8 s, 6 candidates: bit[0x089] = 1 (tested at Room 80 entry script +0x0088) | bit[0x21D] = 1 (tested at Room 80 entry script +0x0098) | object 843 held (tested at Room 80 local script 202 +0x0007) | bit[0x16A] = 1 (tested at Room 80 local script 202 +0x0090) | object 843 in class 6 (tested at Room 80 local script 202 +0x0095) | object 843 out of class 6 (tested at Room 80 local script 202 +0x0095)
+      scripts: Room 80 local script 202 | global script 93; cutscene: (Room 80 local script 202, 50, System.Int32[])
+      result: way Game lines 5 rooms [] frames 126
+      kept: bit[0x089] = 1 (tested at Room 80 entry script +0x0088); bit[0x21D] = 1 (tested at Room 80 entry script +0x0098); object 843 held (tested at Room 80 local script 202 +0x0007); bit[0x16A] = 1 (tested at Room 80 local script 202 +0x0090); object 843 in class 6 (tested at Room 80 local script 202 +0x0095); rooms [] lines 5
+  fresh: begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x114] = 1 (tested at Room 83 entry script +0x0030): begun True rooms [42] lines 8 frames 340 failure 
+  trial var[0x114] = 6 (tested at Room 83 entry script +0x003D): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x114] = 3 (tested at Room 83 entry script +0x0087): begun True rooms [] lines 26 frames 793 failure 
+  trial var[0x114] = 2 (tested at Room 83 entry script +0x0094): begun True rooms [] lines 7 frames 275 failure 
+  trial var[0x114] = 4 (tested at Room 83 entry script +0x00A1): begun True rooms [] lines 44 frames 1179 failure 
+  trial var[0x114] = 5 (tested at Room 83 entry script +0x00AE): begun True rooms [] lines 8 frames 314 failure 
+  trial var[0x0C1] = 1 (tested at Room 83 local script 200 +0x0780): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 120 (tested at Room 83 local script 200 +0x0785): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 121 (tested at Room 83 local script 200 +0x0792): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 122 (tested at Room 83 local script 200 +0x079F): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x0C1] = 123 (tested at Room 83 local script 200 +0x07AC): begun False rooms [] lines 0 frames 600 failure 
+  trial bit[0x1C0] = 1 (tested at Room 83 local script 203 +0x0266): begun False rooms [] lines 0 frames 600 failure 
+  trial var[0x110] = 4 (tested at Room 83 local script 201 +0x00A4): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 83 object 0 verb 0x00 () 1,1 s, 13 candidates: var[0x114] = 1 (tested at Room 83 entry script +0x0030) | var[0x114] = 6 (tested at Room 83 entry script +0x003D) | var[0x114] = 3 (tested at Room 83 entry script +0x0087) | var[0x114] = 2 (tested at Room 83 entry script +0x0094) | var[0x114] = 4 (tested at Room 83 entry script +0x00A1) | var[0x114] = 5 (tested at Room 83 entry script +0x00AE) | var[0x0C1] = 1 (tested at Room 83 local script 200 +0x0780) | var[0x0C1] = 120 (tested at Room 83 local script 200 +0x0785) | var[0x0C1] = 121 (tested at Room 83 local script 200 +0x0792) | var[0x0C1] = 122 (tested at Room 83 local script 200 +0x079F) | var[0x0C1] = 123 (tested at Room 83 local script 200 +0x07AC) | bit[0x1C0] = 1 (tested at Room 83 local script 203 +0x0266) | var[0x110] = 4 (tested at Room 83 local script 201 +0x00A4)
+      scripts: global script 62 | Room 83 local script 200 | global script 119 | Room 83 local script 203 | Room 83 local script 201; cutscene: (global script 62, 0, System.Int32[])
+      result: way Game lines 8 rooms [42] frames 340
+      kept: var[0x114] = 1 (tested at Room 83 entry script +0x0030); rooms [42] lines 8
+  fresh: begun False rooms [] lines 600 frames 600 failure 
+  trial arrived from Room 64 (var[0x065]) (tested at Room 85 entry script +0x012E): begun True rooms [] lines 5986 frames 6000 failure 
+  trial object 867 out of class 6 (tested at Room 85 entry script +0x0072): begun False rooms [] lines 600 frames 600 failure 
+  trial object 867 in class 6 (tested at Room 85 entry script +0x0072): begun False rooms [] lines 600 frames 600 failure 
+  trial object 870 out of class 6 (tested at Room 85 entry script +0x0085): begun False rooms [] lines 600 frames 600 failure 
+  trial object 870 in class 6 (tested at Room 85 entry script +0x0085): begun False rooms [] lines 600 frames 600 failure 
+  trial object 636 in class 24 (tested at Room 85 entry script +0x00C0): begun False rooms [] lines 600 frames 600 failure 
+  trial object 636 out of class 24 (tested at Room 85 entry script +0x00C0): begun False rooms [] lines 600 frames 600 failure 
+  trial var[0x0C3] = 3 (tested at Room 85 entry script +0x00F3): begun False rooms [] lines 600 frames 600 failure 
+  trial var[0x0C3] = 4 (tested at Room 85 entry script +0x00F3): begun False rooms [] lines 600 frames 600 failure 
+  trial var[0x0C3] = 2 (tested at Room 85 entry script +0x00F3): begun False rooms [] lines 600 frames 600 failure 
+  trial bit[0x013] = 1 (tested at Room 85 entry script +0x0100): begun False rooms [] lines 600 frames 600 failure 
+  trial arrived from Room 61 (var[0x065]) (tested at Room 85 entry script +0x0114): begun True rooms [] lines 5973 frames 6000 failure 
+  trial bit[0x1C5] = 1 (tested at Room 85 entry script +0x006D): begun False rooms [] lines 0 frames 600 failure 
+SETUP Room 85 object 0 verb 0x00 () 8,3 s, 13 candidates: arrived from Room 64 (var[0x065]) (tested at Room 85 entry script +0x012E) | object 867 out of class 6 (tested at Room 85 entry script +0x0072) | object 867 in class 6 (tested at Room 85 entry script +0x0072) | object 870 out of class 6 (tested at Room 85 entry script +0x0085) | object 870 in class 6 (tested at Room 85 entry script +0x0085) | object 636 in class 24 (tested at Room 85 entry script +0x00C0) | object 636 out of class 24 (tested at Room 85 entry script +0x00C0) | var[0x0C3] = 3 (tested at Room 85 entry script +0x00F3) | var[0x0C3] = 4 (tested at Room 85 entry script +0x00F3) | var[0x0C3] = 2 (tested at Room 85 entry script +0x00F3) | bit[0x013] = 1 (tested at Room 85 entry script +0x0100) | arrived from Room 61 (var[0x065]) (tested at Room 85 entry script +0x0114) | bit[0x1C5] = 1 (tested at Room 85 entry script +0x006D)
+      scripts: Room 85 local script 203; cutscene: (Room 85 local script 203, 0, System.Int32[])
+      result: way Game lines 5986 rooms [] frames 6000
+      kept: arrived from Room 64 (var[0x065]) (tested at Room 85 entry script +0x012E); rooms [] lines 5986
+fresh start begins 105; setup begins 59; still nothing 0; 90 s

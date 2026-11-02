@@ -123,11 +123,11 @@ public abstract partial class ScummSession
             return Snapshot;
         }
 
-        if (ArrivalScenesSeen) MarkArrivalScenesSeen(room.ResourceId!.Value);
         RunGlobalHook(ScummVars.EntryScript, "before room entry", estimatedLoad);
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
         if (_runtime.IsV2) RunIndexedScript(5, 0, null, 0, pathEstimated: estimatedLoad); // room.cpp: fixed v1/v2 entry hook, after embedded entry.
         RunGlobalHook(ScummVars.EntryScript2, "after room entry", estimatedLoad);
+        EndArrivalCutscenes(room.ResourceId!.Value);
         if (walkTo is not null) _runtime.SetGlobalVariable(ScummVars.WalkToObject, 0);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);

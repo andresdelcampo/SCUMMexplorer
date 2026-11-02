@@ -5300,11 +5300,12 @@ public partial class MainWindow : Window
     {
         if (!VerbStripShown())
         {
-            if (VerbScreenShown())
+            // 2 November 2026 (crash log, user): after another game opens, the old game's verb-screen text can still be set while no LOOM session is.
+            if (VerbScreenShown() && _session is not null)
             {
                 // The verb screen holds the game's text: draw it with the verb slots it goes with,
                 // so the close-up (verb 0x36, script 008) shows above the object's name (script 007).
-                var slots = _session!.VerbArea();
+                var slots = _session.VerbArea();
                 VerbStripImage.Source = CreateBitmap(slots.Width, slots.Height, slots.Pixels, _currentRoom!.Palette);
                 SetVerbScreenNote(_verbMessageBitmap is not null
                         ? "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."

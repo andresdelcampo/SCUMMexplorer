@@ -190,6 +190,8 @@ public partial class MainWindow
     private async void PlayScummCutscene(ScummCutsceneGroup group) => await PlayScummCutsceneAsync(group, null);
 
     /// <param name="interaction">A pick from Interact (R-8.38): an object that is not in the room yet is brought into it first.</param>
+    private ScummCutscene? _sceneOpening;
+
     private async Task PlayScummCutsceneAsync(ScummCutsceneGroup group, string? shownTitle, bool interaction = false)
     {
         var trigger = group.First;
@@ -206,8 +208,15 @@ public partial class MainWindow
             _sceneSound.StopAll("another scene was picked");
             // Restarting the clock in the same prepared room does not execute entry.
             visitedForIt = _play?.CurrentRoomId != trigger.Room;
-            SelectRoomWithIntent(room, RoomOpenKind.Cutscene, reloadSelected: true);
-            if (_roomOpenTask is { } opening) await opening;
+            // The visit that opens the room is already the scene's: it does not replay the room's arrival, and brings the hero a scene speaking as
+            // him needs (StartPlayCoreAsync applies these to the visit).
+            _sceneOpening = trigger;
+            try
+            {
+                SelectRoomWithIntent(room, RoomOpenKind.Cutscene, reloadSelected: true);
+                if (_roomOpenTask is { } opening) await opening;
+            }
+            finally { _sceneOpening = null; }
             // The room view boots or continues play in the opened room; wait for it (a first boot takes a few seconds).
             for (var wait = 0; wait < 600 && !(PlayActive && (_play!.CurrentRoomId == trigger.Room || UsesManiacCutsceneSetup(game) && _play.CurrentRoomId == 45)); wait++)
             {
@@ -231,8 +240,10 @@ public partial class MainWindow
         IReadOnlyList<string> uncertainties;
         // The scene's own scripts do not wait out their timers until it begins (as the plan's runs: Maniac Mansion's Script 139, seven minutes).
         if (plan?.Result.Way != ScummPickedStart.AtCutscene) session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger), trigger.ObjectId);
-        // A scene that is not the room's arrival does not replay the arrival on the way in (ScummSession.ArrivalScenesSeen), as the plan's runs.
-        session.ArrivalScenesSeen = !trigger.IsRoomEntry;
+        // A scene that is not the room's arrival does not replay the arrival on the way in (ScummSession.ArrivalsSkippedFor), as the plan's runs.
+        session.ArrivalsSkippedFor = trigger.IsRoomEntry ? null : trigger;
+        session.ArrivalSetup = plan?.Edits;
+        session.WantHeroForScene(trigger);
         try
         {
             if (plan is { HasEdits: true } && trigger.IsRoomEntry)
@@ -310,7 +321,7 @@ public partial class MainWindow
             StatusText.ToolTip = IsAdvancedMode ? ex.Message : null;
             return;
         }
-        finally { session.ArrivalScenesSeen = false; }
+        finally { session.ArrivalsSkippedFor = null; session.ArrivalSetup = null; }
         ShowPlayFrame();
         PlayScreenImage.Focus();
         StatusText.Text = $"Playing {title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";

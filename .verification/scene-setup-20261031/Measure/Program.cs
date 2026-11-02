@@ -33,6 +33,19 @@ if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 }
         foreach (var c in codePlanner.Setup.Candidates(t)) Console.WriteLine($"  candidate {c.Kind} {c.Target} {c.Value}: {c.Describe()}");
     return;
 }
+if (Environment.GetEnvironmentVariable("MEASURE_OBJECTS") is { Length: > 0 } objectRoom)
+{
+    // MEASURE_OBJECTS=room: the room's objects (directory order) and their stored images by state, with where they lie.
+    var data = ScummDataSources.For(game);
+    var number = int.Parse(objectRoom);
+    var records = data.ReadRoom(number).Objects;
+    foreach (var record in records) Console.WriteLine($"object {record.Id} at ({record.X},{record.Y}) {record.Width}x{record.Height}");
+    if (data is ScummV5DataSource v5)
+        foreach (var state in new byte[] { 0, 1, 2 })
+            foreach (var image in v5.ReadObjectImages(number, records.ToDictionary(r => r.Id, _ => state)))
+                Console.WriteLine($"  state {state}: image of {image.Id} at ({image.X},{image.Y}) {image.Width}x{image.Height} mask {(image.Mask is null ? "none" : "yes")}");
+    return;
+}
 if (Environment.GetEnvironmentVariable("MEASURE_ACTORS") is { Length: > 0 } actorRoom)
 {
     // MEASURE_ACTORS=room: the room visited from the boot (as the app's catalog pick of its entry scene), the actors in it after 200 frames.

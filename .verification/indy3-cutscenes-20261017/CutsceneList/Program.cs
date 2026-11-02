@@ -274,12 +274,19 @@ if (args.Length > 4 && args[1] == "probe")
     }
     for (var frame = 0; frame < 700; frame++)
     {
-        var at = session.SessionTrace.Count; session.AdvanceFrame();
-        if (session.SessionTrace.Skip(at).Any(t => t.Contains("cutscene", StringComparison.OrdinalIgnoreCase) || t.Contains("Room", StringComparison.Ordinal) && t.Contains("enter", StringComparison.OrdinalIgnoreCase))) Print(at, $"frame {frame}");
+        var before = session.CurrentRoomId;
+        session.AdvanceFrame();
+        if (session.CurrentRoomId != before)
+        {
+            Console.WriteLine($"frame {frame}: room {before} -> {session.CurrentRoomId}");
+            foreach (var t in session.SessionTrace.TakeLast(12)) Console.WriteLine("  | " + (t.Length > 200 ? t[..200] : t));
+        }
     }
     void Print(int from, string what)
     {
-        foreach (var t in session.SessionTrace.Skip(from).Where(t => t.Contains("cutscene", StringComparison.OrdinalIgnoreCase) || t.Contains("enter", StringComparison.OrdinalIgnoreCase)))
+        var filter = Environment.GetEnvironmentVariable("PROBE_FILTER");
+        foreach (var t in session.SessionTrace.Skip(from).Where(t => filter is { Length: > 0 } ? t.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                     : t.Contains("cutscene", StringComparison.OrdinalIgnoreCase) || t.Contains("enter", StringComparison.OrdinalIgnoreCase)))
             Console.WriteLine($"{what}: {t}");
     }
     return;

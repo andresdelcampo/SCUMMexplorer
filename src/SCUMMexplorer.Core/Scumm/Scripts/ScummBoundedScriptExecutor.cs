@@ -2019,6 +2019,8 @@ public sealed partial class ScummBoundedScriptExecutor
                         if (room is null) actors.Forget(number, $"{label}: whether it is in the current room is unknown");
                         else if (room == place.CurrentRoom) actors.Replace(number, place, ego);
                     }
+                    else if (item == "neverZClip") actors.SetForceClip(number, 0);
+                    else if (item.StartsWith("alwaysZClip,", StringComparison.Ordinal) && ReadItem(item, 1) is int plane) actors.SetForceClip(number, plane);
                     else if (item.StartsWith("costume", StringComparison.Ordinal))
                         actors.CostumeChanged(number, ReadItem(item, 1), place);
                     else if (item.StartsWith("talkColor,", StringComparison.Ordinal) &&

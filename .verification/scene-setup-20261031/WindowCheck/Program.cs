@@ -138,6 +138,13 @@ internal static class Program
                         for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
                         continue;
                     }
+                    // g:seconds presses Play Game Intro and captures the screen every 3 seconds (2 November 2026, Indy 4's title).
+                    if (raw.StartsWith("g:", StringComparison.Ordinal))
+                    {
+                        typeof(MainWindow).GetMethod("GameIntro_Click", Private)!.Invoke(window, [window.FindName("GameIntroButton"), new RoutedEventArgs()]);
+                        for (var i = 3; i <= int.Parse(raw[2..]); i += 3) { await Pump(3); State($"{raw} +{i}s"); Capture($"intro-{i:00}"); }
+                        continue;
+                    }
                     // r:room opens the room as a pick in the room selector does (a catalog visit).
                     if (raw.StartsWith("r:", StringComparison.Ordinal))
                     {

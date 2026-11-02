@@ -184,14 +184,28 @@ public abstract partial class ScummSession
     /// <summary>
     /// 2 November 2026 (user report, Indy 3 Room 13): the boot script can go on after it hands the player control (Indy 3's Script 1 +0x040D: "I really
     /// have to get out of these wet clothes!", a walk, then loadRoom 73 to change). A room or scene the user picks does not continue the opening's route:
-    /// its remaining work (and the scripts it started) ends, unless it still holds a cutscene.
+    /// its remaining work (and the scripts it started) ends. Indy 3's walk runs inside the boot's own cutscene (+0x023A to +0x04B0): that cutscene is
+    /// closed too, as a picked room's preparation closes a departed route's (<see cref="CancelDepartedManualRoute"/>).
     /// </summary>
     protected void EndOpeningRoute()
     {
         if (_booting) return;
         var active = _pending.Select(p => p.Frame).Concat(_frameScripts.Select(p => p.Frame)).Where(f => !f.Stopped).ToHashSet();
-        var roots = active.Where(f => f.Number == BootScript).ToHashSet();
-        if (roots.Count == 0 || _cutscenes.Any(c => c.Owner is ScriptFrame owner && DescendsFrom(owner, roots))) return;
+        // The boot script's slot, also once it has chained on (Indy 3's Script 1 +0x04B1 chains to Script 119, the "Welcome to my game" tutorial lines).
+        static bool Opening(ScriptFrame frame)
+        {
+            for (var current = frame; current is not null; current = current.ChainedFrom ? current.Parent : null)
+                if (current.Number == BootScript) return true;
+            return false;
+        }
+        var roots = active.Where(Opening).ToHashSet();
+        if (roots.Count == 0) return;
+        if (_cutscenes.Any(c => c.Owner is ScriptFrame owner && DescendsFrom(owner, roots)))
+        {
+            CancelDepartedManualRoute(_currentRoom?.ResourceId ?? 0, CancellationToken.None);
+            _uncertainties.Add($"The game's opening (Script {BootScript}) was still in its cutscene after giving control; a picked room or scene does not continue it, so it and its cutscene were ended.");
+            return;
+        }
         foreach (var frame in active.Where(f => DescendsFrom(f, roots))) frame.Stopped = true;
         _pending.RemoveAll(p => p.Frame.Stopped);
         _frameScripts.RemoveAll(p => p.Frame.Stopped);
@@ -235,30 +249,37 @@ public abstract partial class ScummSession
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (++scopes > MaxNestedScripts) throw new InvalidOperationException("Cutscene cleanup did not finish within its scope bound.");
-            _overrides.Remove(_cutscenes.Count);
-            var closed = _cutscenes.Pop();
-            if (_runtime.IsV2)
-            {
-                // Canceling an exploration route restores its saved UI scope, not its saved
-                // room/camera route: the caller is explicitly selecting another room next.
-                if (_v2CutsceneState.TryPop(out var saved))
-                {
-                    _runtime.SetGlobalVariable(ScummVars.V2.CursorState, saved.Cursor);
-                    _runtime.ApplyV2UserState(saved.UserState | 4 | 2 | 1);
-                }
-            }
-            else
-            {
-                _runtime.SetGlobalVariable(OverrideVariable, 0);
-                _runtime.EstimatedVariables.Remove(OverrideVariable);
-                if (!_runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var end))
-                    throw new InvalidOperationException("The native cutscene-end hook is unavailable.");
-                if (end != 0) RunStartedScript(end, 0, new Dictionary<string, ushort> { ["local[0x000]"] = closed.Data }, 0);
-            }
+            CloseTopCutscene();
         }
         _overrides.Clear();
         _cutsceneOwner = null;
         _visitTrace.Add($"manual selection of Room {target:00}: retired departed scene slots without executing their remaining story or an override jump");
+    }
+
+    // Closes the innermost cutscene without its override jump: version 2 restores its saved interface; later versions run the game's cutscene-end hook.
+    private void CloseTopCutscene()
+    {
+        _overrides.Remove(_cutscenes.Count);
+        var closed = _cutscenes.Pop();
+        if (_runtime.IsV2)
+        {
+            // Canceling an exploration route restores its saved UI scope, not its saved
+            // room/camera route: the caller is explicitly selecting another room next.
+            if (_v2CutsceneState.TryPop(out var saved))
+            {
+                _runtime.SetGlobalVariable(ScummVars.V2.CursorState, saved.Cursor);
+                _runtime.ApplyV2UserState(saved.UserState | 4 | 2 | 1);
+            }
+        }
+        else
+        {
+            _runtime.SetGlobalVariable(OverrideVariable, 0);
+            _runtime.EstimatedVariables.Remove(OverrideVariable);
+            if (!_runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var end))
+                throw new InvalidOperationException("The native cutscene-end hook is unavailable.");
+            if (end != 0) RunStartedScript(end, 0, new Dictionary<string, ushort> { ["local[0x000]"] = closed.Data }, 0);
+        }
+        if (_cutscenes.Count == 0) _cutsceneOwner = null;
     }
 
     private bool RemainingSourceMayBeginScene(ScummScriptDisassembly script, int start,

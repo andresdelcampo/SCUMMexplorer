@@ -101,10 +101,13 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 ### Indiana Jones 4
 - 5 scenes started at their cutscene show nothing (work item 1).
 - Room 14 (the tunnel, user report 2 November): a picked visit puts Indy in by an assumed walk-in from Room 94, but the room's first state (object 165 at 0) is the mine-cart ride, entered without the hero; an arrival should fit the state the room's code tests ([record](../.verification/user-reports-20261102/README.md)).
-- After Play Game Intro (user report): Indy walks very fast; Room 04 shows no animations during the intro. Not reproduced headless.
+- Room 14: the hero still appears for a few seconds before the camera follows the cart away (user retest).
+- Play Game Intro: no sound of the window breaking as Indy comes in (Room 04); Indy walking very fast afterwards (not reproduced headless).
+- Changing rooms changes the room's size a second or so after it shows (user report, 2 November; to see in the window).
 - Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
+- Maniac Mansion enhanced Room 44: no doorway to Room 1 although the hero can walk there (user report, 2 November).
 Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies once the user tells that track.
 - Scenes started at their cutscene (Maniac 6 of 27, Zak 11 of 54; work item 1; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold); a Maniac pick in the window waits for the party selection (the startup rule), so it is checked headless only.
 - Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours.

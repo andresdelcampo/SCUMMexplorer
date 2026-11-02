@@ -38,13 +38,16 @@ public sealed class UserReports20261102Tests(ITestOutputHelper output)
     [Fact]
     public void APickedSceneDoesNotReplayTheRoomsArrival()
     {
-        // Room 82's entry starts local script 200, whose cutscene beheads a soldier unless bit[0x5E2] is set (+0x0005); Script 122 +0x0233 sets it.
+        // Room 82's entry starts local script 200, the arrival: a cutscene that beheads a soldier and walks Indy on to Room 83. Give Grail (object 873)
+        // entering the room does not play it.
         if (Indy3Vga() is not { } game) return;
         var session = ScummGameSession.BootForPlay(game, out _);
-        session.ArrivalScenesSeen = true;
+        session.ArrivalsSkippedFor = new ScummCutscene(82, 873, "", 0x03, ["Room 82 object 873 verb 0x03"], 0, 0, 0, "");
         session.VisitRoom(Room(game, 82));
-        session.ArrivalScenesSeen = false;
-        Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("bit[0x5E2]", StringComparison.Ordinal) && line.Contains("counts as seen", StringComparison.Ordinal));
+        session.ArrivalsSkippedFor = null;
+        Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("its arrival (local script 200", StringComparison.Ordinal));
+        for (var frame = 0; frame < 600; frame++) session.AdvanceFrame();
+        Assert.Equal(82, session.CurrentRoomId);
     }
 
     [Fact]

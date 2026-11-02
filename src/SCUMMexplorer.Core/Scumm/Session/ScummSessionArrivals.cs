@@ -9,11 +9,41 @@ public abstract partial class ScummSession
 {
     /// <summary>
     /// Set while a picked scene that is not a room's arrival is being set up (2 November 2026, user report: Indy 3's Give Grail entered Room 82 and
-    /// replayed its first arrival, the beheading, whose head stayed on the floor through the ending). A room entered meanwhile has its arrival cutscenes
-    /// counted as seen: a flag that a cutscene the entry starts tests first, and that the game raises elsewhere, is raised before the entry runs
-    /// (Room 82 local script 200 +0x0005 tests <c>bit[0x5E2]</c>, which Script 122 +0x0233 sets as the hero comes back with the Grail).
+    /// replayed its first arrival, the beheading, whose head stayed on the floor through the ending). A room entered meanwhile does not play its arrival:
+    /// a room script the entry started that holds a cutscene once the entry has run (Room 82's local script 200, which beheads the soldier, then walks
+    /// Indy on to Room 83) is ended and its cutscene closed, as a skipped route is (the game's cutscene-end hook runs). The picked scene's own scripts
+    /// are kept. The actors and objects the entry itself set stay as it left them.
     /// </summary>
-    public bool ArrivalScenesSeen { get; set; }
+    public ScummCutscene? ArrivalsSkippedFor { get; set; }
+
+    /// <summary>The picked scene's setup values: a room script whose tests they come from is part of the scene and keeps its cutscene (Indy 4 Room 10's
+    /// back door: "arrived from Room 15", tested in the arrival script, local script 204).</summary>
+    public IReadOnlyCollection<ScummSetupEdit>? ArrivalSetup { get; set; }
+
+    private void EndArrivalCutscenes(int roomId)
+    {
+        if (ArrivalsSkippedFor is not { } trigger || _cutscenes.Count == 0) return;
+        // A setup that says how the room is entered (where from, by which door, under which number) wants that arrival.
+        if (ArrivalSetup?.Any(edit => edit.Kind is ScummSetupKind.CameFrom or ScummSetupKind.EnteredBy or ScummSetupKind.EnteredAs) == true) return;
+        var kept = ScummSceneSetupSearch.SceneScripts(_game, trigger).ToHashSet(StringComparer.Ordinal);
+        foreach (var edit in ArrivalSetup ?? []) kept.Add(edit.Where.Split(" +0x", 2)[0]);
+        var active = _pending.Select(p => p.Frame).Concat(_frameScripts.Select(p => p.Frame)).Where(f => !f.Stopped).ToHashSet();
+        var owners = _cutscenes.Select(c => c.Owner).OfType<ScriptFrame>().Where(active.Contains).ToHashSet();
+        bool Kept(ScriptFrame frame)
+        {
+            for (var current = frame; current is not null; current = current.Parent)
+                if (current.Global || kept.Contains($"Room {roomId} local script {current.Number}")) return true;
+            return false;
+        }
+        var arrivals = owners.Where(frame => !frame.Global && frame.OriginRoom == roomId && !Kept(frame)).ToHashSet();
+        if (arrivals.Count == 0) return;
+        foreach (var frame in active.Where(f => DescendsFrom(f, arrivals))) frame.Stopped = true;
+        _pending.RemoveAll(p => p.Frame.Stopped);
+        _frameScripts.RemoveAll(p => p.Frame.Stopped);
+        for (var scopes = 0; _cutscenes.Count > 0 && _cutscenes.Peek().Owner is { Stopped: true } && scopes < MaxNestedScripts; scopes++) CloseTopCutscene();
+        _uncertainties.Add($"A picked scene enters Room {roomId:00}: its arrival (local script {string.Join(", ", arrivals.Select(f => f.Number))}, a cutscene the entry " +
+                           "started) does not play; it was ended and its cutscene closed, as a skipped route is.");
+    }
 
     private sealed record GameScriptFacts(IReadOnlyDictionary<string, int> RaisedFlags, IReadOnlyDictionary<int, HashSet<string>> Loaders)
     {
@@ -37,64 +67,41 @@ public abstract partial class ScummSession
                facts.Loaders.Count(entry => entry.Value.Contains(label)) == 1 ? label : null;
     }
 
+    /// <summary>
+    /// 2 November 2026 (user report, Indy 3 Room 13): a picked room entry whose scripts speak as the hero (<c>printEgo</c>) plays with the hero in its
+    /// room. When no decoded arrival brings him in, he was left in the room the boot ended in (Room 73), and the game's cutscene-end hook (Script 23
+    /// +0x0022, <c>actorFollowCamera</c> on the hero) then loaded his room; now the next visit of the scene's room puts him in it, as a setup that tests
+    /// he is there does (a teleport, labelled).
+    /// </summary>
+    public void WantHeroForScene(ScummCutscene trigger)
+    {
+        ArgumentNullException.ThrowIfNull(trigger);
+        // A room's own arrival (its entry) only, and not a room the game enters under pseudo room numbers, whose ways in our arrival index does
+        // not see (Indy 4 Rooms 72 and 93: the hero brought in where he last stood changed what their entries test).
+        if (!trigger.IsRoomEntry || _runtime.PseudoRooms.Values.Contains(trigger.Room)) return;
+        foreach (var label in ScummSceneSetupSearch.SceneScripts(_game, trigger))
+        {
+            ScummScriptDisassembly? script = null;
+            try
+            {
+                if (Regex.Match(label, @"^global script (\d+)$") is { Success: true } g) script = _data.GlobalScript(int.Parse(g.Groups[1].Value, CultureInfo.InvariantCulture));
+                else if (Regex.Match(label, @"^Room (\d+) local script (\d+)$") is { Success: true } l)
+                    script = _data.RoomLocalScript(int.Parse(l.Groups[1].Value, CultureInfo.InvariantCulture), int.Parse(l.Groups[2].Value, CultureInfo.InvariantCulture));
+                else if (Regex.Match(label, @"^Room (\d+) entry script$") is { Success: true } e) script = _data.RoomEntryScript(int.Parse(e.Groups[1].Value, CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { }
+            if (script?.Instructions.Any(i => i.Operation == "printEgo") != true) continue;
+            WantedHeroIn = trigger.Room;
+            return;
+        }
+    }
+
     private static readonly ConditionalWeakTable<GameLibrary, Lazy<GameScriptFacts>> ScriptFacts = new();
 
     private GameScriptFacts Facts() => ScriptFacts.GetValue(_game, game => new Lazy<GameScriptFacts>(() => ReadScriptFacts(game, _data))).Value;
     private static readonly Regex FlagMove = new(@"^((?:bit|var)\[0x[0-9A-F]+\]) = (0x[0-9A-F]+)$", RegexOptions.CultureInvariant);
     private static readonly Regex BranchTarget = new(@"-> 0x([0-9A-F]+)$", RegexOptions.CultureInvariant);
     private static readonly Regex FlagGuard = new(@"^((?:bit|var)\[0x([0-9A-F]+)\]),", RegexOptions.CultureInvariant);
-
-    private void MarkArrivalScenesSeen(int roomId)
-    {
-        ScummScriptDisassembly? entry;
-        try { entry = _data.RoomEntryScript(roomId); }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { return; }
-        if (entry is null) return;
-        var locals = _data.RoomLocalScriptIds(roomId).ToHashSet();
-        var started = entry.Instructions.Where(i => i.Operation == "startScript")
-            .Select(i => int.TryParse(i.Operands.Split(',')[0].Trim().Replace("0x", "", StringComparison.Ordinal), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var id) ? id : -1)
-            .Where(locals.Contains).Distinct();
-        var raised = Facts().RaisedFlags;
-        foreach (var id in started)
-        {
-            ScummScriptDisassembly? script;
-            try { script = _data.RoomLocalScript(roomId, id); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { continue; }
-            if (script is null || !script.Instructions.Any(i => i.Operation == "cutscene")) continue;
-            // The guards that mark an arrival as seen: one just inside the arrival's cutscene (Indy 3 Room 82's local script 200: cutscene, then
-            // bit[0x5E2] at +0x0005), or a test of a flag the script then sets itself just before its cutscene begins (the "first time" pattern:
-            // Monkey Island 2 Room 50's local script 202 +0x003C, bit[0x058]). A test before any cutscene that leads elsewhere is a story state, not
-            // a "seen" mark (the same script's bit[0x05B] at +0x0000 plays another state), and is left alone.
-            var instructions = script.Instructions;
-            var first = instructions.ToList().FindIndex(i => i.Operation == "cutscene");
-            var guards = instructions.Select((instruction, index) => (instruction, index)).Where(item => item.instruction.Operation is "notEqualZero" or "equalZero" &&
-                (item.index > first && item.index <= first + 3 ||
-                 FlagGuard.Match(item.instruction.Operands) is { Success: true } tested &&
-                 instructions.Skip(item.index + 1).Take(2).Any(next => next.Operation == "move" && next.Operands.StartsWith(tested.Groups[1].Value + " =", StringComparison.Ordinal)) &&
-                 instructions.Skip(item.index + 1).Take(4).Any(next => next.Operation == "cutscene")))
-                .Select(item => item.instruction);
-            foreach (var guard in guards)
-            {
-                if (FlagGuard.Match(guard.Operands) is not { Success: true } match) continue;
-                // A test that loops back waits for the flag (Monkey Island 1 Room 80's local script 202 +0x0001 waits for bit[0x089], then plays):
-                // raising it would start that scene, not count it as seen.
-                if (BranchTarget.Match(guard.Operands) is { Success: true } target &&
-                    int.Parse(target.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) <= guard.Offset) continue;
-                var flag = match.Groups[1].Value;
-                // Story variables only: a bit, or a variable above the engine's own.
-                if (flag.StartsWith("var[", StringComparison.Ordinal) && int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) < 0x80) continue;
-                // The value the script itself marks it with, else one the game sets elsewhere.
-                var marked = instructions.FirstOrDefault(i => i.Operation == "move" && i.Operands.StartsWith(flag + " =", StringComparison.Ordinal) &&
-                    FlagMove.Match(i.Operands) is { Success: true } m && m.Groups[2].Value != "0x0000");
-                int value;
-                if (marked is not null) value = int.Parse(FlagMove.Match(marked.Operands).Groups[2].Value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-                else if (!raised.TryGetValue(flag, out value)) continue;
-                var where = $"Room {roomId} local script {id} +0x{guard.Offset:X4}";
-                if (ApplySetupEdit(new ScummSetupEdit(flag.StartsWith("bit[", StringComparison.Ordinal) ? ScummSetupKind.Bit : ScummSetupKind.Variable, flag, value, where)))
-                    _uncertainties.Add($"A picked scene enters Room {roomId:00}: its arrival cutscene ({where} tests {flag}) counts as seen, so {flag} = {value}, as the game sets it.");
-            }
-        }
-    }
 
     // Over the game's global, room and object scripts: every story flag set to a constant other than 0 (the first such value), and the rooms loaded
     // (loadRoom, loadRoomWithEgo with a constant room) by the boot script and by any other script.

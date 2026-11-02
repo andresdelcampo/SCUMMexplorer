@@ -94,8 +94,14 @@ public static class ScummActorRenderer
             var actorClasses = classes is not null && classes.TryGetValue(actor.Number, out var bits) ? bits : 0u;
             var forceClip = ScummObjectClasses.Has(actorClasses, AlwaysClipClass);
             var neverClip = !forceClip && ScummObjectClasses.Has(actorClasses, NeverClipClass);
-            var zPlane = depthMask is null || neverClip ? 0 : forceClip ? 1 :
-                actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1 + (extraMasks?.Count ?? 0)) : 0;
+            // prepareDrawActorCostume: _forceClip (actorOps alwaysZClip), else the never-clip class, else the walk box's mask. No walk box (an actor
+            // that ignores boxes) is ScummVM's kInvalidBox: version 3's workaround gives it plane 1, version 4 none, version 5 box 0's mask
+            // (Indy 4's title, Room 4: actors 5 and 6 ignore boxes and must not go behind the column).
+            byte BoxMask(int box) => box != ScummWalkBoxSet.InvalidBox ? boxes?.GetMask(box) ?? 0
+                : engineVersion <= 3 ? (byte)1 : engineVersion == 4 ? (byte)0 : boxes?.GetMask(0) ?? 0;
+            var planes = 1 + (extraMasks?.Count ?? 0);
+            var zPlane = depthMask is null ? 0 : actor.ForceClip > 0 ? Math.Min(actor.ForceClip, planes) : neverClip ? 0 : forceClip ? 1 :
+                actor.WalkBox is int box ? Math.Min((int)BoxMask(box), planes) : 0;
             var boxNote = depthMask is not null && !forceClip && !neverClip && actor.WalkBox is null
                 ? "walk box unknown: drawn in front of the depth mask" : null;
             // CD game: a box with a scale of its own (word or slot) sets it where the actor stands, else the actor's own (actorOps scale) holds.

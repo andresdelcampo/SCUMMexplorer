@@ -17,6 +17,9 @@ public sealed record ScummActorSnapshot(int Number, int? Room, int? X, int? Y, i
 
     /// <summary>ScummVM <c>_moving</c>: nonzero while the actor walks or turns (M3a).</summary>
     public int Moving { get; init; }
+
+    /// <summary>ScummVM <c>_forceClip</c>: the z-plane <c>actorOps alwaysZClip</c> forces (0: none; <c>neverZClip</c> and ignore/follow boxes clear it).</summary>
+    public int ForceClip { get; init; }
 }
 
 /// <summary>
@@ -143,7 +146,11 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
 
     /// <summary><c>_ignoreBoxes</c> from actorOps, or cleared by <c>setClass</c> 0 on an actor (small header).</summary>
     public void SetIgnoreBoxes(int number, bool value)
-    { _actors[number].IgnoreBoxes = value; Notify(number); }
+    { _actors[number].IgnoreBoxes = value; _actors[number].ForceClip = 0; Notify(number); }
+
+    /// <summary><c>actorOps alwaysZClip n</c> (n) and <c>neverZClip</c> (0): ScummVM <c>_forceClip</c>.</summary>
+    public void SetForceClip(int number, int plane)
+    { _actors[number].ForceClip = plane; Notify(number); }
 
     /// <summary>
     /// <c>Actor::putActor(x, y, room)</c>. In the current room the actor is shown
@@ -1008,6 +1015,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public int? DestBox { get; set; } = 0;
         public bool? Visible { get; set; } = false;
         public bool? IgnoreBoxes { get; set; } = false;
+        public int ForceClip { get; set; }
         public int TalkColor { get; set; } = DefaultTalkColor;
         public int Width { get; set; } = DefaultWidth;
         public int? LastValidX { get; set; } = 0;
@@ -1080,6 +1088,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
                 Estimate)
             {
                 Moving = Moving,
+                ForceClip = ForceClip,
                 Look = new ScummActorLook(Costume, Elevation, Facing, Frame, InitFrame, WalkFrame, StandFrame,
                     TalkStartFrame, TalkStopFrame, WalkSpeedX, WalkSpeedY, Palette.ToArray(), Animation.Clone(), LookEstimate)
                 { PaletteEstimate = PaletteEstimate, Scale = Scale }

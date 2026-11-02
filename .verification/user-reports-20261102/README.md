@@ -23,7 +23,7 @@ All scenes again after the fixes (`../scene-setup-20261031/*-run49.txt` against 
 LOOM `../loom-editions-20261031/run31-*.txt` against `run30-*.txt`, `EDITIONS_LOOM_SESSION=1`): the five copies and Maniac/Zak unchanged (no scene moved
 either way); LOOM's shared engine plays a few more of its scenes its own way (EGA English 91.7% → 92.2%, CD 91.9% → 92.4%; at the cutscene unchanged).
 
-## Left open
+## Left open (first pass)
 
 - **Indy 4 Room 14** (top-down tunnel): the catalog visit puts Indy in by an assumed walk-in from Room 94 (`loadRoomWithEgo`, object 1224), but the
   room's first state (object 165 state 0) is the mine-cart ride (local script 200, actor 9 in costume 188), which the game enters without the hero.
@@ -34,3 +34,17 @@ either way); LOOM's shared engine plays a few more of its scenes its own way (EG
 Tests: `UserReports20261102Tests` (the print continuation, the arrival flag, the room one script shows, the screens of Rooms 80 and 76, the opening's
 route). Harness additions: `Measure` `MEASURE_SCREEN=<room>`, `MEASURE_INTRO=<frames>`, `MEASURE_ACTORS=<room>`; `CutsceneList <folder> groups <room|all>`;
 `ScriptDump` reads any game (`entry`, `exit`, `room`, global ids).
+
+## Second pass (2 November, after the user's retest)
+
+The user's retest found Give Grail and Room 13 still wrong, and Indy 4's title behind a column; a crash log after switching games.
+
+| Report | Cause | Fix (shared) |
+|---|---|---|
+| Give Grail still replays the arrival | The window's pick opens the scene's room first (`SelectRoomWithIntent`, `RoomOpenKind.Cutscene`), before the rule was on. And raising Room 82's `bit[0x5E2]` only skips the beheading: the rest of the arrival (local script 200: "Be back in a jiffy!", a walk into Room 83) still played | The rule now ends the arrival rather than raising its flag: after the entry of a room a picked (non-entry) scene enters, a room script holding a cutscene is ended and its cutscene closed (the game's cutscene-end hook runs; `CloseTopCutscene`, shared with the manual room's route cancelling). Kept: the scene's own scripts, scripts the setup's values were read in, and every arrival when the setup says how the room is entered (came from, door, pseudo room: Indy 4 Room 10's back door needs its arrival). The pick's opening visit gets the rule too (`_sceneOpening`) |
+| Room 13's clothes change still moves to Room 73 | No decoded arrival brings Indy into Room 13, so he stays in Room 73 (where the boot ends); the game's cutscene-end hook (Script 23 +0x0022) runs `actorFollowCamera` on him, which loads his room | A picked room entry whose scripts speak as the hero (`printEgo`) brings the hero into the room when no arrival does (`WantHeroForScene`; not for rooms entered as pseudo rooms: Indy 4 Rooms 72 and 93 changed when he was) |
+| The opening's tutorial lines ("Hi, I'm Indiana Jones. Welcome to my game.") inside picked scenes | Script 1 chains to Script 119 at its end; the chained script was not counted as the opening | A frame chained from the boot script counts as the opening (`ScriptFrame.ChainedFrom`); the opening's route is ended with its cutscene when it holds one |
+| Indy 4: the title behind a column (Play Game Intro, Room 4) | The title is actors 5 and 6 with `ignoreBoxes`; ScummVM's `getMaskFromBox` gives no box plane 1 only in version 3 (bug #791 workaround); version 4 gives 0, version 5 box 0's mask. We gave plane 1 everywhere. `actorOps alwaysZClip`/`neverZClip` (`_forceClip`) was not modelled | `ScummActorRenderer` follows `prepareDrawActorCostume`: `_forceClip`, then the never-clip class, then the walk box's mask by version; `actorOps alwaysZClip n` / `neverZClip` set it, ignore/follow boxes clear it |
+| Crash after opening Maniac Mansion Enhanced | `UpdateVerbStrip` drew the previous game's verb-screen text with no LOOM session | Guarded |
+
+Checked in the window (`indy3vga-final-*`, `indy4-intro/`): Room 13's entry stays in Room 13 ("It's slippery out here!" … "What was that?"); Give Grail plays its ending in Room 82 ("Elsa, NO!!!"); Indy 4's title is in front of the room. Measured (`*-run50.txt` against `*-run49.txt`, Maniac/Zak `*-run31.txt`, LOOM `run32-*.txt`): the five copies and Maniac unchanged; Zak one more scene from a fresh start; LOOM back to its earlier figures (the flag rule's small gain is gone with it).

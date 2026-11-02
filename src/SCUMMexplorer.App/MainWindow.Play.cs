@@ -246,7 +246,13 @@ public partial class MainWindow
             {
                 // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.
                 _sceneSound.StopAll("another room was picked from the list during play");
-                _play.VisitRoom(resource);
+                if (navigationKind == RoomOpenKind.Cutscene && _sceneOpening is { } scene)
+                {
+                    _play.ArrivalsSkippedFor = scene.IsRoomEntry ? null : scene;
+                    _play.WantHeroForScene(scene);
+                }
+                try { _play.VisitRoom(resource); }
+                finally { _play.ArrivalsSkippedFor = null; }
                 // The visit's entry scripts are a state preview: their lines are not spoken.
                 if (game.Speech is { } visitSpeech) _playSpeech.Attach(visitSpeech, _play.Messages);
             }

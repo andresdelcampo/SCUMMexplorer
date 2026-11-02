@@ -271,6 +271,7 @@ public abstract partial class ScummSession
     // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
     // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
     protected readonly Stack<(ushort Data, ScriptFrame? Owner)> _cutscenes = new();
+    private ScriptFrame? _chainingFrame;
     private readonly Stack<(int UserState, ushort Cursor, int Room, int CameraMode)> _v2CutsceneState = new();
     // ScummVM vm.cutScenePtr/cutSceneScript per cutscene depth (0: no cutscene open).
     protected readonly Dictionary<int, (ScriptFrame Frame, int JumpOffset)> _overrides = new();
@@ -369,7 +370,7 @@ public abstract partial class ScummSession
             }
         }
         var frame = new ScriptFrame { FreezeResistant = freezeResistant, Recursive = recursive, OriginRoom = parent?.OriginRoom,
-            Parent = parent, ObservationParent = parent?.ObservationSlot, ObservationCall = observedCall ?? _observer?.CurrentCall };
+            Parent = parent, ChainedFrom = ReferenceEquals(parent, _chainingFrame) && parent is not null, ObservationParent = parent?.ObservationSlot, ObservationCall = observedCall ?? _observer?.CurrentCall };
         if (frame.ObservationCall?.Slot != frame.ObservationParent) frame.ObservationCall = null;
         if (scriptId < _globalScriptCount)
             return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
@@ -559,8 +560,13 @@ public abstract partial class ScummSession
         {
             _chained = null;
             _visitTrace.Add($"{label} chains to script {chain.Script}");
-            RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
-                frame.FreezeResistant, frame, frame.Recursive, frame.ObservationChainCall);
+            _chainingFrame = frame;
+            try
+            {
+                RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
+                    frame.FreezeResistant, frame, frame.Recursive, frame.ObservationChainCall);
+            }
+            finally { _chainingFrame = null; }
         }
         if (result.ResumeOffset is int next && !frame.Stopped)
         {
@@ -1048,6 +1054,8 @@ public abstract partial class ScummSession
         public bool Recursive { get; init; }
         /// <summary>Global or local script number; null for room entry, exit and verb code.</summary>
         public int? Number { get; set; }
+        /// <summary>The script went on from its parent by <c>chainScript</c>: it is the same slot's work, not a script the parent started.</summary>
+        public bool ChainedFrom { get; init; }
         /// <summary>Separate from numbered scripts: v2 doSentence replaces/stops object slots only.</summary>
         public int? ObjectNumber { get; init; }
         public long ObjectSlotOrder { get; init; }
