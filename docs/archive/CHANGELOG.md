@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 2 November: input screens answered for a picked scene
+
+While a picked scene has not begun, a script waiting for the player's input on a screen of its own is answered as the player would: a loop back while a variable holds a sentinel, followed by a comparison of it with the value it must have, gets that value (Maniac Mansion's keypad, Script 44: the safe's and the radio's codes; the phone); a loop while an input bit is 0 gets the bit set. In the app too (the pick's hurry mode). Maniac 67% → 78% played its own way (both); Zak (its dial pad waits in another way), the other copies and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run22.txt`, `*-run43.txt`).
+
 ## 2 November: two actors brought close
 
 A wait for two actors to come close (`getDist` of them, looped until it is small) becomes a setup value: the first actor stood next to the second in the scene's room (`ScummSetupKind.ActorNear`). Zak McKracken Room 19's guru (Script 42) and Monkey Island 2 Room 57's entry now play their own way: Zak 74% → 76% (both), Monkey Island 2 92.6% → 93.2%; the other copies, Maniac and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run42.txt`, `*-run20.txt`).

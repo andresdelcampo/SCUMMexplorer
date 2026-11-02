@@ -497,6 +497,64 @@ public abstract partial class ScummSession
 
     private readonly HashSet<int> _hurried = [];
 
+    /// <summary>
+    /// While a picked scene has not begun (<see cref="HurryUntilCutscene"/>), a script that waits for the player's input on a screen of its own is
+    /// answered as the player would: a loop back while a variable holds a sentinel (<c>isNotEqual var[0x044], 0xFF</c>, back), followed by a comparison
+    /// of that variable with the value it must have (<c>isNotEqual var[0x044], var[0x03F]</c>), gets that value. Maniac Mansion's keypad (Script 44)
+    /// is typed with the safe's code; an exploration action, noted as such.
+    /// </summary>
+    private void FeedWaitingInput()
+    {
+        if (_hurried.Count == 0) return;
+        foreach (var item in _pending.Where(item => !item.Frame.Stopped).ToArray())
+        {
+            var instructions = item.Script.Instructions;
+            var at = instructions.ToList().FindIndex(ins => ins.Offset == item.Offset);
+            if (at < 0) continue;
+            while (at < instructions.Count && instructions[at].Operation == "breakHere") at++;
+            // A wait on a bit the input screen sets when it is done (Zak McKracken's telephone, Script 13 +0x0033: getBitVar var[0x001], 0x05BE,
+            // 0x00, then equalZero back): the bit set (versions 1/2 and old v3 pack bit n into word n >> 4).
+            if (at + 1 < instructions.Count && instructions[at].Operation == "getBitVar" && instructions[at + 1].Operation == "equalZero" &&
+                instructions[at].Operands.Split(',', StringSplitOptions.TrimEntries) is [var into, var bitBase, var bitIndex] &&
+                instructions[at + 1].Operands.StartsWith(into + ",", StringComparison.Ordinal) && TryLiteral(bitBase, out var waitBase) &&
+                TryLiteral(bitIndex, out var waitIndex))
+            {
+                var bit = waitBase + waitIndex;
+                var word = $"var[0x{bit >> 4:X3}]";
+                var current = _runtime.GlobalVariables.GetValueOrDefault(word);
+                if ((current & (1 << (bit & 15))) == 0)
+                {
+                    _runtime.SetGlobalVariable(word, (ushort)(current | (1 << (bit & 15))));
+                    _uncertainties.Add($"{item.Frame.Label} waited for the player's input (bit 0x{bit:X3}); for the picked scene it was set (an exploration action).");
+                }
+                continue;
+            }
+            if (at + 1 >= instructions.Count || instructions[at].Operation != "isNotEqual") continue;
+            var test = instructions[at];
+            var parts = test.Operands.Split(',', StringSplitOptions.TrimEntries);
+            var arrow = System.Text.RegularExpressions.Regex.Match(test.Operands, @"->\s*0x([0-9A-F]+)\s*$");
+            if (parts.Length < 2 || !arrow.Success || int.Parse(arrow.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) > test.Offset ||
+                !parts[0].StartsWith("var[", StringComparison.Ordinal) || !TryLiteral(parts[1], out var sentinel) ||
+                _runtime.GlobalVariables.GetValueOrDefault(parts[0]) != sentinel) continue;
+            var next = instructions[at + 1];
+            var nextParts = next.Operands.Split(',', StringSplitOptions.TrimEntries);
+            if (next.Operation is not ("isEqual" or "isNotEqual") || nextParts.Length < 2 || nextParts[0] != parts[0]) continue;
+            int answer;
+            if (TryLiteral(nextParts[1], out var literal)) answer = literal;
+            else if (nextParts[1].StartsWith("var[", StringComparison.Ordinal)) answer = _runtime.GlobalVariables.GetValueOrDefault(nextParts[1]);
+            else continue;
+            _runtime.SetGlobalVariable(parts[0], (ushort)answer);
+            _uncertainties.Add($"{item.Frame.Label} waited for the player's input ({parts[0]}); for the picked scene it was given {answer}, the value it is compared with (an exploration action).");
+        }
+    }
+
+    private static bool TryLiteral(string text, out int value)
+    {
+        value = 0;
+        return text.StartsWith("0x", StringComparison.Ordinal) &&
+               int.TryParse(text.AsSpan(2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out value);
+    }
+
     /// <summary>The shortest timer a picked scene hurries (600 jiffies, ten seconds); shorter pauses belong to the scene.</summary>
     protected const int HurryFromJiffies = 600;
 

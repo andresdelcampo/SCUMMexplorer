@@ -49,7 +49,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 | Zak McKracken (classic, enhanced) | ✅ | 🟡 | ✅ | ✅ | 🟡 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
 What keeps a cell from ✅:
-- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 5.9%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 6.8%, Indy 4 4.7% (6.3% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 33% (Maniac, both) and 24% (Zak, both) started at the cutscene.
+- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 5.9%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 6.8%, Indy 4 4.7% (6.3% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 22% (Maniac, both) and 24% (Zak, both) started at the cutscene.
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (80%, 64% and 57% of references); their variables and bits keep numbers (the script maps hold few rows to turn into data; most of what stays unnamed has no name in the game's data: image-only objects, actors no script names).
@@ -104,7 +104,7 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
 Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies once the user tells that track.
-- Scenes started at their cutscene (Maniac 9 of 27, Zak 13 of 54; work item 1; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold); a Maniac pick in the window waits for the party selection (the startup rule), so it is checked headless only.
+- Scenes started at their cutscene (Maniac 6 of 27, Zak 13 of 54; work item 1; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold); a Maniac pick in the window waits for the party selection (the startup rule), so it is checked headless only.
 - Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours.
 
 ## Release readiness (LOOM first)

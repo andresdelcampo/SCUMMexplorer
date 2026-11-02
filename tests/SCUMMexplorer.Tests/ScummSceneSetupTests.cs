@@ -251,6 +251,20 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AnInputScreenIsAnsweredWithTheValueItCompares()
+    {
+        // Maniac Mansion Room 9's wall safe: Script 44, the keypad, waits for each key (isNotEqual var[0x044], 0xFF, back) and compares it with the
+        // code digit (isNotEqual var[0x044], var[0x03F]); while the pick waits, each key is given the digit, and the safe opens its own way.
+        var folder = Path.Combine(TestGames.Root, "mmansion ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 9, 219, 0x01));
+        output.WriteLine(plan.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.Contains(19, plan.Result.RoomsEntered);
+    }
+
+    [Fact]
     public void AWaitForTwoActorsToComeCloseStandsOneNextToTheOther()
     {
         // Zak McKracken Room 19's entry: Script 42 loops on getDist of the hero and the guru (actor 10) until it is 15 or less; the hero stood

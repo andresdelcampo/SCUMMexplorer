@@ -86,6 +86,7 @@ public abstract partial class ScummSession
     {
         _inventoryStatusFrame++;
         StepDeferredBoxPuts();
+        FeedWaitingInput();
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
         // processActors ends the previous frame: animateCostume steps the limbs of the actors in the room.
