@@ -334,3 +334,5 @@ Zak's plane (Room 10): its visit does not bring the hero (no arrival), the pick 
 
 Then (`*-run25.txt`): Zak's flight (Room 11, object 263 +0x0027) waits for the player to skip: `isEqual VAR_CLICK_AREA, 4` (the keyboard) then `isEqual VAR_KEYPRESS, VAR_CUTSCENEEXIT_KEY`. The feeder (versions 1 and 2) presses the exit key for such a wait; the plane lands ("We are now landing", Script 79). Zak 42 → 43 of 54 (80%, both); Maniac unchanged. Read and left: Zak Room 16's switch chains through the brainwashing machine (Script 88 waits for `VAR_CURSORSTATE`, zaps the kid in walk box 6; Script 92 then waits for actor 7 in Room 4).
 
+Tried and dropped (2 November, `*-run26.txt`, `*-run46.txt`): a counter (a variable a script only steps by one) offered one step before the number it is tested against, and version 2's story variables from 0x2C (its engine variables end at 0x2B). Zak Room 10's tune (object 239) gets the counter but also needs the right buttons pressed in order (a wrong one clears bits 0x622/0x623); no scene changed in any copy.
+
