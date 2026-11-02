@@ -73,6 +73,8 @@ public sealed class TalkieSpeechPlayer
         if (_file is { } file) { try { File.Delete(file); } catch (IOException) { } catch (UnauthorizedAccessException) { } _file = null; }
     }
 
+    private readonly List<MediaPlayer> _effects = [];
+
     private async void PlayEffect(ScummSpeechBank bank, ScummSpeechEvent effect)
     {
         byte[] wave;
@@ -81,7 +83,9 @@ public sealed class TalkieSpeechPlayer
         var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-effect-{Guid.NewGuid():N}.wav");
         await File.WriteAllBytesAsync(path, wave);
         var player = new MediaPlayer();
-        void Done() { player.Close(); try { File.Delete(path); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
+        // Held until it ends: a MediaPlayer nothing refers to is collected before it plays (the window breaking was silent, user retest).
+        _effects.Add(player);
+        void Done() { _effects.Remove(player); player.Close(); try { File.Delete(path); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
         player.MediaOpened += (_, _) => { if (!_paused) player.Play(); };
         player.MediaEnded += (_, _) => Done();
         player.MediaFailed += (_, error) => { Log.Add($"failed effect {error.ErrorException.Message}"); Done(); };

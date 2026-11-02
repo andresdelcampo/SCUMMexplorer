@@ -100,6 +100,22 @@ public sealed class UserReports20261102Tests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Indy4sIntroPlaysTheWindowBreakingFromTheSpeechBank()
+    {
+        // Room 4's local script 206 +0x00D0: print 0xFD with four code-10 codes, ScummVM debugMessage: talkSound(78363548, 22, 1).
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        if (game.Speech is not { } speech) return;
+        var intro = ScummGameSession.StartIntro(game, out _);
+        for (var frame = 0; frame < 3000 && !intro.Messages.SpeechEvents.Any(e => e.IsEffect && e.Offset == 78363548); frame++) intro.AdvanceFrame();
+        var effect = Assert.Single(intro.Messages.SpeechEvents, e => e.IsEffect && e.Offset == 78363548);
+        var wave = speech.ReadWave(effect.Offset, effect.Length);
+        output.WriteLine($"window breaking: {wave.Length} bytes of wave");
+        Assert.True(wave.Length > 1000);
+    }
+
+    [Fact]
     public void APickedRoomEndsTheOpeningsLeftoverRoute()
     {
         // Script 1 goes on after it hands over control (+0x040D "wet clothes", a walk, then loadRoom 73); a picked room does not continue it.

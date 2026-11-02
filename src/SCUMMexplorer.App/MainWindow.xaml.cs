@@ -991,7 +991,8 @@ public partial class MainWindow : Window
         {
             _roomHint = value;
             if (value is not null) ObjectsNote.Text = value;
-            ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || value is not null ? Visibility.Visible : Visibility.Collapsed;
+            // Hidden, not collapsed: the hint keeps its two lines, so the room above does not change size as hints come and go (user report, 2 November).
+            ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || value is not null ? Visibility.Visible : Visibility.Hidden;
         }
     }
 
@@ -1000,7 +1001,7 @@ public partial class MainWindow : Window
         var advanced = IsAdvancedMode;
         UpdateSoundDeviceVisibility();
         // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
-        ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || RoomHint is not null ? Visibility.Visible : Visibility.Collapsed;
+        ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || RoomHint is not null ? Visibility.Visible : Visibility.Hidden;
         // A browsed first visit explains itself in Advanced mode only (R-1.13).
         if (_browsedScene is { } shownScene && _currentRoom is not null && ReferenceEquals(shownScene.Room, _currentRoom)) ObjectsNote.Text = BrowsedSceneNote(shownScene);
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;

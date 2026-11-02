@@ -27,7 +27,9 @@ public partial class MainWindow
         var provider = CurrentRoomControls;
         var state = provider.ReadState(_currentRoomResource?.ResourceId, IsAdvancedMode);
         ApplyTransport(state.Transport);
-        PlaybackBar.Visibility = state.BarVisible ? Visibility.Visible : Visibility.Collapsed;
+        // In a played game's room the bar keeps its row while it is not shown (a picked room being prepared), so the screen above does not shrink when
+        // it comes back (user report, 2 November 2026: rooms changed size a second after they showed).
+        PlaybackBar.Visibility = state.BarVisible ? Visibility.Visible : PlayCutscenes ? Visibility.Hidden : Visibility.Collapsed;
         CutsceneMenuButton.IsEnabled = state.GlobalCutsceneEnabled;
         CutsceneMenuButton.Content = "Play Cutscene";
         CutsceneMenuButton.ToolTip = state.CanStartCutscene ? RoomControlText.GlobalCutsceneTip : RoomControlText.GlobalCutsceneBusyTip;

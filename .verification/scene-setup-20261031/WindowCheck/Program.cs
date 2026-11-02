@@ -174,6 +174,25 @@ internal static class Program
                         for (var i = 3; i <= int.Parse(raw[2..]); i += 3) { await Pump(3); State($"{raw} +{i}s"); Capture($"intro-{i:00}"); }
                         continue;
                     }
+                    // R:room opens the room as r: does and captures the window every half second for 4 seconds (2 November 2026: the room's size jump).
+                    if (raw.StartsWith("R:", StringComparison.Ordinal))
+                    {
+                        var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                        var resource = game.Rooms.First(r => r.ResourceId == int.Parse(raw[2..]));
+                        var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
+                        Call("SelectRoomWithIntent", resource, Enum.Parse(kind, "Catalog"), true);
+                        for (var i = 1; i <= 8; i++)
+                        {
+                            await Pump(0.5);
+                            var image = (System.Windows.Controls.Image)window.FindName("PlayScreenImage");
+                            var preview = (System.Windows.Controls.Image)window.FindName("RoomPreview");
+                            string H(string name) => window.FindName(name) is System.Windows.FrameworkElement e ? $"{name}={e.Visibility.ToString()[0]}{e.ActualHeight:F0}" : "";
+                            Log("   " + string.Join(" ", new[] { "RoomViewportHost", "PlayScrollButtonsPanel", "ObjectsNote", "CutsceneScanNote", "CutsceneScanProgress", "GenericRoomActionsHost", "RoomDisplayLayout", "SceneInteractionCard", "SceneSessionBar", "SessionStatusText", "SessionActions", "PlaybackBar", "RoomOptionsExpander" }.Select(H)));
+                            Log($"{raw} +{i * 0.5:F1}s: play {image.Visibility} {image.ActualWidth:F0}x{image.ActualHeight:F0} src {(image.Source as System.Windows.Media.Imaging.BitmapSource)?.PixelWidth}; preview {preview.Visibility} {preview.ActualWidth:F0}x{preview.ActualHeight:F0}");
+                            Capture($"room-{raw[2..]}-{i:00}");
+                        }
+                        continue;
+                    }
                     // r:room opens the room as a pick in the room selector does (a catalog visit).
                     if (raw.StartsWith("r:", StringComparison.Ordinal))
                     {

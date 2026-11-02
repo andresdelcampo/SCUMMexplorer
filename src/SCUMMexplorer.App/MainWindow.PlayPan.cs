@@ -25,10 +25,14 @@ public partial class MainWindow
         UpdatePlayScrollButtons();
     }
 
+    /// <summary>The scroll row outside play: reserved (hidden) in framed mode, where play keeps it, else collapsed (2 November 2026: rooms changed size).</summary>
+    private Visibility ScrollRowWhenIdle => NormalRoomWidthToggle.IsChecked == true ? Visibility.Hidden : Visibility.Collapsed;
+
     /// <summary>The arrows under the game's screen: shown where the room is wider than the screen and the player has control, as in LOOM.</summary>
     private void UpdatePlayScrollButtons()
     {
-        if (!PlayActive || _play is not { } play) { PlayScrollButtonsPanel.Visibility = Visibility.Collapsed; return; }
+        // Not playing yet (a picked room being prepared): the row keeps its place in framed mode, so the screen does not shrink when play starts.
+        if (!PlayActive || _play is not { } play) { PlayScrollButtonsPanel.Visibility = ScrollRowWhenIdle; return; }
         var framed = NormalRoomWidthToggle.IsChecked == true;
         var canScroll = framed && play.CameraPanRange is { } range && range.Max - range.Min > 0 && !play.InCutscene;
         PlayScrollButtonsPanel.Visibility = canScroll ? Visibility.Visible : framed ? Visibility.Hidden : Visibility.Collapsed;

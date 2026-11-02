@@ -76,3 +76,15 @@ the same frame as the live rooms).
 | Indy 4 Play Game Intro: no sound of the window breaking | Room 4's local script 206 +0x00D0 plays it with `print 0xFD` whose text is four code-10 codes: ScummVM's `debugMessage` plays that sample from the speech bank as a sound effect (`talkSound(a, b, 1)`); we dropped text slot 2 | Slot 2 with a code-10 text records a speech-bank sound effect (`ScummSpeechEvent.IsEffect`); the app plays effects on a player of their own, beside the spoken line |
 
 Checked in the window: Room 44 lists the doorway (`mme-44/`, `d` step); Room 14's picture has no Indy (`indy4-14-fix/`); the intro plays two effects, the window break at 78363548 (`indy4-intro-sound/`, `S` step). Indy 3 Room 83's grail scenes: "Give Grail" and "Look Cracked Seal" are object 873's and 864's verbs in Room 82, so they are in Room 82's Interact menu; they were listed under Room 83 only while the arrival bug walked Indy there. Henry being shot is Room 82's own arrival, its "Entry" scene.
+
+## Fifth pass (2 November, the user's retest)
+
+- **The window breaking still silent**: the effect's `MediaPlayer` was a local nothing held, collected before it played. Effect players are now held
+  until they end (`TalkieSpeechPlayer._effects`). The sample decodes to 34,990 bytes of wave (`Indy4sIntroPlaysTheWindowBreakingFromTheSpeechBank`).
+- **Rooms still changed size**: measured every half second after a pick (WindowCheck `R:room` logs the play screen's size and the heights around it;
+  `indy4-size*/`). Three rows came and went under the screen and the 320 × 200 screen was scaled into what was left: the hint line (one line, two
+  lines or none), the scroll-arrow row (collapsed by `StopPlay`), and the playback bar (collapsed while a picked room is prepared). Each now keeps its
+  height in a played game (hidden, not collapsed; the hint has a two-line minimum). Rooms 2, 5, 14 and 4 stay at one size from the pick on (703 × 439
+  in the harness window; before: 802 × 501 or 754 × 471 first).
+- **Room 82's grail scenes**: in Room 82's Interact ("Grail: Give" is the earthquake ending, "Cracked Seal: Look"), left out of Play Cutscene by
+  R-8.2b (the user, 31 October: "keep Interact complete, remove dups from cutscenes"); Henry being shot is Room 82's Entry.
