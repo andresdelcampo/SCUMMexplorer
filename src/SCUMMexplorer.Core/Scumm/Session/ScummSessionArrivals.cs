@@ -45,7 +45,7 @@ public abstract partial class ScummSession
                            "started) does not play; it was ended and its cutscene closed, as a skipped route is.");
     }
 
-    private sealed record GameScriptFacts(IReadOnlyDictionary<string, int> RaisedFlags, IReadOnlyDictionary<int, HashSet<string>> Loaders)
+    private sealed record GameScriptFacts(IReadOnlyDictionary<string, int> RaisedFlags, IReadOnlyDictionary<int, HashSet<string>> Loaders, int? HeroOutfit)
     {
         /// <summary>The one script that loads the room (loadRoom, loadRoomWithEgo with a constant room), or null when none or several do.</summary>
         public string? OnlyLoader(int room) => Loaders.TryGetValue(room, out var labels) && labels.Count == 1 ? labels.Single() : null;
@@ -96,11 +96,27 @@ public abstract partial class ScummSession
         }
     }
 
+    /// <summary>
+    /// 2 November 2026 (user report, Indy 3 Room 85: Indy in his college suit in the catacombs). A room picked from the list is a state preview whose
+    /// route was not played; the hero wears what the boot left (the suit). Unless the opening shows the room (the college, where the suit is right),
+    /// he is dressed in the outfit the game's scripts give him most often (Indy 3: costume 2, the action outfit; the suit is set twice), labelled.
+    /// </summary>
+    public void DressHeroForPreview(int roomId)
+    {
+        if (_runtime.IsV2 || _bootShown.ContainsKey(roomId) || Facts().HeroOutfit is not int outfit) return;
+        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return;
+        if (_runtime.Actors[ego].Look.Costume is int worn && worn == outfit) return;
+        _runtime.Actors.CostumeChanged(ego, outfit, CurrentPlacement());
+        _uncertainties.Add($"Room {roomId:00} was picked without its route: the hero wears costume {outfit}, the outfit the game's scripts dress him in most often " +
+                           "(an estimate; the room's own code or a picked scene's setup may change it).");
+    }
+
     private static readonly ConditionalWeakTable<GameLibrary, Lazy<GameScriptFacts>> ScriptFacts = new();
 
     private GameScriptFacts Facts() => ScriptFacts.GetValue(_game, game => new Lazy<GameScriptFacts>(() => ReadScriptFacts(game, _data))).Value;
     private static readonly Regex FlagMove = new(@"^((?:bit|var)\[0x[0-9A-F]+\]) = (0x[0-9A-F]+)$", RegexOptions.CultureInvariant);
     private static readonly Regex BranchTarget = new(@"-> 0x([0-9A-F]+)$", RegexOptions.CultureInvariant);
+    private static readonly Regex HeroCostume = new(@"^(?:0x01|var\[0x001\]), \[[^\]]*costume, 0x([0-9A-F]+)", RegexOptions.CultureInvariant);
     private static readonly Regex FlagGuard = new(@"^((?:bit|var)\[0x([0-9A-F]+)\]),", RegexOptions.CultureInvariant);
 
     // Over the game's global, room and object scripts: every story flag set to a constant other than 0 (the first such value), and the rooms loaded
@@ -109,6 +125,7 @@ public abstract partial class ScummSession
     {
         var found = new Dictionary<string, int>();
         var loaders = new Dictionary<int, HashSet<string>>();
+        var outfits = new Dictionary<int, int>();
         void Read(Func<ScummScriptDisassembly?> read, string label)
         {
             ScummScriptDisassembly? script;
@@ -120,6 +137,12 @@ public abstract partial class ScummSession
                 if (instruction.Operation == "move" && FlagMove.Match(instruction.Operands) is { Success: true } m &&
                     int.Parse(m.Groups[2].Value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture) is var value and not 0)
                     found.TryAdd(m.Groups[1].Value, value);
+                // actorOps on actor 1 or VAR_EGO (versions 3 to 5): the costumes the game dresses its hero in.
+                if (instruction.Operation == "actorOps" && HeroCostume.Match(instruction.Operands) is { Success: true } dressed)
+                {
+                    var costume = int.Parse(dressed.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    outfits[costume] = outfits.GetValueOrDefault(costume) + 1;
+                }
                 if (instruction.Operation is "loadRoom" or "loadRoomWithEgo")
                 {
                     var operands = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
@@ -144,6 +167,7 @@ public abstract partial class ScummSession
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException or InvalidOperationException) { }
         }
-        return new(found, loaders);
+        var outfit = game.Version is ScummVersion.V1 or ScummVersion.V2 || outfits.Count == 0 ? (int?)null : outfits.MaxBy(pair => pair.Value).Key;
+        return new(found, loaders, outfit);
     }
 }

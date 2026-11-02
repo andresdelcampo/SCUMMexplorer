@@ -228,6 +228,8 @@ public partial class MainWindow
                 }
                 // A room the game shows through one script of its own (a page, a manual: Indy 3's Room 74 and Script 90) is shown as that script shows it.
                 if (_play.ShownOnlyBy(roomId) is { } viewer) _play.StartSceneAt(viewer, 0);
+                // A room picked from the list shows the hero in his usual outfit, not the one the boot left (Indy 3's suit outside the college).
+                else _play.DressHeroForPreview(roomId);
             }
             else _catalogPreviewOnly = false;
             UpdatePlaySoundCard();

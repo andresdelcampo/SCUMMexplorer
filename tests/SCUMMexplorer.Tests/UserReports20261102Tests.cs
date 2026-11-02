@@ -59,6 +59,7 @@ public sealed class UserReports20261102Tests(ITestOutputHelper output)
         Assert.Equal("global script 90", session.ShownOnlyBy(74));
         Assert.Null(session.ShownOnlyBy(76));
         Assert.Null(session.ShownOnlyBy(2));
+        output.WriteLine($"Room 83 shown only by: {session.ShownOnlyBy(83)}");
     }
 
     [Fact]
@@ -73,6 +74,29 @@ public sealed class UserReports20261102Tests(ITestOutputHelper output)
         var logo = session.PrepareAmbientRoom(Room(game, 76), requireAmbient: false).Session!;
         Assert.Equal((16, 152), logo.MainScreen);
         Assert.Empty(logo.PlayVerbArea().Pixels.Where(pixel => pixel != 0).Take(1));
+    }
+
+    [Fact]
+    public void APickedRoomShowsTheHeroInHisUsualOutfit()
+    {
+        // Indy 3's scripts dress the hero in costume 2 (the action outfit) far more often than in the suit the boot leaves (costume 1); Room 85, the
+        // catacombs, is not one the opening shows.
+        if (Indy3Vga() is not { } game) return;
+        var session = ScummGameSession.BootForPlay(game, out _);
+        session.VisitRoom(Room(game, 85));
+        session.DressHeroForPreview(85);
+        output.WriteLine(string.Join(" | ", session.Snapshot.Uncertainties.TakeLast(3)));
+        Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("costume 2", StringComparison.Ordinal));
+        // Room 83 (the first trial) opens as a live preview: the copy's hero is dressed the same way.
+        var fresh = ScummGameSession.BootForPlay(game, out _);
+        var prepared = fresh.PrepareManualRoom(Room(game, 83));
+        output.WriteLine($"prepared: {prepared.Reason ?? "live"}");
+        var still = prepared.Session ?? fresh.PrepareAmbientRoom(Room(game, 83), requireAmbient: false).Session!;
+        still.DressHeroForPreview(83);
+        var runtime = typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(still)!;
+        var actors = (ScummActorTable)runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
+        foreach (var actor in actors.Snapshot().Where(a => a.Room == 83)) output.WriteLine($"actor {actor.Number} costume {actor.Look.Costume} at ({actor.X},{actor.Y})");
+        output.WriteLine(string.Join(" | ", still.Snapshot.Uncertainties.TakeLast(2)));
     }
 
     [Fact]

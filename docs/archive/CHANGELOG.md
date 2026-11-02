@@ -13,6 +13,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 The guard reading treats an unconditional jump back as the loop running again, not the way on, so the tests inside a loop guard the scene (Indy 4 Room 44's entry, two values at once, now plays its own way, with Rooms 17 and 97's entries); an actor's position on the scene's side is tried after the other values there. The picked object's own version 2 handler, waiting for a sentence, is given the verb, recipient and object it tests for (Zak Room 44's object 655 now answers; it still needs the walk to actor 10). Indy 4 95.3% → 96.0%; the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run48.txt`, `*-run29.txt`).
 
+## 2 November: the hero in his usual outfit in picked rooms
+
+A room picked from the list, and its first-visit picture, show the hero in the outfit the game's scripts give him most often (Indy 3: the action outfit, not the college suit the boot leaves), except in rooms the opening shows; picked scenes keep the state their code tests. Record: [user reports](../../.verification/user-reports-20261102/README.md).
+
 ## 2 November: the user's retest: arrivals ended, the hero brought in, actors clipped as ScummVM does
 
 A picked scene that is not a room's arrival ends the arrival the room's entry starts (its cutscene closed, the game's end hook run), also on the window's opening visit: Give Grail plays its ending in Room 82. A picked room entry that speaks as the hero brings him in when no arrival does, so the game's cutscene-end hook does not follow him to another room (Indy 3 Room 13). The opening's route includes what the boot script chains to. Actors are clipped by `_forceClip` (`actorOps alwaysZClip`/`neverZClip`) and an actor with no walk box by version (plane 1 only in version 3): Indy 4's title is in front of the column. A crash after switching games fixed. Scenes unchanged except Zak (one more from a fresh start); LOOM back to its earlier figures. Record: [user reports](../../.verification/user-reports-20261102/README.md).

@@ -48,3 +48,17 @@ The user's retest found Give Grail and Room 13 still wrong, and Indy 4's title b
 | Crash after opening Maniac Mansion Enhanced | `UpdateVerbStrip` drew the previous game's verb-screen text with no LOOM session | Guarded |
 
 Checked in the window (`indy3vga-final-*`, `indy4-intro/`): Room 13's entry stays in Room 13 ("It's slippery out here!" … "What was that?"); Give Grail plays its ending in Room 82 ("Elsa, NO!!!"); Indy 4's title is in front of the room. Measured (`*-run50.txt` against `*-run49.txt`, Maniac/Zak `*-run31.txt`, LOOM `run32-*.txt`): the five copies and Maniac unchanged; Zak one more scene from a fresh start; LOOM back to its earlier figures (the flag rule's small gain is gone with it).
+
+## Third pass: the hero's outfit (2 November)
+
+Indy 3 Rooms 85 and 83 showed Indy in his college suit (the boot leaves costume 1). A room picked from the list, or its first-visit picture, now dresses
+the hero in the outfit the game's own scripts give him most often (`actorOps` on actor 1 or VAR_EGO across global, room and object scripts; Indy 3:
+costume 2, 14 times in the global scripts against the suit's 2), except in rooms the opening shows (the college keeps the suit). Versions 1 and 2 are
+left out (their heroes are several kids). Only the catalog's previews: picked scenes keep the state their code tests (Room 13's entry plays only when
+Indy is not in costume 2). Checked in the window (`r85-dressed2/`, `r83-dressed/`). The red blocks the user saw in Room 85 were the train of the
+opening's logo, no longer shown since the opening's route ends on a pick.
+
+Why rooms change size a second after they show (seen in `r83-dressed/`): while a picked room's live session is prepared, the window shows the still
+picture in the room view (LOOM's view, room rows only, the panel's width); the play screen (`PlayScreenImage`, the whole 320 × 200 screen) then
+replaces it, and the room takes less height. LOOM plays in the room view itself, so it never switches. Next: draw the waiting picture in the play
+screen's frame.

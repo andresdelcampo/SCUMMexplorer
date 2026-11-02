@@ -144,7 +144,12 @@ public static class ScummRoomFirstVisit
         var session = new ScummGameSession(game, indexed, randomSeed, null, data);
         prepareBoot?.Invoke(session);
         var bootRoom = session.CurrentRoomId == roomId;
-        if (!bootRoom) session.VisitRoom(resource);
+        if (!bootRoom)
+        {
+            session.VisitRoom(resource);
+            // The room's picture shows the hero in his usual outfit, as the app's pick of the room does (Indy 3 Room 83).
+            session.DressHeroForPreview(roomId);
+        }
         var settled = session.Settle();
         var records = data.ReadRoom(roomId).Objects;
         var snapshot = settled.State.Snapshot;

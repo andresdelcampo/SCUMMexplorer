@@ -138,6 +138,18 @@ internal static class Program
                         for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
                         continue;
                     }
+                    // A lists the actors in the shown session's room with their costumes (2 November 2026).
+                    if (raw == "A")
+                    {
+                        var shown = (ScummSession)Field("_play")!;
+                        var runtime = typeof(ScummSession).GetField("_runtime", Private)!.GetValue(shown)!;
+                        var table = (ScummActorTable)runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
+                        foreach (var actor in table.Snapshot().Where(a => a.Room == shown.CurrentRoomId))
+                            Log($"  actor {actor.Number} costume {actor.Look.Costume} at ({actor.X},{actor.Y}) visible {actor.Visible}");
+                        Log($"  ambient={Field("_playAmbient")} previewOnly={Field("_catalogPreviewOnly")} sameAsLive={ReferenceEquals(shown, Field("_playLiveSource"))} " +
+                            $"uncertainties: {string.Join(" | ", shown.Snapshot.Uncertainties.Where(u => u.Contains("outfit") || u.Contains("opening") || u.Contains("selected manually")).TakeLast(4))}");
+                        continue;
+                    }
                     // g:seconds presses Play Game Intro and captures the screen every 3 seconds (2 November 2026, Indy 4's title).
                     if (raw.StartsWith("g:", StringComparison.Ordinal))
                     {
