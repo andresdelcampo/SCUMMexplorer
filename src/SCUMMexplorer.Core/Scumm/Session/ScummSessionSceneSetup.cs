@@ -529,12 +529,16 @@ public abstract partial class ScummSession
                 }
                 continue;
             }
-            if (at + 1 >= instructions.Count || instructions[at].Operation != "isNotEqual") continue;
+            // isNotEqual V, K back (loops while V is K) or notEqualZero V back (loops while V is 0: a dialogue choice not made yet, Monkey Island 1
+            // Room 28's local script 220 +0x03C9).
+            if (at + 1 >= instructions.Count || instructions[at].Operation is not ("isNotEqual" or "notEqualZero")) continue;
             var test = instructions[at];
             var parts = test.Operands.Split(',', StringSplitOptions.TrimEntries);
             var arrow = System.Text.RegularExpressions.Regex.Match(test.Operands, @"->\s*0x([0-9A-F]+)\s*$");
-            if (parts.Length < 2 || !arrow.Success || int.Parse(arrow.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) > test.Offset ||
-                !parts[0].StartsWith("var[", StringComparison.Ordinal) || !TryLiteral(parts[1], out var sentinel) ||
+            var sentinel = 0;
+            if (parts.Length < (test.Operation == "isNotEqual" ? 3 : 2) || !arrow.Success ||
+                int.Parse(arrow.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) > test.Offset ||
+                !parts[0].StartsWith("var[", StringComparison.Ordinal) || test.Operation == "isNotEqual" && !TryLiteral(parts[1], out sentinel) ||
                 _runtime.GlobalVariables.GetValueOrDefault(parts[0]) != sentinel) continue;
             var next = instructions[at + 1];
             var nextParts = next.Operands.Split(',', StringSplitOptions.TrimEntries);

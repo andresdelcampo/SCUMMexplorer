@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 2 November: dialogue choices answered for a picked scene
+
+The input feeder also answers a wait while a variable is 0 (`notEqualZero V`, back: a dialogue choice not made yet) with the first choice it is compared with. Monkey Island 2 93.2% → 93.7% (Room 79's entry); the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run44.txt`).
+
 ## 2 November: input screens answered for a picked scene
 
 While a picked scene has not begun, a script waiting for the player's input on a screen of its own is answered as the player would: a loop back while a variable holds a sentinel, followed by a comparison of it with the value it must have, gets that value (Maniac Mansion's keypad, Script 44: the safe's and the radio's codes; the phone); a loop while an input bit is 0 gets the bit set. In the app too (the pick's hurry mode). Maniac 67% → 78% played its own way (both); Zak (its dial pad waits in another way), the other copies and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run22.txt`, `*-run43.txt`).
