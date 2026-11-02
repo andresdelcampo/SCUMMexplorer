@@ -84,6 +84,7 @@ public abstract partial class ScummSession
         _runtime.Messages.RoomOnScreen = () => (-ViewLeft, _runtime.MainScreen.Top, _runtime.MainScreen.Bottom);
         // displayDialog wraps talk lines from version 4 on (addLinebreaks); versions 1 to 3 draw a line as it is.
         if (ScummProfile.For(game).EngineVersion > ScummVersion.V3) _runtime.Messages.LineBreakCharset = number => PlayCharset(number);
+        _runtime.Messages.TextCharset = number => PlayCharset(number);
         _extraTimerVariables = ScummProfile.For(game).ExtraTimerVariables;
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Concat(_runtime.IsV2 ? [] : new[] { TimerTotalVariable }))

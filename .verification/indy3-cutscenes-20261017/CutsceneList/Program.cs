@@ -24,6 +24,15 @@ if (args.Length > 1 && args[1] == "loom")
     return;
 }
 
+// CutsceneList <folder> groups <room>: the scenes the App lists under a room, with where each was found (2 November 2026, user report on Indy 3 Room 83).
+if (args.Length > 2 && args[1] == "groups")
+{
+    var listed = new ScummCutscenePlanner(game, start: ScummCutsceneStart.BootPerRun).Groups.Where(g => args[2] == "all" || g.First.Room == int.Parse(args[2]));
+    foreach (var g in listed)
+        Console.WriteLine($"{g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2} {g.First.VerbLabel} | {string.Join(";", g.First.Scripts)} | t{g.First.Texts} | {g.First.FirstText} | lt[{string.Join(",", g.First.LoadTargets ?? [])}]");
+    return;
+}
+
 // CutsceneList <folder> probe <room> <object> <verb>: one fresh run of a trigger (object 0 = the room's entry) with the session trace's cutscene lines
 // after the visit (Monkey Island floppy S7, 17 October 2026: which script began the cutscene a run counted).
 // CutsceneList <folder> prun <workers>: every group's fresh run on several threads, each with its own copy of the game (its own disk or archive

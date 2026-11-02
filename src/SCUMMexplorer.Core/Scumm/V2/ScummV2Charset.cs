@@ -46,10 +46,10 @@ public sealed class ScummV2Charset : IScummTextCharset
     public int DrawPlainLine(byte[] pixels, int width, int originY, IReadOnlyList<byte> glyphs, int left, int top, byte color) =>
         _font.DrawPlainLine(pixels, width, originY, glyphs, left, top, color);
 
-    public ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor) =>
+    public ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor, (int Top, int Bottom)? mainScreen = null) =>
         // The v3 renderer's 0x40 outline is LOOM-only. DOS v2 supports 0x80
         // shadow; v1 has neither mode (CharsetRendererV3::setColor).
-        _font.RenderMessages(messages.Select(m => m with { Color = m.Color & (_engineVersion == 2 ? 0x8F : 0x0F) }), _ => _font);
+        _font.RenderMessages(messages.Select(m => m with { Color = m.Color & (_engineVersion == 2 ? 0x8F : 0x0F) }), _ => _font, mainScreen);
 
     private static readonly byte[] Spanish = [36,0,37,1,39,2,61,3,91,4,92,5,93,6,123,7,124,8,125,9,126,10];
     private static readonly byte[] French = [36,0,37,1,39,2,60,16,61,17,62,18,91,19,92,20,93,21,95,22,123,23,124,24,125,25,126,26];

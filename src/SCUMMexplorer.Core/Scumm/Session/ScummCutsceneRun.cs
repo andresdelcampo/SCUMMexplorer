@@ -70,8 +70,11 @@ public static class ScummCutsceneRun
             // A verb that plays only in another room is used there, the object held (ScummSetupKind.PlayedIn).
             var playIn = !trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene && ScummSetupEdit.PlayRoom(setup) is int other &&
                          game.Rooms.FirstOrDefault(r => r.ResourceId == other) is { } otherRoom ? otherRoom : room;
+            // A scene that is not the room's arrival does not replay the arrival on the way in (ScummSession.ArrivalScenesSeen).
+            session.ArrivalScenesSeen = !trigger.IsRoomEntry;
             if (trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene) session.EnterRoomAgain(room);
             else session.VisitRoom(playIn);
+            session.ArrivalScenesSeen = false;
             // Again after the visit: the room's entry may have reset what the setup set (Indy 3 Room 23's entry closes its doors, whose Close tests
             // state 1); only what the session lacks is set, so values the entry derived from the setup stay.
             if (setup is { Count: > 0 }) session.ApplySceneSetup(setup);

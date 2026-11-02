@@ -100,6 +100,8 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 
 ### Indiana Jones 4
 - 5 scenes started at their cutscene show nothing (work item 1).
+- Room 14 (the tunnel, user report 2 November): a picked visit puts Indy in by an assumed walk-in from Room 94, but the room's first state (object 165 at 0) is the mine-cart ride, entered without the hero; an arrival should fit the state the room's code tests ([record](../.verification/user-reports-20261102/README.md)).
+- After Play Game Intro (user report): Indy walks very fast; Room 04 shows no animations during the intro. Not reproduced headless.
 - Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)

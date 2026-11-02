@@ -33,6 +33,45 @@ if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 }
         foreach (var c in codePlanner.Setup.Candidates(t)) Console.WriteLine($"  candidate {c.Kind} {c.Target} {c.Value}: {c.Describe()}");
     return;
 }
+if (Environment.GetEnvironmentVariable("MEASURE_ACTORS") is { Length: > 0 } actorRoom)
+{
+    // MEASURE_ACTORS=room: the room visited from the boot (as the app's catalog pick of its entry scene), the actors in it after 200 frames.
+    var visit = ScummGameSession.BootForPlay(game, out _);
+    var target = game.Rooms.First(r => r.ResourceId == int.Parse(actorRoom));
+    visit.VisitRoom(target);
+    visit.EnterRoomAgain(target);
+    for (var f = 0; f < 200; f++) visit.AdvanceFrame();
+    var runtime = typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(visit)!;
+    dynamic actors = runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
+    foreach (var actor in (IEnumerable<ScummActorSnapshot>)actors.Snapshot())
+        if (actor.Room == int.Parse(actorRoom)) Console.WriteLine($"actor {actor.Number}: ({actor.X},{actor.Y}) visible {actor.Visible} costume {actor.Look.Costume}");
+    foreach (var line in visit.SessionTrace.Where(l => l.Contains("ego") || l.Contains("hero") || l.Contains("putActor")).TakeLast(12)) Console.WriteLine("  | " + (line.Length > 220 ? line[..220] : line));
+    return;
+}
+if (Environment.GetEnvironmentVariable("MEASURE_INTRO") is { Length: > 0 } introFrames)
+{
+    // MEASURE_INTRO=frames: Play Game Intro headless (2 November 2026, user report: the button stays disabled after the intro), its state every 300 frames.
+    var intro = ScummGameSession.StartIntro(game, out _);
+    for (var f = 1; f <= int.Parse(introFrames); f++)
+    {
+        intro.AdvanceFrame();
+        if (f % 300 == 0) Console.WriteLine($"{f}: room {intro.CurrentRoomId} jiffies {intro.FrameJiffies} cutscene {intro.InCutscene} control {intro.PlayerHasControl} boot {intro.BootRunning} " +
+            $"last [{intro.Messages.Log.LastOrDefault()?.Text}] | {intro.SessionTrace.LastOrDefault()}");
+    }
+    return;
+}
+if (Environment.GetEnvironmentVariable("MEASURE_SCREEN") is { Length: > 0 } screenRoom)
+{
+    // MEASURE_SCREEN=room: the screen rows after a visit of the room (roomOps setScreen), as the app's visit leaves them.
+    var visited = newRun();
+    Console.WriteLine($"after boot: {visited.MainScreen}");
+    var shown = (System.Collections.IDictionary)typeof(ScummSession).GetField("_bootShown", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(visited)!;
+    foreach (System.Collections.DictionaryEntry e in shown) Console.WriteLine($"  boot showed room {e.Key}: {e.Value} verbs [{string.Join(",", (IEnumerable<int>)e.Value!.GetType().GetField("Item2")!.GetValue(e.Value)!)}]");
+    foreach (var line in visited.SessionTrace.Where(l => l.Contains("verbOps") || l.Contains("verb ") && l.Contains("new") || l.Contains("Room 76") || l.Contains("room 76")).Take(15)) Console.WriteLine("  | " + (line.Length > 200 ? line[..200] : line));
+    visited.VisitRoom(game.Rooms.First(r => r.ResourceId == int.Parse(screenRoom)));
+    Console.WriteLine($"after visiting {screenRoom}: {visited.MainScreen}, room {visited.CurrentRoomId}");
+    return;
+}
 if (Environment.GetEnvironmentVariable("MEASURE_VERBS") == "1")
 {
     Console.WriteLine($"verb source: {planner.VerbSource}");

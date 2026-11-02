@@ -160,7 +160,7 @@ public sealed class ScummV4Charset : IScummTextCharset
         return left;
     }
 
-    public ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor)
+    public ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor, (int Top, int Bottom)? mainScreen = null)
     {
         ArgumentNullException.ThrowIfNull(charsetFor);
         return ScummV4MessageRenderer.Render(messages, number => charsetFor(number) as ScummV4Charset ?? this);

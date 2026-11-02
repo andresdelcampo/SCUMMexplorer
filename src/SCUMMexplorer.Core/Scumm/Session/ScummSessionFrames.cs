@@ -418,6 +418,7 @@ public abstract partial class ScummSession
     {
         ArgumentNullException.ThrowIfNull(room);
         _uncertainties.StartStep();
+        EndOpeningRoute();
         return EnterRoom(room, $"Room {room.ResourceId:00} opened from the catalog (an exploration action; state preview).");
     }
 
@@ -441,6 +442,7 @@ public abstract partial class ScummSession
         ArgumentNullException.ThrowIfNull(room);
         if (_currentRoom?.ResourceId != room.ResourceId) return VisitRoom(room);
         _uncertainties.StartStep();
+        EndOpeningRoute();
         var label = $"Room {room.ResourceId:00} entered again to play its entry scripts (an exploration action, as a loadRoom of the current room would; state preview).";
         _uncertainties.Add(label);
         // A picked scene's setup may want the room loaded under a pseudo room number (its entry code reads VAR_ROOM), or the hero to come in by an

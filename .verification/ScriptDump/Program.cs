@@ -37,8 +37,10 @@ if (args[1] == "objmap")
     }
 }
 else if (args[1] == "entry")
-    Dump($"room {args[2]} entry", reader.DecodeRoomEntry(game.Rooms.Single(r => r.ResourceId == int.Parse(args[2]))));
+    Dump($"room {args[2]} entry", ScummDataSources.For(game).RoomEntryScript(int.Parse(args[2])));
+else if (args[1] == "exit")
+    Dump($"room {args[2]} exit", ScummDataSources.For(game).RoomExitScript(int.Parse(args[2])));
 else if (args[1] == "room")
-    Dump($"room {args[2]} local {args[3]}", reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == int.Parse(args[2])), int.Parse(args[3]), game.Resources.Count(r => r.Kind == ResourceKind.Script)));
+    Dump($"room {args[2]} local {args[3]}", ScummDataSources.For(game).RoomLocalScript(int.Parse(args[2]), int.Parse(args[3])));
 else foreach (var a in args.Skip(1))
-    Dump($"script {a}", reader.Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == int.Parse(a))));
+    Dump($"script {a}", ScummDataSources.For(game).GlobalScript(int.Parse(a)));

@@ -146,6 +146,7 @@ internal static class Program
                         var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
                         Call("SelectRoomWithIntent", resource, Enum.Parse(kind, "Catalog"), true);
                         for (var i = 1; i <= 4; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); }
+                        Capture("room-" + raw[2..]);
                         continue;
                     }
                     // i:room,object,verb picks an interaction of the room shown (the Interact menu's choice, RunGenericRoomAction).

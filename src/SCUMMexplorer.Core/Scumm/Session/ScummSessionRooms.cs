@@ -123,6 +123,7 @@ public abstract partial class ScummSession
             return Snapshot;
         }
 
+        if (ArrivalScenesSeen) MarkArrivalScenesSeen(room.ResourceId!.Value);
         RunGlobalHook(ScummVars.EntryScript, "before room entry", estimatedLoad);
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
         if (_runtime.IsV2) RunIndexedScript(5, 0, null, 0, pathEstimated: estimatedLoad); // room.cpp: fixed v1/v2 entry hook, after embedded entry.
@@ -132,6 +133,8 @@ public abstract partial class ScummSession
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);
         else if (load is { Operation: "actorFollowCamera", ResolvedArguments: [int followed] }) FollowActorAfterEntry(load, followed);
         else if (withEgo is not null) ForgetCamera($"{withEgo.SourceLabel} +0x{withEgo.Offset:X4} puts the camera on the ego, whose actor number is unknown");
+        if (_booting) _bootShown.TryAdd(room.ResourceId!.Value,
+            (_runtime.MainScreen, _runtime.Verbs.Snapshot().Where(verb => verb.Mode is 1 or 2).Select(verb => verb.VerbId).ToHashSet()));
         LastVisitEvents = _visitEvents.Skip(eventsBeforeVisit).ToArray();
         return Snapshot;
     }

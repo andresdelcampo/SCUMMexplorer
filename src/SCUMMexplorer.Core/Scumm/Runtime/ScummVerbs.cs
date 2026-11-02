@@ -86,6 +86,18 @@ public sealed partial class ScummVerbTable
     public ScummVerbSnapshot? Find(int verbId) =>
         FindSlot(verbId) is var slot and > 0 ? _slots[slot].ToSnapshot() : null;
 
+    /// <summary>Switches off (mode 0) every verb shown now (on or dimmed) that is not one of <paramref name="verbIds"/>; returns how many.</summary>
+    public int SwitchOffAllBut(IReadOnlySet<int> verbIds)
+    {
+        var count = 0;
+        foreach (var slot in _slots.Skip(1).Where(slot => slot.VerbId != 0 && slot.SaveId == 0 && slot.Mode is 1 or 2 && !verbIds.Contains(slot.VerbId)))
+        {
+            slot.Mode = 0;
+            count++;
+        }
+        return count;
+    }
+
     public void ForgetAll(string reason)
     {
         Unknown = reason;

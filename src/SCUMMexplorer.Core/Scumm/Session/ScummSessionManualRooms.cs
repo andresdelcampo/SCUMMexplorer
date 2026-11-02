@@ -67,6 +67,7 @@ public abstract partial class ScummSession
                     : !copy.UserInputOn ? "Native entry has not enabled player input within the preparation bound."
                     : initializationPending ? "Native entry still has pending scene initialization within the preparation bound."
                     : "Native entry did not reach a quiet, controllable room within the bound.", settled.Frames, settled.State);
+            copy.TakeBootShownState(roomId);
             copy._uncertainties.Add($"Room {roomId:00} was selected manually: the previous scene was canceled, " +
                 "and native entry ran offscreen on an independent copy. This is an exploration preview, not a played route.");
             return new(copy, null, settled.Frames, copy.CaptureSessionRoom());
@@ -103,6 +104,8 @@ public abstract partial class ScummSession
             // Only the ambient scripts run from here: every other slot (the previous room's exit work, the game's global loops) ends without
             // executing further; the room's own story stays unplayed.
             var stopped = copy.EndEverySlot();
+            copy.TakeEntryScreen(roomId);
+            copy.TakeBootShownState(roomId);
             foreach (var script in ambient.Ambient)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -118,6 +121,40 @@ public abstract partial class ScummSession
         catch (OperationCanceledException) { return new(null, "Ambient preview was canceled.", Cancelled: true); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException or ArgumentException)
         { return new(null, $"The ambient preview is unavailable: {ex.Message}"); }
+    }
+
+    // 2 November 2026 (user report, Indy 3 Rooms 69, 74, 75, 80): the screen rows are how the room is shown, not its story. A static preview runs no entry
+    // code, yet a room whose entry gives it the whole screen (roomOps setScreen 0,200: diary pages, the zeppelin) must not be cut at the verb area and
+    // show the verbs, so the entry's first setScreen with constant rows is taken (initScreens).
+    private void TakeEntryScreen(int roomId)
+    {
+        ScummScriptDisassembly? entry;
+        try { entry = _data.RoomEntryScript(roomId); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { return; }
+        var setScreen = entry?.Instructions.FirstOrDefault(i => i.Operation == "roomOps" && i.Operands.StartsWith("setScreen,", StringComparison.Ordinal));
+        if (setScreen is null) return;
+        var parts = setScreen.Operands.Split(',', StringSplitOptions.TrimEntries);
+        if (parts.Length == 3 && TryConstant(parts[1], out var top) && TryConstant(parts[2], out var bottom) && top < bottom && bottom <= 200)
+        {
+            _runtime.MainScreen = (top, bottom);
+            _visitTrace.Add($"static preview: the entry's {setScreen.Operands} gives the room screen rows {top} to {bottom - 1}");
+        }
+        static bool TryConstant(string text, out int value) =>
+            text.StartsWith("0x", StringComparison.Ordinal) ? int.TryParse(text[2..], System.Globalization.NumberStyles.HexNumber, null, out value) : int.TryParse(text, out value);
+    }
+
+    // A room only the game's opening shows (Indy 3's logo, Room 76: only the boot script loads it, before any verb exists) is seen with the screen rows
+    // and the verbs it had then, not those the game has since: the verbs that were not on then are switched off (2 November 2026, user report). Rooms
+    // the opening passes through that play also loads (Indy 3's college) keep the play state.
+    private readonly Dictionary<int, ((int Top, int Bottom) Screen, HashSet<int> Verbs)> _bootShown = [];
+
+    private void TakeBootShownState(int roomId)
+    {
+        if (!_bootShown.TryGetValue(roomId, out var shown) || !Facts().OpeningOnly(roomId)) return;
+        _runtime.MainScreen = shown.Screen;
+        var hidden = _runtime.Verbs.SwitchOffAllBut(shown.Verbs);
+        _visitTrace.Add($"static preview: the game's opening showed Room {roomId:00} with screen rows {shown.Screen.Top} to {shown.Screen.Bottom - 1}" +
+            $"{(hidden > 0 ? $" and without {hidden} verb(s) on now" : "")}");
     }
 
     // Ends every script slot without executing anything further (no override jump, no end hook); returns how many there were.
@@ -144,6 +181,23 @@ public abstract partial class ScummSession
     protected virtual ScummSessionSnapshot VisitManualRoomCore(GameResource room) =>
         EnterRoom(room, "Room selected manually; native entry ran offscreen (exploration preview).");
 
+    /// <summary>
+    /// 2 November 2026 (user report, Indy 3 Room 13): the boot script can go on after it hands the player control (Indy 3's Script 1 +0x040D: "I really
+    /// have to get out of these wet clothes!", a walk, then loadRoom 73 to change). A room or scene the user picks does not continue the opening's route:
+    /// its remaining work (and the scripts it started) ends, unless it still holds a cutscene.
+    /// </summary>
+    protected void EndOpeningRoute()
+    {
+        if (_booting) return;
+        var active = _pending.Select(p => p.Frame).Concat(_frameScripts.Select(p => p.Frame)).Where(f => !f.Stopped).ToHashSet();
+        var roots = active.Where(f => f.Number == BootScript).ToHashSet();
+        if (roots.Count == 0 || _cutscenes.Any(c => c.Owner is ScriptFrame owner && DescendsFrom(owner, roots))) return;
+        foreach (var frame in active.Where(f => DescendsFrom(f, roots))) frame.Stopped = true;
+        _pending.RemoveAll(p => p.Frame.Stopped);
+        _frameScripts.RemoveAll(p => p.Frame.Stopped);
+        _uncertainties.Add($"The game's opening (Script {BootScript}) had not finished its route after giving control; a picked room or scene does not continue it, so it was ended.");
+    }
+
     private bool DescendsFrom(ScriptFrame frame, HashSet<ScriptFrame>? roots)
     {
         if (roots is null) return false;
@@ -165,7 +219,7 @@ public abstract partial class ScummSession
         }
         foreach (var frame in active)
             if (frame.OriginRoom == _currentRoom?.ResourceId && frame.OriginRoom is not null ||
-                _booting && frame.Number == BootScript) roots.Add(frame);
+                frame.Number == BootScript) roots.Add(frame);
         foreach (var frame in active.Where(f => DescendsFrom(f, roots))) frame.Stopped = true;
         _pending.RemoveAll(p => p.Frame.Stopped);
         _frameScripts.RemoveAll(p => p.Frame.Stopped);

@@ -445,6 +445,7 @@ public sealed class ScummGameSession : ScummSession
         if (room.Kind != ResourceKind.Room || room.ResourceId is not int roomId) throw new InvalidDataException("The session can only visit an indexed room.");
         if (_currentRoom?.ResourceId == roomId) return Snapshot;
         _uncertainties.StartStep();
+        EndOpeningRoute();
         var arrival = $"Room {roomId:00} selected without playing the route to it (state preview): its entry scripts ran from the state the boot left.";
         _runtime.Messages.RouteSkipped($"Room {roomId:00} was entered without its route, so prints on the route to it did not run");
         var arrivals = ScummEgoArrivalIndex.For(_game);

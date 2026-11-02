@@ -24,5 +24,6 @@ public interface IScummTextCharset
     int DrawPlainLine(byte[] pixels, int width, int originY, IReadOnlyList<byte> glyphs, int left, int top, byte color);
 
     /// <summary>The messages on screen, each in this charset or (classic renderer) in the one it was printed with, from <paramref name="charsetFor"/>.</summary>
-    ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor);
+    /// <paramref name="mainScreen"/>: the room screen's rows, where the renderer clips text at a screen's bottom (null: LOOM's 0 to 143).
+    ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor, (int Top, int Bottom)? mainScreen = null);
 }

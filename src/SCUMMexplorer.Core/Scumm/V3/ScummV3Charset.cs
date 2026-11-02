@@ -110,8 +110,8 @@ public sealed class ScummV3Charset : IScummTextCharset
     int IScummTextCharset.DrawPlainLine(byte[] pixels, int width, int originY, IReadOnlyList<byte> glyphs, int left, int top, byte color) =>
         ScummV3MessageRenderer.DrawPlainLine(pixels, width, originY, this, glyphs, left, top, (byte)(color & 0x0F));
 
-    ScummMessageLayer IScummTextCharset.RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor) =>
-        ScummV3MessageRenderer.Render(messages, this);
+    ScummMessageLayer IScummTextCharset.RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor,
+        (int Top, int Bottom)? mainScreen) => ScummV3MessageRenderer.Render(messages, this, mainScreen);
 }
 
 /// <summary>A message drawn into a screen-sized layer of palette indices.</summary>
@@ -143,9 +143,11 @@ public static class ScummV3MessageRenderer
     public const byte Transparent = 0xFF;
     private const byte ShadowColor = 0;
 
-    public static ScummMessageLayer Render(IEnumerable<ScummMessage> messages, ScummV3Charset charset)
+    /// <param name="mainScreen">The room screen's rows (<c>initScreens</c>; the session's <c>roomOps setScreen</c>), LOOM's 0 to 143 when not given:
+    /// text is clipped at the bottom of the screen its top is in (the text screen above the room, the room, the verb screen below it).</param>
+    public static ScummMessageLayer Render(IEnumerable<ScummMessage> messages, ScummV3Charset charset, (int Top, int Bottom)? mainScreen = null)
     {
-        var layer = new Layer();
+        var layer = new Layer { Main = mainScreen ?? (RoomScreenTop, VerbScreenTop) };
         foreach (var message in messages)
         {
             // A box drawn after the string covers its pixels there (drawBox paints over it).
@@ -186,7 +188,7 @@ public static class ScummV3MessageRenderer
     private static void DrawDrawnString(Layer layer, ScummMessage message, ScummV3Charset charset)
     {
         // drawString: the shadow bit applies; bit 0x40 gives no outline in the room screen.
-        var (color, shadow) = TextColor(message.Color, outlineAllowed: message.Y >= VerbScreenTop);
+        var (color, shadow) = TextColor(message.Color, outlineAllowed: message.Y >= layer.Main.Bottom);
         var startLeft = message.X;
         var top = message.Y;
         for (var index = 0; index < message.LineGlyphs.Count; index++)
@@ -223,8 +225,8 @@ public static class ScummV3MessageRenderer
         var width = charset.CharWidth(glyph);
         if (left + width > right + 1) return false;
         // findVirtScreen(top): the room or the verb screen, each clipped at its bottom.
-        var screenTop = top >= VerbScreenTop ? VerbScreenTop : RoomScreenTop;
-        var screenBottom = top >= VerbScreenTop ? ScreenHeight : VerbScreenTop;
+        var (screenTop, screenBottom) = top < layer.Main.Top ? (0, layer.Main.Top)
+            : top < layer.Main.Bottom ? layer.Main : (layer.Main.Bottom, ScreenHeight);
         if (top < 0 || top >= ScreenHeight) return false;
         DrawBits1(layer, charset.Glyph(glyph), left, top, width, ScummV3Charset.GlyphRows, color, shadow, screenTop, screenBottom);
         left += width;
@@ -327,6 +329,7 @@ public static class ScummV3MessageRenderer
         public byte[] Pixels { get; } = Enumerable.Repeat(Transparent, ScreenWidth * ScreenHeight).ToArray();
         public (int Left, int Top, int Right, int Bottom)? Bounds { get; private set; }
         public IReadOnlyList<ScummScreenBox> ErasedBy { get; set; } = [];
+        public (int Top, int Bottom) Main { get; init; } = (RoomScreenTop, VerbScreenTop);
 
         public void Set(int x, int y, byte value, int screenTop, int screenBottom)
         {

@@ -313,8 +313,9 @@ public sealed partial class ScummMessageTable
                 trace = $"print for actor {request.ActorToPrintFor} uses text slot {index} ({(index == 2 ? "a debug message" : "a message dialog")}), which is not shown";
                 break;
         }
-        // v1–v3 keep position, height and colour as the slot's defaults, but not the centring (ScummVM decodeParseStringTextString).
-        slot.SaveCarried();
+        // v1–v3 keep position, height and colour as the slot's defaults, but not the centring (ScummVM decodeParseStringTextString); version 4
+        // and later keep the defaults a print with text set aside (decodeParseString saves them only for a print with no text).
+        if (runtime.EngineVersion <= SCUMMexplorer.Core.Domain.ScummVersion.V3) slot.SaveCarried();
         return trace;
     }
 
@@ -406,6 +407,18 @@ public sealed partial class ScummMessageTable
         // strings may overlap only partly and must retain their uncovered pixels.
         _drawn.RemoveAll(previous => SameDrawnGlyphs(previous, message));
         _drawn.Add(message);
+        // drawString ends with _string[a].xpos = _charset->_str.right (string.cpp, read 2 November 2026), and versions 1 to 3 keep it as the slot's
+        // default, so a print with no position goes on where the last one ended (Indy 3 Room 75's diary: "follow the " then "first").
+        if (runtime.EngineVersion <= SCUMMexplorer.Core.Domain.ScummVersion.V3 && TextCharset?.Invoke(runtime.Charset ?? 0) is { } measure)
+        {
+            var right = slot.X;
+            foreach (var line in lines)
+            {
+                var width = measure.StringWidth(line);
+                if (width > 0) right = Math.Max(right, (slot.Center ? slot.X - width / 2 : slot.X) + width);
+            }
+            slot.X = right;
+        }
         _log.Add(message);
         return $"string drawn: \"{message.Text.Replace("\n", " / ", StringComparison.Ordinal)}\" at ({message.X}, {message.Y}), colour {message.Color}";
     }
@@ -619,6 +632,9 @@ public sealed partial class ScummMessageTable
     /// The charset a talk line is wrapped in (version 4 and later; the session sets it). Null: no wrapping, as version 1 to 3 do.
     /// </summary>
     public Func<int, IScummTextCharset?>? LineBreakCharset { get; set; }
+
+    /// <summary>The charset a drawn string is measured in (every version; the session sets it), for where the next print goes on.</summary>
+    public Func<int, IScummTextCharset?>? TextCharset { get; set; }
 
     /// <summary>
     /// ScummVM <c>displayDialog</c> for version 4 and later (string.cpp, read 30 October 2026): before a chunk is shown, <c>addLinebreaks</c> turns the

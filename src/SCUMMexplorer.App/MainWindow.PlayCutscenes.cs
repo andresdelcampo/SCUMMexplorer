@@ -231,6 +231,8 @@ public partial class MainWindow
         IReadOnlyList<string> uncertainties;
         // The scene's own scripts do not wait out their timers until it begins (as the plan's runs: Maniac Mansion's Script 139, seven minutes).
         if (plan?.Result.Way != ScummPickedStart.AtCutscene) session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger), trigger.ObjectId);
+        // A scene that is not the room's arrival does not replay the arrival on the way in (ScummSession.ArrivalScenesSeen), as the plan's runs.
+        session.ArrivalScenesSeen = !trigger.IsRoomEntry;
         try
         {
             if (plan is { HasEdits: true } && trigger.IsRoomEntry)
@@ -308,6 +310,7 @@ public partial class MainWindow
             StatusText.ToolTip = IsAdvancedMode ? ex.Message : null;
             return;
         }
+        finally { session.ArrivalScenesSeen = false; }
         ShowPlayFrame();
         PlayScreenImage.Focus();
         StatusText.Text = $"Playing {title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
@@ -345,5 +348,7 @@ public partial class MainWindow
         var changed = inCutscene != _playControlsInCutscene;
         _playControlsInCutscene = inCutscene;
         if (changed || ++_playControlsFrame % 12 == 0) UpdatePlayCutsceneControls();
+        // Play Game Intro waits for the game's cutscene to end (2 November 2026, user report: it stayed disabled after the intro).
+        if (changed) UpdateGameIntroButton();
     }
 }

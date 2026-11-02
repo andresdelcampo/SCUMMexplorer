@@ -129,7 +129,7 @@ public sealed class ScummPlayScreen
             }
         if ((_session.PlayCharset(0) ?? _session.CurrentPlayCharset()) is { } charset)
         {
-            var layer = charset.RenderMessages(_session.Messages.OnScreen, number => number is int n ? _session.PlayCharset(n) : null);
+            var layer = charset.RenderMessages(_session.Messages.OnScreen, number => number is int n ? _session.PlayCharset(n) : null, (top, bottom));
             for (var i = 0; i < layer.Pixels.Length; i++)
                 if (layer.Pixels[i] != ScummV3MessageRenderer.Transparent)
                 {

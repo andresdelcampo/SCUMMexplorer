@@ -226,6 +226,8 @@ public partial class MainWindow
                     _play = ready;
                     _playScreen = new ScummPlayScreen(game, ready, _playIndexedStates);
                 }
+                // A room the game shows through one script of its own (a page, a manual: Indy 3's Room 74 and Script 90) is shown as that script shows it.
+                if (_play.ShownOnlyBy(roomId) is { } viewer) _play.StartSceneAt(viewer, 0);
             }
             else _catalogPreviewOnly = false;
             UpdatePlaySoundCard();
