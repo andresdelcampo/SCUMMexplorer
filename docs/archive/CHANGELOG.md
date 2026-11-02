@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 2 November: two actors brought close
+
+A wait for two actors to come close (`getDist` of them, looped until it is small) becomes a setup value: the first actor stood next to the second in the scene's room (`ScummSetupKind.ActorNear`). Zak McKracken Room 19's guru (Script 42) and Monkey Island 2 Room 57's entry now play their own way: Zak 74% → 76% (both), Monkey Island 2 92.6% → 93.2%; the other copies, Maniac and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run42.txt`, `*-run20.txt`).
+
 ## 1 November: the combined try with a value left out
 
 When the combined try of all values fails, it is now also retried with each value left out, one at a time (a value off the scene's way can stop it). In version 2 background handlers `var[0x009]` is the object given, not "this object", and `var[0x00A]` the actor it goes to, not a second object; a hero test whose kid leads away also offers the kids next to it. Monkey Island 2 92.1% → 92.6% (Room 56's entry); the other copies, Maniac, Zak and LOOM unchanged. Measure's trials now start as the planner's runs do. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run40.txt`, `*-run41.txt`, `*-run19.txt`).

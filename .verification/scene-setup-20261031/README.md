@@ -318,3 +318,7 @@ Zak's background object handlers (verb 0xFD) loop and wait for a sentence in the
 
 Zak Room 44's object 655 still starts at its cutscene: its handler also walks the hero to actor 10, who is not in the room. The other copies unchanged (`*-run40.txt`), LOOM unchanged (`../loom-editions-20261031/run23-*.txt`).
 
+## Two actors brought close (2 November, fifteenth batch)
+
+`ScummSetupKind.ActorNear`: `getDist var[X], A, B` then a comparison whose scene side needs a small distance (a loop back while it is large) stands actor A next to actor B in the scene's room (8 pixels to the side; B goes to A when only A is there). Zak Room 19's entry (Script 42 +0x0009: the hero and the guru, actor 10, until 15 or less: the guru's 10 lines) and Monkey Island 2 Room 57's entry now play their own way. `*-run42.txt`: Monkey Island 2 92.6% → 93.2%, the other copies unchanged; Zak 40 → 41 of 54 (76%, both; `*-run20.txt`); Maniac unchanged (its catching scenes also need a chase: Edna walks up to the kid); LOOM unchanged (`../loom-editions-20261031/run24-*.txt`). Test: `AWaitForTwoActorsToComeCloseStandsOneNextToTheOther`.
+

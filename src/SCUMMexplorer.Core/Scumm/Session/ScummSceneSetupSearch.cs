@@ -231,6 +231,7 @@ public sealed partial class ScummSceneSetupSearch
             var xOf = new Dictionary<string, string>();
             var runningOf = new Dictionary<string, int>();
             var bitOf = new Dictionary<string, string>();
+            var distanceOf = new Dictionary<string, (string A, string B)>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             // A script the trigger's code starts or chains to reads its arguments as its locals: literals (Indy 4 Room 7's cat figurine:
             // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116), "this object" (Monkey Island 2's
@@ -253,7 +254,7 @@ public sealed partial class ScummSceneSetupSearch
                 if (WrittenVariable(ins) is { } rewritten)
                 {
                     stateOf.Remove(rewritten); costumeOf.Remove(rewritten); roomOf.Remove(rewritten); boxOf.Remove(rewritten); ownerOf.Remove(rewritten); xOf.Remove(rewritten);
-                    runningOf.Remove(rewritten); bitOf.Remove(rewritten);
+                    runningOf.Remove(rewritten); bitOf.Remove(rewritten); distanceOf.Remove(rewritten);
                 }
                 guard = guardSides.TryGetValue(ins.Offset, out var need) ? need : null;
                 afterCutscene = moreScene.Contains(ins.Offset);
@@ -278,6 +279,11 @@ public sealed partial class ScummSceneSetupSearch
                         // ScummVM o2_getBitVar: bit (base + index) of the variable words, word n >> 4, bit n & 15, as old version 3 packs its bits
                         // (Maniac Mansion Script 139 +0x0038: getBitVar var[0x001], 0x0B00, 0x13).
                         bitOf[parts[0]] = $"bit[0x{bitBase + bitIndex:X3}]";
+                        break;
+                    case "getDist" when parts.Length >= 3 && Actor(parts[1]) is { } near && Actor(parts[2]) is { } to:
+                        // A wait for two actors to come close (Zak McKracken Script 42 +0x0009: getDist of the hero and the guru, actor 10, looped
+                        // while over 15).
+                        distanceOf[parts[0]] = (near, to);
                         break;
                     case "isScriptRunning" when parts.Length >= 2 && Literal(parts[1]) is int checkedScript:
                         runningOf[parts[0]] = checkedScript;
@@ -414,6 +420,12 @@ public sealed partial class ScummSceneSetupSearch
                             foreach (var side in sides.Where(v => v > 0).Distinct())
                                 if (guard is bool toScene && Holds(ins.Operation, value.Value, side) == toScene)
                                     Add(new(ScummSetupKind.ActorX, acrossActor, side, where, trigger.Room), side);
+                        }
+                        else if (distanceOf.TryGetValue(tested, out var pair))
+                        {
+                            // Close (distance 0) on the scene's side: the first actor stood next to the second.
+                            if (guard is bool toNear && Holds(ins.Operation, value.Value, 0) == toNear)
+                                Add(new(ScummSetupKind.ActorNear, $"{pair.A}|{pair.B}", 0, where, trigger.Room), 0);
                         }
                         else if (bitOf.TryGetValue(tested, out var readBit))
                         {

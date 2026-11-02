@@ -50,6 +50,8 @@ public enum ScummSetupKind
     /// Monkey Island 1's sword on Room 36's dogs). Applying it gives the object; the run visits that room (<see cref="ScummSetupEdit.PlayRoom"/>).
     /// </summary>
     PlayedIn,
+    /// <summary>Actor A of <c>Target</c> ("A|B": numbers, "ego" or an actor variable) stood next to actor B in the scene's room (a wait on getDist).</summary>
+    ActorNear,
     /// <summary>Variable A of <c>Target</c> ("A|B") set equal to variable B (Value 1) or to B + 1 (Value 0), read when applied.</summary>
     VariableMatch,
     /// <summary>The hero switched to actor <c>Value</c> (a kid switch: Maniac Mansion's piano wants a musician), in the scene's room.</summary>
@@ -67,6 +69,9 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
     /// <summary>The room a setup's scene is played in when it is not the trigger's own (<see cref="ScummSetupKind.PlayedIn"/>); null otherwise.</summary>
     public static int? PlayRoom(IEnumerable<ScummSetupEdit>? edits) => edits?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.PlayedIn)?.Value;
 
+    private static string ActorName(string actor) =>
+        actor == "ego" ? "the hero" : actor.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {actor}" : $"actor {actor}";
+
     public string Describe() => Kind switch
     {
         ScummSetupKind.Bit => $"{Target} = 1",
@@ -83,6 +88,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
         ScummSetupKind.ScriptRunning => $"script {Target} running",
         ScummSetupKind.HeroIs => $"the hero is actor {Value}",
+        ScummSetupKind.ActorNear => $"{ActorName(Target.Split('|')[0])} next to {ActorName(Target.Split('|')[1])}",
         ScummSetupKind.VariableMatch => $"{Target.Split('|')[0]} {(Value == 1 ? "equal to" : "different from")} {Target.Split('|')[1]}",
         ScummSetupKind.PlayedIn => $"object {Target} held and used in Room {Value}",
         ScummSetupKind.ObjectStateBit => $"object {Target} {Math.Abs(Value) switch { 8 => Value > 0 ? "open (on)" : "closed (off)", 4 => Value > 0 ? "locked" : "unlocked", 2 => Value > 0 ? "untouchable" : "touchable", _ => Value > 0 ? "pickupable" : "not pickupable" }}",
@@ -143,6 +149,27 @@ public abstract partial class ScummSession
                 var id = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (_runtime.ObjectStates.GetValueOrDefault(id) == edit.Value) return false;
                 _runtime.SetObjectState(id, (byte)edit.Value);
+                return true;
+            }
+            case ScummSetupKind.ActorNear:
+            {
+                // Only in the scene's room; the first actor goes to the second (or the second to the first when only the first is there).
+                if (edit.Room is int nearRoom && _runtime.CurrentRoom != nearRoom) return false;
+                int Resolve(string actor) => actor == "ego" ? variables.GetValueOrDefault(_runtime.EgoVariable)
+                    : actor.StartsWith("var[", StringComparison.Ordinal) ? variables.GetValueOrDefault(actor)
+                    : int.Parse(actor, System.Globalization.CultureInfo.InvariantCulture);
+                var pair = edit.Target.Split('|');
+                var (mover, anchor) = (Resolve(pair[0]), Resolve(pair[1]));
+                if (!_runtime.Actors.Contains(mover) || !_runtime.Actors.Contains(anchor)) return false;
+                if (_runtime.Actors[anchor].Room != _runtime.CurrentRoom) (mover, anchor) = (anchor, mover);
+                if (_runtime.Actors[anchor].Room != _runtime.CurrentRoom) return false;
+                var (anchorX, anchorY) = (_runtime.Actors[anchor].X ?? 0, _runtime.Actors[anchor].Y ?? 0);
+                var x = anchorX + (anchorX > 160 ? -8 : 8);
+                if (_runtime.Actors[mover].Room == _runtime.CurrentRoom && Math.Abs((_runtime.Actors[mover].X ?? 0) - x) <= 8 &&
+                    Math.Abs((_runtime.Actors[mover].Y ?? 0) - anchorY) <= 4) return false;
+                var heroNow = variables.TryGetValue(_runtime.EgoVariable, out var heroActor) ? (int?)heroActor : null;
+                _runtime.Actors.Put(mover, x, anchorY, _runtime.CurrentRoom, CurrentPlacement(), heroNow);
+                _runtime.Actors.ShowActorsIn(CurrentPlacement());
                 return true;
             }
             case ScummSetupKind.VariableMatch:

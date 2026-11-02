@@ -251,6 +251,20 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AWaitForTwoActorsToComeCloseStandsOneNextToTheOther()
+    {
+        // Zak McKracken Room 19's entry: Script 42 loops on getDist of the hero and the guru (actor 10) until it is 15 or less; the hero stood
+        // next to the guru, the scene plays the game's own way.
+        var folder = Path.Combine(TestGames.Root, "zak ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 19, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ActorNear, Target: "ego|10" });
+    }
+
+    [Fact]
     public void ThePianoIsPlayedByAKidWhoCanPlayIt()
     {
         // Maniac Mansion Room 17's piano (verb 0x0B, +0x0018: isGreaterEqual var[0x000], 2, else "I can't play that thing!"): the hero switched
