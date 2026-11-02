@@ -20,7 +20,7 @@ public abstract partial class ScummSession
     /// back door: "arrived from Room 15", tested in the arrival script, local script 204).</summary>
     public IReadOnlyCollection<ScummSetupEdit>? ArrivalSetup { get; set; }
 
-    private void EndArrivalCutscenes(int roomId)
+    private void EndArrivalCutscenes(int roomId, IReadOnlySet<int>? inRoomBefore)
     {
         if (ArrivalsSkippedFor is not { } trigger || _cutscenes.Count == 0) return;
         // A setup that says how the room is entered (where from, by which door, under which number) wants that arrival.
@@ -32,7 +32,7 @@ public abstract partial class ScummSession
         bool Kept(ScriptFrame frame)
         {
             for (var current = frame; current is not null; current = current.Parent)
-                if (current.Global || kept.Contains($"Room {roomId} local script {current.Number}")) return true;
+                if (kept.Contains(current.Global ? $"global script {current.Number}" : $"Room {roomId} local script {current.Number}")) return true;
             return false;
         }
         var arrivals = owners.Where(frame => !frame.Global && frame.OriginRoom == roomId && !Kept(frame)).ToHashSet();
@@ -41,8 +41,61 @@ public abstract partial class ScummSession
         _pending.RemoveAll(p => p.Frame.Stopped);
         _frameScripts.RemoveAll(p => p.Frame.Stopped);
         for (var scopes = 0; _cutscenes.Count > 0 && _cutscenes.Peek().Owner is { Stopped: true } && scopes < MaxNestedScripts; scopes++) CloseTopCutscene();
+        // The arrival had already begun: Room 82's local script 200 puts the soldier's head (actor 10, costume 85) in before its first pause. The
+        // actors its script puts into this room, and that were not here before the entry, go back out (the user saw the head roll by later).
+        var placed = new HashSet<int>();
+        foreach (var number in arrivals.Select(f => f.Number).OfType<int>())
+        {
+            ScummScriptDisassembly? script;
+            try { script = _data.RoomLocalScript(roomId, number); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { continue; }
+            if (script is not null) MarkArrivalSeen(roomId, number, script);
+            foreach (var put in script?.Instructions.Where(i => i.Operation == "putActorInRoom") ?? [])
+            {
+                var operands = put.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (operands.Length == 2 && operands[0].StartsWith("0x", StringComparison.Ordinal) &&
+                    int.TryParse(operands[0][2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var actor)) placed.Add(actor);
+            }
+        }
+        var ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) ? (int?)egoValue : null;
+        foreach (var actor in placed.Where(a => _runtime.Actors.Contains(a) && _runtime.Actors[a].Room == roomId && inRoomBefore?.Contains(a) != true && a != ego))
+            _runtime.Actors.PutInRoom(actor, 0, CurrentPlacement(), ego);
         _uncertainties.Add($"A picked scene enters Room {roomId:00}: its arrival (local script {string.Join(", ", arrivals.Select(f => f.Number))}, a cutscene the entry " +
                            "started) does not play; it was ended and its cutscene closed, as a skipped route is.");
+    }
+
+    /// <summary>
+    /// An ended arrival also counts as seen, so a later entry in the same scene skips it as the game would (the user saw the head roll by when Give
+    /// Grail's ending entered Room 82 again): the flag the arrival tests just inside its cutscene (Room 82's local script 200 +0x0005, bit[0x5E2], which
+    /// Script 122 sets as Indy comes back with the Grail), or the flag it tests and sets itself before its cutscene, is raised to the value the game
+    /// gives it. A test that loops back (a wait for the flag) is left alone.
+    /// </summary>
+    private void MarkArrivalSeen(int roomId, int number, ScummScriptDisassembly script)
+    {
+        var instructions = script.Instructions;
+        var first = instructions.ToList().FindIndex(i => i.Operation == "cutscene");
+        if (first < 0) return;
+        var raised = Facts().RaisedFlags;
+        for (var index = 0; index < instructions.Count; index++)
+        {
+            var guard = instructions[index];
+            if (guard.Operation is not ("notEqualZero" or "equalZero") || FlagGuard.Match(guard.Operands) is not { Success: true } match) continue;
+            var flag = match.Groups[1].Value;
+            var marks = instructions.Skip(index + 1).Take(2).FirstOrDefault(i => i.Operation == "move" && i.Operands.StartsWith(flag + " =", StringComparison.Ordinal) &&
+                FlagMove.Match(i.Operands) is { Success: true } m && m.Groups[2].Value != "0x0000");
+            var inside = index > first && index <= first + 3;
+            var selfMarked = marks is not null && instructions.Skip(index + 1).Take(4).Any(i => i.Operation == "cutscene");
+            if (!inside && !selfMarked) continue;
+            if (BranchTarget.Match(guard.Operands) is { Success: true } target &&
+                int.Parse(target.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) <= guard.Offset) continue;
+            if (flag.StartsWith("var[", StringComparison.Ordinal) && int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) < 0x80) continue;
+            int value;
+            if (marks is not null) value = int.Parse(FlagMove.Match(marks.Operands).Groups[2].Value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            else if (!raised.TryGetValue(flag, out value)) continue;
+            var where = $"Room {roomId} local script {number} +0x{guard.Offset:X4}";
+            if (ApplySetupEdit(new ScummSetupEdit(flag.StartsWith("bit[", StringComparison.Ordinal) ? ScummSetupKind.Bit : ScummSetupKind.Variable, flag, value, where)))
+                _uncertainties.Add($"The ended arrival counts as seen ({where} tests {flag}): {flag} = {value}, as the game sets it.");
+        }
     }
 
     private sealed record GameScriptFacts(IReadOnlyDictionary<string, int> RaisedFlags, IReadOnlyDictionary<int, HashSet<string>> Loaders, int? HeroOutfit)

@@ -164,7 +164,7 @@ internal static class Program
                         foreach (var actor in table.Snapshot().Where(a => a.Room == shown.CurrentRoomId))
                             Log($"  actor {actor.Number} costume {actor.Look.Costume} at ({actor.X},{actor.Y}) visible {actor.Visible}");
                         Log($"  ambient={Field("_playAmbient")} previewOnly={Field("_catalogPreviewOnly")} sameAsLive={ReferenceEquals(shown, Field("_playLiveSource"))} " +
-                            $"uncertainties: {string.Join(" | ", shown.Snapshot.Uncertainties.Where(u => u.Contains("outfit") || u.Contains("opening") || u.Contains("selected manually")).TakeLast(4))}");
+                            $"uncertainties: {string.Join(" | ", shown.Snapshot.Uncertainties.Where(u => u.Contains("outfit") || u.Contains("opening") || u.Contains("arrival") || u.Contains("selected manually") || u.Contains("entered again") || u.Contains("Room 82")).TakeLast(12))}");
                         continue;
                     }
                     // g:seconds presses Play Game Intro and captures the screen every 3 seconds (2 November 2026, Indy 4's title).

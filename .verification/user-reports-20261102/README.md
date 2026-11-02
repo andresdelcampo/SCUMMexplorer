@@ -88,3 +88,13 @@ Checked in the window: Room 44 lists the doorway (`mme-44/`, `d` step); Room 14'
   in the harness window; before: 802 × 501 or 754 × 471 first).
 - **Room 82's grail scenes**: in Room 82's Interact ("Grail: Give" is the earthquake ending, "Cracked Seal: Look"), left out of Play Cutscene by
   R-8.2b (the user, 31 October: "keep Interact complete, remove dups from cutscenes"); Henry being shot is Room 82's Entry.
+
+## Sixth pass: the rolling head (2 November)
+
+The user saw the soldier's head bounce on the left through Give Grail, and later roll across. Ending Room 82's arrival (local script 200) left what
+it had already done: it puts the head (actor 10, costume 85) in before its first pause. And the pick enters Room 82 a second time after its setup
+(`EnterRoomAgain`), where the arrival played again from its later part, because the "kept" test spared any cutscene with a global script among its
+callers. Now an ended arrival (1) takes out the actors its script puts into the room that were not there before the entry, (2) counts as seen: the
+flag it tests just inside its cutscene (or tests and sets itself) is raised to the game's value (`bit[0x5E2]`), so a later entry skips it, and (3) only
+the scene's own scripts and the scripts the setup's values come from are kept. Checked in the window (`r82-head6/`: no actor 10, the ending goes on
+to "Nice going, Elsa."). Tests: `APickedSceneDoesNotReplayTheRoomsArrival` (no actor 10), `GiveGrailDoesNotReplayTheArrivalLater`.

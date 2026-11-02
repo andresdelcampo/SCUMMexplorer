@@ -13,6 +13,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 The guard reading treats an unconditional jump back as the loop running again, not the way on, so the tests inside a loop guard the scene (Indy 4 Room 44's entry, two values at once, now plays its own way, with Rooms 17 and 97's entries); an actor's position on the scene's side is tried after the other values there. The picked object's own version 2 handler, waiting for a sentence, is given the verb, recipient and object it tests for (Zak Room 44's object 655 now answers; it still needs the walk to actor 10). Indy 4 95.3% → 96.0%; the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run48.txt`, `*-run29.txt`).
 
+## 2 November: an ended arrival leaves nothing behind
+
+An arrival ended for a picked scene takes out the actors it had put in and counts as seen (its flag raised), and only the scene's own scripts keep their cutscenes: Give Grail no longer shows Room 82's soldier's head bouncing or rolling by. Record: [user reports](../../.verification/user-reports-20261102/README.md).
+
 ## 2 November: the window breaking heard, rooms keep one size
 
 Speech-bank sound effects are held until they end (the player was collected before playing). Under a played game's screen the hint line, the scroll-arrow row and the playback bar keep their height when they are not shown, so a picked room no longer changes size a second after it shows. Record: [user reports](../../.verification/user-reports-20261102/README.md).

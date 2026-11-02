@@ -48,6 +48,33 @@ public sealed class UserReports20261102Tests(ITestOutputHelper output)
         Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("its arrival (local script 200", StringComparison.Ordinal));
         for (var frame = 0; frame < 600; frame++) session.AdvanceFrame();
         Assert.Equal(82, session.CurrentRoomId);
+        // The arrival had put the soldier's head (actor 10) in before its first pause; ended, it takes the head back out (user report: it bounced there).
+        var runtime = typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(session)!;
+        var actors = (ScummActorTable)runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
+        foreach (var actor in actors.Snapshot().Where(a => a.Room == 82)) output.WriteLine($"actor {actor.Number} costume {actor.Look.Costume} at ({actor.X},{actor.Y})");
+        Assert.DoesNotContain(actors.Snapshot(), a => a.Room == 82 && a.Number == 10);
+    }
+
+    [Fact]
+    public void GiveGrailDoesNotReplayTheArrivalLater()
+    {
+        if (Indy3Vga() is not { } game) return;
+        var session = ScummGameSession.BootForPlay(game, out _);
+        var trigger = new ScummCutscene(82, 873, "", 0x03, ["Room 82 object 873 verb 0x03"], 0, 0, 0, "");
+        session.ArrivalsSkippedFor = trigger;
+        session.VisitRoom(Room(game, 82));
+        session.ArrivalsSkippedFor = null;
+        session.PickInteraction(873, 0x03, 3);
+        for (var frame = 0; frame < 4000; frame++)
+        {
+            session.AdvanceFrame();
+            if (session.Messages.Log.Any(m => m.Text.Contains("Except maybe that", StringComparison.Ordinal)))
+            {
+                foreach (var line in session.SessionTrace.TakeLast(40)) output.WriteLine(line.Length > 200 ? line[..200] : line);
+                break;
+            }
+        }
+        Assert.DoesNotContain(session.Messages.Log, m => m.Text.Contains("Except maybe that", StringComparison.Ordinal));
     }
 
     [Fact]

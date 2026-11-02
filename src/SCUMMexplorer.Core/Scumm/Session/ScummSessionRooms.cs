@@ -123,11 +123,14 @@ public abstract partial class ScummSession
             return Snapshot;
         }
 
+        // Who is in the room before its entry runs: an arrival ended for a picked scene takes back out only the actors it brought in.
+        var inRoomBefore = ArrivalsSkippedFor is null ? null
+            : _runtime.Actors.Snapshot().Where(actor => actor.Room == room.ResourceId).Select(actor => actor.Number).ToHashSet();
         RunGlobalHook(ScummVars.EntryScript, "before room entry", estimatedLoad);
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
         if (_runtime.IsV2) RunIndexedScript(5, 0, null, 0, pathEstimated: estimatedLoad); // room.cpp: fixed v1/v2 entry hook, after embedded entry.
         RunGlobalHook(ScummVars.EntryScript2, "after room entry", estimatedLoad);
-        EndArrivalCutscenes(room.ResourceId!.Value);
+        EndArrivalCutscenes(room.ResourceId!.Value, inRoomBefore);
         if (walkTo is not null) _runtime.SetGlobalVariable(ScummVars.WalkToObject, 0);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);
