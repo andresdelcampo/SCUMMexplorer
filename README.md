@@ -64,7 +64,7 @@ In these games the room picker fills in on its own, and the Costumes tab sits be
 | **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | 91% | ✔ | ✔ | ✔ | – | 49% |
 | **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | 92% | ✔ | ✔ | ✔ | – | 50% |
 | **Monkey Island 2** | ✔ | ✔ | ✔ | ✔ | 94% | ✔ | ✔ | ✔ | – | 60% |
-| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 95% | ✔ | ✔ | ✔ | – | 84% |
+| **Indiana Jones 4** | ✔ | ✔ | ✔ | ✔ | 96% | ✔ | ✔ | ✔ | – | 84% |
 | **Maniac Mansion** classic | ✔ | ✔ | ✔ | ✔ | 78% | ✔ | ✔ | ✔ | ✔ | 44% |
 | **Maniac Mansion** enhanced | ✔ | ✔ | ✔ | ✔ | 78% | ✔ | ✔ | ✔ | ✔ | 43% |
 | **Zak McKracken** classic | ✔ | 69% | ✔ | ✔ | 80% | ✔ | ✔ | ✔ | ✔ | 37% |

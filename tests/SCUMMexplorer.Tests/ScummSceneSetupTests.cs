@@ -251,6 +251,19 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void AJumpBackIsALoopNotTheWayOn()
+    {
+        // Indy 4 Room 44's entry (local script 203: a bit, then the hero's walk box and x, inside a loop): reading an unconditional jump back as
+        // the loop running again lets its tests guard the cutscene, and the scene plays the game's own way.
+        var folder = Path.Combine(TestGames.Root, "indy4 vga en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, 44, 0, 0));
+        output.WriteLine(plan.Note);
+        Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
+    }
+
+    [Fact]
     public void AnInputScreenIsAnsweredWithTheValueItCompares()
     {
         // Maniac Mansion Room 9's wall safe: Script 44, the keypad, waits for each key (isNotEqual var[0x044], 0xFF, back) and compares it with the

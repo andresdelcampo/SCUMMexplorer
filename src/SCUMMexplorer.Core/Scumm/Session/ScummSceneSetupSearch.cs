@@ -538,8 +538,12 @@ public sealed partial class ScummSceneSetupSearch
         // the scene's side of its tests against 1 and 2 as well).
         found.RemoveAll(f => beside.Contains(f.Edit) &&
                              found.Any(o => o.Edit.Kind == f.Edit.Kind && o.Edit.Target == f.Edit.Target && o.Rank != 2 && !beside.Contains(o.Edit)));
-        // A value that lets more of the scene run (3) keeps its place among the others (1) in the search.
-        return found.OrderBy(f => f.Rank == 3 ? 1 : f.Rank).ToList();
+        // A value that lets more of the scene run (3) keeps its place among the others (1) in the search; an actor's position on the scene's side
+        // (a wait for it to walk somewhere) comes after the other values on that side (Zak McKracken Room 11's call button: the stewardess's x
+        // values first crowded out the doors its scene needs).
+        return found.OrderBy(f => f.Rank == 3 ? 1 : f.Rank)
+            .ThenBy(f => f.Rank == 0 && f.Edit.Kind is ScummSetupKind.ActorX or ScummSetupKind.ActorNear or ScummSetupKind.WalkBox or ScummSetupKind.CameraX ? 1 : 0)
+            .ToList();
     }
 
     /// <summary>

@@ -46,7 +46,8 @@ public sealed partial class ScummSceneSetupSearch
             var ins = instructions[i];
             if (ins.Operation == "jumpRelative")
             {
-                if (Branch(i) is int to) yield return to;
+                // A jump back is the loop running again (a handler waiting for its sentence, Zak McKracken Room 44's object 655), not the way on.
+                if (Branch(i) is int to && to > i) yield return to;
                 yield break;
             }
             if (ins.Operation is "stopObjectCode" or "chainScript" || ins.Operation == "stopScript" && (ins.Operands.Length == 0 || Literal(ins.Operands.Trim()) == 0)) yield break;

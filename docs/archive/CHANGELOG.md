@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 2 November: a jump back is a loop; the picked object's handler answered
+
+The guard reading treats an unconditional jump back as the loop running again, not the way on, so the tests inside a loop guard the scene (Indy 4 Room 44's entry, two values at once, now plays its own way, with Rooms 17 and 97's entries); an actor's position on the scene's side is tried after the other values there. The picked object's own version 2 handler, waiting for a sentence, is given the verb, recipient and object it tests for (Zak Room 44's object 655 now answers; it still needs the walk to actor 10). Indy 4 95.3% → 96.0%; the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run48.txt`, `*-run29.txt`).
+
 ## 2 November: a wait for the player to skip answered
 
 The input feeder also answers a version 1/2 wait for the player to skip (a test of `VAR_KEYPRESS` against `VAR_CUTSCENEEXIT_KEY`): the exit key pressed on the keyboard. Zak 78% → 80% (both: the plane lands, Room 11's object 263); Maniac and the other copies unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run25.txt`).

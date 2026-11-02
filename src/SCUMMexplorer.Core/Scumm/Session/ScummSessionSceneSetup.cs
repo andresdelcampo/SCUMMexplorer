@@ -510,13 +510,30 @@ public abstract partial class ScummSession
     /// </summary>
     private void FeedWaitingInput()
     {
-        if (_hurried.Count == 0) return;
+        if (!_pickActive) return;
         foreach (var item in _pending.Where(item => !item.Frame.Stopped).ToArray())
         {
             var instructions = item.Script.Instructions;
             var at = instructions.ToList().FindIndex(ins => ins.Offset == item.Offset);
             if (at < 0) continue;
             while (at < instructions.Count && instructions[at].Operation == "breakHere") at++;
+            // The picked object's own version 1/2 handler waiting for a sentence (Zak McKracken Room 44's object 655, +0x0021: isEqual var[0x008],
+            // 3; isEqual var[0x00A], 10; the object given in var[0x009]): it is given the verb, recipient and object it tests for first.
+            if (_runtime.IsV2 && _pickedObject != 0 && item.Frame.ObjectNumber == _pickedObject)
+            {
+                var given = new HashSet<string>();
+                foreach (var ins in instructions.Skip(at).Take(24).Where(ins => ins.Operation == "isEqual"))
+                {
+                    var sentence = ins.Operands.Split(',', StringSplitOptions.TrimEntries);
+                    if (sentence.Length < 2 || sentence[0] is not (ScummVars.V2.ActiveVerb or ScummVars.V2.ActiveObject1 or ScummVars.V2.ActiveObject2) ||
+                        !given.Add(sentence[0]) || !TryLiteral(sentence[1], out var wanted)) continue;
+                    if (_runtime.GlobalVariables.GetValueOrDefault(sentence[0]) == wanted) continue;
+                    _runtime.SetGlobalVariable(sentence[0], (ushort)wanted);
+                    if (sentence[0] == ScummVars.V2.ActiveObject1)
+                        ApplySetupEdit(new ScummSetupEdit(ScummSetupKind.Held, wanted.ToString(System.Globalization.CultureInfo.InvariantCulture), 1, "the handler's sentence"));
+                    _uncertainties.Add($"{item.Frame.Label} waited for a sentence ({sentence[0]} = {wanted}); for the picked scene it was given (an exploration action).");
+                }
+            }
             // A wait for the player to skip (versions 1/2: Zak McKracken's flight, Room 11 object 263 +0x0027: isEqual VAR_CLICK_AREA, 4, then
             // isEqual VAR_KEYPRESS, VAR_CUTSCENEEXIT_KEY): the exit key pressed on the keyboard.
             if (_runtime.IsV2 && instructions.Skip(at).Take(3).Any(ins => ins.Operation == "isEqual" &&
@@ -585,12 +602,20 @@ public abstract partial class ScummSession
     /// Until the next cutscene begins, the given scripts do not wait out a <c>delay</c> (a picked scene's timer: Maniac Mansion's Script 139 waits
     /// seven minutes before Ed's round, Script 148 a minute after the kids go in); the time passes at once, an exploration action noted as such.
     /// </summary>
-    public void HurryUntilCutscene(IEnumerable<int> scripts)
+    public void HurryUntilCutscene(IEnumerable<int> scripts, int pickedObject = 0)
     {
         ArgumentNullException.ThrowIfNull(scripts);
         _hurried.Clear();
         _hurried.UnionWith(scripts);
+        _pickActive = true;
+        _pickedObject = pickedObject;
     }
+
+    /// <summary>True while a picked scene waits to begin (<see cref="HurryUntilCutscene"/>; the next cutscene ends it).</summary>
+    private bool _pickActive;
+
+    /// <summary>The picked object while its scene waits (its version 1/2 handler is given the sentence it waits for).</summary>
+    private int _pickedObject;
 
     /// <summary>A script a picked scene's setup wants running (<see cref="ScummSetupKind.ScriptRunning"/>), started from its first instruction.</summary>
     private bool StartScriptForSetup(int number)

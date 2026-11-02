@@ -230,7 +230,7 @@ public partial class MainWindow
         }
         IReadOnlyList<string> uncertainties;
         // The scene's own scripts do not wait out their timers until it begins (as the plan's runs: Maniac Mansion's Script 139, seven minutes).
-        if (plan?.Result.Way != ScummPickedStart.AtCutscene) session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger));
+        if (plan?.Result.Way != ScummPickedStart.AtCutscene) session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger), trigger.ObjectId);
         try
         {
             if (plan is { HasEdits: true } && trigger.IsRoomEntry)

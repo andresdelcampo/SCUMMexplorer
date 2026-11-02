@@ -336,3 +336,11 @@ Then (`*-run25.txt`): Zak's flight (Room 11, object 263 +0x0027) waits for the p
 
 Tried and dropped (2 November, `*-run26.txt`, `*-run46.txt`): a counter (a variable a script only steps by one) offered one step before the number it is tested against, and version 2's story variables from 0x2C (its engine variables end at 0x2B). Zak Room 10's tune (object 239) gets the counter but also needs the right buttons pressed in order (a wrong one clears bits 0x622/0x623); no scene changed in any copy.
 
+## A jump back is a loop; the picked object's handler answered (2 November, eighteenth batch)
+
+1. `GuardSides`: an unconditional `jumpRelative` back is the loop running again, not the way on (a handler or a waiting script loops forever, so every test could reach the cutscene by going round). Indy 4 Rooms 17, 44 and 97's entries now play their own way (Room 44's local script 203: a bit, then the hero's walk box and x). Position values on the scene's side (x, walk box, next to another, camera) are tried after the other values there: with the new guards, Zak Room 11's call button had first kept the stewardess's x values instead of the doors it needs (`*-run28.txt`), and with this order keeps them (`*-run29.txt`).
+2. The input feeder answers the picked object's own version 1/2 handler waiting for a sentence (`HurryUntilCutscene` now takes the picked object): the first `isEqual` of the active verb, the object given (held) and the recipient. Zak Room 44's object 655 now answers ("Sorry, mate, you're not my type!" for Zak; with Annie no refusal), but its scene also needs the walk to actor 10 to finish.
+3. `Measure`'s `MEASURE_COMBO` applies to every scene of the run.
+
+`*-run48.txt`: Indy 4 95.3% → 96.0%; the other copies unchanged; Maniac and Zak unchanged (`*-run29.txt`); LOOM unchanged (`../loom-editions-20261031/run30-*.txt`). Tried and dropped: hurrying object scripts' timers (Zak Room 44's object 653 is only ambient talk), raising the candidate cap to 32 for versions 1 and 2 (no change). Test: `AJumpBackIsALoopNotTheWayOn`.
+
