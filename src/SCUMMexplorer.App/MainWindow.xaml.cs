@@ -1431,7 +1431,10 @@ public partial class MainWindow : Window
                 StatusText.ToolTip = "Room background read from the game's own data.";
                 // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
                 if (browsedScene is not null && SessionModeToggle.IsChecked == true && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
+                {
+                    ShowWaitingPlayFrame(browsedScene);
                     await StartPlayCoreAsync(resource, token, navigationKind);
+                }
                 if (!token.IsCancellationRequested && ReferenceEquals(_game, previewGame))
                 {
                     UpdateRoomMusicActions();

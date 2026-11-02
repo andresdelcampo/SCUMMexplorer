@@ -164,7 +164,7 @@ internal static class Program
                         var resource = game.Rooms.First(r => r.ResourceId == int.Parse(raw[2..]));
                         var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
                         Call("SelectRoomWithIntent", resource, Enum.Parse(kind, "Catalog"), true);
-                        for (var i = 1; i <= 4; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); }
+                        for (var i = 1; i <= 4; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 1) Capture("room-" + raw[2..] + "-early"); }
                         Capture("room-" + raw[2..]);
                         continue;
                     }

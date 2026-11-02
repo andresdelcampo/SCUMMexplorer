@@ -153,6 +153,39 @@ public sealed class ScummPlayScreen
         return new ScummPlayFrame(pixels, scene?.RoomId, top, bottom, viewLeft, verbs, cursor) { PixelWidth = pixelWidth, CameraLeft = cameraLeft, VerbLeft = verbLeft };
     }
 
+    /// <summary>
+    /// A room's first-visit picture laid out as a play frame (the room screen at rows <paramref name="top"/> to <paramref name="bottom"/>, black around
+    /// it), shown while a picked room's play session is prepared so the picture keeps the play screen's size (2 November 2026, user report: rooms
+    /// changed size a second after they showed). No verbs, messages or cursor.
+    /// </summary>
+    public static ScummPlayFrame Still(ScummRoomScene scene, int top, int bottom, bool wide)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        var pixelWidth = wide ? Math.Max(ScummPlayFrame.Width, scene.Room.Width) : ScummPlayFrame.Width;
+        var viewLeft = pixelWidth == ScummPlayFrame.Width ? Math.Clamp(scene.State.ViewLeft, 0, Math.Max(0, scene.Room.Width - ScummPlayFrame.Width)) : 0;
+        var pixels = new uint[pixelWidth * ScummPlayFrame.Height];
+        Array.Fill(pixels, 0xFF000000u);
+        var room = scene.Compose();
+        var background = scene.EngineVersion <= 2 ? scene.DisplayPalette() : scene.BackgroundPalette();
+        var actors = scene.ActorLayer();
+        var actorPalette = scene.DisplayPalette();
+        var width = scene.Room.Width;
+        for (var y = top; y < bottom && y < ScummPlayFrame.Height; y++)
+        {
+            var roomY = y - top;
+            if (roomY >= scene.Room.Height) break;
+            for (var x = 0; x < pixelWidth; x++)
+            {
+                var roomX = x + viewLeft;
+                if (roomX >= width) break;
+                var index = roomY * width + roomX;
+                pixels[y * pixelWidth + x] = actors.IsDrawn(index) ? Colour(actorPalette, actors.Pixels[index]) : Colour(background, room[index]);
+            }
+        }
+        return new ScummPlayFrame(pixels, scene.RoomId, top, bottom, viewLeft, new ScummVerbAreaPicture(new byte[ScummVerbArea.Width * ScummVerbArea.Height], [], []), false)
+            { PixelWidth = pixelWidth, CameraLeft = viewLeft, VerbLeft = (pixelWidth - ScummPlayFrame.Width) / 2 };
+    }
+
     // ScummEngine_v5::resetCursors, cursor 0: one word per row, bit 15 is the left column; setBuiltinCursor paints the set bits.
     private static readonly ushort[] CrossHairImage =
         [0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0000, 0x7E3F, 0x0000, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0000];

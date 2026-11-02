@@ -13,6 +13,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 The guard reading treats an unconditional jump back as the loop running again, not the way on, so the tests inside a loop guard the scene (Indy 4 Room 44's entry, two values at once, now plays its own way, with Rooms 17 and 97's entries); an actor's position on the scene's side is tried after the other values there. The picked object's own version 2 handler, waiting for a sentence, is given the verb, recipient and object it tests for (Zak Room 44's object 655 now answers; it still needs the walk to actor 10). Indy 4 95.3% → 96.0%; the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run48.txt`, `*-run29.txt`).
 
+## 2 November: a picked room keeps its size
+
+While a picked room's play session is prepared, and when it stays a still picture, its first-visit picture is drawn in the play screen's frame (`ScummPlayScreen.Still`), so it no longer changes size when the session's frames take over. LOOM plays in its room view and never had the switch. Record: [user reports](../../.verification/user-reports-20261102/README.md).
+
 ## 2 November: the hero in his usual outfit in picked rooms
 
 A room picked from the list, and its first-visit picture, show the hero in the outfit the game's scripts give him most often (Indy 3: the action outfit, not the college suit the boot leaves), except in rooms the opening shows; picked scenes keep the state their code tests. Record: [user reports](../../.verification/user-reports-20261102/README.md).

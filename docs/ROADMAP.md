@@ -103,7 +103,6 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 - Room 14 (the tunnel, user report 2 November): a picked visit puts Indy in by an assumed walk-in from Room 94, but the room's first state (object 165 at 0) is the mine-cart ride, entered without the hero; an arrival should fit the state the room's code tests ([record](../.verification/user-reports-20261102/README.md)).
 - Room 14: the hero still appears for a few seconds before the camera follows the cart away (user retest).
 - Play Game Intro: no sound of the window breaking as Indy comes in (Room 04); Indy walking very fast afterwards (not reproduced headless).
-- Changing rooms changes the room's size a second or so after it shows (user report, 2 November): the still picture waits in the room view, then the play screen (320 × 200) replaces it; draw the waiting picture in the play screen's frame (LOOM plays in the room view and does not switch).
 - Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)

@@ -213,6 +213,8 @@ public partial class MainWindow
                     if (ambient.Session is not ScummGameSession still)
                     {
                         UpdatePlaybackControls();
+                        // The still picture stays in the play frame's layout, as it waited (no size change).
+                        if (_browsedScene is { } waiting && ScummProfile.For(game).PlaysThroughVerbs) ShowWaitingPlayFrame(waiting);
                         return;
                     }
                     _play = still;
@@ -288,6 +290,22 @@ public partial class MainWindow
         UpdateGameStatusButton();
         PlayScreenImage.Focus();
         UpdatePlaybackControls();
+    }
+
+    /// <summary>
+    /// While a picked room's play session is prepared, its first-visit picture is shown on the play screen in the play frame's layout (the rows the
+    /// last frame had), so the room keeps its size when the session's frames take over (2 November 2026, user report). LOOM plays in the room view and
+    /// never switches.
+    /// </summary>
+    private void ShowWaitingPlayFrame(ScummRoomScene scene)
+    {
+        var (top, bottom) = _playShown is { } last ? (last.RoomTop, last.RoomBottom) : (16, 144);
+        var frame = ScummPlayScreen.Still(scene, top, bottom, wide: NormalRoomWidthToggle.IsChecked != true);
+        if (_playBitmap is null || _playBitmap.PixelWidth != frame.PixelWidth) _playBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
+        _playBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
+        PlayScreenImage.Source = _playBitmap;
+        RoomDisplayGroup.Visibility = Visibility.Collapsed;
+        PlayScreenImage.Visibility = Visibility.Visible;
     }
 
     /// <summary>Stops the frames and gives the room view back (another game, another kind of resource).</summary>

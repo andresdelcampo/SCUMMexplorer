@@ -62,3 +62,7 @@ Why rooms change size a second after they show (seen in `r83-dressed/`): while a
 picture in the room view (LOOM's view, room rows only, the panel's width); the play screen (`PlayScreenImage`, the whole 320 × 200 screen) then
 replaces it, and the room takes less height. LOOM plays in the room view itself, so it never switches. Next: draw the waiting picture in the play
 screen's frame.
+
+Done: the first-visit picture is drawn as a play frame (`ScummPlayScreen.Still`: the rows the last frame had, the same width mode) and shown on the play
+screen while the session is prepared, and kept there when the room becomes a still preview with no animated scripts (`size-jump/`: Room 83 ends in
+the same frame as the live rooms).
