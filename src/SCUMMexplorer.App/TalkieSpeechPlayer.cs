@@ -47,8 +47,12 @@ public sealed class TalkieSpeechPlayer
         if (_messages is not { } messages || _bank is not { } bank) return;
         var events = messages.SpeechEvents;
         if (events.Count <= _seen) return;
-        var latest = events[^1];
+        // Sound effects (debugMessage) play on a player of their own, beside the line; the newest line or stop decides the voice.
+        foreach (var effect in events.Skip(_seen).Where(e => e.IsEffect)) PlayEffect(bank, effect);
+        var lines = events.Skip(_seen).Where(e => !e.IsEffect).ToArray();
         _seen = events.Count;
+        if (lines.Length == 0) return;
+        var latest = lines[^1];
         if (latest.IsStop)
         {
             Stop();
@@ -67,6 +71,22 @@ public sealed class TalkieSpeechPlayer
         _generation++;
         if (_player is { } player) { player.Stop(); player.Close(); _player = null; }
         if (_file is { } file) { try { File.Delete(file); } catch (IOException) { } catch (UnauthorizedAccessException) { } _file = null; }
+    }
+
+    private async void PlayEffect(ScummSpeechBank bank, ScummSpeechEvent effect)
+    {
+        byte[] wave;
+        try { wave = await Task.Run(() => bank.ReadWave(effect.Offset, effect.Length)); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { Log.Add($"failed effect {effect.Offset}: {ex.Message}"); return; }
+        var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-effect-{Guid.NewGuid():N}.wav");
+        await File.WriteAllBytesAsync(path, wave);
+        var player = new MediaPlayer();
+        void Done() { player.Close(); try { File.Delete(path); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
+        player.MediaOpened += (_, _) => { if (!_paused) player.Play(); };
+        player.MediaEnded += (_, _) => Done();
+        player.MediaFailed += (_, error) => { Log.Add($"failed effect {error.ErrorException.Message}"); Done(); };
+        player.Open(new Uri(path));
+        Log.Add($"effect {effect.Offset}/{effect.Length}");
     }
 
     private async void Play(ScummSpeechBank bank, ScummSpeechEvent line)

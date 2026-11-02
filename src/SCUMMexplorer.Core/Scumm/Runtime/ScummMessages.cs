@@ -72,7 +72,11 @@ public readonly record struct ScummVoiceCue(int Offset, int Length)
 /// A talkie's spoken line (S6 Indy4, 17 October 2026): the sample's offset in the speech bank and its VCTL size, as the text's code 10 gives them,
 /// the session time (jiffies) it started, and its length in jiffies read from the sample (null when unknown); or a stop (<c>stopTalk</c>).
 /// </summary>
-public readonly record struct ScummSpeechEvent(int Offset, int Length, long Jiffies, int? DurationJiffies, bool IsStop);
+public readonly record struct ScummSpeechEvent(int Offset, int Length, long Jiffies, int? DurationJiffies, bool IsStop)
+{
+    /// <summary>A sound effect from the speech bank (<c>debugMessage</c>, <c>talkSound(a, b, 1)</c>): played beside the spoken line, not instead of it.</summary>
+    public bool IsEffect { get; init; }
+}
 
 /// <summary>A <c>drawBox</c> rectangle in screen coordinates, corners inclusive.</summary>
 public sealed record ScummScreenBox(int Left, int Top, int Right, int Bottom, int Color)
@@ -307,6 +311,9 @@ public sealed partial class ScummMessageTable
                 break;
             case 1:
                 trace = DrawString(request, slot, runtime, estimates);
+                break;
+            case 2 when DebugMessageSound(request, runtime, estimates) is { } sound:
+                trace = sound;
                 break;
             default:
                 // Slot 2 is debugMessage and slot 3 showMessageDialog (a banner that waits for a key).
@@ -753,6 +760,23 @@ public sealed partial class ScummMessageTable
 
     /// <summary>True while the last started line still plays on the session clock.</summary>
     public bool SpeechPlaying => _speechEndsAt is long end && Jiffies < end;
+
+    /// <summary>
+    /// ScummVM <c>debugMessage</c> (string.cpp): a text of slot 2 that begins with code 10 is no message but a sound from the speech bank,
+    /// <c>talkSound(a, b, 1)</c>, a sound effect that does not stop a line being spoken. Indy 4's intro (Room 4's local script 206 +0x00D0,
+    /// <c>print 0xFD</c>) breaks the window this way (2 November 2026, user report: no sound of the window breaking). Null for any other text.
+    /// </summary>
+    private string? DebugMessageSound(ScummPrintRequest request, ScummScriptRuntimeState runtime, List<string> estimates)
+    {
+        var buffer = ScummTextDecoder.ConvertMessage(request.Text!, request.Variables ?? runtime.GlobalVariables,
+            runtime.ObjectName, runtime.VerbName, runtime.StringText, out _);
+        if (buffer.Count < 16 || buffer[0] != 0xFF || buffer[1] != 10) return null;
+        var offset = buffer[2] | buffer[3] << 8 | buffer[6] << 16 | buffer[7] << 24;
+        var length = buffer[10] | buffer[11] << 8 | buffer[14] << 16 | buffer[15] << 24;
+        // A sound effect: its sample is played, but it is no spoken line (no mouth movement, no wait for it).
+        _speechEvents.Add(new ScummSpeechEvent(offset, length, Jiffies, SpeechJiffies?.Invoke(offset, length), false) { IsEffect = true });
+        return $"print for actor {request.ActorToPrintFor} (debugMessage) plays the sound at {offset} in the speech bank (talkSound, a sound effect)";
+    }
 
     private void StartSpeech(int offset, int length, List<string> estimates)
     {

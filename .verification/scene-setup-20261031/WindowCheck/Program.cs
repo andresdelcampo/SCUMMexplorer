@@ -138,6 +138,23 @@ internal static class Program
                         for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
                         continue;
                     }
+                    // S lists what the talkie speech player played (lines and effects).
+                    if (raw == "S")
+                    {
+                        var player = Field("_playSpeech")!;
+                        var log = (System.Collections.IEnumerable)player.GetType().GetProperty("Log")!.GetValue(player)!;
+                        foreach (var line in log) Log($"  speech: {line}");
+                        continue;
+                    }
+                    // d lists the doorways the room shows (VisibleDoorways, 2 November 2026).
+                    if (raw == "d")
+                    {
+                        var shown = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
+                        if (shown is null) { Log("  d: no session"); continue; }
+                        var doors = (System.Collections.IEnumerable)Call("VisibleDoorways", shown.Snapshot)!;
+                        foreach (ScummRoomObjectRecord door in doors) Log($"  doorway object {door.Id} at ({door.X},{door.Y}) {door.Width}x{door.Height}: {Call("DoorwayLabel", door)}");
+                        continue;
+                    }
                     // A lists the actors in the shown session's room with their costumes (2 November 2026).
                     if (raw == "A")
                     {

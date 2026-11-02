@@ -51,16 +51,18 @@ public interface IRoomHotspotProvider
 public static class RoomHotspotRules
 {
     /// <summary>
-    /// Whether the game's own object search can select the object here (<c>findObject</c>): it has a box, it is not at 0, 0 (off the scene), the room owns
-    /// it, it is not untouchable (class 24, R-6.15) and its parent chain is in the required states. The same for every game; a version only supplies
-    /// the state bits (<paramref name="stateMask"/>) and what an unlisted owner means.
+    /// Whether the game's own object search can select the object here (<c>findObject</c>): it has a box, the room owns it, it is not untouchable
+    /// (class 24, R-6.15) and its parent chain is in the required states. The same for every game; a version only supplies the state bits
+    /// (<paramref name="stateMask"/>) and what an unlisted owner means. <paramref name="originIsOffScene"/>: LOOM keeps its draft previews at 0, 0
+    /// (R-6.14), so there an object at 0, 0 is not a hotspot; <c>findObject</c> has no such test, and other games put real objects there (Maniac
+    /// Mansion enhanced Room 44's exit to Room 1, object 258, a strip along the left edge: user report, 2 November 2026).
     /// </summary>
     public static bool IsHotspot(ScummRoomObjectRecord record, IReadOnlyList<ScummRoomObjectRecord> records, ScummSessionSnapshot snapshot,
-        byte stateMask = 0x0F, byte ownerWhenUnlisted = 0x0F)
+        byte stateMask = 0x0F, byte ownerWhenUnlisted = 0x0F, bool originIsOffScene = false)
     {
         if (record.Width <= 0 || record.Height <= 0) return false;
         var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var moved) ? moved : new RoomObjectPosition(record.X, record.Y);
-        if (at == new RoomObjectPosition(0, 0)) return false;
+        if (originIsOffScene && at == new RoomObjectPosition(0, 0)) return false;
         if ((snapshot.ObjectOwners.TryGetValue(record.Id, out var owner) ? owner : ownerWhenUnlisted) != 0x0F || snapshot.IsUntouchable(record.Id)) return false;
         if (stateMask == 8 && (snapshot.ObjectStates.GetValueOrDefault(record.Id) & 2) != 0) return false;
         var current = record;

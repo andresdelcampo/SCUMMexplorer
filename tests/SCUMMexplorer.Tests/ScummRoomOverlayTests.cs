@@ -83,8 +83,9 @@ public sealed class ScummRoomOverlayTests
         Assert.Single(ScummRoomOverlays.Objects(Changed(snapshot), new Dictionary<int, int[]>()));
         var owners = new Dictionary<int, byte>(snapshot.ObjectOwners) { [record.Id] = 1 };
         Assert.Empty(ScummRoomOverlays.Objects(Changed(snapshot with { ObjectOwners = owners }), new Dictionary<int, int[]>()));
+        // Outside LOOM an object at 0, 0 stays a hotspot (findObject; Maniac enhanced Room 44's exit lies there, 2 November 2026).
         var positions = new Dictionary<int, RoomObjectPosition>(snapshot.ObjectPositions) { [record.Id] = new(0, 0) };
-        Assert.Empty(ScummRoomOverlays.Objects(Changed(snapshot with { ObjectPositions = positions }), new Dictionary<int, int[]>()));
+        Assert.Single(ScummRoomOverlays.Objects(Changed(snapshot with { ObjectPositions = positions }), new Dictionary<int, int[]>()));
         positions[record.Id] = new(456, 80);
         var moved = Assert.Single(ScummRoomOverlays.Objects(Changed(snapshot with { ObjectPositions = positions }), new Dictionary<int, int[]>()));
         Assert.Equal((456, 80), (moved.X, moved.Y));

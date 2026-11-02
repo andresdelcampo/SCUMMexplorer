@@ -174,7 +174,8 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
         Assert.Contains(session.Messages.Log, message => message.Text.Contains(texts.Opening, StringComparison.Ordinal));
         if (texts.OpeningSpeech is { } opening)
         {
-            var marcus = session.Messages.SpeechEvents.First();
+            // The intro's sound effects (debugMessage, the window breaking) come first since 2 November 2026; Marcus' line is the first spoken one.
+            var marcus = session.Messages.SpeechEvents.First(e => !e.IsEffect);
             Assert.Equal((opening, 14, false, (int?)null), (marcus.Offset, marcus.Length, marcus.IsStop, marcus.DurationJiffies));
         }
         else Assert.Empty(session.Messages.SpeechEvents);

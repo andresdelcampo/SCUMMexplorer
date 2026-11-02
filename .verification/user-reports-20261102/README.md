@@ -66,3 +66,13 @@ screen's frame.
 Done: the first-visit picture is drawn as a play frame (`ScummPlayScreen.Still`: the rows the last frame had, the same width mode) and shown on the play
 screen while the session is prepared, and kept there when the room becomes a still preview with no animated scripts (`size-jump/`: Room 83 ends in
 the same frame as the live rooms).
+
+## Fourth pass: the last three reports (2 November)
+
+| Report | Cause | Fix (shared) |
+|---|---|---|
+| Maniac Mansion enhanced Room 44: no doorway to Room 1 | Its exit is object 258, a 16 × 128 strip along the left edge at 0, 0 (verb 0x0D: `loadRoomWithEgo 0x0101, 0x01`). The hotspot rule left out every object at 0, 0 (R-6.14, a LOOM rule for its draft previews); ScummVM's `findObject` has no such test | `RoomHotspotRules.IsHotspot` leaves out 0, 0 only when asked (`originIsOffScene`, LOOM only) |
+| Indy 4 Room 14: Indy shown for a few seconds in the top-down tunnel | The catalog visit brings him in by an assumed walk-in from Room 94; the room's first state (object 165 at 0) begins a cutscene of the mine cart (local script 200, actor 9) that never refers to him | After an assumed arrival, when the room's entry begins a cutscene whose script never refers to the hero (no `printEgo`, no hero actor or VAR_EGO operand), he is taken out again (`TakeOutHeroNotInArrival`, labelled) |
+| Indy 4 Play Game Intro: no sound of the window breaking | Room 4's local script 206 +0x00D0 plays it with `print 0xFD` whose text is four code-10 codes: ScummVM's `debugMessage` plays that sample from the speech bank as a sound effect (`talkSound(a, b, 1)`); we dropped text slot 2 | Slot 2 with a code-10 text records a speech-bank sound effect (`ScummSpeechEvent.IsEffect`); the app plays effects on a player of their own, beside the spoken line |
+
+Checked in the window: Room 44 lists the doorway (`mme-44/`, `d` step); Room 14's picture has no Indy (`indy4-14-fix/`); the intro plays two effects, the window break at 78363548 (`indy4-intro-sound/`, `S` step). Indy 3 Room 83's grail scenes: "Give Grail" and "Look Cracked Seal" are object 873's and 864's verbs in Room 82, so they are in Room 82's Interact menu; they were listed under Room 83 only while the arrival bug walked Indy there. Henry being shot is Room 82's own arrival, its "Entry" scene.

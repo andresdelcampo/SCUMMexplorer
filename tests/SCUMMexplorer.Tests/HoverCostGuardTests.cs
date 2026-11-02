@@ -25,7 +25,8 @@ public sealed class HoverCostGuardTests
         Until(() => session.PlayerHasControl);
         Frames(60);
         var screen = new ScummPlayScreen(game, session, indexed.States);
-        var sign = ScummRoomOverlays.Objects(screen.Scene()!, new Dictionary<int, int[]>()).Single(item => !item.IsDoorway);
+        // The sign; the room's exit to Room 1 (object 258, a strip at 0, 0) is a hotspot too since 2 November 2026.
+        var sign = ScummRoomOverlays.Objects(screen.Scene()!, new Dictionary<int, int[]>()).Single(item => !item.IsDoorway && (item.X, item.Y) == (8, 80));
         Assert.Equal((8, 80), (sign.X, sign.Y));
         Assert.True(HoverCost(session, screen, sign.Y + 12 + session.MainScreen.Top, rounds: 8) < 4.0);
     }

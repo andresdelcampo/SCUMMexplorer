@@ -19,7 +19,9 @@ public class RoomHotspotRulesTests
         var snapshot = Snapshot(owners: new() { [4] = 3 });
         Assert.True(RoomHotspotRules.IsHotspot(records[0], records, snapshot));
         Assert.False(RoomHotspotRules.IsHotspot(records[1], records, snapshot));
-        Assert.False(RoomHotspotRules.IsHotspot(records[2], records, snapshot));
+        // 0, 0 is off the scene only in LOOM (R-6.14, its draft previews); findObject has no such test (Maniac enhanced Room 44's exit lies there).
+        Assert.True(RoomHotspotRules.IsHotspot(records[2], records, snapshot));
+        Assert.False(RoomHotspotRules.IsHotspot(records[2], records, snapshot, originIsOffScene: true));
         Assert.False(RoomHotspotRules.IsHotspot(records[3], records, snapshot));
     }
 

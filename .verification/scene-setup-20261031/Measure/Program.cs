@@ -39,7 +39,14 @@ if (Environment.GetEnvironmentVariable("MEASURE_OBJECTS") is { Length: > 0 } obj
     var data = ScummDataSources.For(game);
     var number = int.Parse(objectRoom);
     var records = data.ReadRoom(number).Objects;
-    foreach (var record in records) Console.WriteLine($"object {record.Id} at ({record.X},{record.Y}) {record.Width}x{record.Height}");
+    var verbTables = data.ReadObjectVerbs(number, records);
+    foreach (var record in records)
+    {
+        Console.WriteLine($"object {record.Id} at ({record.X},{record.Y}) {record.Width}x{record.Height}");
+        foreach (var verb in verbTables.GetValueOrDefault(record.Id) ?? [])
+            foreach (var ins in data.ReadObjectVerb(number, record, verb.VerbId, out _).Instructions.Where(i => i.Operation.StartsWith("loadRoom", StringComparison.Ordinal) || i.Operation == "putActorInRoom"))
+                Console.WriteLine($"    verb 0x{verb.VerbId:X2} +0x{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+    }
     if (data is ScummV5DataSource v5)
         foreach (var state in new byte[] { 0, 1, 2 })
             foreach (var image in v5.ReadObjectImages(number, records.ToDictionary(r => r.Id, _ => state)))

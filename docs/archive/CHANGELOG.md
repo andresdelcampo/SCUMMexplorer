@@ -13,6 +13,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 The guard reading treats an unconditional jump back as the loop running again, not the way on, so the tests inside a loop guard the scene (Indy 4 Room 44's entry, two values at once, now plays its own way, with Rooms 17 and 97's entries); an actor's position on the scene's side is tried after the other values there. The picked object's own version 2 handler, waiting for a sentence, is given the verb, recipient and object it tests for (Zak Room 44's object 655 now answers; it still needs the walk to actor 10). Indy 4 95.3% → 96.0%; the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run48.txt`, `*-run29.txt`).
 
+## 2 November: an exit at 0, 0, a cart without the hero, the intro's sound effects
+
+Objects at 0, 0 are hotspots again outside LOOM (Maniac Mansion enhanced Room 44's exit to Room 1); a room whose entry begins a cutscene that never refers to the hero is entered without him (Indy 4 Room 14's mine cart); a speech-bank sound effect played through text slot 2 (ScummVM `debugMessage`) is heard (Indy 4's intro: the window breaking). Record: [user reports](../../.verification/user-reports-20261102/README.md).
+
 ## 2 November: a picked room keeps its size
 
 While a picked room's play session is prepared, and when it stays a still picture, its first-visit picture is drawn in the play screen's frame (`ScummPlayScreen.Still`), so it no longer changes size when the session's frames take over. LOOM plays in its room view and never had the switch. Record: [user reports](../../.verification/user-reports-20261102/README.md).

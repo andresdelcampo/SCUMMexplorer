@@ -519,7 +519,37 @@ public sealed class ScummGameSession : ScummSession
             ResolvedArguments: [first.ObjectId, first.LoadedNumber, first.WalkX, first.WalkY]);
         // o5_loadRoomWithEgo puts the ego in the room with the position it had (putActor(room)): the entry code sees it where the previous room left it.
         _uncertainties.Add($"Before its assumed arrival the ego keeps the position it had in the room the session was in (estimate: the route that would have moved it was not played).");
-        return EnterRoom(room, $"{arrival} {label}", load, label);
+        EnterRoom(room, $"{arrival} {label}", load, label);
+        TakeOutHeroNotInArrival(roomId, ego);
+        return Snapshot;
+    }
+
+    /// <summary>
+    /// 2 November 2026 (user report, Indy 4 Room 14: the top-down tunnel showed Indy for a few seconds). An assumed arrival puts the hero in, but when
+    /// the room's entry then begins a cutscene of its own (Room 14 with object 165 at 0: local script 200, the mine cart, actor 9) whose script never
+    /// refers to the hero, the room's first state is entered without him (Room 14's other state dresses him in the small top-down costume instead):
+    /// he is taken out again, an estimate like the arrival.
+    /// </summary>
+    private void TakeOutHeroNotInArrival(int roomId, int ego)
+    {
+        var owners = _cutscenes.Select(c => c.Owner).OfType<ScriptFrame>().Where(f => !f.Stopped && !f.Global && f.OriginRoom == roomId && f.Number is int).ToArray();
+        if (owners.Length == 0 || _runtime.Actors[ego].Room != roomId) return;
+        var egoActor = $"0x{ego:X2}";
+        foreach (var owner in owners)
+        {
+            ScummScriptDisassembly? script;
+            try { script = ScummDataSources.For(_game).RoomLocalScript(roomId, owner.Number!.Value); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { return; }
+            if (script is null) return;
+            var refersToHero = script.Instructions.Any(i => i.Operation is "printEgo" or "doSentence" ||
+                i.Operands.Contains(EgoVariable, StringComparison.Ordinal) ||
+                i.Operation is "actorOps" or "putActor" or "putActorInRoom" or "putActorAtObject" or "walkActorTo" or "walkActorToObject" or "animateActor"
+                    or "actorFollowCamera" or "faceActor" or "loadRoomWithEgo" && i.Operands.Split(',')[0].Trim() == egoActor);
+            if (refersToHero) return;
+        }
+        _runtime.Actors.PutInRoom(ego, 0, CurrentPlacement(), ego);
+        _uncertainties.Add($"Room {roomId:00}'s entry begins a cutscene that does not involve the hero (local script {string.Join(", ", owners.Select(o => o.Number))}): " +
+                           "the hero is not put in by an assumed arrival there (an estimate).");
     }
 
     // A visit with no arrival to follow. A room the game's pseudoRoom instructions map other numbers to is loaded under one of them, as every load of

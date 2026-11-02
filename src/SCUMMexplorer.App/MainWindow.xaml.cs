@@ -5498,7 +5498,7 @@ public partial class MainWindow : Window
     // R-6.14/R-6.15 in one rule for every game (RoomHotspotRules): a box, on the scene, owned by the room, touchable, parents in their states.
     // LOOM keeps its draft previews (48 x 40) at 0, 0 (R-6.14) and lists no owner for an object that does not exist.
     private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, ScummSessionSnapshot snapshot) =>
-        RoomHotspotRules.IsHotspot(record, _currentRoomObjectRecords, snapshot, 0x0F, 0);
+        RoomHotspotRules.IsHotspot(record, _currentRoomObjectRecords, snapshot, 0x0F, 0, originIsOffScene: IsLoomGame);
 
     /// <summary>
     /// Doorway hotspots at a room point that are present in the room (owned by
