@@ -66,6 +66,11 @@ public enum ScummSetupKind
 /// </summary>
 public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Value, string Where, int? Room = null)
 {
+    /// <summary>The values that stand actors in the scene's room (set again once the pick has put the hero there).</summary>
+    public static IReadOnlyList<ScummSetupEdit> InRoomActors(IEnumerable<ScummSetupEdit> edits) =>
+        edits.Where(edit => edit.Kind is ScummSetupKind.ActorX or ScummSetupKind.ActorNear or ScummSetupKind.WalkBox or ScummSetupKind.CameraX or
+            ScummSetupKind.HeroIs).ToArray();
+
     /// <summary>The room a setup's scene is played in when it is not the trigger's own (<see cref="ScummSetupKind.PlayedIn"/>); null otherwise.</summary>
     public static int? PlayRoom(IEnumerable<ScummSetupEdit>? edits) => edits?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.PlayedIn)?.Value;
 

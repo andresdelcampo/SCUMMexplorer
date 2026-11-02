@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 2 November: actors stood in the room once the pick has put the hero there
+
+The setup values that stand actors in the scene's room (x position, walk box, next to another, camera, hero switch) are applied again right after the pick, in the headless runs and the app: the hero enters some rooms only when the pick puts him at the object. Zak 76% → 78% (both: Room 10's purple button, the hero past x 50 on the plane); the other copies, Maniac and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run24.txt`, `*-run45.txt`).
+
 ## 2 November: dialogue choices answered for a picked scene
 
 The input feeder also answers a wait while a variable is 0 (`notEqualZero V`, back: a dialogue choice not made yet) with the first choice it is compared with. Monkey Island 2 93.2% → 93.7% (Room 79's entry); the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run44.txt`).

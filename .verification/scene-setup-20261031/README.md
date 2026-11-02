@@ -328,3 +328,7 @@ Zak Room 44's object 655 still starts at its cutscene: its handler also walks th
 
 Then (`*-run44.txt`, `*-run23.txt`): the feeder also answers `notEqualZero V`, back (a dialogue choice not made yet: Monkey Island 1 Room 28's local script 220 +0x03C9) with the first value V is compared with. Monkey Island 2 93.2% → 93.7% (Room 79's entry); the other copies, Maniac, Zak and LOOM unchanged (`../loom-editions-20261031/run26-*.txt`). Maniac's six left are story climaxes that need a sequence of events: the endings (Script 62, Room 47: Room 30's entry), the radioactive-steam death (Script 61: the contract, the stereo), Edna's catches (Script 49: the inner door; Scripts 153/36/37: Room 10's door) and the power-out (Script 101: the wires need the power on, its scene needs it off later; Script 138 checks that no kid is in Rooms 18, 13, 19, 26).
 
+## Actors stood again after the pick (2 November, seventeenth batch)
+
+Zak's plane (Room 10): its visit does not bring the hero (no arrival), the pick does (put at the object), so a setup value that stands the hero at an x (`ActorX`, the purple button waits for x past 50) was skipped before the pick. `ScummSetupEdit.InRoomActors` (x position, walk box, next to another, camera, hero switch) is applied again right after the pick in `ScummCutsceneRun` and in the app's pick. `*-run24.txt`: Zak 41 → 42 of 54 (78%, both); the other copies, Maniac (`*-run45.txt`) and LOOM (`../loom-editions-20261031/run27-*.txt`) unchanged.
+

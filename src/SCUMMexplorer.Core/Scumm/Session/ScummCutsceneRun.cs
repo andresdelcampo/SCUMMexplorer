@@ -95,6 +95,9 @@ public static class ScummCutsceneRun
                 var second = setup?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
                 if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
                 else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second);
+                // The hero is in the room only from the pick on (put at the object): the values that stand actors in it are set again now (Zak
+                // McKracken Room 10's purple button waits for the hero past x 50).
+                if (setup is { Count: > 0 }) session.ApplySceneSetup(ScummSetupEdit.InRoomActors(setup));
             }
             // Only a cutscene begun by a script the trigger's code reaches counts: a room's own background scripts begin cutscenes of their
             // own (Monkey Island's SCUMM Bar and High Street open and close doors through global scripts 25/26, each a short cutscene), and a visit's
