@@ -174,6 +174,28 @@ internal static class Program
                         for (var i = 3; i <= int.Parse(raw[2..]); i += 3) { await Pump(3); State($"{raw} +{i}s"); Capture($"intro-{i:00}"); }
                         continue;
                     }
+                    // F:room opens the room and logs every 0.1 s for 4 s which of the room area, the loading panel, the room picture and the play screen show
+                    // (3 November 2026: picking a room flickered).
+                    if (raw.StartsWith("F:", StringComparison.Ordinal))
+                    {
+                        var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                        var resource = game.Rooms.First(r => r.ResourceId == int.Parse(raw[2..]));
+                        var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
+                        Call("SelectRoomWithIntent", resource, Enum.Parse(kind, "Catalog"), true);
+                        string V(string name) => window.FindName(name) is System.Windows.UIElement e ? e.Visibility.ToString()[0].ToString() : "?";
+                        string last = "";
+                        for (var i = 1; i <= 40; i++)
+                        {
+                            await Pump(0.1);
+                            var image = (System.Windows.Controls.Image)window.FindName("PlayScreenImage");
+                            var state = $"layout {V("RoomDisplayLayout")} loading {V("PreviewMessage")} roomview {V("RoomDisplayGroup")} play {V("PlayScreenImage")} {image.ActualWidth:F0}x{image.ActualHeight:F0}";
+                            string H2(string name) => window.FindName(name) is System.Windows.FrameworkElement fe ? $"{name}={fe.Visibility.ToString()[0]}{fe.ActualHeight:F0}" : "";
+                            state += " | " + string.Join(" ", new[] { "StatusText", "PageTitle", "PageSubtitle", "ObjectsNote", "PlaybackBar", "SceneInteractionCard", "RoomOptionsExpander", "PlayScrollButtonsPanel" }.Select(H2));
+                            if (state != last) Log($"{raw} +{i * 0.1:F1}s: {state}");
+                            last = state;
+                        }
+                        continue;
+                    }
                     // R:room opens the room as r: does and captures the window every half second for 4 seconds (2 November 2026: the room's size jump).
                     if (raw.StartsWith("R:", StringComparison.Ordinal))
                     {
@@ -187,7 +209,7 @@ internal static class Program
                             var image = (System.Windows.Controls.Image)window.FindName("PlayScreenImage");
                             var preview = (System.Windows.Controls.Image)window.FindName("RoomPreview");
                             string H(string name) => window.FindName(name) is System.Windows.FrameworkElement e ? $"{name}={e.Visibility.ToString()[0]}{e.ActualHeight:F0}" : "";
-                            Log("   " + string.Join(" ", new[] { "RoomViewportHost", "PlayScrollButtonsPanel", "ObjectsNote", "CutsceneScanNote", "CutsceneScanProgress", "GenericRoomActionsHost", "RoomDisplayLayout", "SceneInteractionCard", "SceneSessionBar", "SessionStatusText", "SessionActions", "PlaybackBar", "RoomOptionsExpander" }.Select(H)));
+                            Log("   " + string.Join(" ", new[] { "RoomViewportHost", "PlayScrollButtonsPanel", "ObjectsNote", "CutsceneScanNote", "CutsceneScanProgress", "GenericRoomActionsHost", "RoomDisplayLayout", "StatusText", "PageTitle", "PageSubtitle", "PageHeader", "BusyOverlay", "SceneInteractionCard", "SceneSessionBar", "SessionStatusText", "SessionActions", "PlaybackBar", "RoomOptionsExpander" }.Select(H)));
                             Log($"{raw} +{i * 0.5:F1}s: play {image.Visibility} {image.ActualWidth:F0}x{image.ActualHeight:F0} src {(image.Source as System.Windows.Media.Imaging.BitmapSource)?.PixelWidth}; preview {preview.Visibility} {preview.ActualWidth:F0}x{preview.ActualHeight:F0}");
                             Capture($"room-{raw[2..]}-{i:00}");
                         }

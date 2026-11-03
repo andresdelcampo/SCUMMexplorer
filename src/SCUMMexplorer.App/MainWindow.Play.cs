@@ -199,7 +199,8 @@ public partial class MainWindow
                 {
                     _catalogPreviewOnly = true;
                     var reason = prepared.Reason ?? "The native startup has not established the game's input script.";
-                    StopPlay();
+                    // The waiting picture stays on the screen while the still preview is made (no flash of the room view).
+                    StopPlay(keepScreen: PlayScreenImage.Visibility == Visibility.Visible && _browsedScene is not null);
                     // R-8.5b (rule confirmed by the user 20 Oct): the static preview keeps the room's controls, and the room's ambient scripts (its
                     // permanent animation, decided from its code) run on a play clock; none of its other entry code runs, and no input reaches the game.
                     // Maniac Mansion and Zak keep their own startup and static-preview rules (R-8.34, 19 Oct): no ambient session there.
@@ -297,8 +298,13 @@ public partial class MainWindow
     /// last frame had), so the room keeps its size when the session's frames take over (2 November 2026, user report). LOOM plays in the room view and
     /// never switches.
     /// </summary>
+    /// <summary>Set while a room pick in a played game keeps the play screen showing (no loading panel, no empty room view; cleared once the new
+    /// room's picture is on the screen).</summary>
+    private bool _keepPlayScreen;
+
     private void ShowWaitingPlayFrame(ScummRoomScene scene)
     {
+        _keepPlayScreen = false;
         var (top, bottom) = _playShown is { } last ? (last.RoomTop, last.RoomBottom) : (16, 144);
         var frame = ScummPlayScreen.Still(scene, top, bottom, wide: NormalRoomWidthToggle.IsChecked != true);
         if (_playBitmap is null || _playBitmap.PixelWidth != frame.PixelWidth) _playBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
@@ -309,12 +315,14 @@ public partial class MainWindow
     }
 
     /// <summary>Stops the frames and gives the room view back (another game, another kind of resource).</summary>
-    private void StopPlay()
+    private void StopPlay(bool keepScreen = false)
     {
         _playTimer?.Stop();
         _playTimer = null;
         if (_play is not null && _sceneSound.Follows(_play)) _sceneSound.StopAll("play was left");
         _playSpeech.Detach();
+        // A room pick in a played game keeps the screen showing until the new room's picture replaces it (no flicker).
+        if (_keepPlayScreen || keepScreen) { PlayScreenImage.Cursor = null; UpdateGameStatusButton(); if (PlayCutscenes) UpdatePlayCutsceneControls(); return; }
         PlayScreenImage.Visibility = Visibility.Collapsed;
         PlayScrollButtonsPanel.Visibility = ScrollRowWhenIdle;
         ClearPlayOverlays();

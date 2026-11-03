@@ -1091,17 +1091,33 @@ public partial class MainWindow : Window
             return;
         }
         using var busy = BeginBusy(null);
+        // 3 November 2026 (user report: picking a room flickered): in a played game whose screen is showing, a pick keeps that screen, with the last
+        // frame, until the new room's own picture replaces it (ShowWaitingPlayFrame); no loading panel, no empty room view in between.
+        _keepPlayScreen = PlayCutscenes && RoomDisplayLayout.Visibility == Visibility.Visible && PlayScreenImage.Visibility == Visibility.Visible;
         // The welcome text ("Choose a room") gives way to the scene's own at once; the blocking work comes after this paint.
         PreviewTitle.Text = "Scene";
         PreviewTitle.ToolTip = null;
         PreviewDescription.Text = "Loading the scene…";
-        PreviewMessage.Visibility = Visibility.Visible;
-        RoomDisplayLayout.Visibility = Visibility.Collapsed;
+        if (!_keepPlayScreen)
+        {
+            PreviewMessage.Visibility = Visibility.Visible;
+            RoomDisplayLayout.Visibility = Visibility.Collapsed;
+        }
         // Paint the wait text now, before the blocking work below. A synchronous render pass keeps the body running as one call:
         // playback enters rooms through this handler and relies on that (it sets _playbackEnteringRoom around the call).
         Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
         _roomOpenTask = ResourceTree_SelectedItemChangedCore(sender, e);
-        await _roomOpenTask;
+        try { await _roomOpenTask; }
+        finally
+        {
+            // A pick that never put the new room's picture on the screen (no first visit, an error, another pick) gives the room view back.
+            if (_keepPlayScreen)
+            {
+                _keepPlayScreen = false;
+                if (!PlayActive) StopPlay();
+                RoomDisplayLayout.Visibility = Visibility.Visible;
+            }
+        }
     }
 
     private int _busyCount;
@@ -1207,7 +1223,7 @@ public partial class MainWindow : Window
             return;
         }
         StopRoomPan();
-        RoomDisplayLayout.Visibility = Visibility.Collapsed;
+        if (!_keepPlayScreen) RoomDisplayLayout.Visibility = Visibility.Collapsed;
         _currentRoomResource = null;
         _currentRoomObjectRecords = [];
         _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
@@ -1229,7 +1245,7 @@ public partial class MainWindow : Window
             _showCostumeCards = resource.Kind == ResourceKind.Costume;
         UpdateRoomCardSelection(resource);
         UpdateAdvancedMode();
-        StatusText.Visibility = Visibility.Visible;
+        if (!_keepPlayScreen) StatusText.Visibility = Visibility.Visible;
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         UpdateConnectionsButton();
         // Another kind of resource leaves play: its frames stop and so do the sounds its scripts started (S6 sound; before, the game ran on unseen and
@@ -1321,8 +1337,9 @@ public partial class MainWindow : Window
         PreviewTitle.Text = "Scene";
         PreviewTitle.ToolTip = resource.Name;
         PreviewDescription.Text = "Loading the scene…";
-        PreviewMessage.Visibility = Visibility.Visible;
-        StatusText.Visibility = Visibility.Visible;
+        if (!_keepPlayScreen) PreviewMessage.Visibility = Visibility.Visible;
+        // The status line under the room ("Opening Room 83…") would take its height from the room while it loads.
+        if (!_keepPlayScreen) StatusText.Visibility = Visibility.Visible;
         _pendingCameraX = null;
         RoomViewport.ScrollToHorizontalOffset(0);
         RoomPreview.Source = null;

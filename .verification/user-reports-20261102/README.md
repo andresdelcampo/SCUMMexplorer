@@ -98,3 +98,12 @@ callers. Now an ended arrival (1) takes out the actors its script puts into the 
 flag it tests just inside its cutscene (or tests and sets itself) is raised to the game's value (`bit[0x5E2]`), so a later entry skips it, and (3) only
 the scene's own scripts and the scripts the setup's values come from are kept. Checked in the window (`r82-head6/`: no actor 10, the ending goes on
 to "Nice going, Elsa."). Tests: `APickedSceneDoesNotReplayTheRoomsArrival` (no actor 10), `GiveGrailDoesNotReplayTheArrivalLater`.
+
+## Seventh pass: picking a room flickered (3 November)
+
+WindowCheck `F:room` logs every 0.1 s which of the room area, the loading panel, the room view and the play screen show, with the heights around the
+screen (`flicker*/`). A pick hid the whole room area and showed the "Loading the scene…" panel, `StopPlay` swapped the play screen for the cleared room
+view (twice for a still preview), and the status line under the room ("Opening Room 83…") took 22 px from it while loading. In a played game whose
+screen is showing, a pick now keeps the screen with its last frame until the new room's picture replaces it (`_keepPlayScreen`, cleared by
+`ShowWaitingPlayFrame` or when the pick ends): no loading panel, no room view, no status line in between. After the first pick, Indy 3 Rooms 2, 83,
+85, 74, 13, 82 and Indy 4 Rooms 2, 5, 14, 4 stay on the play screen at one size throughout.

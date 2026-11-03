@@ -99,9 +99,6 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 - 1 scene started at its cutscene shows nothing (work item 1).
 - Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates.
 
-### All games (played through their own verbs)
-- Picking a room flickers while it loads (user report, 2 November): the room view, the "Loading the scene" panel and the play screen take turns.
-
 ### Indiana Jones 4
 - 5 scenes started at their cutscene show nothing (work item 1).
 - After Play Game Intro: Indy walking very fast (user report, not reproduced).
