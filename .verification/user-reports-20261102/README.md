@@ -107,3 +107,15 @@ view (twice for a still preview), and the status line under the room ("Opening R
 screen is showing, a pick now keeps the screen with its last frame until the new room's picture replaces it (`_keepPlayScreen`, cleared by
 `ShowWaitingPlayFrame` or when the pick ends): no loading panel, no room view, no status line in between. After the first pick, Indy 3 Rooms 2, 83,
 85, 74, 13, 82 and Indy 4 Rooms 2, 5, 14, 4 stay on the play screen at one size throughout.
+
+Then (user: "now it goes back to changing size"): a pick that was still finishing when the next room was picked restored the room view in its
+clean-up and undid the new pick's kept screen. Only the latest pick restores it now (`_roomPickSerial`). Checked at 1000 × 700, 1600 × 1000 and the
+default size, with quick successive picks (WindowCheck `P:room` picks without waiting; `WINDOWCHECK_SIZE=WxH`): the play screen keeps one size.
+
+Then (user: the jump is after the new room shows): the waiting picture was drawn with the previous room's screen rows and the live frames then used the
+room's own (Indy 3 Room 85: 16 to 143, then 8 to 199), and live sessions kept the rows the previous room's route had left (Room 13 after the diary
+page kept 0 to 199; Room 82 after the zeppelin, 8 to 199). Now the first-visit picture carries the rows its visit reached
+(`ScummRoomScene.MainScreen`), a still preview uses them too (Room 80), a picked room starts from the screen the game had when the boot handed over
+control (`TakeControlScreen`, Indy 3: 16 to 143) before its own entry sets its own, and the first-visit picture of a room only the opening shows takes
+the opening's state (Room 76). WindowCheck `F:room` logs the shown frame's rows: after a pick each room keeps one set of rows from its first picture on
+(`pickframes6/`; Indy 4 `pickframes5-i4/`).

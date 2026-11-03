@@ -17,6 +17,7 @@ public abstract partial class ScummSession
     protected void FinishBoot(int frames)
     {
         _booting = false;
+        _controlScreen = _runtime.MainScreen;
         BootFrames = frames;
         if (_pending.Any(item => item.ScriptNumber == BootScript))
             _uncertainties.Add($"The boot (script 001) was still running after {frames} frames; the preview stopped following it.");

@@ -12,6 +12,9 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
     Func<int, ScummCostume?> Costumes, bool IsFirstRoomOfTheGame, IReadOnlyList<string> Notes)
 {
     public ScummSessionSnapshot Snapshot => State.Snapshot;
+
+    /// <summary>The room screen's rows the first visit left (<c>roomOps setScreen</c>), for drawing the picture as the play screen will (null: unknown).</summary>
+    public (int Top, int Bottom)? MainScreen { get; init; }
     /// <summary>v1/v2 draw only intrinsic bit 8; later engines use the whole state nibble.</summary>
     public byte IntrinsicStateMask { get; init; } = 0x0F;
     public int EngineVersion { get; init; } = 3;
@@ -151,6 +154,8 @@ public static class ScummRoomFirstVisit
             session.DressHeroForPreview(roomId);
         }
         var settled = session.Settle();
+        // A room only the opening shows keeps the opening's screen and verbs, after the room's own frames (Indy 3 Room 76, the logo).
+        if (!bootRoom) session.TakeOpeningState(roomId);
         var records = data.ReadRoom(roomId).Objects;
         var snapshot = settled.State.Snapshot;
         // v5 objects store one image per state (S5 Indy4, S4b Monkey2): the settled state picks it.
@@ -170,6 +175,7 @@ public static class ScummRoomFirstVisit
         };
         return new ScummRoomScene(roomId, room, records, images, settled.State, selection, settled.Outcome, settled.Frames, settled.LeftTo,
             id => { try { return session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
-            bootRoom, notes) { IndexedStates = indexed.States, IntrinsicStateMask = stateMask, EngineVersion = (int)ScummProfile.For(game).EngineVersion };
+            bootRoom, notes) { IndexedStates = indexed.States, IntrinsicStateMask = stateMask, EngineVersion = (int)ScummProfile.For(game).EngineVersion,
+                MainScreen = session.MainScreen };
     }
 }

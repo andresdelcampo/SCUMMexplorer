@@ -23,6 +23,9 @@ internal static class Program
         var report = new List<string>(); var clock = Stopwatch.StartNew();
         void Log(string message) { report.Add($"{clock.Elapsed.TotalSeconds,6:F2}s {message}"); File.WriteAllLines(Path.Combine(output, "report.txt"), report); Console.WriteLine(report[^1]); }
         var app = new App(); app.InitializeComponent(); var window = new MainWindow();
+        // WINDOWCHECK_SIZE=WxH: the window's size (3 November 2026: the room changed size at the user's window size).
+        if (Environment.GetEnvironmentVariable("WINDOWCHECK_SIZE") is { Length: > 0 } size && size.Split('x') is [var w, var h])
+        { window.Width = double.Parse(w); window.Height = double.Parse(h); }
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
         void Capture(string name)
@@ -174,6 +177,15 @@ internal static class Program
                         for (var i = 3; i <= int.Parse(raw[2..]); i += 3) { await Pump(3); State($"{raw} +{i}s"); Capture($"intro-{i:00}"); }
                         continue;
                     }
+                    // P:room picks the room and goes on at once (quick successive picks, 3 November 2026).
+                    if (raw.StartsWith("P:", StringComparison.Ordinal))
+                    {
+                        var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                        var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
+                        Call("SelectRoomWithIntent", game.Rooms.First(r => r.ResourceId == int.Parse(raw[2..])), Enum.Parse(kind, "Catalog"), true);
+                        await Pump(0.3);
+                        continue;
+                    }
                     // F:room opens the room and logs every 0.1 s for 4 s which of the room area, the loading panel, the room picture and the play screen show
                     // (3 November 2026: picking a room flickered).
                     if (raw.StartsWith("F:", StringComparison.Ordinal))
@@ -191,7 +203,10 @@ internal static class Program
                             var state = $"layout {V("RoomDisplayLayout")} loading {V("PreviewMessage")} roomview {V("RoomDisplayGroup")} play {V("PlayScreenImage")} {image.ActualWidth:F0}x{image.ActualHeight:F0}";
                             string H2(string name) => window.FindName(name) is System.Windows.FrameworkElement fe ? $"{name}={fe.Visibility.ToString()[0]}{fe.ActualHeight:F0}" : "";
                             state += " | " + string.Join(" ", new[] { "StatusText", "PageTitle", "PageSubtitle", "ObjectsNote", "PlaybackBar", "SceneInteractionCard", "RoomOptionsExpander", "PlayScrollButtonsPanel" }.Select(H2));
-                            if (state != last) Log($"{raw} +{i * 0.1:F1}s: {state}");
+                            var shown = Field("_playShown");
+                            if (shown is not null) state += $" | frame {shown.GetType().GetProperty("PixelWidth")!.GetValue(shown)} rows {shown.GetType().GetProperty("RoomTop")!.GetValue(shown)}-{shown.GetType().GetProperty("RoomBottom")!.GetValue(shown)} left {shown.GetType().GetProperty("ViewLeft")!.GetValue(shown)}";
+                            state += $" src {(image.Source as System.Windows.Media.Imaging.BitmapSource)?.PixelWidth}";
+                            if (state != last) { Log($"{raw} +{i * 0.1:F1}s: {state}"); if (i <= 30) Capture($"pick-{raw[2..]}-{i:00}"); }
                             last = state;
                         }
                         continue;

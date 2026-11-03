@@ -45,6 +45,7 @@ public abstract partial class ScummSession
             }
             copy.ManualNavigationBegan();
             copy.CancelDepartedManualRoute(roomId, cancellationToken);
+            copy.TakeControlScreen();
             copy._manualEntryRoots = [];
             copy._capturingManualEntryRoots = true;
             try { copy.VisitManualRoomCore(room); }
@@ -104,6 +105,7 @@ public abstract partial class ScummSession
             // Only the ambient scripts run from here: every other slot (the previous room's exit work, the game's global loops) ends without
             // executing further; the room's own story stays unplayed.
             var stopped = copy.EndEverySlot();
+            copy.TakeControlScreen();
             copy.TakeEntryScreen(roomId);
             copy.TakeBootShownState(roomId);
             foreach (var script in ambient.Ambient)
@@ -148,6 +150,9 @@ public abstract partial class ScummSession
     // the opening passes through that play also loads (Indy 3's college) keep the play state.
     private readonly Dictionary<int, ((int Top, int Bottom) Screen, HashSet<int> Verbs)> _bootShown = [];
 
+    /// <summary>A first-visit picture of a room only the opening shows takes the opening's screen and verbs, as the app's pick does (Indy 3 Room 76).</summary>
+    public void TakeOpeningState(int roomId) => TakeBootShownState(roomId);
+
     private void TakeBootShownState(int roomId)
     {
         if (!_bootShown.TryGetValue(roomId, out var shown) || !Facts().OpeningOnly(roomId)) return;
@@ -155,6 +160,22 @@ public abstract partial class ScummSession
         var hidden = _runtime.Verbs.SwitchOffAllBut(shown.Verbs);
         _visitTrace.Add($"static preview: the game's opening showed Room {roomId:00} with screen rows {shown.Screen.Top} to {shown.Screen.Bottom - 1}" +
             $"{(hidden > 0 ? $" and without {hidden} verb(s) on now" : "")}");
+    }
+
+    /// <summary>The screen rows the game had when the boot handed over control (Indy 3: 16 to 143), or null before that.</summary>
+    private (int Top, int Bottom)? _controlScreen;
+
+    /// <summary>
+    /// 3 November 2026 (user report: a picked room jumped in size a moment after it showed): a room picked without its route starts from the screen
+    /// the game has in play, not the one the previous room left (Indy 3 Room 13 after the diary page, Room 74, kept its 0 to 199). The room's own
+    /// entry may still set its own (Room 85: 8 to 199).
+    /// </summary>
+    /// <summary>A still preview shows the room with the screen its first visit reached (its scripts ran there; the still preview runs none).</summary>
+    public void UseScreen((int Top, int Bottom) screen) => _runtime.MainScreen = screen;
+
+    protected void TakeControlScreen()
+    {
+        if (_controlScreen is { } screen) _runtime.MainScreen = screen;
     }
 
     // Ends every script slot without executing anything further (no override jump, no end hook); returns how many there were.

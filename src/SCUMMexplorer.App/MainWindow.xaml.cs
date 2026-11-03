@@ -1094,6 +1094,7 @@ public partial class MainWindow : Window
         // 3 November 2026 (user report: picking a room flickered): in a played game whose screen is showing, a pick keeps that screen, with the last
         // frame, until the new room's own picture replaces it (ShowWaitingPlayFrame); no loading panel, no empty room view in between.
         _keepPlayScreen = PlayCutscenes && RoomDisplayLayout.Visibility == Visibility.Visible && PlayScreenImage.Visibility == Visibility.Visible;
+        var pick = ++_roomPickSerial;
         // The welcome text ("Choose a room") gives way to the scene's own at once; the blocking work comes after this paint.
         PreviewTitle.Text = "Scene";
         PreviewTitle.ToolTip = null;
@@ -1110,8 +1111,9 @@ public partial class MainWindow : Window
         try { await _roomOpenTask; }
         finally
         {
-            // A pick that never put the new room's picture on the screen (no first visit, an error, another pick) gives the room view back.
-            if (_keepPlayScreen)
+            // A pick that never put the new room's picture on the screen (no first visit, an error) gives the room view back. Only the latest pick
+            // does: an earlier one ending late must not undo the next pick's kept screen (user report: rooms still changed size when picked quickly).
+            if (pick == _roomPickSerial && _keepPlayScreen)
             {
                 _keepPlayScreen = false;
                 if (!PlayActive) StopPlay();
@@ -1120,6 +1122,7 @@ public partial class MainWindow : Window
         }
     }
 
+    private int _roomPickSerial;
     private int _busyCount;
     private IDisposable? _musicBusy;
 

@@ -218,6 +218,8 @@ public partial class MainWindow
                         if (_browsedScene is { } waiting && ScummProfile.For(game).PlaysThroughVerbs) ShowWaitingPlayFrame(waiting);
                         return;
                     }
+                    // The screen rows the room's first visit reached, as its waiting picture showed them (Indy 3 Room 80: no jump when the frames start).
+                    if (_browsedScene?.MainScreen is { } firstVisitScreen) still.UseScreen(firstVisitScreen);
                     _play = still;
                     _playAmbient = true;
                     _playScreen = new ScummPlayScreen(game, still, _playIndexedStates);
@@ -305,8 +307,10 @@ public partial class MainWindow
     private void ShowWaitingPlayFrame(ScummRoomScene scene)
     {
         _keepPlayScreen = false;
-        var (top, bottom) = _playShown is { } last ? (last.RoomTop, last.RoomBottom) : (16, 144);
+        // The room's own screen rows, from its first visit (Indy 3 Room 85: 8 to 199); the previous room's rows made the picture jump when play began.
+        var (top, bottom) = scene.MainScreen ?? (_playShown is { } last ? (last.RoomTop, last.RoomBottom) : (16, 144));
         var frame = ScummPlayScreen.Still(scene, top, bottom, wide: NormalRoomWidthToggle.IsChecked != true);
+        _playShown = frame;
         if (_playBitmap is null || _playBitmap.PixelWidth != frame.PixelWidth) _playBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
         _playBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
         PlayScreenImage.Source = _playBitmap;
