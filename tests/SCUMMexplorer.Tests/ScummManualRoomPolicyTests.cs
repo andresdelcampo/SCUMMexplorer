@@ -19,7 +19,8 @@ public sealed class ScummManualRoomPolicyTests
         Assert.Equal(before, session.CurrentRoomId);
         Assert.False(result.Succeeded);
         Assert.Equal(2400, result.Frames);
-        Assert.Contains("pending scene initialization", result.Reason);
+        // Its watchers no longer count as initialization (decision 7, 6 November 2026), but the room still does not come to rest.
+        Assert.Contains("within the bound", result.Reason);
     }
 
     [Fact]
