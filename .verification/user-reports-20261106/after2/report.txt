@@ -1,0 +1,69 @@
+  9,94s derivation done=True, LOOM lists=False
+ 11,50s r:15 +1,5s: room= cutscene= texts=[] printed= last=[]
+ 13,08s r:15 +3,0s: room= cutscene= texts=[] printed= last=[]
+ 14,60s r:15 +4,5s: room= cutscene= texts=[] printed= last=[]
+ 16,11s r:15 +6,0s: room=73 cutscene=False texts=[] printed=14 last=[Debo cambiarme de ropas.                      ]
+ 16,15s   room 15 cutscenes (3): Room 15 · Entry | Room 19 · Ir a agujero (played from Room 19) | Room 53 · Ir a tapa (played from Room 53)
+ 16,16s 15,0,98: playing "Room 15 · Entry"
+ 17,67s 15,0,98 +1,5s: room=15 cutscene=True texts=[] printed=14 last=[Debo cambiarme de ropas.                      ]
+ 19,21s 15,0,98 +3,0s: room=15 cutscene=True texts=[] printed=14 last=[Debo cambiarme de ropas.                      ]
+ 20,71s 15,0,98 +4,5s: room=15 cutscene=True texts=[] printed=14 last=[Debo cambiarme de ropas.                      ]
+ 22,24s 15,0,98 +6,0s: room=15 cutscene=True texts=[] printed=14 last=[Debo cambiarme de ropas.                      ]
+ 23,77s 15,0,98 +7,5s: room=15 cutscene=True texts=[] printed=14 last=[Debo cambiarme de ropas.                      ]
+ 25,30s 15,0,98 +9,0s: room=15 cutscene=True texts=[Ah,Venecia!] printed=15 last=[Ah,Venecia!]
+ 26,84s 15,0,98 +10,5s: room=15 cutscene=True texts=[] printed=15 last=[Ah,Venecia!]
+ 28,36s 15,0,98 +12,0s: room=15 cutscene=True texts=[] printed=15 last=[Ah,Venecia!]
+ 29,87s 15,0,98 +13,5s: room=15 cutscene=True texts=[Como reconoceremos a nuestro contacto,  / el Doctor Schneider?] printed=16 last=[Como reconoceremos a nuestro contacto,  el Doctor Schneider?]
+ 31,38s 15,0,98 +15,0s: room=15 cutscene=True texts=[Como reconoceremos a nuestro contacto,  / el Doctor Schneider?] printed=16 last=[Como reconoceremos a nuestro contacto,  el Doctor Schneider?]
+ 32,90s 15,0,98 +16,5s: room=15 cutscene=True texts=[Como reconoceremos a nuestro contacto,  / el Doctor Schneider?] printed=16 last=[Como reconoceremos a nuestro contacto,  el Doctor Schneider?]
+ 34,43s 15,0,98 +18,0s: room=15 cutscene=True texts=[Quiza el nos reconozca.  ] printed=17 last=[Quiza el nos reconozca.  ]
+ 35,97s 15,0,98 +19,5s: room=15 cutscene=True texts=[] printed=17 last=[Quiza el nos reconozca.  ]
+ 37,49s 15,0,98 +21,0s: room=15 cutscene=True texts=[Dr. Jones?] printed=18 last=[Dr. Jones?]
+ 39,00s 15,0,98 +22,5s: room=15 cutscene=True texts=[Si. ] printed=19 last=[Si. ]
+ 40,51s 15,0,98 +24,0s: room=15 cutscene=True texts=[Sabia que era Vd. Tiene los ojos de su padre.   ] printed=20 last=[Sabia que era Vd. Tiene los ojos de su padre.   ]
+ 42,04s 15,0,98 +25,5s: room=15 cutscene=True texts=[Sabia que era Vd. Tiene los ojos de su padre.   ] printed=20 last=[Sabia que era Vd. Tiene los ojos de su padre.   ]
+ 43,56s 15,0,98 +27,0s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 45,11s 15,0,98 +28,5s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 46,62s 15,0,98 +30,0s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 46,62s 15,0,98 setup: Room 15 local script 201 +0x002D: getRandomNr at +0x0000 picked 0 of 0..2 (seeded pick, seed 0, draw 68); what follows from it is an estimate, not a reached game state. | Room 15 local script 201 +0x002D: getRandomNr at +0x0000 picked 0 of 0..2 (seeded pick, seed 0, draw 69); what follows from it is an estimate, not a reached game state. | Room 15 local script 201 +0x002D: getRandomNr at +0x0000 picked 2 of 0..2 (seeded pick, seed 0, draw 70); what follows from it is an estimate, not a reached game state.
+ 46,62s   actor 1 costume 2 scale 255 at (313,117) visible True
+ 46,62s   actor 3 costume 12 scale 255 at (310,116) visible True
+ 46,62s   actor 4 costume 13 scale 255 at (370,116) visible True
+ 46,62s   actor 10 costume 82 scale 255 at (61,121) visible True
+ 46,62s   ambient=False previewOnly=False sameAsLive=False uncertainties: Room 15 was picked without its route: the hero wears costume 2, the outfit the game's scripts dress him in most often (an estimate; the room's own code or a picked scene's setup may change it). | The game's opening (Script 1) had not finished its route after giving control; a picked room or scene does not continue it, so it was ended. | Before its assumed arrival the ego keeps the position it had in the room the session was in (estimate: the route that would have moved it was not played). | Room 15 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 53 Object 679 Verb 0x0A +0x005C (object 179, no walk) would bring it in (seeded pick 2 of 2 (seed 0)). Which route led here was not played; the arrival is a possible outcome, not a reached one. | Camera x (var[0x002]) = 313 is an estimate: the camera is put on the ego at Room 53 Object 679 Verb 0x0A +0x005C, whose position is an estimate (assumed arrival at Room 53 Object 679 Verb 0x0A +0x005C after a catalog visit). | Script 98 +0x00BE: getDist reads actor 1: assumed arrival at Room 53 Object 679 Verb 0x0A +0x005C after a catalog visit, so what follows is an estimate (+0x00BE)
+ 48,14s r:32 +1,5s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 49,67s r:32 +3,0s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 51,18s r:32 +4,5s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 52,68s r:32 +6,0s: room=15 cutscene=True texts=[Y las orejas de mi madre, pero el resto es suyo.  ] printed=21 last=[Y las orejas de mi madre, pero el resto es suyo.  ]
+ 52,71s   [0] Unnamed object: Ir a
+ 52,72s   [1] Unnamed object 2: Ir a
+ 52,72s   [2] Unnamed object 3: Ir a
+ 52,72s   [3] Unnamed object 4: Ir a
+ 52,72s   [4] Unnamed object 5: Ir a
+ 52,72s   [5] Unnamed object 6: Ir a
+ 52,72s   [6] Unnamed object 7: Ir a
+ 52,72s   [7] Unnamed object 8: Ir a
+ 52,72s   [8] Unnamed object 9: Ir a
+ 52,72s   [9] Unnamed object 10: Ir a
+ 52,72s   [10] Unnamed object 11: Ir a
+ 52,72s   [11] Unnamed object 12: Ir a
+ 52,72s c:0,0: Unnamed object · Ir a
+ 54,25s c:0,0 +1,5s: room=28 cutscene=True texts=[] printed=22 last=[ALTO!  ALTO!]
+ 55,76s c:0,0 +3,0s: room=21 cutscene=True texts=[] printed=23 last=[oh^]
+ 57,32s c:0,0 +4,5s: room=21 cutscene=True texts=[] printed=23 last=[oh^]
+ 58,84s c:0,0 +6,0s: room=21 cutscene=True texts=[] printed=23 last=[oh^]
+ 60,37s c:0,0 +7,5s: room=21 cutscene=True texts=[] printed=23 last=[oh^]
+ 61,88s c:0,0 +9,0s: room=21 cutscene=True texts=[Adonde vas?     ] printed=24 last=[Adonde vas?     ]
+ 61,88s   actor 1 costume 2 scale 255 at (140,106) visible True
+ 61,88s   actor 2 costume 7 scale 255 at (124,104) visible True
+ 61,88s   actor 6 costume 11 scale 255 at (-31,106) visible True
+ 61,88s   actor 10 costume 80 scale 255 at (180,106) visible True
+ 61,88s   ambient=False previewOnly=False sameAsLive=True uncertainties: The game's opening (Script 1) had not finished its route after giving control; a picked room or scene does not continue it, so it was ended. | Before its assumed arrival the ego keeps the position it had in the room the session was in (estimate: the route that would have moved it was not played). | Room 15 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 53 Object 679 Verb 0x0A +0x005C (object 179, no walk) would bring it in (seeded pick 2 of 2 (seed 0)). Which route led here was not played; the arrival is a possible outcome, not a reached one. | Camera x (var[0x002]) = 313 is an estimate: the camera is put on the ego at Room 53 Object 679 Verb 0x0A +0x005C, whose position is an estimate (assumed arrival at Room 53 Object 679 Verb 0x0A +0x005C after a catalog visit). | Script 98 +0x00BE: getDist reads actor 1: assumed arrival at Room 53 Object 679 Verb 0x0A +0x005C after a catalog visit, so what follows is an estimate (+0x00BE) | Before its assumed arrival the ego keeps the position it had in the room the session was in (estimate: the route that would have moved it was not played). | Room 32 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 34 Object 516 Verb 0x0A +0x0000 (object 489, no walk) would bring it in (seeded pick 2 of 2 (seed 0)). Which route led here was not played; the arrival is a possible outcome, not a reached one. | Camera x (var[0x002]) = 160 is an estimate: the camera is put on the ego at Room 34 Object 516 Verb 0x0A +0x0000, whose position is an estimate (assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit). | Script 63 +0x0000: getActorX reads actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x001C); getActorY reads actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x0020); getDist reads actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x0109) | Script 58 +0x0050: getDist reads actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x0050) | Script 64 +0x0000: getDist reads actor 11: actor 11's actorOps at +0x0024 follows a seeded pick; actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x002B); getActorX reads actor 11: actor 11's actorOps at +0x0024 follows a seeded pick, so what follows is an estimate (+0x005E); getActorY reads actor 11: actor 11's actorOps at +0x0024 follows a seeded pick, so what follows is an estimate (+0x0065) | Script 63 +0x0000: getActorX reads actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x001C); getActorY reads actor 1: assumed arrival at Room 34 Object 516 Verb 0x0A +0x0000 after a catalog visit, so what follows is an estimate (+0x0020)
+ 61,88s k:160,60: refused: user input is off (cursorCommand)
+ 65,88s   hero at (140,106) box 0; draw order 
+ 65,91s k:160,100: refused: user input is off (cursorCommand)
+ 69,93s   hero at (140,106) box 0; draw order 
+ 69,95s k:160,130: refused: user input is off (cursorCommand)
+ 73,97s   hero at (140,106) box 0; draw order 
+ 74,00s k:240,130: click in the room at screen (240, 130), room (240, 114)
+ 78,03s   hero at (140,106) box 0; draw order 

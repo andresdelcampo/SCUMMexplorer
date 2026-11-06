@@ -1,0 +1,88 @@
+﻿Room 001 | live | hero c1 (945,124) scale 255 | live hero c1 (945,124)
+Room 002 | live | hero c2 (160,120) scale 255 | live hero c1 (160,120)
+Room 003 | live | no hero | live hero none | shown by global script 55
+Room 004 | live | hero c2 (95,109) scale 255 | live hero c1 (95,109)
+Room 006 | still | hero c43 (477,101) scale 255 | Native entry left the selected room; no live preview was adopted.
+Room 007 | live | hero c2 (37,114) scale 255 | live hero c1 (37,114)
+Room 008 | live | no hero | live hero none | shown by global script 83
+Room 009 | live | no hero | live hero none
+Room 012 | still | hero c2 (150,166) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 013 | still | no hero | Native entry still has pending scene initialization within the preparation bound.
+Room 014 | live | no hero | live hero none | shown by global script 9
+Room 015 | still | hero c2 (313,117) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 016 | live | hero c2 (160,97) scale 255 | live hero c1 (160,97)
+Room 017 | live | hero c2 (302,118) scale 255 | live hero c1 (302,118)
+Room 018 | still | no hero | Native entry left the selected room; no live preview was adopted.
+Room 019 | live | hero c2 (166,88) scale 255 | live hero c2 (166,88)
+Room 020 | still | hero c2 (144,74) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 021 | live | hero c2 (158,103) scale 255 | live hero c1 (158,103)
+Room 022 | still | hero c30 (100,112) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 023 | live | hero c2 (365,108) scale 255 | live hero c1 (365,108)
+Room 024 | live | hero c2 (41,112) scale 255 | live hero c1 (41,112)
+Room 025 | live | hero c2 (138,92) scale 255 | live hero c1 (138,92)
+Room 026 | live | hero c2 (171,96) scale 255 | live hero c1 (171,96)
+Room 027 | live | hero c2 (174,116) scale 255 | live hero c1 (174,116)
+Room 028 | still | hero c2 (23,53) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 029 | live | hero c2 (667,49) scale 255 | live hero c1 (667,49)
+Room 030 | live | hero c2 (200,118) scale 255 | live hero c1 (200,118)
+Room 031 | still | hero c2 (139,111) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 032 | still | hero c2 (241,33) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 033 | live | hero c2 (174,72) scale 255 | live hero c1 (174,72)
+Room 034 | live | hero c2 (400,118) scale 255 | live hero c1 (400,118)
+Room 035 | live | hero c2 (36,112) scale 255 | live hero c1 (36,112)
+Room 036 | live | hero c2 (233,97) scale 255 | live hero c40 (233,97)
+Room 037 | still | hero c2 (9,7) scale 255 | Native entry left the selected room; no live preview was adopted.
+Room 038 | live | hero c2 (631,114) scale 255 | live hero c1 (631,114)
+Room 039 | still | hero c2 (88,115) scale 255 | Native entry still has an active cutscene within the preparation bound.
+Room 040 | live | hero c2 (125,107) scale 255 | live hero c1 (125,107)
+Room 041 | still | hero c2 (42,21) scale 255 | Native entry left the selected room; no live preview was adopted.
+Room 042 | live | no hero | live hero none | shown by global script 33
+Room 043 | still | hero c2 (661,23) scale 255 | Native entry left the selected room; no live preview was adopted.
+Room 044 | still | hero c2 (149,52) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 045 | still | no hero | Native entry has not enabled player input within the preparation bound.
+Room 046 | live | no hero | live hero none
+Room 047 | still | hero c2 (907,18) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 048 | live | hero c2 (203,106) scale 255 | live hero c1 (203,106)
+Room 049 | live | hero c2 (63,64) scale 255 | live hero c1 (63,64)
+Room 050 | live | hero c2 (139,90) scale 255 | live hero c1 (139,90)
+Room 051 | live | hero c2 (39,92) scale 255 | live hero c1 (39,92)
+Room 052 | live | hero c2 (280,93) scale 255 | live hero c1 (280,93)
+Room 053 | live | hero c2 (113,106) scale 255 | live hero c1 (113,106)
+Room 054 | live | hero c2 (250,112) scale 255 | live hero c1 (250,112)
+Room 055 | live | hero c2 (17,51) scale 255 | live hero c1 (17,51)
+Room 056 | live | hero c2 (22,51) scale 255 | live hero c1 (22,51)
+Room 057 | live | hero c2 (263,100) scale 255 | live hero c1 (263,100)
+Room 058 | live | hero c2 (72,97) scale 255 | live hero c1 (72,97)
+Room 059 | live | hero c2 (32,107) scale 255 | live hero c1 (32,107)
+Room 060 | still | hero c2 (664,65) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 061 | live | hero c2 (67,94) scale 255 | live hero c1 (67,94)
+Room 062 | still | hero c2 (45,88) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 063 | live | hero c2 (238,93) scale 255 | live hero c2 (238,93)
+Room 064 | live | no hero | live hero none | shown by global script 126
+Room 066 | still | hero c2 (867,151) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 067 | live | no hero | live hero none
+Room 068 | live | no hero | live hero none
+Room 069 | live | no hero | live hero none
+Room 070 | live | no hero | live hero none | shown by global script 49 | LEFT at frame 3
+Room 071 | still | hero c2 (100,115) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 072 | still | hero c2 (293,108) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 073 | live | hero c1 (119,83) scale 255 | live hero c1 (119,83)
+Room 074 | live | no hero | live hero none | shown by global script 90
+Room 075 | live | no hero | live hero none
+Room 076 | live | no hero | live hero none
+Room 077 | still | hero c2 (165,65) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 078 | still | no hero | Native entry left the selected room; no live preview was adopted.
+Room 079 | still | hero c59 (1145,19) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 080 | still | no hero | Native entry left the selected room; no live preview was adopted.
+Room 081 | live | hero c2 (140,108) scale 255 | live hero c2 (140,108)
+Room 082 | still | hero c2 (131,99) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 083 | still | hero c2 (39,119) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 084 | still | hero c2 (132,108) scale 255 | Native entry did not reach a quiet, controllable room within the bound.
+Room 085 | live | hero c2 (0,94) scale 255 | live hero c1 (18,96)
+Room 086 | still | hero c2 (522,90) scale 255 | Native entry still has pending scene initialization within the preparation bound.
+Room 087 | live | no hero | live hero none
+Room 090 | live | no hero | live hero none
+Room 091 | live | hero c2 (160,100) scale 255 | live hero c1 (160,100)
+Room 093 | live | hero c2 (136,101) scale 255 | live hero c71 (136,101)
+Room 094 | still | no hero | Native entry still has an active cutscene within the preparation bound.
+TOTAL rooms 87, live 56 (64,4%), still 31; after the pick in live rooms: cutscene 0 (0,0%), lines 0 (0,0%), left 1 (1,8%); no hero in the room's picture 22 (25,3%); shown through a script 7
