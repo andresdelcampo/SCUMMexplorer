@@ -149,9 +149,8 @@ public static class ScummRoomFirstVisit
         var bootRoom = session.CurrentRoomId == roomId;
         if (!bootRoom)
         {
-            session.VisitRoom(resource);
-            // The room's picture shows the hero in his usual outfit, as the app's pick of the room does (Indy 3 Room 83).
-            session.DressHeroForPreview(roomId);
+            // The room's picture shows the hero as the app's pick of the room does: his usual outfit (Indy 3 Room 83), then what the room's own code gives him.
+            session.VisitRoomAsPicked(resource);
         }
         var settled = session.Settle();
         // A room only the opening shows keeps the opening's screen and verbs, after the room's own frames (Indy 3 Room 76, the logo).

@@ -44,6 +44,8 @@ public static class ScummCutsceneRun
     public static ScummCutsceneRunResult RunPicked(GameLibrary game, Func<ScummSession> newSession, ScummCutscene trigger,
         IReadOnlyList<ScummSetupEdit>? setup = null)
     {
+        // An arrival scene the room's loader starts: the room's entry does not begin it, so it starts at its cutscene, as the loader starts it.
+        if (trigger.IsArrivalScript) return Run(game, newSession, trigger, setup, ScummPickedStart.AtCutscene);
         var sentence = Run(game, newSession, trigger, setup);
         if (sentence.Begun || trigger.IsRoomEntry) return sentence;
         var direct = Run(game, newSession, trigger, setup, ScummPickedStart.Direct);
@@ -60,6 +62,7 @@ public static class ScummCutsceneRun
         try
         {
             var session = newSession();
+            session.DressHeroForScene(trigger);
             if (setup is { Count: > 0 }) session.ApplySceneSetup(setup);
             if (game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return new(false, [], 0, $"Room {trigger.Room} is not in the game's index");
             var earlier = session.CutscenesBegun;

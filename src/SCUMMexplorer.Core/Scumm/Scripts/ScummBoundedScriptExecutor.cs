@@ -897,8 +897,8 @@ public sealed partial class ScummBoundedScriptExecutor
                     unresolved = $"{detail} at +0x{instruction.Offset:X4}";
                     break;
                 }
-                if (onEstimatedPath || instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
-                        .Any(operand => OperandIsEstimated(operand, estimated, knownVariables)))
+                if (!trace[^1].EndsWith("nothing drawn", StringComparison.Ordinal) && (onEstimatedPath || instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
+                        .Any(operand => OperandIsEstimated(operand, estimated, knownVariables))))
                 {
                     runtime?.EstimatedStates.Add(drawQueue[^1]);
                     trace[^1] += " (estimate: follows a seeded pick)";
@@ -1993,11 +1993,15 @@ public sealed partial class ScummBoundedScriptExecutor
                     break;
                 }
                 if (target is null || walker.Room != place.CurrentRoom || target.Room != place.CurrentRoom) break;
-                if (Read(2) is not int distance || distance == 0xFF || target.X is null || target.Y is null || walker.X is null)
+                if (Read(2) is not int distance || target.X is null || target.Y is null || walker.X is null)
                 {
                     actors.Forget(number, $"{label}: the distance or an actor position is unknown");
                     break;
                 }
+                // walkActorToActor: 0xFF is the walker's scaled width plus half the target's (6 November 2026, user report: Indy 3's Script 56 walks a
+                // follower this way; forgetting the walker took Indy out of Room 6 and left the man following him standing).
+                if (distance == 0xFF)
+                    distance = walker.Look.Scale * actors.Width(number) / 0xFF + target.Look.Scale * actors.Width(Read(1)!.Value) / 0xFF / 2;
                 var x = target.X < walker.X ? target.X + distance : target.X - distance;
                 actors.Walk(number, x, target.Y, place, $"actor {number}'s {label}");
                 break;
@@ -3222,8 +3226,11 @@ public sealed partial class ScummBoundedScriptExecutor
         var record = runtime?.IsV2 == true ? roomObjects.LastOrDefault(item => item.Id == objectId) : roomObjects.FirstOrDefault(item => item.Id == objectId);
         if (record is null || !states.ContainsKey(objectId))
         {
-            detail = $"drawObject targets object {objectId}, which is not in the room state table";
-            return false;
+            // o5_drawObject: getObjectIndex finds no such object here, and the instruction does nothing (6 November 2026, user report: Indy 3's Script 25, the
+            // castle plans, draws its second section, object 0 when Indy stands in one box, every frame; ending the script there stopped the plan's drawing).
+            trace.Add($"drawObject {objectId}: no such object in this room, nothing drawn");
+            detail = "";
+            return true;
         }
 
         var state = runtime?.IsV2 == true ? (byte)(states[objectId] | 8) : (byte)1;

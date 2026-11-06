@@ -163,8 +163,35 @@ public sealed class ScummGameSession : ScummSession
         _bootKeys.Clear();
     }
 
-    protected override ScummSessionSnapshot VisitManualRoomCore(GameResource room) =>
-        _currentRoom?.ResourceId == room.ResourceId ? EnterRoomAgain(room) : VisitRoom(room);
+    protected override ScummSessionSnapshot VisitManualRoomCore(GameResource room)
+    {
+        if (_currentRoom?.ResourceId == room.ResourceId)
+        {
+            if (room.ResourceId is int here) DressHeroForPreview(here);
+            EnterRoomAgain(room);
+            if (room.ResourceId is int again) DressHeroFromRoomCode(again);
+            return Snapshot;
+        }
+        return VisitRoomAsPicked(room);
+    }
+
+    private bool _standHeroByHand;
+
+    /// <summary>
+    /// A room picked from the list (the app's pick, the room's first-visit picture): the hero first wears his usual outfit, so that the room's own entry can
+    /// dress him as it does in the game (6 November 2026, user report: Indy 3 Room 12 sets costume 0x2A and showed him in the full-size one), then the
+    /// outfit the room's code would have chosen by a test the visit cannot answer (the castle plans, Script 25).
+    /// </summary>
+    public ScummSessionSnapshot VisitRoomAsPicked(GameResource room)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        if (room.ResourceId is int picked) DressHeroForPreview(picked);
+        _standHeroByHand = true;
+        try { VisitRoom(room); }
+        finally { _standHeroByHand = false; }
+        if (room.ResourceId is int shown) DressHeroFromRoomCode(shown);
+        return Snapshot;
+    }
 
     private readonly Dictionary<int, int?> _speechJiffies = [];
 
@@ -458,6 +485,18 @@ public sealed class ScummGameSession : ScummSession
         }
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return EnterWithoutEgo(room, arrival, arrivals);
         var candidates = arrivals.Into(roomId);
+        // 6 November 2026 (found by the user's tour, Indy 3 Room 9: no Indy): no loadRoomWithEgo comes here, but a script stands him in the room by hand (Script 73:
+        // Room 9 at 532, 83): the first such place, a labelled estimate. Only for a room picked from the list: a scene's setup says where it wants him. Not a room only the opening shows, and not versions 1 and 2 (several heroes).
+        if (candidates.Count == 0 && _standHeroByHand && !_runtime.IsV2 && !OpeningOnly(roomId) && arrivals.PlacedInto(roomId) is [var placed, ..])
+        {
+            WantedHeroIn = null;
+            _runtime.Actors.Put(ego, placed.X, placed.Y, roomId, CurrentPlacement(), ego);
+            var stood = $"Assumed arrival: the hero stands where {placed.Describe()} puts him; no loadRoomWithEgo brings him into Room {roomId:00} (an estimate).";
+            _uncertainties.Add(stood);
+            EnterRoom(room, $"{arrival} {stood}");
+            TakeOutHeroNotInArrival(roomId, ego);
+            return Snapshot;
+        }
         if (candidates.Count == 0 && WantedHeroIn == roomId)
         {
             WantedHeroIn = null;

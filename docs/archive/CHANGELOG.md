@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 6 November: the user's Indy 3 tour, by shared cause
+
+Picked scenes begin from the boot with their setup, so they play the same every time and nothing an earlier scene left reaches them (R-8.5). A room pick plays no scene: a script started for a room must be a page, and a room that moves on by itself within five seconds stays still. The hero is dressed before a room's entry, and in what the room's own code gives him (Room 12's small Indy, the castle plans from above). Engine: `walkActorToActor` by width (Room 6's three men walk to the car), `drawObject` of no object does nothing (the castle plans keep drawing). A still preview keeps the actors of its picture (Room 15's Indy); a room's loader can start its arrival scene (Room 15, Elsa). Measured: no scene moved in any game; 0% of the picked rooms begin a cutscene or leave by themselves. [Record](../../.verification/user-reports-20261106/README.md).
+
 ## 2 November: a jump back is a loop; the picked object's handler answered
 
 The guard reading treats an unconditional jump back as the loop running again, not the way on, so the tests inside a loop guard the scene (Indy 4 Room 44's entry, two values at once, now plays its own way, with Rooms 17 and 97's entries); an actor's position on the scene's side is tried after the other values there. The picked object's own version 2 handler, waiting for a sentence, is given the verb, recipient and object it tests for (Zak Room 44's object 655 now answers; it still needs the walk to actor 10). Indy 4 95.3% → 96.0%; the other copies, Maniac, Zak and LOOM unchanged. Record: [scene setup](../../.verification/scene-setup-20261031/README.md) (`*-run48.txt`, `*-run29.txt`).

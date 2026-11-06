@@ -28,6 +28,15 @@ public sealed record ScummEgoArrival(int TargetRoom, int ObjectId, int WalkX, in
 }
 
 /// <summary>
+/// A script that stands the hero in a room by hand: <c>putActorInRoom</c> then <c>putActor</c> with literal operands (Indy 3's Script 73: Room 9 at 532, 83),
+/// the way into a room that no <c>loadRoomWithEgo</c> names.
+/// </summary>
+public sealed record ScummHeroPlacement(int Room, int X, int Y, string Source, int Offset)
+{
+    public string Describe() => $"{Source} +0x{Offset:X4} (at {X}, {Y})";
+}
+
+/// <summary>
 /// Every decoded <c>loadRoomWithEgo</c> with a literal object and room across the game's global scripts, room entry, exit and local scripts, and
 /// object verbs. These are possible arrivals (the conditions that lead to each are not evaluated); an arrival whose object is not in the target
 /// room's directory is left out. A load of a pseudo room (0x80 and up) counts for the real room the game's literal <c>pseudoRoom</c> instructions map it
@@ -38,12 +47,19 @@ public sealed class ScummEgoArrivalIndex
     private static readonly ConcurrentDictionary<string, ScummEgoArrivalIndex> Cache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly Regex LiteralOperands = new(
         @"^0x(?<object>[0-9A-Fa-f]+), 0x(?<room>[0-9A-Fa-f]+), walkTo=\((?<x>-?\d+), (?<y>-?\d+)\)$", RegexOptions.CultureInvariant);
+    private static readonly Regex HeroInRoom = new(@"^(?:0x01|var\[0x001\]), 0x([0-9A-F]+)$", RegexOptions.CultureInvariant);
+    private static readonly Regex HeroAt = new(@"^(?:0x01|var\[0x001\]), 0x([0-9A-F]+), 0x([0-9A-F]+)$", RegexOptions.CultureInvariant);
     private readonly Dictionary<int, List<ScummEgoArrival>> _byRoom = [];
 
     private ScummEgoArrivalIndex() { }
 
     /// <summary>The literal arrivals into <paramref name="room"/>, in source order.</summary>
     public IReadOnlyList<ScummEgoArrival> Into(int room) => _byRoom.TryGetValue(room, out var list) ? list : [];
+
+    private readonly Dictionary<int, List<ScummHeroPlacement>> _placed = [];
+
+    /// <summary>The places the game's scripts stand the hero in <paramref name="room"/> by hand, in source order.</summary>
+    public IReadOnlyList<ScummHeroPlacement> PlacedInto(int room) => _placed.TryGetValue(room, out var list) ? list : [];
 
     private readonly Dictionary<int, int> _pseudoRooms = [];
 
@@ -90,6 +106,18 @@ public sealed class ScummEgoArrivalIndex
                     int.Parse(match.Groups["x"].Value, CultureInfo.InvariantCulture),
                     int.Parse(match.Groups["y"].Value, CultureInfo.InvariantCulture),
                     source, instruction.Offset, sourceRoom));
+            }
+            for (var i = 0; i < script.Instructions.Count; i++)
+            {
+                if (script.Instructions[i].Operation != "putActorInRoom" || HeroInRoom.Match(script.Instructions[i].Operands) is not { Success: true } inRoom) continue;
+                var put = script.Instructions.Skip(i + 1).Take(3).FirstOrDefault(item => item.Operation == "putActor" && HeroAt.IsMatch(item.Operands));
+                if (put is null) continue;
+                var at = HeroAt.Match(put.Operands);
+                var (target, x, y) = (int.Parse(inRoom.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture),
+                    int.Parse(at.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture), int.Parse(at.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture));
+                if (target == 0 || x == 0 && y == 0) continue;
+                if (!index._placed.TryGetValue(target, out var list)) index._placed[target] = list = [];
+                list.Add(new ScummHeroPlacement(target, x, y, source, script.Instructions[i].Offset));
             }
         }
 

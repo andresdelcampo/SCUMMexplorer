@@ -116,9 +116,19 @@ public abstract partial class ScummSession
     {
         var facts = Facts();
         // A viewer: a global script (not the boot) that loads this room and no other, so starting it shows the room and leaves the story alone.
-        return facts.OnlyLoader(room) is { } label && label.StartsWith("global script ", StringComparison.Ordinal) && label != $"global script {BootScript}" &&
-               facts.Loaders.Count(entry => entry.Value.Contains(label)) == 1 ? label : null;
+        if (facts.OnlyLoader(room) is not { } label || !label.StartsWith("global script ", StringComparison.Ordinal) || label == $"global script {BootScript}" ||
+            facts.Loaders.Count(entry => entry.Value.Contains(label)) != 1) return null;
+        // 6 November 2026 (user: "we should not play full room entry cutscenes on entry"): only a page. A script whose time passes, whose actors act or that
+        // starts others is a scene (Indy 3's Script 55, Room 3: walks and lines) or a screen of its own (Script 9, save and load), played only on demand.
+        ScummScriptDisassembly? script;
+        try { script = _data.GlobalScript(int.Parse(label["global script ".Length..], CultureInfo.InvariantCulture)); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { return null; }
+        return script?.Instructions.Any(i => i.Operation is "delay" or "delayVariable" or "printEgo" or "startScript" or "chainScript" or "startObject" or "doSentence" or
+            "saveLoadGame" or "actorOps" or "animateActor" or "putActor" or "putActorInRoom" or "walkActorTo" or "walkActorToActor" or "walkActorToObject") == false ? label : null;
     }
+
+    /// <summary>A room only the game's opening shows (<see cref="GameScriptFacts.OpeningOnly"/>).</summary>
+    protected bool OpeningOnly(int room) => Facts().OpeningOnly(room);
 
     /// <summary>
     /// 2 November 2026 (user report, Indy 3 Room 13): a picked room entry whose scripts speak as the hero (<c>printEgo</c>) plays with the hero in its
@@ -134,16 +144,7 @@ public abstract partial class ScummSession
         if (!trigger.IsRoomEntry || _runtime.PseudoRooms.Values.Contains(trigger.Room)) return;
         foreach (var label in ScummSceneSetupSearch.SceneScripts(_game, trigger))
         {
-            ScummScriptDisassembly? script = null;
-            try
-            {
-                if (Regex.Match(label, @"^global script (\d+)$") is { Success: true } g) script = _data.GlobalScript(int.Parse(g.Groups[1].Value, CultureInfo.InvariantCulture));
-                else if (Regex.Match(label, @"^Room (\d+) local script (\d+)$") is { Success: true } l)
-                    script = _data.RoomLocalScript(int.Parse(l.Groups[1].Value, CultureInfo.InvariantCulture), int.Parse(l.Groups[2].Value, CultureInfo.InvariantCulture));
-                else if (Regex.Match(label, @"^Room (\d+) entry script$") is { Success: true } e) script = _data.RoomEntryScript(int.Parse(e.Groups[1].Value, CultureInfo.InvariantCulture));
-            }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { }
-            if (script?.Instructions.Any(i => i.Operation == "printEgo") != true) continue;
+            if (ScriptOfLabel(label)?.Instructions.Any(i => i.Operation == "printEgo") != true) continue;
             WantedHeroIn = trigger.Room;
             return;
         }
@@ -156,12 +157,84 @@ public abstract partial class ScummSession
     /// </summary>
     public void DressHeroForPreview(int roomId)
     {
-        if (_runtime.IsV2 || _bootShown.ContainsKey(roomId) || Facts().HeroOutfit is not int outfit) return;
-        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return;
+        if (_runtime.IsV2 || !_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return;
+        // Whatever the room picked before dressed him in stays there (Room 12's small costume in the next room): a room the opening shows gets what the boot left.
+        var opening = _bootShown.ContainsKey(roomId);
+        if ((opening ? _controlHeroCostume : Facts().HeroOutfit) is not int outfit) return;
         if (_runtime.Actors[ego].Look.Costume is int worn && worn == outfit) return;
         _runtime.Actors.CostumeChanged(ego, outfit, CurrentPlacement());
-        _uncertainties.Add($"Room {roomId:00} was picked without its route: the hero wears costume {outfit}, the outfit the game's scripts dress him in most often " +
+        if (!opening) _uncertainties.Add($"Room {roomId:00} was picked without its route: the hero wears costume {outfit}, the outfit the game's scripts dress him in most often " +
                            "(an estimate; the room's own code or a picked scene's setup may change it).");
+    }
+
+    /// <summary>
+    /// 6 November 2026 (user report, Indy 3's castle plans, Rooms 28 and 32: Indy full size on a top-down map): the room's entry dresses the hero by a test the
+    /// visit cannot answer (Script 25 +0x0018: what he wears, var[0x0B4], which only play sets), so no branch ran and he keeps his usual outfit. When the code the
+    /// entry starts gives him costumes and he wears none of them, he wears the first (an estimate, labelled). Cutscenes in that code are scenes, not the room.
+    /// </summary>
+    public void DressHeroFromRoomCode(int roomId)
+    {
+        if (_runtime.IsV2 || !_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego) || _runtime.Actors[ego].Room != roomId) return;
+        ScummScriptDisassembly? entry;
+        try { entry = _data.RoomEntryScript(roomId); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { return; }
+        if (entry is null) return;
+        var costumes = new List<int>();
+        CollectHeroCostumes(entry, roomId, costumes, [], 0);
+        if (costumes.Count == 0 || _runtime.Actors[ego].Look.Costume is int worn && costumes.Contains(worn)) return;
+        _runtime.Actors.CostumeChanged(ego, costumes[0], CurrentPlacement());
+        _uncertainties.Add($"Room {roomId:00}'s entry dresses the hero by a test this visit does not answer: he wears costume {costumes[0]}, the first its code gives him (an estimate).");
+    }
+
+    private void CollectHeroCostumes(ScummScriptDisassembly script, int roomId, List<int> costumes, HashSet<int> seen, int depth)
+    {
+        var inCutscene = 0;
+        foreach (var instruction in script.Instructions)
+        {
+            if (instruction.Operation == "cutscene") inCutscene++;
+            else if (instruction.Operation == "endCutscene") inCutscene = Math.Max(0, inCutscene - 1);
+            if (inCutscene > 0) continue;
+            if (instruction.Operation == "actorOps" && HeroCostume.Match(instruction.Operands) is { Success: true } dressed)
+            {
+                var costume = int.Parse(dressed.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                if (!costumes.Contains(costume)) costumes.Add(costume);
+            }
+            if (depth >= 3 || instruction.Operation is not ("startScript" or "chainScript") || !instruction.Operands.StartsWith("0x", StringComparison.Ordinal)) continue;
+            var number = int.Parse(instruction.Operands[2..].Split(',', 2)[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            if (!seen.Add(number)) continue;
+            try
+            {
+                if ((number < _globalScriptCount ? _data.GlobalScript(number) : _data.RoomLocalScript(roomId, number)) is { } called)
+                    CollectHeroCostumes(called, roomId, costumes, seen, depth + 1);
+            }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { }
+        }
+    }
+
+    /// <summary>
+    /// A picked scene plays with the hero in his usual outfit, as a picked room shows him, unless its own code or its room's entry reads what he wears (Indy 3
+    /// Room 13's entry plays only when he is not in costume 2): those keep what the boot left, and a setup that tests it sets it. Before the setup and the visit.
+    /// </summary>
+    public void DressHeroForScene(ScummCutscene trigger)
+    {
+        ArgumentNullException.ThrowIfNull(trigger);
+        if (_runtime.IsV2 || _bootShown.ContainsKey(trigger.Room)) return;
+        foreach (var label in ScummSceneSetupSearch.SceneScripts(_game, trigger).Append($"Room {trigger.Room} entry script"))
+            if (ScriptOfLabel(label)?.Instructions.Any(i => i.Operation == "getActorCostume") == true) return;
+        DressHeroForPreview(trigger.Room);
+    }
+
+    private ScummScriptDisassembly? ScriptOfLabel(string label)
+    {
+        try
+        {
+            if (Regex.Match(label, @"^global script (\d+)$") is { Success: true } g) return _data.GlobalScript(int.Parse(g.Groups[1].Value, CultureInfo.InvariantCulture));
+            if (Regex.Match(label, @"^Room (\d+) local script (\d+)$") is { Success: true } l)
+                return _data.RoomLocalScript(int.Parse(l.Groups[1].Value, CultureInfo.InvariantCulture), int.Parse(l.Groups[2].Value, CultureInfo.InvariantCulture));
+            if (Regex.Match(label, @"^Room (\d+) entry script$") is { Success: true } e) return _data.RoomEntryScript(int.Parse(e.Groups[1].Value, CultureInfo.InvariantCulture));
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { }
+        return null;
     }
 
     private static readonly ConditionalWeakTable<GameLibrary, Lazy<GameScriptFacts>> ScriptFacts = new();

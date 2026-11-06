@@ -13,6 +13,9 @@ public sealed record ScummManualRoomResult(ScummSession? Session, string? Reason
 
 public abstract partial class ScummSession
 {
+    /// <summary>The frames looked ahead on a copy before a rested room is handed over (five seconds).</summary>
+    private const int LookAheadFrames = 300;
+
     private HashSet<ScriptFrame>? _manualEntryRoots;
     private bool _capturingManualEntryRoots;
 
@@ -68,6 +71,17 @@ public abstract partial class ScummSession
                     : !copy.UserInputOn ? "Native entry has not enabled player input within the preparation bound."
                     : initializationPending ? "Native entry still has pending scene initialization within the preparation bound."
                     : "Native entry did not reach a quiet, controllable room within the bound.", settled.Frames, settled.State);
+            // A room that rests only for a moment and then goes on by itself (Indy 3 Room 70, the plane: three frames on it crashes into Room 71, a scene of 16 lines)
+            // is not a room to hand over: a look ahead on a copy (6 November 2026, user: "we should not play full room entry cutscenes on entry").
+            var ahead = ObjectGraphCopy.Copy(copy, shared);
+            for (var frame = 1; frame <= LookAheadFrames; frame++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                ahead.StepFrame();
+                if (ahead.CurrentRoomId != roomId || ahead.InCutscene)
+                    return new(null, ahead.CurrentRoomId != roomId ? $"Native entry leaves the selected room by itself {frame} frames after it rests; no live preview was adopted."
+                        : $"Native entry begins a cutscene by itself {frame} frames after it rests; no live preview was adopted.", settled.Frames, settled.State);
+            }
             copy.TakeBootShownState(roomId);
             copy._uncertainties.Add($"Room {roomId:00} was selected manually: the previous scene was canceled, " +
                 "and native entry ran offscreen on an independent copy. This is an exploration preview, not a played route.");
@@ -87,7 +101,10 @@ public abstract partial class ScummSession
     /// session is a state preview, never a reached outcome; the live session is not modified. Returns no session when the room has no ambient script,
     /// unless <paramref name="requireAmbient"/> is false (a still room whose objects an explicit Interact action can then act on).
     /// </summary>
-    public ScummManualRoomResult PrepareAmbientRoom(GameResource room, CancellationToken cancellationToken = default, bool requireAmbient = true)
+    /// <param name="standing">The actors of the room's first-visit picture (<see cref="ScummRoomScene"/>): they stand where the picture showed them, so the
+    /// animation does not take them away (6 November 2026, user report: Indy 3 Room 15 lost Indy when its fountains began to play).</param>
+    public ScummManualRoomResult PrepareAmbientRoom(GameResource room, CancellationToken cancellationToken = default, bool requireAmbient = true,
+        IReadOnlyList<ScummActorSnapshot>? standing = null)
     {
         ArgumentNullException.ThrowIfNull(room);
         if (room.Kind != ResourceKind.Room || room.ResourceId is not int roomId ||
@@ -108,6 +125,13 @@ public abstract partial class ScummSession
             copy.TakeControlScreen();
             copy.TakeEntryScreen(roomId);
             copy.TakeBootShownState(roomId);
+            var egoNumber = copy._runtime.GlobalVariables.TryGetValue(copy.EgoVariable, out var hero) ? (int?)hero : null;
+            foreach (var actor in standing ?? [])
+            {
+                if (actor.Room != roomId || actor.X is null || actor.Y is null || !copy._runtime.Actors.Contains(actor.Number)) continue;
+                if (copy._runtime.Actors[actor.Number].Look.Costume != actor.Look.Costume) copy._runtime.Actors.CostumeChanged(actor.Number, actor.Look.Costume, copy.CurrentPlacement());
+                copy._runtime.Actors.Put(actor.Number, actor.X, actor.Y, roomId, copy.CurrentPlacement(), egoNumber);
+            }
             foreach (var script in ambient.Ambient)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -117,7 +141,7 @@ public abstract partial class ScummSession
             }
             copy._uncertainties.Add($"Room {roomId:00} is a static preview (R-8.5b): its entry code did not run; {stopped} other script slot(s) were ended; " +
                 $"only its ambient script(s) {string.Join(", ", ambient.Ambient.Select(a => a.ScriptId))} run, started as the entry would start them " +
-                "(an exploration preview, not a played route; the ego is not placed).");
+                $"(an exploration preview, not a played route; {(standing is null ? "the ego is not placed" : "its actors stand where the room's first-visit picture shows them")}).");
             return new(copy, null, 0, copy.CaptureSessionRoom(), Ambient: ambient);
         }
         catch (OperationCanceledException) { return new(null, "Ambient preview was canceled.", Cancelled: true); }
@@ -164,6 +188,9 @@ public abstract partial class ScummSession
 
     /// <summary>The screen rows the game had when the boot handed over control (Indy 3: 16 to 143), or null before that.</summary>
     private (int Top, int Bottom)? _controlScreen;
+
+    /// <summary>The costume the hero wore when the boot handed over control.</summary>
+    private int? _controlHeroCostume;
 
     /// <summary>
     /// 3 November 2026 (user report: a picked room jumped in size a moment after it showed): a room picked without its route starts from the screen

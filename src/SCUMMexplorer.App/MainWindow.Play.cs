@@ -168,6 +168,8 @@ public partial class MainWindow
                 var session = await Task.Run(() => ScummGameSession.BootForPlay(game, out objects), token);
                 if (!CurrentRequest()) return;
                 _play = session;
+                _playBoot = UsesManiacCutsceneSetup(game) ? null : await Task.Run(() => ScummBootSnapshot.Of(session), token);
+                if (!CurrentRequest()) return;
                 UpdatePlaySoundCard();
                 _playIndexedStates = objects!.States;
                 _playScreen = new ScummPlayScreen(game, session, _playIndexedStates);
@@ -205,7 +207,7 @@ public partial class MainWindow
                     // permanent animation, decided from its code) run on a play clock; none of its other entry code runs, and no input reaches the game.
                     // Maniac Mansion and Zak keep their own startup and static-preview rules (R-8.34, 19 Oct): no ambient session there.
                     var ambient = UsesManiacCutsceneSetup(game) ? new ScummManualRoomResult(null, "Maniac Mansion and Zak keep their startup rules.")
-                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token), token);
+                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token, standing: _browsedScene is { } picture && picture.RoomId == roomId ? picture.State.Actors : null), token);
                     if (!CurrentRequest()) return;
                     _playLiveSource = source;
                     StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";
@@ -233,8 +235,6 @@ public partial class MainWindow
                 }
                 // A room the game shows through one script of its own (a page, a manual: Indy 3's Room 74 and Script 90) is shown as that script shows it.
                 if (_play.ShownOnlyBy(roomId) is { } viewer) _play.StartSceneAt(viewer, 0);
-                // A room picked from the list shows the hero in his usual outfit, not the one the boot left (Indy 3's suit outside the college).
-                else _play.DressHeroForPreview(roomId);
             }
             else _catalogPreviewOnly = false;
             UpdatePlaySoundCard();

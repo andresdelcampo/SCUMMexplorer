@@ -192,6 +192,36 @@ public partial class MainWindow
     /// <param name="interaction">A pick from Interact (R-8.38): an object that is not in the room yet is brought into it first.</param>
     private ScummCutscene? _sceneOpening;
 
+    /// <summary>The game as the boot left it, from which every picked scene begins (R-8.5; null in Maniac Mansion and Zak McKracken, whose party is the player's).</summary>
+    private ScummBootSnapshot? _playBoot;
+
+    /// <summary>
+    /// R-8.5 (6 November 2026, user report: "strange behavior around cutscene states"): a scene picked from a list begins from the state its plan was measured on,
+    /// the boot with the plan's setup, not from wherever the session stands. A scene that already played would otherwise find its flags set and play nothing or
+    /// another branch, and the scripts a finished scene left running would go on inside the next. The picture stays until the scene's room replaces it.
+    /// </summary>
+    private async Task<bool> StartSceneFromBootAsync(GameLibrary game, ScummCutscene trigger, ScummScenePlan? plan, Func<bool> current)
+    {
+        if (_playBoot is not { } boot) return false;
+        var fresh = await Task.Run(() =>
+        {
+            var session = (ScummGameSession)boot.Start();
+            ScummCutscenePlanner.IntoControl(session);
+            return session;
+        });
+        if (!current()) return false;
+        _sceneSound.StopAll("a picked scene begins from the boot");
+        fresh.DressHeroForScene(trigger);
+        if (plan is { HasEdits: true }) fresh.ApplySceneSetup(plan.Edits);
+        fresh.ArrivalSetup = plan?.Edits;
+        _playAmbient = false;
+        _playLiveSource = null;
+        _catalogPreviewOnly = false;
+        _play = fresh;
+        _playScreen = new ScummPlayScreen(game, fresh, _playIndexedStates!);
+        return true;
+    }
+
     private async Task PlayScummCutsceneAsync(ScummCutsceneGroup group, string? shownTitle, bool interaction = false)
     {
         var trigger = group.First;
@@ -201,8 +231,19 @@ public partial class MainWindow
         // R-8.5b: a static preview's ambient session gives way to the session it was made from; the scene plays from there (stated start).
         LeaveAmbientPreview();
         if (!PreparePlayCutsceneStartup(game)) return;
+        // A list's pick begins from the boot, as its plan's runs do; an Interact pick acts on the room as it stands (R-8.5).
+        var fromBoot = false;
+        ScummScenePlan? earlyPlan = null;
+        if (!interaction && _playBoot is not null && _playPlanner is { } earlyPlanner)
+        {
+            try { earlyPlan = await Task.Run(() => earlyPlanner.Value.PlanSetup(trigger)); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { earlyPlan = null; }
+            if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_game, game)) return;
+            fromBoot = await StartSceneFromBootAsync(game, trigger, earlyPlan, () => launch == _cutsceneLaunchGeneration && ReferenceEquals(_game, game));
+            if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_game, game)) return;
+        }
         var visitedForIt = false;
-        if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room || _play is { InCutscene: true })
+        if (!PlayActive || _currentRoomResource?.ResourceId != trigger.Room || _play is { InCutscene: true } || _play?.CurrentRoomId != trigger.Room)
         {
             // A scene still playing is ended by opening the room again (the manual preparation cancels the departed scene, R-8.5a).
             _sceneSound.StopAll("another scene was picked");
@@ -230,8 +271,8 @@ public partial class MainWindow
         _playPaused = false;
         var title = shownTitle ?? GenericCutsceneTitle(trigger);
         // §8.6 (user, 31 Oct 2026): the state the scene needs is set, then it starts the way the plan found works; nothing is refused by the game's rules.
-        ScummScenePlan? plan = null;
-        if (_playPlanner is { } plannerLazy)
+        ScummScenePlan? plan = earlyPlan;
+        if (plan is null && _playPlanner is { } plannerLazy)
         {
             try { plan = await Task.Run(() => plannerLazy.Value.PlanSetup(trigger)); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { plan = null; }
@@ -246,7 +287,16 @@ public partial class MainWindow
         session.WantHeroForScene(trigger);
         try
         {
-            if (plan is { HasEdits: true } && trigger.IsRoomEntry)
+            // From the boot the setup was set before the visit, as in the plan's runs; again now for what the entry reset (ScummCutsceneRun.Run), the room not re-entered.
+            if (fromBoot)
+            {
+                if (plan is { HasEdits: true })
+                {
+                    if (session.CurrentRoomId != trigger.Room && ScummSetupEdit.PlayRoom(plan.Edits) is null) session.VisitRoom(room);
+                    session.ApplySceneSetup(plan.Edits);
+                }
+            }
+            else if (plan is { HasEdits: true } && trigger.IsRoomEntry)
             {
                 // A room entry reads its setup as the room is entered, and the room was opened before the plan was applied: as in the plan's runs,
                 // the hero first goes to the room it comes from (a "came from" value) and the setup is set, then the room is entered again.

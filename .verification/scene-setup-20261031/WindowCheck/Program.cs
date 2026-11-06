@@ -141,6 +141,28 @@ internal static class Program
                         for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
                         continue;
                     }
+                    // e presses Skip (Esc), as the playback bar does (6 November 2026: a scene skipped, then played again).
+                    if (raw == "e")
+                    {
+                        Call("SkipPlayCutscene");
+                        Log("e: skip pressed");
+                        await Pump(2);
+                        State("e +2s");
+                        continue;
+                    }
+                    // k:x,y clicks the game's screen as the player does and watches 4 seconds (6 November 2026: walking on the castle plans).
+                    if (raw.StartsWith("k:", StringComparison.Ordinal))
+                    {
+                        var at = raw[2..].Split(',').Select(int.Parse).ToArray();
+                        var clicked = (ScummSession)Field("_play")!;
+                        var delivered = clicked.ClickScreen(at[0], at[1], out var refused);
+                        Log($"{raw}: {(delivered is null ? "refused: " + refused : delivered.Description)}");
+                        await Pump(4);
+                        var hero = clicked.Actors.FirstOrDefault(a => a.Number == 1);
+                        Log($"  hero at ({hero?.X},{hero?.Y}) box {hero?.WalkBox}; draw order {string.Join(",", clicked.Snapshot.DrawOrder)}");
+                        Capture(raw.Replace(':', '-').Replace(',', '-'));
+                        continue;
+                    }
                     // S lists what the talkie speech player played (lines and effects).
                     if (raw == "S")
                     {
@@ -165,7 +187,7 @@ internal static class Program
                         var runtime = typeof(ScummSession).GetField("_runtime", Private)!.GetValue(shown)!;
                         var table = (ScummActorTable)runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
                         foreach (var actor in table.Snapshot().Where(a => a.Room == shown.CurrentRoomId))
-                            Log($"  actor {actor.Number} costume {actor.Look.Costume} at ({actor.X},{actor.Y}) visible {actor.Visible}");
+                            Log($"  actor {actor.Number} costume {actor.Look.Costume} scale {actor.Look.Scale} at ({actor.X},{actor.Y}) visible {actor.Visible}");
                         Log($"  ambient={Field("_playAmbient")} previewOnly={Field("_catalogPreviewOnly")} sameAsLive={ReferenceEquals(shown, Field("_playLiveSource"))} " +
                             $"uncertainties: {string.Join(" | ", shown.Snapshot.Uncertainties.Where(u => u.Contains("outfit") || u.Contains("opening") || u.Contains("arrival") || u.Contains("selected manually") || u.Contains("entered again") || u.Contains("Room 82")).TakeLast(12))}");
                         continue;
@@ -234,7 +256,8 @@ internal static class Program
                     if (raw.StartsWith("r:", StringComparison.Ordinal))
                     {
                         var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
-                        var resource = game.Rooms.First(r => r.ResourceId == int.Parse(raw[2..]));
+                        var resource = game.Rooms.FirstOrDefault(r => r.ResourceId == int.Parse(raw[2..]));
+                        if (resource is null) { Log($"{raw}: no such room; rooms {string.Join(",", game.Rooms.Select(r => r.ResourceId))}"); continue; }
                         var kind = typeof(MainWindow).GetNestedType("RoomOpenKind", Private)!;
                         Call("SelectRoomWithIntent", resource, Enum.Parse(kind, "Catalog"), true);
                         for (var i = 1; i <= 4; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 1) Capture("room-" + raw[2..] + "-early"); }
@@ -267,7 +290,23 @@ internal static class Program
                     if (picked is null) { Log($"{spec}: not in the list"); continue; }
                     Log($"{spec}: playing \"{picked.GetType().GetProperty("Title")!.GetValue(picked)}\"");
                     ((Action)picked.GetType().GetProperty("Play")!.GetValue(picked)!).Invoke();
-                    for (var i = 1; i <= 8; i++) { await Pump(1.5); State($"{spec} +{i * 1.5:F1}s"); if (i == 3) Capture($"{spec.Replace(',', '-')}"); }
+                    // WINDOWCHECK_SCENE=seconds: how long a scene is watched (6 November 2026: full scenes, played twice).
+                    var watched = int.TryParse(Environment.GetEnvironmentVariable("WINDOWCHECK_SCENE"), out var sceneSeconds) ? sceneSeconds * 2 / 3 : 8;
+                    // WINDOWCHECK_EARLY=n: n pictures and actor lists half a second apart as the scene begins (its first state).
+                    var repeat = report.Count(line => line.Contains($"{spec}: playing"));
+                    for (var i = 1; i <= (int.TryParse(Environment.GetEnvironmentVariable("WINDOWCHECK_EARLY"), out var early) ? early : 0); i++)
+                    {
+                        await Pump(0.5);
+                        var shown = (ScummSession?)Field("_play");
+                        if (shown is not null)
+                        {
+                            var runtime = typeof(ScummSession).GetField("_runtime", Private)!.GetValue(shown)!;
+                            var table = (ScummActorTable)runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
+                            Log($"  +{i * 0.5:F1}s room {shown.CurrentRoomId} actors: {string.Join(", ", table.Snapshot().Where(a => a.Room == shown.CurrentRoomId).Select(a => $"{a.Number} c{a.Look.Costume} ({a.X},{a.Y}){(a.Visible == true ? "" : " hidden")}"))}");
+                        }
+                        Capture($"{spec.Replace(',', '-')}-run{repeat}-early{i:00}");
+                    }
+                    for (var i = 1; i <= watched; i++) { await Pump(1.5); State($"{spec} +{i * 1.5:F1}s"); if (i == 3 || i % 6 == 0) Capture($"{spec.Replace(',', '-')}-run{repeat}-{i:00}"); }
                     var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
                     Log($"{spec} setup: {string.Join(" | ", play?.Snapshot.Uncertainties.Where(u => u.Contains("setup") || u.Contains("picked") || u.Contains("started directly")).TakeLast(3) ?? [])}");
                 }

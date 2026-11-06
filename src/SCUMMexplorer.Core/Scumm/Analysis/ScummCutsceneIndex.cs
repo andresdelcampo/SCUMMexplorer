@@ -62,6 +62,9 @@ public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, in
 
     public bool IsRoomEntry => ObjectId == 0;
 
+    /// <summary>A room's arrival scene that the script loading the room starts (no object; <see cref="VerbId"/> is the scene's script): the room's entry does not begin it.</summary>
+    public bool IsArrivalScript => ObjectId == 0 && VerbId != 0;
+
     /// <summary>The game's verb roles (never null).</summary>
     public ScummCutsceneVerbs Roles => Verbs ?? ScummCutsceneVerbs.None;
 
@@ -101,8 +104,9 @@ public static partial class ScummCutsceneIndex
 
     /// <param name="doorways">The rooms a look, walk-to or use verb's code leads to (the game's doorway finder), or null.</param>
     /// <param name="verbs">The game's verb roles and words; <see cref="ScummCutsceneVerbs.None"/> when null.</param>
+    /// <param name="arrivalScripts">Also list the arrival scenes that the script loading a room starts (<see cref="FindArrivalScripts"/>).</param>
     public static IReadOnlyList<ScummCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
-        Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null, ScummCutsceneVerbs? verbs = null)
+        Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null, ScummCutsceneVerbs? verbs = null, bool arrivalScripts = false)
     {
         verbs ??= ScummCutsceneVerbs.None;
         var found = new List<ScummCutscene>();
@@ -144,7 +148,45 @@ public static partial class ScummCutsceneIndex
                 }
             }
         }
+        if (arrivalScripts) FindArrivalScripts(data, rooms.ToHashSet(), found, verbs);
         return found.OrderBy(c => c.Room).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).ToArray();
+    }
+
+    /// <summary>
+    /// A room's arrival scene started by the script that loads the room, not by its entry (6 November 2026, user report: Indy 3 Room 15, where Elsa meets Indy:
+    /// Script 91 +0x00AC <c>loadRoom 0x0F</c>, +0x00AE <c>startScript 0x62</c>; Script 98 holds the cutscene). It belongs to that room: a trigger with no object
+    /// whose verb number is the scene's script, so a room can have one beside its entry.
+    /// </summary>
+    private static void FindArrivalScripts(IScummDataSource data, HashSet<int> rooms, List<ScummCutscene> found, ScummCutsceneVerbs verbs)
+    {
+        foreach (var number in data.GlobalScriptIds())
+        {
+            var loader = Try(() => data.GlobalScript(number));
+            if (loader is null) continue;
+            var ins = loader.Instructions;
+            for (var i = 0; i < ins.Count; i++)
+            {
+                if (ins[i].Operation != "loadRoom" || LiteralScriptNumber().Match(ins[i].Operands) is not { Success: true } roomOperand) continue;
+                var room = int.Parse(roomOperand.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                // A pseudo room number (0x80 and up) is not a room of the list.
+                if (!rooms.Contains(room)) continue;
+                if (ins.Skip(i + 1).Take(3).FirstOrDefault(next => next.Operation is "startScript" or "chainScript") is not { } call ||
+                    LiteralScriptNumber().Match(call.Operands) is not { Success: true } scriptOperand) continue;
+                var id = int.Parse(scriptOperand.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                var label = $"global script {id}";
+                // The opening's own chain (Script 1) is Play Game Intro's; a scene already listed for the room stays one.
+                if (number == 1 || id >= data.GlobalScriptCount || found.Any(c => c.Room == room && c.Scripts.Contains(label))) continue;
+                var scene = Try(() => data.GlobalScript(id));
+                if (scene is null) continue;
+                var scripts = new List<string>();
+                var texts = new List<string>();
+                var summary = new Span();
+                Walk(data, room, scene, label, 1, false, [], scripts, texts, summary);
+                if (scripts.Count == 0 || scripts[0] != label) continue;
+                found.Add(new(room, 0, "", id, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", null,
+                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs));
+            }
+        }
     }
 
     /// <summary>Triggers that reach the same cutscene scripts are one scene (LOOM: four owl holes, five wool piles); a script reached from more triggers than this is a shared helper (a generic reaction), not a scene of its own.</summary>

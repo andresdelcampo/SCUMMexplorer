@@ -49,7 +49,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 | Zak McKracken (classic, enhanced) | ✅ | 🟡 | ✅ | ✅ | 🟡 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
 What keeps a cell from ✅:
-- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 5.9%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 6.3%, Indy 4 4.0% (5.9% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 22% (Maniac, both) and 20% (Zak, both) started at the cutscene.
+- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 5.8%, Monkey Island 1 8.5% (floppy) and 8.1% (CD), Monkey Island 2 6.3%, Indy 4 4.0% (5.9% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 22% (Maniac, both) and 20% (Zak, both) started at the cutscene.
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (80%, 64% and 57% of references); their variables and bits keep numbers (the script maps hold few rows to turn into data; most of what stays unnamed has no name in the game's data: image-only objects, actors no script names).
@@ -134,7 +134,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 | 2 | A picked room whose entry leaves it (MI2's campfire, Room 4): a Normal-mode hint pointing to Play Game Intro, or let the boot room play its settled boot state? | R-8.5b vs R-5.3a | |
 | 4 | Indy 3's cursor: ScummVM's 16 × 16 cross-hair is used; the game draws a different one. Acceptable? | R-1.5, Indy 3 tracker | |
 | 5 | Indy 3: count `printEgo` lines as first texts (changes the text columns)? | ROADMAP | |
-| 7 | Indy 3 castle Rooms 20, 28, 32: guards can start a confrontation at any moment, so the catalog shows a still picture (R-8.5b). Make such rooms live anyway? | [record](../.verification/indy3-castle-20261030/README.md) | |
+| 7 | Indy 3 castle Rooms 20, 28, 32: guards can start a confrontation at any moment, so the catalog shows a still picture (R-8.5b; the picture now has Indy from above, and the plan keeps drawing once something makes the room live). Make such rooms live anyway, so you can walk them? | [record](../.verification/indy3-castle-20261030/README.md) | |
 
 ### LOOM
 
@@ -153,6 +153,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 |---|---|---|
 | Room 73 · Turn off light switch, Room 22 · Entry, Room 80 · Entry: start as in the game? Esc and Space work? | [cutscene record](../.verification/indy3-cutscenes-20261017/README.md) | |
 | Rooms 20, 28, 32: the castle's cut-away plan shows only the section around Indy (decoded, Script 25). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
+| **Retest (6 Nov):** Room 6 · Entry twice, also from Room 9 and after Skip; Rooms 12, 28, 32 Indy's size; Room 15 Indy, and its Entry (Elsa). Room 6's men: do they look right next to the real game? | [record](../.verification/user-reports-20261106/README.md) | |
 | Rooms 6, 18, 78, 80: their pictures now come from the moment their scene leaves them (the game follows Indy into the next room). Do they look right? | [record](../.verification/indy3-rooms-20261030/README.md) | |
 | The same in the 256-colour copy, and the Spanish copies' accents | [editions](../.verification/indy3-editions-20261017/README.md) | |
 

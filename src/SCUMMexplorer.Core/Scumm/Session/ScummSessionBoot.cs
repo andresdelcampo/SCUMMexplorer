@@ -18,6 +18,7 @@ public abstract partial class ScummSession
     {
         _booting = false;
         _controlScreen = _runtime.MainScreen;
+        _controlHeroCostume = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var hero) && _runtime.Actors.Contains(hero) ? _runtime.Actors[hero].Look.Costume : null;
         BootFrames = frames;
         if (_pending.Any(item => item.ScriptNumber == BootScript))
             _uncertainties.Add($"The boot (script 001) was still running after {frames} frames; the preview stopped following it.");
