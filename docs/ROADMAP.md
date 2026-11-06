@@ -88,7 +88,7 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 
 ### Indiana Jones 3 (EGA and 256 colours)
 - 4 scenes started at their cutscene show nothing (work item 1).
-- Rooms 47, 60, 66 start dark and are shown lit. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
+- Rooms 47, 60, 66 start dark (live since 6 November): compare with the game. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
 ### Monkey Island 1 (floppy and CD)
 - 1 (floppy) and 1 (CD) scene started at its cutscene shows nothing (work item 1).
@@ -134,7 +134,6 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 | 2 | A picked room whose entry leaves it (MI2's campfire, Room 4): a Normal-mode hint pointing to Play Game Intro, or let the boot room play its settled boot state? | R-8.5b vs R-5.3a | |
 | 4 | Indy 3's cursor: ScummVM's 16 × 16 cross-hair is used; the game draws a different one. Acceptable? | R-1.5, Indy 3 tracker | |
 | 5 | Indy 3: count `printEgo` lines as first texts (changes the text columns)? | ROADMAP | |
-| 7 | Indy 3 castle Rooms 20, 28, 32: guards can start a confrontation at any moment, so the catalog shows a still picture (R-8.5b; the picture now has Indy from above, and the plan keeps drawing once something makes the room live). Make such rooms live anyway, so you can walk them? | [record](../.verification/indy3-castle-20261030/README.md) | |
 
 ### LOOM
 
@@ -152,7 +151,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 | Check | Steps | Result |
 |---|---|---|
 | Room 73 · Turn off light switch, Room 22 · Entry, Room 80 · Entry: start as in the game? Esc and Space work? | [cutscene record](../.verification/indy3-cutscenes-20261017/README.md) | |
-| Rooms 20, 28, 32: the castle's cut-away plan shows only the section around Indy (decoded, Script 25). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
+| Rooms 20, 28, 32 are live: walk the plan; only the sections Indy has been in show, and a guard who reaches him starts the confrontation (no disguise is assumed). Does the real game look the same? | [record](../.verification/indy3-castle-20261030/README.md) | |
 | **Retest (6 Nov):** Room 6 · Entry twice, also from Room 9 and after Skip; Rooms 12, 28, 32 Indy's size; Room 15 Indy, and its Entry (Elsa). Room 6's men: do they look right next to the real game? | [record](../.verification/user-reports-20261106/README.md) | |
 | Rooms 6, 18, 78, 80: their pictures now come from the moment their scene leaves them (the game follows Indy into the next room). Do they look right? | [record](../.verification/indy3-rooms-20261030/README.md) | |
 | The same in the 256-colour copy, and the Spanish copies' accents | [editions](../.verification/indy3-editions-20261017/README.md) | |

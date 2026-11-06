@@ -45,6 +45,24 @@ if (Environment.GetEnvironmentVariable("TOUR_WALK") is { Length: > 0 } walkRoom)
         return $"room {session.CurrentRoomId} hero ({hero.X},{hero.Y}) box {hero.WalkBox}; queue {string.Join(",", session.Snapshot.DrawOrder.TakeLast(6))} | pending {string.Join(" ", running)} | var B8 {session.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x0B8]")} B9 {session.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x0B9]")}";
     }
     Console.WriteLine(Report());
+    // TOUR_CLICKS=x,y;x,y: room points clicked in turn, the hero followed every 40 frames.
+    foreach (var click in (Environment.GetEnvironmentVariable("TOUR_CLICKS") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries))
+    {
+        var at = click.Split(',').Select(int.Parse).ToArray();
+        var delivered = session.ClickScreen(at[0] - session.ViewLeft, at[1] + session.MainScreen.Top, out var why);
+        Console.WriteLine($"click {click}: {delivered?.Description ?? "refused " + why}");
+        for (var step = 0; step < 10; step++)
+        {
+            for (var i = 0; i < 40; i++) { Stop(); session.StepFrame(); }
+            var actor = session.Actors.First(a => a.Number == 1);
+            Console.WriteLine($"   {Report()} moving {session.EgoMoving} estimate [{actor.Estimate}] unknown costume {actor.Look.Costume}");
+        }
+    }
+    if (Environment.GetEnvironmentVariable("TOUR_CLICKS") is { Length: > 0 })
+    {
+        foreach (var line in session.SessionTrace.TakeLast(14)) Console.WriteLine("  trace: " + line);
+        return;
+    }
     for (var box = 0; box < (boxes?.Boxes.Count ?? 0); box++)
     {
         if (boxes!.Coordinates(box) is not { } shape) continue;

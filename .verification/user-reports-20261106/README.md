@@ -38,6 +38,12 @@ Rooms with no hero are mostly pages, maps and close-ups. Lines after a pick in a
 
 Scenes, `../scene-setup-20261031/*-run55.txt` against `*-run53.txt` (Maniac and Zak `*-run54.txt` against `*-run31.txt`, LOOM `../loom-editions-20261031/run35-*.txt` against `run34-*.txt`): no scene moved either way. Started directly at their cutscene: Indy 3 5.8% (of 155, two new arrival scenes), Monkey Island 1 8.5% and 8.1%, Monkey Island 2 6.3%, Indy 4 4.0%; 5.9% of the five copies; Maniac 22%, Zak 20%; LOOM unchanged. Scenes showing nothing: 11, as before.
 
+## The castle plans live (the same day; decision 7, the user: yes)
+
+A script that can go round for ever without beginning its scene is a watcher, not initialization (`RemainingSourceWatches`: Script 58, a guard's patrol), and in a pick's preparation an actor that moves all the time does not keep the room from resting (`SettleRoom(restlessActors:)`). When the room's own watcher takes the hero away at once, the room's other decoded arrivals are tried (`OtherArrivalObjects`; Room 32: a guard patrols through the door of the assumed arrival, so he comes in by the stairs at 284, 34). The look ahead is 600 frames.
+
+`tour-*.txt` after this, `tour-before-live-*.txt` before. Live rooms: Indy 3 EGA 69.3%, 256 colours 70.1%, Monkey Island 1 72.8% and 71.1%, Monkey Island 2 81.8%, Indy 4 65.6%. In every copy 0% begin a cutscene or leave in the next 900 frames. Scenes (`*-run56.txt` against `*-run55.txt`): none moved. Checked in the window (`live4/`, `live3/`): Room 28's plan is live with the small Indy, and walking from Room 32 down the stairs into Room 28, where a guard reaching him starts the confrontation ("ALTO!"), as the scripts say: no disguise is assumed (`var[0x0B4]` stays 0), so every guard stops him. The full suite passed apart from two tests that named the old reason for Monkey Island Room 51 (still refused; the wording was updated and those tests and this record's rerun).
+
 ## Tests
 
 `UserReports20261106Tests`. Harness additions: `Tour`; WindowCheck `k:x,y` (a click), `e` (Skip), `WINDOWCHECK_SCENE=seconds`, `WINDOWCHECK_EARLY=n`.

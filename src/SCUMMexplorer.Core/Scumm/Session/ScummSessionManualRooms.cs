@@ -13,8 +13,8 @@ public sealed record ScummManualRoomResult(ScummSession? Session, string? Reason
 
 public abstract partial class ScummSession
 {
-    /// <summary>The frames looked ahead on a copy before a rested room is handed over (five seconds).</summary>
-    private const int LookAheadFrames = 300;
+    /// <summary>The frames looked ahead on a copy before a rested room is handed over (ten seconds).</summary>
+    private const int LookAheadFrames = 600;
 
     private HashSet<ScriptFrame>? _manualEntryRoots;
     private bool _capturingManualEntryRoots;
@@ -36,6 +36,29 @@ public abstract partial class ScummSession
         {
             cancellationToken.ThrowIfCancellationRequested();
             var shared = ObjectGraphCopy.Reachable(_game);
+            // A room's own watcher can take the hero away at once where the assumed arrival stands him (Indy 3 Room 32: a guard patrols through the door he came
+            // by): the game's other ways in are tried before the room is given up as a still picture (6 November 2026, user: the castle plans live).
+            var first = PrepareManualRoomFrom(room, roomId, null, shared, frameLimit, quietFrames, cancellationToken, out var takenAway);
+            if (first.Succeeded || !takenAway) return first;
+            foreach (var door in OtherArrivalObjects(roomId))
+            {
+                var other = PrepareManualRoomFrom(room, roomId, door, shared, frameLimit, quietFrames, cancellationToken, out _);
+                if (other.Succeeded) return other;
+            }
+            return first;
+        }
+        catch (OperationCanceledException) { return new(null, "Manual room preparation was canceled.", Cancelled: true); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException or ArgumentException)
+        { return new(null, $"Native room preparation is unavailable: {ex.Message}"); }
+    }
+
+    /// <summary>The objects of the room's other decoded arrivals, for a retry of <see cref="PrepareManualRoom"/>; a game's session supplies them.</summary>
+    protected virtual IEnumerable<int> OtherArrivalObjects(int roomId) => [];
+
+    private ScummManualRoomResult PrepareManualRoomFrom(GameResource room, int roomId, int? door, HashSet<object> shared, int frameLimit, int quietFrames,
+        CancellationToken cancellationToken, out bool takenAway)
+    {
+        takenAway = false;
             var copy = ObjectGraphCopy.Copy(this, shared);
             cancellationToken.ThrowIfCancellationRequested();
             // Existing source-derived party bindings distinguish filling the selection slots
@@ -49,6 +72,7 @@ public abstract partial class ScummSession
             copy.ManualNavigationBegan();
             copy.CancelDepartedManualRoute(roomId, cancellationToken);
             copy.TakeControlScreen();
+            if (door is int by) copy.WantedArrivalObject = by;
             copy._manualEntryRoots = [];
             copy._capturingManualEntryRoots = true;
             try { copy.VisitManualRoomCore(room); }
@@ -58,11 +82,12 @@ public abstract partial class ScummSession
             bool InitializationPending() => copy._pending.Any(p =>
                 copy.DescendsFrom(p.Frame, copy._manualEntryRoots) &&
                 (ReferenceEquals(p.Script, copy.LastEntryScript) ||
-                 copy.RemainingSourceMayBeginScene(p.Script, p.Offset, possibleScenes, [], 0)));
-            var settled = copy.SettleRoom(frameLimit, quietFrames, cancellationToken, InitializationPending);
+                 copy.RemainingSourceMayBeginScene(p.Script, p.Offset, possibleScenes, [], 0) && !RemainingSourceWatches(p.Script, p.Offset)));
+            var settled = copy.SettleRoom(frameLimit, quietFrames, cancellationToken, InitializationPending, restlessActors: true);
             var initializationPending = InitializationPending();
             copy._manualEntryRoots = null;
             cancellationToken.ThrowIfCancellationRequested();
+            takenAway = settled.Outcome == ScummSettleOutcome.RoomLeft || copy.InCutscene;
             if (settled.Outcome != ScummSettleOutcome.Settled || copy.CurrentRoomId != roomId ||
                 copy.InCutscene || !copy.UserInputOn || initializationPending)
                 return new(null, settled.Outcome == ScummSettleOutcome.RoomLeft
@@ -78,7 +103,8 @@ public abstract partial class ScummSession
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ahead.StepFrame();
-                if (ahead.CurrentRoomId != roomId || ahead.InCutscene)
+                takenAway = ahead.CurrentRoomId != roomId || ahead.InCutscene;
+                if (takenAway)
                     return new(null, ahead.CurrentRoomId != roomId ? $"Native entry leaves the selected room by itself {frame} frames after it rests; no live preview was adopted."
                         : $"Native entry begins a cutscene by itself {frame} frames after it rests; no live preview was adopted.", settled.Frames, settled.State);
             }
@@ -86,10 +112,6 @@ public abstract partial class ScummSession
             copy._uncertainties.Add($"Room {roomId:00} was selected manually: the previous scene was canceled, " +
                 "and native entry ran offscreen on an independent copy. This is an exploration preview, not a played route.");
             return new(copy, null, settled.Frames, copy.CaptureSessionRoom());
-        }
-        catch (OperationCanceledException) { return new(null, "Manual room preparation was canceled.", Cancelled: true); }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException or ArgumentException)
-        { return new(null, $"Native room preparation is unavailable: {ex.Message}"); }
     }
 
     /// <summary>
@@ -328,6 +350,37 @@ public abstract partial class ScummSession
             if (end != 0) RunStartedScript(end, 0, new Dictionary<string, ushort> { ["local[0x000]"] = closed.Data }, 0);
         }
         if (_cutscenes.Count == 0) _cutsceneOwner = null;
+    }
+
+    /// <summary>
+    /// 6 November 2026 (user: the castle plans live; decision 7): a script that can go round for ever without beginning its scene is a watcher, a part of the living
+    /// room, not initialization still under way (Indy 3's Script 58, a guard's patrol: a scene only when Indy comes near). From <paramref name="start"/>, the code is
+    /// followed up to whatever may begin a scene; it watches when a jump back closes a loop on the way.
+    /// </summary>
+    private static bool RemainingSourceWatches(ScummScriptDisassembly script, int start)
+    {
+        var instructions = script.Instructions.ToDictionary(i => i.Offset);
+        var pending = new Stack<int>();
+        var seen = new HashSet<int>();
+        pending.Push(start);
+        while (pending.TryPop(out var offset))
+        {
+            if (!seen.Add(offset) || !instructions.TryGetValue(offset, out var instruction)) continue;
+            if (instruction.Operation is "cutscene" or "startObject" or "doSentence" or "stopObjectCode" or "chainScript") continue;
+            var jump = Regex.Match(instruction.Operands, @"->\s*0x([0-9A-F]+)", RegexOptions.IgnoreCase);
+            if (jump.Success)
+            {
+                var target = int.Parse(jump.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                if (target <= offset && seen.Contains(target)) return true;
+                pending.Push(target);
+            }
+            if (instruction.Operation == "jumpRelative") continue;
+            var next = offset + instruction.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+            if (instruction.Operation == "beginOverride" && instructions.TryGetValue(next, out var skipped))
+                next += skipped.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+            pending.Push(next);
+        }
+        return false;
     }
 
     private bool RemainingSourceMayBeginScene(ScummScriptDisassembly script, int start,

@@ -2,7 +2,7 @@ namespace SCUMMexplorer.Core.Scumm;
 
 public abstract partial class ScummSession
 {
-    protected ScummSettleResult SettleRoom(int frameLimit, int quietFrames, CancellationToken cancellationToken = default, Func<bool>? extraBusy = null)
+    protected ScummSettleResult SettleRoom(int frameLimit, int quietFrames, CancellationToken cancellationToken = default, Func<bool>? extraBusy = null, bool restlessActors = false)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var room = _currentRoom?.ResourceId ?? throw new InvalidOperationException("Visit a room before settling it.");
@@ -13,6 +13,7 @@ public abstract partial class ScummSession
         var previous = ObjectValues();
         var signature = Signature(changes, 0);
         var quiet = 0;
+        var actorPlaces = new Dictionary<int, int>();
         for (var frame = 1; frame <= frameLimit; frame++)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -24,6 +25,19 @@ public abstract partial class ScummSession
                 {
                     if (!changes.TryGetValue(id, out var queue)) changes[id] = queue = new();
                     queue.Enqueue(frame);
+                }
+            // An actor that moves all the time (a patrolling guard, Indy 3's castle) never rests either, as an ambient object; the hero's own walk stays busy.
+            if (restlessActors)
+                foreach (var actor in Actors.Where(a => a.Room == room))
+                {
+                    var key = -actor.Number;
+                    var at = (actor.X ?? 0) * 1000 + (actor.Y ?? 0);
+                    if (actorPlaces.TryGetValue(key, out var was) && was != at)
+                    {
+                        if (!changes.TryGetValue(key, out var queue)) changes[key] = queue = new();
+                        queue.Enqueue(frame);
+                    }
+                    actorPlaces[key] = at;
                 }
             foreach (var queue in changes.Values)
                 while (queue.Count > 0 && queue.Peek() < frame - 240) queue.Dequeue();
@@ -66,7 +80,7 @@ public abstract partial class ScummSession
             if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
         foreach (var pair in _runtime.ObjectPositions.OrderBy(item => item.Key))
             if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
-        foreach (var actor in Actors) { hash.Add(actor.Number); hash.Add(actor.Room); hash.Add(actor.X); hash.Add(actor.Y); hash.Add(actor.Visible); hash.Add(actor.Look.Costume); }
+        foreach (var actor in Actors.Where(a => !Ambient(-a.Number))) { hash.Add(actor.Number); hash.Add(actor.Room); hash.Add(actor.X); hash.Add(actor.Y); hash.Add(actor.Visible); hash.Add(actor.Look.Costume); }
         foreach (var colour in _runtime.ShadowPalette.Take(16)) hash.Add(colour);
         foreach (var colour in _runtime.RoomColors.Take(16)) hash.Add(colour);
         hash.Add(CameraX);

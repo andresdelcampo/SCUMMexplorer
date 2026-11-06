@@ -56,6 +56,23 @@ public sealed class UserReports20261106Tests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void TheCastlePlansAreLive()
+    {
+        // Decision 7 (user, 6 November 2026): the guards' patrols (Script 58) watch for Indy; they do not make the room a still picture. In Room 32 a guard patrols
+        // through the door of the assumed arrival, so another way in is taken.
+        if (Indy3Vga() is not { } game) return;
+        var boot = ScummGameSession.BootForPlay(game, out _);
+        foreach (var plan in new[] { 20, 28, 32 })
+        {
+            var prepared = boot.PrepareManualRoom(Room(game, plan));
+            output.WriteLine($"Room {plan}: {prepared.Reason ?? "live"}");
+            Assert.True(prepared.Succeeded, prepared.Reason);
+            Assert.Equal(plan, prepared.Session!.CurrentRoomId);
+            Assert.Equal(0x14, HeroCostume(prepared.Session));
+        }
+    }
+
+    [Fact]
     public void APickedRoomDressesTheHeroItsOwnWay()
     {
         if (Indy3Vga() is not { } game) return;

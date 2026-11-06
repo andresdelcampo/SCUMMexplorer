@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 6 November: the castle plans are live
+
+Decision 7, the user: yes. A script that only watches for a condition (a guard's patrol) and an actor that keeps moving no longer make a room a still picture; when a guard takes the hero away at once, the room's other arrivals are tried. Indy 3 Rooms 20, 28, 32, and also 47, 60, 66; other games by the same rule. [Record](../../.verification/user-reports-20261106/README.md).
+
 ## 6 November: the user's Indy 3 tour, by shared cause
 
 Picked scenes begin from the boot with their setup, so they play the same every time and nothing an earlier scene left reaches them (R-8.5). A room pick plays no scene: a script started for a room must be a page, and a room that moves on by itself within five seconds stays still. The hero is dressed before a room's entry, and in what the room's own code gives him (Room 12's small Indy, the castle plans from above). Engine: `walkActorToActor` by width (Room 6's three men walk to the car), `drawObject` of no object does nothing (the castle plans keep drawing). A still preview keeps the actors of its picture (Room 15's Indy); a room's loader can start its arrival scene (Room 15, Elsa). Measured: no scene moved in any game; 0% of the picked rooms begin a cutscene or leave by themselves. [Record](../../.verification/user-reports-20261106/README.md).

@@ -177,6 +177,9 @@ public sealed class ScummGameSession : ScummSession
 
     private bool _standHeroByHand;
 
+    protected override IEnumerable<int> OtherArrivalObjects(int roomId) =>
+        _runtime.IsV2 ? [] : ScummEgoArrivalIndex.For(_game).Into(roomId).Select(item => item.ObjectId).Distinct().Take(4);
+
     /// <summary>
     /// A room picked from the list (the app's pick, the room's first-visit picture): the hero first wears his usual outfit, so that the room's own entry can
     /// dress him as it does in the game (6 November 2026, user report: Indy 3 Room 12 sets costume 0x2A and showed him in the full-size one), then the

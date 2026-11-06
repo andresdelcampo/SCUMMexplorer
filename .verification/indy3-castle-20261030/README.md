@@ -16,6 +16,10 @@
 
 No code change. The Room 20 card thumbnail looks entirely black in the window (the first-visit picture shows the section near Indy's start); not investigated.
 
+## Answered (6 November 2026): live
+
+The user chose live: [record](../user-reports-20261106/README.md). The refusal came from the possible scene *and*, as it turned out, from the moving guards: both are rules now.
+
 ## Question for the user (gate G)
 
 Should a room whose guards can start a confrontation at any time (Indy 3 castle) be live from the catalog, with that risk, instead of a still picture? Today R-8.5b keeps it still. Listed in [ROADMAP (Your checks)](../../docs/ROADMAP.md).
