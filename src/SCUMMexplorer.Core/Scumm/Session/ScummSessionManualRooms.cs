@@ -126,8 +126,9 @@ public abstract partial class ScummSession
     /// <param name="standing">The actors of the room's first-visit picture (<see cref="ScummRoomScene"/>): they stand where the picture showed them, so the
     /// animation does not take them away (6 November 2026, user report: Indy 3 Room 15 lost Indy when its fountains began to play).</param>
     public ScummManualRoomResult PrepareAmbientRoom(GameResource room, CancellationToken cancellationToken = default, bool requireAmbient = true,
-        IReadOnlyList<ScummActorSnapshot>? standing = null)
+        ScummRoomCapture? picture = null)
     {
+        var standing = picture?.Actors;
         ArgumentNullException.ThrowIfNull(room);
         if (room.Kind != ResourceKind.Room || room.ResourceId is not int roomId ||
             !_game.Rooms.Any(r => r.ResourceId == roomId)) throw new ArgumentException("Choose an indexed room of this game.", nameof(room));
@@ -151,9 +152,10 @@ public abstract partial class ScummSession
             foreach (var actor in standing ?? [])
             {
                 if (actor.Room != roomId || actor.X is null || actor.Y is null || !copy._runtime.Actors.Contains(actor.Number)) continue;
-                if (copy._runtime.Actors[actor.Number].Look.Costume != actor.Look.Costume) copy._runtime.Actors.CostumeChanged(actor.Number, actor.Look.Costume, copy.CurrentPlacement());
                 copy._runtime.Actors.Put(actor.Number, actor.X, actor.Y, roomId, copy.CurrentPlacement(), egoNumber);
+                copy._runtime.Actors.TakeLook(actor);
             }
+            if (picture is not null) copy.ShowFirstVisitPicture(picture);
             foreach (var script in ambient.Ambient)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -169,6 +171,21 @@ public abstract partial class ScummSession
         catch (OperationCanceledException) { return new(null, "Ambient preview was canceled.", Cancelled: true); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException or ArgumentException)
         { return new(null, $"The ambient preview is unavailable: {ex.Message}"); }
+    }
+
+    // 6 November 2026 (user report, Indy 3 Room 62: no hotspots, no doorways, no scrolling): a still room is a session like any other, standing as its first-visit
+    // picture shows it (objects, colours, the camera), so the arrows, the overlays and Interact work on it; its entry code still does not run.
+    private void ShowFirstVisitPicture(ScummRoomCapture picture)
+    {
+        foreach (var (id, state) in picture.Snapshot.ObjectStates) _runtime.SetObjectState(id, state);
+        foreach (var (id, position) in picture.Snapshot.ObjectPositions) _runtime.SetObjectPosition(id, position);
+        foreach (var (id, owner) in picture.Snapshot.ObjectOwners) _runtime.SetObjectOwner(id, owner);
+        foreach (var (id, classes) in picture.Snapshot.ObjectClasses) _runtime.SetObjectClasses(id, classes);
+        _runtime.DrawQueue.Clear();
+        _runtime.DrawQueue.AddRange(picture.Snapshot.DrawOrder);
+        picture.ShadowPalette.CopyTo(_runtime.ShadowPalette, 0);
+        picture.RoomColors.CopyTo(_runtime.RoomColors, 0);
+        if (picture.CameraX is int camera) JumpCameraTo(camera);
     }
 
     // 2 November 2026 (user report, Indy 3 Rooms 69, 74, 75, 80): the screen rows are how the room is shown, not its story. A static preview runs no entry

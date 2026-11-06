@@ -74,7 +74,7 @@ if (Environment.GetEnvironmentVariable("TOUR_WALK") is { Length: > 0 } walkRoom)
     }
     return;
 }
-int rooms = 0, live = 0, begins = 0, speaks = 0, leaves = 0, noHero = 0, viewers = 0;
+int rooms = 0, live = 0, begins = 0, speaks = 0, leaves = 0, noHero = 0, viewers = 0, stillCompared = 0, stillDiffering = 0;
 // The scripts the engine ended because it could not go on (the class of the castle plans' drawObject 0), with the rooms they ended in.
 var died = new Dictionary<string, HashSet<int>>();
 void NoteDead(int room, IEnumerable<string> uncertainties)
@@ -104,6 +104,27 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId is not null).OrderBy(r =
         if (prepared.Session is not ScummGameSession ready)
         {
             line = $"still | {heroText} | {prepared.Reason}";
+            // TOUR_STILL=1: the still room's session (6 November 2026) against the room's first-visit picture, pixel by pixel, on the screen rows and camera of the picture.
+            if (Environment.GetEnvironmentVariable("TOUR_STILL") == "1")
+            {
+                var still = ((ScummGameSession)snapshot.Start()).PrepareAmbientRoom(room, requireAmbient: false, picture: picture.State);
+                if (still.Session is not ScummGameSession stillSession) line += $" | NO SESSION {still.Reason}";
+                else
+                {
+                    var (top, bottom) = picture.MainScreen ?? (16, 144);
+                    stillSession.UseScreen((top, bottom));
+                    var want = ScummPlayScreen.Still(picture, top, bottom, wide: false);
+                    var indexed = picture.IndexedStates.ToDictionary(pair => pair.Key, pair => pair.Value);
+                    var got = new ScummPlayScreen(game, stillSession, indexed).Compose(0);
+                    var different = 0;
+                    for (var y = top; y < bottom && y < ScummPlayFrame.Height; y++)
+                        for (var x = 0; x < ScummPlayFrame.Width; x++)
+                            if (want.Pixels[y * ScummPlayFrame.Width + x] != got.Pixels[y * ScummPlayFrame.Width + x]) different++;
+                    stillCompared++;
+                    if (different > 0) stillDiffering++;
+                    line += $" | session differs from the picture by {different} pixels (view {want.ViewLeft} and {got.ViewLeft})";
+                }
+            }
         }
         else
         {
@@ -137,6 +158,7 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId is not null).OrderBy(r =
     Console.WriteLine($"Room {id:000} | {line}");
 }
 foreach (var (key, set) in died.OrderByDescending(p => p.Value.Count)) Console.WriteLine($"ENDED in {set.Count} room(s) [{string.Join(",", set.Order().Take(6))}]: {key}");
+if (stillCompared > 0) Console.WriteLine($"STILL rooms compared {stillCompared}, differing from their picture {stillDiffering} ({Percent(stillDiffering, stillCompared)})");
 static string Percent(int part, int all) => all == 0 ? "-" : $"{100.0 * part / all:F1}%";
 Console.WriteLine($"TOTAL rooms {rooms}, live {live} ({Percent(live, rooms)}), still {rooms - live}; after the pick in live rooms: cutscene {begins} ({Percent(begins, live)}), lines {speaks} ({Percent(speaks, live)}), left {leaves} ({Percent(leaves, live)}); " +
                   $"no hero in the room's picture {noHero} ({Percent(noHero, rooms)}); shown through a script {viewers}");

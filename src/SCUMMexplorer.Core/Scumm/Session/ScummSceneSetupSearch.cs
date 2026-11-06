@@ -370,7 +370,10 @@ public sealed partial class ScummSceneSetupSearch
                                 {
                                     var holds = ins.Operation == "isEqual" ? equal : !equal;
                                     var rank = guard is bool toPair ? holds == toPair ? 0 : 2 : 1;
-                                    var edit = new ScummSetupEdit(ScummSetupKind.VariableMatch, $"{tested}|{parts[1]}", equal ? 1 : 0, where);
+                                    // Compared with the active object, which the sentence script sets to the object itself just before the code runs (Indy 4 Room 76's jungle path, +0x0007).
+                                    var edit = parts[1] == "var[0x007]" && !trigger.IsRoomEntry
+                                        ? new ScummSetupEdit(ScummSetupKind.Variable, tested, equal ? trigger.ObjectId : trigger.ObjectId + 1, where)
+                                        : new ScummSetupEdit(ScummSetupKind.VariableMatch, $"{tested}|{parts[1]}", equal ? 1 : 0, where);
                                     if (!found.Any(f => f.Edit == edit)) found.Add((edit, rank));
                                 }
                             break;

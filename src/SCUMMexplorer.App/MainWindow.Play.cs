@@ -207,7 +207,7 @@ public partial class MainWindow
                     // permanent animation, decided from its code) run on a play clock; none of its other entry code runs, and no input reaches the game.
                     // Maniac Mansion and Zak keep their own startup and static-preview rules (R-8.34, 19 Oct): no ambient session there.
                     var ambient = UsesManiacCutsceneSetup(game) ? new ScummManualRoomResult(null, "Maniac Mansion and Zak keep their startup rules.")
-                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token, standing: _browsedScene is { } picture && picture.RoomId == roomId ? picture.State.Actors : null), token);
+                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token, requireAmbient: false, picture: _browsedScene is { } picture && picture.RoomId == roomId ? picture.State : null), token);
                     if (!CurrentRequest()) return;
                     _playLiveSource = source;
                     StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";

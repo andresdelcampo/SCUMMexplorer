@@ -122,7 +122,7 @@ public sealed class UserReports20261106Tests(ITestOutputHelper output)
         if (Indy3Vga() is not { } game) return;
         var picture = ScummRoomFirstVisit.Run(game, 15);
         Assert.Contains(picture.State.Actors, a => a.Number == 1 && a.Room == 15);
-        var preview = ScummGameSession.BootForPlay(game, out _).PrepareAmbientRoom(Room(game, 15), standing: picture.State.Actors);
+        var preview = ScummGameSession.BootForPlay(game, out _).PrepareAmbientRoom(Room(game, 15), picture: picture.State);
         Assert.NotNull(preview.Session);
         var hero = preview.Session!.Actors.First(a => a.Number == 1);
         Assert.Equal(15, hero.Room);

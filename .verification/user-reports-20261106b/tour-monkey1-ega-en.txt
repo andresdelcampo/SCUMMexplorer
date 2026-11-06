@@ -1,0 +1,83 @@
+Room 001 | still | no hero | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 8 pixels (view 0 and 0)
+Room 002 | still | hero c4 (156,168) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 003 | still | hero c4 (136,191) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 004 | still | hero c3 (146,151) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 13 pixels (view 0 and 0)
+Room 005 | still | hero c4 (231,43) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 006 | still | hero c4 (291,141) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 007 | live | hero c1 (33,134) scale 255 | live hero c1 (33,134)
+Room 008 | live | hero c1 (202,106) scale 255 | live hero c1 (202,106)
+Room 009 | live | hero c1 (215,133) scale 255 | live hero c1 (215,133)
+Room 010 | live | no hero | live hero none
+Room 011 | still | hero c1 (114,134) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 6 pixels (view 0 and 0)
+Room 012 | still | hero c1 (693,127) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 0 pixels (view 592 and 592)
+Room 014 | live | hero c1 (48,138) scale 255 | live hero c1 (48,138)
+Room 015 | live | hero c1 (133,74) scale 255 | live hero c1 (133,74)
+Room 016 | live | hero c1 (252,122) scale 255 | live hero c1 (252,122)
+Room 017 | live | hero c1 (140,98) scale 255 | live hero c1 (140,98)
+Room 018 | live | no hero | live hero none
+Room 019 | still | hero c1 (110,110) scale 255 | Native entry left the selected room; no live preview was adopted. | session differs from the picture by 1036 pixels (view 0 and 0)
+Room 020 | live | no hero | live hero none
+Room 021 | live | hero c1 (89,101) scale 255 | live hero c1 (89,101)
+Room 023 | live | no hero | live hero none
+Room 025 | live | hero c1 (506,133) scale 255 | live hero c1 (506,133)
+Room 027 | live | hero c1 (220,126) scale 255 | live hero c1 (220,126)
+Room 028 | still | hero c1 (67,125) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 378 pixels (view 0 and 0)
+Room 029 | live | hero c1 (109,101) scale 255 | live hero c1 (109,101)
+Room 030 | live | hero c1 (80,126) scale 255 | live hero c1 (80,126) | LINES 2
+Room 031 | live | hero c1 (262,120) scale 255 | live hero c1 (262,120)
+Room 032 | live | hero c1 (200,134) scale 255 | live hero c1 (200,134)
+Room 033 | live | hero c1 (346,133) scale 255 | live hero c1 (9,76)
+Room 034 | still | hero c1 (463,79) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 0 pixels (view 368 and 368)
+Room 035 | still | hero c1 (413,131) scale 110 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 103 pixels (view 160 and 160)
+Room 036 | live | hero c1 (191,132) scale 255 | live hero c1 (191,132)
+Room 037 | live | hero c1 (105,129) scale 255 | live hero c1 (105,129)
+Room 038 | live | hero c1 (244,106) scale 255 | live hero c1 (244,106)
+Room 039 | still | hero c1 (585,53) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 26907 pixels (view 320 and 320)
+Room 040 | still | hero c1 (150,142) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 2531 pixels (view 0 and 0)
+Room 041 | live | hero c1 (51,129) scale 255 | live hero c1 (51,129)
+Room 042 | still | hero c38 (150,128) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 1188 pixels (view 0 and 0)
+Room 043 | live | hero c1 (136,89) scale 255 | live hero c1 (136,89)
+Room 044 | live | hero c1 (134,123) scale 255 | live hero c1 (134,123)
+Room 045 | live | hero c1 (110,132) scale 255 | live hero c1 (110,132)
+Room 048 | live | hero c1 (22,134) scale 255 | live hero c1 (22,134)
+Room 049 | live | no hero | live hero none
+Room 050 | live | no hero | live hero none
+Room 051 | still | hero c1 (243,135) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 64 and 64)
+Room 052 | live | hero c1 (430,130) scale 255 | live hero c1 (430,130)
+Room 053 | live | hero c1 (91,97) scale 255 | live hero c1 (91,97)
+Room 057 | still | hero c1 (78,136) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 058 | live | hero c1 (294,110) scale 255 | live hero c1 (294,110)
+Room 059 | live | hero c1 (53,121) scale 255 | live hero c1 (53,121)
+Room 060 | live | hero c1 (67,123) scale 255 | live hero c1 (67,123)
+Room 061 | live | hero c1 (13,124) scale 255 | live hero c1 (13,124)
+Room 062 | live | no hero | live hero none
+Room 063 | live | no hero | live hero none
+Room 064 | live | hero c1 (121,89) scale 255 | live hero c1 (121,89)
+Room 065 | live | hero c1 (67,97) scale 255 | live hero c1 (67,97)
+Room 069 | live | no hero | live hero none
+Room 070 | live | hero c1 (114,111) scale 255 | live hero c1 (114,111)
+Room 071 | still | hero c51 (237,108) scale 255 | Native entry did not reach a quiet, controllable room within the bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 072 | still | hero c51 (249,117) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 149 pixels (view 0 and 0)
+Room 073 | live | hero c51 (267,100) scale 255 | live hero c51 (267,100)
+Room 074 | still | hero c51 (63,118) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 075 | live | hero c51 (74,104) scale 255 | live hero c51 (74,104)
+Room 076 | live | no hero | live hero none
+Room 077 | live | hero c51 (272,103) scale 255 | live hero c51 (272,103)
+Room 078 | live | hero c1 (145,142) scale 255 | live hero c1 (145,142)
+Room 079 | live | no hero | live hero none
+Room 080 | live | hero c1 (225,127) scale 255 | live hero c1 (225,127)
+Room 081 | live | no hero | live hero none
+Room 082 | live | no hero | live hero none
+Room 083 | live | hero c1 (9,121) scale 255 | live hero c1 (9,121)
+Room 084 | live | no hero | live hero none
+Room 085 | still | hero c3 (206,146) scale 255 | Native entry still has pending scene initialization within the preparation bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 086 | live | no hero | live hero none
+Room 087 | live | hero c1 (164,80) scale 255 | live hero c1 (164,80)
+Room 089 | live | no hero | live hero none
+Room 090 | live | no hero | live hero none
+Room 095 | live | no hero | live hero none
+Room 096 | still | no hero | Native entry has not enabled player input within the preparation bound. | session differs from the picture by 0 pixels (view 0 and 0)
+Room 097 | live | no hero | live hero none
+Room 098 | live | no hero | live hero none
+STILL rooms compared 22, differing from their picture 10 (45,5%)
+TOTAL rooms 81, live 59 (72,8%), still 22; after the pick in live rooms: cutscene 0 (0,0%), lines 1 (1,7%), left 0 (0,0%); no hero in the room's picture 22 (27,2%); shown through a script 0

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 6 November: what a doorway is; still rooms are sessions; a door opens
+
+The user's second Indy 3 list, by shared cause. R-6.13b: a doorway is an object you walk through (its Walk to verb, read from each copy's data, or its default code outside any cutscene); statues, Grails and the like are hotspots in every game (doorway share of what could load a room: Indy 3 83.3%, Monkey Island 1 97.9%, Monkey Island 2 82.5%, Indy 4 78.0%, Maniac 100%, Zak 93.3%, LOOM 97.3%). A still room is a session standing as its first-visit picture shows it, so scrolling, hotspots, doorways and Interact work there. A verb run directly gets the variables the game's sentence script sets, so shared door scripts act on the right object (Room 4's door opens and closes). Being caught and appearing with Henry is the game's own Script 85. [Record](../../.verification/user-reports-20261106b/README.md).
+
 ## 6 November: the castle plans are live
 
 Decision 7, the user: yes. A script that only watches for a condition (a guard's patrol) and an actor that keeps moving no longer make a room a still picture; when a guard takes the hero away at once, the room's other arrivals are tried. Indy 3 Rooms 20, 28, 32, and also 47, 60, 66; other games by the same rule. [Record](../../.verification/user-reports-20261106/README.md).

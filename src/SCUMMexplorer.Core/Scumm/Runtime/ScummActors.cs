@@ -200,6 +200,21 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
     public void Put(int number, int? x, int? y, Placement place, int? ego) =>
         Put(number, x, y, _actors[number].Room, place, ego);
 
+    /// <summary>The actor looks and stands as a captured picture shows it, its pose included (scenery drawn as actors: Monkey Island Room 39's rocks): a still room's session, 6 November 2026.</summary>
+    public void TakeLook(ScummActorSnapshot from)
+    {
+        var actor = _actors[from.Number];
+        var look = from.Look;
+        (actor.Costume, actor.Elevation, actor.Scale, actor.Facing, actor.Frame) = (look.Costume, look.Elevation, look.Scale, look.Facing, look.Frame);
+        (actor.InitFrame, actor.WalkFrame, actor.StandFrame, actor.TalkStartFrame, actor.TalkStopFrame) = (look.InitFrame, look.WalkFrame, look.StandFrame, look.TalkStartFrame, look.TalkStopFrame);
+        (actor.WalkSpeedX, actor.WalkSpeedY) = (look.WalkSpeedX, look.WalkSpeedY);
+        for (var i = 0; i < actor.Palette.Length && i < look.Palette.Count; i++) actor.Palette[i] = look.Palette[i];
+        actor.Animation = look.Animation.Clone();
+        actor.CostumeNeedsInit = false;
+        (actor.X, actor.Y, actor.Visible, actor.IgnoreBoxes, actor.WalkBox, actor.ForceClip, actor.Moving) = (from.X, from.Y, from.Visible, from.IgnoreBoxes, from.WalkBox, from.ForceClip, 0);
+        Notify(from.Number);
+    }
+
     /// <summary><c>putActor()</c>: re-places the actor where it is (actorOps ignoreBoxes/followBoxes).</summary>
     public void Replace(int number, Placement place, int? ego) =>
         Put(number, _actors[number].X, _actors[number].Y, _actors[number].Room, place, ego, replace: true);
@@ -1057,7 +1072,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public bool ClearEstimateOnArrival { get; set; }
         public byte[] Palette { get; } = new byte[16];
         public bool CostumeNeedsInit { get; set; }
-        public ScummCostumeAnimationState Animation { get; } = new();
+        public ScummCostumeAnimationState Animation { get; set; } = new();
         public string? LookEstimate { get; set; }
         public string? PaletteEstimate { get; set; }
         public string? Estimate

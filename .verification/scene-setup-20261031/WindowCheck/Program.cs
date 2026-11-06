@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
@@ -169,6 +170,63 @@ internal static class Program
                         var player = Field("_playSpeech")!;
                         var log = (System.Collections.IEnumerable)player.GetType().GetProperty("Log")!.GetValue(player)!;
                         foreach (var line in log) Log($"  speech: {line}");
+                        continue;
+                    }
+                    // p:direction,seconds holds a scroll arrow (or a key) that long and logs the camera (6 November 2026: scrolling in long rooms).
+                    if (raw.StartsWith("p:", StringComparison.Ordinal))
+                    {
+                        var at = raw[2..].Split(',').Select(double.Parse).ToArray();
+                        var shown = (ScummSession?)Field("_play");
+                        Log($"{raw}: before camera {shown?.CameraX} range {shown?.CameraPanRange} view {((System.Windows.Controls.ScrollViewer)window.FindName("RoomViewport")).HorizontalOffset:F0} playActive {typeof(MainWindow).GetProperty("PlayActive", Private)!.GetValue(window)} ambient {Field("_playAmbient")} framed {((System.Windows.Controls.Primitives.ToggleButton)window.FindName("NormalRoomWidthToggle")).IsChecked} arrows {((UIElement)window.FindName("PlayScrollButtonsPanel")).Visibility}/{((UIElement)window.FindName("RoomScrollButtonsPanel")).Visibility} left {((UIElement)window.FindName("PlayScrollLeftButton")).IsEnabled} right {((UIElement)window.FindName("PlayScrollRightButton")).IsEnabled}");
+                        Call("BeginRoomPan", (int)at[0], 64.0, null, System.Windows.Input.Key.Right);
+                        await Pump(at[1]);
+                        Log($"  during camera {shown?.CameraX} view {((System.Windows.Controls.ScrollViewer)window.FindName("RoomViewport")).HorizontalOffset:F0} active {Field("_roomPanActive")}");
+                        Call("StopRoomPan");
+                        await Pump(0.5);
+                        Log($"  after camera {shown?.CameraX} view left {((ScummPlayFrame?)Field("_playShown"))?.ViewLeft}");
+                        Capture(raw.Replace(':', '-').Replace(',', '-'));
+                        continue;
+                    }
+                    // m:direction,seconds presses a scroll arrow with the mouse (its own handlers, the button captured) that long.
+                    if (raw.StartsWith("m:", StringComparison.Ordinal))
+                    {
+                        var at = raw[2..].Split(',').Select(double.Parse).ToArray();
+                        var shown = (ScummSession?)Field("_play");
+                        var button = (System.Windows.Controls.Button)window.FindName(at[0] < 0 ? "PlayScrollLeftButton" : "PlayScrollRightButton");
+                        Log($"{raw}: before camera {shown?.CameraX} range {shown?.CameraPanRange} enabled {button.IsEnabled} visible {button.IsVisible} ambient {Field("_playAmbient")}");
+                        MouseButtonEventArgs Press(RoutedEvent routed) => new(System.Windows.Input.Mouse.PrimaryDevice, 0, System.Windows.Input.MouseButton.Left) { RoutedEvent = routed };
+                        typeof(MainWindow).GetMethod("PanButton_PreviewMouseLeftButtonDown", Private)!.Invoke(window, [button, Press(UIElement.PreviewMouseLeftButtonDownEvent)]);
+                        Log($"  pressed: active {Field("_roomPanActive")} captured {button.IsMouseCaptured}");
+                        await Pump(at[1]);
+                        Log($"  held: camera {shown?.CameraX} active {Field("_roomPanActive")}");
+                        typeof(MainWindow).GetMethod("PanButton_PreviewMouseLeftButtonUp", Private)!.Invoke(window, [button, Press(UIElement.PreviewMouseLeftButtonUpEvent)]);
+                        await Pump(0.5);
+                        Log($"  released: camera {shown?.CameraX} view left {((ScummPlayFrame?)Field("_playShown"))?.ViewLeft}");
+                        Capture(raw.Replace(':', '-').Replace(',', '-'));
+                        continue;
+                    }
+                    // O:id,id logs objects' states and pictures the room (6 November 2026: a door that opens does not show open).
+                    if (raw.StartsWith("O:", StringComparison.Ordinal))
+                    {
+                        var shown = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
+                        Log($"{raw}: room {shown?.CurrentRoomId} ambient {Field("_playAmbient")}: " + string.Join(", ", raw[2..].Split(',').Select(int.Parse).Select(id => $"{id}={shown?.Snapshot.ObjectStates.GetValueOrDefault(id)}")));
+                        foreach (var line in shown?.SessionTrace.Where(l => !l.Contains("delay") && !l.Contains("Script 17")).TakeLast(24) ?? []) Log("    " + line);
+                        foreach (var line in shown?.Snapshot.Uncertainties.Where(l => !l.Contains("getRandomNr")).TakeLast(6) ?? []) Log("    ? " + line);
+                        Capture(raw.Replace(':', '-').Replace(',', '-'));
+                        continue;
+                    }
+                    // H lists the room's hotspots and doorways as the shared views get them, whatever draws them, and pictures them Always (6 November 2026).
+                    if (raw == "H")
+                    {
+                        var provider = typeof(MainWindow).GetProperty((bool)typeof(MainWindow).GetProperty("PlayActive", Private)!.GetValue(window)! ? "PlayHotspots" : "LoomHotspots", Private)!.GetValue(window)!;
+                        var hotspots = (IReadOnlyList<RoomHotspot>)provider.GetType().GetMethod("Hotspots")!.Invoke(provider, [])!;
+                        Log($"H: playActive {typeof(MainWindow).GetProperty("PlayActive", Private)!.GetValue(window)} ambient {Field("_playAmbient")} previewOnly {Field("_catalogPreviewOnly")} {hotspots.Count} objects");
+                        foreach (var item in hotspots)
+                            Log($"  {(item.IsDoorway ? "doorway" : "hotspot")} {item.ObjectId} \"{item.Name}\" ({item.X},{item.Y}) {item.Width}x{item.Height}{(item.IsDoorway ? " to " + string.Join("/", item.Destinations) : "")} actions {provider.GetType().GetMethod("HasActions")!.Invoke(provider, [item])}");
+                        foreach (var option in new[] { "ObjectsAlways", "DoorwaysAlways" })
+                            if (window.FindName(option) is System.Windows.Controls.RadioButton radio) radio.IsChecked = true; else Log($"  no option {option}");
+                        await Pump(0.6);
+                        Capture("hotspots-" + (Field("_playOverlayRoom") ?? ((SCUMMexplorer.Core.Domain.GameResource?)Field("_currentRoomResource"))?.ResourceId));
                         continue;
                     }
                     // d lists the doorways the room shows (VisibleDoorways, 2 November 2026).

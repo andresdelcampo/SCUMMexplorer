@@ -378,6 +378,27 @@ public abstract partial class ScummSession
     }
 
 
+    /// <summary>
+    /// A verb run without the game's sentence script still gets what that script tells it: the variables it copies its verb and objects into
+    /// (<c>move var[N] = local[0..2]</c>; <c>var[0x007]</c>, the active object, in Indy 3, Monkey Island and Indy 4). Code that reads them acted on the last object
+    /// used: Indy 3's door scripts (26 and 27, <c>setState var[0x007]</c>) opened another object, not the door (user report, 6 November 2026).
+    /// Read from the game's own script, so a game without one (LOOM) changes nothing.
+    /// </summary>
+    private void BindSentenceVariables(int verb, int objectA, int objectB)
+    {
+        var number = _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
+        if (number == 0) return;
+        ScummScriptDisassembly? sentence;
+        try { sentence = _data.GlobalScript(number); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or ArgumentException or KeyNotFoundException) { return; }
+        foreach (var instruction in sentence?.Instructions ?? [])
+        {
+            if (instruction.Operation != "move" || instruction.Operands.Split(" = ") is not [var target, var source] || !target.StartsWith("var[", StringComparison.Ordinal)) continue;
+            var value = source switch { "local[0x000]" => verb, "local[0x001]" => objectA, "local[0x002]" => objectB, _ => -1 };
+            if (value >= 0) _runtime.SetGlobalVariable(target, checked((ushort)value));
+        }
+    }
+
     /// <param name="objectB">The second object of a two-object verb (Use X with Y), passed as the code's <c>local[0x000]</c> with the verb in
     /// <c>local[0x001]</c>, as the sentence scripts' <c>startObject A, verb, [B, verb]</c> do (Indy 4 Script 2 +0x0520, Indy 3 Script 2 +0x0335); 0 for none.</param>
     public ScummObjectActionResult ActivateObjectVerb(int objectId, int verbId, int objectB = 0)
@@ -415,6 +436,7 @@ public abstract partial class ScummSession
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject1, checked((ushort)objectId));
                 _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, checked((ushort)objectB));
             }
+            else if (!_runtime.IsV2) BindSentenceVariables(verbId, objectId, objectB);
             var locals = objectB != 0 && !_runtime.IsV2
                 ? new Dictionary<string, ushort> { ["local[0x000]"] = checked((ushort)objectB), ["local[0x001]"] = checked((ushort)verbId) }
                 : null;

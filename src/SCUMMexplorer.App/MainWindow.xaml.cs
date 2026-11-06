@@ -732,12 +732,12 @@ public partial class MainWindow : Window
             foreach (var record in records)
             {
                 if (!verbs.TryGetValue(record.Id, out var entries)) continue;
-                foreach (var verb in entries)
+                foreach (var verb in finder.DoorVerbs(entries))
                 {
                     ScummScriptDisassembly script;
                     try { script = data.ReadObjectVerb(roomId, record, verb.VerbId, out _); }
                     catch (Exception ex) when (ex is IOException or InvalidDataException or KeyNotFoundException or ArgumentException) { continue; }
-                    foreach (var target in finder.Find(room, script))
+                    foreach (var target in finder.FindDoorway(room, script, verb))
                         found.Add(new RoomVerbDestination(record, verb, target.RoomId, target.InstructionOffset, target.Path));
                 }
             }
@@ -5638,14 +5638,14 @@ public partial class MainWindow : Window
         foreach (var record in _currentRoomObjectRecords)
         {
             if (!_roomVerbs.TryGetValue(record.Id, out var verbs)) continue;
-            foreach (var verb in verbs)
+            foreach (var verb in _doorwayFinder.DoorVerbs(verbs))
             {
                 ScummScriptDisassembly script;
                 try { script = _cdData is not null ? _cdData.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _verbReader.Decode(room, record, verb.VerbId); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
                 // Follow started room-local and global scripts too: many exits
                 // (for example Room 03's town and cemetery paths) load the room there.
-                foreach (var target in _doorwayFinder.Find(room, script))
+                foreach (var target in _doorwayFinder.FindDoorway(room, script, verb))
                     candidates.Add(new RoomVerbDestination(record, verb, target.RoomId, target.InstructionOffset, target.Path));
             }
         }

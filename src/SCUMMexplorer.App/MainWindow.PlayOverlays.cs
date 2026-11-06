@@ -258,11 +258,11 @@ public partial class MainWindow
             {
                 if (!verbs.TryGetValue(record.Id, out var entries)) continue;
                 var targets = new HashSet<int>();
-                foreach (var verb in entries)
+                foreach (var verb in finder.DoorVerbs(entries))
                     try
                     {
                         var script = data.ReadObjectVerb(roomId, record, verb.VerbId, out _);
-                        targets.UnionWith(finder.Find(resource, script).Select(target => target.RoomId));
+                        targets.UnionWith(finder.FindDoorway(resource, script, verb).Select(target => target.RoomId));
                     }
                     catch (Exception ex) when (ex is IOException or InvalidDataException or KeyNotFoundException or ArgumentException or NotSupportedException) { }
                 if (targets.Count > 0) found[record.Id] = targets.Order().ToArray();
