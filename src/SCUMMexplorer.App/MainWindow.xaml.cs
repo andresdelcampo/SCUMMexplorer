@@ -1158,10 +1158,22 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Rooms the user picked that are still opening (their picture, then their play session).</summary>
+    private int _roomsOpening;
+
+    /// <summary>
+    /// The background scene derivation holds its next step while a sound the game waits for is rendered, and while a picked room opens (7 November 2026, user
+    /// report: the Indy 3 EGA castle plans took over half a minute to open while the derivation filled every worker).
+    /// </summary>
+    private void UpdateScanGate()
+    {
+        if (_sceneSound.IsPreparing || _roomsOpening > 0) _scanGate.Reset(); else _scanGate.Set();
+    }
+
     /// <summary>A track the game started is still being rendered and the game waits for it (see <see cref="SceneSoundPlayer.IsPreparing"/>).</summary>
     private void SceneSound_PreparingChanged()
     {
-        if (_sceneSound.IsPreparing) _scanGate.Reset(); else _scanGate.Set();
+        UpdateScanGate();
         if (_sceneSound.IsPreparing)
         {
             _musicBusy ??= BeginBusy(_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland
@@ -1386,6 +1398,8 @@ public partial class MainWindow : Window
         }
 
         var previewGame = _game!;
+        _roomsOpening++;
+        UpdateScanGate();
         try
         {
             if (await roomSource.LoadAsync(this, previewGame, resource, () => token.IsCancellationRequested || !ReferenceEquals(_game, previewGame), token) is not { } load) return;
@@ -1552,6 +1566,11 @@ public partial class MainWindow : Window
                 PreviewDescription.Text = ex.Message;
                 StatusText.Text = $"{resource.Name} · background unavailable";
             }
+        }
+        finally
+        {
+            _roomsOpening--;
+            UpdateScanGate();
         }
     }
 

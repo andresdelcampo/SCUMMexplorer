@@ -164,6 +164,38 @@ internal static class Program
                         Capture(raw.Replace(':', '-').Replace(',', '-'));
                         continue;
                     }
+                    // K:x,y presses a point of the shown frame as the play image's own handler does (WPF's hit testing first: an overlay on top would take it), then watches 4 seconds (7 November 2026: "Indy won't move").
+                    if (raw.StartsWith("K:", StringComparison.Ordinal))
+                    {
+                        var at = raw[2..].Split(',').Select(int.Parse).ToArray();
+                        var image = (System.Windows.Controls.Image)window.FindName("PlayScreenImage");
+                        var frameWidth = ((ScummPlayFrame?)Field("_playShown"))?.PixelWidth ?? ScummPlayFrame.Width;
+                        var scale = Math.Min(image.ActualWidth / frameWidth, image.ActualHeight / ScummPlayFrame.Height);
+                        var inImage = new Point((image.ActualWidth - frameWidth * scale) / 2 + (at[0] + 0.5) * scale, (image.ActualHeight - ScummPlayFrame.Height * scale) / 2 + (at[1] + 0.5) * scale);
+                        var inWindow = image.TranslatePoint(inImage, window);
+                        var before = (ScummSession?)Field("_play");
+                        var hit = window.InputHitTest(inWindow) as FrameworkElement;
+                        var heroBefore = before?.Actors.FirstOrDefault(a => a.Number == 1);
+                        var inputsBefore = before?.SessionTrace.Count ?? 0;
+                        var refusal = before is null ? null : typeof(ScummSession).GetMethod("InputRefusal", Private)!.Invoke(before, []);
+                        Log($"{raw}: hit {hit?.GetType().Name} \"{hit?.Name}\"; takes input {typeof(MainWindow).GetProperty("PlayTakesInput", Private)!.GetValue(window)}; room {before?.CurrentRoomId} hero ({heroBefore?.X},{heroBefore?.Y}); refusal [{refusal}] delivered {before?.DeliveredInput.Count} pending {before?.HasPendingPlayInput}");
+                        // Posted mouse messages reach WPF only while the window is active with the real cursor over it, so the press goes in as the image's
+                        // handler passes it on, where what is under the point is the image itself (an overlay on top would take it in the app).
+                        if (ReferenceEquals(hit, image) && (bool)typeof(MainWindow).GetProperty("PlayTakesInput", Private)!.GetValue(window)!) Call("PlayScreenPress", (at[0], at[1]), 1);
+                        else Log("  not pressed: the image is not under the point or play takes no input");
+                        Log($"  sent: pending {before?.HasPendingPlayInput} delivered {before?.DeliveredInput.Count} tooltip [{((System.Windows.Controls.TextBlock)window.FindName("StatusText")).ToolTip}] focus {Keyboard.FocusedElement?.GetType().Name} captured {Mouse.Captured?.GetType().Name}");
+                        for (var i = 1; i <= 8; i++)
+                        {
+                            await Pump(0.5);
+                            var shown = (ScummSession?)Field("_play");
+                            var hero = shown?.Actors.FirstOrDefault(a => a.Number == 1);
+                            var sound = Field("_sceneSound")!;
+                            Log($"  +{i * 0.5:F1}s room {shown?.CurrentRoomId} hero ({hero?.X},{hero?.Y}) box {hero?.WalkBox} cutscene {shown?.InCutscene} draw {string.Join(",", shown?.Snapshot.DrawOrder ?? [])} | frame {Field("_playFrame")} paused {Field("_playPaused")} preparing {sound.GetType().GetProperty("IsPreparing")!.GetValue(sound)} clock {(Field("_playTimer") as System.Windows.Threading.DispatcherTimer)?.IsEnabled}");
+                            if (i == 4) Capture(raw.Replace(':', '-').Replace(',', '-') + "-2s");
+                        }
+                        foreach (var line in before?.SessionTrace.Skip(inputsBefore).Where(l => l.StartsWith("input", StringComparison.Ordinal) || l.Contains("sentence")).Take(6) ?? []) Log("    " + (line.Length > 170 ? line[..170] : line));
+                        continue;
+                    }
                     // S lists what the talkie speech player played (lines and effects).
                     if (raw == "S")
                     {

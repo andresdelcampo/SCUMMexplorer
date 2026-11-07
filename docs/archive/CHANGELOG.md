@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: the castle plans open again
+
+The user: Indy 3's castle plans "no longer show correctly - Indy won't move". In the EGA copy a picked plan stayed on "Loading the scene" for 36 s, without a session, while the background scene derivation filled every worker and reread each script from its file (the 6 November tour asks for many more). Now a room being opened holds the derivation, the EGA data source decodes each script once per game (LOOM EGA too), and the play clock stops while a pick copies its source session (a still room's source was stepped during the copy). EGA Room 20 first pick 36 s → 16 s, later plans about 3 s; Indy walks in all three plans in every copy. [Record](../../.verification/user-reports-20261107/README.md).
+
 ## 6 November: what a doorway is; still rooms are sessions; a door opens
 
 The user's second Indy 3 list, by shared cause. R-6.13b: a doorway is an object you walk through (its Walk to verb, read from each copy's data, or its default code outside any cutscene); statues, Grails and the like are hotspots in every game (doorway share of what could load a room: Indy 3 83.3%, Monkey Island 1 97.9%, Monkey Island 2 82.5%, Indy 4 78.0%, Maniac 100%, Zak 93.3%, LOOM 97.3%). A still room is a session standing as its first-visit picture shows it, so scrolling, hotspots, doorways and Interact work there. A verb run directly gets the variables the game's sentence script sets, so shared door scripts act on the right object (Room 4's door opens and closes). Being caught and appearing with Henry is the game's own Script 85. [Record](../../.verification/user-reports-20261106b/README.md).

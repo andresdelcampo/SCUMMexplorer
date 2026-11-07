@@ -364,7 +364,7 @@ public partial class MainWindow
         _loomScenePlanner = shared;
         _cdRoomListsDone = seed is not null;
         _scanDone = 0; _scanTotal = 0;
-        if (!_sceneSound.IsPreparing) _scanGate.Set();
+        UpdateScanGate();
         _ = Task.Run(() =>
         {
             try

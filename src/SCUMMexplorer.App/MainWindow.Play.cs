@@ -178,6 +178,10 @@ public partial class MainWindow
                 _playImuse = ScummImuseMusic.For(game);
             }
             if (!CurrentRequest()) return;
+            // 7 November 2026 (user report: the castle plans after another room, "Indy won't move"): the session a pick is prepared from is copied on another
+            // thread, so its clock and input stop until the new room's session takes over (StartPlayClock); a frame stepped during the copy left a session
+            // that took clicks and never ran them. The waiting picture stays on the screen meanwhile.
+            if (navigationKind == RoomOpenKind.Catalog) { _playTimer?.Stop(); _playTimer = null; }
             // A static preview's session runs only its room's ambient scripts; the session it was made from carries the game on.
             if (_playAmbient && _playLiveSource is { } live) _play = live;
             _playAmbient = false;
@@ -468,11 +472,17 @@ public partial class MainWindow
         if (!PlayTakesInput || PlayPoint(e) is not { } point) return;
         PlayScreenImage.Focus();
         e.Handled = true;
+        PlayScreenPress(point, e.ClickCount);
+    }
+
+    // A left press on the shown frame's point (0..frame width, 0..199).
+    private void PlayScreenPress((int X, int Y) point, int clickCount)
+    {
         SelectGenericInteractAt(point);
         // R-1.5 / R-6.25.2: where the game's own input leaves a double click free (ScummProfile.DoubleClickLookVerb), the second press of a double click
         // looks at the object under it through the game's own sentence path; the first press was the normal click. Elsewhere it is just a second click.
         if (GamePoint(point, jump: true) is not { } gamePoint) return;
-        if (e.ClickCount == 2 && PlayObjectAt(point) && _play!.DoubleClickLook(gamePoint.X, gamePoint.Y, out _) is not null)
+        if (clickCount == 2 && PlayObjectAt(point) && _play!.DoubleClickLook(gamePoint.X, gamePoint.Y, out _) is not null)
         {
             UpdatePlaybackControls();
             return;

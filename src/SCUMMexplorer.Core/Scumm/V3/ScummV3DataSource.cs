@@ -25,19 +25,26 @@ public sealed class ScummV3DataSource : IScummDataSource
         _game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
             .Select(item => item.ResourceId!.Value).Distinct().Order().ToArray();
 
-    public ScummScriptDisassembly? GlobalScript(int number) =>
+    // 7 November 2026 (user report: the Indy 3 EGA castle plans took over half a minute to open): each script was decoded again from its file whenever it was
+    // asked for, and the scene derivation running beside a pick asks thousands of times. A decoded script never changes, so each is read once per game, for
+    // every source made for it (ScummDataSources.For makes a new one per call) and every thread (the derivation's workers share a file-per-room game's copy).
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<GameLibrary,
+        System.Collections.Concurrent.ConcurrentDictionary<(char Kind, int Room, int Number), ScummScriptDisassembly?>> Decoded = new();
+    private System.Collections.Concurrent.ConcurrentDictionary<(char Kind, int Room, int Number), ScummScriptDisassembly?> _decoded => Decoded.GetValue(_game, _ => new());
+
+    public ScummScriptDisassembly? GlobalScript(int number) => _decoded.GetOrAdd(('g', 0, number), _ =>
         _game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script && item.ResourceId == number) is { } resource
-            ? _reader.Decode(resource) : null;
+            ? _reader.Decode(resource) : null);
 
-    public ScummScriptDisassembly? RoomEntryScript(int room) => _reader.DecodeRoomEntry(Room(room));
+    public ScummScriptDisassembly? RoomEntryScript(int room) => _decoded.GetOrAdd(('n', room, 0), _ => _reader.DecodeRoomEntry(Room(room)));
 
-    public ScummScriptDisassembly? RoomExitScript(int room) => _reader.DecodeRoomExit(Room(room));
+    public ScummScriptDisassembly? RoomExitScript(int room) => _decoded.GetOrAdd(('x', room, 0), _ => _reader.DecodeRoomExit(Room(room)));
 
     public IReadOnlyList<int> RoomLocalScriptIds(int room) =>
         FindRoom(room) is { } resource ? ScummScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(resource.FilePath), GlobalScriptCount) : [];
 
     public ScummScriptDisassembly? RoomLocalScript(int room, int number) =>
-        _reader.DecodeRoomLocalScript(Room(room), number, GlobalScriptCount);
+        _decoded.GetOrAdd(('l', room, number), _ => _reader.DecodeRoomLocalScript(Room(room), number, GlobalScriptCount));
 
     public ScummCostume? ReadCostume(int id) => ScummCostume.Load(_game, id);
 

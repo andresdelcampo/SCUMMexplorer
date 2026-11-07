@@ -94,7 +94,7 @@ public partial class MainWindow
         });
         _playPlanner = planner;
         _scanDone = 0; _scanTotal = 0;
-        if (!_sceneSound.IsPreparing) _scanGate.Set();
+        UpdateScanGate();
         _ = Task.Run(() =>
         {
             try
