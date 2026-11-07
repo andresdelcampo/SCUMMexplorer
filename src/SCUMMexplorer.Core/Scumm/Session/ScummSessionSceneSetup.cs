@@ -445,6 +445,12 @@ public abstract partial class ScummSession
             ActivateObjectVerb(objectA, verb, objectB);
             return;
         }
+        // 7 November 2026 (work item 1: Monkey Island 2 Room 14's Cheese Squigglies): an object owned by neither the room nor anyone's inventory has no verb
+        // code the game can find (ScummVM whereIsObject: WIO_NOT_FOUND, so getVerbEntrypoint is 0 and the sentence script answers "I can't reach it"). Its
+        // verbs run only once it is held, so a pick gives it to the hero first, its code that of this room.
+        if (_runtime.ObjectOwners.GetValueOrDefault(objectA) is var owner && owner != 0x0F && owner != 0 && Array.IndexOf(_runtime.InventorySlots, objectA) < 0 &&
+            _currentRoom?.ResourceId is int here)
+            ApplySceneSetup([new ScummSetupEdit(ScummSetupKind.Held, objectA.ToString(System.Globalization.CultureInfo.InvariantCulture), 1, $"Room {here} object {objectA} (its owner {owner} is neither the room nor an inventory)", here)]);
         if (heldFirst && objectB != 0)
         {
             _runtime.Sentences.Add((verb, objectB, objectA));

@@ -1,0 +1,37 @@
+﻿Test run for D:\Documents\Personal\Code Projects\SCUMMexplorer\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:01:15.32]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit [1 ms]
+[xUnit.net 00:01:15.33]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpSpeakers [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpSpeakers [1 ms]
+[xUnit.net 00:01:47.54]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCatalogSetups [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCatalogSetups [1 ms]
+[xUnit.net 00:03:25.83]     SCUMMexplorer.Tests.LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick [SKIP]
+[xUnit.net 00:03:25.83]     SCUMMexplorer.Tests.LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick [1 ms]
+  Skipped SCUMMexplorer.Tests.LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs [1 ms]
+rtk.exe : [xUnit.net 00:04:08.68]     SCUMMexplorer.Tests.ScummPlayStartTests.PlayReachesALiveRoomWithinSeconds(copy: 
+"indy3 ega en") [FAIL]
+At line:1 char:584
++ ... ct -Last 2; & $rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMe ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([xUnit.net 00:0...ega en") [FAIL]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  Failed SCUMMexplorer.Tests.ScummPlayStartTests.PlayReachesALiveRoomWithinSeconds(copy: "indy3 ega en") [20 s]
+  Error Message:
+   indy3 ega en: play took 20,1 s to reach a live room (bound 20 s)
+  Stack Trace:
+     at SCUMMexplorer.Tests.ScummPlayStartTests.PlayReachesALiveRoomWithinSeconds(String copy) in D:\Documents\Personal\Code Projects\SCUMMexplorer\tests\SCUMMexplorer.Tests\ScummPlayStartTests.cs:line 51
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+  Standard Output Messages:
+ Room 73: 567 frames, live
+ indy3 ega en: boot 5,48 s (Room 73), live Room 73, with 30 frames 20,08 s
+
+
+
+Failed!  - Failed:     1, Passed:  1914, Skipped:     5, Total:  1920, Duration: 8 m 46 s - SCUMMexplorer.Tests.dll (net10.0)

@@ -37,6 +37,15 @@ Indy 4 Rooms 48 and 72 named their Sunstone scene by Push (0x06), whose code the
 
 Measured (`*-run61.txt` against `*-run60.txt`, `ways.py`): 8 scenes moved, none lost its own way. Indy 4 Rooms 48, 72 and 97 (Give) to the held object first, Room 1 to the game's own way; Indy 3 Room 31's grating and Monkey Island 1 Room 28 (both copies) from their cutscene to the game's own way. Started at their cutscene: Indy 3 5.2%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 6.3%, Indy 4 3.1% (all five copies 5.3%, was 5.6%). Monkey Island 2 Room 14's Cheese Squigglies (Use with object 131) still runs directly. Full suite: `full-suite-item1b.txt` (1912 passed; the one failure was `ScummSceneSetupTests`' expectation that Room 72's peg runs directly, now the game's own way: updated, and that class with this record's tests rerun, 39 passed).
 
+## Work item 1, continued: Monkey Island 2's last direct runs
+
+| Scene | Cause | Fix (shared) |
+|---|---|---|
+| Room 14, Use the Cheese Squigglies (132) with the box (131) | Object 132's owner is 14: neither the room (15) nor anyone's inventory. ScummVM's `whereIsObject` then finds nothing, `getVerbEntrypoint` gives 0 and the sentence script answers "I can't reach it" | `PickInteraction`: an object no one can find is given to the hero first (the state its own verb needs), its code that of the room |
+| Room 28, Use the fishing pole | Global script 56 +0x0046 tests the hero's room against Room 59; the search offered "the hero in Room 59", which moves only the hero and leaves the scene in Room 28, and it kept that, so "used in Room 53" was tried on top of it. `bit[0x02A]` alone changes nothing in Room 28, so it was not kept either | A test of the hero's room in a verb's code is offered as the object held and used in that room (as a `VAR_ROOM` test already was); the "used elsewhere" pass also tries it with the values on the scene's side of the tests |
+
+Measured (`*-run62.txt` against `*-run61.txt`): Monkey Island 2 Rooms 14, 21 and 28 to the game's own way (Room 28 now goes on to Rooms 59, 58 and 45); no scene moved back, no other copy changed. The scenes started at their cutscene are unchanged (5.3%); Monkey Island 2 runs one scene directly (was 4). Full suite: `full-suite-item1c.txt` (1914 passed; the one failure was `ScummPlayStartTests`' 20 s bound for Indy 3 EGA, 20.1 s under the suite's load; alone it takes 1 s and passes, with this record's tests).
+
 ## Tools
 
 `PlanPick/` (headless: every plan from each source room, `walk <room> <x> <y> [frames] [after rooms]` frame by frame, `first <rooms>` times the first-visit pictures; `PLANPICK_AFTER` frames after a guard's cutscene begins). WindowCheck `K:x,y`.

@@ -141,8 +141,13 @@ public sealed partial class ScummSceneSetupSearch
         }
         foreach (var other in elsewhere.TakeWhile(_ => !best.Begun))
         {
-            // With the values kept so far (the diary's bit[0x5DF]), then alone.
-            foreach (var trial in kept.Count > 0 ? [[.. kept, other], [other]] : new List<ScummSetupEdit>[] { [other] })
+            // With the values kept so far (the diary's bit[0x5DF]), then with the values on the scene's side of its tests (Monkey Island 2's fishing pole:
+            // bit[0x02A], which alone changes nothing in Room 28, so was not kept), then alone.
+            var trials = new List<List<ScummSetupEdit>>();
+            if (kept.Count > 0) trials.Add([.. kept, other]);
+            if (guards.Count > 0 && !guards.All(kept.Contains)) trials.Add([.. guards, other]);
+            trials.Add([other]);
+            foreach (var trial in trials)
             {
                 var result = _run(trigger, trial);
                 if (result.Failure is null && result.Begun) { best = result; kept = trial; break; }
@@ -466,7 +471,15 @@ public sealed partial class ScummSceneSetupSearch
                                     Add(new(ScummSetupKind.CameraX, ScummVars.CameraPosX, side, where, trigger.Room), side);
                         }
                         else if (roomOf.TryGetValue(tested, out var placedActor))
-                            Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
+                        {
+                            // The hero's room tested by a verb's code is where the object is used (Monkey Island 2 Room 28's fishing pole: global script 56
+                            // +0x0046, getActorRoom of the hero against Room 59): the object held and used there, as a VAR_ROOM test is read below
+                            // (7 November 2026, work item 1). Moving only the hero would leave the scene in the trigger's room, and kept with it the use there failed.
+                            if (placedActor == "ego" && !trigger.IsRoomEntry && value.Value != trigger.Room && ins.Operation is "isEqual" or "isNotEqual" &&
+                                (guard is not bool heroThere || Holds(ins.Operation, value.Value, value.Value) == heroThere) && _game.Rooms.Any(r => r.ResourceId == value.Value))
+                                Add(new(ScummSetupKind.PlayedIn, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), value.Value, where, trigger.Room), value.Value);
+                            else Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
+                        }
                         else if ((objectCode && (tested == "local[0x000]" || _isV2 && tested == ScummVars.V2.ActiveObject2 && !V2Handler(trigger)) ||
                                   Argument(tested) == SecondObjectArgument) && value.Value != 0)
                             // Versions 1 and 2 keep the second object in VAR_ACTIVE_OBJECT2 (Zak McKracken Room 21's sand pile, +0x003F: isEqual var[0x00A], 0x44).

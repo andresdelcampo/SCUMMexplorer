@@ -59,7 +59,8 @@ if (args.Length > 4 && args[1] == "scene")
     var result = ScummCutsceneRun.RunPicked(game, () => { var s = ScummGameSession.BootForPlay(game, out _); runs.Add(s); return s; }, trigger, edits);
     Console.WriteLine($"begun {result.Begun} way {result.Way}{(result.Verb is int used ? $" by verb 0x{used:X2}" : "")} rooms [{string.Join(",", result.RoomsEntered)}] lines {result.Lines} frames {result.Frames} failure {result.Failure}");
     // The first run is the game's own way (the sentence); a later one the start at the cutscene.
-    var boots = runs.FirstOrDefault()?.SessionTrace.ToList().FindIndex(l => l.StartsWith("boot:", StringComparison.Ordinal)) ?? -1;
+    var trace = runs.FirstOrDefault()?.SessionTrace.ToList() ?? [];
+    var boots = trace.FindIndex(l => l.StartsWith("picked", StringComparison.Ordinal)) is >= 0 and var pick ? pick - 8 : trace.FindIndex(l => l.StartsWith("boot:", StringComparison.Ordinal));
     foreach (var line in runs.FirstOrDefault()?.SessionTrace.Skip(boots + 1).Where(l => !l.Contains("delay") && !l.Contains("Script 17")).Take(60) ?? []) Console.WriteLine("  | " + (line.Length > 170 ? line[..170] : line));
     foreach (var line in runs.FirstOrDefault()?.Snapshot.Uncertainties.Where(u => u.Contains("Script 02", StringComparison.Ordinal) || u.Contains("getDist", StringComparison.Ordinal)).TakeLast(8) ?? [])
         Console.WriteLine("  ? " + (line.Length > 400 ? line[..400] : line));

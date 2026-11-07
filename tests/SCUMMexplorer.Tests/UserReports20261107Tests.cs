@@ -58,6 +58,30 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void AnObjectNoOneCanFindIsHeldForItsVerb()
+    {
+        // Monkey Island 2 Room 14: the Cheese Squigglies (132) are owned by neither the room nor an inventory, so the game finds no verb code for them
+        // (whereIsObject: not found) and answers "I can't reach it"; a pick gives them to the hero first, and Use with the box begins the game's own way.
+        if (Copy("mi2 mt32 en") is not { } game) return;
+        var result = RunScene(game, 14, 132, 0x07, new(ScummSetupKind.SecondObject, "131", 1, "test", 14), new(ScummSetupKind.ObjectState, "131", 2, "test", 14));
+        Assert.True(result.Begun, result.Failure);
+        Assert.Equal(ScummPickedStart.Game, result.Way);
+    }
+
+    [Fact]
+    public void TheHerosRoomInAVerbIsWhereTheObjectIsUsed()
+    {
+        // Monkey Island 2 Room 28's fishing pole: global script 56 +0x0046 tests the hero's room against Room 59, so the pole is used there, held; the
+        // search offers that, with bit[0x02A] from the scene's side of its tests, and the scene begins the game's own way.
+        if (Copy("mi2 mt32 en") is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t.Room == 28 && t.ObjectId == 269 && t.VerbId == 0x07);
+        var plan = planner.PlanSetup(trigger);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.PlayedIn, Value: 59 });
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

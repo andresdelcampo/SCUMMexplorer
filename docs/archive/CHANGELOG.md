@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: an object no one holds, and where a verb is used
+
+Work item 1. A picked verb on an object owned by neither its room nor an inventory gives it to the hero first, as the game finds no verb code for it otherwise (Monkey Island 2's Cheese Squigglies). A verb's test of the hero's room is read as the object used there, held, and is tried with the scene's other values (Monkey Island 2's fishing pole, now on to Rooms 59, 58 and 45). Monkey Island 2 Rooms 14, 21 and 28 moved to the game's own way, none back. [Record](../../.verification/user-reports-20261107/README.md).
+
 ## 7 November: one scene, several verbs
 
 Work item 1. A scene with a held second object that begins neither way round is tried through the object's other verbs that share its code (Indy 4 Rooms 48 and 72: the scan names the scene by Push, the game reaches it by Use with the Sunstone); the window plays it with the verb that worked. 8 scenes moved to the game's own way, none back. Started at their cutscene: Indy 3 5.2%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 6.3%, Indy 4 3.1% (5.3% of the five copies, was 5.6%). [Record](../../.verification/user-reports-20261107/README.md).
