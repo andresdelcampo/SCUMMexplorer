@@ -70,6 +70,43 @@ public static class ScummCutsceneRun
         return direct.Score >= sentence.Score ? direct : sentence;
     }
 
+    /// <summary>The most frames a room's own reaction to the hero put at a picked object plays before the scene (<see cref="LetRoomMeetHero"/>).</summary>
+    public const int MeetFrames = 3000;
+
+    /// <summary>
+    /// 7 November 2026 (ROADMAP 2b, LOOM English's catalog as the answer key: Room 23's drafts at the shepherds ran 650 frames and 40 lines longer than
+    /// the reviewed replays). A pick puts the hero at the object instead of walking him there, and a room script that watches where he stands would have
+    /// begun its cutscene on the way, before the player's verb: Room 23's local script 201 chains 202, the shepherds' first meeting, once Bobbin is left of
+    /// x 125 (+0x0006, ScummVM <c>o5_isGreater</c>), and their walk point is x 121. One frame lets the room react to the hero's new place; a cutscene a
+    /// local script of the room begins there, not one of the scene's own scripts, is played to its end first, as the walk would have played it, and the
+    /// hero is put at the object again. A global script's cutscene (Indy 3's guards, Scripts 58 and 64) is not the room's reaction and is left to the
+    /// scene. Returns the frames played.
+    /// </summary>
+    public static int LetRoomMeetHero(ScummSession session, ScummCutscene trigger)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        ArgumentNullException.ThrowIfNull(trigger);
+        if (trigger.IsRoomEntry || session.CurrentRoomId != trigger.Room) return 0;
+        var reached = trigger.Scripts.Select(ScriptKey).Where(key => key is not null).ToHashSet();
+        var traced = session.SessionTrace.Count;
+        var begunBefore = session.CutscenesBegun;
+        session.PutHeroAtObject(trigger.ObjectId);
+        session.StepFrame();
+        if (session.CutscenesBegun == begunBefore) return 1;
+        var owners = session.SessionTrace.Skip(traced).Where(line => line.StartsWith("cutscene at ", StringComparison.Ordinal))
+            .Select(line => line["cutscene at ".Length..]).ToList();
+        if (owners.Count == 0 || owners.Any(owner => RoomOf(owner) != trigger.Room || reached.Contains(ScriptKey(owner)))) return 1;
+        var frames = 1;
+        for (var quiet = 0; frames < MeetFrames && session.CurrentRoomId == trigger.Room; frames++)
+        {
+            quiet = !session.InCutscene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
+            if (quiet >= 2) break;
+            session.StepFrame();
+        }
+        if (session.CurrentRoomId == trigger.Room) session.PutHeroAtObject(trigger.ObjectId);
+        return frames;
+    }
+
     /// <summary>The trigger object's other verbs whose code starts where the trigger verb's does (one scene, several verbs).</summary>
     private static IReadOnlyList<int> SameCodeVerbs(GameLibrary game, ScummCutscene trigger)
     {
@@ -126,6 +163,8 @@ public static class ScummCutsceneRun
             }
             else if (!trigger.IsRoomEntry)
             {
+                // What the room does as the hero reaches the object plays before the scene (LetRoomMeetHero); the direct way runs the verb where he stands.
+                if (way != ScummPickedStart.Direct && LetRoomMeetHero(session, trigger) > 1 && session.CurrentRoomId != playIn.ResourceId) session.VisitRoom(playIn);
                 // The rooms the visit itself entered (a pseudo room, an entry that moves on) are not the scene's.
                 mark = session.RoomsEntered.Count;
                 earlier = session.CutscenesBegun;

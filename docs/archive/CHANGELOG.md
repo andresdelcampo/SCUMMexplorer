@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: what the room does as the hero arrives plays before a picked scene
+
+Work item 2b (LOOM English's catalog as the answer key). Room 23's drafts at the shepherds ran 650 frames and 40 lines too long: the pick put Bobbin at their walk point (x 121) and ran the draft, and only then did local script 201 begin the shepherds' first meeting (local 202 and 212), which the walk there plays first in the game. Now one frame lets the room react to the hero put at the object, and a cutscene a local script of the room begins (not the scene's own) plays to its end first, unseen; global scripts' cutscenes (Indy 3's guards) are left to the scene. Used by the planner, the window's play and LOOM's play. Scene length within 10% of the catalog: 217 → 222 of 238 (93.3%); begins, rooms and category unchanged; LOOM CD, English Roland and Spanish unchanged. Other games (run 64): no scene moved back; Monkey Island 1 Room 19's cannon nozzle (both copies) from a direct run to the game's own way (its 3-frame cutscene); Maniac Mansion and Zak McKracken unchanged. Checked in the window on LOOM Spanish (the shepherds stand round Bobbin, one line). Full suite 1917 passed. [Record](../../.verification/loom-answer-key-20261031/README.md)
+
 ## 7 November: a second object named by its class
 
 Work item 1. A verb that tests its second object's class offers the objects the game's index puts in that class (Indy 3's hot coals: a full container, objects 337 and 520). 4 scenes moved from their cutscene to the game's own way, none back. Started at their cutscene: Indy 3 4.5%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 5.3%, Indy 4 3.1% (5.0%); 10 show nothing. [Record](../../.verification/user-reports-20261107/README.md).

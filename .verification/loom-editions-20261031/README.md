@@ -21,7 +21,7 @@ Every edition but the English reference lists the scenes LOOM's scan finds (`Loo
 
 The seven EGA copies give the same numbers (their scripts differ in ids and bit numbering, not in what the scenes test). Every scene begins on the shared engine (100%); LOOM's path left one (Room 34's entry) without a start.
 
-Against the English catalog's 238 reviewed replays (`../loom-answer-key-20261031/compare-run-loom-session.txt`), the shared engine on LOOM's session: all 238 begin the game's own way and reach the catalog's rooms (100%), 219 share its category (92.0%), 217 are within 10% of its length (91.2%; 212, 89.1%, on `ScummGameSession`).
+Against the English catalog's 238 reviewed replays (`../loom-answer-key-20261031/compare-run-loom-session.txt`), the shared engine on LOOM's session: all 238 begin the game's own way and reach the catalog's rooms (100%), 219 share its category (92.0%), 217 are within 10% of its length (91.2%; 212, 89.1%, on `ScummGameSession`); 222 (93.3%) since 7 November (the room's reaction to the hero put at the object plays first, `../loom-answer-key-20261031/README.md`). The editions' own counts did not change with it (`run36-*.txt`: CD, English Roland, Spanish).
 
 ## Fix 1: the hero stood in the walk box a script waits for
 

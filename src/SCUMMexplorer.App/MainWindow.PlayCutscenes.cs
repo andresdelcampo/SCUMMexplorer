@@ -358,6 +358,13 @@ public partial class MainWindow
                     session.VisitRoom(playRoom);
                 }
                 var second = plan?.Edits.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
+                // As the plan's runs: what the room does as the hero reaches the object (LOOM Room 23's shepherds meet him) plays first, unseen.
+                if (plan?.Result.Way != ScummPickedStart.Direct && ScummCutsceneRun.LetRoomMeetHero(session, trigger) > 1)
+                {
+                    _sceneSound.StopAll("the room's own cutscene played before a picked scene");
+                    if (session.CurrentRoomId != playRoom.ResourceId) session.VisitRoom(playRoom);
+                    session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger), trigger.ObjectId);
+                }
                 if (plan?.Result.Way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
                 else session.PickInteraction(trigger.ObjectId, plan?.Result.Verb ?? trigger.VerbId, second, heldFirst: plan?.Result.Way == ScummPickedStart.GameHeldFirst);
                 // As the plan's runs: the values that stand actors in the room again, once the pick has put the hero there.

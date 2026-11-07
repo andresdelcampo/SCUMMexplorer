@@ -501,7 +501,16 @@ public partial class MainWindow
         else if (!trigger.IsRoomEntry)
         {
             // LOOM has no sentence script: a pick puts Bobbin at the object and runs its verb (as ScummSession.PickInteraction does); the direct way runs it where he stands.
-            if (plan.Result.Way == ScummPickedStart.Game) session.PutHeroAtObject(trigger.ObjectId);
+            if (plan.Result.Way == ScummPickedStart.Game)
+            {
+                session.PutHeroAtObject(trigger.ObjectId);
+                // As the plan's runs: what the room does as Bobbin reaches the object (Room 23's shepherds meet him) plays first, unseen.
+                if (ScummCutsceneRun.LetRoomMeetHero(session, sharedTrigger) > 1)
+                {
+                    if (session.CurrentRoomId != room.ResourceId) session.VisitRoom(room);
+                    before = (session.CutscenesBegun, session.EgoPuts);
+                }
+            }
             action = session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
         }
         IReadOnlyList<string> storyNotes = plan.Note.Length == 0 ? [] : [plan.Note];

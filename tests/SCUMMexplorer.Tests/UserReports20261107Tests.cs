@@ -95,6 +95,23 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void WhatTheRoomDoesAsTheHeroArrivesPlaysBeforeThePickedScene()
+    {
+        // LOOM Room 23 (ROADMAP 2b, the English catalog as the answer key): local script 201 begins the shepherds' first meeting (local 202, 212: 40 lines)
+        // once Bobbin is left of x 125, and their walk point is x 121. It plays before the draft, as the walk there would; the reaction alone is the scene
+        // (the catalog's Other draft response, 70 frames less its idle tail).
+        if (Copy("loom ega mt32 en") is not { } game) return;
+        var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+        var planner = new ScummCutscenePlanner(game, () => new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, snapshot));
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t.Room == 23 && t.ObjectId == 422 && t.VerbId == 0x56);
+        var plan = planner.PlanSetup(trigger);
+        Assert.True(plan.Result.Begun, plan.Result.Failure);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.InRange(plan.Result.Frames, 30, 120);
+        Assert.InRange(plan.Result.Lines, 1, 3);
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

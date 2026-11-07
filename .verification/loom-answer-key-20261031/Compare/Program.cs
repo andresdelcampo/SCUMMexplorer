@@ -19,7 +19,13 @@ if (Environment.GetEnvironmentVariable("COMPARE_TRACE") is { Length: > 0 } spec)
     Console.WriteLine($"after visit: room {session.CurrentRoomId}, pending [{string.Join(", ", session.PendingScriptSummary)}]");
     var mark = session.SessionTrace.Count;
     session.PickInteraction(p[1], p[2]);
-    for (var f = 0; f < 600 && session.CurrentRoomId == p[0]; f++) session.StepFrame();
+    for (var f = 0; f < 600 && session.CurrentRoomId == p[0]; f++)
+    {
+        session.StepFrame();
+        // COMPARE_TRACE_EGO=1: the hero's place each frame it changes (7 November: what starts Room 23's meeting after a reaction)
+        if (Environment.GetEnvironmentVariable("COMPARE_TRACE_EGO") == "1" && session.Actors.FirstOrDefault(a => a.Number == 1) is { } ego)
+            Console.WriteLine($"frame {f}: ego ({ego.X}, {ego.Y}) box {ego.WalkBox} room {ego.Room}, cutscene {session.InCutscene}, lines {session.SessionTrace.Count}");
+    }
     Console.WriteLine($"now: room {session.CurrentRoomId}");
     foreach (var line in session.SessionTrace.Skip(mark).Where(l => Environment.GetEnvironmentVariable("COMPARE_TRACE_ALL") == "1" || l.Contains("load", StringComparison.OrdinalIgnoreCase) || l.Contains("Room 02") || l.StartsWith("picked") || l.Contains("sentence")).Take(60)) Console.WriteLine("  " + line);
     return;
