@@ -336,15 +336,16 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     [Fact]
     public void ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant()
     {
-        // Indy 4 Room 72's peg (verb 0x06) is used with object 934; the sentence script refuses it (Script 9: the peg has no class 1 to 3), so the
-        // verb's code is run directly with the second object as local[0x000], as startObject passes it. Indy 3 Room 24's first aid kit plays only
-        // when var[0x0C1] is not 1000.
+        // Indy 4 Room 72's peg (verb 0x06) is used with object 934; the sentence script refuses the peg in front (Script 9: it has no class 1 to 3).
+        // Since 7 November the game's own way is found: Use (0x08, the same code) with the Sunstone first, whose code starts the peg's with itself as
+        // local[0x000]. Indy 3 Room 24's first aid kit plays only when var[0x0C1] is not 1000.
         var folder = Path.Combine(TestGames.Root, "indy4 vga en");
         if (Directory.Exists(folder))
         {
             var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
             var plan = planner.PlanSetup(Trigger(planner, 72, 992, 0x06));
-            Assert.Equal(ScummPickedStart.Direct, plan.Result.Way);
+            Assert.Equal(ScummPickedStart.GameHeldFirst, plan.Result.Way);
+            Assert.Equal(0x08, plan.Result.Verb);
             Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.SecondObject, Target: "934" });
         }
         if (Indy3() is not { } game) return;

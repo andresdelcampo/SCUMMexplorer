@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: one scene, several verbs
+
+Work item 1. A scene with a held second object that begins neither way round is tried through the object's other verbs that share its code (Indy 4 Rooms 48 and 72: the scan names the scene by Push, the game reaches it by Use with the Sunstone); the window plays it with the verb that worked. 8 scenes moved to the game's own way, none back. Started at their cutscene: Indy 3 5.2%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 6.3%, Indy 4 3.1% (5.3% of the five copies, was 5.6%). [Record](../../.verification/user-reports-20261107/README.md).
+
 ## 7 November: a picked scene keeps the hero in its room; a held object can come first
 
 Work item 1. A picked scene that enters a room now puts the hero there before the room's arrival cutscene is closed, so the game's cutscene-end hook does not follow him back to the boot's room (Indy 3's diary, used in Room 18). A scene with a held second object that does not begin with the object first is tried with the held object first, as the player says it (Indy 4 Room 33's Sunstone and pedestal). Each moved one scene from a direct run to the game's own way; no other scene changed way in any copy. [Record](../../.verification/user-reports-20261107/README.md).

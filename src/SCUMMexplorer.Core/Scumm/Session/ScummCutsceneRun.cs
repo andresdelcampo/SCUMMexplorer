@@ -17,8 +17,10 @@ public enum ScummPickedStart
     GameHeldFirst,
 }
 
+/// <param name="Verb">The verb the game's own way used when it is not the trigger's: another verb of the object whose code is the same scene (Indy 4 Room 48's
+/// stone, Push and Use share it, and only Use reaches it with the Sunstone).</param>
 public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> RoomsEntered, int Frames, string? Failure = null, int Lines = 0,
-    ScummPickedStart Way = ScummPickedStart.Game)
+    ScummPickedStart Way = ScummPickedStart.Game, int? Verb = null)
 {
     /// <summary>Beginning at all outweighs everything; then the rooms the scene went on to and the lines it printed (as LOOM's <c>LoomSceneOutcome</c>).</summary>
     public int Score => (Begun ? 10000 : 0) + RoomsEntered.Count * 20 + Lines;
@@ -57,10 +59,29 @@ public static class ScummCutsceneRun
         {
             var heldFirst = Run(game, newSession, trigger, setup, ScummPickedStart.GameHeldFirst);
             if (heldFirst.Begun) return heldFirst;
+            // The object's other verbs whose code is the same scene: the scan names the scene by one of them (Indy 4 Room 48's stone: Push, 0x06), the game
+            // reaches it by another (Use, 0x08: the Sunstone's code, +0x0057, starts the stone's Use with itself as the argument).
+            foreach (var verb in SameCodeVerbs(game, trigger))
+                foreach (var way in new[] { ScummPickedStart.Game, ScummPickedStart.GameHeldFirst })
+                    if (Run(game, newSession, trigger with { VerbId = verb }, setup, way) is { Begun: true } other) return other with { Verb = verb };
         }
         var direct = Run(game, newSession, trigger, setup, ScummPickedStart.Direct);
         // On a tie the verb's own code wins: the sentence script's answer is then the game's refusal ("I can't get there from here", Indy 4's crate).
         return direct.Score >= sentence.Score ? direct : sentence;
+    }
+
+    /// <summary>The trigger object's other verbs whose code starts where the trigger verb's does (one scene, several verbs).</summary>
+    private static IReadOnlyList<int> SameCodeVerbs(GameLibrary game, ScummCutscene trigger)
+    {
+        try
+        {
+            var data = ScummDataSources.For(game);
+            var records = data.ReadRoom(trigger.Room).Objects;
+            if (!data.ReadObjectVerbs(trigger.Room, records).TryGetValue(trigger.ObjectId, out var entries)) return [];
+            if (entries.FirstOrDefault(e => e.VerbId == trigger.VerbId) is not { } own) return [];
+            return entries.Where(e => !e.IsFallback && e.VerbId != trigger.VerbId && e.CodeOffset == own.CodeOffset).Select(e => e.VerbId).ToArray();
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException or KeyNotFoundException) { return []; }
     }
 
     public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummSession> newSession, ScummCutscene trigger,

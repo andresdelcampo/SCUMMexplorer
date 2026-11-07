@@ -17,6 +17,13 @@ if (args.Length > 2 && args[1] == "first")
     }
     return;
 }
+// PlanPick <game folder> verbs: the verbs the boot leaves on, with their names.
+if (args.Length > 1 && args[1] == "verbs")
+{
+    var booted = ScummGameSession.BootForPlay(game, out _);
+    foreach (var v in booted.PlayVerbArea().Items) Console.WriteLine($"verb 0x{v.VerbId:X2}: {v}");
+    return;
+}
 // PlanPick <game folder> where <object>: the rooms whose object directory holds the object, with its verbs.
 if (args.Length > 2 && args[1] == "where")
 {
@@ -50,7 +57,7 @@ if (args.Length > 4 && args[1] == "scene")
     var edits = args.Skip(5).Select(a => a.Split(':')).Select(p => new ScummSetupEdit(Enum.Parse<ScummSetupKind>(p[0]), p[1], int.Parse(p[2]), "PlanPick", p.Length > 3 ? int.Parse(p[3]) : null)).ToList();
     var runs = new List<ScummSession>();
     var result = ScummCutsceneRun.RunPicked(game, () => { var s = ScummGameSession.BootForPlay(game, out _); runs.Add(s); return s; }, trigger, edits);
-    Console.WriteLine($"begun {result.Begun} way {result.Way} rooms [{string.Join(",", result.RoomsEntered)}] lines {result.Lines} frames {result.Frames} failure {result.Failure}");
+    Console.WriteLine($"begun {result.Begun} way {result.Way}{(result.Verb is int used ? $" by verb 0x{used:X2}" : "")} rooms [{string.Join(",", result.RoomsEntered)}] lines {result.Lines} frames {result.Frames} failure {result.Failure}");
     // The first run is the game's own way (the sentence); a later one the start at the cutscene.
     var boots = runs.FirstOrDefault()?.SessionTrace.ToList().FindIndex(l => l.StartsWith("boot:", StringComparison.Ordinal)) ?? -1;
     foreach (var line in runs.FirstOrDefault()?.SessionTrace.Skip(boots + 1).Where(l => !l.Contains("delay") && !l.Contains("Script 17")).Take(60) ?? []) Console.WriteLine("  | " + (line.Length > 170 ? line[..170] : line));

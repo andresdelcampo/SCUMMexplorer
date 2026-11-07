@@ -1,0 +1,35 @@
+﻿Test run for D:\Documents\Personal\Code Projects\SCUMMexplorer\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:03:15.93]     SCUMMexplorer.Tests.LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick [SKIP]
+[xUnit.net 00:03:15.95]     SCUMMexplorer.Tests.LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick [1 ms]
+  Skipped SCUMMexplorer.Tests.LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs [1 ms]
+[xUnit.net 00:04:05.55]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit [SKIP]
+[xUnit.net 00:04:05.55]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpSpeakers [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit [1 ms]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpSpeakers [1 ms]
+[xUnit.net 00:04:37.57]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCatalogSetups [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCatalogSetups [1 ms]
+rtk.exe : [xUnit.net 00:08:12.11]     
+SCUMMexplorer.Tests.ScummSceneSetupTests.ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant [FAIL]
+At line:1 char:584
++ ... ct -Last 2; & $rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMe ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([xUnit.net 00:0...Constant [FAIL]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  Failed SCUMMexplorer.Tests.ScummSceneSetupTests.ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant [4 s]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: Direct
+Actual:   GameHeldFirst
+  Stack Trace:
+     at SCUMMexplorer.Tests.ScummSceneSetupTests.ADirectRunPassesTheSecondObjectAndAVariableIsTriedBesideItsConstant() in D:\Documents\Personal\Code Projects\SCUMMexplorer\tests\SCUMMexplorer.Tests\ScummSceneSetupTests.cs:line 347
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+Failed!  - Failed:     1, Passed:  1912, Skipped:     5, Total:  1918, Duration: 9 m 5 s - SCUMMexplorer.Tests.dll (net10.0)

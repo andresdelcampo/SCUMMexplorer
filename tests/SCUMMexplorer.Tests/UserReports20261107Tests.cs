@@ -46,6 +46,18 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void AnotherVerbOfTheSameCodeReachesTheScene()
+    {
+        // Indy 4 Room 48: the stone's Push (0x06) and Use (0x08) share their code; the scan names the scene by Push, which the game never runs with the
+        // Sunstone. The Sunstone's Use (+0x0057) starts the stone's Use with itself, so the scene begins the game's own way through Use.
+        if (Copy("indy4 vga en") is not { } game) return;
+        var result = RunScene(game, 48, 589, 0x06, new ScummSetupEdit(ScummSetupKind.SecondObject, "934", 1, "test", 68));
+        Assert.True(result.Begun, result.Failure);
+        Assert.Equal(ScummPickedStart.GameHeldFirst, result.Way);
+        Assert.Equal(0x08, result.Verb);
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

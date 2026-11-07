@@ -31,6 +31,12 @@ Two shared causes found by reading the scenes whose result was a direct run with
 
 Measured: no other scene changed way in any copy (run 58: the diary only; run 60: the pedestal only). The counts of scenes started at their cutscene stay: Indy 3 5.8%, Monkey Island 1 8.5% and 8.1%, Monkey Island 2 6.3%, Indy 4 3.1%. Indy 4 Rooms 48 and 72 use the Sunstone with verb 0x06, whose code was not read yet. Harness additions: `PlanPick scene <room> <object> <verb> <edits>` (the planner's run with a given setup), `classes`, `where`; `SCUMM_TRACE_SCRIPTS=label;label` puts those scripts' instruction traces in the session trace. Full suite: `full-suite-item1.txt`.
 
+## Work item 1, continued: one scene, several verbs
+
+Indy 4 Rooms 48 and 72 named their Sunstone scene by Push (0x06), whose code the object shares with Use (0x08) (one code offset in its verb table). Push takes one object, so the game never runs that code with the Sunstone; the Sunstone's own Use (+0x0057) starts the object's Use with itself. When a scene with a held second object begins neither way round, the object's other verbs that share the scene's code are tried, both orders; the run keeps the verb it used (`ScummCutsceneRunResult.Verb`) and the window plays the scene with it.
+
+Measured (`*-run61.txt` against `*-run60.txt`, `ways.py`): 8 scenes moved, none lost its own way. Indy 4 Rooms 48, 72 and 97 (Give) to the held object first, Room 1 to the game's own way; Indy 3 Room 31's grating and Monkey Island 1 Room 28 (both copies) from their cutscene to the game's own way. Started at their cutscene: Indy 3 5.2%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 6.3%, Indy 4 3.1% (all five copies 5.3%, was 5.6%). Monkey Island 2 Room 14's Cheese Squigglies (Use with object 131) still runs directly. Full suite: `full-suite-item1b.txt` (1912 passed; the one failure was `ScummSceneSetupTests`' expectation that Room 72's peg runs directly, now the game's own way: updated, and that class with this record's tests rerun, 39 passed).
+
 ## Tools
 
 `PlanPick/` (headless: every plan from each source room, `walk <room> <x> <y> [frames] [after rooms]` frame by frame, `first <rooms>` times the first-visit pictures; `PLANPICK_AFTER` frames after a guard's cutscene begins). WindowCheck `K:x,y`.
