@@ -49,7 +49,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 | Zak McKracken (classic, enhanced) | ✅ | 🟡 | ✅ | ✅ | 🟡 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
 What keeps a cell from ✅:
-- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 5.2%, Monkey Island 1 7.9% (floppy) and 7.5% (CD), Monkey Island 2 6.3%, Indy 4 3.1% (5.3% of all five copies), some of them showing nothing, no line and no other room (Indy 3 3, Monkey Island 1 1 and 1, Monkey Island 2 1, Indy 4 5); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 22% (Maniac, both) and 20% (Zak, both) started at the cutscene.
+- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 4.5%, Monkey Island 1 7.9% (floppy) and 7.5% (CD), Monkey Island 2 5.3%, Indy 4 3.1% (5.0% of all five copies), some of them showing nothing, no line and no other room (Indy 3 2, Monkey Island 1 2 and 2, Monkey Island 2 1, Indy 4 3); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 22% (Maniac, both) and 20% (Zak, both) started at the cutscene.
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (80%, 64% and 57% of references); their variables and bits keep numbers (the script maps hold few rows to turn into data; most of what stays unnamed has no name in the game's data: image-only objects, actors no script names).
@@ -87,11 +87,11 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 - CD: the scene categories against ScummVM (19 of 98 scenes called dialogue); your picture/voice/music timing run.
 
 ### Indiana Jones 3 (EGA and 256 colours)
-- 4 scenes started at their cutscene show nothing (work item 1).
+- 2 scenes started at their cutscene show nothing (work item 1).
 - Rooms 47, 60, 66 start dark (live since 6 November): compare with the game. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
 ### Monkey Island 1 (floppy and CD)
-- 1 (floppy) and 1 (CD) scene started at its cutscene shows nothing (work item 1).
+- 2 (floppy) and 2 (CD) scenes started at their cutscene show nothing (work item 1).
 - `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
 - Spanish eight-disk copy and the CD's five languages in the window (passed S9 headless only).
 
@@ -100,7 +100,7 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 - Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates.
 
 ### Indiana Jones 4
-- 5 scenes started at their cutscene show nothing (work item 1).
+- 3 scenes started at their cutscene show nothing (work item 1).
 - After Play Game Intro: Indy walking very fast (user report, not reproduced).
 - Spanish talkie and floppy in the window.
 

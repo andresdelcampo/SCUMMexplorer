@@ -39,6 +39,14 @@ if (args.Length > 2 && args[1] == "where")
     }
     return;
 }
+// PlanPick <game folder> inclass <class>: the objects the game's index puts in a class.
+if (args.Length > 2 && args[1] == "inclass")
+{
+    var indexed = ScummGameSession.BootForPlay(game, out _).Snapshot.ObjectClasses;
+    var bit = 1u << (int.Parse(args[2]) - 1);
+    Console.WriteLine(string.Join(", ", indexed.Where(p => (p.Value & bit) != 0).Select(p => p.Key).Order()));
+    return;
+}
 // PlanPick <game folder> classes <object,object...>: the objects' classes as the game's index gives them.
 if (args.Length > 2 && args[1] == "classes")
 {

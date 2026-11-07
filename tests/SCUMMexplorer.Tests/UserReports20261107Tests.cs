@@ -82,6 +82,19 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void ASecondObjectsClassNamesTheObjectsThatHaveIt()
+    {
+        // Indy 3 Room 26's hot coals: Use tests its second object for class 12 (a container) and class 10 (full). The index puts objects 337 and 520 in
+        // class 12; they are offered held, with class 10 set, and the scene begins the game's own way.
+        if (Copy("indy3 vga en") is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t.Room == 26 && t.ObjectId == 401 && t.VerbId == 0x08);
+        var plan = planner.PlanSetup(trigger);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.SecondObject, Target: "337" or "520" });
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

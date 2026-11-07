@@ -46,6 +46,12 @@ Measured (`*-run61.txt` against `*-run60.txt`, `ways.py`): 8 scenes moved, none 
 
 Measured (`*-run62.txt` against `*-run61.txt`): Monkey Island 2 Rooms 14, 21 and 28 to the game's own way (Room 28 now goes on to Rooms 59, 58 and 45); no scene moved back, no other copy changed. The scenes started at their cutscene are unchanged (5.3%); Monkey Island 2 runs one scene directly (was 4). Full suite: `full-suite-item1c.txt` (1914 passed; the one failure was `ScummPlayStartTests`' 20 s bound for Indy 3 EGA, 20.1 s under the suite's load; alone it takes 1 s and passes, with this record's tests).
 
+## Work item 1, continued: a second object named by its class
+
+Indy 3 Room 26's hot coals (Use, +0x0000 and +0x0009): `ifClassOfIs local[0x000], [0x8C]`, then `[0x8A]`: the second object must be a container (class 12) and a full one (class 10). The search's only candidate, object 381, came from `local[0x000]` reused later as a loop counter. Now a class test on the second object offers the objects the index puts in that class (Indy 3: 337 and 520, the two the game's code tests for class 10 elsewhere), and a class no object starts with is set on those offered. `ScummGameSession.ReadIndexedObjects` gives the index's starting objects to any reader (the boot used it inline).
+
+Measured (`*-run63.txt` against `*-run62.txt`): the hot coals (both Indy 3 copies) and Monkey Island 2 Rooms 85 and 97 (Give) from their cutscene to the game's own way, none back. Started at their cutscene: Indy 3 4.5%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 5.3%, Indy 4 3.1% (5.0% of the five copies); 10 show nothing. Read and left: Indy 3 Room 62's local script 200 is a door that opens or closes by its argument; started at its cutscene it closes (an animation, no line). Monkey Island 2 Room 19's key goes to a room script as the sentence script (202) and walks the hero into Room 18. Full suite: `full-suite-item1d.txt`.
+
 ## Tools
 
 `PlanPick/` (headless: every plan from each source room, `walk <room> <x> <y> [frames] [after rooms]` frame by frame, `first <rooms>` times the first-visit pictures; `PLANPICK_AFTER` frames after a guard's cutscene begins). WindowCheck `K:x,y`.

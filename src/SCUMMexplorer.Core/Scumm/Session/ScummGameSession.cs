@@ -97,22 +97,22 @@ public sealed class ScummGameSession : ScummSession
 
     private static ScummGameSession CreateSession(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects, bool boot)
     {
+        indexedObjects = ReadIndexedObjects(game);
+        return ScummDataSources.For(game) is ScummV2DataSource v2 ? new ScummGameSession(game, indexedObjects, data: v2, boot: boot)
+            : !ScummProfile.For(game).UsesV4Archive ? new ScummGameSession(game, indexedObjects, boot: boot)
+            : new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game), boot: boot);
+    }
+
+    /// <summary>The objects' starting states, owners and classes as the game's index gives them (what a boot starts from).</summary>
+    public static ScummIndexedObjectSnapshot ReadIndexedObjects(GameLibrary game)
+    {
         ArgumentNullException.ThrowIfNull(game);
-        if (ScummDataSources.For(game) is ScummV2DataSource v2)
-        {
-            indexedObjects = v2.ReadIndexedObjects();
-            return new ScummGameSession(game, indexedObjects, data: v2, boot: boot);
-        }
-        if (!ScummProfile.For(game).UsesV4Archive)
-        {
-            indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
-            return new ScummGameSession(game, indexedObjects, boot: boot);
-        }
+        if (ScummDataSources.For(game) is ScummV2DataSource v2) return v2.ReadIndexedObjects();
+        if (!ScummProfile.For(game).UsesV4Archive) return new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
         // S6 MonkeyCd (17 October 2026): a v5 game reads its starting objects from its own index (MONKEY.000's DOBJ), as its first visit does.
-        indexedObjects = (game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault())?.ReadIndexedObjects()
+        return (game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault())?.ReadIndexedObjects()
             ?? game.V4Disks?.Disks.OfType<ScummV5Archive>().FirstOrDefault()?.ReadIndexedObjects()
             ?? throw new InvalidDataException("The game has no v4 or v5 index to read its objects from.");
-        return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game), boot: boot);
     }
 
     private bool _introPlaying;

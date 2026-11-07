@@ -32,6 +32,8 @@ public sealed partial class ScummSceneSetupSearch
     private readonly Func<ScummCutscene, IReadOnlyList<ScummSetupEdit>?, ScummCutsceneRunResult> _run;
     private readonly ConcurrentDictionary<(int, int, int), Lazy<ScummScenePlan>> _plans = [];
     private readonly Lazy<IReadOnlyDictionary<int, int>> _objectRooms;
+    /// <summary>The objects' classes as the game's index gives them.</summary>
+    private readonly Lazy<IReadOnlyDictionary<int, uint>> _indexedClasses;
     private readonly Lazy<IReadOnlySet<string>> _roomLeftVariables;
 
     /// <param name="run">A headless run of the trigger from a fresh start with the given setup (<see cref="ScummCutsceneRun.Run"/>).</param>
@@ -44,6 +46,11 @@ public sealed partial class ScummSceneSetupSearch
         _isV2 = ScummProfile.For(game).EngineVersion <= ScummVersion.V2;
         _run = run;
         _objectRooms = new(ObjectRooms);
+        _indexedClasses = new(() =>
+        {
+            try { return ScummGameSession.ReadIndexedObjects(game).Classes ?? new Dictionary<int, uint>(); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { return new Dictionary<int, uint>(); }
+        });
         _roomLeftVariables = new(RoomLeftVariables);
     }
 
@@ -237,6 +244,8 @@ public sealed partial class ScummSceneSetupSearch
             var runningOf = new Dictionary<string, int>();
             var bitOf = new Dictionary<string, string>();
             var distanceOf = new Dictionary<string, (string A, string B)>();
+            // The second objects a class test offered (a later class of theirs is set on them).
+            var secondByClass = new List<int>();
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             // A script the trigger's code starts or chains to reads its arguments as its locals: literals (Indy 4 Room 7's cat figurine:
             // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116), "this object" (Monkey Island 2's
@@ -356,6 +365,34 @@ public sealed partial class ScummSceneSetupSearch
                                 Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? number : -number, where), 1);
                                 Add(new(ScummSetupKind.ObjectClass, classed.ToString(CultureInfo.InvariantCulture), (cls & 0x80) != 0 ? -number : number, where), 0);
                             }
+                        break;
+                    }
+                    case "ifClassOfIs" when ins.Operands.IndexOf(", [", StringComparison.Ordinal) + 2 is var secondOpen and > 1 &&
+                                            (objectCode && parts[0] == "local[0x000]" || Argument(parts[0]) == SecondObjectArgument):
+                    {
+                        // A class the verb's second object must have (Indy 3 Room 26's hot coals, +0x0000: ifClassOfIs local[0x000], [0x8C], then [0x8A]: a
+                        // container, then a full one): the objects the index puts in that class are offered as the second object, and a class no object
+                        // starts with is set on those offered already (7 November 2026, work item 1).
+                        foreach (var item in ins.Operands[(secondOpen + 1)..ins.Operands.IndexOf(']', secondOpen)].Split(',', StringSplitOptions.TrimEntries))
+                        {
+                            if (Literal(item) is not int cls || (cls & 0x80) == 0) continue;
+                            var number = cls & 0x7F;
+                            if (number is < 1 or > 32) continue;
+                            var bit = 1u << (number - 1);
+                            var having = _indexedClasses.Value.Where(pair => (pair.Value & bit) != 0 && pair.Key != trigger.ObjectId).Select(pair => pair.Key).Order().Take(4).ToList();
+                            if (having.Count > 0)
+                            {
+                                foreach (var candidate in having)
+                                {
+                                    secondByClass.Add(candidate);
+                                    Add(new(ScummSetupKind.SecondObject, candidate.ToString(CultureInfo.InvariantCulture), 1, where,
+                                        _objectRooms.Value.TryGetValue(candidate, out var classedRoom) ? classedRoom : null), 1);
+                                }
+                            }
+                            else
+                                foreach (var candidate in secondByClass)
+                                    Add(new(ScummSetupKind.ObjectClass, candidate.ToString(CultureInfo.InvariantCulture), number, where), 1);
+                        }
                         break;
                     }
                     case "isEqual" or "isNotEqual" or "isLess" or "isGreater" or "isLessEqual" or "isGreaterEqual" or "equalZero" or "notEqualZero":

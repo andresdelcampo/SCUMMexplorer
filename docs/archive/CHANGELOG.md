@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: a second object named by its class
+
+Work item 1. A verb that tests its second object's class offers the objects the game's index puts in that class (Indy 3's hot coals: a full container, objects 337 and 520). 4 scenes moved from their cutscene to the game's own way, none back. Started at their cutscene: Indy 3 4.5%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 5.3%, Indy 4 3.1% (5.0%); 10 show nothing. [Record](../../.verification/user-reports-20261107/README.md).
+
 ## 7 November: an object no one holds, and where a verb is used
 
 Work item 1. A picked verb on an object owned by neither its room nor an inventory gives it to the hero first, as the game finds no verb code for it otherwise (Monkey Island 2's Cheese Squigglies). A verb's test of the hero's room is read as the object used there, held, and is tried with the scene's other values (Monkey Island 2's fishing pole, now on to Rooms 59, 58 and 45). Monkey Island 2 Rooms 14, 21 and 28 moved to the game's own way, none back. [Record](../../.verification/user-reports-20261107/README.md).
