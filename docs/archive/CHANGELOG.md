@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: a picked scene keeps the hero in its room; a held object can come first
+
+Work item 1. A picked scene that enters a room now puts the hero there before the room's arrival cutscene is closed, so the game's cutscene-end hook does not follow him back to the boot's room (Indy 3's diary, used in Room 18). A scene with a held second object that does not begin with the object first is tried with the held object first, as the player says it (Indy 4 Room 33's Sunstone and pedestal). Each moved one scene from a direct run to the game's own way; no other scene changed way in any copy. [Record](../../.verification/user-reports-20261107/README.md).
+
 ## 7 November: the castle plans open again
 
 The user: Indy 3's castle plans "no longer show correctly - Indy won't move". In the EGA copy a picked plan stayed on "Loading the scene" for 36 s, without a session, while the background scene derivation filled every worker and reread each script from its file (the 6 November tour asks for many more). Now a room being opened holds the derivation, the EGA data source decodes each script once per game (LOOM EGA too), and the play clock stops while a pick copies its source session (a still room's source was stepped during the copy). EGA Room 20 first pick 36 s → 16 s, later plans about 3 s; Indy walks in all three plans in every copy. [Record](../../.verification/user-reports-20261107/README.md).

@@ -13,6 +13,9 @@ namespace SCUMMexplorer.Core.Scumm;
 public abstract partial class ScummSession
 {
     protected const int MaxNestedScripts = 8;
+
+    private static readonly HashSet<string> TracedScripts =
+        (Environment.GetEnvironmentVariable("SCUMM_TRACE_SCRIPTS") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet(StringComparer.Ordinal);
     protected readonly GameLibrary _game;
     protected readonly ScummSoundClock _soundClock;
     protected readonly IScummDataSource _data;
@@ -540,6 +543,9 @@ public abstract partial class ScummSession
             _executing.RemoveAt(_executing.Count - 1);
         }
         var label = script.Context ?? $"Script {script.ScriptId:00}";
+        // Diagnostics (harnesses): SCUMM_TRACE_SCRIPTS=label;label adds those scripts' instruction traces to the session trace.
+        if (TracedScripts.Contains(label))
+            foreach (var line in result.Trace) _visitTrace.Add($"{label} +0x{startOffset:X4} trace: {line}");
         // o5_delay leaves the slot ssPaused with its delay; any other pause or end clears it.
         frame.Delay = result.ResumeOffset is null ? null : result.Delay;
         if (frame.Delay is int delay) _visitTrace.Add($"{label} waits {delay} jiffies (delay) before +0x{result.ResumeOffset:X4}");

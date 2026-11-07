@@ -20,6 +20,17 @@ Measured on the EGA copy in the window (`ega-gate/`): Room 20 first pick 36 s �
 - A guard who sees him starts the confrontation within a second or two of walking (Script 58 → 64 → 60), as the 6 November record says.
 - A first harness version clicked with posted mouse messages; WPF ignores those unless the window is active under the real cursor, which made some runs look as if Indy did not move. `WindowCheck`'s `K:x,y` now hit-tests the window and passes the point to the image's own handler (`PlayScreenPress`).
 
+## Work item 1, the same day: two scenes that ran their verb directly
+
+Two shared causes found by reading the scenes whose result was a direct run with no line and no other room (`../scene-setup-20261031/*-run60.txt` against `*-run58.txt` and `*-run57.txt`; `ways.py` there compares each scene's way between runs, as `summarise.py` counts only the scenes started at their cutscene).
+
+| Scene | Cause | Fix (shared) |
+|---|---|---|
+| Indy 3 Room 2, the diary (Open, used in Room 18) | A picked scene entering Room 18 closes the room's arrival cutscene; the game's cutscene-end hook (Script 23 +0x0022, `actorFollowCamera var[0x001]`) follows the hero, who was still in the boot's Room 73, so the game went back there. The game's own `loadRoomWithEgo` puts him in the room before `startScene` | `EndArrivalCutscenes` puts the hero in the room before closing the arrival. Direct → the game's own way, both copies |
+| Indy 4 Room 33, Use the Sunstone with the pedestal | The pick queued (Use, pedestal, Sunstone); Script 2 +0x04A3 runs Script 9 on the first object and refuses one without class 1 to 3. The player names the held item first, and the Sunstone's own code hands over (object 934 verb 0x08 +0x0057: `startObject 0x0179, 0x08, [0x03A6]`) | A new way, `GameHeldFirst`: when the usual order does not begin a scene with a held second object, the sentence with the held object first is tried before the verb is run directly. Always putting it first was tried and lost 26 scenes their own way (Give, verb 0x50, in Monkey Island and Indy 4), so it is the second try |
+
+Measured: no other scene changed way in any copy (run 58: the diary only; run 60: the pedestal only). The counts of scenes started at their cutscene stay: Indy 3 5.8%, Monkey Island 1 8.5% and 8.1%, Monkey Island 2 6.3%, Indy 4 3.1%. Indy 4 Rooms 48 and 72 use the Sunstone with verb 0x06, whose code was not read yet. Harness additions: `PlanPick scene <room> <object> <verb> <edits>` (the planner's run with a given setup), `classes`, `where`; `SCUMM_TRACE_SCRIPTS=label;label` puts those scripts' instruction traces in the session trace. Full suite: `full-suite-item1.txt`.
+
 ## Tools
 
 `PlanPick/` (headless: every plan from each source room, `walk <room> <x> <y> [frames] [after rooms]` frame by frame, `first <rooms>` times the first-visit pictures; `PLANPICK_AFTER` frames after a guard's cutscene begins). WindowCheck `K:x,y`.

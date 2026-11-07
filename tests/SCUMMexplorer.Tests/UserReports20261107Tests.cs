@@ -14,6 +14,37 @@ public sealed class UserReports20261107Tests
         return File.Exists(Path.Combine(folder, "00.LFL")) ? new GameFolderScanner().Scan(folder) : null;
     }
 
+    private static GameLibrary? Copy(string folder) =>
+        Directory.Exists(Path.Combine(TestGames.Root, folder)) ? new GameFolderScanner().Scan(Path.Combine(TestGames.Root, folder)) : null;
+
+    private static ScummCutsceneRunResult RunScene(GameLibrary game, int room, int obj, int verb, params ScummSetupEdit[] setup)
+    {
+        var trigger = new ScummCutscenePlanner(game).Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t.Room == room && t.ObjectId == obj && t.VerbId == verb);
+        return ScummCutsceneRun.RunPicked(game, () => ScummGameSession.BootForPlay(game, out _), trigger, setup);
+    }
+
+    [Fact]
+    public void TheDiaryUsedInAnotherRoomKeepsTheHeroThere()
+    {
+        // Indy 3 Room 2's diary, Open in Room 18: closing Room 18's arrival ran the cutscene-end hook (Script 23 +0x0022, actorFollowCamera of the hero), which
+        // took the game back to the hero's room; the hero is now in Room 18 before the arrival is closed, and the game's own sentence begins the scene.
+        if (Copy("indy3 vga en") is not { } game) return;
+        var result = RunScene(game, 2, 68, 0x01, new(ScummSetupKind.Bit, "bit[0x5DF]", 1, "test", 2), new(ScummSetupKind.PlayedIn, "68", 18, "test", 2));
+        Assert.True(result.Begun, result.Failure);
+        Assert.Equal(ScummPickedStart.Game, result.Way);
+    }
+
+    [Fact]
+    public void AHeldObjectComesFirstWhereTheGameNeedsIt()
+    {
+        // Indy 4 Room 33: Use the Sunstone (934) with the pedestal (377). Script 2 refuses the pedestal in front (Script 9: no class 1 to 3); the Sunstone's
+        // own code hands over to the pedestal (+0x0057), so the sentence with the held object first begins the scene the game's own way.
+        if (Copy("indy4 vga en") is not { } game) return;
+        var result = RunScene(game, 33, 377, 0x08, new ScummSetupEdit(ScummSetupKind.SecondObject, "934", 1, "test", 68));
+        Assert.True(result.Begun, result.Failure);
+        Assert.Equal(ScummPickedStart.GameHeldFirst, result.Way);
+    }
+
     [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {

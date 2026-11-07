@@ -430,7 +430,10 @@ public abstract partial class ScummSession
     /// sentence script runs it on the next frame (it sets the object variables, faces the hero, runs the verb's code with its arguments). Elsewhere the
     /// verb's code is run directly (<see cref="ActivateObjectVerb"/>). An exploration action, never the player's click.
     /// </summary>
-    public void PickInteraction(int objectA, int verb, int objectB = 0)
+    /// <param name="heldFirst">The held second object named first, as the player says "Use the Sunstone with the pedestal": its code hands over to the object
+    /// (Indy 4 object 934 verb 0x08 +0x0057: startObject 0x0179, 0x08, [0x03A6]), and the sentence script refuses an object of no usable class in front (Indy 4
+    /// Script 2 +0x04A3, Script 9). The sentence is then (verb, B, A); the hero is still put at A (7 November 2026, work item 1).</param>
+    public void PickInteraction(int objectA, int verb, int objectB = 0, bool heldFirst = false)
     {
         var sentence = _runtime.IsV2 ? 0 : _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
         // The hero is put at the object on every path (LOOM has no sentence script: left in the boot's room, the scene's own actorFollowCamera of
@@ -440,6 +443,14 @@ public abstract partial class ScummSession
         if (sentence == 0)
         {
             ActivateObjectVerb(objectA, verb, objectB);
+            return;
+        }
+        if (heldFirst && objectB != 0)
+        {
+            _runtime.Sentences.Add((verb, objectB, objectA));
+            _uncertainties.Add($"Object {objectB} was picked to use with object {objectA}: the hero was put at object {objectA} and the sentence, the held object first " +
+                               $"as the player says it, given to the game's sentence script {sentence} (an exploration action, not the player's click).");
+            _visitTrace.Add($"picked interaction: verb 0x{verb:X2} on held object {objectB} with object {objectA} queued for sentence script {sentence}");
             return;
         }
         _runtime.Sentences.Add((verb, objectA, objectB));

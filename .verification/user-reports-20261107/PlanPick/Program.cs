@@ -17,6 +17,29 @@ if (args.Length > 2 && args[1] == "first")
     }
     return;
 }
+// PlanPick <game folder> where <object>: the rooms whose object directory holds the object, with its verbs.
+if (args.Length > 2 && args[1] == "where")
+{
+    var data = ScummDataSources.For(game);
+    var id = int.Parse(args[2]);
+    foreach (var room in game.Rooms.Select(r => r.ResourceId!.Value))
+    {
+        ScummRoomData read;
+        try { read = data.ReadRoom(room); } catch (Exception) { continue; }
+        if (read.Objects.FirstOrDefault(o => o.Id == id) is not { } record) continue;
+        var verbs = data.ReadObjectVerbs(room, read.Objects).GetValueOrDefault(id) ?? [];
+        Console.WriteLine($"Room {room}: verbs {string.Join(",", verbs.Select(v => $"0x{v.VerbId:X2}"))}");
+    }
+    return;
+}
+// PlanPick <game folder> classes <object,object...>: the objects' classes as the game's index gives them.
+if (args.Length > 2 && args[1] == "classes")
+{
+    var indexed = ScummGameSession.BootForPlay(game, out _).Snapshot.ObjectClasses;
+    foreach (var id in args[2].Split(',').Select(int.Parse))
+        Console.WriteLine($"object {id}: classes [{string.Join(",", Enumerable.Range(1, 32).Where(c => (indexed.GetValueOrDefault(id) & (1u << (c - 1))) != 0))}]");
+    return;
+}
 // PlanPick <game folder> scene <room> <object> <verb hex> <edit>...: one scene run as the planner runs it with the given setup (edits Kind:Target:Value[:Room],
 // e.g. Bit:bit[0x5DF]:1 PlayedIn:68:18), then its result and the trace of the run (work item 1: scenes that need two values).
 if (args.Length > 4 && args[1] == "scene")
@@ -36,7 +59,7 @@ if (args.Length > 4 && args[1] == "scene")
     if (runs.FirstOrDefault() is { } own)
     {
         var hero = own.Actors.First(a => a.Number == 1);
-        Console.WriteLine($"  hero room {hero.Room} at ({hero.X},{hero.Y}); object {args[3]} owner {own.Snapshot.ObjectOwners.GetValueOrDefault(int.Parse(args[3]))}; messages: {string.Join(" / ", own.Messages.Log.TakeLast(3).Select(m => m.Text))}");
+        Console.WriteLine($"  hero room {hero.Room} at ({hero.X},{hero.Y}); object {args[3]} owner {own.Snapshot.ObjectOwners.GetValueOrDefault(int.Parse(args[3]))} classes [{string.Join(",", Enumerable.Range(1, 32).Where(c => (own.Snapshot.ObjectClasses.GetValueOrDefault(int.Parse(args[3])) & (1u << (c - 1))) != 0))}]; messages: {string.Join(" / ", own.Messages.Log.TakeLast(3).Select(m => m.Text))}");
     }
     return;
 }

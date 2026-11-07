@@ -1,0 +1,17 @@
+﻿Test run for D:\Documents\Personal\Code Projects\SCUMMexplorer\Exe\SCUMMexplorer.Tests\Debug\net10.0\SCUMMexplorer.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:03:52.74]     SCUMMexplorer.Tests.LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick [SKIP]
+[xUnit.net 00:03:52.76]     SCUMMexplorer.Tests.LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick [1 ms]
+  Skipped SCUMMexplorer.Tests.LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs [1 ms]
+[xUnit.net 00:04:06.25]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit [1 ms]
+[xUnit.net 00:04:06.25]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpSpeakers [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpSpeakers [1 ms]
+[xUnit.net 00:04:31.88]     SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCatalogSetups [SKIP]
+  Skipped SCUMMexplorer.Tests.LoomSceneSetupPlannerTests.DumpCatalogSetups [1 ms]
+
+Passed!  - Failed:     0, Passed:  1912, Skipped:     5, Total:  1917, Duration: 8 m 15 s - SCUMMexplorer.Tests.dll (net10.0)

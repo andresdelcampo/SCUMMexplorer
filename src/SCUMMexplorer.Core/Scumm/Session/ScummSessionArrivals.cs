@@ -40,6 +40,12 @@ public abstract partial class ScummSession
         foreach (var frame in active.Where(f => DescendsFrom(f, arrivals))) frame.Stopped = true;
         _pending.RemoveAll(p => p.Frame.Stopped);
         _frameScripts.RemoveAll(p => p.Frame.Stopped);
+        // 7 November 2026 (work item 1: Indy 3's diary, used in Room 18, showed nothing): the game's cutscene-end hook can follow the hero with the camera
+        // (Indy 3 Script 23 +0x0022, actorFollowCamera var[0x001]), which loads his room. He enters with the room on the game's own way (o5_loadRoomWithEgo puts
+        // him in before startScene), but a picked scene's visit stands him there only after the entry, so he is put in the room before its arrival is closed.
+        var egoActor = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoNumber) ? (int?)egoNumber : null;
+        if (egoActor is int hero && _runtime.Actors.Contains(hero) && _runtime.Actors[hero].Room != roomId)
+            _runtime.Actors.PutInRoom(hero, roomId, CurrentPlacement(), hero);
         for (var scopes = 0; _cutscenes.Count > 0 && _cutscenes.Peek().Owner is { Stopped: true } && scopes < MaxNestedScripts; scopes++) CloseTopCutscene();
         // The arrival had already begun: Room 82's local script 200 puts the soldier's head (actor 10, costume 85) in before its first pause. The
         // actors its script puts into this room, and that were not here before the entry, go back out (the user saw the head roll by later).

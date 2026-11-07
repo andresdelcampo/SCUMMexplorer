@@ -12,6 +12,9 @@ public enum ScummPickedStart
     Direct,
     /// <summary>The script holding the cutscene started at its <c>cutscene</c> (<see cref="ScummSession.StartSceneAt"/>).</summary>
     AtCutscene,
+    /// <summary>The sentence script given the held second object first, as the player says "Use the Sunstone with the pedestal" (Indy 4 Room 33): tried when
+    /// the object first does not begin the scene (<see cref="ScummSession.PickInteraction"/>).</summary>
+    GameHeldFirst,
 }
 
 public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> RoomsEntered, int Frames, string? Failure = null, int Lines = 0,
@@ -48,6 +51,13 @@ public static class ScummCutsceneRun
         if (trigger.IsArrivalScript) return Run(game, newSession, trigger, setup, ScummPickedStart.AtCutscene);
         var sentence = Run(game, newSession, trigger, setup);
         if (sentence.Begun || trigger.IsRoomEntry) return sentence;
+        // A held second object may need to come first in the sentence (Indy 4 Script 2 +0x04A3 refuses an object of no usable class in front; the
+        // Sunstone's own code hands over to the pedestal). Most two-object scenes begin the other way (Give: Monkey Island 2, Indy 4), so this is second.
+        if (setup?.Any(edit => edit.Kind == ScummSetupKind.SecondObject) == true)
+        {
+            var heldFirst = Run(game, newSession, trigger, setup, ScummPickedStart.GameHeldFirst);
+            if (heldFirst.Begun) return heldFirst;
+        }
         var direct = Run(game, newSession, trigger, setup, ScummPickedStart.Direct);
         // On a tie the verb's own code wins: the sentence script's answer is then the game's refusal ("I can't get there from here", Indy 4's crate).
         return direct.Score >= sentence.Score ? direct : sentence;
@@ -103,7 +113,7 @@ public static class ScummCutsceneRun
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
                 var second = setup?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
                 if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
-                else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second);
+                else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second, heldFirst: way == ScummPickedStart.GameHeldFirst);
                 // The hero is in the room only from the pick on (put at the object): the values that stand actors in it are set again now (Zak
                 // McKracken Room 10's purple button waits for the hero past x 50).
                 if (setup is { Count: > 0 }) session.ApplySceneSetup(ScummSetupEdit.InRoomActors(setup));
