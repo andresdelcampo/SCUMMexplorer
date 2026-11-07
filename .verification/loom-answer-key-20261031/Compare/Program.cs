@@ -39,6 +39,23 @@ var groupOf = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others).
 // Every trigger the scan saw, shared helpers included (Group leaves those out), for telling "left out as a shared helper" from "not found".
 var all = planner.Triggers.Select(t => (t.Room, t.ObjectId, t.VerbId)).ToHashSet();
 var data = ScummDataSources.For(game);
+if (Environment.GetEnvironmentVariable("COMPARE_ONE") is { Length: > 0 } one)
+{
+    // COMPARE_ONE=room,object,verb (7 November 2026): the planner's run of one replay, its setup replayed in a session kept for reading: the session's
+    // cutscene, load and chain lines and the lines it printed.
+    var q = one.Split(',').Select(int.Parse).ToArray();
+    var picked = triggers[(q[0], q[1], q[2])];
+    var onePlan = planner.PlanSetup(picked);
+    Console.WriteLine($"plan: way {onePlan.Result.Way} frames {onePlan.Result.Frames} lines {onePlan.Result.Lines} rooms [{string.Join(",", onePlan.Result.RoomsEntered)}] setup: {string.Join("; ", onePlan.Edits.Select(e => e.Describe()))}");
+    ScummSession? kept = null;
+    var again = ScummCutsceneRun.Run(game, () => kept = onLoom ? new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, lflSnapshot!) : ScummGameSession.BootForPlay(game, out _),
+        picked, onePlan.Edits, onePlan.Result.Way);
+    Console.WriteLine($"again: frames {again.Frames} lines {again.Lines}");
+    foreach (var line in kept!.SessionTrace.Where(l => l.StartsWith("cutscene at") || l.StartsWith("endCutscene") || l.Contains("chains") || l.Contains("load", StringComparison.OrdinalIgnoreCase) || l.StartsWith("picked")).TakeLast(40))
+        Console.WriteLine("  " + line);
+    foreach (var line in kept.Messages.Log.TakeLast(12)) Console.WriteLine("  said: " + line);
+    return;
+}
 int catSame = 0, helpers = 0, sharedCode = 0;
 var thresholds = new[] { 60, 100, 150, 200, 300, 400, 600 };
 var runRule = new int[thresholds.Length];

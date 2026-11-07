@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 7 November: LOOM's length comparison read to the end
+
+Work item 2b. The 16 replays more than 10% off the catalog's length were each run alone (`Compare`'s new `COMPARE_ONE`): all 16 play the catalog's own cutscenes from the same instruction to the same end and reach its rooms. The lengths differ by the start: the catalog ran each verb where Bobbin arrived, a pick puts him at the object (walks of Rooms 4, 12, 15, 18, 32, 33 and 51), Room 23's 0x49 drafts wait on the shepherds' idle loop, and four 0x47 replays the catalog cut short. Nothing is left for the shared engine there; the next step is retiring the catalog to its reviewed data. [Record](../../.verification/loom-answer-key-20261031/README.md)
+
 ## 7 November: what the room does as the hero arrives plays before a picked scene
 
 Work item 2b (LOOM English's catalog as the answer key). Room 23's drafts at the shepherds ran 650 frames and 40 lines too long: the pick put Bobbin at their walk point (x 121) and ran the draft, and only then did local script 201 begin the shepherds' first meeting (local 202 and 212), which the walk there plays first in the game. Now one frame lets the room react to the hero put at the object, and a cutscene a local script of the room begins (not the scene's own) plays to its end first, unseen; global scripts' cutscenes (Indy 3's guards) are left to the scene. Used by the planner, the window's play and LOOM's play. Scene length within 10% of the catalog: 217 → 222 of 238 (93.3%); begins, rooms and category unchanged; LOOM CD, English Roland and Spanish unchanged. Other games (run 64): no scene moved back; Monkey Island 1 Room 19's cannon nozzle (both copies) from a direct run to the game's own way (its 3-frame cutscene); Maniac Mansion and Zak McKracken unchanged. Checked in the window on LOOM Spanish (the shepherds stand round Bobbin, one line). Full suite 1917 passed. [Record](../../.verification/loom-answer-key-20261031/README.md)

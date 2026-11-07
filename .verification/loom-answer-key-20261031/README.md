@@ -62,3 +62,16 @@ Fix (shared, `ScummCutsceneRun.LetRoomMeetHero`): after the hero is put at the o
 Measured (`compare-run10-loom-session.txt`, `lengths.py` against run 9 before the fix): within 10% **217 → 222 of 238 (91.2% → 93.3%)**; rooms 238, category 219, begin 238 unchanged. Room 23's Other draft response at the four shepherds and the 0x49 draft at object 423 now match. Left in Room 23: the draft 0x47 (four objects: 73 frames against 30) and the 0x49 draft (three: 141 against 123). The 0x47 catalog replay is the shorter one: its 30 frames are local script 229's cutscene alone (frames 0 to 30 in the trace), and local 232, which prints "That camouflage trick won't work on us" one frame later, was cut off by the replay's end at the first quiet frame. The engine's run is the whole reaction.
 
 The other 9 still off: Room 4's walk responses (3) and Room 12's Use of object 322 (a walk to x -88, then Room 13: 77 frames against 126) start from the pick's teleport to the walk point (by design); Rooms 15, 18, 32, 33 and 51 are single cases.
+
+### The 16 read: same code, another start
+
+`COMPARE_ONE=room,object,verb` (the planner's run of one replay, replayed in a session kept for reading: its cutscene lines and what it printed) against each catalog replay's recorded boundaries. **All 16 run the catalog's cutscenes from the same instruction to the same `endCutscene` and reach its rooms**; none takes another branch. The catalog's replays ran the verb directly where Bobbin arrived ("catalog arrival assumed; direct object verb"); a pick puts him at the object first, as a click does in the game (the Use verb walks him there, CLAUDE.md). So:
+
+| Replays | Cutscene (both) | Why the length differs |
+|---|---|---|
+| Room 4 objects 169, 170 (0x37), 176 (0x36); Room 12 object 322, Room 15 object 338, Room 32 object 537, Room 33 object 543 (Use) | the verb's own (+0x0000 or +0x0010 to its `endCutscene`), Room 4's local 202 | Bobbin walks on from where he stands (Room 12: to x -88); the pick starts him at the object, nearer: shorter |
+| Room 18 object 374 (Look), Room 51 object 742 (Use) | Room 18 local 205 +0x0000 to +0x02FC; Script 102 +0x0000 to +0x00D8, then Room 66 | `walkActorToObject 0x01, 0x0174` (+0x002C), `walkActorTo 0x01, 160, 115` (+0x0020): from the object's walk point a longer walk (+90 and +18 frames) |
+| Room 23 draft 0x47 (four shepherds) | local 229, then local 232 | the catalog ended at the frame between them (above) |
+| Room 23 draft 0x49 (three shepherds) | local 210 +0x0000 to +0x024B | waits for the shepherds' idle scripts (`bit[0xD66]`, then `bit[0xD65]`, +0x000B, +0x0016), whose phase differs: +18 frames |
+
+So nothing is left for the shared engine in the length comparison: within 10% 222 of 238, and the other 16 the same scene from another start. The next step of the work item is retiring the catalog to the reviewed data the engine cannot derive (titles and draft names, the named sequences, Room 46's recipe).
