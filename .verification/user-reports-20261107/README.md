@@ -52,6 +52,17 @@ Indy 3 Room 26's hot coals (Use, +0x0000 and +0x0009): `ifClassOfIs local[0x000]
 
 Measured (`*-run63.txt` against `*-run62.txt`): the hot coals (both Indy 3 copies) and Monkey Island 2 Rooms 85 and 97 (Give) from their cutscene to the game's own way, none back. Started at their cutscene: Indy 3 4.5%, Monkey Island 1 7.9% and 7.5%, Monkey Island 2 5.3%, Indy 4 3.1% (5.0% of the five copies); 10 show nothing. Read and left: Indy 3 Room 62's local script 200 is a door that opens or closes by its argument; started at its cutscene it closes (an animation, no line). Monkey Island 2 Room 19's key goes to a room script as the sentence script (202) and walks the hero into Room 18. Full suite: `full-suite-item1d.txt`.
 
+## Read and left (no shared cause)
+
+| Scene | What it needs |
+|---|---|
+| Indy 4 Room 65, Close the closet door | At the moment the door closes (+0x0018), actor 12 must stand in walk box 13 (`getActorWalkBox 0x0C`), then local script 209 locks him in. The setup puts him there, but his own script walks him on while Indy walks to the door (box 1 when it closes): a moment the player chooses |
+| Monkey Island 2 Room 93, the light switch | Global script 143 picks one of nine dark rooms at random, puts the hero there and only then begins its cutscene (+0x0102); started there, its room is 0. Its own way needs the switch's first test (`var[0x027]`) and the random room |
+| Indy 3 Room 62's local script 200 | A door opened or closed by its argument (above) |
+| Monkey Island 2 Room 19's key | A room script as the sentence script (above) |
+
+What is left of the scenes that show nothing is in ROADMAP item 1 (Indy 4 Room 57's two values, Monkey Island 1 Room 41 started by no script the scan reads, Room 25's Herman).
+
 ## Tools
 
 `PlanPick/` (headless: every plan from each source room, `walk <room> <x> <y> [frames] [after rooms]` frame by frame, `first <rooms>` times the first-visit pictures; `PLANPICK_AFTER` frames after a guard's cutscene begins). WindowCheck `K:x,y`.
