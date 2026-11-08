@@ -133,5 +133,8 @@ public sealed class ScummV1RoomDecoder(ScummV1Game game)
     /// <summary>The room's 256 character patterns (eight rows of four 2-bit pixels each).</summary>
     internal static byte[] Characters(byte[] data) => DecodeStream(data, Word(data, 10), 2048);
 
+    /// <summary>The room's mask characters (word 18: a length that is 8 too big, then the stream; GdiV1::roomChanged).</summary>
+    internal static byte[] MaskCharacters(byte[] data) => DecodeStream(data, Word(data, 18) + 2, Math.Max(0, Word(data, Word(data, 18)) - 8));
+
     private static int Word(byte[] data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(offset, 2));
 }

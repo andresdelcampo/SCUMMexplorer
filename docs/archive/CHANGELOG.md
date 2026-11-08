@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 8 November: Maniac Mansion reports: object masks, rooms' scene lists
+
+User reports (Maniac Mansion enhanced). Versions 1 and 2 now read each object's depth mask with its picture (ScummVM `GdiV2::prepareDrawBitmap`, `GdiV1::drawStripV1Mask`): Room 24's closed shower curtain hides the mummy, in both copies, and every other masked object in Maniac Mansion and Zak McKracken. A room's scene list shows a scene only where its run goes once it has run (Room 6 had listed the stereo of Room 20 for a load in the death script its code can reach). Read and left as the game does: the loose brick opens a door off-screen for three seconds; Room 8 needs its own light switch; the Edsel launches whatever the garage door. Open: scenes started from exit scripts (Room 41's publisher), and which ending left rooms with nothing to do. Full suite 1,920 passed. [Record](../../.verification/maniac-ready-20261108/README.md)
+
 ## 8 November: Maniac Mansion's scenes ready for the user's check
 
 Every scene of Maniac Mansion's list played in the real window, both copies, and what was wrong fixed in shared code: in versions 1 and 2 a script that hides the whole interface starts a scene as `cutscene` does (`ScummSceneMarks`; the Green Tentacle with the contract and with the demo tape had been started at the death script behind them); Give's receiver is an actor stood next to the hero (`SecondActor`; contract, badge, film, package, cassette, hamster now play their own way); the window hurries a scene's scripts again after the pick (the stairs' delivery); an input screen shows 15 frames before each answer (the safe's keypad); a scene that begins without a line gets the setup search too. Maniac Mansion lists 39 scenes per copy (was 27), 85% begin the game's own way (was 78%); Zak McKracken 79 and 82 scenes (was 54), 85% and 84% (was 80%); the other games' ways unchanged (started at their cutscene 5.0%). Dark Rooms 5, 8, 9, 15, 22, 23 are the boot's own (`setBitVar 0x0B00`). Full suite run. [Record](../../.verification/maniac-ready-20261108/README.md)

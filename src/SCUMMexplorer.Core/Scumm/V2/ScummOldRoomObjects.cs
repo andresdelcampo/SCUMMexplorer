@@ -119,8 +119,12 @@ public static class ScummOldRoomObjects
         {
             if (entry.ImageOffset == 0 || entry.Width == 0 || entry.Height == 0) continue;
             var pixels = new byte[entry.Width * entry.Height];
-            PaintV2(decoded, entry.ImageOffset, 0, 0, entry.Width, entry.Height, pixels, entry.Width);
-            images.Add(new(entry.Id, entry.X, entry.Y, entry.Width, entry.Height, pixels));
+            var maskAt = PaintV2(decoded, entry.ImageOffset, 0, 0, entry.Width, entry.Height, pixels, entry.Width);
+            // GdiV2::prepareDrawBitmap: an object's mask follows its picture (8 November 2026: Maniac Mansion Room 24's closed shower curtain hides Ted).
+            images.Add(new(entry.Id, entry.X, entry.Y, entry.Width, entry.Height, pixels)
+            {
+                Mask = ScummV2RoomDecoder.ReadMask(decoded, maskAt, decoded.Length, entry.Width, entry.Height)?.Pixels.ToArray()
+            });
         }
         return images;
     }
@@ -135,12 +139,13 @@ public static class ScummOldRoomObjects
             if (entry.ImageOffset == 0 || entry.Width == 0 || entry.Height == 0) continue;
             var pixels = new byte[entry.Width * entry.Height];
             PaintV1(decoded, entry.ImageOffset, 0, 0, entry.Width, entry.Height, game, pixels, entry.Width, ref characters);
-            images.Add(new(entry.Id, entry.X, entry.Y, entry.Width, entry.Height, pixels));
+            images.Add(new(entry.Id, entry.X, entry.Y, entry.Width, entry.Height, pixels) { Mask = V1Mask(decoded, entry.ImageOffset, entry.Width, entry.Height) });
         }
         return images;
     }
 
-    private static void PaintV2(byte[] data, int pos, int x, int y, int width, int height, byte[] canvas, int canvasWidth)
+    /// <returns>Where the picture's data ends (its mask follows).</returns>
+    private static int PaintV2(byte[] data, int pos, int x, int y, int width, int height, byte[] canvas, int canvasWidth)
     {
         var run = 1;
         var dither = false;
@@ -168,6 +173,7 @@ public static class ScummOldRoomObjects
                 else canvas[at] = color;
             }
         }
+        return pos;
     }
 
     private static void PaintV1(byte[] data, int image, int x, int y, int width, int height, ScummV1Game game, byte[] canvas, int canvasWidth, ref byte[]? characters)
@@ -178,8 +184,10 @@ public static class ScummOldRoomObjects
         var pos = image + 4;
         if (image + 4 > data.Length) throw new InvalidDataException("The object image starts outside the room.");
         var common = data.AsSpan(image, 4).ToArray();
-        var picture = ScummV1RoomDecoder.DecodeCodes(data, ref pos, common, count);
-        var tileColors = ScummV1RoomDecoder.DecodeCodes(data, ref pos, common, count);
+        // GdiV1::prepareDrawBitmap decodes the object's three blocks as one stream: characters, colours, mask characters.
+        var blocks = ScummV1RoomDecoder.DecodeCodes(data, ref pos, common, count * 3);
+        var picture = blocks.AsSpan(0, count).ToArray();
+        var tileColors = blocks.AsSpan(count, count).ToArray();
         var map = ScummV1RoomDecoder.EgaColors(game);
         var colors = new int[4] { data[6], data[7], data[8], 0 };
         for (var tile = 0; tile < count; tile++)
@@ -201,4 +209,33 @@ public static class ScummOldRoomObjects
     }
 
     private static int Word(byte[] data, int offset) => data[offset] | data[offset + 1] << 8;
+
+    /// <summary>
+    /// A version 1 object's depth mask (GdiV1::drawStripV1Mask in object mode): the third block of its image names a mask character per cell, row by row,
+    /// in the room's mask characters; the stored bits are inverted. Null when it does not read (8 November 2026: Maniac Mansion Room 24's curtain).
+    /// </summary>
+    private static byte[]? V1Mask(byte[] data, int image, int width, int height)
+    {
+        try
+        {
+            var across = width / 8;
+            var down = height / 8;
+            var count = across * down;
+            var pos = image + 4;
+            var blocks = ScummV1RoomDecoder.DecodeCodes(data, ref pos, data.AsSpan(image, 4).ToArray(), count * 3);
+            var maskChars = ScummV1RoomDecoder.MaskCharacters(data);
+            var mask = new byte[width * height];
+            for (var tile = 0; tile < count; tile++)
+            {
+                var character = blocks[2 * count + tile] * 8;
+                for (var row = 0; row < 8; row++)
+                {
+                    var bits = character + row < maskChars.Length ? (byte)(maskChars[character + row] ^ 0xFF) : (byte)0;
+                    for (var x = 0; x < 8; x++) mask[(tile / across * 8 + row) * width + tile % across * 8 + x] = (byte)((bits & (0x80 >> x)) != 0 ? 1 : 0);
+                }
+            }
+            return mask;
+        }
+        catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException) { return null; }
+    }
 }

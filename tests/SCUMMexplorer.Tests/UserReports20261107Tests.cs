@@ -156,6 +156,32 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void ARoomListsOnlyTheScenesWhoseRunGoesThere()
+    {
+        // User, 8 November: Room 06 listed "Encender el equipo de música (Room 20)", which plays only in Room 20; its code can reach the death script's
+        // room loads, a branch its run never takes. Once a scene has run, a room lists it only where it goes.
+        if (Copy("mmansionE ega es") is not { } game) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game);
+        var group = planner.Groups.First(g => g.First is { Room: 20, ObjectId: 164, VerbId: 0x04 });
+        planner.PlanSetup(group.First);
+        Assert.True(planner.HasRun(group.First));
+        Assert.True(planner.PlaysIn(group, 20));
+        Assert.False(planner.PlaysIn(group, 6));
+    }
+
+    [Theory]
+    [InlineData("mmansion ega en")]
+    [InlineData("mmansionE ega es")]
+    public void OldObjectsCarryTheirDepthMasks(string folder)
+    {
+        // User, 8 November: Maniac Mansion Room 24's mummy showed in front of the closed shower curtain. Versions 1 and 2 keep an object's mask with its
+        // picture (GdiV1::drawStripV1Mask, GdiV2::prepareDrawBitmap); the curtain's mask covers Ted, who stands in a masked walk box.
+        if (Copy(folder) is not { } game) return;
+        var images = ScummDataSources.For(game).ReadObjectImages(24);
+        Assert.Contains(images, image => image.Mask is { } mask && mask.Any(bit => bit != 0));
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

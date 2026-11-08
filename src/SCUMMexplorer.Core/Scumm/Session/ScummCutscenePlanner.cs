@@ -223,7 +223,14 @@ public sealed class ScummCutscenePlanner
 
     /// <summary>Whether a run of the scene was in this room at some point (its own room always counts).</summary>
     public bool PlaysIn(ScummCutsceneGroup group, int room) =>
-        group.First.Room == room || group.Others.Any(o => o.Room == room) || TryGetRun(group.First, out var run) && run.RoomsEntered.Contains(room);
+        group.First.Room == room || group.Others.Any(o => o.Room == room) ||
+        // The rooms the scene goes on to when picked: its plan's run when it has one (its setup), else the fresh run (8 November 2026: Maniac Mansion's
+        // stereo, Room 20, was listed in Room 6 for a load in the death script its code can reach, a branch its run never takes).
+        (_lastResort.TryGetValue(Key(group.First), out var plan) && plan.Result.Begun ? plan.Result.RoomsEntered.Contains(room)
+            : TryGetRun(group.First, out var run) && run.RoomsEntered.Contains(room));
+
+    /// <summary>Whether the scene has been run (its fresh-start run is known, from this launch or an earlier one).</summary>
+    public bool HasRun(ScummCutscene trigger) => TryGetRun(trigger, out _);
 
     /// <summary>The start sentence of a scene's note: what its fresh-start run showed, or that it is still being checked.</summary>
     public string StartNote(ScummCutscene trigger) =>

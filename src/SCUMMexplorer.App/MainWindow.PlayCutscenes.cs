@@ -144,8 +144,10 @@ public partial class MainWindow
     private static string PlayCutsceneKey(ScummCutscene trigger) => $"{trigger.Room},{trigger.ObjectId},{trigger.VerbId}";
 
     private bool PlayCutscenePlaysIn(ScummCutscenePlanner planner, ScummCutsceneGroup group, int room) =>
-        planner.PlaysIn(group, room) || _playSavedRoomLists is { } saved && saved.TryGetValue(PlayCutsceneKey(group.First), out var rooms) && rooms.Contains(room) ||
-        new[] { group.First }.Concat(group.Others).Any(t => t.LeadsTo.Contains(room) || (t.LoadTargets?.Contains(room) ?? false)); // R-6.36: Normal lists what Advanced lists
+        planner.PlaysIn(group, room) ||
+        // Until the scene has been run, the rooms its saved run or its code can load (R-6.36: Normal lists what Advanced lists); once run, only where it went.
+        !planner.HasRun(group.First) && (_playSavedRoomLists is { } saved && saved.TryGetValue(PlayCutsceneKey(group.First), out var rooms) && rooms.Contains(room) ||
+            new[] { group.First }.Concat(group.Others).Any(t => t.LeadsTo.Contains(room) || (t.LoadTargets?.Contains(room) ?? false)));
 
     // Titles stay readable in both modes; raw verb/object provenance belongs in the
     // entry's Advanced note. An unknown native word never becomes a made-up action.

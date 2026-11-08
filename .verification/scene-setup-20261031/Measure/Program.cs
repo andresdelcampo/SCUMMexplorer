@@ -64,7 +64,8 @@ if (Environment.GetEnvironmentVariable("MEASURE_ACTORS") is { Length: > 0 } acto
     var runtime = typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(visit)!;
     dynamic actors = runtime.GetType().GetProperty("Actors")!.GetValue(runtime)!;
     foreach (var actor in (IEnumerable<ScummActorSnapshot>)actors.Snapshot())
-        if (actor.Room == int.Parse(actorRoom)) Console.WriteLine($"actor {actor.Number}: ({actor.X},{actor.Y}) visible {actor.Visible} costume {actor.Look.Costume}");
+        if (actor.Room == int.Parse(actorRoom)) Console.WriteLine($"actor {actor.Number}: ({actor.X},{actor.Y}) visible {actor.Visible} costume {actor.Look.Costume} box {actor.WalkBox} ignoreBoxes {actor.IgnoreBoxes} forceClip {actor.ForceClip}");
+    if (visit.CurrentWalkBoxes is { } wb) foreach (var b in wb.Boxes) Console.WriteLine($"  box {b.Index} mask {b.Mask} flags {wb.GetFlags(b.Index)} corners {string.Join(" ", b.Corners.Select(c => $"({c.X},{c.Y})"))}");
     foreach (var line in visit.SessionTrace.Where(l => l.Contains("ego") || l.Contains("hero") || l.Contains("putActor")).TakeLast(12)) Console.WriteLine("  | " + (line.Length > 220 ? line[..220] : line));
     return;
 }

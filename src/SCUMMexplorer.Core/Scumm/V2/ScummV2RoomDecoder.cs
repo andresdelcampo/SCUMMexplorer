@@ -66,7 +66,7 @@ public sealed class ScummV2RoomDecoder : IRoomBackgroundDecoder
     /// The mask stream that follows the picture (ScummVM <c>generateStripTable</c>): one byte of 8 mask bits (bit 7 = the leftmost pixel) per row of each 8-pixel strip, strip after strip;
     /// a code is a run (bit 7: the next byte repeated, otherwise that many bytes follow), and a run may cross from one strip to the next. Null when the stream is missing or truncated.
     /// </summary>
-    private static RoomDepthMask? ReadMask(byte[] data, int pos, int end, int width, int height)
+    internal static RoomDepthMask? ReadMask(byte[] data, int pos, int end, int width, int height)
     {
         var pixels = new byte[width * height];
         var strips = width / 8;
