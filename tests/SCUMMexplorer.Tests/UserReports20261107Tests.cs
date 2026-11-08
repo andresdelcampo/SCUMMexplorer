@@ -112,6 +112,20 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void APickedSceneGetsTheStateOfTheCodeBeforeIt()
+    {
+        // ROADMAP 3c, scene order: Monkey Island 2 Room 5's entry needs bit[0x0A5], which only global script 52 sets; what that script
+        // leaves (bit[0x30D]) comes with it, labelled as earlier code, and the scene still begins and reaches its rooms.
+        if (Copy("mi2 mt32 en") is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t.Room == 5 && t.IsRoomEntry);
+        var plan = planner.PlanSetup(trigger);
+        Assert.True(plan.Result.Begun);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.Bit, Target: "bit[0x0A5]" });
+        Assert.Contains(plan.Edits, edit => edit.Target == "bit[0x30D]" && edit.Where.Contains("earlier code", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

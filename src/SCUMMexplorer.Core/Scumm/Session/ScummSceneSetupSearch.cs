@@ -37,8 +37,12 @@ public sealed partial class ScummSceneSetupSearch
     private readonly Lazy<IReadOnlySet<string>> _roomLeftVariables;
 
     /// <param name="run">A headless run of the trigger from a fresh start with the given setup (<see cref="ScummCutsceneRun.Run"/>).</param>
-    public ScummSceneSetupSearch(GameLibrary game, Func<ScummCutscene, IReadOnlyList<ScummSetupEdit>?, ScummCutsceneRunResult> run)
+    /// <param name="scenes">Every scene the game's scan found, for the order of scenes (<see cref="EarlierScenesState"/>); none leaves it out.</param>
+    public ScummSceneSetupSearch(GameLibrary game, Func<ScummCutscene, IReadOnlyList<ScummSetupEdit>?, ScummCutsceneRunResult> run,
+        IReadOnlyList<ScummCutscene>? scenes = null)
     {
+        _scenes = scenes ?? [];
+        _order = new(ReadOrder);
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(run);
         _game = game;
@@ -160,6 +164,13 @@ public sealed partial class ScummSceneSetupSearch
                 if (result.Failure is null && result.Begun) { best = result; kept = trial; break; }
             }
         }
+        // Scene order (ROADMAP 3c): the state the scenes before it leave, from the flags it needs; kept when it still begins and reaches its rooms.
+        if (best.Begun && EarlierScenesState(trigger, kept) is { Count: > 0 } earlier)
+        {
+            var withEarlier = kept.Concat(earlier).ToList();
+            var result = _run(trigger, withEarlier);
+            if (result.Failure is null && result.Begun && best.RoomsEntered.All(result.RoomsEntered.Contains)) { best = result; kept = withEarlier; }
+        }
         var plan = new ScummScenePlan(kept, fresh, best, "");
         return plan with { Note = Describe(plan, candidates.Count + elsewhere.Count) };
     }
@@ -195,15 +206,17 @@ public sealed partial class ScummSceneSetupSearch
     /// side that leads away from it, 3 for one that lets more of the scene run after its cutscene instruction, 1 for the rest; ordered by rank (3 as
     /// 1), then code order.
     /// </summary>
-    private List<(ScummSetupEdit Edit, int Rank)> Ranked(ScummCutscene trigger)
+    /// <param name="goal">The instruction whose way is read instead of the first cutscene's (scene order: the write of a flag an earlier unit sets).</param>
+    private List<(ScummSetupEdit Edit, int Rank)> Ranked(ScummCutscene trigger, (string Label, int Offset)? goal = null)
     {
         ArgumentNullException.ThrowIfNull(trigger);
         // The trigger's own code first (the scan may list only the scripts it reaches: Indy 4's bread, Room 39 object 425, chains to local 208 after
         // its own owner tests), then the scripts the scan found.
         var own = trigger.IsRoomEntry ? $"Room {trigger.Room} entry script" : $"Room {trigger.Room} object {trigger.ObjectId} verb 0x{trigger.VerbId:X2}";
-        (string Label, int Offset)? cutscene = null;
-        foreach (var label in trigger.Scripts)
-            if (Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start) { cutscene = (label, start.Offset); break; }
+        var cutscene = goal;
+        if (cutscene is null)
+            foreach (var label in trigger.Scripts)
+                if (Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start) { cutscene = (label, start.Offset); break; }
         // Then the scripts on the way from the trigger's code to the cutscene's script that the scan does not list.
         var between = OnTheWay(own, trigger, cutscene?.Label, out var toward);
         var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Concat(between).Select(label => (label, script: Read(label, trigger)))

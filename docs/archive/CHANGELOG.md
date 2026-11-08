@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 8 November: scene order, first step
+
+Work item 3c. When a picked scene's setup needs a story flag that exactly one piece of the game's code sets (an object verb, a room script, a global script other than the boot and shared helpers), that code came first: the scene also gets the other flags it sets and the flag values its tests need on the way, back up to four steps, kept only when the scene still begins and reaches its rooms. 27 of 570 setups gain earlier state (Indy 4 10, Monkey Island 2 11, Monkey Island 1 2 and 2, Maniac Mansion 1 and 1); no scene changed its way in any game; Indy 3 and Zak McKracken have no such flag. Full suite run. [Record](../../.verification/scene-order-20261108/README.md)
+
 ## 7 November: LOOM's length comparison read to the end
 
 Work item 2b. The 16 replays more than 10% off the catalog's length were each run alone (`Compare`'s new `COMPARE_ONE`): all 16 play the catalog's own cutscenes from the same instruction to the same end and reach its rooms. The lengths differ by the start: the catalog ran each verb where Bobbin arrived, a pick puts him at the object (walks of Rooms 4, 12, 15, 18, 32, 33 and 51), Room 23's 0x49 drafts wait on the shepherds' idle loop, and four 0x47 replays the catalog cut short. Nothing is left for the shared engine there; the next step is retiring the catalog to its reviewed data. [Record](../../.verification/loom-answer-key-20261031/README.md)

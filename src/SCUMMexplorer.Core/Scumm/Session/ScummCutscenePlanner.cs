@@ -64,7 +64,7 @@ public sealed class ScummCutscenePlanner
             Triggers = Triggers.Select(t => t with { ObjectName = readableText(t.ObjectName), FirstText = readableText(t.FirstText) }).ToArray();
         Groups = ScummCutsceneIndex.Group(Triggers);
         Setup = new ScummSceneSetupSearch(game, (trigger, setup) => _pool is null ? ScummCutsceneRun.RunPicked(_game, _newSession, trigger, setup)
-            : _pool.Use(fresh => ScummCutsceneRun.RunPicked(_game, fresh, trigger, setup)));
+            : _pool.Use(fresh => ScummCutsceneRun.RunPicked(_game, fresh, trigger, setup)), Triggers);
     }
 
     /// <summary>The setup search of a picked scene that a fresh start does not begin (§8.6).</summary>

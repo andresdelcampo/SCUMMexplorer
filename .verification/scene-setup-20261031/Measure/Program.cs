@@ -151,5 +151,12 @@ foreach (var group in planner.Groups)
         Console.WriteLine($"      scripts: {string.Join(" | ", t.Scripts)}; cutscene: {ScummSceneSetupSearch.FirstCutscene(game, t)}");
     Console.WriteLine($"      result: way {plan.Result.Way} lines {plan.Result.Lines} rooms [{string.Join(",", plan.Result.RoomsEntered)}] frames {plan.Result.Frames}");
     if (plan.HasEdits) Console.WriteLine($"      kept: {string.Join("; ", plan.Edits.Select(e => e.Describe()))}; rooms [{string.Join(",", plan.Result.RoomsEntered)}] lines {plan.Result.Lines}");
+    // MEASURE_ORDER=1 (8 November 2026, ROADMAP 3c): for each flag the setup needs, the scenes that set it, and what the earlier scenes would add.
+    if (Environment.GetEnvironmentVariable("MEASURE_ORDER") == "1" && plan.HasEdits)
+    {
+        foreach (var need in plan.Edits.Where(e => e.Kind is ScummSetupKind.Bit or ScummSetupKind.Variable))
+            Console.WriteLine($"      order: {need.Describe()} set by [{string.Join(", ", planner.Setup.CodeSetting(need.Kind, need.Target, need.Value))}]");
+        Console.WriteLine($"      order: earlier code adds {string.Join("; ", planner.Setup.EarlierScenesState(t, plan.Edits.Where(e => !e.Where.Contains("earlier code")).ToList()).Select(e => e.Describe()))}");
+    }
 }
 Console.WriteLine($"fresh start begins {fresh}; setup begins {setup}; still nothing {still}; {clock.Elapsed.TotalSeconds:F0} s");
