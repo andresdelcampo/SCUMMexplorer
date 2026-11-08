@@ -63,6 +63,15 @@ internal static class Program
                 foreach (var raw in args.Skip(2))
                 {
                     // a lists (LOOM) the objects with verbs that are not hotspots now: what the Interact overview adds since 31 October.
+                    // R lists the shown room's Play Cutscene list (8 November 2026).
+                    if (raw == "R")
+                    {
+                        var shownRoom = ((ScummSession?)Field("_play"))?.CurrentRoomId;
+                        foreach (var item in (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { shownRoom })!)
+                            Log($"room {shownRoom} item {item!.GetType().GetField("Item1")!.GetValue(item)} \"{item.GetType().GetField("Item2")!.GetValue(item)!.GetType().GetProperty("Title")!.GetValue(item.GetType().GetField("Item2")!.GetValue(item))}\"");
+                        Log($"room {shownRoom}: list done");
+                        continue;
+                    }
                     // L lists the scene list's items (id and title), as the window offers them.
                     if (raw == "L")
                     {

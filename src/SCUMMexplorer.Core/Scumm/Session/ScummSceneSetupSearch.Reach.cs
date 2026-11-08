@@ -55,12 +55,18 @@ public sealed partial class ScummSceneSetupSearch
     private (ScummCutsceneRunResult Best, List<ScummSetupEdit> Kept) Placed(ScummCutscene trigger, ScummCutsceneRunResult best, List<ScummSetupEdit> kept)
     {
         var tried = new List<List<ScummSetupEdit>>();
-        if (RoomState(trigger, kept) is { Count: > 0 } room)
+        // What uncovers the picked object first (the garage door opened over Maniac Mansion's Edsel), with the rest; then without it.
+        var uncover = UncoverState(trigger, kept);
+        foreach (var start in uncover.Count > 0 ? new[] { kept.Concat(uncover).ToList(), kept } : [kept])
         {
-            var withRoom = kept.Concat(room).ToList();
-            tried.Add(withRoom.Concat(EarlierScenesState(trigger, withRoom)).ToList());
+            if (RoomState(trigger, start) is { Count: > 0 } room)
+            {
+                var withRoom = start.Concat(room).ToList();
+                tried.Add(withRoom.Concat(EarlierScenesState(trigger, withRoom)).ToList());
+            }
+            if (EarlierScenesState(trigger, start) is { Count: > 0 } earlier) tried.Add(start.Concat(earlier).ToList());
+            if (start != kept) tried.Add(start);
         }
-        if (EarlierScenesState(trigger, kept) is { Count: > 0 } earlier) tried.Add(kept.Concat(earlier).ToList());
         foreach (var trial in tried)
         {
             var result = _run(trigger, trial);

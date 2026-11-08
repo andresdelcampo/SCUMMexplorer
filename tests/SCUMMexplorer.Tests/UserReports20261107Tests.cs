@@ -169,6 +169,21 @@ public sealed class UserReports20261107Tests
         Assert.False(planner.PlaysIn(group, 6));
     }
 
+    [Fact]
+    public void APickedObjectUnderOthersGetsWhatUncoversIt()
+    {
+        // User, 8 November: Maniac Mansion's Edsel (Room 16 object 340, part of the background) launched with the garage door closed. The door's slats
+        // (objects 144 to 149) lie over it until Script 14 opens it; that code ran first, so the scene gets the door open.
+        if (Copy("mmansionE ega es") is not { } game) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game);
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t is { Room: 16, ObjectId: 340, VerbId: 0x0B });
+        var plan = planner.PlanSetup(trigger);
+        Assert.True(plan.Result.Begun);
+        foreach (var slat in Enumerable.Range(144, 6))
+            Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ObjectStateBit, Value: -8 } && edit.Target == slat.ToString() &&
+                                                edit.Where.Contains("uncovers object 340", StringComparison.Ordinal));
+    }
+
     [Theory]
     [InlineData("mmansion ega en")]
     [InlineData("mmansionE ega es")]

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 8 November: what lies over a picked object is taken away first
+
+Scene order. A picked object under objects the player sees and can click (drawn, touchable, over its middle) gets what the one piece of the game's code that takes them all away sets: Maniac Mansion's Edsel launches with the garage door opened by Script 14 (user report: it launched with the door closed). Used by Maniac Mansion 1 scene per copy, Monkey Island 2 1, Indy 4 5 (run 74); no way changed in any game. Full suite 1,924 passed. [Record](../../.verification/maniac-ready-20261108/README.md)
+
 ## 8 November: Maniac Mansion reports: object masks, rooms' scene lists
 
 User reports (Maniac Mansion enhanced). Versions 1 and 2 now read each object's depth mask with its picture (ScummVM `GdiV2::prepareDrawBitmap`, `GdiV1::drawStripV1Mask`): Room 24's closed shower curtain hides the mummy, in both copies, and every other masked object in Maniac Mansion and Zak McKracken. A room's scene list shows a scene only where its run goes once it has run (Room 6 had listed the stereo of Room 20 for a load in the death script its code can reach). Read and left as the game does: the loose brick opens a door off-screen for three seconds; Room 8 needs its own light switch; the Edsel launches whatever the garage door. Open: scenes started from exit scripts (Room 41's publisher), and which ending left rooms with nothing to do. Full suite 1,920 passed. [Record](../../.verification/maniac-ready-20261108/README.md)
