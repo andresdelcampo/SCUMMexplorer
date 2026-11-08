@@ -40,6 +40,13 @@ internal static class Program
         {
             var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
             Log($"{stage}: room={play?.CurrentRoomId} cutscene={play?.InCutscene} texts=[{string.Join(" / ", play?.Messages.OnScreen.SelectMany(m => m.Lines).Where(l => l.Length > 0).Take(3) ?? [])}] printed={play?.Messages.Log.Count} last=[{play?.Messages.Log.LastOrDefault()?.Text.Replace('\n', ' ')}] status=[{(Field("StatusText") as System.Windows.Controls.TextBlock)?.Text}]");
+            // WINDOWCHECK_VARS=var[0x00C],obj:157: those variables and object states at each step (8 November 2026).
+            if (play is not null && Environment.GetEnvironmentVariable("WINDOWCHECK_VARS") is { Length: > 0 } watched)
+            {
+                var runtime = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", Private)!.GetValue(play)!;
+                Log("    " + string.Join(" ", watched.Split(',').Select(w => w.StartsWith("obj:", StringComparison.Ordinal)
+                    ? $"{w}={runtime.ObjectStates.GetValueOrDefault(int.Parse(w[4..]))}" : $"{w}={runtime.GlobalVariables.GetValueOrDefault(w)}")));
+            }
         }
         window.Loaded += async (_, _) =>
         {
@@ -56,6 +63,13 @@ internal static class Program
                 foreach (var raw in args.Skip(2))
                 {
                     // a lists (LOOM) the objects with verbs that are not hotspots now: what the Interact overview adds since 31 October.
+                    // L lists the scene list's items (id and title), as the window offers them.
+                    if (raw == "L")
+                    {
+                        foreach (var item in (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null })!)
+                            Log($"item {item!.GetType().GetField("Item1")!.GetValue(item)} \"{item.GetType().GetField("Item2")!.GetValue(item)!.GetType().GetProperty("Title")!.GetValue(item.GetType().GetField("Item2")!.GetValue(item))}\"");
+                        continue;
+                    }
                     if (raw == "a")
                     {
                         var session = Field("_session");

@@ -171,7 +171,7 @@ public static class ScummCutsceneRun
                 traced = session.SessionTrace.Count;
                 logMark = session.Messages.Log.Count;
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
-                var second = setup?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.SecondObject) is { } with ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
+                var second = ScummSetupEdit.SecondOf(setup);
                 if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
                 else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second, heldFirst: way == ScummPickedStart.GameHeldFirst);
                 // The hero is in the room only from the pick on (put at the object): the values that stand actors in it are set again now (Zak
@@ -206,7 +206,7 @@ public static class ScummCutsceneRun
                 }
                 // A scene may be a chain of cutscenes (LOOM Room 18's bell: Script 62, then Room 20's, then Scripts 58 and 59, one frame apart): it is
                 // over only after QuietFrames frames with no cutscene and no line, as LOOM English's reviewed replays were run (31 October 2026).
-                quiet = begun && !session.InCutscene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
+                quiet = begun && !session.InScene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
                 if (quiet >= quietNeeded) break;
                 if (!begun && frame >= TrialFrames + wait) break;
                 session.StepFrame();

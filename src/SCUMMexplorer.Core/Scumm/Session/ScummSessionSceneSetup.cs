@@ -58,6 +58,11 @@ public enum ScummSetupKind
     HeroIs,
     /// <summary>One bit of a version 1/2 object's state set (Value &gt; 0) or cleared (Value &lt; 0): 8 open/on, 4 locked, 2 untouchable, 1 pickupable.</summary>
     ObjectStateBit,
+    /// <summary>
+    /// The second object of a two-object verb is an actor (versions 1 and 2: Give X to someone; Maniac Mansion's contract to the Green Tentacle, actor
+    /// 14, global script 110 +0x000C): the actor stood next to the hero in the scene's room and passed as object B (8 November 2026).
+    /// </summary>
+    SecondActor,
 }
 
 /// <summary>
@@ -69,7 +74,12 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
     /// <summary>The values that stand actors in the scene's room (set again once the pick has put the hero there).</summary>
     public static IReadOnlyList<ScummSetupEdit> InRoomActors(IEnumerable<ScummSetupEdit> edits) =>
         edits.Where(edit => edit.Kind is ScummSetupKind.ActorX or ScummSetupKind.ActorNear or ScummSetupKind.WalkBox or ScummSetupKind.CameraX or
-            ScummSetupKind.HeroIs).ToArray();
+            ScummSetupKind.HeroIs or ScummSetupKind.SecondActor).ToArray();
+
+    /// <summary>The second object a picked verb is used with: an object given to the hero, or an actor (<see cref="ScummSetupKind.SecondActor"/>); 0 for none.</summary>
+    public static int SecondOf(IEnumerable<ScummSetupEdit>? edits) =>
+        edits?.FirstOrDefault(edit => edit.Kind is ScummSetupKind.SecondObject or ScummSetupKind.SecondActor) is { } with
+            ? int.Parse(with.Target, System.Globalization.CultureInfo.InvariantCulture) : 0;
 
     /// <summary>The room a setup's scene is played in when it is not the trigger's own (<see cref="ScummSetupKind.PlayedIn"/>); null otherwise.</summary>
     public static int? PlayRoom(IEnumerable<ScummSetupEdit>? edits) => edits?.FirstOrDefault(edit => edit.Kind == ScummSetupKind.PlayedIn)?.Value;
@@ -83,6 +93,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.Variable => $"{Target} = {Value}",
         ScummSetupKind.ObjectState => $"object {Target} state {Value}",
         ScummSetupKind.SecondObject => $"object {Target} used with it (held)",
+        ScummSetupKind.SecondActor => $"given to actor {Target}, next to the hero",
         ScummSetupKind.ActorCostume => $"{(Target == "ego" ? "the hero" : Target.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {Target}" : $"actor {Target}")} in costume {Value}",
         ScummSetupKind.ActorRoom => $"{(Target == "ego" ? "the hero" : Target.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {Target}" : $"actor {Target}")} in Room {Value}",
         ScummSetupKind.CameFrom => $"arrived from Room {Value} ({Target})",
@@ -156,6 +167,9 @@ public abstract partial class ScummSession
                 _runtime.SetObjectState(id, (byte)edit.Value);
                 return true;
             }
+            case ScummSetupKind.SecondActor:
+                // The actor the verb is used on stands next to the hero, as ActorNear does (only in the scene's room).
+                return ApplySceneSetup([edit with { Kind = ScummSetupKind.ActorNear, Target = $"{edit.Target}|ego" }]).Count > 0;
             case ScummSetupKind.ActorNear:
             {
                 // Only in the scene's room; the first actor goes to the second (or the second to the first when only the first is there).
@@ -525,6 +539,11 @@ public abstract partial class ScummSession
     /// of that variable with the value it must have (<c>isNotEqual var[0x044], var[0x03F]</c>), gets that value. Maniac Mansion's keypad (Script 44)
     /// is typed with the safe's code; an exploration action, noted as such.
     /// </summary>
+    /// <summary>The frames a waiting input screen shows before it is answered for a picked scene.</summary>
+    public const int InputShownFrames = 15;
+
+    private readonly Dictionary<(string Label, int Offset), int> _inputShown = [];
+
     private void FeedWaitingInput()
     {
         if (!_pickActive) return;
@@ -600,6 +619,10 @@ public abstract partial class ScummSession
             if (TryLiteral(nextParts[1], out var literal)) answer = literal;
             else if (nextParts[1].StartsWith("var[", StringComparison.Ordinal)) answer = _runtime.GlobalVariables.GetValueOrDefault(nextParts[1]);
             else continue;
+            // The screen shows a moment before each answer (8 November 2026: Maniac Mansion's keypad was typed in the frame it opened, unseen).
+            var waiting = (item.Frame.Label, test.Offset);
+            if ((_inputShown[waiting] = _inputShown.GetValueOrDefault(waiting) + 1) < InputShownFrames) continue;
+            _inputShown.Remove(waiting);
             _runtime.SetGlobalVariable(parts[0], (ushort)answer);
             _uncertainties.Add($"{item.Frame.Label} waited for the player's input ({parts[0]}); for the picked scene it was given {answer}, the value it is compared with (an exploration action).");
         }

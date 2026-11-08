@@ -267,14 +267,25 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     public void AnInputScreenIsAnsweredWithTheValueItCompares()
     {
         // Maniac Mansion Room 9's wall safe: Script 44, the keypad, waits for each key (isNotEqual var[0x044], 0xFF, back) and compares it with the
-        // code digit (isNotEqual var[0x044], var[0x03F]); while the pick waits, each key is given the digit, and the safe opens its own way.
+        // code digit (isNotEqual var[0x044], var[0x03F]); while the pick waits, each key is given the digit, and the safe opens its own way. Since
+        // 8 November 2026 the keypad taking control (cursorCommand, ScummSceneMarks) is the scene's start: it shows (Room 43) and is answered.
         var folder = Path.Combine(TestGames.Root, "mmansion ega en");
         if (!Directory.Exists(folder)) return;
-        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(new GameFolderScanner().Scan(folder));
-        var plan = planner.PlanSetup(Trigger(planner, 9, 219, 0x01));
+        var game = new GameFolderScanner().Scan(folder);
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game);
+        var trigger = Trigger(planner, 9, 219, 0x01);
+        var plan = planner.PlanSetup(trigger);
         output.WriteLine(plan.Note);
         Assert.NotEqual(ScummPickedStart.AtCutscene, plan.Result.Way);
-        Assert.Contains(19, plan.Result.RoomsEntered);
+        Assert.Contains(43, plan.Result.RoomsEntered);
+        var session = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.NewSession(game);
+        ScummCutscenePlanner.IntoControl(session);
+        session.VisitRoom(game.Rooms.First(r => r.ResourceId == 9));
+        session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger), trigger.ObjectId);
+        session.PickInteraction(219, 0x01);
+        for (var frame = 0; frame < 3000 && !session.Snapshot.Uncertainties.Any(u => u.Contains("Script 44 waited for the player's input", StringComparison.Ordinal)); frame++)
+            session.StepFrame();
+        Assert.Contains(session.Snapshot.Uncertainties, u => u.Contains("Script 44 waited for the player's input", StringComparison.Ordinal));
     }
 
     [Fact]

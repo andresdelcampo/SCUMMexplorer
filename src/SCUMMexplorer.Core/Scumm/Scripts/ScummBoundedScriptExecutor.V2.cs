@@ -351,7 +351,9 @@ public sealed partial class ScummBoundedScriptExecutor
             case "cursorCommand":
                 if (!Read(0, out var command)) return false;
                 if ((command & 255) != 0) variables[ScummVars.V2.CursorState] = (ushort)(command & 255);
+                var wasOff = runtime.V2InterfaceOff;
                 runtime.ApplyV2UserState(command >> 8);
+                if (!wasOff && runtime.V2InterfaceOff) runtime.V2InterfaceHidden?.Invoke(source.Offset);
                 handled = true;
                 return true;
             case "getActorX": case "getActorY": case "getActorElevation":

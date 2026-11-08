@@ -53,10 +53,14 @@ public sealed class ScummScriptRuntimeState
     public Func<int, byte, bool>? SetObjectPreposition { get; set; }
     public Action<int>? CopyV2InventoryHeader { get; set; }
     public Action<bool>? V2FreezeScripts { get; set; }
+    /// <summary>A script's <c>cursorCommand</c> hid the whole interface (a scene without <c>cutscene</c>, <see cref="ScummSceneMarks"/>): the instruction's offset.</summary>
+    public Action<int>? V2InterfaceHidden { get; set; }
+    /// <summary>The interface is hidden by a script's user state (versions 1 and 2), until one shows it again.</summary>
+    public bool V2InterfaceOff { get; private set; }
     /// <summary>script_v2.cpp setUserState, scumm.h USERSTATE flags (17 October 2026).</summary>
     public void ApplyV2UserState(int state)
     {
-        if ((state & 4) != 0) V2UserState = state & 0xE0;
+        if ((state & 4) != 0) { V2UserState = state & 0xE0; V2InterfaceOff = ScummSceneMarks.HidesInterface(state); }
         if ((state & 1) != 0) V2FreezeScripts?.Invoke((state & 8) != 0);
         if ((state & 2) != 0) UserPut = CursorState = (state & 0x10) != 0 ? 1 : 0;
     }

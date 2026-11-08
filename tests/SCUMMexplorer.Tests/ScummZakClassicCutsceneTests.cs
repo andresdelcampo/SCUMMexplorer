@@ -14,9 +14,10 @@ public sealed class ScummZakClassicCutsceneTests(ITestOutputHelper output)
     public void ScanFollowsNativeCallsAndKeepsSourceTitles()
     {
         if (Planner.Value is not { } planner) return;
-        Assert.Equal(130, planner.Triggers.Count);
-        Assert.Equal(54, planner.Groups.Count);
-        Assert.Equal(37, planner.Groups.Count(g => g.IsScene));
+        // 8 November 2026: scenes that take control by hiding the interface count too (ScummSceneMarks).
+        Assert.Equal(165, planner.Triggers.Count);
+        Assert.Equal(79, planner.Groups.Count);
+        Assert.Equal(43, planner.Groups.Count(g => g.IsScene));
         Assert.Equal("Read", planner.Verbs.WordFor(12));
         Assert.Contains(planner.Groups, g => ScummCutsceneTitles.Title(g.First) == "Room 03 · Push doorbell");
         Assert.Contains(planner.Groups, g => g.First.Room == 2 && g.First.IsRoomEntry && g.First.Scripts.Contains("global script 126"));

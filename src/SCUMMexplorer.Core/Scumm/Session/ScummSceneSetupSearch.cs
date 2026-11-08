@@ -213,7 +213,7 @@ public sealed partial class ScummSceneSetupSearch
         var cutscene = goal;
         if (cutscene is null)
             foreach (var label in trigger.Scripts)
-                if (Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start) { cutscene = (label, start.Offset); break; }
+                if (Read(label, trigger)?.Instructions.FirstOrDefault(ScummSceneMarks.Starts) is { } start) { cutscene = (label, start.Offset); break; }
         // Then the scripts on the way from the trigger's code to the cutscene's script that the scan does not list.
         var between = OnTheWay(own, trigger, cutscene?.Label, out var toward);
         var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Concat(between).Select(label => (label, script: Read(label, trigger)))
@@ -527,12 +527,19 @@ public sealed partial class ScummSceneSetupSearch
                                 Add(new(ScummSetupKind.PlayedIn, trigger.ObjectId.ToString(CultureInfo.InvariantCulture), value.Value, where, trigger.Room), value.Value);
                             else Add(new(ScummSetupKind.ActorRoom, placedActor, value.Value, where), value.Value);
                         }
-                        else if ((objectCode && (tested == "local[0x000]" || _isV2 && tested == ScummVars.V2.ActiveObject2 && !V2Handler(trigger)) ||
+                        else if ((objectCode && tested == "local[0x000]" || _isV2 && !trigger.IsRoomEntry && tested == ScummVars.V2.ActiveObject2 && !V2Handler(trigger) ||
                                   Argument(tested) == SecondObjectArgument) && value.Value != 0)
-                            // Versions 1 and 2 keep the second object in VAR_ACTIVE_OBJECT2 (Zak McKracken Room 21's sand pile, +0x003F: isEqual var[0x00A], 0x44).
-                            // An object no room holds (an inventory-only item, Monkey Island 2) is given without a room of its own code.
-                            Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
-                                _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);
+                        {
+                            // Versions 1 and 2 keep the second object in VAR_ACTIVE_OBJECT2 (Zak McKracken Room 21's sand pile, +0x003F: isEqual var[0x00A], 0x44),
+                            // also in the global scripts the verb's code starts (Maniac Mansion's contract, global script 110). A number no room holds as an object
+                            // is an actor (Give X to someone: the Green Tentacle, 14). An object no room holds in later versions (an inventory-only item, Monkey
+                            // Island 2) is given without a room of its own code.
+                            if (_isV2 && tested == ScummVars.V2.ActiveObject2 && value.Value is > 0 and < MaxV2Actor && !_objectRooms.Value.ContainsKey(value.Value))
+                                Add(new(ScummSetupKind.SecondActor, value.Value.ToString(CultureInfo.InvariantCulture), 1, where, trigger.Room), value.Value);
+                            else
+                                Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
+                                    _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);
+                        }
                         else if (!_isV2 && tested == ScummVars.WalkToObject && value.Value > 0 && ins.Operation is "isEqual" or "isNotEqual" && trigger.IsRoomEntry)
                             // The door the hero came in by (VAR_WALKTO_OBJ, set while loadRoomWithEgo enters the room).
                             Add(new(ScummSetupKind.EnteredBy, tested, value.Value, where, trigger.Room), value.Value);
@@ -654,7 +661,7 @@ public sealed partial class ScummSceneSetupSearch
         ArgumentNullException.ThrowIfNull(trigger);
         var reader = new ScummSceneSetupSearch(game, (_, _) => new(false, [], 0));
         foreach (var label in trigger.Scripts)
-            if (reader.Read(label, trigger)?.Instructions.FirstOrDefault(ins => ins.Operation == "cutscene") is { } start)
+            if (reader.Read(label, trigger)?.Instructions.FirstOrDefault(ScummSceneMarks.Starts) is { } start)
                 return (label, start.Offset, reader.CallArguments(label, trigger));
         return null;
     }
@@ -690,6 +697,9 @@ public sealed partial class ScummSceneSetupSearch
 
     /// <summary>The operand of a call argument that is the second object of the trigger's two-object verb (its code's <c>local[0x000]</c>).</summary>
     private const string SecondObjectArgument = "second object";
+
+    /// <summary>Above the actors of versions 1 and 2 (ScummVM <c>_numActors</c>: 25 for Maniac Mansion and Zak McKracken).</summary>
+    private const int MaxV2Actor = 25;
 
     /// <summary>The variable the sentence script sets to "this object" before an object's verb code runs (Indy 3, Monkey Island 2, Indy 4).</summary>
     private const string ThisObject = "var[0x007]";

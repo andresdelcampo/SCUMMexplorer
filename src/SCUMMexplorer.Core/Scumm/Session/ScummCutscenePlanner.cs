@@ -78,7 +78,10 @@ public sealed class ScummCutscenePlanner
     {
         var fresh = Run(trigger);
         // A scene a fresh start begins still gets the state of its place in the story (scene order, ROADMAP 3c), when kept.
-        if (fresh.Begun) return _lastResort.GetOrAdd(Key(trigger), _ => Setup.Place(trigger, fresh));
+        if (fresh.Begun && fresh.Lines > 0) return _lastResort.GetOrAdd(Key(trigger), _ => Setup.Place(trigger, fresh));
+        // A scene that begins but says nothing (Maniac Mansion's wall safe: its keypad, Room 43, takes control; the scene after it needs Edna in Room 19)
+        // is searched as one that does not begin; a value is kept only when the scene then plays more (8 November 2026).
+        if (fresh.Begun) return _lastResort.GetOrAdd(Key(trigger), _ => Setup.Plan(trigger, fresh));
         return _lastResort.GetOrAdd(Key(trigger), _ =>
         {
             var plan = Setup.Plan(trigger, fresh);

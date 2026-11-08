@@ -228,8 +228,8 @@ public static partial class ScummCutsceneIndex
         var calls = new List<(ScummScriptInstruction Call, bool InSpan)>();
         foreach (var i in ins)
         {
-            if (i.Operation == "cutscene") { open = true; if (!counted) { scripts.Add(label); counted = true; } continue; }
-            if (i.Operation == "endCutscene") { open = false; continue; }
+            if (ScummSceneMarks.Starts(i)) { open = true; if (!counted) { scripts.Add(label); counted = true; } continue; }
+            if (ScummSceneMarks.Ends(i)) { open = false; continue; }
             if (i.Operation is "startScript" or "chainScript") calls.Add((i, open));
             if (!open)
             {

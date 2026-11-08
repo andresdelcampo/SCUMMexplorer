@@ -26,7 +26,7 @@ if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 }
     var p = code.Split(',');
     var data = ScummDataSources.For(game);
     var record = data.ReadRoom(int.Parse(p[0])).Objects.First(o => o.Id == int.Parse(p[1]));
-    foreach (var ins in data.ReadObjectVerb(int.Parse(p[0]), record, Convert.ToInt32(p[2], 16), out var entry)!.Instructions.Take(6))
+    foreach (var ins in data.ReadObjectVerb(int.Parse(p[0]), record, Convert.ToInt32(p[2], 16), out var entry)!.Instructions.Take(int.TryParse(Environment.GetEnvironmentVariable("MEASURE_TAKE"), out var take) ? take : 6))
         Console.WriteLine($"  {ins.Offset:X4} {ins.Operation} {ins.Operands}");
     var codePlanner = new ScummCutscenePlanner(game);
     foreach (var t in codePlanner.Triggers.Where(t => t.Room == int.Parse(p[0]) && t.ObjectId == int.Parse(p[1]) && t.VerbId == Convert.ToInt32(p[2], 16)))
@@ -116,6 +116,10 @@ if (Environment.GetEnvironmentVariable("MEASURE_WINDOWPATH") is { Length: > 0 } 
     var changed = s1.ApplySceneSetup(plan.Edits).Count;
     if (changed > 0 && q[3] == "1") { s1.EnterRoomAgain(room); s1.ApplySceneSetup(plan.Edits); }
     Console.WriteLine($"changed {changed}, room {s1.CurrentRoomId}");
+    {
+        var rt = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(s1)!;
+        Console.WriteLine($"lights var[0x00C]={rt.GlobalVariables.GetValueOrDefault("var[0x00C]")} var[0x06F]={rt.GlobalVariables.GetValueOrDefault("var[0x06F]")} obj157={rt.ObjectStates.GetValueOrDefault(157)}");
+    }
     var meet = ScummCutsceneRun.LetRoomMeetHero(s1, t);
     var before = s1.CutscenesBegun;
     s1.PickInteraction(t.ObjectId, plan.Result.Verb ?? t.VerbId, 0);
@@ -149,6 +153,15 @@ foreach (var group in planner.Groups)
     if (run.Begun)
     {
         fresh++;
+        if (Environment.GetEnvironmentVariable("MEASURE_TRIALS") == "1" && onlyRoom is not null)
+        {
+            Console.WriteLine($"FRESH Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2}: rooms [{string.Join(",", run.RoomsEntered)}] lines {run.Lines}; candidates: {string.Join(" | ", planner.Setup.Candidates(t).Select(c => c.Describe()))}");
+            foreach (var c in planner.Setup.Candidates(t))
+            {
+                var r1 = ScummCutsceneRun.RunPicked(game, newRun, t, [c]);
+                Console.WriteLine($"  trial {c.Describe()}: begun {r1.Begun} rooms [{string.Join(",", r1.RoomsEntered)}] lines {r1.Lines}");
+            }
+        }
         // MEASURE_ORDER=1 (8 November 2026, ROADMAP 3c second step): a scene a fresh start begins, with the state of its room's ways in and the code before.
         if (Environment.GetEnvironmentVariable("MEASURE_ORDER") == "1" && planner.PlanSetup(t) is { HasEdits: true } placed)
             Console.WriteLine($"PLACED Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} ({t.ObjectName}): {string.Join("; ", placed.Edits.Select(e => e.Describe()))}; " +

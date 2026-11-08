@@ -80,6 +80,12 @@ public abstract partial class ScummSession
         _runtime.SoundParameter = SoundParameter;
         _runtime.OverrideChanged = RecordOverride;
         _runtime.V2FreezeScripts = FreezeV2Scripts;
+        // A version 1 or 2 scene that takes control by hiding the interface (ScummSceneMarks) is a scene begun, as beginCutscene is.
+        _runtime.V2InterfaceHidden = offset =>
+        {
+            CutscenesBegun++;
+            _visitTrace.Add($"cutscene at {(_executing.Count > 0 ? _executing[^1].Label : "a script")} +0x{offset:X4} (v1/v2 interface hidden)");
+        };
         _runtime.Actors.CostumeSource = _data.ReadCostume;
         _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
@@ -104,6 +110,9 @@ public abstract partial class ScummSession
     /// The player has no control then, so a click's outcome is where it ends.
     /// </summary>
     public bool InCutscene => _cutscenes.Any(item => IsAlive(item.Owner));
+
+    /// <summary>In a cutscene, or (versions 1 and 2) with the interface hidden by a script until one shows it again (<see cref="ScummSceneMarks"/>).</summary>
+    public bool InScene => InCutscene || _runtime.V2InterfaceOff;
 
     /// <summary>
     /// How many cutscenes this session has begun (<c>beginCutscene</c> reached). The app compares it

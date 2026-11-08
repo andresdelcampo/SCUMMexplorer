@@ -49,7 +49,7 @@ Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. 
 | Zak McKracken (classic, enhanced) | ✅ | 🟡 | ✅ | ✅ | 🟡 | 🟡 | ✅ | 🟡 | ✅ | 🟡 |
 
 What keeps a cell from ✅:
-- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 4.5%, Monkey Island 1 7.9% (floppy) and 7.5% (CD), Monkey Island 2 5.3%, Indy 4 3.1% (5.0% of all five copies), some of them showing nothing, no line and no other room (Indy 3 2, Monkey Island 1 2 and 2, Monkey Island 2 1, Indy 4 3); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 22% (Maniac, both) and 20% (Zak, both) started at the cutscene.
+- **5**: every scene begins when picked; started directly at their cutscene (not the game's own way): Indy 3 4.5%, Monkey Island 1 7.9% (floppy) and 7.5% (CD), Monkey Island 2 5.3%, Indy 4 3.1% (5.0% of all five copies), some of them showing nothing, no line and no other room (Indy 3 2, Monkey Island 1 2 and 2, Monkey Island 2 1, Indy 4 3); LOOM's other editions and CD (on the shared engine) start 0.9% (EGA) and 0.4% (CD) of their scenes at the cutscene; Maniac Mansion and Zak McKracken (on the shared scene setup since 1 November) begin every scene, 15% (Maniac, 6 of 39 in each copy) and 15% and 16% (Zak, 12 of 79 and 13 of 82) started at the cutscene; since 8 November their scenes that take control by hiding the interface are listed too (Maniac 27 → 39, Zak 54 → 79 and 82).
 - **6**: LOOM's other editions and CD share the reference's code but were not looked at; Maniac/Zak keep their own Interact. Verbs a game never names show as "Action".
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (80%, 64% and 57% of references); their variables and bits keep numbers (the script maps hold few rows to turn into data; most of what stays unnamed has no name in the game's data: image-only objects, actors no script names).
@@ -106,7 +106,7 @@ Optional, when the code is next touched: a ScummVM picture capture, splitting `M
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
 Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies once the user tells that track.
-- Scenes started at their cutscene (Maniac 6 of 27, Zak 11 of 54; work item 1; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold); a Maniac pick in the window waits for the party selection (the startup rule), so it is checked headless only.
+- Scenes started at their cutscene (Maniac 6 of 39: Room 4's keypad door, Room 10's door, Room 12's entry, the wires, the developer tray, Room 30's ending; Zak 12 of 79 and 13 of 82; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold). Maniac Mansion's 39 scenes were all played in the window on 8 November ([record](../.verification/maniac-ready-20261108/README.md)); a pick there needs a room opened first (the assumed party).
 - Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours.
 
 ## Release readiness (LOOM first)
@@ -198,6 +198,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 
 | Check | Steps | Result |
 |---|---|---|
+| **Maniac Mansion's scenes, ready for your check** (8 November): open a room first (Room 1), then Play Cutscene: Give contract, Turn on mondo stereo, Give cassette tape, Give badge, Open wall safe (the keypad), Walk to stairs (the delivery), Use piano, Open microwave oven | [record](../.verification/maniac-ready-20261108/README.md) | |
 | Maniac classic: Syd, Bernard, Start, skip the intro, front door and doormat route | [play record](../.verification/maniacclassic-play-20261017/README.md) | |
 | Classic Maniac Room 18 (six black rectangles), Zak classic Room 44, enhanced 13, 16, 44: black in the real game too? | [S5 checkpoint](archive/checkpoints/20261017-S5-ManiacZak.md) | |
 | Zak Rooms 3 and 33: camera position; Room 19: still picture after about 25 s | [S5 checkpoint](archive/checkpoints/20261017-S5-ManiacZak.md), NEXT_SESSION_PROMPT | |

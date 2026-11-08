@@ -53,7 +53,8 @@ public sealed class RoomControlRulesTests(ITestOutputHelper output)
         var path = Path.Combine(TestGames.Root, folder);
         if (!Directory.Exists(path)) return;
         var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(path));
-        var technical = new Regex(@"0x|verb|script|\bobject \d|\d{3}", RegexOptions.IgnoreCase);
+        // Whole words: Maniac Mansion's manuscript is a game object, not evidence (8 November 2026).
+        var technical = new Regex(@"0x|\bverb\b|\bscript\b|\bobject \d|\d{3}", RegexOptions.IgnoreCase);
         var count = 0;
         foreach (var group in planner.Groups)
         {
