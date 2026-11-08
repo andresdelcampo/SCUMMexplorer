@@ -43,6 +43,7 @@ public sealed partial class ScummSceneSetupSearch
     {
         _scenes = scenes ?? [];
         _order = new(ReadOrder);
+        _roomNeeds = new(ReadRoomNeeds);
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(run);
         _game = game;
@@ -165,12 +166,8 @@ public sealed partial class ScummSceneSetupSearch
             }
         }
         // Scene order (ROADMAP 3c): the state the scenes before it leave, from the flags it needs; kept when it still begins and reaches its rooms.
-        if (best.Begun && EarlierScenesState(trigger, kept) is { Count: > 0 } earlier)
-        {
-            var withEarlier = kept.Concat(earlier).ToList();
-            var result = _run(trigger, withEarlier);
-            if (result.Failure is null && result.Begun && best.RoomsEntered.All(result.RoomsEntered.Contains)) { best = result; kept = withEarlier; }
-        }
+        // With the state every way into its room needs first (the rooms reachable at that point), then without.
+        if (best.Begun) (best, kept) = Placed(trigger, best, kept);
         var plan = new ScummScenePlan(kept, fresh, best, "");
         return plan with { Note = Describe(plan, candidates.Count + elsewhere.Count) };
     }

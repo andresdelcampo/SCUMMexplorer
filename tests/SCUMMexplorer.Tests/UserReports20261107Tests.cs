@@ -126,6 +126,22 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void ASceneAFreshStartBeginsGetsWhatEveryWayIntoItsRoomNeeds()
+    {
+        // ROADMAP 3c, second step: the only way into Monkey Island 2's Room 43 the code reads (global script 48 +0x2171) tests var[0x0AF] = 1 first,
+        // so the book of pirate quotations there, which a fresh start already begins, gets it as the state of its place in the story.
+        if (Copy("mi2 mt32 en") is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        Assert.Contains(planner.Setup.RoomNeeds(43), need => need is { Kind: ScummSetupKind.Variable, Target: "var[0x0AF]", Value: 1 });
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t is { Room: 43, ObjectId: 444, VerbId: 0x05 });
+        var plan = planner.PlanSetup(trigger);
+        Assert.True(plan.Base.Begun);
+        Assert.True(plan.Result.Begun);
+        Assert.Contains(plan.Edits, edit => edit.Target == "var[0x0AF]" && edit.Where.Contains("every way in", StringComparison.Ordinal));
+        Assert.StartsWith("Story point (estimate)", plan.Note, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.

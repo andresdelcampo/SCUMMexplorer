@@ -77,7 +77,8 @@ public sealed class ScummCutscenePlanner
     public ScummScenePlan PlanSetup(ScummCutscene trigger)
     {
         var fresh = Run(trigger);
-        if (fresh.Begun) return new([], fresh, fresh, "");
+        // A scene a fresh start begins still gets the state of its place in the story (scene order, ROADMAP 3c), when kept.
+        if (fresh.Begun) return Setup.Place(trigger, fresh);
         return _lastResort.GetOrAdd(Key(trigger), _ =>
         {
             var plan = Setup.Plan(trigger, fresh);

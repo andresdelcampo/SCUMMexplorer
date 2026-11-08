@@ -115,7 +115,15 @@ foreach (var group in planner.Groups)
         if (run.Begun) fresh++;
         continue;
     }
-    if (run.Begun) { fresh++; continue; }
+    if (run.Begun)
+    {
+        fresh++;
+        // MEASURE_ORDER=1 (8 November 2026, ROADMAP 3c second step): a scene a fresh start begins, with the state of its room's ways in and the code before.
+        if (Environment.GetEnvironmentVariable("MEASURE_ORDER") == "1" && planner.PlanSetup(t) is { HasEdits: true } placed)
+            Console.WriteLine($"PLACED Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} ({t.ObjectName}): {string.Join("; ", placed.Edits.Select(e => e.Describe()))}; " +
+                              $"rooms [{string.Join(",", run.RoomsEntered)}] -> [{string.Join(",", placed.Result.RoomsEntered)}] lines {run.Lines} -> {placed.Result.Lines}");
+        continue;
+    }
     var start = clock.Elapsed;
     var candidates = planner.Setup.Candidates(t);
     if (Environment.GetEnvironmentVariable("MEASURE_TRIALS") == "1")

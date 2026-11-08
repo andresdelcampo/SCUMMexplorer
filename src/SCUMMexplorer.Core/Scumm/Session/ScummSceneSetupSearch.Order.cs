@@ -143,12 +143,17 @@ public sealed partial class ScummSceneSetupSearch
         var queue = new Queue<(ScummSetupEdit Need, int Depth)>(kept.Where(k => k.Kind is ScummSetupKind.Bit or ScummSetupKind.Variable).Select(k => (k, 0)));
         while (queue.TryDequeue(out var item) && added.Count < MaxOrderEdits)
         {
+            // A variable needed at 0 holds what it starts with: that is no sign of the code that also writes 0 (Indy 3 Room 40's local 201, var[0x076]).
+            if (item.Need is { Kind: ScummSetupKind.Variable, Value: 0 }) continue;
             if (item.Depth >= MaxOrderDepth || !order.Setters.TryGetValue((item.Need.Kind, item.Need.Target, item.Need.Value), out var setters)) continue;
             var outside = setters.Where(s => !labels.Contains(s.Unit.Label)).ToList();
             if (outside.Count == 0 || outside.Select(s => s.Unit.Label).Distinct().Count() != 1 || !visited.Add(outside[0].Unit.Label)) continue;
             var (unit, offset) = outside[0];
-            foreach (var (write, _) in order.Writes[unit.Label])
-                Offer(write with { Where = $"{write.Where}, which sets it: earlier code that sets {item.Need.Target}" }, item.Depth, false);
+            // Only the writes one run of that code can make with this one (Monkey Island 2's global script 48 sets each part's flags on a branch of its own).
+            var path = Read(unit.Label, unit.AsTrigger) is { } code ? OnOnePath(code, offset) : null;
+            foreach (var (write, at) in order.Writes[unit.Label])
+                if (path is null || path.Contains(at))
+                    Offer(write with { Where = $"{write.Where}, which sets it: earlier code that sets {item.Need.Target}" }, item.Depth, false);
             foreach (var (need, rank) in Ranked(unit.AsTrigger, (unit.Label, offset)))
                 if (rank == 0 && need.Kind is ScummSetupKind.Bit or ScummSetupKind.Variable)
                     Offer(need with { Where = $"{need.Where}: needed on the way to {unit.Label} +0x{offset:X4}, earlier code that sets {item.Need.Target}" }, item.Depth, true);
@@ -163,6 +168,47 @@ public sealed partial class ScummSceneSetupSearch
             added.Add(edit);
             if (follow) queue.Enqueue((edit, depth + 1));
         }
+    }
+
+    /// <summary>
+    /// The instructions a run through <paramref name="offset"/> can also run: those it leads on to and those that lead to it, by forward jumps and
+    /// falling through (a jump back is a loop going round again, as in <see cref="GuardSides(string, ScummScriptDisassembly, (string Label, int Offset)?, IReadOnlySet{string}, ScummCutscene)"/>),
+    /// so the other branches of an if/else chain are left out.
+    /// </summary>
+    private static HashSet<int> OnOnePath(ScummScriptDisassembly script, int offset)
+    {
+        var instructions = script.Instructions;
+        var index = new Dictionary<int, int>();
+        for (var i = 0; i < instructions.Count; i++) index.TryAdd(instructions[i].Offset, i);
+        if (!index.TryGetValue(offset, out var start)) return instructions.Select(i => i.Offset).ToHashSet();
+        int? Branch(int i) => BranchPattern().Match(instructions[i].Operands) is { Success: true } m &&
+                              index.TryGetValue(int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture), out var to) ? to : null;
+        IEnumerable<int> Next(int i)
+        {
+            var ins = instructions[i];
+            if (ins.Operation == "jumpRelative")
+            {
+                if (Branch(i) is int to && to > i) yield return to;
+                yield break;
+            }
+            if (ins.Operation is "stopObjectCode" or "chainScript" || ins.Operation == "stopScript" && (ins.Operands.Length == 0 || Literal(ins.Operands.Trim()) == 0)) yield break;
+            if (i + 1 < instructions.Count) yield return i + 1;
+            if (Branch(i) is int branch && branch > i) yield return branch;
+        }
+        var into = new List<int>[instructions.Count];
+        for (var i = 0; i < instructions.Count; i++)
+            foreach (var to in Next(i)) (into[to] ??= []).Add(i);
+        var found = new HashSet<int> { start };
+        foreach (var forward in new[] { true, false })
+        {
+            var seen = new HashSet<int> { start };
+            var work = new Stack<int>([start]);
+            while (work.Count > 0)
+                foreach (var next in forward ? Next(work.Pop()) : into[work.Pop()] ?? [])
+                    if (seen.Add(next)) work.Push(next);
+            found.UnionWith(seen);
+        }
+        return found.Select(i => instructions[i].Offset).ToHashSet();
     }
 
     [GeneratedRegex(@"^bit\[0x[0-9A-F]+\]$")]

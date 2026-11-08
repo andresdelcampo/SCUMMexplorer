@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 8 November: scene order, the rooms reachable at that point
+
+Work item 3c, second step. Every room load in the game's code is read with the tests on the way to it; a flag, story variable or held item that every way into a room needs was there when the hero came in, so a scene in that room gets it, and then the state of the code that sets it, kept only when the scene still begins and reaches its rooms. Scenes a fresh start begins get it too (they had no setup before). Fresh-begun scenes placed: Indy 3 10 of 93 (each copy), Monkey Island 2 17 of 101, Indy 4 6 of 225, none in Monkey Island 1, Maniac Mansion and Zak McKracken (43 of 779, 5.5%). With the first step, 92 of 1,413 scenes (6.5%) carry room or earlier state: Indy 3 11.0%, Monkey Island 2 17.4%, Indy 4 4.5%, Monkey Island 1 1.2%, Maniac Mansion 3.7%, Zak McKracken 0%. The earlier code now gives only the writes on one path with the needed one, and a variable needed at 0 is not followed back. No scene changed its way in any game; started at their cutscene stay 5.0%. Checked in the window on Monkey Island 2 Room 43's book. Full suite run. [Record](../../.verification/scene-order-20261108/README.md)
+
 ## 8 November: scene order, first step
 
 Work item 3c. When a picked scene's setup needs a story flag that exactly one piece of the game's code sets (an object verb, a room script, a global script other than the boot and shared helpers), that code came first: the scene also gets the other flags it sets and the flag values its tests need on the way, back up to four steps, kept only when the scene still begins and reaches its rooms. 27 of 570 setups gain earlier state (Indy 4 10, Monkey Island 2 11, Monkey Island 1 2 and 2, Maniac Mansion 1 and 1); no scene changed its way in any game; Indy 3 and Zak McKracken have no such flag. Full suite run. [Record](../../.verification/scene-order-20261108/README.md)
