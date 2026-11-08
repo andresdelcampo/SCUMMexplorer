@@ -18,7 +18,17 @@ public sealed partial class ScummSceneSetupSearch
     /// <summary>One room load: from a room's code (<c>From</c>; -1 for a global script), into <c>To</c>, with the values on the way to it.</summary>
     private sealed record RoomLoad(int From, int To, IReadOnlyList<ScummSetupEdit> Gate);
 
-    private static bool IsReachKind(ScummSetupKind kind) => kind is ScummSetupKind.Bit or ScummSetupKind.Variable or ScummSetupKind.Held;
+    private static bool IsReachKind(ScummSetupKind kind) => kind is ScummSetupKind.Bit or ScummSetupKind.Variable or ScummSetupKind.Held or
+        ScummSetupKind.ObjectState or ScummSetupKind.ObjectStateBit or ScummSetupKind.ObjectClass;
+
+    private readonly System.Collections.Concurrent.ConcurrentBag<string> _unreadLoads = [];
+
+    /// <summary>The room loads whose room the read could not tell (a variable no constant on the way fills), as "label +0xOFFSET operand".</summary>
+    public IReadOnlyList<string> UnreadRoomLoads()
+    {
+        _ = _roomNeeds.Value;
+        return _unreadLoads.Order(StringComparer.Ordinal).ToArray();
+    }
 
     /// <summary>What every way into a room that the game's code reads needs (flags, items held), by room.</summary>
     public IReadOnlyList<ScummSetupEdit> RoomNeeds(int room) =>
@@ -121,7 +131,7 @@ public sealed partial class ScummSceneSetupSearch
             IReadOnlyList<ScummSetupEdit> gate;
             try
             {
-                gate = Ranked(stand, (script, offset)).Where(r => r.Rank == 0 && IsReachKind(r.Edit.Kind)).Select(r => r.Edit)
+                gate = Ranked(stand, (script, offset)).Where(r => r.Rank == 0 && IsReachKind(r.Edit.Kind) && (r.Edit.Kind != ScummSetupKind.Variable || StoryVariable(r.Edit.Target))).Select(r => r.Edit)
                     .Select(e => e with { Where = $"{e.Where}, on the way into Room {to} ({unit} +0x{offset:X4}): every way in the code reads needs it" }).ToList();
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException or InvalidOperationException) { gate = []; }
@@ -134,12 +144,7 @@ public sealed partial class ScummSceneSetupSearch
             catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException or EndOfStreamException) { continue; }
             if (script is null) continue;
             var label = $"global script {id}";
-            foreach (var ins in script.Instructions.Where(i => i.Operation is "loadRoom" or "loadRoomWithEgo"))
-            {
-                var parts = ins.Operands.Split(',', StringSplitOptions.TrimEntries);
-                if (Literal(ins.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "") is int to)
-                    Add(-1, label, Stand(label, 0), label, ins.Offset, to);
-            }
+            foreach (var (to, offset) in LoadsIn(label, script, literals: true)) Add(-1, label, Stand(label, 0), label, offset, to);
         }
         foreach (var resource in _game.Rooms.Where(r => r.ResourceId is not null).DistinctBy(r => r.ResourceId).OrderBy(r => r.ResourceId))
         {
@@ -165,8 +170,12 @@ public sealed partial class ScummSceneSetupSearch
             foreach (var (label, stand, read) in units)
             {
                 IReadOnlyList<ScummDoorwayTarget> targets;
-                try { targets = read() is { } script ? finder.Find(resource, script) : []; }
+                ScummScriptDisassembly? own;
+                try { own = read(); targets = own is not null ? finder.Find(resource, own) : []; }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException or EndOfStreamException or InvalidOperationException) { continue; }
+                // Its own loads of a room a variable holds (the finder reads literal rooms and arguments).
+                foreach (var (to, offset) in own is null ? [] : LoadsIn(label, own, literals: false))
+                    if (to != room) Add(room, label, stand, label, offset, to);
                 foreach (var target in targets)
                 {
                     // The script that holds the load: the last step of the path ("local script 201 → global script 7").
@@ -178,5 +187,31 @@ public sealed partial class ScummSceneSetupSearch
             }
         }
         return loads;
+    }
+
+    /// <summary>
+    /// A script's room loads: with a literal room (when <paramref name="literals"/>), each at its own instruction; with a variable, each constant a
+    /// <c>move</c> before it on one path puts there (a choice of rooms: one load per branch), at that move, so the way read is the one that picks the
+    /// room. A variable no such constant fills is listed in <see cref="UnreadRoomLoads"/>.
+    /// </summary>
+    private IEnumerable<(int Room, int Offset)> LoadsIn(string label, ScummScriptDisassembly script, bool literals)
+    {
+        var rooms = _game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).ToHashSet();
+        foreach (var ins in script.Instructions.Where(i => i.Operation is "loadRoom" or "loadRoomWithEgo"))
+        {
+            var parts = ins.Operands.Split(',', StringSplitOptions.TrimEntries);
+            var operand = Flatten(ins.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "");
+            if (Literal(operand) is int literal)
+            {
+                if (literals && rooms.Contains(literal)) yield return (literal, ins.Offset);
+                continue;
+            }
+            var path = OnOnePath(script, ins.Offset);
+            var set = script.Instructions.Where(m => m.Offset < ins.Offset && path.Contains(m.Offset) && m.Operation == "move" &&
+                                                     m.Operands.Split(" = ") is [var into, var from] && into.Trim() == operand && Literal(from.Trim()) is int r && rooms.Contains(r))
+                .Select(m => (Room: Literal(m.Operands.Split(" = ")[1].Trim())!.Value, m.Offset)).ToList();
+            if (set.Count == 0) _unreadLoads.Add($"{label} +0x{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+            foreach (var found in set) yield return found;
+        }
     }
 }

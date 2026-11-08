@@ -122,9 +122,10 @@ public partial class MainWindow
                 // The room lists are known once every scene has run: the Play Cutscene buttons are ready now, before the setup plans below.
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists(), game.Language);
                 Dispatcher.BeginInvoke(() => { if (_playPlanner == planner) { _playRoomListsDone = true; UpdatePlaybackControls(); } });
-                // §8.6, second phase: the setup of each scene a fresh start does not begin, so a later pick plays it at once (a pick before that works
-                // its plan out on the spot); kept for later launches (ScenePlanCache).
-                var unplanned = groups.Where(group => !planner.Value.IsDerived(group.First)).ToList();
+                // §8.6, second phase: the setup of each scene a fresh start does not begin, and the place in the story of each it does (scene order,
+                // ROADMAP 3c), so a later pick plays it at once (a pick before that works its plan out on the spot); kept for later launches
+                // (ScenePlanCache). The scenes that need a setup first.
+                var unplanned = groups.Where(group => !planner.Value.IsPlanned(group.First)).OrderBy(group => planner.Value.IsDerived(group.First)).ToList();
                 Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(unplanned, System.Collections.Concurrent.EnumerablePartitionerOptions.NoBuffering), options, group =>
                 {
                     _scanGate.Wait();

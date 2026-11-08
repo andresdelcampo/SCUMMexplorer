@@ -163,6 +163,9 @@ public sealed partial class ScummSceneSetupSearch
         void Offer(ScummSetupEdit edit, int depth, bool follow)
         {
             if (added.Count >= MaxOrderEdits || own.Contains(edit.Target) || taken.Contains(edit.Target)) return;
+            // Only story state: an engine variable on the way (Maniac Mansion's var[0x00A], the second object, tested by Room 6's object 139) is the
+            // sentence of that earlier code, not something it left; set, it spoils the scene's own pick.
+            if (edit.Kind == ScummSetupKind.Variable && !StoryVariable(edit.Target)) return;
             if (needed.TryGetValue(edit.Target, out var value) && value != edit.Value) return;
             taken.Add(edit.Target);
             added.Add(edit);

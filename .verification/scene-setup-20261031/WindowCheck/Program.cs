@@ -39,7 +39,7 @@ internal static class Program
         void State(string stage)
         {
             var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
-            Log($"{stage}: room={play?.CurrentRoomId} cutscene={play?.InCutscene} texts=[{string.Join(" / ", play?.Messages.OnScreen.SelectMany(m => m.Lines).Where(l => l.Length > 0).Take(3) ?? [])}] printed={play?.Messages.Log.Count} last=[{play?.Messages.Log.LastOrDefault()?.Text.Replace('\n', ' ')}]");
+            Log($"{stage}: room={play?.CurrentRoomId} cutscene={play?.InCutscene} texts=[{string.Join(" / ", play?.Messages.OnScreen.SelectMany(m => m.Lines).Where(l => l.Length > 0).Take(3) ?? [])}] printed={play?.Messages.Log.Count} last=[{play?.Messages.Log.LastOrDefault()?.Text.Replace('\n', ' ')}] status=[{(Field("StatusText") as System.Windows.Controls.TextBlock)?.Text}]");
         }
         window.Loaded += async (_, _) =>
         {
@@ -399,6 +399,9 @@ internal static class Program
                     for (var i = 1; i <= watched; i++) { await Pump(1.5); State($"{spec} +{i * 1.5:F1}s"); if (i == 3 || i % 6 == 0) Capture($"{spec.Replace(',', '-')}-run{repeat}-{i:00}"); }
                     var play = (ScummSession?)Field("_play") ?? (ScummSession?)Field("_session");
                     Log($"{spec} setup: {string.Join(" | ", play?.Snapshot.Uncertainties.Where(u => u.Contains("setup") || u.Contains("picked") || u.Contains("started directly")).TakeLast(3) ?? [])}");
+                    // WINDOWCHECK_TRACE=n: the session's last n trace lines after the scene.
+                    if (int.TryParse(Environment.GetEnvironmentVariable("WINDOWCHECK_TRACE"), out var traced) && play is not null)
+                        foreach (var line in play.SessionTrace.TakeLast(traced)) Log("  | " + (line.Length > 200 ? line[..200] : line));
                 }
             }
             catch (Exception ex) { Log("FAILED: " + ex); }

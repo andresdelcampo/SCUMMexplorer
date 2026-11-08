@@ -78,7 +78,7 @@ public sealed class ScummCutscenePlanner
     {
         var fresh = Run(trigger);
         // A scene a fresh start begins still gets the state of its place in the story (scene order, ROADMAP 3c), when kept.
-        if (fresh.Begun) return Setup.Place(trigger, fresh);
+        if (fresh.Begun) return _lastResort.GetOrAdd(Key(trigger), _ => Setup.Place(trigger, fresh));
         return _lastResort.GetOrAdd(Key(trigger), _ =>
         {
             var plan = Setup.Plan(trigger, fresh);
@@ -253,6 +253,9 @@ public sealed class ScummCutscenePlanner
             if (scene.Plan is { } plan) _lastResort.TryAdd(key, plan);
         }
     }
+
+    /// <summary>Whether the scene's plan is known (worked out in this launch or kept from an earlier one), its place in the story included.</summary>
+    public bool IsPlanned(ScummCutscene trigger) => _lastResort.ContainsKey(Key(trigger));
 
     /// <summary>Whether the scene's derivation is complete: its run is known and, when that does not begin it, its plan too.</summary>
     public bool IsDerived(ScummCutscene trigger) =>

@@ -101,6 +101,37 @@ if (Environment.GetEnvironmentVariable("MEASURE_VERBS") == "1")
     foreach (var verb in boot.Verbs.Take(20)) Console.WriteLine($"  session verb 0x{verb.VerbId:X2} mode {verb.Mode} name [{verb.Name}] image {verb.ImageObject}");
     return;
 }
+if (Environment.GetEnvironmentVariable("MEASURE_WINDOWPATH") is { Length: > 0 } wp)
+{
+    // MEASURE_WINDOWPATH=room,object,verb(hex),reenter(0/1): the window's order for a non-entry scene with a setup (room opened first, setup, entered again).
+    var q = wp.Split(',');
+    var t = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(c => c.Room == int.Parse(q[0]) && c.ObjectId == int.Parse(q[1]) && c.VerbId == Convert.ToInt32(q[2], 16));
+    var plan = planner.PlanSetup(t);
+    Console.WriteLine($"plan: way {plan.Result.Way} edits {string.Join("; ", plan.Edits.Select(e => e.Describe()))}");
+    var s1 = newRun();
+    var room = game.Rooms.First(r => r.ResourceId == t.Room);
+    s1.VisitRoom(room);
+    s1.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, t), t.ObjectId);
+    s1.ArrivalsSkippedFor = t; s1.ArrivalSetup = plan.Edits; s1.WantHeroForScene(t);
+    var changed = s1.ApplySceneSetup(plan.Edits).Count;
+    if (changed > 0 && q[3] == "1") { s1.EnterRoomAgain(room); s1.ApplySceneSetup(plan.Edits); }
+    Console.WriteLine($"changed {changed}, room {s1.CurrentRoomId}");
+    var meet = ScummCutsceneRun.LetRoomMeetHero(s1, t);
+    var before = s1.CutscenesBegun;
+    s1.PickInteraction(t.ObjectId, plan.Result.Verb ?? t.VerbId, 0);
+    for (var f = 0; f < 400; f++) s1.StepFrame();
+    Console.WriteLine($"meet {meet}; cutscenes {s1.CutscenesBegun - before}; room {s1.CurrentRoomId}; rooms [{string.Join(",", s1.RoomsEntered)}]");
+    foreach (var line in s1.SessionTrace.TakeLast(25)) Console.WriteLine("  | " + (line.Length > 180 ? line[..180] : line));
+    return;
+}
+if (Environment.GetEnvironmentVariable("MEASURE_LOADS") == "1")
+{
+    // MEASURE_LOADS=1 (8 November 2026, ROADMAP 3c): what every way into each room needs, and the room loads whose room the read cannot tell.
+    foreach (var room in game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).Distinct().Order())
+        if (planner.Setup.RoomNeeds(room) is { Count: > 0 } needs) Console.WriteLine($"Room {room}: {string.Join("; ", needs.Select(e => e.Describe()))}");
+    foreach (var unread in planner.Setup.UnreadRoomLoads()) Console.WriteLine($"unread: {unread}");
+    return;
+}
 int fresh = 0, setup = 0, still = 0, n = 0;
 foreach (var group in planner.Groups)
 {

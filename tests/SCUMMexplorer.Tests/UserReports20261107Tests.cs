@@ -142,6 +142,20 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void EarlierCodeBringsOnlyStoryState()
+    {
+        // ROADMAP 3c: Maniac Mansion's microwave (Room 7 object 85, Open) gets the state of Room 6's object 139, which sets var[0x0A6]; the engine's
+        // second-object variable on the way there (var[0x00A]) is that code's sentence, and set it spoiled the window's pick (8 November 2026).
+        if (Copy("mmansion ega en") is not { } game) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game);
+        var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t is { Room: 7, ObjectId: 85, VerbId: 0x01 });
+        var plan = planner.PlanSetup(trigger);
+        Assert.True(plan.Result.Begun);
+        Assert.Contains(plan.Edits, edit => edit.Target == "var[0x0A8]" && edit.Where.Contains("earlier code", StringComparison.Ordinal));
+        Assert.DoesNotContain(plan.Edits, edit => edit.Target == "var[0x00A]");
+    }
+
+    [Fact]
     public void AnEgaScriptIsDecodedOncePerGame()
     {
         // ScummDataSources.For makes a new source per call; the decoded scripts are shared by every source of the same game.
