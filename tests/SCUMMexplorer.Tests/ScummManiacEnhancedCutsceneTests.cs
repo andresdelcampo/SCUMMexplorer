@@ -37,8 +37,8 @@ public sealed class ScummManiacEnhancedCutsceneTests
     {
         if (Planner.Value is not { } planner) return;
         // 8 November 2026: scenes that take control by hiding the interface count too (ScummSceneMarks).
-        Assert.Equal(78, planner.Triggers.Count);
-        Assert.Equal(39, planner.Groups.Count);
+        Assert.Equal(79, planner.Triggers.Count);
+        Assert.Equal(40, planner.Groups.Count);
         Assert.Equal("Abrir", planner.Verbs.WordFor(1));
         Assert.Equal("Qué es", planner.Verbs.WordFor(15));
         Assert.Equal("teléfono", Assert.Single(planner.Triggers, t => t.Room == 5 && t.ObjectId == 136 && t.VerbId == 11).ObjectName);

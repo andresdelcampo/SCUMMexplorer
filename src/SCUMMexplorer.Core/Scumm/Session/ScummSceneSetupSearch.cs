@@ -216,8 +216,15 @@ public sealed partial class ScummSceneSetupSearch
                 if (Read(label, trigger)?.Instructions.FirstOrDefault(ScummSceneMarks.Starts) is { } start) { cutscene = (label, start.Offset); break; }
         // Then the scripts on the way from the trigger's code to the cutscene's script that the scan does not list.
         var between = OnTheWay(own, trigger, cutscene?.Label, out var toward);
-        var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Concat(between).Select(label => (label, script: Read(label, trigger)))
-            .Where(u => u.script is not null).ToList();
+        // Then the scripts the cutscene's own script starts after its cutscene instruction (8 November 2026: Maniac Mansion's Script 105 starts Script 106,
+        // the publisher, who reads the manuscript only when var[0x052] is 1): what they test is the scene going on.
+        var during = new List<string>();
+        if (goal is null && cutscene is { } scene && Read(scene.Label, trigger) is { } cutsceneScript)
+            foreach (var call in cutsceneScript.Instructions.Where(i => i.Offset > scene.Offset && i.Operation is "startScript" or "chainScript"))
+                if (Literal(call.Operands.Split(',')[0].Trim()) is int called)
+                    during.Add(called >= _data.GlobalScriptCount ? $"Room {trigger.Room} local script {called}" : $"global script {called}");
+        var units = new[] { own }.Concat(trigger.Scripts.Where(label => label != own)).Concat(between).Concat(during).Distinct()
+            .Select(label => (label, script: Read(label, trigger))).Where(u => u.script is not null).ToList();
         var written = new HashSet<string>();
         var flagged = new HashSet<string>();
         foreach (var (_, script) in units)

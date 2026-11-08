@@ -59,7 +59,7 @@ public sealed class ScummCutscenePlanner
         VerbSource = UntilAVerbIsOn(booted);
         Verbs = VerbsOf(booted, readableText);
         Triggers = ScummCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).ToList(), null, game, Verbs,
-            arrivalScripts: game.Version is not (ScummVersion.V1 or ScummVersion.V2));
+            arrivalScripts: game.Version is not (ScummVersion.V1 or ScummVersion.V2), departureScripts: true);
         if (readableText is not null)
             Triggers = Triggers.Select(t => t with { ObjectName = readableText(t.ObjectName), FirstText = readableText(t.FirstText) }).ToArray();
         Groups = ScummCutsceneIndex.Group(Triggers);

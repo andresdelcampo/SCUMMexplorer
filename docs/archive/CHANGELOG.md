@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 8 November: scenes started on leaving a room
+
+The scan now also reads each room's exit script: a global script it starts that holds a scene is a scene of that room (`Room NN · Leaving`), played from its cutscene, and listed in every room its run goes through. The setup search also reads the scripts a cutscene starts after it begins. Maniac Mansion's Room 41 (the publisher's office, which the kids never enter) now lists the publisher reading the mailed manuscript, started by Room 1's exit script (user report). Found: Maniac Mansion 1 and Indy 3 1 per copy (run 75); no way changed in any game. Full suite run. [Record](../../.verification/maniac-ready-20261108/README.md)
+
 ## 8 November: what lies over a picked object is taken away first
 
 Scene order. A picked object under objects the player sees and can click (drawn, touchable, over its middle) gets what the one piece of the game's code that takes them all away sets: Maniac Mansion's Edsel launches with the garage door opened by Script 14 (user report: it launched with the door closed). Used by Maniac Mansion 1 scene per copy, Monkey Island 2 1, Indy 4 5 (run 74); no way changed in any game. Full suite 1,924 passed. [Record](../../.verification/maniac-ready-20261108/README.md)

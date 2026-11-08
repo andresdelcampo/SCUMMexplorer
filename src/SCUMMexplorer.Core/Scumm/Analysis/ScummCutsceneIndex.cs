@@ -56,7 +56,7 @@ public sealed record ScummCutsceneVerbs(int? Look, int? WalkTo, int? Use, int? S
 /// <param name="Verbs">The game's verb roles and words (<see cref="ScummCutsceneVerbs"/>); <see cref="ScummCutsceneVerbs.None"/> when not given.</param>
 public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
     int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null,
-    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null)
+    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null, bool Departure = false)
 {
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
 
@@ -64,6 +64,12 @@ public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, in
 
     /// <summary>A room's arrival scene that the script loading the room starts (no object; <see cref="VerbId"/> is the scene's script): the room's entry does not begin it.</summary>
     public bool IsArrivalScript => ObjectId == 0 && VerbId != 0;
+
+    /// <summary>
+    /// A scene the room's exit script starts as the hero leaves (no object; <see cref="VerbId"/> is the scene's script; 8 November 2026, user: Maniac
+    /// Mansion Room 41, the publisher reading the manuscript, Script 105 started by Room 1's exit script +0x0028). Played from its cutscene, as an arrival scene.
+    /// </summary>
+    public bool IsDepartureScript => Departure && IsArrivalScript;
 
     /// <summary>The game's verb roles (never null).</summary>
     public ScummCutsceneVerbs Roles => Verbs ?? ScummCutsceneVerbs.None;
@@ -106,7 +112,8 @@ public static partial class ScummCutsceneIndex
     /// <param name="verbs">The game's verb roles and words; <see cref="ScummCutsceneVerbs.None"/> when null.</param>
     /// <param name="arrivalScripts">Also list the arrival scenes that the script loading a room starts (<see cref="FindArrivalScripts"/>).</param>
     public static IReadOnlyList<ScummCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
-        Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null, ScummCutsceneVerbs? verbs = null, bool arrivalScripts = false)
+        Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null, ScummCutsceneVerbs? verbs = null, bool arrivalScripts = false,
+        bool departureScripts = false)
     {
         verbs ??= ScummCutsceneVerbs.None;
         var found = new List<ScummCutscene>();
@@ -149,6 +156,7 @@ public static partial class ScummCutsceneIndex
             }
         }
         if (arrivalScripts) FindArrivalScripts(data, rooms.ToHashSet(), found, verbs);
+        if (departureScripts) FindDepartureScripts(data, rooms, found, verbs);
         return found.OrderBy(c => c.Room).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).ToArray();
     }
 
@@ -185,6 +193,33 @@ public static partial class ScummCutsceneIndex
                 if (scripts.Count == 0 || scripts[0] != label) continue;
                 found.Add(new(room, 0, "", id, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", null,
                     summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs));
+            }
+        }
+    }
+
+    /// <summary>
+    /// The scenes a room's exit script starts (a literal global script whose own code, or a script it starts, holds a scene): they belong to the room being
+    /// left. A script a trigger of the same room already reaches stays that trigger's scene.
+    /// </summary>
+    private static void FindDepartureScripts(IScummDataSource data, IEnumerable<int> rooms, List<ScummCutscene> found, ScummCutsceneVerbs verbs)
+    {
+        foreach (var room in rooms)
+        {
+            if (Try(() => data.RoomExitScript(room)) is not { } exit) continue;
+            foreach (var call in exit.Instructions.Where(i => i.Operation is "startScript" or "chainScript"))
+            {
+                if (LiteralScriptNumber().Match(call.Operands) is not { Success: true } operand) continue;
+                var id = int.Parse(operand.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                var label = $"global script {id}";
+                if (id >= data.GlobalScriptCount || found.Any(c => c.Room == room && c.Scripts.Contains(label))) continue;
+                if (Try(() => data.GlobalScript(id)) is not { } scene) continue;
+                var scripts = new List<string>();
+                var texts = new List<string>();
+                var summary = new Span();
+                Walk(data, room, scene, label, 1, false, [], scripts, texts, summary);
+                if (scripts.Count == 0 || scripts[0] != label) continue;
+                found.Add(new(room, 0, "", id, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", null,
+                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs, Departure: true));
             }
         }
     }

@@ -170,6 +170,24 @@ public sealed class UserReports20261107Tests
     }
 
     [Fact]
+    public void ASceneStartedOnLeavingARoomIsListedThereAndWhereItGoes()
+    {
+        // User, 8 November: Maniac Mansion Room 41 (the publisher's office) had nothing to play. Its scene, the publisher reading the mailed manuscript
+        // (Script 106), is started by Script 105, which Room 1's exit script starts: a scene of Room 1 that goes to Room 41, playing its lines once the
+        // manuscript was sent (var[0x052], read in Script 106 after the cutscene starts).
+        if (Copy("mmansionE ega es") is not { } game) return;
+        var planner = SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game);
+        var group = planner.Groups.First(g => g.First is { Room: 1, ObjectId: 0, VerbId: 105 });
+        Assert.True(group.First.IsDepartureScript);
+        Assert.Equal("Room 01 · Leaving", ScummCutsceneTitles.Plain(group.First));
+        var plan = planner.PlanSetup(group.First);
+        Assert.True(plan.Result.Begun);
+        Assert.Contains(41, plan.Result.RoomsEntered);
+        Assert.True(plan.Result.Lines > 0);
+        Assert.True(planner.PlaysIn(group, 41));
+    }
+
+    [Fact]
     public void APickedObjectUnderOthersGetsWhatUncoversIt()
     {
         // User, 8 November: Maniac Mansion's Edsel (Room 16 object 340, part of the background) launched with the garage door closed. The door's slats

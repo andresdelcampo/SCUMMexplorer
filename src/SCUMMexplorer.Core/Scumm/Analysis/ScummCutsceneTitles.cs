@@ -44,6 +44,7 @@ public static class ScummCutsceneTitles
         if (reached.Count > 0)
             return Format(trigger.Room, "Reached " + (reached.Count == 1 ? "Room " : "Rooms ") +
                 string.Join(", ", reached.Select(r => r.ToString("00"))));
+        if (trigger.IsDepartureScript) return Format(trigger.Room, "Leaving");
         if (trigger.IsRoomEntry) return Format(trigger.Room, "Entry");
         var word = roles.WordFor(trigger.VerbId);
         if (trigger.ObjectName.Length == 0 && plain) return Format(trigger.Room, word.Split(' ')[0] + " response");
