@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 9 November: Indy 3 scenes that need several values play their own way
+
+Setups can now set a bit numbered by a variable, use a room's pseudo numbers where it is only entered so, offer another of the game's outfits, and bring the hero in by any door. Indy 3's Room 21 door, Room 33's meeting with Henry and Room 13's change of clothes play the game's own way: started at their cutscene 7 → 4 of 81 (run 86). [Record](../../.verification/cutscene-definition-20261109/README.md).
+
 ## 9 November: LOOM English's scene lists follow each replay's run; stock responses are not scenes
 
 The English catalog's reviewed categories never gave way to the runs (R-8.9): each replay without steps now follows its own trigger's run. A game's stock response (one global script's animation reached by the same verb from three rooms or more: LOOM's Other draft sparkle, Script 41) is not a cutscene (R-8.10). LOOM English lists 213 of 332 entries (64%) as cutscenes; Room 06 lists 5, was none. The other nine copies are unchanged (run 85). [Record](../../.verification/cutscene-definition-20261109/README.md).

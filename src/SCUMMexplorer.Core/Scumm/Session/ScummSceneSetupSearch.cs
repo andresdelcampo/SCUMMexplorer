@@ -240,11 +240,16 @@ public sealed partial class ScummSceneSetupSearch
         var afterCutscene = false;
         var operation = "";
         int? constant = null;
+        // Whether the instruction compares with VAR_ROOM, and the values found so: the room's own number, which a room entered under pseudo room
+        // numbers never shows (below).
+        var roomTest = false;
+        var asRoom = new List<ScummSetupEdit>();
         // tested: the value the test sees once the edit is applied (null when the edit is not the tested value itself).
         void Add(ScummSetupEdit edit, int? tested = null)
         {
             var rank = guard is bool need && tested is int v && Holds(operation, constant, v) is bool holds ? holds == need ? 0 : 2
                 : afterCutscene && tested is int after && Holds(operation, constant, after) == true ? 3 : 1;
+            if (roomTest && edit.Value == trigger.Room && edit.Kind is ScummSetupKind.Variable or ScummSetupKind.ActorRoom) asRoom.Add(edit);
             var at = found.FindIndex(f => f.Edit.Kind == edit.Kind && f.Edit.Target == edit.Target && f.Edit.Value == edit.Value);
             if (at < 0) found.Add((edit, rank));
             else if (rank < found[at].Rank) found[at] = (found[at].Edit, rank);
@@ -291,6 +296,7 @@ public sealed partial class ScummSceneSetupSearch
                 afterCutscene = moreScene.Contains(ins.Offset);
                 operation = ins.Operation;
                 constant = parts.Length >= 2 && Literal(parts[1]) is int k ? k : parts.Length >= 2 && parts[1] == ScummVars.Room ? trigger.Room : null;
+                roomTest = parts.Length >= 2 && parts[1] == ScummVars.Room;
                 switch (ins.Operation)
                 {
                     case "move" when !objectCode && trigger.ObjectId != 0 && !trigger.IsRoomEntry && ins.Operands.Split(" = ") is [var into, var from] &&
@@ -467,7 +473,14 @@ public sealed partial class ScummSceneSetupSearch
                             foreach (var side in sides.Where(v => v >= 0).Distinct())
                                 Add(new(ScummSetupKind.ObjectState, stateObject.ToString(CultureInfo.InvariantCulture), side, where), side);
                         else if (costumeOf.TryGetValue(tested, out var dressedActor))
+                        {
                             Add(new(ScummSetupKind.ActorCostume, dressedActor, value.Value, where), value.Value);
+                            // The scene's side wants another costume: those the game dresses the actor in (ScummSceneSetupSearch.Costumes).
+                            if (ins.Operation is "isEqual" or "isNotEqual" && guard is bool toCostume && Holds(ins.Operation, value.Value, value.Value) != toCostume)
+                                // The first two (a disguise script dresses the hero in many: they would crowd out the scene's other values).
+                                foreach (var other in SiblingCostumes(dressedActor, value.Value).Take(2))
+                                    Add(new(ScummSetupKind.ActorCostume, dressedActor, other, where), other);
+                        }
                         else if (boxOf.TryGetValue(tested, out var boxedActor))
                         {
                             // A script that waits for the hero to walk into a box (LOOM Room 10's local script 200: getActorWalkBox of actor 1, then
@@ -547,6 +560,15 @@ public sealed partial class ScummSceneSetupSearch
                                 Add(new(ScummSetupKind.SecondObject, value.Value.ToString(CultureInfo.InvariantCulture), 1, where,
                                     _objectRooms.Value.TryGetValue(value.Value, out var withRoom) ? withRoom : null), value.Value);
                         }
+                        else if (!_isV2 && tested == ScummVars.WalkToObject && ins.Operation is "equalZero" or "notEqualZero" && trigger.IsRoomEntry)
+                        {
+                            // Came in by any door (Indy 3 Room 13's entry, +0x001F: notEqualZero VAR_WALKTO_OBJ, else no change of clothes): each door the
+                            // game's arrivals bring the hero in by, where the scene's side is "by a door".
+                            if (guard is not bool byAny || Holds(ins.Operation, null, 1) == byAny)
+                                foreach (var door in (ScummEgoArrivalIndex.For(_game).Into(trigger.Room).Select(a => a.ObjectId).Where(o => o > 0).Distinct().ToList()
+                                             is { Count: > 0 } arrivals ? arrivals : ExitObjects(trigger.Room)).Take(3))
+                                    Add(new(ScummSetupKind.EnteredBy, tested, door, where, trigger.Room), door);
+                        }
                         else if (!_isV2 && tested == ScummVars.WalkToObject && value.Value > 0 && ins.Operation is "isEqual" or "isNotEqual" && trigger.IsRoomEntry)
                             // The door the hero came in by (VAR_WALKTO_OBJ, set while loadRoomWithEgo enters the room).
                             Add(new(ScummSetupKind.EnteredBy, tested, value.Value, where, trigger.Room), value.Value);
@@ -561,6 +583,10 @@ public sealed partial class ScummSceneSetupSearch
                             // The room under a pseudo room number (Indy 3 Room 21's entry: isEqual VAR_ROOM, 0x81): applied only where the game maps it here.
                             Add(new(ScummSetupKind.EnteredAs, ScummVars.Room, value.Value, where, trigger.Room), value.Value);
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
+                            Add(new(ScummSetupKind.Bit, tested, 1, where), 1);
+                        else if (IndexedBit().IsMatch(tested))
+                            // A bit numbered by a variable (Indy 3 Room 21's door, +0x0000: notEqualZero bit[0x59D+var[0x069]], else "It's locked!"): the
+                            // bit the variable names when the setup is applied (ScummSession.ApplySceneSetup).
                             Add(new(ScummSetupKind.Bit, tested, 1, where), 1);
                         else if (_roomLeftVariables.Value.Contains(tested) && ins.Operation is "isEqual" or "isNotEqual" &&
                                  (_game.Rooms.Any(r => r.ResourceId == value.Value) || value.Value >= 0x80) &&
@@ -597,6 +623,21 @@ public sealed partial class ScummSceneSetupSearch
                 }
             }
         }
+        roomTest = false;
+        // A room the game enters under pseudo room numbers (Indy 3 Room 33, Henry's room, as 164 to 166: its entry computes var[0x065] = VAR_ROOM - 164)
+        // never has its own number in VAR_ROOM: a value compared with VAR_ROOM (+0x009A: isEqual var[0x0B5], var[0x004]; +0x00A8: Henry's room) is each
+        // pseudo number, tried before the room's own.
+        // Only for a room no arrival loads under its own number (Zak McKracken's Room 15 is loaded both ways: its own number stays the value).
+        if (asRoom.Count > 0 && ScummEgoArrivalIndex.For(_game) is var arrivalIndex && !arrivalIndex.Into(trigger.Room).Any(a => a.PseudoRoom is null) &&
+            arrivalIndex.PseudoNumbersOf(trigger.Room).Distinct().ToList() is { Count: > 0 } pseudo)
+            foreach (var edit in asRoom.Distinct())
+            {
+                var at = found.FindIndex(f => f.Edit == edit);
+                if (at < 0) continue;
+                var rank = found[at].Rank;
+                found.InsertRange(at, pseudo.Where(p => !found.Any(f => f.Edit.Kind == edit.Kind && f.Edit.Target == edit.Target && f.Edit.Value == p))
+                    .Select(p => (edit with { Value = p }, rank)));
+            }
         // An object's scene may depend on how its room was entered: the doors the room's entry compares VAR_WALKTO_OBJ with (Indy 3 Room 82's
         // entry +0x0072: the grail chamber set up differently by door 861 or 862) are tried last.
         if (!_isV2 && !trigger.IsRoomEntry && Read($"Room {trigger.Room} entry script", trigger) is { } entry)
@@ -815,6 +856,10 @@ public sealed partial class ScummSceneSetupSearch
 
     [GeneratedRegex(@"^bit\[0x[0-9A-F]+\]")]
     private static partial Regex BitPattern();
+
+    /// <summary>A bit numbered by a global variable: <c>bit[0x59D+var[0x069]]</c>.</summary>
+    [GeneratedRegex(@"^bit\[0x[0-9A-F]+\+var\[0x[0-9A-F]+\]\]$")]
+    internal static partial Regex IndexedBit();
 
     [GeneratedRegex(@"^local\[0x([0-9A-F]+)\]")]
     private static partial Regex LocalPattern();

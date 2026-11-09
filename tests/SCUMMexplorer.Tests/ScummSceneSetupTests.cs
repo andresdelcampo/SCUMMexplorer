@@ -449,6 +449,26 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         Assert.Contains(41, plan.Result.RoomsEntered);
     }
 
+    [Theory]
+    // Room 21's door: bit[0x59D+var[0x069]] (a bit numbered by a variable), else "It's locked!".
+    [InlineData(21, 311, 0x01, 7)]
+    // Room 33's entry, Henry's first meeting: the room is entered as pseudo room 164 to 166, so var[0x0B5] and Henry's room are that number.
+    [InlineData(33, 0, 0, 3)]
+    // Room 13's entry: Indy comes in by a door (no decoded arrival: the room's own doors) in another of Script 52's outfits, and changes clothes.
+    [InlineData(13, 0, 0, 3)]
+    public void Indy3ScenesThatNeededSeveralValuesPlayTheGamesOwnWay(int room, int objectId, int verb, int lines)
+    {
+        // 9 November 2026: started at their cutscene before; the game's own code begins them with their setup.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var trigger = planner.Triggers.First(t => t.Room == room && t.ObjectId == objectId && t.VerbId == verb);
+        var plan = planner.PlanSetup(trigger);
+        output.WriteLine($"{plan.Result.Way} lines {plan.Result.Lines}: {string.Join("; ", plan.Edits.Select(e => e.Describe()))}");
+        Assert.True(plan.Result.Begun);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.True(plan.Result.Lines >= lines, $"{plan.Result.Lines} lines");
+    }
+
     [Fact]
     public void EveryIndy3SceneBeginsWhenPicked()
     {

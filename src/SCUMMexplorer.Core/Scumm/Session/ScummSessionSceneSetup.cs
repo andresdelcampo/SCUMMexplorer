@@ -139,14 +139,21 @@ public abstract partial class ScummSession
         {
             case ScummSetupKind.Bit:
             {
+                // A bit numbered by a variable (bit[0x59D+var[0x069]]): the one the variable names now.
+                var target = edit.Target;
+                if (target.IndexOf("+var[", StringComparison.Ordinal) is var plus and > 0)
+                {
+                    var offset = Convert.ToInt32(target[6..plus], 16) + variables.GetValueOrDefault(target[(plus + 1)..^1]);
+                    target = $"bit[0x{offset:X3}]";
+                }
                 if (variables.ContainsKey(ScummBoundedScriptExecutor.SeparateBitStorage))
                 {
-                    if (variables.GetValueOrDefault(edit.Target) != 0) return false;
-                    _runtime.SetGlobalVariable(edit.Target, 1);
+                    if (variables.GetValueOrDefault(target) != 0) return false;
+                    _runtime.SetGlobalVariable(target, 1);
                     return true;
                 }
                 // Old v3: bit n is bit (n & 15) of global word n >> 4.
-                var bit = Convert.ToInt32(edit.Target[6..^1], 16);
+                var bit = Convert.ToInt32(target[6..^1], 16);
                 var word = $"var[0x{bit >> 4:X3}]";
                 var mask = (ushort)(1 << (bit & 15));
                 var value = variables.GetValueOrDefault(word);
@@ -333,8 +340,11 @@ public abstract partial class ScummSession
                 }
                 else
                 {
-                    if (_runtime.Actors[actor].Room == edit.Value) return false;
-                    _runtime.Actors.PutInRoom(actor, edit.Value, CurrentPlacement(), ego);
+                    // A pseudo room number is kept as its real room, as putActorInRoom keeps it (getActorRoom gives the number back in that room):
+                    // Indy 3's Henry in pseudo room 164 is in Room 33.
+                    var room = edit.Value >= 0x80 && _runtime.PseudoRooms.TryGetValue(edit.Value, out var realRoom) ? realRoom : edit.Value;
+                    if (_runtime.Actors[actor].Room == room) return false;
+                    _runtime.Actors.PutInRoom(actor, room, CurrentPlacement(), ego);
                 }
                 return true;
             }

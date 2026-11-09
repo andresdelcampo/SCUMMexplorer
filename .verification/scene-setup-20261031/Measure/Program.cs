@@ -129,6 +129,12 @@ if (Environment.GetEnvironmentVariable("MEASURE_WINDOWPATH") is { Length: > 0 } 
     foreach (var line in s1.SessionTrace.TakeLast(25)) Console.WriteLine("  | " + (line.Length > 180 ? line[..180] : line));
     return;
 }
+// MEASURE_ARRIVALS=room: the game's arrivals of the hero into that room (door objects and pseudo room numbers).
+if (int.TryParse(Environment.GetEnvironmentVariable("MEASURE_ARRIVALS"), out var arrivalsRoom))
+{
+    foreach (var arrival in ScummEgoArrivalIndex.For(game).Into(arrivalsRoom)) Console.WriteLine($"arrival {arrival.Describe()}");
+    return;
+}
 if (Environment.GetEnvironmentVariable("MEASURE_LOADS") == "1")
 {
     // MEASURE_LOADS=1 (8 November 2026, ROADMAP 3c): what every way into each room needs, and the room loads whose room the read cannot tell.
@@ -183,8 +189,18 @@ foreach (var group in planner.Groups)
         if (Environment.GetEnvironmentVariable("MEASURE_COMBO") is { Length: > 0 } combo)
         {
             var picked = combo.Split(',').Select(int.Parse).Where(i => i < candidates.Count).Select(i => candidates[i]).ToList();
-            var rc = ScummCutsceneRun.RunPicked(game, newRun, t, picked);
+            ScummSession? last = null;
+            var rc = ScummCutsceneRun.RunPicked(game, () => last = newRun(), t, picked);
             Console.WriteLine($"  combo {string.Join(" + ", picked.Select(c => c.Describe()))}: begun {rc.Begun} rooms [{string.Join(",", rc.RoomsEntered)}] lines {rc.Lines} frames {rc.Frames}");
+            // MEASURE_COMBO_TRACE=n: the run's last n session trace lines and printed lines (SCUMM_TRACE_SCRIPTS names scripts traced instruction by instruction).
+            if (int.TryParse(Environment.GetEnvironmentVariable("MEASURE_COMBO_TRACE"), out var tail) && last is not null)
+            {
+                foreach (var line in last.SessionTrace.TakeLast(tail)) Console.WriteLine($"    trace {line}");
+                foreach (var message in last.Messages.Log) Console.WriteLine($"    printed {message.Text.Replace('\n', ' ')}");
+                foreach (var note in last.Snapshot.Uncertainties.TakeLast(8)) Console.WriteLine($"    note {note}");
+                var runtime = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(last)!;
+                Console.WriteLine($"    walk-to object {runtime.GlobalVariables.GetValueOrDefault(ScummVars.WalkToObject)}, hero costume {runtime.Actors[1].Look.Costume}, room {last.CurrentRoomId}");
+            }
         }
         // Pairs, for a few candidates (a scene that needs two values at once).
         if (candidates.Count is > 1 and <= 4)

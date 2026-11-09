@@ -488,6 +488,17 @@ public sealed class ScummGameSession : ScummSession
         }
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return EnterWithoutEgo(room, arrival, arrivals);
         var candidates = arrivals.Into(roomId);
+        // A picked scene's setup wants the hero in by one of the room's objects, and no decoded arrival brings him in at all (Indy 3 Room 13, whose doors
+        // load rooms through variables): he comes in by that object (VAR_WALKTO_OBJ), a teleport the setup labels.
+        if (candidates.Count == 0 && WantedArrivalObject is int byObject && ScummDataSources.For(_game).ReadRoom(roomId).Objects.Any(item => item.Id == byObject))
+        {
+            WantedArrivalObject = null;
+            var by = $"A picked scene's setup brings the hero into Room {roomId:00} by object {byObject}; no decoded arrival brings him in (an estimate).";
+            _uncertainties.Add(by);
+            return EnterRoom(room, $"{arrival} {by}", new ScummScriptEvent(0, "explorer visit", 0, ScummScriptEventKind.RoomLoaded, "loadRoomWithEgo",
+                $"the hero brought in by object {byObject} for a picked scene", ResourceKind.Room, roomId, ScummScriptEventCertainty.Conditional,
+                ResolvedArguments: [byObject, roomId, -1, -1]));
+        }
         // 6 November 2026 (found by the user's tour, Indy 3 Room 9: no Indy): no loadRoomWithEgo comes here, but a script stands him in the room by hand (Script 73:
         // Room 9 at 532, 83): the first such place, a labelled estimate. Only for a room picked from the list: a scene's setup says where it wants him. Not a room only the opening shows, and not versions 1 and 2 (several heroes).
         if (candidates.Count == 0 && _standHeroByHand && !_runtime.IsV2 && !OpeningOnly(roomId) && arrivals.PlacedInto(roomId) is [var placed, ..])
