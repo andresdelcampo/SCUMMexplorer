@@ -59,6 +59,27 @@ public sealed partial class ScummSceneSetupSearch
         return found.ToDictionary(p => p.Key, p => (IReadOnlyList<int>)p.Value);
     })).Value.TryGetValue(room, out var exits) ? exits : [];
 
+    private Lazy<IReadOnlyDictionary<int, byte>>? _v2Masks;
+
+    /// <summary>Versions 1 and 2: each object's class mask (its header's byte 6, which <c>o2_ifClassOfIs</c> tests), from the first room that holds it.</summary>
+    private IReadOnlyDictionary<int, byte> V2ClassMasks => (_v2Masks ??= new(() =>
+    {
+        var masks = new Dictionary<int, byte>();
+        foreach (var room in _game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).Distinct().Order())
+        {
+            try { foreach (var record in _data.ReadRoom(room).Objects) masks.TryAdd(record.Id, record.V2ClassMask); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException) { }
+        }
+        return masks;
+    })).Value;
+
+    /// <summary>
+    /// Versions 1 and 2: the objects whose class mask has all of <paramref name="needed"/> and none of <paramref name="excluded"/> (the masks earlier tests
+    /// on the way rule out), other than the picked object; at most three, in id order.
+    /// </summary>
+    private IReadOnlyList<int> ObjectsWithMask(int needed, int excluded, int picked) =>
+        V2ClassMasks.Where(p => p.Key != picked && (p.Value & needed) == needed && (p.Value & excluded) == 0).Select(p => p.Key).Order().Take(3).ToList();
+
     [GeneratedRegex(@"^Room (\d+) object (\d+) verb ")]
     private static partial Regex ObjectUnit();
 

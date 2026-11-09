@@ -268,6 +268,8 @@ public sealed partial class ScummSceneSetupSearch
             var distanceOf = new Dictionary<string, (string A, string B)>();
             // The second objects a class test offered (a later class of theirs is set on them).
             var secondByClass = new List<int>();
+            // Versions 1 and 2: the class masks the second object must lack, from the tests on the way so far.
+            var v2Excluded = 0;
             var objectCode = label.Contains(" object ", StringComparison.Ordinal);
             // A script the trigger's code starts or chains to reads its arguments as its locals: literals (Indy 4 Room 7's cat figurine:
             // chainScript 206, [0x0074, 0x0009], whose local 206 tests the class of local[0x000], the object 116), "this object" (Monkey Island 2's
@@ -375,6 +377,21 @@ public sealed partial class ScummSceneSetupSearch
                         Add(new(ScummSetupKind.Held, held.ToString(CultureInfo.InvariantCulture), 1, where,
                             _objectRooms.Value.TryGetValue(held, out var room) ? room : null));
                         break;
+                    case "ifClassOfIs" when _isV2 && parts.Length >= 2 && parts[0] == ScummVars.V2.ActiveObject2 && !trigger.IsRoomEntry && Literal(parts[1]) is int v2Mask and > 0:
+                    {
+                        // Versions 1 and 2 (o2_ifClassOfIs jumps when the object's header mask lacks the bits): the second object must have them, or lack
+                        // them, as the scene's side needs (Zak McKracken Room 05's drop slot, +0x00A5: not 0x08, "It's too big"; +0x00DB: 0x20, then Script
+                        // 62). Where it must have them: objects with that mask and none of those ruled out before, as the second object.
+                        if (guard is bool hasMask)
+                        {
+                            if (!hasMask) v2Excluded |= v2Mask;
+                            else foreach (var candidate in ObjectsWithMask(v2Mask, v2Excluded, trigger.ObjectId).Where(c => !found.Any(f => f.Rank == 2 &&
+                                         f.Edit.Kind == ScummSetupKind.SecondObject && f.Edit.Target == c.ToString(CultureInfo.InvariantCulture))))
+                                    Add(new(ScummSetupKind.SecondObject, candidate.ToString(CultureInfo.InvariantCulture), 1, where,
+                                        _objectRooms.Value.TryGetValue(candidate, out var maskedRoom) ? maskedRoom : null), 1);
+                        }
+                        break;
+                    }
                     case "ifClassOfIs" when ins.Operands.IndexOf(", [", StringComparison.Ordinal) + 2 is var open and > 1 &&
                                             (Known(parts[0]) ?? (objectCode && trigger.ObjectId != 0 && parts[0] == "var[0x007]" ? trigger.ObjectId : null)) is int classed and > 0:
                     {
