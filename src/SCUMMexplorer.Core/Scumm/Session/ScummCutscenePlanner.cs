@@ -235,11 +235,56 @@ public sealed class ScummCutscenePlanner
     public bool IsScene(ScummCutsceneGroup group)
     {
         ArgumentNullException.ThrowIfNull(group);
-        if (!TryGetRun(group.First, out var run)) return group.IsScene;
-        var shown = run.Begun || !_lastResort.TryGetValue(Key(group.First), out var plan) ? run : plan.Result;
-        if (!shown.Begun) return group.IsScene;
-        // R-8.10 (user, 9 November 2026): it changes room or animates characters or objects; lines of text alone are a dialogue or reaction.
-        return group.First.Widened ? shown.IsWidenedCutscene : shown.IsCutscene;
+        return IsScene(group.First, group.IsScene);
+    }
+
+    /// <summary>
+    /// Whether this one trigger is a cutscene by its own run (R-8.10); <paramref name="fallback"/> until that run is known or when it did not begin. A
+    /// group's other triggers can differ from its first (LOOM's drafts at the wool share scripts with a reaction).
+    /// </summary>
+    public bool IsScene(ScummCutscene trigger, bool fallback)
+    {
+        ArgumentNullException.ThrowIfNull(trigger);
+        if (!TryGetRun(trigger, out var run)) return fallback;
+        var shown = run.Begun || !_lastResort.TryGetValue(Key(trigger), out var plan) ? run : plan.Result;
+        if (!shown.Begun) return fallback;
+        // R-8.10 (user, 9 November 2026): it changes room or animates characters or objects; lines of text alone are a dialogue or reaction. The game's
+        // stock response to a verb (one global script's animation, reached by that verb in StockRooms rooms or more) is the verb's, not a scene.
+        var stock = StockPlaces(trigger.VerbId);
+        return shown.ShowsBeyond(stock.Contains, trigger.Widened);
+    }
+
+    /// <summary>Rooms from which one verb reaching the same animation of a global script make it the game's stock response to that verb.</summary>
+    public const int StockRooms = 3;
+
+    private (int Runs, Dictionary<int, HashSet<string>> Places)? _stock;
+
+    /// <summary>
+    /// The places (<c>Script 41 +0x004C</c>) of global scripts that the same verb animates through from <see cref="StockRooms"/> rooms or more, by the runs
+    /// known so far (LOOM English: every object's Other draft starts Script 41, the draft's sparkle at the object, then "that draft won't work").
+    /// </summary>
+    private HashSet<string> StockPlaces(int verb)
+    {
+        var known = _stock;
+        if (known is not { } cached || cached.Runs != _runs.Count)
+        {
+            var rooms = new Dictionary<(int Verb, string Place), HashSet<int>>();
+            foreach (var (key, run) in _runs.ToArray())
+            {
+                var shown = run.Begun || !_lastResort.TryGetValue(key, out var plan) ? run : plan.Result;
+                foreach (var place in shown.Animations ?? [])
+                {
+                    if (!place.StartsWith("Script ", StringComparison.Ordinal)) continue;
+                    (rooms.TryGetValue((key.Item3, place), out var set) ? set : rooms[(key.Item3, place)] = []).Add(key.Item1);
+                }
+            }
+            var places = new Dictionary<int, HashSet<string>>();
+            foreach (var ((v, place), set) in rooms.Where(p => p.Value.Count >= StockRooms))
+                (places.TryGetValue(v, out var list) ? list : places[v] = new(StringComparer.Ordinal)).Add(place);
+            cached = (_runs.Count, places);
+            _stock = cached;
+        }
+        return cached.Places.TryGetValue(verb, out var found) ? found : [];
     }
 
     /// <summary>Whether a run of the scene was in this room at some point (its own room always counts).</summary>

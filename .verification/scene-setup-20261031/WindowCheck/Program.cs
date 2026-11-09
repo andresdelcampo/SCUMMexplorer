@@ -63,6 +63,31 @@ internal static class Program
                 foreach (var raw in args.Skip(2))
                 {
                     // a lists (LOOM) the objects with verbs that are not hotspots now: what the Interact overview adds since 31 October.
+                    // RL:room lists LOOM's room Play Cutscene list (9 November 2026), as the window shows it.
+                    if (raw.StartsWith("RL:", StringComparison.Ordinal))
+                    {
+                        var listed = (System.Collections.IList)typeof(MainWindow).GetMethod("RoomCutsceneItems", Private)!.Invoke(window, [int.Parse(raw[3..])])!;
+                        foreach (var item in listed) Log($"{raw} item \"{item!.GetType().GetProperty("Title")!.GetValue(item)}\" [{item.GetType().GetProperty("Category")!.GetValue(item)}]");
+                        Log($"{raw}: {listed.Count} items");
+                        // How far the background classification of the catalog (StartCatalogKinds) has got.
+                        if (Field("_loomScenePlanner") is Lazy<ScummCutscenePlanner> { IsValueCreated: true } shared)
+                        {
+                            Log($"{raw}: shared planner runs {shared.Value.Triggers.Count(shared.Value.HasRun)} of {shared.Value.Triggers.Count}");
+                            foreach (var t in shared.Value.Triggers.Where(t => t.Room == int.Parse(raw[3..])))
+                                Log($"{raw}: object {t.ObjectId} verb 0x{t.VerbId:X2} run {shared.Value.HasRun(t)} planned {shared.Value.IsPlanned(t)} cutscene {shared.Value.IsScene(t, false)} animation {shared.Value.PlanSetup(t).Result.Animation ?? "-"} lines {shared.Value.PlanSetup(t).Result.Lines}");
+                        }
+                        else Log($"{raw}: shared planner {(Field("_loomScenePlanner") is null ? "none" : "not created")}");
+                        continue;
+                    }
+                    // K counts LOOM's catalog entries by category, as the window shows them (9 November 2026).
+                    if (raw == "K")
+                    {
+                        var all = (System.Collections.IList)Call("PlayableCutsceneItems", new object?[] { null })!;
+                        var categories = all.Cast<object>().Select(i => (string)i.GetType().GetField("Item2")!.GetValue(i)!.GetType().GetProperty("Category")!.GetValue(i.GetType().GetField("Item2")!.GetValue(i))!)
+                            .GroupBy(c => c).Select(g => $"{g.Key} {g.Count()}");
+                        Log($"K: {all.Count} entries: {string.Join(", ", categories)}");
+                        continue;
+                    }
                     // R lists the shown room's Play Cutscene list (8 November 2026).
                     if (raw == "R")
                     {

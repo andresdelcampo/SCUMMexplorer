@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 9 November: LOOM English's scene lists follow each replay's run; stock responses are not scenes
+
+The English catalog's reviewed categories never gave way to the runs (R-8.9): each replay without steps now follows its own trigger's run. A game's stock response (one global script's animation reached by the same verb from three rooms or more: LOOM's Other draft sparkle, Script 41) is not a cutscene (R-8.10). LOOM English lists 213 of 332 entries (64%) as cutscenes; Room 06 lists 5, was none. The other nine copies are unchanged (run 85). [Record](../../.verification/cutscene-definition-20261109/README.md).
+
 ## 9 November: a scene that animates without taking control plays its own way
 
 A scene whose own code animates or shows another room without taking the player's control plays the game's own way instead of from a cutscene of another branch, when it shows at least as much (lines, then rooms). Maniac Mansion Room 12's Green Tentacle, Monkey Island 1 Room 25's door and Room 41, Monkey Island 2's Wally (28 lines, was 6), Indy 4 Room 57, Zak McKracken 1. Started at their cutscene (five non-LOOM copies): 5.0% → 3.7%. Full suite 1,925 passed. [Record](../../.verification/cutscene-definition-20261109/README.md)

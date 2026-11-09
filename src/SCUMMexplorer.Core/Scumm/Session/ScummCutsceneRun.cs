@@ -20,8 +20,21 @@ public enum ScummPickedStart
 /// <param name="Verb">The verb the game's own way used when it is not the trigger's: another verb of the object whose code is the same scene (Indy 4 Room 48's
 /// stone, Push and Use share it, and only Use reaches it with the Sunstone).</param>
 public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> RoomsEntered, int Frames, string? Failure = null, int Lines = 0,
-    ScummPickedStart Way = ScummPickedStart.Game, int? Verb = null, bool ChangesRoom = false, string? Animation = null, bool ChangesView = false)
+    ScummPickedStart Way = ScummPickedStart.Game, int? Verb = null, bool ChangesRoom = false, string? Animation = null, bool ChangesView = false,
+    IReadOnlyList<string>? Animations = null)
 {
+    /// <summary>
+    /// Whether it changed room or animated something other than the game's stock responses (<paramref name="stock"/>: places such as LOOM's Script 41,
+    /// the "that draft does nothing here" sparkle every object's Other draft reaches). A run kept without its places (an older cache) counts its first.
+    /// </summary>
+    public bool ShowsBeyond(Func<string, bool> stock, bool widened)
+    {
+        ArgumentNullException.ThrowIfNull(stock);
+        if (!Begun) return false;
+        if (ChangesView || !widened && (ChangesRoom || RoomsEntered.Count > 0)) return true;
+        return Animations is { Count: > 0 } places ? places.Any(place => !stock(place)) : Animation is not null;
+    }
+
     /// <summary>R-8.10 for a widened candidate (a verb that does not take control): it showed another room itself or animated; the hero walking through a door does not count.</summary>
     public bool IsWidenedCutscene => Begun && (ChangesView || Animation is not null);
 
@@ -230,7 +243,8 @@ public static class ScummCutsceneRun
             }
             session.WatchScript = null;
             return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way,
-                ChangesRoom: session.SceneActivity.ChangesRoom, Animation: session.SceneActivity.Animation, ChangesView: session.SceneActivity.ChangesView);
+                ChangesRoom: session.SceneActivity.ChangesRoom, Animation: session.SceneActivity.Animation, ChangesView: session.SceneActivity.ChangesView,
+                Animations: session.SceneActivity.Animations.ToArray());
         }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NotSupportedException)
         {

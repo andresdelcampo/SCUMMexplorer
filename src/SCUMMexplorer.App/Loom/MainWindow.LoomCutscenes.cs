@@ -314,8 +314,9 @@ public partial class MainWindow
     {
         if (_loomScenePlanner is not { IsValueCreated: true } lazy) return fallback;
         var shared = lazy.Value;
-        if (shared.Triggers.FirstOrDefault(c => c.Room == room && c.ObjectId == objectId && c.VerbId == verbId) is not { } trigger || !shared.HasRun(trigger)) return fallback;
-        return shared.Groups.FirstOrDefault(g => g.First == trigger || g.Others.Contains(trigger)) is { } group ? shared.IsScene(group) : fallback;
+        // Each entry by its own run: a replay that is not its group's first (a draft at Room 6's wool) is not decided by the first one's run.
+        return shared.Triggers.FirstOrDefault(c => c.Room == room && c.ObjectId == objectId && c.VerbId == verbId) is { } trigger
+            ? shared.IsScene(trigger, fallback) : fallback;
     }
 
     private string LoomCategory(int room, int objectId, int verbId, bool fallback) => LoomIsCutscene(room, objectId, verbId, fallback) ? "Scenes" : "Dialogue and reactions";
@@ -619,7 +620,8 @@ public partial class MainWindow
             items.Add(("opening", new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening)));
         foreach (var scene in AllCutscenes().Where(scene => onlyIds is null || onlyIds.Contains(scene.Id)))
             items.Add((scene.Id, new(PickerVerbTitle(scene.Title, scene.ObjectId == 0 ? 0 : scene.VerbId),
-                scene.SequenceId is null && scene.Steps is null ? LoomCategory(scene.RoomId, scene.ObjectId, scene.VerbId, scene.Category == "Scenes") : scene.Category,
+                // A single trigger (no steps) follows its run; every catalog replay carries its id as SequenceId, so that is not the test.
+                scene.Steps is null ? LoomCategory(scene.RoomId, scene.ObjectId, scene.VerbId, scene.Category == "Scenes") : scene.Category,
                 scene.Source + " " + CutsceneStartNote(scene), () => PlayKnownCutscene(scene))));
         items.AddRange(scanned.Select(choice => (choice.Id, choice.Item)));
         return items;

@@ -21,6 +21,18 @@ public sealed class ScummSceneActivity
 
     public bool Animates => Animation is not null;
 
+    private readonly List<string> _animations = [];
+
+    /// <summary>Every instruction that animated something, by place (<c>Script 41 +0x004C</c>), in the order first run.</summary>
+    public IReadOnlyList<string> Animations => _animations;
+
+    private void Animated(string label, ScummScriptInstruction ins, string? detail = null)
+    {
+        var place = $"{label} +0x{ins.Offset:X4}";
+        Animation ??= $"{place} {ins.Operation}{detail}";
+        if (!_animations.Contains(place)) _animations.Add(place);
+    }
+
     /// <summary>The scene showed another room by itself (<c>loadRoom</c>), not the hero walking through a door (<c>loadRoomWithEgo</c>).</summary>
     public bool ChangesView { get; private set; }
 
@@ -60,16 +72,16 @@ public sealed class ScummSceneActivity
                 case "walkActorTo" or "walkActorToObject" or "walkActorToActor" or "putActor" or "putActorAtObject" when !first.StartsWith("0x", StringComparison.Ordinal):
                     break;
                 case "walkActorTo" or "walkActorToObject" or "walkActorToActor" or "putActor" or "putActorAtObject" or "panCameraTo" or "setCameraAt":
-                    Animation ??= $"{label} +0x{ins.Offset:X4} {ins.Operation}";
+                    Animated(label, ins);
                     break;
                 case "animateActor" when !IsPose(ins.Operands, OldVersion):
-                    Animation ??= $"{label} +0x{ins.Offset:X4} {ins.Operation}";
+                    Animated(label, ins);
                     break;
                 // Only a change of the object's picture: in versions 1 and 2 the IntrinsicOn bit (Untouchable, Locked and Pickupable are not drawn; Maniac
                 // Mansion's Pick up writes IntrinsicOff then Untouchable, one picture change).
                 case "setState" or "drawObject" when ChangesPicture(ins):
                     if ((_objectChanges[first] = _objectChanges.GetValueOrDefault(first) + 1) >= 2)
-                        Animation ??= $"{label} +0x{ins.Offset:X4} {ins.Operation} (object {first} changes picture again)";
+                        Animated(label, ins, $" (object {first} changes picture again)");
                     break;
             }
         }
