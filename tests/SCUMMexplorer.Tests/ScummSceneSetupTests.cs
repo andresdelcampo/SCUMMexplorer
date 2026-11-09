@@ -469,6 +469,23 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         Assert.True(plan.Result.Lines >= lines, $"{plan.Result.Lines} lines");
     }
 
+    [Theory]
+    // Room 42's ladder: Script 201 (Guybrush tied to the idol) must have ended, else "I can't reach it".
+    [InlineData(42, 585, 0x0A, 40)]
+    // Room 38's entry, the lookout's first meeting: bit[0x074] cleared (the intro's visit set it).
+    [InlineData(38, 0, 0, 20)]
+    public void Monkey1ScenesThatNeedAStoppedScriptOrAClearedBitPlayTheGamesOwnWay(int room, int objectId, int verb, int lines)
+    {
+        // 9 November 2026: started at their cutscene before.
+        var folder = Path.Combine(TestGames.Root, "monkey1 ega en");
+        if (!Directory.Exists(folder)) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        var plan = planner.PlanSetup(Trigger(planner, room, objectId, verb));
+        output.WriteLine($"{plan.Result.Way} lines {plan.Result.Lines}: {string.Join("; ", plan.Edits.Select(e => e.Describe()))}");
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.True(plan.Result.Lines >= lines, $"{plan.Result.Lines} lines");
+    }
+
     [Fact]
     public void EveryIndy3SceneBeginsWhenPicked()
     {

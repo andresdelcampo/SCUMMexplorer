@@ -89,7 +89,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
 
     public string Describe() => Kind switch
     {
-        ScummSetupKind.Bit => $"{Target} = 1",
+        ScummSetupKind.Bit => $"{Target} = {(Value == 0 ? 0 : 1)}",
         ScummSetupKind.Variable => $"{Target} = {Value}",
         ScummSetupKind.ObjectState => $"object {Target} state {Value}",
         ScummSetupKind.SecondObject => $"object {Target} used with it (held)",
@@ -102,7 +102,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.OwnedBy => $"object {Target} owned by actor {Value}",
         ScummSetupKind.ActorX => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} at x {Value}",
         ScummSetupKind.WalkBox => $"{(Target == "ego" ? "the hero" : $"actor {Target}")} in walk box {Value}",
-        ScummSetupKind.ScriptRunning => $"script {Target} running",
+        ScummSetupKind.ScriptRunning => $"script {Target} {(Value == 0 ? "not running" : "running")}",
         ScummSetupKind.HeroIs => $"the hero is actor {Value}",
         ScummSetupKind.ActorNear => $"{ActorName(Target.Split('|')[0])} next to {ActorName(Target.Split('|')[1])}",
         ScummSetupKind.VariableMatch => $"{Target.Split('|')[0]} {(Value == 1 ? "equal to" : "different from")} {Target.Split('|')[1]}",
@@ -146,10 +146,13 @@ public abstract partial class ScummSession
                     var offset = Convert.ToInt32(target[6..plus], 16) + variables.GetValueOrDefault(target[(plus + 1)..^1]);
                     target = $"bit[0x{offset:X3}]";
                 }
+                // Value 0 clears it: a first visit's scene that the boot already played (Monkey Island 1 Room 38's lookout, local script 200 +0x0048:
+                // bit[0x074], set by the intro's visit).
+                var on = edit.Value != 0;
                 if (variables.ContainsKey(ScummBoundedScriptExecutor.SeparateBitStorage))
                 {
-                    if (variables.GetValueOrDefault(target) != 0) return false;
-                    _runtime.SetGlobalVariable(target, 1);
+                    if (variables.GetValueOrDefault(target) != 0 == on) return false;
+                    _runtime.SetGlobalVariable(target, on ? (ushort)1 : (ushort)0);
                     return true;
                 }
                 // Old v3: bit n is bit (n & 15) of global word n >> 4.
@@ -157,8 +160,8 @@ public abstract partial class ScummSession
                 var word = $"var[0x{bit >> 4:X3}]";
                 var mask = (ushort)(1 << (bit & 15));
                 var value = variables.GetValueOrDefault(word);
-                if ((value & mask) != 0) return false;
-                _runtime.SetGlobalVariable(word, (ushort)(value | mask));
+                if ((value & mask) != 0 == on) return false;
+                _runtime.SetGlobalVariable(word, on ? (ushort)(value | mask) : (ushort)(value & ~mask));
                 return true;
             }
             case ScummSetupKind.Variable:
@@ -279,7 +282,10 @@ public abstract partial class ScummSession
             {
                 // Only in the scene's room, after its entry (a room's script runs only there; the entry would end a local one).
                 var number = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
-                if (edit.Room is int runRoom && _runtime.CurrentRoom != runRoom || IsScriptRunning(number).Running) return false;
+                if (edit.Room is int runRoom && _runtime.CurrentRoom != runRoom) return false;
+                // Not running (Monkey Island 1 Room 42's ladder: Script 201, Guybrush tied to the idol, must have ended): stopped, as its end would.
+                if (edit.Value == 0) return IsScriptRunning(number).Running && StopRunningScript(number) > 0;
+                if (IsScriptRunning(number).Running) return false;
                 return StartScriptForSetup(number);
             }
             case ScummSetupKind.CameraX:

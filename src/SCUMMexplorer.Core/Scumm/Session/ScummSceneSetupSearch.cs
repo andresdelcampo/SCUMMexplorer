@@ -245,9 +245,10 @@ public sealed partial class ScummSceneSetupSearch
         var roomTest = false;
         var asRoom = new List<ScummSetupEdit>();
         // tested: the value the test sees once the edit is applied (null when the edit is not the tested value itself).
-        void Add(ScummSetupEdit edit, int? tested = null)
+        // lastResort: a value that undoes what the boot reached (a bit cleared, a script stopped), ordered after every other value (rank 4).
+        void Add(ScummSetupEdit edit, int? tested = null, bool lastResort = false)
         {
-            var rank = guard is bool need && tested is int v && Holds(operation, constant, v) is bool holds ? holds == need ? 0 : 2
+            var rank = lastResort ? 4 : guard is bool need && tested is int v && Holds(operation, constant, v) is bool holds ? holds == need ? 0 : 2
                 : afterCutscene && tested is int after && Holds(operation, constant, after) == true ? 3 : 1;
             if (roomTest && edit.Value == trigger.Room && edit.Kind is ScummSetupKind.Variable or ScummSetupKind.ActorRoom) asRoom.Add(edit);
             var at = found.FindIndex(f => f.Edit.Kind == edit.Kind && f.Edit.Target == edit.Target && f.Edit.Value == edit.Value);
@@ -545,6 +546,10 @@ public sealed partial class ScummSceneSetupSearch
                             // cutscene's Script 115 only while it runs): only on the way to the cutscene, started in the scene's room.
                             if (guard is bool toScene && Holds(ins.Operation, value.Value, 1) == toScene)
                                 Add(new(ScummSetupKind.ScriptRunning, runningScript.ToString(CultureInfo.InvariantCulture), 1, where, trigger.Room), 1);
+                            // Or must not run (Monkey Island 1 Room 42's ladder, local script 200 +0x0000: Script 201, Guybrush tied to the idol, else "I can't
+                            // reach it"): stopped after the room is entered.
+                            else if (guard is bool toStopped && Holds(ins.Operation, value.Value, 0) == toStopped)
+                                Add(new(ScummSetupKind.ScriptRunning, runningScript.ToString(CultureInfo.InvariantCulture), 0, where, trigger.Room), lastResort: true);
                         }
                         else if (tested == ScummVars.CameraPosX)
                         {
@@ -600,7 +605,14 @@ public sealed partial class ScummSceneSetupSearch
                             // The room under a pseudo room number (Indy 3 Room 21's entry: isEqual VAR_ROOM, 0x81): applied only where the game maps it here.
                             Add(new(ScummSetupKind.EnteredAs, ScummVars.Room, value.Value, where, trigger.Room), value.Value);
                         else if (BitPattern().IsMatch(tested) && tested == BitPattern().Match(tested).Value)
+                        {
                             Add(new(ScummSetupKind.Bit, tested, 1, where), 1);
+                            // Only 0 leads on (a first visit's scene, Monkey Island 1 Room 38's lookout: equalZero bit[0x074], which the intro's visit set):
+                            // cleared as well.
+                            if (guard is bool toClear && Holds(ins.Operation, constant, 0) == toClear && Holds(ins.Operation, constant, 1) != toClear)
+                                // Ranked after the values on the scene's side (no tested value): undoing what the boot reached is the last resort.
+                                Add(new(ScummSetupKind.Bit, tested, 0, where), lastResort: true);
+                        }
                         else if (IndexedBit().IsMatch(tested))
                             // A bit numbered by a variable (Indy 3 Room 21's door, +0x0000: notEqualZero bit[0x59D+var[0x069]], else "It's locked!"): the
                             // bit the variable names when the setup is applied (ScummSession.ApplySceneSetup).
@@ -676,7 +688,7 @@ public sealed partial class ScummSceneSetupSearch
         // A value that lets more of the scene run (3) keeps its place among the others (1) in the search; an actor's position on the scene's side
         // (a wait for it to walk somewhere) comes after the other values on that side (Zak McKracken Room 11's call button: the stewardess's x
         // values first crowded out the doors its scene needs).
-        return found.OrderBy(f => f.Rank == 3 ? 1 : f.Rank)
+        return found.OrderBy(f => f.Rank switch { 3 => 1, 4 => 3, _ => f.Rank })
             .ThenBy(f => f.Rank == 0 && f.Edit.Kind is ScummSetupKind.ActorX or ScummSetupKind.ActorNear or ScummSetupKind.WalkBox or ScummSetupKind.CameraX ? 1 : 0)
             .ToList();
     }
