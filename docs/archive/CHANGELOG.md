@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 9 November: Game Status for Indy 3
+
+Indy 3 has Game Status: Indy's inventory (catalog grants, one recipient), his health and outfit, the 68 IQ awards and 46 story flags, each found by its role in the scripts (REQUIREMENTS R-12.15 to R-12.17). [Record](../../.verification/indy3-status-20261109/README.md).
+
 ## 9 November: a picked scene no longer plays on another game's session
 
 The boot a picked scene begins from was kept across games: Maniac Mansion's scenes, after Indy 3, played on Indy 3's session (Indy in the garage, Indy 3's verbs, "I can't reach it." in Room 20). It is cleared when a game opens. [Record](../../.verification/user-reports-20261109/README.md).

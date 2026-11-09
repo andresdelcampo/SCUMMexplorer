@@ -129,7 +129,34 @@ if (Environment.GetEnvironmentVariable("MEASURE_WINDOWPATH") is { Length: > 0 } 
     foreach (var line in s1.SessionTrace.TakeLast(25)) Console.WriteLine("  | " + (line.Length > 180 ? line[..180] : line));
     return;
 }
-// MEASURE_ARRIVALS=room: the game's arrivals of the hero into that room (door objects and pseudo room numbers).
+// MEASURE_GREP=text: every instruction of every script, entry, exit and object verb whose operation or operands contain the text (9 November 2026).
+if (Environment.GetEnvironmentVariable("MEASURE_GREP") is { Length: > 0 } grep)
+{
+    var data = ScummDataSources.For(game);
+    void Scan(string label, ScummScriptDisassembly? script)
+    {
+        if (script is null) return;
+        foreach (var ins in script.Instructions)
+            if ($"{ins.Operation} {ins.Operands}".Contains(grep, StringComparison.Ordinal)) Console.WriteLine($"{label} +0x{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+    }
+    foreach (var id in data.GlobalScriptIds()) { try { Scan($"Script {id}", data.GlobalScript(id)); } catch (Exception) { } }
+    foreach (var room in game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).Distinct().Order())
+    {
+        try
+        {
+            Scan($"Room {room} entry", data.RoomEntryScript(room));
+            Scan($"Room {room} exit", data.RoomExitScript(room));
+            foreach (var local in data.RoomLocalScriptIds(room)) Scan($"Room {room} local {local}", data.RoomLocalScript(room, local));
+            var objects = data.ReadRoom(room).Objects;
+            foreach (var (objectId, verbs) in data.ReadObjectVerbs(room, objects))
+                foreach (var verb in verbs)
+                    Scan($"Room {room} object {objectId} verb 0x{verb.VerbId:X2}", data.ReadObjectVerb(room, objects.Last(o => o.Id == objectId), verb.VerbId, out _));
+        }
+        catch (Exception) { }
+    }
+    return;
+}
+// MEASURE_ARRIVALS=room:the game's arrivals of the hero into that room (door objects and pseudo room numbers).
 if (int.TryParse(Environment.GetEnvironmentVariable("MEASURE_ARRIVALS"), out var arrivalsRoom))
 {
     foreach (var arrival in ScummEgoArrivalIndex.For(game).Into(arrivalsRoom)) Console.WriteLine($"arrival {arrival.Describe()}");

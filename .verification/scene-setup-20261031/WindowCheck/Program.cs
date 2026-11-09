@@ -402,6 +402,27 @@ internal static class Program
                         }
                         continue;
                     }
+                    // GS opens Game Status as the header button does (not modal, so it can be pictured), captures each tab and closes it without applying
+                    // (9 November 2026: Indy 3's Game Status). GS:tab,index,... also ticks those rows of a tab's list and applies.
+                    if (raw == "GS" || raw.StartsWith("GS:", StringComparison.Ordinal))
+                    {
+                        Log($"GS: available {typeof(MainWindow).GetProperty("InventoryStatusAvailable", Private)!.GetValue(window)}");
+                        var dialog = (Window)Call("BuildInventoryStatusWindow")!;
+                        dialog.Show();
+                        await Pump(1);
+                        var tabs = (System.Windows.Controls.TabControl)dialog.FindName("StatusTabs");
+                        for (var t = 0; t < tabs.Items.Count; t++)
+                        {
+                            tabs.SelectedIndex = t; await Pump(0.6); dialog.UpdateLayout();
+                            var header = ((System.Windows.Controls.TabItem)tabs.Items[t]).Header;
+                            Log($"GS tab {t}: {header}");
+                            var bitmap = new RenderTargetBitmap((int)dialog.ActualWidth, (int)dialog.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                            bitmap.Render(dialog); var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                            using (var stream = File.Create(Path.Combine(output, $"status-{t}.png"))) encoder.Save(stream);
+                        }
+                        dialog.Close();
+                        continue;
+                    }
                     // G:folder opens another game in the same window, as the game picker does (9 November 2026: Indy 3's shadow left in Maniac Mansion).
                     if (raw.StartsWith("G:", StringComparison.Ordinal))
                     {

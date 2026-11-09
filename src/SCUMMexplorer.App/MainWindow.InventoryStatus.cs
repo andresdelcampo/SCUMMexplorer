@@ -12,7 +12,19 @@ public partial class MainWindow
     private bool InventoryStatusAvailable => _game is { } game && PlayActive && _playFolder == game.Key &&
         _play?.InventoryCharactersAvailable == true &&
         GameSupport.For(game)[SupportFeature.Status] != SupportLevel.None &&
-        ScummProfile.For(game).EngineVersion is ScummVersion.V1 or ScummVersion.V2;
+        ScummProfile.For(game).EngineVersion is ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3;
+
+    /// <summary>The game's values beyond the inventory (Indy 3: health, outfit, IQ points, story flags), read once per opened game.</summary>
+    private (string Key, ScummStatusSchema Schema)? _statusSchema;
+
+    private ScummStatusSchema? StatusSchema(ScummGameSession session)
+    {
+        if (_game is not { } game || ScummProfile.For(game).EngineVersion != ScummVersion.V3) return null;
+        if (_statusSchema is { } kept && kept.Key == game.Key) return kept.Schema;
+        var schema = ScummStatusSchema.Read(game, ScummCutscenePlanner.VerbsOf(session));
+        _statusSchema = (game.Key, schema);
+        return schema;
+    }
 
     private InventoryStatusWindow BuildInventoryStatusWindow()
     {
@@ -21,7 +33,7 @@ public partial class MainWindow
         var dialog = new InventoryStatusWindow(session, () => ReferenceEquals(_play, session) && _playFolder == folder && _game?.Key == folder,
             () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _game is { } game ? ManiacPreviewText.For(game) : null,
             _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2,
-            ReferenceEquals(_inventoryUndoSession, session) ? _inventoryLastUndo : null)
+            ReferenceEquals(_inventoryUndoSession, session) ? _inventoryLastUndo : null, StatusSchema(session))
         { Owner = this };
         dialog.Resources.MergedDictionaries.Add(Resources);
         return dialog;

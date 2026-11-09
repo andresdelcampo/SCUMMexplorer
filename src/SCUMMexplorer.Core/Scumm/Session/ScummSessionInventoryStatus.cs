@@ -56,7 +56,11 @@ public sealed class ScummInventoryUndoToken
 }
 
 internal sealed record ScummInventoryOriginal(int ObjectId, byte? Owner, byte? State, bool Member,
-    int? Room, byte? Preposition, int Slot);
+    int? Room, byte? Preposition, int Slot)
+{
+    /// <summary>The object's classes before the edit (a version 3 grant makes it untouchable), or null when it had none.</summary>
+    public uint? Classes { get; init; }
+}
 
 public abstract partial class ScummSession
 {
@@ -138,7 +142,9 @@ public abstract partial class ScummSession
                 if (original.Room is int room) _runtime.InventoryRooms[id] = room; else _runtime.InventoryRooms.Remove(id);
                 if (original.Preposition is byte prep) _inventoryObjectPrepositions[id] = prep; else _inventoryObjectPrepositions.Remove(id);
                 if (original.Slot < 0) _runtime.RemoveFromInventorySlots(id);
+                if (IsV3Inventory) _runtime.SetObjectClasses(id, original.Classes ?? 0);
             }
+            if (IsV3Inventory) RunInventoryScript();
         }
         else foreach (var (id, owner) in token.Owners) _runtime.SetObjectOwner(id, owner);
         _inventoryEditRevision++;
@@ -149,7 +155,7 @@ public abstract partial class ScummSession
 
     private string? InventoryEditRefusal(ScummInventoryCharacter[] characters)
     {
-        if (!_runtime.IsV2) return "This engine has no reviewed inventory edit contract.";
+        if (!_runtime.IsV2 && !IsV3Inventory) return "This engine has no reviewed inventory edit contract.";
         if (this is not ScummGameSession { BootReport: not null } || CurrentRoomId is null)
             return "The session is still starting.";
         if (InCutscene || !UserInputOn) return "The game has not released control.";
@@ -175,7 +181,7 @@ public abstract partial class ScummSession
 
     private ScummInventoryCharacter[] InventoryCharacters()
     {
-        if (!_runtime.IsV2) return [];
+        if (!_runtime.IsV2) return IsV3Inventory ? V3InventoryCharacters() : [];
         // Native input script assignments followed by actorFollowCamera establish
         // selected-party variables, without hard-coding this edition's party slots.
         if (_inventoryPartyBindings is null)

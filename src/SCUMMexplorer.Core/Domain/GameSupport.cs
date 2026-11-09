@@ -75,9 +75,11 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         // Sound ✔ for every row since 1 November 2026: the user listened to sounds across the games and sources (30 October to 1 November) and
         // counts them as good; ✔ means "listened to by the user" (REQUIREMENTS §3.1, S3).
         // S7 Indy3Ega and Indy3Vga (17 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummIndy3CutsceneTests).
-        Row_(GameFamily.Indy3Ega, "**Indiana Jones 3** EGA", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        // Game Status ◐ (9 November 2026, user: "makes total sense to add those to status"): inventory (Indy, catalog grants), health, outfit, IQ points
+        // and story flags, found by their roles in the scripts (ScummStatusSchema; Indy3GameStatusTests).
+        Row_(GameFamily.Indy3Ega, "**Indiana Jones 3** EGA", [F, F, F, F, F, F, F, F, P, P], Explore, ExplorePreview),
         // S6 Indy3Vga (16 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy3VgaPlayTests).
-        Row_(GameFamily.Indy3Vga, "**Indiana Jones 3** 256 colours", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
+        Row_(GameFamily.Indy3Vga, "**Indiana Jones 3** 256 colours", [F, F, F, F, F, F, F, F, P, P], Explore, ExplorePreview),
         // S7 MonkeyFloppy (17 October 2026): Cutscenes ◐, the list derived from the scripts and playable (ScummMonkeyFloppyCutsceneTests).
         Row_(GameFamily.MonkeyFloppy, "**Monkey Island 1** floppy", [F, F, F, F, F, F, F, F, P, N], Explore, ExplorePreview),
         // S6 MonkeyCd (17 October 2026): Objects and Play ✔ with the R-7.18 route (ScummMonkeyCdPlayTests).

@@ -23,20 +23,31 @@ public partial class InventoryStatusWindow : Window
     private readonly Dictionary<int, string> _portraitEvidence = [];
     private CharacterChoice[] _characters = [];
     internal ScummInventoryUndoToken? LastUndo => _undo;
+    /// <summary>The game's values beyond the inventory (Indy 3: health, outfit, IQ points, story flags), or null.</summary>
+    private readonly ScummStatusSchema? _schema;
+    private int? _health;
+    private int? _outfit;
+    private readonly Dictionary<int, bool> _awards = [];
+    private readonly Dictionary<string, bool> _flags = [];
+    /// <summary>One playable character (Indy 3): no recipient choices.</summary>
+    private bool SingleCharacter => _characters.Length == 1;
 
     public InventoryStatusWindow(ScummGameSession session, Func<bool> isCurrent, Action refresh,
         bool advanced = false, Func<string, string>? readable = null, int engineVersion = 2,
-        ScummInventoryUndoToken? undo = null)
+        ScummInventoryUndoToken? undo = null, ScummStatusSchema? schema = null)
     {
         InitializeComponent();
         _session = session; _isCurrent = isCurrent; _refresh = refresh; _advanced = advanced;
         _engineVersion = engineVersion;
         _undo = undo;
+        _schema = schema is { IsEmpty: false } ? schema : null;
         _readable = readable ?? (text => text);
         LoadSnapshot();
+        BuildStatusTabs();
     }
 
-    private string DisplayName(string name) => _readable(name).Replace("@", "", StringComparison.Ordinal).Trim();
+    // Glyphs the charset draws (a trademark sign, "IndyWear(tm) by Lucasfilm") are left out of the window's text.
+    private string DisplayName(string name) => System.Text.RegularExpressions.Regex.Replace(_readable(name).Replace("@", "", StringComparison.Ordinal), @"\\x[0-9A-Fa-f]{2}|\p{Cc}", "").Trim();
     private string? CharacterName(int id) => _characters.FirstOrDefault(c => c.ActorId == id)?.Name;
     private Dictionary<int, string> ItemNames()
     {
@@ -71,6 +82,14 @@ public partial class InventoryStatusWindow : Window
         GrantRecipient.SelectedValuePath = nameof(CharacterChoice.ActorId);
         GrantRecipient.SelectedValue = _snapshot.CurrentActorId;
         GrantRecipient.IsEnabled = _snapshot.CanEdit && _isCurrent();
+        if (SingleCharacter)
+        {
+            GiveLabel.Visibility = GrantRecipient.Visibility = MoveHeader.Visibility = Visibility.Collapsed;
+            GiveColumn.Width = MoveColumn.Width = new GridLength(0);
+            InventoryHeading.Text = $"Edit {_characters[0].Name}’s inventory";
+            InventoryIntro.Text = "Admin choices: add items. These are not earned pickups or played scenes.";
+            InventoryTab.Header = "Inventory";
+        }
         ItemSearch.IsEnabled = _snapshot.CanEdit && _isCurrent();
         RefreshCatalog(); RefreshRows();
         AdvancedEvidence.Visibility = _advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -110,6 +129,8 @@ public partial class InventoryStatusWindow : Window
         foreach (var item in rows)
         {
             if (!_advanced && string.IsNullOrWhiteSpace(item.Name)) continue;
+            // One hero (Indy 3): what others hold (Henry's coins, the money set aside as owner 14) is not his inventory.
+            if (SingleCharacter && !item.Pending && item.OwnerId != _characters[0].ActorId) continue;
             _targets.TryAdd(item.ObjectId, item.OwnerId);
             var row = new Grid { Margin = new Thickness(0, 0, 0, 1), Background = new SolidColorBrush(Color.FromRgb(25, 38, 50)) };
             row.ColumnDefinitions.Add(new() { Width = new GridLength(2, GridUnitType.Star) });
@@ -118,6 +139,7 @@ public partial class InventoryStatusWindow : Window
             row.Children.Add(new TextBlock { Text = names.GetValueOrDefault(item.ObjectId, DisplayName(item.Name ?? $"Object {item.ObjectId}")), Margin = new Thickness(10, 16, 8, 12), TextWrapping = TextWrapping.Wrap });
             var owner = new TextBlock { Text = item.Pending ? "Pending addition" : CharacterName(item.OwnerId) ?? (_advanced ? $"Actor {item.OwnerId}" : "Elsewhere"), Margin = new Thickness(10, 16, 8, 12) };
             Grid.SetColumn(owner, 1); row.Children.Add(owner);
+            if (SingleCharacter) { InventoryRows.Children.Add(row); continue; }
             var choice = new ComboBox { ItemsSource = _characters, ItemTemplate = CharacterTemplate, SelectedValuePath = nameof(CharacterChoice.ActorId),
                 SelectedValue = _targets[item.ObjectId], Tag = item.ObjectId, Margin = new Thickness(8),
                 IsEnabled = _snapshot.CanEdit && _isCurrent() && !string.IsNullOrWhiteSpace(item.Name), MinWidth = 120, MaxDropDownHeight = 520 };
@@ -130,17 +152,18 @@ public partial class InventoryStatusWindow : Window
             Grid.SetColumn(choice, 2); row.Children.Add(choice); InventoryRows.Children.Add(row);
         }
         if (InventoryRows.Children.Count == 0)
-            InventoryRows.Children.Add(new TextBlock { Text = "No items held by your characters. Choose an item above to add it.", Margin = new Thickness(12), Foreground = new SolidColorBrush(Color.FromRgb(198, 185, 159)) });
+            InventoryRows.Children.Add(new TextBlock { Text = SingleCharacter ? "No items held. Choose an item above to add it." : "No items held by your characters. Choose an item above to add it.", Margin = new Thickness(12), Foreground = new SolidColorBrush(Color.FromRgb(198, 185, 159)) });
         UpdateButtons();
     }
 
-    private bool HasChanges => _targets.Any(target => !_snapshot.Items.Any(item => item.ObjectId == target.Key && item.OwnerId == target.Value));
+    private bool HasInventoryChanges => _targets.Any(target => !_snapshot.Items.Any(item => item.ObjectId == target.Key && item.OwnerId == target.Value));
+    private bool HasChanges => HasInventoryChanges || StatusChoices() is not null;
     private int PendingAdditions => _targets.Keys.Count(id => !_snapshot.Items.Any(item => item.ObjectId == id));
     private void UpdateButtons()
     {
         if (_snapshot is null) return;
         var editable = _isCurrent() && _snapshot.CanEdit;
-        ApplyButton.IsEnabled = editable;
+        ApplyButton.IsEnabled = editable || _schema is not null && _isCurrent() && _session.StatusEditRefusal() is null;
         UndoButton.IsEnabled = editable && _undo is not null;
         AddItemButton.IsEnabled = editable && CatalogItems.SelectedItem is ItemChoice selected && GrantRecipient.SelectedValue is int recipient &&
             (!_targets.TryGetValue(selected.ObjectId, out var current) ? PendingAdditions < _snapshot.FreeSlots : current != recipient);
@@ -165,11 +188,17 @@ public partial class InventoryStatusWindow : Window
     {
         if (!_isCurrent()) { Rejected("The live session changed."); return; }
         if (!HasChanges) { Close(); return; }
-        var changes = _targets.Where(target => !_snapshot.Items.Any(item => item.ObjectId == target.Key && item.OwnerId == target.Value))
-            .Select(target => new ScummInventoryTransfer(target.Key, target.Value)).ToArray();
-        var result = _session.ApplyInventoryEdits(_snapshot, changes);
-        if (!result.Applied) { Rejected(result.Refusal); return; }
-        _undo = result.Undo;
+        if (HasInventoryChanges)
+        {
+            var changes = _targets.Where(target => !_snapshot.Items.Any(item => item.ObjectId == target.Key && item.OwnerId == target.Value))
+                .Select(target => new ScummInventoryTransfer(target.Key, target.Value)).ToArray();
+            var result = _session.ApplyInventoryEdits(_snapshot, changes);
+            if (!result.Applied) { Rejected(result.Refusal); return; }
+            _undo = result.Undo;
+        }
+        // The values beyond the inventory (health, outfit, IQ points, story flags), after it: a granted outfit can then be worn.
+        if (_schema is not null && StatusChoices() is { } choices && _session.ApplyStatusChoices(_schema, choices) is { } refusal)
+        { _refresh(); Rejected(refusal); return; }
         _refresh();
         Close();
     }
@@ -223,6 +252,111 @@ public partial class InventoryStatusWindow : Window
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { }
         _portraits[actorId] = picture;
         return picture;
+    }
+
+    /// <summary>The pending choices beyond the inventory, or null when none differs from the session.</summary>
+    private ScummStatusChoices? StatusChoices()
+    {
+        if (_schema is null) return null;
+        int? health = _health is int h && _schema.HealthVariable is { } hv && _session.StatusVariable(hv) != h ? h : null;
+        int? outfit = _outfit is int o && _schema.OutfitVariable is { } ov && _session.StatusVariable(ov) != o ? o : null;
+        var awards = _awards.Where(a => a.Value != _session.StatusAward(_schema, a.Key) > 0).ToDictionary(a => a.Key, a => a.Value);
+        var flags = _flags.Where(f => f.Value != _session.StatusBit(f.Key)).ToDictionary(f => f.Key, f => f.Value);
+        return health is null && outfit is null && awards.Count == 0 && flags.Count == 0 ? null : new(health, outfit, awards, flags);
+    }
+
+    private static readonly Brush Muted = new SolidColorBrush(Color.FromRgb(198, 185, 159));
+
+    /// <summary>
+    /// Tabs for the game's values beyond the inventory (user, 9 November 2026: Indy 3's health, outfit, IQ points and story flags, "like we added for
+    /// LOOM"), from <see cref="ScummStatusSchema"/>. Every choice waits for Apply and close.
+    /// </summary>
+    private void BuildStatusTabs()
+    {
+        if (_schema is not { } schema) return;
+        var hero = _characters.FirstOrDefault(c => c.ActorId == _snapshot.CurrentActorId)?.Name ?? "Hero";
+        var editable = _isCurrent() && _session.StatusEditRefusal() is null;
+        if (schema.HealthVariable is not null || schema.OutfitVariable is not null)
+        {
+            var panel = new StackPanel { Margin = new Thickness(16) };
+            panel.Children.Add(new TextBlock { Text = $"{hero}’s state", FontSize = 17 });
+            panel.Children.Add(new TextBlock { Text = "Admin choices, as the game keeps them. Nothing is played.", Foreground = Muted, Margin = new Thickness(0, 6, 0, 16), TextWrapping = TextWrapping.Wrap });
+            if (schema.HealthVariable is { } healthVariable)
+            {
+                var now = _session.StatusVariable(healthVariable) ?? schema.HealthMax;
+                var value = new TextBlock { Text = $"{now} of {schema.HealthMax}", Margin = new Thickness(12, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, MinWidth = 90 };
+                var slider = new Slider { Minimum = 0, Maximum = schema.HealthMax, Value = now, Width = 360, IsEnabled = editable, TickFrequency = schema.HealthMax / 10.0,
+                    IsSnapToTickEnabled = false, SmallChange = 10, LargeChange = schema.HealthMax / 10.0 };
+                System.Windows.Automation.AutomationProperties.SetName(slider, "Health");
+                slider.ValueChanged += (_, _) => { _health = (int)Math.Round(slider.Value); value.Text = $"{_health} of {schema.HealthMax}"; UpdateButtons(); };
+                var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 6) };
+                row.Children.Add(new TextBlock { Text = "Health", Width = 90, VerticalAlignment = VerticalAlignment.Center });
+                row.Children.Add(slider); row.Children.Add(value);
+                panel.Children.Add(row);
+                panel.Children.Add(new TextBlock { Text = "Fist fights take it down; at 0 the fight is lost.", Foreground = Muted, Margin = new Thickness(90, 0, 0, 16) });
+                if (_advanced) panel.Children.Add(new TextBlock { Text = $"{healthVariable}: {schema.HealthWhere}", Foreground = Muted, FontSize = 11, Margin = new Thickness(90, -12, 0, 16) });
+            }
+            if (schema.OutfitVariable is { } outfitVariable)
+            {
+                var worn = _session.StatusVariable(outfitVariable);
+                // The outfits the hero has: the one worn and those he holds (a held outfit can be put on; one not held is granted in Inventory first).
+                var held = _snapshot.Items.Select(i => i.ObjectId).Concat(_targets.Keys).ToHashSet();
+                var choices = schema.Outfits.Where(o => o.ObjectId == worn || held.Contains(o.ObjectId))
+                    .Select(o => new ItemChoice(o.ObjectId, DisplayName(o.Name ?? $"Object {o.ObjectId}"))).ToArray();
+                var box = new ComboBox { ItemsSource = choices, SelectedValuePath = nameof(ItemChoice.ObjectId), SelectedValue = worn, Width = 360, IsEnabled = editable && choices.Length > 1 };
+                System.Windows.Automation.AutomationProperties.SetName(box, "Outfit");
+                box.SelectionChanged += (_, _) => { _outfit = box.SelectedValue as int?; UpdateButtons(); };
+                var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 6) };
+                row.Children.Add(new TextBlock { Text = "Wearing", Width = 90, VerticalAlignment = VerticalAlignment.Center });
+                // No outfit worn or held yet (the game's start: his own clothes): nothing to choose until one is added in Inventory.
+                if (choices.Length == 0)
+                    row.Children.Add(new TextBlock { Text = $"{hero}’s own clothes: no outfit held yet.", VerticalAlignment = VerticalAlignment.Center });
+                else row.Children.Add(box);
+                panel.Children.Add(row);
+                panel.Children.Add(new TextBlock { Text = "Guards remember the outfit they saw. To wear an outfit, it must be held (add it in Inventory).", Foreground = Muted, Margin = new Thickness(90, 0, 0, 16), TextWrapping = TextWrapping.Wrap });
+                if (_advanced) panel.Children.Add(new TextBlock { Text = $"{outfitVariable}: {schema.OutfitWhere}", Foreground = Muted, FontSize = 11, Margin = new Thickness(90, -12, 0, 16) });
+            }
+            StatusTabs.Items.Add(new TabItem { Header = hero, Content = new ScrollViewer { Content = panel, VerticalScrollBarVisibility = ScrollBarVisibility.Auto } });
+        }
+        if (schema.Awards.Count > 0)
+        {
+            var total = new TextBlock { FontSize = 17 };
+            void Total() => total.Text = $"IQ points: {schema.Awards.Sum(a => (_awards.TryGetValue(a.Slot, out var given) ? given : _session.StatusAward(schema, a.Slot) > 0) ? a.Points : 0)} of {schema.Awards.Sum(a => a.Points)}";
+            Total();
+            StatusTabs.Items.Add(new TabItem { Header = "IQ points", Content = CheckList(total,
+                "The game awards IQ points for clever solutions. Checking one counts it as earned; nothing is played.",
+                schema.Awards.Select(a => (Key: a.Slot.ToString(System.Globalization.CultureInfo.InvariantCulture), Label: $"{a.Title} ({a.Points} points)",
+                    Detail: $"slot {a.Slot}: {a.Where}", On: _session.StatusAward(schema, a.Slot) > 0)),
+                (key, on) => { _awards[int.Parse(key, System.Globalization.CultureInfo.InvariantCulture)] = on; Total(); }, editable) });
+        }
+        if (schema.Flags.Count > 0)
+            StatusTabs.Items.Add(new TabItem { Header = "Story", Content = CheckList(new TextBlock { Text = "Story: what the game remembers", FontSize = 17 },
+                "Each mark is something that happened, named after the scene that sets it. Checking marks it as done, as the game would; nothing is played.",
+                schema.Flags.Select(f => (Key: f.Bit, Label: string.Join(" / ", f.Titles.Distinct()), Detail: $"{f.Bit}: {string.Join("; ", f.Where)}", On: _session.StatusBit(f.Bit)))
+                    .OrderBy(f => f.Label.StartsWith("A scene", StringComparison.Ordinal) || f.Label.Contains("· A scene", StringComparison.Ordinal) ? 1 : 0).ThenBy(f => f.Label, StringComparer.CurrentCultureIgnoreCase),
+                (key, on) => _flags[key] = on, editable) });
+    }
+
+    private UIElement CheckList(TextBlock heading, string intro, IEnumerable<(string Key, string Label, string Detail, bool On)> rows, Action<string, bool> changed, bool editable)
+    {
+        var list = new StackPanel();
+        foreach (var row in rows)
+        {
+            var box = new CheckBox { Content = new TextBlock { Text = DisplayName(row.Label), TextWrapping = TextWrapping.Wrap }, IsChecked = row.On, IsEnabled = editable,
+                Margin = new Thickness(10, 5, 10, 5), Foreground = Foreground };
+            if (_advanced) box.ToolTip = row.Detail;
+            box.Checked += (_, _) => { changed(row.Key, true); UpdateButtons(); };
+            box.Unchecked += (_, _) => { changed(row.Key, false); UpdateButtons(); };
+            list.Children.Add(box);
+        }
+        var panel = new DockPanel { Margin = new Thickness(16) };
+        var top = new StackPanel { Margin = new Thickness(0, 0, 0, 10) };
+        top.Children.Add(heading);
+        top.Children.Add(new TextBlock { Text = intro, Foreground = Muted, Margin = new Thickness(0, 6, 0, 0), TextWrapping = TextWrapping.Wrap });
+        DockPanel.SetDock(top, Dock.Top);
+        panel.Children.Add(top);
+        panel.Children.Add(new ScrollViewer { Content = list, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Background = new SolidColorBrush(Color.FromRgb(21, 31, 41)) });
+        return panel;
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e) => Close();

@@ -67,7 +67,7 @@ public abstract partial class ScummSession
             _runtime.ObjectStates.TryGetValue(x.ObjectId, out var state) ? state : null,
             _runtime.Inventory.Contains(x.ObjectId), _runtime.InventoryRooms.TryGetValue(x.ObjectId, out var room) ? room : null,
             _inventoryObjectPrepositions.TryGetValue(x.ObjectId, out var prep) ? prep : null,
-            Array.IndexOf(_runtime.InventorySlots, x.ObjectId))).ToArray();
+            Array.IndexOf(_runtime.InventorySlots, x.ObjectId)) { Classes = _runtime.ObjectClasses.TryGetValue(x.ObjectId, out var classes) ? classes : null }).ToArray();
         // All source reads and validation finish before the first write.
         Dictionary<int, ScummRoomObjectRecord> headers;
         try { headers = grants.ToDictionary(x => x.Key, x => _data.ReadRoom(x.Value.SourceRoomId).Objects.Last(o => o.Id == x.Key)); }
@@ -75,6 +75,12 @@ public abstract partial class ScummSession
         { return new(false, "An item's retained source code could not be read; no changes were applied.", null); }
         foreach (var edit in changed)
         {
+            if (IsV3Inventory)
+            {
+                if (grants.TryGetValue(edit.ObjectId, out var v3Source)) V3Grant(edit.ObjectId, v3Source.SourceRoomId, edit.TargetActorId);
+                else _runtime.SetObjectOwner(edit.ObjectId, (byte)edit.TargetActorId);
+                continue;
+            }
             if (grants.TryGetValue(edit.ObjectId, out var source))
             {
                 _runtime.AddToInventorySlots(edit.ObjectId);
@@ -87,6 +93,7 @@ public abstract partial class ScummSession
             }
             _runtime.SetObjectOwner(edit.ObjectId, (byte)edit.TargetActorId);
         }
+        if (IsV3Inventory) RunInventoryScript();
         _inventoryEditRevision++;
         _visitTrace.Add("Explicit inventory admin choice: " + string.Join("; ", changed.Select(x =>
             $"object {x.ObjectId} {(grants.ContainsKey(x.ObjectId) ? "added" : "transferred")} to actor {x.TargetActorId}")) +
@@ -99,7 +106,7 @@ public abstract partial class ScummSession
     private ScummInventoryCatalogItem[] InventoryCatalog()
     {
         if (_inventoryCatalog is not null) return _inventoryCatalog;
-        if (_data is not ScummV2DataSource source) return _inventoryCatalog = [];
+        if (_data is not ScummV2DataSource source) return _inventoryCatalog = IsV3Inventory ? V3InventoryCatalog() : [];
         var indexed = source.ReadIndexedObjects();
         var rooms = _game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).Distinct().Order()
             .ToDictionary(r => r, r => _data.ReadRoom(r));
