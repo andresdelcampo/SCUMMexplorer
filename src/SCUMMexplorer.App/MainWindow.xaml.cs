@@ -297,6 +297,9 @@ public partial class MainWindow : Window
         _scanDone = _scanTotal = 0;
         StopPlay();
         _play = null;
+        // The boot every picked scene begins from belongs to the game it was taken in (9 November 2026, user report: Indy 3's Indy, verbs and lines in
+        // Maniac Mansion's garage, whose own party start leaves it unset).
+        _playBoot = null;
         _playFolder = null;
         // R-3.16: a game whose data holds several languages opens in the one remembered for this folder (the default otherwise).
         var game = new GameFolderScanner { DiscFolder = RememberedLanguage(folder) }.Scan(folder);

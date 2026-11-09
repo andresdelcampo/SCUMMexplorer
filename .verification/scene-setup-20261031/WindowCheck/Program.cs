@@ -79,6 +79,18 @@ internal static class Program
                         else Log($"{raw}: shared planner {(Field("_loomScenePlanner") is null ? "none" : "not created")}");
                         continue;
                     }
+                    // RP:room,index plays item index of LOOM's room Play Cutscene list, as the menu does, and captures it (9 November 2026: the distaff's
+                    // notes shown during a Room 44 cutscene).
+                    if (raw.StartsWith("RP:", StringComparison.Ordinal))
+                    {
+                        var at = raw[3..].Split(',').Select(int.Parse).ToArray();
+                        var listed = (System.Collections.IList)typeof(MainWindow).GetMethod("RoomCutsceneItems", Private)!.Invoke(window, [at[0]])!;
+                        var item = listed[at[1]]!;
+                        Log($"{raw}: playing \"{item.GetType().GetProperty("Title")!.GetValue(item)}\"");
+                        ((Action)item.GetType().GetProperty("Play")!.GetValue(item)!)();
+                        for (var i = 1; i <= 10; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i % 2 == 0) Capture($"rp-{at[0]}-{at[1]}-{i:00}"); }
+                        continue;
+                    }
                     // K counts LOOM's catalog entries by category, as the window shows them (9 November 2026).
                     if (raw == "K")
                     {
@@ -388,6 +400,15 @@ internal static class Program
                             Log($"{raw} +{i * 0.5:F1}s: play {image.Visibility} {image.ActualWidth:F0}x{image.ActualHeight:F0} src {(image.Source as System.Windows.Media.Imaging.BitmapSource)?.PixelWidth}; preview {preview.Visibility} {preview.ActualWidth:F0}x{preview.ActualHeight:F0}");
                             Capture($"room-{raw[2..]}-{i:00}");
                         }
+                        continue;
+                    }
+                    // G:folder opens another game in the same window, as the game picker does (9 November 2026: Indy 3's shadow left in Maniac Mansion).
+                    if (raw.StartsWith("G:", StringComparison.Ordinal))
+                    {
+                        Call("OpenGameFolder", raw[2..]);
+                        await Pump(3);
+                        for (var i = 0; i < 40 && Field("_playPlanner") is null && Field("_session") is null; i++) await Pump(1);
+                        Log($"{raw}: opened {((SCUMMexplorer.Core.Domain.GameLibrary?)Field("_game"))?.Id}");
                         continue;
                     }
                     // r:room opens the room as a pick in the room selector does (a catalog visit).

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 9 November: a picked scene no longer plays on another game's session
+
+The boot a picked scene begins from was kept across games: Maniac Mansion's scenes, after Indy 3, played on Indy 3's session (Indy in the garage, Indy 3's verbs, "I can't reach it." in Room 20). It is cleared when a game opens. [Record](../../.verification/user-reports-20261109/README.md).
+
 ## 9 November: Indy 3 scenes that need several values play their own way
 
 Setups can now set a bit numbered by a variable, use a room's pseudo numbers where it is only entered so, offer another of the game's outfits, and bring the hero in by any door. Indy 3's Room 21 door, Room 33's meeting with Henry and Room 13's change of clothes play the game's own way: started at their cutscene 7 → 4 of 81 (run 86). In versions 1 and 2 a second object's class mask is offered too: Zak McKracken's drop slot, CashCard reader and Yak play their own way (15 → 12 and 16 → 13, run 87). A setup may also stop a script that must not run or clear a bit a first visit needs (Monkey Island 1's ladder and lookout, 12 → 10, run 89). [Record](../../.verification/cutscene-definition-20261109/README.md).
