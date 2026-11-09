@@ -388,10 +388,11 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         var folder = Path.Combine(TestGames.Root, "mi2 mt32 en");
         if (!Directory.Exists(folder)) return;
         var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        // Since 9 November 2026 (R-8.10) his own code, run directly, plays more of his lines (28) than his cutscene started directly with bit[0x237] (6):
+        // what matters is that his lines play.
         var plan = planner.PlanSetup(Trigger(planner, 79, 777, 0x0A));
-        Assert.Equal(ScummPickedStart.AtCutscene, plan.Result.Way);
-        Assert.True(plan.Result.Lines > 0);
-        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.Bit, Target: "bit[0x237]" });
+        Assert.True(plan.Result.Begun);
+        Assert.True(plan.Result.Lines > 6);
     }
 
     [Fact]

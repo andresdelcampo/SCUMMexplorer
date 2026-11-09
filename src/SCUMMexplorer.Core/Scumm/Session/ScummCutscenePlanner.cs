@@ -88,6 +88,20 @@ public sealed class ScummCutscenePlanner
         {
             var plan = Setup.Plan(trigger, fresh);
             if (plan.Result.Begun) return plan;
+            // R-8.10 (user, 9 November 2026): played its own way, the scene animates or shows another room without taking control (Maniac Mansion's
+            // Room 12: the Green Tentacle on the stairs, "You can't pass until you feed me!"; only kid 5's branch takes control). That is the scene, played
+            // the game's own way rather than from a cutscene of another branch.
+            // The hero walking out to another room (Room 4's inner door into Room 31) is navigation, not that scene.
+            // Kept only when it shows at least as much as the cutscene started directly: Monkey Island 1's SCUMM Bar entry, Room 25,
+            // plays 23 lines its own way and 219 from its cutscene.
+            ScummScenePlan? ownWay = plan.Result is { Failure: null } shown && (shown.Animation is not null || shown.ChangesView) &&
+                                     !(shown.RoomsEntered.Count > 0 && !shown.ChangesView)
+                ? plan with
+                {
+                    Result = shown with { Begun = true },
+                    Note = (plan.Note.Length > 0 ? plan.Note + " " : "") + "Its own code plays it without taking the player's control (it animates or shows another room).",
+                }
+                : null;
             // R-8.35: nothing made the game's own code begin it, so its cutscene is started directly (with the setup kept, if any).
             ScummCutsceneRunResult AtCutscene(IReadOnlyList<ScummSetupEdit> edits) => _pool is null
                 ? ScummCutsceneRun.Run(_game, _newSession, trigger, edits, ScummPickedStart.AtCutscene)
@@ -102,6 +116,10 @@ public sealed class ScummCutscenePlanner
                 at = guarded;
                 edits = [.. edits, .. guards];
             }
+            // At least as much: the lines first (Maniac Mansion's Room 12: the tentacle's 15 lines its own way, 1 line and Room 13 from the cutscene of kid 5's
+            // branch), then the rooms.
+            if (ownWay is not null && (ownWay.Result.Lines > at.Lines || ownWay.Result.Lines == at.Lines && ownWay.Result.RoomsEntered.Count >= at.RoomsEntered.Count))
+                return ownWay;
             return at.Score > plan.Result.Score
                 ? plan with { Edits = edits, Result = at, Note = (plan.Note.Length > 0 ? plan.Note + " " : "") + "Its cutscene is started directly (the tests before it skipped)." }
                 : plan;

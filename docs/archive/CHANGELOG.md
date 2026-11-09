@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 9 November: a scene that animates without taking control plays its own way
+
+A scene whose own code animates or shows another room without taking the player's control plays the game's own way instead of from a cutscene of another branch, when it shows at least as much (lines, then rooms). Maniac Mansion Room 12's Green Tentacle, Monkey Island 1 Room 25's door and Room 41, Monkey Island 2's Wally (28 lines, was 6), Indy 4 Room 57, Zak McKracken 1. Started at their cutscene (five non-LOOM copies): 5.0% → 3.7%. Full suite 1,925 passed. [Record](../../.verification/cutscene-definition-20261109/README.md)
+
 ## 9 November: what a cutscene is
 
 User's definition (REQUIREMENTS R-8.10): a cutscene changes room (even coming back) or animates characters or objects; lines of text alone are not. Measured from each entry's run: the instructions its own scripts run (`ScummSceneActivity`). Not counted: talk, the hero's own gestures and approach, one change (a door, an item picked up, a lamp), poses, doorway walks. The trigger stays in Interact and the scene is in Play Cutscene (R-8.2b, user); text-only replies are Interact's. Object verbs that animate or show another room without taking control are entries too (R-8.41, after the user saw the numbers). Cutscenes now (old rule): LOOM English catalog 201 of 238 (79), Maniac Mansion 42 of 49 (32 of 40), Indy 3 80 of 160 (75 of 156), Zak McKracken 129 of 175 (43 of 79), Monkey Island 1 87 of 191 (64 of 165), Monkey Island 2 176 of 259 (76 of 190), Indy 4 301 of 520 (182 of 426). No way changed; full suite run. [Record](../../.verification/cutscene-definition-20261109/README.md)
