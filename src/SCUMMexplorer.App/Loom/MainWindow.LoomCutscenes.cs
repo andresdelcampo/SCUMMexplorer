@@ -306,6 +306,51 @@ public partial class MainWindow
     }
 
     /// <summary>The shared planner's own trigger for a LOOM scan trigger (same room, object and verb; the two scans list the same triggers).</summary>
+    /// <summary>
+    /// R-8.10 (user, 9 November 2026): whether a LOOM entry is a cutscene, by the shared engine's run of the same trigger (it changes room or animates);
+    /// <paramref name="fallback"/> (the code's rule, or the reference catalog's reviewed category) until that run is known.
+    /// </summary>
+    private bool LoomIsCutscene(int room, int objectId, int verbId, bool fallback)
+    {
+        if (_loomScenePlanner is not { IsValueCreated: true } lazy) return fallback;
+        var shared = lazy.Value;
+        if (shared.Triggers.FirstOrDefault(c => c.Room == room && c.ObjectId == objectId && c.VerbId == verbId) is not { } trigger || !shared.HasRun(trigger)) return fallback;
+        return shared.Groups.FirstOrDefault(g => g.First == trigger || g.Others.Contains(trigger)) is { } group ? shared.IsScene(group) : fallback;
+    }
+
+    private string LoomCategory(int room, int objectId, int verbId, bool fallback) => LoomIsCutscene(room, objectId, verbId, fallback) ? "Scenes" : "Dialogue and reactions";
+
+    /// <summary>
+    /// The English reference: its catalog plays the replays; the shared engine runs the same triggers in the background, so each entry's kind (R-8.10)
+    /// follows its run (R-8.9). Plans are kept for the next launch (<see cref="ScenePlanCache"/>).
+    /// </summary>
+    private void StartCatalogKinds(GameLibrary game)
+    {
+        var shared = NewLoomScenePlanner(game);
+        _loomScenePlanner = shared;
+        var kept = _roomCardsMayUseCache ? ScenePlanCache.Load(game.FolderPath, game.Language) : null;
+        var replays = _replayCatalog!.Replays;
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                var planner = shared.Value;
+                if (kept is not null) planner.ImportScenes(kept);
+                foreach (var replay in replays)
+                {
+                    if (!ReferenceEquals(_loomScenePlanner, shared)) return;
+                    _scanGate.Wait();
+                    if (planner.Triggers.FirstOrDefault(c => c.Room == replay.Room && c.ObjectId == replay.ObjectId && c.VerbId == replay.Verb) is { } trigger)
+                        planner.PlanSetup(trigger);
+                }
+                if (!ReferenceEquals(_loomScenePlanner, shared)) return;
+                ScenePlanCache.Save(game.FolderPath, game.Language, planner.ExportScenes());
+                Dispatcher.BeginInvoke(() => { if (ReferenceEquals(_loomScenePlanner, shared)) UpdatePlaybackControls(); });
+            }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { }
+        });
+    }
+
     private static ScummCutscene SharedTrigger(ScummCutscenePlanner planner, ScummCutscene t) =>
         planner.Triggers.FirstOrDefault(c => c.Room == t.Room && c.ObjectId == t.ObjectId && c.VerbId == t.VerbId) ?? t;
     /// <summary>Room lists saved by an earlier run (same build and game data), used until the background runs finish.</summary>
@@ -349,7 +394,12 @@ public partial class MainWindow
     /// </summary>
     private void StartCdSetupDerivation(GameLibrary game)
     {
-        if (!ScannedCutscenes) { _cdSetupPlanner = null; _cdSavedRoomLists = null; return; }
+        if (!ScannedCutscenes)
+        {
+            _cdSetupPlanner = null; _cdSavedRoomLists = null;
+            if (game is { Id: GameId.Loom, IsDemo: false } && _replayCatalog is { Replays.Length: > 0 }) StartCatalogKinds(game);
+            return;
+        }
         // The shipped lists of the known disc come first (fingerprint-checked); otherwise, as with the thumbnails, only reopening the last game reuses
         // the saved lists, and the Open button derives them again.
         var seed = LoomCdSeed.Load(game);
@@ -453,7 +503,7 @@ public partial class MainWindow
         CdCutsceneGroups().Where(group => room is null || group.First.Room == room || group.Others.Any(o => o.Room == room) || CdPlaysIn(group, room.Value))
             .Select(group => ($"cd-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}",
                 new CutscenePickerItem(CdCutsceneTitle(group.First) + (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
-                    group.IsScene ? "Scenes" : "Dialogue and reactions", CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
+                    LoomCategory(group.First.Room, group.First.ObjectId, group.First.VerbId, group.IsScene), CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
 
     /// <summary>Whether a headless run of the scene from its start (already derived in the background) was in this room at some point.</summary>
     private bool CdPlaysIn(ScummCutsceneGroup group, int room) =>
@@ -568,7 +618,9 @@ public partial class MainWindow
         if (onlyIds is null || onlyIds.Contains("opening"))
             items.Add(("opening", new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening)));
         foreach (var scene in AllCutscenes().Where(scene => onlyIds is null || onlyIds.Contains(scene.Id)))
-            items.Add((scene.Id, new(PickerVerbTitle(scene.Title, scene.ObjectId == 0 ? 0 : scene.VerbId), scene.Category, scene.Source + " " + CutsceneStartNote(scene), () => PlayKnownCutscene(scene))));
+            items.Add((scene.Id, new(PickerVerbTitle(scene.Title, scene.ObjectId == 0 ? 0 : scene.VerbId),
+                scene.SequenceId is null && scene.Steps is null ? LoomCategory(scene.RoomId, scene.ObjectId, scene.VerbId, scene.Category == "Scenes") : scene.Category,
+                scene.Source + " " + CutsceneStartNote(scene), () => PlayKnownCutscene(scene))));
         items.AddRange(scanned.Select(choice => (choice.Id, choice.Item)));
         return items;
     }
@@ -582,7 +634,8 @@ public partial class MainWindow
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
         if (ScannedCutscenes)
         {
-            var items = CdCutsceneItems(roomId).Where(choice => !OfferedByInteract(choice.Id, roomId, LoomInteractHas)).Select(choice => choice.Item).ToList();
+            // R-8.2b (user, 9 November 2026): the room's cutscenes (R-8.10), also those an Interact row starts; reactions are Interact's.
+            var items = CdCutsceneItems(roomId).Where(choice => choice.Item.Category == "Scenes").Select(choice => choice.Item).ToList();
             if (_game?.Id == GameId.LoomVga && CdIntroPlaysIn(roomId)) items.Insert(0, CdIntroItem());
             // The EGA opening (script 044) is not a scanned trigger; it plays in the rooms OpeningSource names, so Room 01 (the title) is never an empty list.
             else if (_game?.Id == GameId.Loom && roomId is 1 or 2 or 53)
@@ -591,7 +644,7 @@ public partial class MainWindow
         }
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
         var starts = (_replayCatalog?.Membership ?? []).ToDictionary(m => m.Id, m => m.StartRoom);
-        return PlayableCutsceneItems(ids).Where(choice => !OfferedByInteract(choice.Id, roomId, LoomInteractHas)).Select(choice =>
+        return PlayableCutsceneItems(ids).Where(choice => choice.Item.Category == "Scenes").Select(choice =>
             starts.TryGetValue(choice.Id, out var start) && start != roomId
                 ? choice.Item with { Title = choice.Item.Title + $" (played from Room {start:00})" }
                 : choice.Item).ToList();

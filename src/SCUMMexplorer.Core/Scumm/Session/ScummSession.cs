@@ -114,6 +114,25 @@ public abstract partial class ScummSession
     /// <summary>In a cutscene, or (versions 1 and 2) with the interface hidden by a script until one shows it again (<see cref="ScummSceneMarks"/>).</summary>
     public bool InScene => InCutscene || _runtime.V2InterfaceOff;
 
+    /// <summary>The scripts whose instructions count as a picked scene's own (<see cref="SceneActivity"/>), by their session label; null for none.</summary>
+    public Func<string, bool>? WatchScript { get; set; }
+
+    /// <summary>What the watched scripts changed on screen (a room load, an animation).</summary>
+    public ScummSceneActivity SceneActivity { get; private set; } = new();
+
+    /// <summary>An actor operand that names the hero: the ego variable, or a number equal to the ego's.</summary>
+    private bool IsHeroOperand(string operand) =>
+        operand == (_runtime.IsV2 ? ScummVars.V2.Ego : ScummVars.Ego) ||
+        operand.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(operand.AsSpan(2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var number) &&
+        number == _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable);
+
+    /// <summary>Starts watching a picked scene's scripts afresh.</summary>
+    public void WatchScene(Func<string, bool> scripts, int pickedObject = 0)
+    {
+        WatchScript = scripts;
+        SceneActivity = new() { PickedObject = pickedObject == 0 ? null : pickedObject, OldVersion = _runtime.IsV2 };
+    }
+
     /// <summary>
     /// How many cutscenes this session has begun (<c>beginCutscene</c> reached). The app compares it
     /// before and after an input, with <see cref="EgoPuts"/>, to tell whether the game answered it with a change of scene.
@@ -519,6 +538,7 @@ public abstract partial class ScummSession
         if (!frame.Global) frame.OriginRoom = _currentRoom?.ResourceId;
         _executing.Add(frame);
         ScummBoundedScriptResult result;
+        var watched = WatchScript?.Invoke(frame.Label) == true ? new List<ScummScriptInstruction>() : null;
         try
         {
             result = _executor.Execute(script, _runtime.ObjectStates, objects,
@@ -544,12 +564,15 @@ public abstract partial class ScummSession
                 observation: _observer is null ? null : new(_observer, frame.ObservationSlot, frame.ObservationParent,
                     frame.ObservationCall, frame.ObservationRan),
                 // Only a run the session keeps (LastEntryRun, LastAction) needs the states and positions as they were when it ended.
-                snapshotState: keepState);
+                snapshotState: keepState, executed: watched);
             frame.ObservationRan = true;
         }
         finally
         {
             _executing.RemoveAt(_executing.Count - 1);
+            if (watched is not null)
+                SceneActivity.Record(frame.Label, watched, IsHeroOperand,
+                    id => id >= _globalScriptCount && _runtime.CurrentRoom is int here ? $"local {here}/{id}" : $"global {id}");
         }
         var label = script.Context ?? $"Script {script.ScriptId:00}";
         // Diagnostics (harnesses): SCUMM_TRACE_SCRIPTS=label;label adds those scripts' instruction traces to the session trace.

@@ -168,7 +168,8 @@ public sealed partial class ScummBoundedScriptExecutor
         IReadOnlyCollection<string>? estimatedLocals = null,
         bool pathEstimated = false,
         ScummScriptObservationContext? observation = null,
-        bool snapshotState = true)
+        bool snapshotState = true,
+        List<ScummScriptInstruction>? executed = null)
     {
         ArgumentNullException.ThrowIfNull(script);
         ArgumentNullException.ThrowIfNull(initialObjectStates);
@@ -266,6 +267,8 @@ public sealed partial class ScummBoundedScriptExecutor
             }
 
             var instruction = instructions[instructionIndex];
+            // The instructions run, for a caller that watches a scene's own scripts (what a cutscene shows: ScummSceneActivity).
+            executed?.Add(instruction);
             var next = instruction.Offset + EncodedLength(instruction.Bytes);
             var instructionSequence = observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
                 "instruction", instruction.Offset, instruction.Operation, instruction.Operands,

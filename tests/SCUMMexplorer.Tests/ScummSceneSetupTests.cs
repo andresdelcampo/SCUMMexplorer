@@ -451,13 +451,15 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     [Fact]
     public void EveryIndy3SceneBeginsWhenPicked()
     {
-        // R-8.35: the game's own way, a setup, or the cutscene started directly; none is left out.
+        // R-8.35: the game's own way, a setup, or the cutscene started directly; none is left out. A widened candidate (R-8.41) that does not begin is a
+        // single change, a reaction (Room 86's tunnel), not a scene left out.
         if (Indy3() is not { } game) return;
         var planner = new ScummCutscenePlanner(game);
-        var ways = planner.Groups.Select(group => planner.PlanSetup(group.First)).GroupBy(plan => (plan.Result.Begun, plan.HasEdits, plan.Result.Way))
+        var scenes = planner.Groups.Where(group => !group.First.Widened).ToList();
+        var ways = scenes.Select(group => planner.PlanSetup(group.First)).GroupBy(plan => (plan.Result.Begun, plan.HasEdits, plan.Result.Way))
             .ToDictionary(g => g.Key, g => g.Count());
         foreach (var (key, count) in ways) output.WriteLine($"{key}: {count}");
-        Assert.Equal(planner.Groups.Count, ways.Where(pair => pair.Key.Begun).Sum(pair => pair.Value));
+        Assert.Equal(scenes.Count, ways.Where(pair => pair.Key.Begun).Sum(pair => pair.Value));
     }
 
     [Fact]

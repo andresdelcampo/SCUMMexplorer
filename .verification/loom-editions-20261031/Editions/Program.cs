@@ -112,6 +112,20 @@ foreach (var group in groups)
                   (plan.HasEdits ? $" | setup: {string.Join("; ", plan.Edits.Select(e => e.Describe()))}" : ""));
 }
 foreach (var line in lines) Console.WriteLine(line);
+// R-8.10 (9 November 2026): the shared engine's entries by kind (SCUMM_WIDE_SCENES=1 adds the widened candidates).
+if (Environment.GetEnvironmentVariable("EDITIONS_KINDS") == "1")
+{
+    int cutscenes = 0, oldScenes = 0, widened = 0, widenedCut = 0, scanned = 0;
+    foreach (var g in shared.Groups)
+    {
+        var res = shared.PlanSetup(g.First).Result;
+        var cut = shared.IsScene(g);
+        if (cut) cutscenes++;
+        if (g.First.Widened) { widened++; if (cut) widenedCut++; } else { scanned++; if (g.IsScene) oldScenes++; }
+        Console.WriteLine($"KIND {(cut ? "cutscene" : "reaction")}{(g.First.Widened ? " widened" : "")} Room {g.First.Room:00} object {g.First.ObjectId} verb 0x{g.First.VerbId:X2} ({g.First.ObjectName}): rooms [{string.Join(",", res.RoomsEntered)}] view {res.ChangesView} lines {res.Lines} animation {res.Animation ?? "-"}");
+    }
+    Console.WriteLine($"KINDS cutscenes {cutscenes} of {shared.Groups.Count}; old rule Scenes {oldScenes} of {scanned}; widened candidates {widened}, of them cutscenes {widenedCut}");
+}
 string P(int k) => $"{k} ({100.0 * k / Math.Max(1, groups.Count):F1}%)";
 Console.WriteLine($"SUMMARY{(onLoom ? " (LOOM session)" : "")} {Path.GetFileName(args[0].TrimEnd('\\', '/'))}: groups {groups.Count}; LOOM path begins {P(loomFresh + loomSetup)} (fresh {loomFresh}, setup {loomSetup}, none {loomNone}); " +
                   $"shared begins {P(own + setup + atCut)} (own {P(own)}, setup {P(setup)}, at cutscene {P(atCut)}, none {none}), shows nothing {P(nothing)}, not in shared scan {notInShared}; {clock.Elapsed.TotalSeconds:F0} s");

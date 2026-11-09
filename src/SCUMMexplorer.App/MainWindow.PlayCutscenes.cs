@@ -161,9 +161,9 @@ public partial class MainWindow
         try { planner = lazy.Value; }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { return []; }
         // R-6.36 (user, 24 Oct): Normal lists every entry Advanced lists for the room; no fresh-start-run filter, no mode filter.
-        return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value) &&
-                !OfferedByInteract($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", room.Value,
-                    (objectId, verbId) => GenericObjectActions(objectId).Any(action => action.Verb == verbId)))
+        // R-8.2 and R-8.2b (user, 9 November 2026): a room lists its cutscenes (R-8.10), also those Interact triggers (the trigger in Interact, the scene
+        // here); dialogue and reactions are Interact's only. The Advanced whole-game picker (no room) lists everything.
+        return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value) && planner.IsScene(group))
             .Select(group => ($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", new CutscenePickerItem(
                 GenericCutsceneTitle(group.First) +
                 (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),

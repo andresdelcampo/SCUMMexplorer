@@ -212,4 +212,16 @@ foreach (var group in planner.Groups)
         Console.WriteLine($"      order: earlier code adds {string.Join("; ", planner.Setup.EarlierScenesState(t, plan.Edits.Where(e => !e.Where.Contains("earlier code")).ToList()).Select(e => e.Describe()))}");
     }
 }
+// R-8.10 (9 November 2026): each entry's kind from its run, and what decided it.
+var kinds = 0;
+foreach (var g in planner.Groups.Where(g => onlyRoom is not int only || g.First.Room == only).Take(limit))
+{
+    var shown = planner.PlanSetup(g.First).Result;
+    var cut = planner.IsScene(g);
+    if (cut) kinds++;
+    if (Environment.GetEnvironmentVariable("MEASURE_KINDS") == "1")
+        Console.WriteLine($"KIND {(cut ? "cutscene" : "reaction")}{(g.First.Widened ? " widened" : "")} way {(shown.Begun ? shown.Way.ToString() : "none")} Room {g.First.Room:00} object {g.First.ObjectId} verb 0x{g.First.VerbId:X2} ({g.First.ObjectName}): rooms [{string.Join(",", shown.RoomsEntered)}] loads {shown.ChangesRoom} view {shown.ChangesView} lines {shown.Lines} animation {shown.Animation ?? "-"}");
+}
+var listed = planner.Groups.Where(g => onlyRoom is not int only || g.First.Room == only).Take(limit).ToList();
+Console.WriteLine($"cutscenes {kinds} of {listed.Count}; old rule Scenes {listed.Count(g => !g.First.Widened && g.IsScene)} of {listed.Count(g => !g.First.Widened)} (widened candidates {listed.Count(g => g.First.Widened)}, of them cutscenes {listed.Count(g => g.First.Widened && planner.IsScene(g))})");
 Console.WriteLine($"fresh start begins {fresh}; setup begins {setup}; still nothing {still}; {clock.Elapsed.TotalSeconds:F0} s");

@@ -56,7 +56,7 @@ public sealed record ScummCutsceneVerbs(int? Look, int? WalkTo, int? Use, int? S
 /// <param name="Verbs">The game's verb roles and words (<see cref="ScummCutsceneVerbs"/>); <see cref="ScummCutsceneVerbs.None"/> when not given.</param>
 public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
     int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null,
-    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null, bool Departure = false)
+    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null, bool Departure = false, bool Widened = false)
 {
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
 
@@ -113,7 +113,7 @@ public static partial class ScummCutsceneIndex
     /// <param name="arrivalScripts">Also list the arrival scenes that the script loading a room starts (<see cref="FindArrivalScripts"/>).</param>
     public static IReadOnlyList<ScummCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
         Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null, ScummCutsceneVerbs? verbs = null, bool arrivalScripts = false,
-        bool departureScripts = false)
+        bool departureScripts = false, bool animatingVerbs = false)
     {
         verbs ??= ScummCutsceneVerbs.None;
         var found = new List<ScummCutscene>();
@@ -130,7 +130,14 @@ public static partial class ScummCutsceneIndex
                 var texts = new List<string>();
                 var summary = new Span();
                 Walk(data, room, script, label, 0, false, visited, scripts, texts, summary);
-                if (scripts.Count == 0) return;
+                if (scripts.Count == 0)
+                {
+                    // R-8.10 widened (user, 9 November 2026; behind the switch until the user has seen the numbers): an object verb whose code can animate
+                    // a character or an object or show another room is a candidate without taking control; its run decides.
+                    if (animatingVerbs && objectId != 0 && !IsDoorWalk(objectId, verbId) && Animating(data, room, script, label) is { Count: > 0 } reached)
+                        found.Add(new(room, objectId, objectName, verbId, reached, 0, 0, 0, "", null, null, 0, verbs, Widened: true));
+                    return;
+                }
                 IReadOnlyList<int>? destinations = null;
                 if (objectId != 0 && verbs.IsPlain(verbId) && doorways is not null &&
                     game?.Rooms.FirstOrDefault(r => r.ResourceId == room) is { } resource)
@@ -138,8 +145,18 @@ public static partial class ScummCutsceneIndex
                 found.Add(new(room, objectId, objectName, verbId, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", destinations,
                     summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs));
             }
-            Trigger(0, "", 0, Try(() => data.RoomEntryScript(room)), $"Room {room} entry script");
             var objectVerbs = Try(() => data.ReadObjectVerbs(room, roomData.Objects)) ?? new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
+            // R-6.13b: a doorway's door verb (its Walk to, or its default code) is navigation, never a widened candidate (Indy 4's exits, Monkey Island's doors).
+            var finder = animatingVerbs && game is not null ? new ScummDoorwayFinder(game, data) : null;
+            var resource = game?.Rooms.FirstOrDefault(r => r.ResourceId == room);
+            bool IsDoorWalk(int objectId, int verbId)
+            {
+                if (finder is null || resource is null || !objectVerbs.TryGetValue(objectId, out var entries)) return false;
+                var record = roomData.Objects.FirstOrDefault(o => o.Id == objectId);
+                return record is not null && finder.DoorVerbs(entries).FirstOrDefault(v => v.VerbId == verbId) is { } door &&
+                       Try(() => data.ReadObjectVerb(room, record, door.VerbId, out _)) is { } code && finder.FindDoorway(resource, code, door).Count > 0;
+            }
+            Trigger(0, "", 0, Try(() => data.RoomEntryScript(room)), $"Room {room} entry script");
             foreach (var (objectId, entries) in objectVerbs)
             {
                 var record = roomData.Objects.First(o => o.Id == objectId);
@@ -222,6 +239,51 @@ public static partial class ScummCutsceneIndex
                     summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs, Departure: true));
             }
         }
+    }
+
+    /// <summary>
+    /// The labels of a verb's code and the scripts it starts by a literal number (<see cref="Depth"/> levels) when any of them can animate or show another
+    /// room (R-8.10: a walk, placement or animation of an actor other than the hero, not a turn; a camera move; the lights; an object's picture changed
+    /// twice; a <c>loadRoom</c>); empty otherwise. The hero is the ego variable (var 1, or var 0 in versions 1 and 2).
+    /// </summary>
+    private static List<string> Animating(IScummDataSource data, int room, ScummScriptDisassembly script, string label)
+    {
+        var labels = new List<string>();
+        var animates = false;
+        var visited = new HashSet<(bool, int)>();
+        void Look(ScummScriptDisassembly code, string name, int depth)
+        {
+            labels.Add(name);
+            var changes = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var i in code.Instructions)
+            {
+                var parts = i.Operands.Split(',', StringSplitOptions.TrimEntries);
+                var actor = parts.ElementAtOrDefault(0) ?? "";
+                var hero = actor is "var[0x001]" or "var[0x000]";
+                switch (i.Operation)
+                {
+                    case "loadRoom" or "panCameraTo" or "setCameraAt":
+                    case "walkActorTo" or "walkActorToObject" or "walkActorToActor" or "putActor" or "putActorAtObject" when !hero && actor.StartsWith("0x", StringComparison.Ordinal):
+                        animates = true;
+                        break;
+                    case "animateActor" when !hero && !ScummSceneActivity.IsPose(i.Operands, data is ScummV2DataSource):
+                        animates = true;
+                        break;
+                    case "setState" or "drawObject" when ScummSceneActivity.ChangesPicture(i):
+                        if ((changes[actor] = changes.GetValueOrDefault(actor) + 1) >= 2) animates = true;
+                        break;
+                    case "startScript" or "chainScript" when depth < Depth && LiteralScriptNumber().Match(i.Operands) is { Success: true } m:
+                        var id = int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        var local = id >= data.GlobalScriptCount;
+                        if (!visited.Add((local, id))) break;
+                        if (Try(() => local ? data.RoomLocalScript(room, id) : data.GlobalScript(id)) is { } next)
+                            Look(next, local ? $"Room {room} local script {id}" : $"global script {id}", depth + 1);
+                        break;
+                }
+            }
+        }
+        Look(script, label, 0);
+        return animates ? labels : [];
     }
 
     /// <summary>Triggers that reach the same cutscene scripts are one scene (LOOM: four owl holes, five wool piles); a script reached from more triggers than this is a shared helper (a generic reaction), not a scene of its own.</summary>

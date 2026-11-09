@@ -20,8 +20,17 @@ public enum ScummPickedStart
 /// <param name="Verb">The verb the game's own way used when it is not the trigger's: another verb of the object whose code is the same scene (Indy 4 Room 48's
 /// stone, Push and Use share it, and only Use reaches it with the Sunstone).</param>
 public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> RoomsEntered, int Frames, string? Failure = null, int Lines = 0,
-    ScummPickedStart Way = ScummPickedStart.Game, int? Verb = null)
+    ScummPickedStart Way = ScummPickedStart.Game, int? Verb = null, bool ChangesRoom = false, string? Animation = null, bool ChangesView = false)
 {
+    /// <summary>R-8.10 for a widened candidate (a verb that does not take control): it showed another room itself or animated; the hero walking through a door does not count.</summary>
+    public bool IsWidenedCutscene => Begun && (ChangesView || Animation is not null);
+
+    /// <summary>
+    /// A cutscene by REQUIREMENTS R-8.10 (user, 9 November 2026): it begun and changed room (went to another room, or loaded one, even coming back) or
+    /// animated a character or an object (<see cref="ScummSceneActivity"/>). Otherwise lines of text only: a dialogue or reaction.
+    /// </summary>
+    public bool IsCutscene => Begun && (ChangesRoom || RoomsEntered.Count > 0 || Animation is not null);
+
     /// <summary>Beginning at all outweighs everything; then the rooms the scene went on to and the lines it printed (as LOOM's <c>LoomSceneOutcome</c>).</summary>
     public int Score => (Begun ? 10000 : 0) + RoomsEntered.Count * 20 + Lines;
 }
@@ -145,6 +154,10 @@ public static class ScummCutsceneRun
             session.ArrivalsSkippedFor = trigger.IsRoomEntry ? null : trigger;
             session.ArrivalSetup = setup;
             session.WantHeroForScene(trigger);
+            // The scene's own scripts: what they change on screen decides whether it is a cutscene (R-8.10).
+            var own = SceneScriptKeys(trigger);
+            bool Watched(string label) => ScriptKey(label) is { } key && (own.Contains(key) || session.SceneActivity.Children.Contains(key));
+            session.WatchScene(Watched, trigger.ObjectId);
             if (trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene) session.EnterRoomAgain(room);
             else session.VisitRoom(playIn);
             session.ArrivalsSkippedFor = null;
@@ -158,6 +171,7 @@ public static class ScummCutsceneRun
                 earlier = session.CutscenesBegun;
                 traced = session.SessionTrace.Count;
                 logMark = session.Messages.Log.Count;
+                session.WatchScene(Watched, trigger.ObjectId);
                 if (ScummSceneSetupSearch.FirstCutscene(game, trigger) is not { } at || !session.StartSceneAt(at.Label, at.Offset, at.Arguments))
                     return new(false, [], 0, "no cutscene the session can start in this room", Way: way);
             }
@@ -172,6 +186,7 @@ public static class ScummCutsceneRun
                 logMark = session.Messages.Log.Count;
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
                 var second = ScummSetupEdit.SecondOf(setup);
+                session.WatchScene(Watched, trigger.ObjectId);
                 if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
                 else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second, heldFirst: way == ScummPickedStart.GameHeldFirst);
                 // The hero is in the room only from the pick on (put at the object): the values that stand actors in it are set again now (Zak
@@ -204,6 +219,8 @@ public static class ScummCutsceneRun
                         RoomOf(line["cutscene at ".Length..]) is int at && at != trigger.Room && session.RoomsEntered.Skip(mark).Contains(at));
                     earlier = session.CutscenesBegun;
                 }
+                // A widened candidate takes no control: it begins when its own scripts animate or show another room (R-8.10).
+                if (!begun && trigger.Widened && (session.SceneActivity.Animates || session.SceneActivity.ChangesView)) begun = true;
                 // A scene may be a chain of cutscenes (LOOM Room 18's bell: Script 62, then Room 20's, then Scripts 58 and 59, one frame apart): it is
                 // over only after QuietFrames frames with no cutscene and no line, as LOOM English's reviewed replays were run (31 October 2026).
                 quiet = begun && !session.InScene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
@@ -211,7 +228,9 @@ public static class ScummCutsceneRun
                 if (!begun && frame >= TrialFrames + wait) break;
                 session.StepFrame();
             }
-            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way);
+            session.WatchScript = null;
+            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way,
+                ChangesRoom: session.SceneActivity.ChangesRoom, Animation: session.SceneActivity.Animation, ChangesView: session.SceneActivity.ChangesView);
         }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NotSupportedException)
         {
@@ -225,6 +244,13 @@ public static class ScummCutsceneRun
     /// versions 1 and 2 <c>Room 08 / Object 208 / Verb 0xFD</c>):
     /// global scripts by number, local scripts by room and number, objects by id, the entry by room. Null for a label of another shape.
     /// </summary>
+    /// <summary>The keys (<see cref="ScriptKey"/>) of a scene's own scripts: those the scan found and the trigger's own code.</summary>
+    internal static HashSet<string> SceneScriptKeys(ScummCutscene trigger)
+    {
+        var own = trigger.IsRoomEntry ? $"Room {trigger.Room} entry script" : $"Room {trigger.Room} object {trigger.ObjectId} verb 0x{trigger.VerbId:X2}";
+        return trigger.Scripts.Append(own).Select(ScriptKey).Where(key => key is not null).Select(key => key!).ToHashSet(StringComparer.Ordinal);
+    }
+
     internal static string? ScriptKey(string label)
     {
         // Versions 1 and 2 label object code "Room 08 / Object 208 / Verb 0xFD" (Zak McKracken).

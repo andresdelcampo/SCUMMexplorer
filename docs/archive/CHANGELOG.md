@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 9 November: what a cutscene is
+
+User's definition (REQUIREMENTS R-8.10): a cutscene changes room (even coming back) or animates characters or objects; lines of text alone are not. Measured from each entry's run: the instructions its own scripts run (`ScummSceneActivity`). Not counted: talk, the hero's own gestures and approach, one change (a door, an item picked up, a lamp), poses, doorway walks. The trigger stays in Interact and the scene is in Play Cutscene (R-8.2b, user); text-only replies are Interact's. Object verbs that animate or show another room without taking control are entries too (R-8.41, after the user saw the numbers). Cutscenes now (old rule): LOOM English catalog 201 of 238 (79), Maniac Mansion 42 of 49 (32 of 40), Indy 3 80 of 160 (75 of 156), Zak McKracken 129 of 175 (43 of 79), Monkey Island 1 87 of 191 (64 of 165), Monkey Island 2 176 of 259 (76 of 190), Indy 4 301 of 520 (182 of 426). No way changed; full suite run. [Record](../../.verification/cutscene-definition-20261109/README.md)
+
 ## 8 November: scenes started on leaving a room
 
 The scan now also reads each room's exit script: a global script it starts that holds a scene is a scene of that room (`Room NN · Leaving`), played from its cutscene, and listed in every room its run goes through. The setup search also reads the scripts a cutscene starts after it begins. Maniac Mansion's Room 41 (the publisher's office, which the kids never enter) now lists the publisher reading the mailed manuscript, started by Room 1's exit script (user report). Found: Maniac Mansion 1 and Indy 3 1 per copy (run 75); no way changed in any game. Full suite run. [Record](../../.verification/maniac-ready-20261108/README.md)

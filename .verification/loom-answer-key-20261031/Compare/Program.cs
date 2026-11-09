@@ -92,7 +92,7 @@ foreach (var replay in catalog.EnumerateArray())
     var category = planner.IsScene(groupOf[(room, obj, verb)]) ? "Scenes" : "Dialogue and reactions";
     var expectedCategory = replay.GetProperty("category").GetString();
     if (category == expectedCategory) catSame++;
-    else Console.WriteLine($"CATEGORY {id}: catalog {expectedCategory}, engine {category} | {replay.GetProperty("title").GetString()}");
+    else Console.WriteLine($"CATEGORY {id}: catalog {expectedCategory}, engine {category} | {replay.GetProperty("title").GetString()} | rooms [{string.Join(",", plan.Result.RoomsEntered)}] loads {plan.Result.ChangesRoom} animation {plan.Result.Animation ?? "-"}");
     // The catalog's rule (R-8.9) applied to the run: another room reached, or a long silent animation (no line, at least T frames).
     for (var t = 0; t < thresholds.Length; t++)
         if ((plan.Result.RoomsEntered.Any(r => r != room) || plan.Result.Lines == 0 && plan.Result.Frames >= thresholds[t] ? "Scenes" : "Dialogue and reactions") == expectedCategory) runRule[t]++;

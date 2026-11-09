@@ -89,7 +89,8 @@ public sealed class ScummIndy4CutsceneTests(ITestOutputHelper output)
         var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
         output.WriteLine($"{planner.Triggers.Count} triggers, {planner.Groups.Count} groups, {planner.Groups.Count(g => g.IsScene)} scenes; {planner.VerbSource}");
 
-        Assert.Equal((666, 426, 182), (planner.Triggers.Count, planner.Groups.Count, planner.Groups.Count(g => g.IsScene)));
+        // 9 November 2026: the widened candidates (R-8.41) are entries too.
+        Assert.Equal((764, 520, 182), (planner.Triggers.Count, planner.Groups.Count, planner.Groups.Count(g => g.IsScene)));
         Assert.Equal(["Abrir", "Cerrar", "Dar", "Empujar", "Tirar", "Usar", "Mirar", "Ir a", "Coger", "Hablar"],
             Enumerable.Range(3, 10).Select(verb => planner.Verbs.WordFor(verb)).ToArray());
         Assert.Equal("Room 10 · Usar salida de incendios", ScummCutsceneTitles.Title(GroupOf(planner, 10, 138, 0x08).First));

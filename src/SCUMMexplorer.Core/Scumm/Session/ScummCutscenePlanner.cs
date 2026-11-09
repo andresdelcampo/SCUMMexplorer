@@ -59,7 +59,9 @@ public sealed class ScummCutscenePlanner
         VerbSource = UntilAVerbIsOn(booted);
         Verbs = VerbsOf(booted, readableText);
         Triggers = ScummCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).ToList(), null, game, Verbs,
-            arrivalScripts: game.Version is not (ScummVersion.V1 or ScummVersion.V2), departureScripts: true);
+            arrivalScripts: game.Version is not (ScummVersion.V1 or ScummVersion.V2), departureScripts: true,
+            // R-8.10 widened candidates (user, 9 November 2026, after the numbers: "great! keep going"); SCUMM_WIDE_SCENES=0 leaves them out (harnesses).
+            animatingVerbs: Environment.GetEnvironmentVariable("SCUMM_WIDE_SCENES") != "0");
         if (readableText is not null)
             Triggers = Triggers.Select(t => t with { ObjectName = readableText(t.ObjectName), FirstText = readableText(t.FirstText) }).ToArray();
         Groups = ScummCutsceneIndex.Group(Triggers);
@@ -218,7 +220,8 @@ public sealed class ScummCutscenePlanner
         if (!TryGetRun(group.First, out var run)) return group.IsScene;
         var shown = run.Begun || !_lastResort.TryGetValue(Key(group.First), out var plan) ? run : plan.Result;
         if (!shown.Begun) return group.IsScene;
-        return shown.RoomsEntered.Count > 0 || shown.Lines == 0 && shown.Frames >= SilentSceneFrames;
+        // R-8.10 (user, 9 November 2026): it changes room or animates characters or objects; lines of text alone are a dialogue or reaction.
+        return group.First.Widened ? shown.IsWidenedCutscene : shown.IsCutscene;
     }
 
     /// <summary>Whether a run of the scene was in this room at some point (its own room always counts).</summary>

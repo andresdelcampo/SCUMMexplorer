@@ -15,8 +15,9 @@ public sealed class ScummZakEnhancedCutsceneTests(ITestOutputHelper output)
     {
         if (Planner.Value is not { } planner) return;
         // 8 November 2026: scenes that take control by hiding the interface count too (ScummSceneMarks).
-        Assert.Equal(168, planner.Triggers.Count);
-        Assert.Equal(82, planner.Groups.Count);
+        // 9 November 2026: the widened candidates (R-8.41) are entries too.
+        Assert.Equal(284, planner.Triggers.Count);
+        Assert.Equal(180, planner.Groups.Count);
         Assert.Equal(43, planner.Groups.Count(g => g.IsScene));
         Assert.Equal("Read", planner.Verbs.WordFor(12));
         Assert.Contains(planner.Groups, g => ScummCutsceneTitles.Title(g.First) == "Room 03 · Push doorbell");
