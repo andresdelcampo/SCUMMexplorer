@@ -332,8 +332,9 @@ public partial class InventoryStatusWindow : Window
         if (schema.Flags.Count > 0)
             StatusTabs.Items.Add(new TabItem { Header = "Story", Content = CheckList(new TextBlock { Text = "Story: what the game remembers", FontSize = 17 },
                 "Each mark is something that happened, named after the scene that sets it. Checking marks it as done, as the game would; nothing is played.",
-                schema.Flags.Select(f => (Key: f.Bit, Label: string.Join(" / ", f.Titles.Distinct()), Detail: $"{f.Bit}: {string.Join("; ", f.Where)}", On: _session.StatusBit(f.Bit)))
-                    .OrderBy(f => f.Label.StartsWith("A scene", StringComparison.Ordinal) || f.Label.Contains("· A scene", StringComparison.Ordinal) ? 1 : 0).ThenBy(f => f.Label, StringComparer.CurrentCultureIgnoreCase),
+                // A flag no scene names and the game's start has set (Indy 3's Script 118) is the game's setup, not story: left out.
+                schema.Flags.Where(f => !(f.Unnamed && _session.StatusBit(f.Bit))).Select(f => (Key: f.Bit, Label: string.Join(" / ", f.Titles.Distinct()), Detail: $"{f.Bit}: {string.Join("; ", f.Where)}", On: _session.StatusBit(f.Bit)))
+                    .OrderBy(f => f.Label.Contains("An unnamed scene", StringComparison.Ordinal) ? 1 : 0).ThenBy(f => f.Label, StringComparer.CurrentCultureIgnoreCase),
                 (key, on) => _flags[key] = on, editable) });
     }
 

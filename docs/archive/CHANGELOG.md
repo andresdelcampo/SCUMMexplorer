@@ -11,7 +11,7 @@ The running log of finished work, newest first, each entry linking its record un
 
 ## 9 November: Game Status for Indy 3
 
-Indy 3 has Game Status: Indy's inventory (catalog grants, one recipient), his health and outfit, the 68 IQ awards and 46 story flags, each found by its role in the scripts (REQUIREMENTS R-12.15 to R-12.17). [Record](../../.verification/indy3-status-20261109/README.md).
+Indy 3 has Game Status: Indy's inventory (catalog grants, one recipient), his health and outfit, the 68 IQ awards and 46 story flags, each found by its role in the scripts (REQUIREMENTS R-12.15 to R-12.17). 10 November (user report on the Spanish 256-colour copy): items carry the name their pickup gives them ("tomo": "libro mapas", "manual", "Mein Kampf"); the game start's flags are left out of Story; the English names are the copy's own. [Record](../../.verification/indy3-status-20261109/README.md).
 
 ## 9 November: a picked scene no longer plays on another game's session
 

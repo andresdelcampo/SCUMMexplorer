@@ -50,6 +50,9 @@ public abstract partial class ScummSession
         return _heroName.Length > 0 ? _heroName : null;
     }
 
+    [GeneratedRegex(@"^([^,]+), ""([^""]*)""$")]
+    private static partial Regex RenameOperands();
+
     [GeneratedRegex(@"actorName, ""([^""]+)""")]
     private static partial Regex ActorNameOperand();
 
@@ -61,10 +64,22 @@ public abstract partial class ScummSession
         var names = new Dictionary<int, string>();
         var ego = _runtime.GlobalVariables.GetValueOrDefault(_runtime.EgoVariable);
         void Take(int id, int room, string evidence) { if (!found.ContainsKey(id)) found[id] = (room, evidence); }
+        // The name the pickup itself gives the object (setObjectName in the same code): the three books of Room 17 ("tomo" in the Spanish copy) become
+        // "libro mapas", "manual" and "Mein Kampf" as Indy takes them. A rename elsewhere (the package becomes the Grail diary when opened) is not the
+        // item as granted.
+        var renames = new Dictionary<int, HashSet<string>>();
         void Scan(ScummScriptDisassembly? script, string label, int room, int self)
         {
+            var picks = new HashSet<int>();
+            foreach (var ins in script?.Instructions ?? [])
+                if (ins.Operation is "pickupObject" or "setOwnerOf" && (ins.Operands.Split(',')[0].Trim() is var first && first == "var[0x007]" && self > 0 ? self : V3Literal(first)) is int taken)
+                    picks.Add(taken);
             foreach (var ins in script?.Instructions ?? [])
             {
+                if (ins.Operation == "setObjectName" && RenameOperands().Match(ins.Operands) is { Success: true } rename &&
+                    (rename.Groups[1].Value == "var[0x007]" && self > 0 ? self : V3Literal(rename.Groups[1].Value)) is int renamed and > 0 && picks.Contains(renamed) &&
+                    rename.Groups[2].Value.Trim('@', ' ') is { Length: > 0 } newName)
+                    (renames.TryGetValue(renamed, out var set) ? set : renames[renamed] = []).Add(newName);
                 var parts = ins.Operands.Split(',', StringSplitOptions.TrimEntries);
                 if (ins.Operation == "pickupObject" && (parts[0] == "var[0x007]" && self > 0 ? self : V3Literal(parts[0])) is int picked and > 0)
                     Take(picked, room, $"{label} +0x{ins.Offset:X4}: pickupObject {parts[0]}");
@@ -101,13 +116,19 @@ public abstract partial class ScummSession
         return found.Where(f => locations.ContainsKey(f.Key))
             .Select(f => (f.Key, Room: locations[f.Key].Contains(f.Value.Room) ? f.Value.Room : locations[f.Key].Distinct().Count() == 1 ? locations[f.Key][0] : 0, f.Value.Evidence))
             .Where(f => f.Room > 0)
-            .Select(f => new ScummInventoryCatalogItem(f.Key, f.Room, names.GetValueOrDefault(f.Key), f.Evidence))
+            .Select(f => renames.TryGetValue(f.Key, out var given) && given.Count == 1
+                ? new ScummInventoryCatalogItem(f.Key, f.Room, given.First(), f.Evidence + $"; named by the pickup's setObjectName \"{given.First()}\"") { Renamed = true }
+                : new ScummInventoryCatalogItem(f.Key, f.Room, names.GetValueOrDefault(f.Key), f.Evidence))
             .OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ThenBy(x => x.ObjectId).ToArray();
     }
 
-    /// <summary>A version 3 grant: what <c>o4_pickupObject</c> writes (the executor's <c>TryApplyPickupObject</c>), without the pickup's verb or scene.</summary>
-    private void V3Grant(int id, int room, int owner)
+    /// <summary>
+    /// A version 3 grant: what <c>o4_pickupObject</c> writes (the executor's <c>TryApplyPickupObject</c>), without the pickup's verb or scene; and the name
+    /// the pickup gives it (<paramref name="name"/>, when the catalog took it from the pickup's own <c>setObjectName</c>).
+    /// </summary>
+    private void V3Grant(int id, int room, int owner, string? name = null)
     {
+        if (name is not null) _runtime.ObjectNameOverrides[id] = System.Text.Encoding.Latin1.GetBytes(name);
         _runtime.AddToInventorySlots(id);
         _runtime.InventoryRooms[id] = room;
         _runtime.SetObjectOwner(id, (byte)owner);

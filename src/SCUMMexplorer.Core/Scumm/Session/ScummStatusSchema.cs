@@ -11,7 +11,11 @@ public sealed record ScummStatusAward(int Slot, int Points, string Where, string
 public sealed record ScummStatusOutfit(int ObjectId, int Costume, string? Name);
 
 /// <summary>A story bit the game's code raises, and the places that raise it (titles as the scene lists name them).</summary>
-public sealed record ScummStatusFlag(string Bit, IReadOnlyList<string> Titles, IReadOnlyList<string> Where);
+public sealed record ScummStatusFlag(string Bit, IReadOnlyList<string> Titles, IReadOnlyList<string> Where)
+{
+    /// <summary>Only global scripts no object or entry runs set it (Indy 3's Script 118 at the game's start: bits 5D5 to 5D7), so no scene names it.</summary>
+    public bool Unnamed { get; init; }
+}
 
 /// <summary>
 /// Game Status values beyond the inventory (user, 9 November 2026: "makes total sense to add those to status": Indy 3's health, outfit, IQ points and
@@ -68,14 +72,17 @@ public sealed partial class ScummStatusSchema
             if (unit.Label.EndsWith(" entry", StringComparison.Ordinal)) return $"Room {unit.Room:00} · Entry";
             if (depth < 2 && callers.TryGetValue(unit.Label, out var by) && by.Count > 0)
                 return Title(by.OrderBy(u => u.ObjectId == 0 ? 1 : 0).First(), depth + 1);
-            return unit.Room > 0 ? $"Room {unit.Room:00} · A scene" : "A scene";
+            return unit.Room > 0 ? $"Room {unit.Room:00} · An unnamed scene" : "An unnamed scene";
         }
         // Code no object or entry runs directly (Indy 3's fights, Script 60): named after the line spoken nearest before it (after it, if none).
         string Named(Unit unit, int offset)
         {
             var title = Title(unit);
-            if (!title.EndsWith("A scene", StringComparison.Ordinal)) return title;
-            var lines = unit.Script.Instructions.Where(i => i.Operation is "print" or "printEgo").Select(i => (i.Offset, Text: SpokenText().Match(i.Operands)))
+            if (!title.EndsWith("An unnamed scene", StringComparison.Ordinal)) return title;
+            // Lines a character speaks; not the game's own screen text (print 0xFE/0xFF: the hint line's "Desde Canada, 1-800-...").
+            var lines = unit.Script.Instructions.Where(i => i.Operation == "printEgo" || i.Operation == "print" && !i.Operands.StartsWith("0xFE", StringComparison.Ordinal) &&
+                                                            !i.Operands.StartsWith("0xFF", StringComparison.Ordinal))
+                .Select(i => (i.Offset, Text: SpokenText().Match(i.Operands)))
                 .Where(l => l.Text.Success && l.Text.Groups[1].Value.Trim().Length > 2).ToList();
             var near = lines.LastOrDefault(l => l.Offset < offset);
             if (near.Text is null) near = lines.FirstOrDefault(l => l.Offset > offset);
@@ -153,7 +160,8 @@ public sealed partial class ScummStatusSchema
                     (flagWhere.TryGetValue(bit, out var where) ? where : flagWhere[bit] = []).Add($"{unit.Label} +0x{ins.Offset:X4}");
                 }
         return schema.With(flags: flags.OrderBy(f => f.Key, StringComparer.Ordinal)
-            .Select(f => new ScummStatusFlag(f.Key, f.Value.Select(u => Named(u.Unit, u.Offset)).Distinct().ToList(), flagWhere[f.Key])).ToList());
+            .Select(f => new ScummStatusFlag(f.Key, f.Value.Select(u => Named(u.Unit, u.Offset)).Distinct().ToList(), flagWhere[f.Key])
+            { Unnamed = f.Value.All(u => u.Unit.Room == 0 && Named(u.Unit, u.Offset) == "An unnamed scene") }).ToList());
     }
 
     private ScummStatusSchema With((string Variable, int Max, string Where)? health = null,

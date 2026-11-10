@@ -33,6 +33,34 @@ public sealed class Indy3GameStatusTests(ITestOutputHelper output)
         Assert.True(schema.Flags.Count > 30, $"{schema.Flags.Count} flags");
     }
 
+    [Theory]
+    [InlineData("indy3 vga es")]
+    [InlineData("indy3 ega en")]
+    public void ItemsCarryTheirPickupNamesAndTheStartsFlagsAreUnnamed(string folder)
+    {
+        // 10 November 2026 (user report on the Spanish 256-colour copy: English item names, "uniform", "A scene" checked): where each name comes from.
+        var path = Path.Combine(TestGames.Root, folder);
+        if (!Directory.Exists(path)) return;
+        var game = new GameFolderScanner().Scan(path);
+        var session = ScummGameSession.BootForPlay(game, out _);
+        ScummCutscenePlanner.IntoControl(session);
+        var data = ScummDataSources.For(game);
+        var names = game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).Distinct()
+            .SelectMany(r => data.ReadRoom(r).ObjectNames.Select(n => (Room: r, n.Key, Name: ScummTextDecoder.DecodeGlyphs(n.Value).TrimEnd('\0', '@', ' ')))).ToList();
+        foreach (var item in session.CaptureInventoryStatus().Catalog)
+            output.WriteLine($"item {item.ObjectId} \"{item.Name}\" room {item.SourceRoomId}: {item.Evidence}; names {string.Join(", ", names.Where(n => n.Key == item.ObjectId).Select(n => $"{n.Room}:{n.Name}"))}");
+        var schema = ScummStatusSchema.Read(game, ScummCutscenePlanner.VerbsOf(session));
+        foreach (var flag in schema.Flags.Where(f => f.Titles.Any(t => t.EndsWith("An unnamed scene", StringComparison.Ordinal))))
+            output.WriteLine($"flag {flag.Bit} set {session.StatusBit(flag.Bit)} unnamed {flag.Unnamed}: {string.Join(" / ", flag.Titles)} at {string.Join("; ", flag.Where)}");
+        // The books of Room 17 carry the names their pickup gives them (the Spanish copy's "tomo": "libro mapas", "manual", "Mein Kampf").
+        var books = session.CaptureInventoryStatus().Catalog.Where(c => c.ObjectId is 239 or 240 or 241).ToList();
+        Assert.Equal(3, books.Count);
+        Assert.All(books, book => Assert.True(book.Renamed, book.Name));
+        Assert.Equal(3, books.Select(b => b.Name).Distinct().Count());
+        // The game's start (Script 118) sets bits 5D5 to 5D7: no scene names them.
+        Assert.All(schema.Flags.Where(f => f.Bit is "bit[0x5D5]" or "bit[0x5D6]" or "bit[0x5D7]"), flag => Assert.True(flag.Unnamed, flag.Bit));
+    }
+
     [Fact]
     public void IndyIsTheOnlyRecipientAndTheCatalogAndChoicesApply()
     {

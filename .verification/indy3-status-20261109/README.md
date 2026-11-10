@@ -18,3 +18,13 @@ User: "Would it make sense to add Game Status to Indiana Jones and the Last Crus
 - Window (`window/`, WindowCheck step `GS`): Room 13, Game Status: Inventory (Indy's, no recipient choices), Indy (health 1000 of 1000; "Indy's own clothes: no outfit held yet"), IQ points (0 of 775), Story. Maniac Mansion's Game Status unchanged but in an Inventory tab (`window-maniac/`).
 
 The fist fights did not quite work (user, 9 November); the health value is the one they use.
+
+## User report, 10 November 2026 (Indy 3 256 colours, Spanish)
+
+| Report | Finding | Result |
+|---|---|---|
+| "Why is there a mix of Spanish and English Items?" | The Spanish copy's own data names arm, Grail, tickets, uniform, whip, wrench and "IndyWear by Lucasfilm" in English, in every room that holds them, and no script renames them (only "arm" becomes "hook"), so the game shows the same names. Some items are renamed by the pickup itself (`setObjectName`): Room 17's three "tomo" become "libro mapas", "manual" and "Mein Kampf". | The catalog takes the name the pickup's own code gives an item, and a grant gives it too (Undo takes it back); a rename elsewhere (the package becomes the Grail diary when opened) is not used. |
+| "What is the 'uniform' -there is already 'traje gris'. Uniform does not appear in Indy clothes to change." | Object 357, "uniform" in the Spanish data too: picked up from Room 24's closet (object 350); used in Room 27 (object 407) it is taken away and Indy has the grey uniform (406, "traje gris"), which is the outfit he wears. A real item, not an outfit. | No change. |
+| "What are 'A scene' all equal and premarked?" | Bits 5D5 to 5D7, set by Script 118 at the game's start; no object or entry runs it, so no scene names them. | A flag only unnamed code sets that is already set at the start is left out of Story; the other unnamed ones read "Room NN · An unnamed scene", or the line a character speaks nearest (not the game's screen text, such as the hint line's phone number). |
+
+Tests: `Indy3GameStatusTests.ItemsCarryTheirPickupNamesAndTheStartsFlagsAreUnnamed` (EGA English and 256-colour Spanish). Window: `window-vga-es/`.

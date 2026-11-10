@@ -15,6 +15,8 @@ public sealed record ScummInventoryItemContext(int ActorId, string? Text, string
 public sealed record ScummInventoryCatalogItem(int ObjectId, int SourceRoomId, string? Name, string Evidence)
 {
     public ScummInventoryItemContext? Context { get; init; }
+    /// <summary>The name is the one the pickup gives the object (version 3 <c>setObjectName</c>); a grant gives it too.</summary>
+    public bool Renamed { get; init; }
 }
 public sealed record ScummInventoryEditResult(bool Applied, string? Refusal, ScummInventoryUndoToken? Undo);
 
@@ -60,6 +62,8 @@ internal sealed record ScummInventoryOriginal(int ObjectId, byte? Owner, byte? S
 {
     /// <summary>The object's classes before the edit (a version 3 grant makes it untouchable), or null when it had none.</summary>
     public uint? Classes { get; init; }
+    /// <summary>The object's renamed name before the edit (a version 3 grant may give the pickup's name), or null when it had none.</summary>
+    public byte[]? NameOverride { get; init; }
 }
 
 public abstract partial class ScummSession
@@ -142,7 +146,11 @@ public abstract partial class ScummSession
                 if (original.Room is int room) _runtime.InventoryRooms[id] = room; else _runtime.InventoryRooms.Remove(id);
                 if (original.Preposition is byte prep) _inventoryObjectPrepositions[id] = prep; else _inventoryObjectPrepositions.Remove(id);
                 if (original.Slot < 0) _runtime.RemoveFromInventorySlots(id);
-                if (IsV3Inventory) _runtime.SetObjectClasses(id, original.Classes ?? 0);
+                if (IsV3Inventory)
+                {
+                    _runtime.SetObjectClasses(id, original.Classes ?? 0);
+                    if (original.NameOverride is { } name) _runtime.ObjectNameOverrides[id] = name; else _runtime.ObjectNameOverrides.Remove(id);
+                }
             }
             if (IsV3Inventory) RunInventoryScript();
         }
