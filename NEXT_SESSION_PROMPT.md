@@ -28,4 +28,4 @@ Harness notes for these: `Measure` with `MEASURE_SCRIPTS=1`, `MEASURE_TRIALS=1`,
 
 How to work (user, 31 October): batch small fixes; focused tests while fixing, then one all-games measurement, one full suite and one commit per batch. Keep the README's readiness table (percentages) in step when a measured number changes.
 
-Open questions for the user (ask once, in passing): the decisions 2, 4 and 5 in ROADMAP's "Your checks", the retests, which LOOM room showed the flying sheep, and whether REQUIREMENTS.md becomes a short list of rules with the present file kept as the detailed reference (audit, Documents).
+Open questions for the user (ask once, in passing): the decisions 2, 4 and 5 in ROADMAP's "Your checks", the retests and which LOOM room showed the flying sheep. `docs/REQUIREMENTS.md` is short since 10 November: add a new rule there in one or two sentences; do not grow the frozen detailed reference in `docs/archive/`.

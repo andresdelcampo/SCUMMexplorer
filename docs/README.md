@@ -19,7 +19,7 @@ The root holds four files: this index, [ROADMAP](ROADMAP.md), [REQUIREMENTS](REQ
 ## Project references
 
 - [Roadmap](ROADMAP.md): the one current-state document: scope, readiness, the ten features per game, what is open, the work in order, the checks only the user can do, the rules.
-- [Requirements](REQUIREMENTS.md): what the app must do, tagged by engine, version, game and edition scope.
+- [Requirements](REQUIREMENTS.md): what the app must do, the user's rules in short. The full wording of every id (captions, implementation names, the rows describing the code) is frozen in [the detailed reference of 10 November](archive/REQUIREMENTS_DETAIL_2026-11-10.md).
 - [Templates](templates/README.md): the fixed formats for a game's README, tracker, script map and evidence record.
 - [Boot sequence by version](engine/SCUMM_BOOT_SEQUENCE.md): how each SCUMM version starts.
 - Per-game folders (`loom/`, `indy3/`, `monkey1/`, `monkey2/`, `indy4/`, `maniac/`, `zak/`): README, SUPPORT_STATUS and `<GAME>_SCRIPT_MAP.md` in the same format (see the instructions, section 7).

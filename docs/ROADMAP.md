@@ -4,7 +4,7 @@ The one current-state document: the scope, how ready each game is, the ten featu
 
 ## Scope
 
-REQUIREMENTS R-1.14 and §8.6 (user, 31 October 2026): an explorer. Pick any room and trigger any of its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; the game's rules never forbid a pick. Playing through the game's own interface stays as it is and comes last.
+REQUIREMENTS R-1.14 and §7 (user, 31 October 2026): an explorer. Pick any room and trigger any of its interactions and cutscenes at any time, without playing to them; teleports and magic costume changes are fine; nothing is saved or loaded; the game's rules never forbid a pick. Playing through the game's own interface stays as it is and comes last.
 
 ## Readiness
 
@@ -25,11 +25,11 @@ Architecture ([audit, 10 November](archive/AUDIT_2026-11-10.md)): the engine (`C
 | 2 | **Costumes** | Every costume is read and shown in the game's palette. |
 | 3 | **Sounds** | Music, effects and CD tracks play on the game's sound devices; the user has listened. |
 | 4 | **Scripts available** | Every script can be opened. |
-| 5 | **Cutscenes** | Every cutscene of a room plays from that room when picked, and the game's intro through Play Game Intro (§8.6, R-8.35). |
+| 5 | **Cutscenes** | Every cutscene of a room plays from that room when picked, and the game's intro through Play Game Intro (R-8.35). |
 | 6 | **Interactions** | Interact offers every object of the room, present or not yet, with every verb that has code, and plays it (R-8.38). |
 | 7 | **Room sounds** | The room's Sounds button plays the sounds and music its scripts use (R-6.40). |
 | 8 | **Hotspots, doorways, paths, depth** | Overlays, walk boxes and depth masks right for the room. |
-| 9 | **Game state** | A Status window (§12). Parked for Indy 3, Monkey Island 1 and 2, Indy 4: a picked scene sets what it needs. |
+| 9 | **Game state** | A Status window (REQUIREMENTS §8). Parked for Indy 3, Monkey Island 1 and 2, Indy 4: a picked scene sets what it needs. |
 | 10 | **Readable scripts** | Scripts read as plain language with names for the game's variables, verbs and objects. |
 
 ✅ done · 🟡 works, partial or not checked by the user · 🔴 known gap · — parked.
@@ -216,7 +216,7 @@ Decisions 1, 3 and 6 were answered by the scope decision of 31 October (REQUIREM
 ## Product rules
 
 - Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state.
-- A scene or interaction the user picks may get the state its own code tests (teleport, costume, items, flags, an object brought into the room), derived generically from its scripts and listed in Advanced (R-1.9, §8.6). Rooms' first visits and Play never force anything. No room-specific engine hacks; label estimates and picker assumptions.
+- A scene or interaction the user picks may get the state its own code tests (teleport, costume, items, flags, an object brought into the room), derived generically from its scripts and listed in Advanced (R-1.9, R-8.36). Rooms' first visits and Play never force anything. No room-specific engine hacks; label estimates and picker assumptions.
 - Normal mode shows artwork, game text and concise controls; technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches.
 - Source execution, prepared checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, prerequisites or timing.
 - Compatibility checks cover plausible version differences for the changed feature; reuse the [edition analysis](../.verification/editions-20261005/README.md). English Roland stays the LOOM reference.

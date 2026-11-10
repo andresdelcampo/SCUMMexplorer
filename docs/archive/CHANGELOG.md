@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 10 November: REQUIREMENTS is the rules, short
+
+REQUIREMENTS.md went from 191,000 characters to 18,700: the user's rules, one or two sentences each, with the ids the code cites, grouped by what the app shows (rooms, room controls, Interact, cutscenes, Game Status, sound). The full document as it stood (exact captions, implementation names, the 106 rows describing the code, the 17 Play proposals) is frozen as [REQUIREMENTS_DETAIL_2026-11-10.md](REQUIREMENTS_DETAIL_2026-11-10.md), not maintained. The generated support matrix stays in REQUIREMENTS.md.
+
 ## 10 November: project audit; the roadmap's way to a release
 
 An audit of the code and the documents ([record](AUDIT_2026-11-10.md)): the engine layer names a game in one place and Game Status has the right generic/specific split; the odd pictures come from the window's per-game state being reset field by field (Indy in Maniac Mansion) and from scene setups being scored by "begun, rooms, lines" and never by the picture (Indy 3 Room 82's Give Grail keeps a side branch over the ending). The roadmap's work list is now six steps, each with what ends it. LOOM's derived scene starts are emptied when a LOOM copy opens (`_startSetups` was never cleared). The Maniac Mansion and Zak McKracken handoff of 23 October is archived; those games follow the roadmap.

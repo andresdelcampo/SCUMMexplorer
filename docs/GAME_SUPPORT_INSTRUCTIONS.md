@@ -26,7 +26,7 @@ How work on a game is done, the same for every game: the rules, what "done" prod
 
 ## 3. Reference
 
-- **Family**: a `GameFamily` (one row of `GameSupport.Families`, the matrix of REQUIREMENTS §3.1, generated; regenerate with `SCUMM_UPDATE_SUPPORT_MATRIX=1`). **Fixture**: the local game folder its tests use; a family without one cannot raise a level.
+- **Family**: a `GameFamily` (one row of `GameSupport.Families`, the matrix of REQUIREMENTS §3, generated; regenerate with `SCUMM_UPDATE_SUPPORT_MATRIX=1`). **Fixture**: the local game folder its tests use; a family without one cannot raise a level.
 - **ScummVM** `engines/scumm` source (GitHub, `raw.githubusercontent.com`) is the ground truth for engine behaviour; the bundled build in `D:\Juegos\scummvm` for runtime comparison. Read the source before porting behaviour, and note the date in the record.
 
 | Feature | ScummVM files |

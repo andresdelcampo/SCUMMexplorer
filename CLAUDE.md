@@ -26,7 +26,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 
 ## Requirements and scope tags
 
-`docs/REQUIREMENTS.md` is the list of what the app must do (scope tags, code homes, the Normal vs Advanced rule and the requirement-vs-implementation rule are defined there, in section 0); `docs/archive/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Keep requirement rules in that document, not here. A requirement's tag states how wide the requirement is; put the code in the lowest layer that is true for the code.
+`docs/REQUIREMENTS.md` is the short list of what the app must do: the user's rules, one or two sentences each, with the scope tags and the Normal vs Advanced rule (R-1.13). The full wording of every cited id is frozen in `docs/archive/REQUIREMENTS_DETAIL_2026-11-10.md` (not maintained); `docs/archive/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Keep requirement rules in that document, not here. A requirement's tag states how wide the requirement is; put the code in the lowest layer that is true for the code.
 
 ## Build and test
 
@@ -59,7 +59,7 @@ All shell and child commands must use RTK, including PowerShell; the global RTK.
 
 - Tie every exit, action, state change, cue, scene or secret to the resource, script and instruction that support it.
 - A decoded branch or room load is a **possible** outcome. Calling a verb directly is an **exploration action**. A partial session is a **state preview**. Label estimates as estimates.
-- Do not add room-specific engine/renderer hacks or invent states in first visits or Play. Since 31 October (REQUIREMENTS R-1.14, §8.6) a scene or interaction the user picks may get the state its own code tests (teleport, costume, items, flags), derived generically from its scripts and listed in Advanced; playing through the game's own interface is the lowest priority. On 8 October the user approved direct late-room catalog starts running reviewed actual source prerequisites when missing, while preserving later state. The fingerprinted English Room 46 recipe implements this exception; operands remain in source-reviewed recipe data. The user's product rules are:
+- Do not add room-specific engine/renderer hacks or invent states in first visits or Play. Since 31 October (REQUIREMENTS R-1.14, R-1.9, §7) a scene or interaction the user picks may get the state its own code tests (teleport, costume, items, flags), derived generically from its scripts and listed in Advanced; playing through the game's own interface is the lowest priority. On 8 October the user approved direct late-room catalog starts running reviewed actual source prerequisites when missing, while preserving later state. The fingerprinted English Room 46 recipe implements this exception; operands remain in source-reviewed recipe data. The user's product rules are:
   - Rooms should show no gaps and should show their first-visit state. When in doubt, pick at random and label the pick.
   - Objects respond as in the game, with Bobbin on screen (decided 28 September). A single click walks Bobbin to the object and uses it (scripts 005–007, verb 0x38; exits lead on). A double click also looks at it (verb 0x36: the description). Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture such as Alt+click. Hiding an object is allowed only if the background behind it has no gap.
   - Room hotspots navigate between rooms.
