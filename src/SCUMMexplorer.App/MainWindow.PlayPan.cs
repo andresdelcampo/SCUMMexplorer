@@ -13,13 +13,13 @@ public partial class MainWindow
 
     private bool PlayPanCan(int direction)
     {
-        if (_play is not { } play || play.CameraPanRange is not { } range || play.CameraX is not int x || play.InCutscene) return false;
+        if (_ctx.Play is not { } play || play.CameraPanRange is not { } range || play.CameraX is not int x || play.InCutscene) return false;
         return direction < 0 ? x > range.Min : x < range.Max;
     }
 
     private void PlayPanBy(double sourcePixels)
     {
-        if (_play is not { } play) return;
+        if (_ctx.Play is not { } play) return;
         if (play.InCutscene) { StopRoomPan(); return; }
         play.PanCameraBy((int)Math.Round(sourcePixels));
         UpdatePlayScrollButtons();
@@ -32,7 +32,7 @@ public partial class MainWindow
     private void UpdatePlayScrollButtons()
     {
         // Not playing yet (a picked room being prepared): the row keeps its place in framed mode, so the screen does not shrink when play starts.
-        if (!PlayActive || _play is not { } play) { PlayScrollButtonsPanel.Visibility = ScrollRowWhenIdle; return; }
+        if (!PlayActive || _ctx.Play is not { } play) { PlayScrollButtonsPanel.Visibility = ScrollRowWhenIdle; return; }
         var framed = NormalRoomWidthToggle.IsChecked == true;
         var canScroll = framed && play.CameraPanRange is { } range && range.Max - range.Min > 0 && !play.InCutscene;
         PlayScrollButtonsPanel.Visibility = canScroll ? Visibility.Visible : framed ? Visibility.Hidden : Visibility.Collapsed;

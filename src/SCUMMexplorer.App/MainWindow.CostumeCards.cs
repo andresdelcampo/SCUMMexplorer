@@ -9,7 +9,6 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow
 {
-    private CancellationTokenSource? _costumeCardCancellation;
     private bool _showCostumeCards;
 
     /// <summary>The Costumes tab and the Costumes/Sounds/Scripts groups: every game whose format the explorer reads (v1 to v3 room files, v4 and v5 archives), not a list of games.</summary>
@@ -23,8 +22,8 @@ public partial class MainWindow
 
     private void UpdateNormalCatalog(bool advanced)
     {
-        bool visible = _game is not null && !advanced;
-        bool costumes = HasCostumeCards(_game);
+        bool visible = _ctx.Game is not null && !advanced;
+        bool costumes = HasCostumeCards(_ctx.Game);
         NormalCatalogTabs.Visibility = visible && costumes ? Visibility.Visible : Visibility.Collapsed;
         if (!costumes) _showCostumeCards = false;
         RoomsTab.IsChecked = !_showCostumeCards;
@@ -35,8 +34,8 @@ public partial class MainWindow
 
     private void PopulateCostumeCards(GameLibrary game)
     {
-        _costumeCardCancellation?.Cancel();
-        var cancellation = _costumeCardCancellation = new CancellationTokenSource();
+        _ctx.CostumeCardCancellation?.Cancel();
+        var cancellation = _ctx.CostumeCardCancellation = new CancellationTokenSource();
         _showCostumeCards = false;
         CostumeCardList.Children.Clear();
         if (!HasCostumeCards(game)) return;
@@ -119,7 +118,7 @@ public partial class MainWindow
                 // .verification/archive/costume-leftovers-20261003. Normal mode hides such cards; Advanced lists them in the tree.
                 noData = ex is InvalidDataException or FileNotFoundException;
             }
-            if (token.IsCancellationRequested || !ReferenceEquals(_game, game)) return;
+            if (token.IsCancellationRequested || !ReferenceEquals(_ctx.Game, game)) return;
             var card = CostumeCardList.Children.OfType<Button>().Single(c => Equals(c.Tag, resource));
             if (noData) { CostumeCardList.Children.Remove(card); continue; }
             if (bitmap is not null)

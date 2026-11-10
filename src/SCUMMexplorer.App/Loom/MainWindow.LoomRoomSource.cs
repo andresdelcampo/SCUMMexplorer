@@ -18,18 +18,18 @@ public partial class MainWindow
             await w.PrepareRoomArtworkAsync(game, token);
             if (cancelled()) return null;
             LoomCdScene? cdScene = null;
-            if (w._session is null)
+            if (w._ctx.Session is null)
             {
                 try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(game, resource.ResourceId!.Value), token); }
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
             var browsedScene = await FirstVisitAsync(game, resource, token);
             if (cancelled()) return null;
-            w._browsedScene = browsedScene;
+            w._ctx.BrowsedScene = browsedScene;
             var room = browsedScene?.Room ?? cdScene?.Room ?? await Task.Run(() => game.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token);
-            var cdRoom = w._session is not null && w._cdData is not null ? await Task.Run(() => w._cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
+            var cdRoom = w._ctx.Session is not null && w._ctx.CdData is not null ? await Task.Run(() => w._ctx.CdData.ReadRoom(resource.ResourceId!.Value), token) : null;
             if (cancelled()) return null;
-            w._cdScene = cdScene;
+            w._ctx.CdScene = cdScene;
             return new(Kind, room, [], cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes, cdScene, browsedScene, null, cdRoom, null, Live: cdRoom is not null);
         }
     }

@@ -25,7 +25,7 @@ public partial class MainWindow
     private void RefreshRoomControls()
     {
         var provider = CurrentRoomControls;
-        var state = provider.ReadState(_currentRoomResource?.ResourceId, IsAdvancedMode);
+        var state = provider.ReadState(_ctx.CurrentRoomResource?.ResourceId, IsAdvancedMode);
         ApplyTransport(state.Transport);
         // In a played game's room the bar keeps its row while it is not shown (a picked room being prepared), so the screen above does not shrink when
         // it comes back (user report, 2 November 2026: rooms changed size a second after they showed).
@@ -146,7 +146,7 @@ public partial class MainWindow
 
     private void ShowRoomCutsceneMenu()
     {
-        var state = CurrentRoomControls.ReadState(_currentRoomResource?.ResourceId, IsAdvancedMode);
+        var state = CurrentRoomControls.ReadState(_ctx.CurrentRoomResource?.ResourceId, IsAdvancedMode);
         if (!state.RoomCutsceneEnabled) return;
         var items = state.RoomCutscenes;
         if (items.Count == 1) items[0].Start?.Invoke();

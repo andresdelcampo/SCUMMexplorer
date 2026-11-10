@@ -14,7 +14,6 @@ public partial class MainWindow
     private IGameVoice? _loomVoiceInstance;
     private IGameVoice LoomVoice => _loomVoiceInstance ??= new LoomCdVoice(this);
 
-    private IReadOnlyList<LoomCdCue> _cdRoomCues = [];
 
     private sealed class LoomCdVoice(MainWindow w) : IGameVoice
     {
@@ -29,7 +28,7 @@ public partial class MainWindow
 
         public bool Attach(LoomExplorationSession session)
         {
-            if (w._game?.V4Archive is not { } vga) return false;
+            if (w._ctx.Game?.V4Archive is not { } vga) return false;
             w._cdVoice.Attach(vga.Disc, session);
             return true;
         }
@@ -38,12 +37,12 @@ public partial class MainWindow
     /// <summary>The CD game's Sounds list: the disc's audio the room's own scripts ask for (music or narration first, then the spoken lines), played on demand.</summary>
     private bool UpdateCdRoomSounds(GameResource? room)
     {
-        if (_game?.Id != GameId.LoomVga) return false;
-        if (_game.V4Archive?.Disc is not null && room is { ResourceId: int cdRoomId })
+        if (_ctx.Game?.Id != GameId.LoomVga) return false;
+        if (_ctx.Game.V4Archive?.Disc is not null && room is { ResourceId: int cdRoomId })
         {
-            try { _cdRoomCues = LoomCdCueIndex.ScanRoom(_cdData ?? ScummDataSources.For(_game), cdRoomId).OrderByDescending(cue => cue.IsMusicOrNarration).ThenBy(cue => cue.Cue.Offset).ToArray(); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException) { _cdRoomCues = []; }
-            RoomSoundsButton.Visibility = _cdRoomCues.Count > 0 && _cdVoice.Enabled ? Visibility.Visible : Visibility.Collapsed;
+            try { _ctx.CdRoomCues = LoomCdCueIndex.ScanRoom(_ctx.CdData ?? ScummDataSources.For(_ctx.Game), cdRoomId).OrderByDescending(cue => cue.IsMusicOrNarration).ThenBy(cue => cue.Cue.Offset).ToArray(); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException) { _ctx.CdRoomCues = []; }
+            RoomSoundsButton.Visibility = _ctx.CdRoomCues.Count > 0 && _cdVoice.Enabled ? Visibility.Visible : Visibility.Collapsed;
         }
         return true;
     }

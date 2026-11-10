@@ -9,18 +9,13 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow
 {
-    private GameLibrary? _genericSoundGame;
-    private int? _genericSoundRoom;
-    private int _genericSoundEventCount = -1;
-    private Dictionary<int, string> _genericSoundCandidates = [];
-    private Task _genericRoomSoundsTask = Task.CompletedTask;
 
     /// <summary>Changing a CD device must not hide an unrelated room's cached sound list.</summary>
     private void RefreshRoomSoundsVisibility()
     {
         var available = CurrentModule.Voice.ReplacesSceneSound
-            ? _cdRoomCues.Count > 0 && CurrentModule.VoicesEnabled
-            : _roomSoundChoices.Count > 0;
+            ? _ctx.CdRoomCues.Count > 0 && CurrentModule.VoicesEnabled
+            : _ctx.RoomSoundChoices.Count > 0;
         RoomSoundsButton.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -29,46 +24,46 @@ public partial class MainWindow
     {
         ++_cutsceneLaunchGeneration;
         ++_roomMusicUpdateGeneration;
-        _previewCancellation?.Cancel();
+        _ctx.PreviewCancellation?.Cancel();
         StopPlay();
         StopScenePlayback();
         StopAudio();
         _sceneSound.Detach();
         CurrentModule.Voice.Detach();
         _playSpeech.Detach();
-        _session = null;
-        _idleSession = null;
-        _idleSignature = null;
-        _roomMusicActionsRoom = null;
-        _roomSoundChoices = [];
-        _cdRoomCues = [];
-        _genericSoundGame = null;
-        _genericSoundRoom = null;
-        _genericSoundEventCount = -1;
-        _genericSoundCandidates = [];
+        _ctx.Session = null;
+        _ctx.IdleSession = null;
+        _ctx.IdleSignature = null;
+        _ctx.RoomMusicActionsRoom = null;
+        _ctx.RoomSoundChoices = [];
+        _ctx.CdRoomCues = [];
+        _ctx.GenericSoundGame = null;
+        _ctx.GenericSoundRoom = null;
+        _ctx.GenericSoundEventCount = -1;
+        _ctx.GenericSoundCandidates = [];
         RoomSoundsButton.Visibility = RoomMusicPanel.Visibility = Visibility.Collapsed;
     }
 
     /// <summary>Uses the same native data source as Play for all non-LOOM room sound lists.</summary>
     private bool TryUpdateGenericRoomSounds()
     {
-        if (_game is not { } game || game.Id is GameId.Loom or GameId.LoomVga) return false;
-        if (_currentRoomResource?.ResourceId is not int roomId)
+        if (_ctx.Game is not { } game || game.Id is GameId.Loom or GameId.LoomVga) return false;
+        if (_ctx.CurrentRoomResource?.ResourceId is not int roomId)
         {
             RoomSoundsButton.Visibility = Visibility.Collapsed;
             return true;
         }
         RoomMusicPanel.Visibility = Visibility.Collapsed;
-        if (!ReferenceEquals(_genericSoundGame, game) || _genericSoundRoom != roomId)
+        if (!ReferenceEquals(_ctx.GenericSoundGame, game) || _ctx.GenericSoundRoom != roomId)
         {
-            _genericSoundGame = game;
-            _genericSoundRoom = roomId;
-            _genericSoundEventCount = -1;
-            _genericSoundCandidates = [];
-            _roomSoundChoices = [];
+            _ctx.GenericSoundGame = game;
+            _ctx.GenericSoundRoom = roomId;
+            _ctx.GenericSoundEventCount = -1;
+            _ctx.GenericSoundCandidates = [];
+            _ctx.RoomSoundChoices = [];
             RoomSoundsButton.Visibility = Visibility.Collapsed;
             var generation = ++_roomMusicUpdateGeneration;
-            _genericRoomSoundsTask = LoadGenericRoomSoundsAsync(game, roomId, generation);
+            _ctx.GenericRoomSoundsTask = LoadGenericRoomSoundsAsync(game, roomId, generation);
         }
         PublishGenericRoomSounds(game, roomId);
         return true;
@@ -87,19 +82,19 @@ public partial class MainWindow
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or UnauthorizedAccessException)
         { candidates = []; }
-        if (generation != _roomMusicUpdateGeneration || !ReferenceEquals(game, _game) || _currentRoomResource?.ResourceId != roomId) return;
-        _genericSoundCandidates = candidates;
-        _genericSoundEventCount = -1;
+        if (generation != _roomMusicUpdateGeneration || !ReferenceEquals(game, _ctx.Game) || _ctx.CurrentRoomResource?.ResourceId != roomId) return;
+        _ctx.GenericSoundCandidates = candidates;
+        _ctx.GenericSoundEventCount = -1;
         PublishGenericRoomSounds(game, roomId);
     }
 
     private void PublishGenericRoomSounds(GameLibrary game, int roomId)
     {
-        var session = _playFolder == game.Key && _play?.CurrentRoomId == roomId ? _play : null;
+        var session = _ctx.PlayFolder == game.Key && _ctx.Play?.CurrentRoomId == roomId ? _ctx.Play : null;
         var count = session?.SoundEvents.Count ?? 0;
-        if (_genericSoundEventCount == count) return;
-        _genericSoundEventCount = count;
-        var candidates = new Dictionary<int, string>(_genericSoundCandidates);
+        if (_ctx.GenericSoundEventCount == count) return;
+        _ctx.GenericSoundEventCount = count;
+        var candidates = new Dictionary<int, string>(_ctx.GenericSoundCandidates);
         foreach (var item in session?.SoundEvents ?? [])
             if ((item.RoomId == roomId || item.OriginRoomId == roomId) &&
                 item.Event.Kind is ScummScriptEventKind.SoundStarted or ScummScriptEventKind.MusicStarted && item.Event.TargetId is int id)
@@ -115,9 +110,9 @@ public partial class MainWindow
         if (ScummProfile.For(game).PlaysThroughVerbs)
             foreach (var id in candidates.Keys.Where(id => !sounds.ContainsKey(id)))
                 sounds[id] = new GameResource($"Sound {id:00}", ResourceKind.Sound, game.FolderPath, id, "A sound this room's scripts may start.", null, null);
-        _roomSoundChoices = candidates.Where(c => sounds.ContainsKey(c.Key)).OrderBy(c => c.Key)
+        _ctx.RoomSoundChoices = candidates.Where(c => sounds.ContainsKey(c.Key)).OrderBy(c => c.Key)
             .Select(c => (sounds[c.Key], cd?.Plays(c.Key) == true, (TimeSpan?)null, c.Value)).ToList();
-        RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        RoomSoundsButton.Visibility = _ctx.RoomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         UpdateSoundDeviceControls();
     }
 
@@ -191,7 +186,7 @@ public partial class MainWindow
     private async Task AuditionGenericRoomSoundAsync(GameLibrary game,
         (GameResource Resource, bool Music, TimeSpan? Duration, string Evidence) choice, ScummCdAudioTracks? cd)
     {
-        if (!ReferenceEquals(_game, game) || SoundDeviceLocked) return;
+        if (!ReferenceEquals(_ctx.Game, game) || SoundDeviceLocked) return;
         if (cd?.Plays(choice.Resource.ResourceId!.Value) != true)
         {
             await AuditionRoomSoundAsync(choice);
@@ -201,21 +196,21 @@ public partial class MainWindow
         _sceneSound.StopAll("a sound was picked from the room's sound list");
         StopAudio();
         SelectRoomCue(choice.Resource, choice.Evidence, false, true);
-        _audioSurface = AudioSurface.Room;
-        _audioCancellation = new CancellationTokenSource();
-        var token = _audioCancellation.Token;
+        _ctx.AudioSurface = AudioSurface.Room;
+        _ctx.AudioCancellation = new CancellationTokenSource();
+        var token = _ctx.AudioCancellation.Token;
         try
         {
             var wave = await Task.Run(() => cd.ReadWave(choice.Resource.ResourceId.Value), token);
-            if (token.IsCancellationRequested || !ReferenceEquals(_game, game) || wave.Length <= 44) return;
+            if (token.IsCancellationRequested || !ReferenceEquals(_ctx.Game, game) || wave.Length <= 44) return;
             var file = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(file, wave, token);
-            if (token.IsCancellationRequested || !ReferenceEquals(_game, game)) { File.Delete(file); return; }
-            _audioFile = file;
-            _playWhenReady = true;
-            _audioKnownDuration = TimeSpan.FromSeconds((wave.Length - 44) / (double)BitConverter.ToInt32(wave, 28));
+            if (token.IsCancellationRequested || !ReferenceEquals(_ctx.Game, game)) { File.Delete(file); return; }
+            _ctx.AudioFile = file;
+            _ctx.PlayWhenReady = true;
+            _ctx.AudioKnownDuration = TimeSpan.FromSeconds((wave.Length - 44) / (double)BitConverter.ToInt32(wave, 28));
             _audioPlayer.Open(new Uri(file));
-            _audioReady = true;
+            _ctx.AudioReady = true;
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException)

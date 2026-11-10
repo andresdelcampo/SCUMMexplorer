@@ -95,7 +95,7 @@ public sealed class ScummV1ActorColors
 
     /// <summary>The colours of a classic v1 game, read once per folder; null for any other game.</summary>
     public static ScummV1ActorColors? For(GameLibrary game) =>
-        game.V1Game is null ? null : Cache.GetOrAdd(game.FolderPath, _ => Read(game));
+        game.V1Game is null ? null : Cache.GetOrAdd(game.Key, _ => Read(game));
 
     /// <summary>Reads the scripts of a classic v1 game folder.</summary>
     public static ScummV1ActorColors Read(GameLibrary game)

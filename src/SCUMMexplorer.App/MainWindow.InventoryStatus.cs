@@ -7,33 +7,29 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow
 {
-    private ScummGameSession? _inventoryUndoSession;
-    private ScummInventoryUndoToken? _inventoryLastUndo;
-    private bool InventoryStatusAvailable => _game is { } game && PlayActive && _playFolder == game.Key &&
-        _play?.InventoryCharactersAvailable == true &&
+    private bool InventoryStatusAvailable => _ctx.Game is { } game && PlayActive && _ctx.PlayFolder == game.Key &&
+        _ctx.Play?.InventoryCharactersAvailable == true &&
         GameSupport.For(game)[SupportFeature.Status] != SupportLevel.None &&
         ScummProfile.For(game).EngineVersion is ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3;
 
-    /// <summary>The game's values beyond the inventory (Indy 3: health, outfit, IQ points, story flags), read once per opened game.</summary>
-    private (string Key, ScummStatusSchema Schema)? _statusSchema;
 
     private ScummStatusSchema? StatusSchema(ScummGameSession session)
     {
-        if (_game is not { } game || ScummProfile.For(game).EngineVersion != ScummVersion.V3) return null;
-        if (_statusSchema is { } kept && kept.Key == game.Key) return kept.Schema;
+        if (_ctx.Game is not { } game || ScummProfile.For(game).EngineVersion != ScummVersion.V3) return null;
+        if (_ctx.StatusSchema is { } kept && kept.Key == game.Key) return kept.Schema;
         var schema = ScummStatusSchema.Read(game, ScummCutscenePlanner.VerbsOf(session));
-        _statusSchema = (game.Key, schema);
+        _ctx.StatusSchema = (game.Key, schema);
         return schema;
     }
 
     private InventoryStatusWindow BuildInventoryStatusWindow()
     {
-        var session = _play ?? throw new InvalidOperationException("There is no live inventory session.");
-        var folder = _playFolder;
-        var dialog = new InventoryStatusWindow(session, () => ReferenceEquals(_play, session) && _playFolder == folder && _game?.Key == folder,
-            () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _game is { } game ? ManiacPreviewText.For(game) : null,
-            _game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2,
-            ReferenceEquals(_inventoryUndoSession, session) ? _inventoryLastUndo : null, StatusSchema(session))
+        var session = _ctx.Play ?? throw new InvalidOperationException("There is no live inventory session.");
+        var folder = _ctx.PlayFolder;
+        var dialog = new InventoryStatusWindow(session, () => ReferenceEquals(_ctx.Play, session) && _ctx.PlayFolder == folder && _ctx.Game?.Key == folder,
+            () => { ShowPlayFrame(); UpdatePlaybackControls(); }, IsAdvancedMode, _ctx.Game is { } game ? ManiacPreviewText.For(game) : null,
+            _ctx.Game is { } current ? (int)ScummProfile.For(current).EngineVersion : 2,
+            ReferenceEquals(_ctx.InventoryUndoSession, session) ? _ctx.InventoryLastUndo : null, StatusSchema(session))
         { Owner = this };
         dialog.Resources.MergedDictionaries.Add(Resources);
         return dialog;
@@ -41,26 +37,26 @@ public partial class MainWindow
 
     private void ShowInventoryStatus()
     {
-        var session = _play;
-        var timer = _playTimer;
+        var session = _ctx.Play;
+        var timer = _ctx.PlayTimer;
         var timerRunning = timer?.IsEnabled == true;
-        var wasPaused = _playPaused;
-        var soundWasPaused = _playSoundPaused;
-        timer?.Stop(); _playPaused = true;
+        var wasPaused = _ctx.PlayPaused;
+        var soundWasPaused = _ctx.PlaySoundPaused;
+        timer?.Stop(); _ctx.PlayPaused = true;
         if (!soundWasPaused) _sceneSound.Pause();
-        _playSoundPaused = true;
+        _ctx.PlaySoundPaused = true;
         try
         {
             var dialog = BuildInventoryStatusWindow();
             dialog.ShowDialog();
-            _inventoryUndoSession = session;
-            _inventoryLastUndo = dialog.LastUndo;
+            _ctx.InventoryUndoSession = session;
+            _ctx.InventoryLastUndo = dialog.LastUndo;
         }
         finally
         {
-            if (ReferenceEquals(_play, session) && ReferenceEquals(_playTimer, timer))
+            if (ReferenceEquals(_ctx.Play, session) && ReferenceEquals(_ctx.PlayTimer, timer))
             {
-                _playPaused = wasPaused; _playSoundPaused = soundWasPaused;
+                _ctx.PlayPaused = wasPaused; _ctx.PlaySoundPaused = soundWasPaused;
                 if (!soundWasPaused) _sceneSound.Resume();
                 if (timerRunning) timer?.Start();
                 ShowPlayFrame(); UpdatePlaybackControls();

@@ -17,7 +17,7 @@ public partial class MainWindow
     private bool SharedKeyDown(KeyEventArgs e)
     {
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
-        if (key == Key.F11 && _game is not null && RoomDisplayLayout.Visibility == Visibility.Visible)
+        if (key == Key.F11 && _ctx.Game is not null && RoomDisplayLayout.Visibility == Visibility.Visible)
         {
             e.Handled = true;
             SetFullscreen(!_fullscreen);

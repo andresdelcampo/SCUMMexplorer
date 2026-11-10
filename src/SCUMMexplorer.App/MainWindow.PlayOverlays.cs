@@ -14,97 +14,84 @@ namespace SCUMMexplorer.App;
 public partial class MainWindow
 {
     private readonly Canvas _playOverlayCanvas = new() { IsHitTestVisible = false, ClipToBounds = true, Visibility = Visibility.Collapsed };
-    private GameLibrary? _playOverlayGame;
-    private int? _playOverlayRoom;
-    private Dictionary<int, int[]> _playDoorwayTargets = [];
-    private (int X, int Y)? _playOverlayPointer;
-    private int? _playHighlightId;
-    private ScummRoomScene? _playOverlayScene;
-    private Dictionary<int, string> _playOverlayNames = [];
-    private Dictionary<int, int> _playOverlayLocalIndex = [];
-    private string? _playOverlayListKey;
-    private UIElement[] _playOverlayObjectRows = [];
-    private UIElement[] _playOverlayDoorwayRows = [];
 
     private void ClearPlayOverlays()
     {
         _playOverlayCanvas.Children.Clear();
         _playOverlayCanvas.Visibility = Visibility.Collapsed;
-        _playOverlayPointer = null;
-        _playOverlayHoverKey = null;
-        _playOverlayHotspots = [];
-        _playHighlightId = null;
-        _playOverlayScene = null;
-        _playOverlayListKey = null;
-        _playOverlayObjectRows = [];
-        _playOverlayDoorwayRows = [];
+        _ctx.PlayOverlayPointer = null;
+        _ctx.PlayOverlayHoverKey = null;
+        _ctx.PlayOverlayHotspots = [];
+        _ctx.PlayHighlightId = null;
+        _ctx.PlayOverlayScene = null;
+        _ctx.PlayOverlayListKey = null;
+        _ctx.PlayOverlayObjectRows = [];
+        _ctx.PlayOverlayDoorwayRows = [];
     }
 
     private void UpdatePlayOverlayHover((int X, int Y)? point)
     {
-        if (_playOverlayPointer == point) return;
-        _playOverlayPointer = point;
+        if (_ctx.PlayOverlayPointer == point) return;
+        _ctx.PlayOverlayPointer = point;
         if (IsAdvancedMode) LightHotspotRow(PlayHotspotAt(point)?.ObjectId);
         // R-6.48: a pointer move redraws only when what it points at changed (the hotspot under it, the doorways under it); the table is the one the last
         // redraw (every game frame) built, so a move does no scene capture, no hotspot derivation and no control writes.
         if (ObjectAreaMode != DisplayMode.Hover && DoorwayMode != DisplayMode.Hover) return;
         var key = PlayHoverKey(point);
-        if (key == _playOverlayHoverKey) return;
-        _playOverlayHoverKey = key;
+        if (key == _ctx.PlayOverlayHoverKey) return;
+        _ctx.PlayOverlayHoverKey = key;
         RefreshPlayOverlays();
     }
 
-    private string? _playOverlayHoverKey;
-    private IReadOnlyList<RoomHotspot> _playOverlayHotspots = [];
 
     /// <summary>What the pointer points at in the cached hotspot table: the strong box's object and the doorway objects under it ("" for neither).</summary>
     private string PlayHoverKey((int X, int Y)? point)
     {
-        if (point is not { } p || _playShown is not { } frame ||
+        if (point is not { } p || _ctx.PlayShown is not { } frame ||
             frame.Viewport.ToRoom(p.X, p.Y) is not { } at) return "";
-        return RoomHotspotRules.HoverKey(_playOverlayHotspots, at.X, at.Y, _playHighlightId is null && ObjectAreaMode != DisplayMode.Never, DoorwayMode == DisplayMode.Hover);
+        return RoomHotspotRules.HoverKey(_ctx.PlayOverlayHotspots, at.X, at.Y, _ctx.PlayHighlightId is null && ObjectAreaMode != DisplayMode.Never, DoorwayMode == DisplayMode.Hover);
     }
 
     /// <summary>Whether a present object of the room (a hotspot or a doorway) is under a native screen point.</summary>
     private bool PlayObjectAt((int X, int Y)? point)
     {
-        if (point is not { } p || _playShown is not { } frame) return false;
+        if (point is not { } p || _ctx.PlayShown is not { } frame) return false;
         if (frame.Viewport.ToRoom(p.X, p.Y) is not { } at) return false;
         // The scene as the game leaves it now (the overlays' copy is refreshed only while an aid is visible).
-        return _playScreen?.Scene() is { } scene && ScummRoomOverlays.Objects(scene, _playDoorwayTargets).Any(item => item.Contains(at.X, at.Y));
+        return _ctx.PlayScreen?.Scene() is { } scene && ScummRoomOverlays.Objects(scene, _ctx.PlayDoorwayTargets).Any(item => item.Contains(at.X, at.Y));
     }
 
     /// <summary>The listed hotspot under a native screen point, as the game's search would pick it (the same pick as LOOM's room picture).</summary>
     private RoomHotspot? PlayHotspotAt((int X, int Y)? point)
     {
-        if (point is not { } p || _playShown is not { } frame) return null;
+        if (point is not { } p || _ctx.PlayShown is not { } frame) return null;
         if (frame.Viewport.ToRoom(p.X, p.Y) is not { } at) return null;
         var provider = PlayHotspots;
         return RoomHotspotRules.PointedAt(provider.Hotspots().Where(item => !item.IsDoorway && provider.HasActions(item)), at.X, at.Y);
     }
 
-    private void RefreshPlayOverlays() => RefreshPlayOverlays(_playShown);
+    private void RefreshPlayOverlays() => RefreshPlayOverlays(_ctx.PlayShown);
 
     private void RefreshPlayOverlays(ScummPlayFrame? frame)
     {
-        if (!PlayActive || _playScreen is null || _game is null || frame?.RoomId is not int roomId)
+        if (!PlayActive || _ctx.PlayScreen is null || _ctx.Game is null || frame?.RoomId is not int roomId)
         {
             ClearPlayOverlays();
             return;
         }
-        var changed = !ReferenceEquals(_playOverlayGame, _game) || _playOverlayRoom != roomId;
+        var changed = !ReferenceEquals(_ctx.PlayOverlayGame, _ctx.Game) || _ctx.PlayOverlayRoom != roomId;
         if (changed)
         {
-            _playOverlayGame = _game;
-            _playOverlayRoom = roomId;
-            _playOverlayPointer = null;
-            _playOverlayHoverKey = null;
+            _ctx.PlayOverlayGame = _ctx.Game;
+            _ctx.PlayOverlayRoom = roomId;
+            _ctx.PlayOverlayPointer = null;
+            _ctx.PlayOverlayHoverKey = null;
             // Read on a worker (30 October 2026: on the UI thread it waited for the inspection copy, 6.8 s on Indy 4's first room); the overlay and the
             // doorway rows fill in when the room's code has been read.
-            _playDoorwayTargets = [];
-            _playOverlayNames = [];
-            _playOverlayLocalIndex = [];
-            _ = LoadPlayDoorwayTargetsAsync(_game, roomId);
+            _ctx.PlayDoorwayTargets = [];
+            _ctx.PlayOverlayNames = [];
+            _ctx.PlayOverlayLocalIndex = [];
+            _ = LoadPlayDoorwayTargetsAsync(_ctx.Game, roomId);
         }
         if (_playOverlayCanvas.Parent is null)
         {
@@ -112,14 +99,14 @@ public partial class MainWindow
             Panel.SetZIndex(_playOverlayCanvas, 1);
             _playOverlayCanvas.SizeChanged += (_, _) => RefreshPlayOverlays();
         }
-        var wanted = ObjectAreaMode != DisplayMode.Never || DoorwayMode != DisplayMode.Never || _playHighlightId is not null ||
+        var wanted = ObjectAreaMode != DisplayMode.Never || DoorwayMode != DisplayMode.Never || _ctx.PlayHighlightId is not null ||
             IsAdvancedMode && (RoomMaskToggle.IsChecked == true || WalkBoxToggle.IsChecked == true);
         // Decoded backgrounds/objects are cached by ScummPlayScreen. Capture mutable source state only when an aid is visible.
-        if (changed || wanted || IsAdvancedMode || _playOverlayScene is null) _playOverlayScene = _playScreen.Scene();
-        if (_playOverlayScene is not { } scene || scene.RoomId != roomId) { ClearPlayOverlays(); return; }
+        if (changed || wanted || IsAdvancedMode || _ctx.PlayOverlayScene is null) _ctx.PlayOverlayScene = _ctx.PlayScreen.Scene();
+        if (_ctx.PlayOverlayScene is not { } scene || scene.RoomId != roomId) { ClearPlayOverlays(); return; }
 
         ObjectAreaOptions.Visibility = RoomOverlayRules.HotspotOptionOffered() ? Visibility.Visible : Visibility.Collapsed;
-        DoorwayOptions.Visibility = RoomOverlayRules.DoorwayOptionOffered(_playDoorwayTargets.Count) ? Visibility.Visible : Visibility.Collapsed;
+        DoorwayOptions.Visibility = RoomOverlayRules.DoorwayOptionOffered(_ctx.PlayDoorwayTargets.Count) ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.Visibility = WalkBoxToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.IsEnabled = scene.Room.DepthMask is not null || scene.Room.ExtraDepthMasks.Count > 0;
         RoomMaskToggle.ToolTip = RoomMaskToggle.IsEnabled ? "Highlight the displayed room and active objects' native depth areas." : "No depth areas are stored in this room.";
@@ -163,15 +150,15 @@ public partial class MainWindow
                 Label(box.Index.ToString(), Map(box.Corners.Average(point => point.X), box.Corners.Average(point => point.Y)), color);
             }
         var surface = new RoomSurface(_playOverlayCanvas, scale, Map, offsetX, offsetX + frame.PixelWidth * scale);
-        var pointInRoom = _playOverlayPointer is { } pointer ? viewport.ToRoom(pointer.X, pointer.Y) : null;
+        var pointInRoom = _ctx.PlayOverlayPointer is { } pointer ? viewport.ToRoom(pointer.X, pointer.Y) : null;
         var hotspots = PlayHotspots.Hotspots();
-        _playOverlayHotspots = hotspots;
+        _ctx.PlayOverlayHotspots = hotspots;
         // The same drawing as LOOM's room picture: doorway boxes by their option; hotspot boxes faint under `Always`, strong for the one pointed at or chosen in the list.
         DrawDoorwayBoxes(surface, RoomHotspotRules.DoorwayBoxes(hotspots,
             group => RoomOverlayRules.Shows(DoorwayMode, pointInRoom is { } hover && group.Any(item => item.Contains(hover.X, hover.Y))),
             item => PlayHotspots.DoorwayTip(item), _ => true));
         var objects = hotspots.Where(item => !item.IsDoorway).ToArray();
-        var pointed = _playHighlightId is int chosen ? objects.FirstOrDefault(item => item.ObjectId == chosen)
+        var pointed = _ctx.PlayHighlightId is int chosen ? objects.FirstOrDefault(item => item.ObjectId == chosen)
             : ObjectAreaMode != DisplayMode.Never && pointInRoom is { } at ? RoomHotspotRules.PointedAt(objects, at.X, at.Y) : null;
         if (ObjectAreaMode == DisplayMode.Always)
             foreach (var item in objects)
@@ -195,27 +182,27 @@ public partial class MainWindow
 
     private void RefreshPlayOverlayLists()
     {
-        if (!PlayActive || !IsAdvancedMode || _playOverlayScene is not { } scene)
+        if (!PlayActive || !IsAdvancedMode || _ctx.PlayOverlayScene is not { } scene)
         {
-            _playOverlayListKey = null;
+            _ctx.PlayOverlayListKey = null;
             return;
         }
         var provider = PlayHotspots;
         var hotspots = provider.Hotspots();
-        var key = _game!.Key + ":" + scene.RoomId + ":" + string.Join(',', hotspots.Select(item => $"{item.ObjectId}@{item.X},{item.Y}:{(provider.HasActions(item) ? 1 : 0)}"));
+        var key = _ctx.Game!.Key + ":" + scene.RoomId + ":" + string.Join(',', hotspots.Select(item => $"{item.ObjectId}@{item.X},{item.Y}:{(provider.HasActions(item) ? 1 : 0)}"));
         // Preview controls share these panels and can replace their children without changing
         // native room state. Only reuse rows that are still the ones this view published.
-        if (_playOverlayListKey == key &&
-            ObjectList.Children.Cast<UIElement>().SequenceEqual(_playOverlayObjectRows) &&
-            RoomNavigationButtons.Children.Cast<UIElement>().SequenceEqual(_playOverlayDoorwayRows))
+        if (_ctx.PlayOverlayListKey == key &&
+            ObjectList.Children.Cast<UIElement>().SequenceEqual(_ctx.PlayOverlayObjectRows) &&
+            RoomNavigationButtons.Children.Cast<UIElement>().SequenceEqual(_ctx.PlayOverlayDoorwayRows))
         { DisplayLists(); return; }
-        _playOverlayListKey = key;
+        _ctx.PlayOverlayListKey = key;
         RoomNavigationButtons.Children.Clear(); ObjectList.Children.Clear();
-        _hoveredHotspotRowId = null;
+        _ctx.HoveredHotspotRowId = null;
         FillHotspotRows(provider);
         FillDoorwayRows(provider.DoorwayRows());
-        _playOverlayObjectRows = ObjectList.Children.Cast<UIElement>().ToArray();
-        _playOverlayDoorwayRows = RoomNavigationButtons.Children.Cast<UIElement>().ToArray();
+        _ctx.PlayOverlayObjectRows = ObjectList.Children.Cast<UIElement>().ToArray();
+        _ctx.PlayOverlayDoorwayRows = RoomNavigationButtons.Children.Cast<UIElement>().ToArray();
         DisplayLists();
 
         void DisplayLists()
@@ -229,8 +216,8 @@ public partial class MainWindow
     private async Task LoadPlayDoorwayTargetsAsync(GameLibrary game, int roomId)
     {
         var read = await Task.Run(() => ReadPlayDoorwayTargets(game, roomId));
-        if (!ReferenceEquals(_playOverlayGame, game) || _playOverlayRoom != roomId) return;
-        (_playDoorwayTargets, _playOverlayNames, _playOverlayLocalIndex) = read;
+        if (!ReferenceEquals(_ctx.PlayOverlayGame, game) || _ctx.PlayOverlayRoom != roomId) return;
+        (_ctx.PlayDoorwayTargets, _ctx.PlayOverlayNames, _ctx.PlayOverlayLocalIndex) = read;
         RefreshPlayOverlays();
         RefreshPlayOverlayLists();
     }

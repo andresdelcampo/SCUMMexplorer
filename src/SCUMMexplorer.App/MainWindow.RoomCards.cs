@@ -9,11 +9,6 @@ public partial class MainWindow
 {
     private enum RoomCardPreviewStage { Background, InitialState }
     private enum RoomCardLoadPhase { Backgrounds, InitialStates, Completed, Cancelled }
-    private readonly Dictionary<GameResource, RoomCardPreviewStage> _roomCardStages = [];
-    private Task? _roomCardLoadTask;
-    private RoomCardLoadPhase _roomCardLoadPhase;
-    private bool _roomCardCacheCommitted;
-    private TaskCompletionSource<bool> _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     private async Task StartRoomBackgroundFollowupsAsync(GameLibrary game, Task<bool> backgroundsReady,
         bool useCache, int generation, CancellationToken token)
@@ -32,18 +27,18 @@ public partial class MainWindow
     }
 
     private bool IsCurrentRoomCardLoad(GameLibrary game, int generation, CancellationToken token) =>
-        !token.IsCancellationRequested && generation == _roomCardGeneration && ReferenceEquals(_game, game);
+        !token.IsCancellationRequested && generation == _roomCardGeneration && ReferenceEquals(_ctx.Game, game);
 
     private async Task PrepareRoomArtworkAsync(GameLibrary game, CancellationToken token)
     {
-        if (!UsesInitializedRoomCards(game) || _sceneBatches is not null) return;
+        if (!UsesInitializedRoomCards(game) || _ctx.SceneBatches is not null) return;
         ScummSceneDrawBatches batches;
         try { batches = await DrawBatchesAsync(game).WaitAsync(token); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         { batches = ScummSceneDrawBatches.Empty; }
         token.ThrowIfCancellationRequested();
-        if (!ReferenceEquals(_game, game)) throw new OperationCanceledException();
-        _sceneBatches = batches;
+        if (!ReferenceEquals(_ctx.Game, game)) throw new OperationCanceledException();
+        _ctx.SceneBatches = batches;
     }
 
     private async Task<bool> PublishRoomCardAsync(GameLibrary game, GameResource resource,
@@ -92,10 +87,10 @@ public partial class MainWindow
         // OpenGameFolder's cache flag is scoped to its synchronous call; capture it before yielding.
         var useCache = _roomCardsMayUseCache;
         if (!IsCurrentRoomCardLoad(game, generation, cancellationToken)) return;
-        var backgroundsReady = _roomCardBackgroundsReady;
+        var backgroundsReady = _ctx.RoomCardBackgroundsReady;
         using var cancelled = cancellationToken.Register(() => backgroundsReady.TrySetResult(false));
-        _roomCardLoadPhase = RoomCardLoadPhase.Backgrounds;
-        _roomCardCacheCommitted = false;
+        _ctx.RoomCardLoadPhase = RoomCardLoadPhase.Backgrounds;
+        _ctx.RoomCardCacheCommitted = false;
         try
         {
             // Every room gets its cheap background before the first native initialization starts.
@@ -112,7 +107,7 @@ public partial class MainWindow
             }
 
             if (!IsCurrentRoomCardLoad(game, generation, cancellationToken)) return;
-            _roomCardLoadPhase = RoomCardLoadPhase.InitialStates;
+            _ctx.RoomCardLoadPhase = RoomCardLoadPhase.InitialStates;
             backgroundsReady.TrySetResult(true);
             var cached = useCache
                 ? await Task.Run(() => RoomThumbnailCache.TryLoad(game.FolderPath,
@@ -125,7 +120,7 @@ public partial class MainWindow
                         !await PublishRoomCardAsync(game, resource, bitmap, RoomCardPreviewStage.InitialState,
                             null, generation, cancellationToken)) return;
                 if (!IsCurrentRoomCardLoad(game, generation, cancellationToken)) return;
-                _roomCardCacheCommitted = true;
+                _ctx.RoomCardCacheCommitted = true;
             }
 
             // Cache pixels accelerate display; native states are still prepared for opening rooms.
@@ -157,23 +152,23 @@ public partial class MainWindow
             }
 
             if (!IsCurrentRoomCardLoad(game, generation, cancellationToken)) return;
-            if (_roomCardLoadPhase == RoomCardLoadPhase.InitialStates && !failed &&
+            if (_ctx.RoomCardLoadPhase == RoomCardLoadPhase.InitialStates && !failed &&
                 completed.Count == rooms.Count && completed.Count > 0 && cached is null)
             {
                 var saved = await Task.Run(() => RoomThumbnailCache.SaveCompleted(game.FolderPath,
                     completed, game.Language, cancellationToken), cancellationToken);
                 if (!IsCurrentRoomCardLoad(game, generation, cancellationToken)) return;
-                _roomCardCacheCommitted = saved;
+                _ctx.RoomCardCacheCommitted = saved;
             }
-            _roomCardLoadPhase = RoomCardLoadPhase.Completed;
+            _ctx.RoomCardLoadPhase = RoomCardLoadPhase.Completed;
         }
         catch (OperationCanceledException) { }
         catch (Exception) when (Dispatcher.HasShutdownStarted) { }
         finally
         {
-            if (generation == _roomCardGeneration && ReferenceEquals(_game, game) && cancellationToken.IsCancellationRequested)
+            if (generation == _roomCardGeneration && ReferenceEquals(_ctx.Game, game) && cancellationToken.IsCancellationRequested)
             {
-                _roomCardLoadPhase = RoomCardLoadPhase.Cancelled;
+                _ctx.RoomCardLoadPhase = RoomCardLoadPhase.Cancelled;
                 backgroundsReady.TrySetResult(false);
             }
         }

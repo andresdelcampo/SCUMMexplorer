@@ -79,7 +79,7 @@ public partial class MainWindow
 
     private void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_languageFill || _game is not { } game || LanguageCombo.SelectedItem is not ComboBoxItem { Tag: string key } ||
+        if (_languageFill || _ctx.Game is not { } game || LanguageCombo.SelectedItem is not ComboBoxItem { Tag: string key } ||
             string.Equals(key, game.Language, StringComparison.OrdinalIgnoreCase)) return;
         RememberLanguage(game, key);
         // The thumbnails and room lists saved for that language are its own (keyed by language), so they may be reused.

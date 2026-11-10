@@ -27,7 +27,13 @@ internal static class Program
         // WINDOWCHECK_SIZE=WxH: the window's size (3 November 2026: the room changed size at the user's window size).
         if (Environment.GetEnvironmentVariable("WINDOWCHECK_SIZE") is { Length: > 0 } size && size.Split('x') is [var w, var h])
         { window.Width = double.Parse(w); window.Height = double.Parse(h); }
-        object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
+        object? Field(string name)
+        {
+            // 10 November 2026: the open game's fields live in MainWindow's GameContext (_ctx), named without the underscore.
+            if (typeof(MainWindow).GetField(name, Private) is { } own) return own.GetValue(window);
+            var context = typeof(MainWindow).GetField("_ctx", Private)!.GetValue(window)!;
+            return context.GetType().GetField(char.ToUpperInvariant(name[1]) + name[2..])!.GetValue(context);
+        }
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
         void Capture(string name)
         {

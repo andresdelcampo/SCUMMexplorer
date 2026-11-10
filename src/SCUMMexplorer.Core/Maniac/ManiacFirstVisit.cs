@@ -21,7 +21,7 @@ public static class ManiacFirstVisit
     private static readonly ConcurrentDictionary<string, Lazy<ScummRoomScene?>> Scenes = new(StringComparer.OrdinalIgnoreCase);
 
     public static ScummRoomScene? Cached(GameLibrary game, int roomId) =>
-        Scenes.GetOrAdd($"{game.FolderPath}|{roomId}|syd-bernard-v1", _ => new(() =>
+        Scenes.GetOrAdd($"{game.Key}|{roomId}|syd-bernard-v1", _ => new(() =>
         {
             try { return Run(game, roomId); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or NotSupportedException) { return null; }

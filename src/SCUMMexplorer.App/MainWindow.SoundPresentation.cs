@@ -6,7 +6,6 @@ namespace SCUMMexplorer.App;
 
 public partial class MainWindow
 {
-    private readonly Dictionary<GameResource, string> _soundLines = new();
 
     private async void ResourceTree_Expanded(object sender, RoutedEventArgs e)
     {
@@ -24,7 +23,7 @@ public partial class MainWindow
     {
         AudioFormat.Text = IsSpeech(resource) ? "Recorded speech" : format;
         AudioSource.Text = resource.Description?.Replace(" Its text is in Game Texts.", "", StringComparison.Ordinal) ?? "";
-        AudioLine.Text = _soundLines.TryGetValue(resource, out var line) ? SoundDisplayLine(line) : "";
+        AudioLine.Text = _ctx.SoundLines.TryGetValue(resource, out var line) ? SoundDisplayLine(line) : "";
         AudioLine.Visibility = AudioLine.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         AudioPlaybackState.Text = "Preparing…";
         AudioProgress.Value = 0;

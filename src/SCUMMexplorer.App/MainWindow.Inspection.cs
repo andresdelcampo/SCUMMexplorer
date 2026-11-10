@@ -12,15 +12,13 @@ namespace SCUMMexplorer.App;
 /// </summary>
 public partial class MainWindow
 {
-    private GameLibrary? _inspectionFor;
-    private Task<GameLibrary>? _inspectionCopy;
     private readonly object _inspectionLock = new();
 
     /// <summary>Starts the inspection copy of a newly opened game. A folder game (no shared archive reader) inspects itself.</summary>
     private void StartInspectionCopy(GameLibrary game)
     {
-        _inspectionFor = game;
-        _inspectionCopy = game.V4Archive is null && game.V4Disks is null ? Task.FromResult(game) : Task.Run(() => GameFolderScanner.Reopen(game));
+        _ctx.InspectionFor = game;
+        _ctx.InspectionCopy = game.V4Archive is null && game.V4Disks is null ? Task.FromResult(game) : Task.Run(() => GameFolderScanner.Reopen(game));
     }
 
     /// <summary>
@@ -29,7 +27,7 @@ public partial class MainWindow
     /// </summary>
     private InspectionTurn UseInspectionCopy(GameLibrary game, out GameLibrary source)
     {
-        var copy = ReferenceEquals(_inspectionFor, game) && _inspectionCopy is { } made ? made
+        var copy = ReferenceEquals(_ctx.InspectionFor, game) && _ctx.InspectionCopy is { } made ? made
             : game.V4Archive is null && game.V4Disks is null ? Task.FromResult(game) : Task.FromResult(GameFolderScanner.Reopen(game));
         source = copy.GetAwaiter().GetResult();
         Monitor.Enter(_inspectionLock);

@@ -120,7 +120,7 @@ public sealed class LoomEgoArrivalIndex
     public static LoomEgoArrivalIndex For(GameLibrary game, int globalScriptCount)
     {
         ArgumentNullException.ThrowIfNull(game);
-        return Cache.GetOrAdd($"{game.FolderPath}|{game.Id}", _ => Build(game, globalScriptCount));
+        return Cache.GetOrAdd($"{game.Key}|{game.Id}", _ => Build(game, globalScriptCount));
     }
 
     private static LoomEgoArrivalIndex Build(GameLibrary game, int globalScriptCount)

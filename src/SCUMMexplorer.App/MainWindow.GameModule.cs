@@ -173,7 +173,7 @@ public partial class MainWindow
     private IReadOnlyList<IGameModule> GameModules => _gameModules ??= [new LoomGameModule(this)];
 
     /// <summary>The one place that picks the module of the open game (composition, like <see cref="CurrentRoomControls"/>).</summary>
-    private IGameModule CurrentModule => _game is { } game ? GameModules.FirstOrDefault(module => module.Handles(game)) ?? NoGameModule.Instance : NoGameModule.Instance;
+    private IGameModule CurrentModule => _ctx.Game is { } game ? GameModules.FirstOrDefault(module => module.Handles(game)) ?? NoGameModule.Instance : NoGameModule.Instance;
 
     /// <summary>LOOM's module, whichever game is open (the voices option belongs to it and survives a change of game).</summary>
     private IGameModule LoomModule => GameModules.OfType<LoomGameModule>().First();

@@ -53,7 +53,7 @@ public partial class MainWindow
             if (cancelled()) return null;
             var browsedScene = await FirstVisitAsync(game, resource, token);
             if (cancelled()) return null;
-            w._browsedScene = browsedScene;
+            w._ctx.BrowsedScene = browsedScene;
             var room = browsedScene?.Room ?? await Task.Run(() => archive.DecodeRoom(resource.ResourceId!.Value), token);
             BrowsedObjects? browsedObjects = null;
             if (browsedScene is null)
@@ -79,7 +79,7 @@ public partial class MainWindow
             if (cancelled()) return null;
             var browsedScene = await FirstVisitAsync(game, resource, token);
             if (cancelled()) return null;
-            w._browsedScene = browsedScene;
+            w._ctx.BrowsedScene = browsedScene;
             var room = browsedScene?.Room ?? DecodeOlderRoom(game, bytes);
             if (cancelled()) return null;
             return new(Kind, room, bytes, TryReadOlderWalkBoxes(bytes), null, browsedScene, null, null, null);
@@ -101,7 +101,7 @@ public partial class MainWindow
             if (cancelled()) return null;
             var browsedScene = await FirstVisitAsync(game, resource, token);
             if (cancelled()) return null;
-            w._browsedScene = browsedScene;
+            w._ctx.BrowsedScene = browsedScene;
             var room = browsedScene?.Room ?? DecodeBrowsedOldV3Room(game, w._roomDecoder.Decode(bytes), bytes);
             if (cancelled()) return null;
             return new(Kind, room, bytes, TryReadWalkBoxes(bytes), null, browsedScene, null, null, null, Live: w.CurrentModule.HasDedicatedSession);

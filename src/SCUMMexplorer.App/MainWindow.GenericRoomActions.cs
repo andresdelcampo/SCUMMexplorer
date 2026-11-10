@@ -12,22 +12,9 @@ namespace SCUMMexplorer.App;
 public partial class MainWindow
 {
     private Panel? _genericActionsHost, _genericSourceHost;
-    private GameLibrary? _genericActionsGame;
-    private int? _genericActionsRoom;
-    private bool _genericActionsAdvanced;
-    private bool _genericActionStarting;
-    private int _genericNamesFrame;
-    private Func<string, string>? _genericReadable;
-    private readonly List<Button> _genericActionButtons = [];
-    private readonly List<(string Label, ScummScriptDisassembly Code)> _genericRoomScripts = [];
-    private readonly List<GenericSourceAction> _genericSourceActions = [];
-    private RoomPanelAction? _genericLastAction;
-    private IReadOnlyList<string> _genericAssumptions = [];
-    private string? _genericSourceFailure;
-    private int? _genericActionsShownFor;
     private sealed record GenericSourceAction(int Object, int Verb, string Title, string Target, ScummScriptDisassembly? Code, string Source, bool Executable);
 
-    private bool GenericRoomActions => _game is { } game && !HasDedicatedSession && ScummProfile.For(game).PlaysThroughVerbs;
+    private bool GenericRoomActions => _ctx.Game is { } game && !HasDedicatedSession && ScummProfile.For(game).PlaysThroughVerbs;
 
     private void InitializeGenericRoomActions(Panel actionsHost, Panel sourceHost)
     {
@@ -41,17 +28,17 @@ public partial class MainWindow
     private void RefreshPlayRoomActions()
     {
         if (_genericActionsHost is null || _genericSourceHost is null) return;
-        var room = _currentRoomResource?.ResourceId;
-        var changed = !ReferenceEquals(_genericActionsGame, _game) || _genericActionsRoom != room;
+        var room = _ctx.CurrentRoomResource?.ResourceId;
+        var changed = !ReferenceEquals(_ctx.GenericActionsGame, _ctx.Game) || _ctx.GenericActionsRoom != room;
         _genericActionsHost.Visibility = GenericRoomActions && room is not null ? Visibility.Visible : Visibility.Collapsed;
         _genericSourceHost.Visibility = GenericRoomActions && room is not null && IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
-        if (!GenericRoomActions || _game is not { } game || room is not int roomId)
+        if (!GenericRoomActions || _ctx.Game is not { } game || room is not int roomId)
         {
-            _genericActionsGame = null;
-            _genericActionsRoom = null;
+            _ctx.GenericActionsGame = null;
+            _ctx.GenericActionsRoom = null;
             _genericActionsHost.Children.Clear();
             _genericSourceHost.Children.Clear();
-            _genericActionButtons.Clear();
+            _ctx.GenericActionButtons.Clear();
             return;
         }
         // The old browse-first object/navigation lists were built for the original
@@ -65,19 +52,19 @@ public partial class MainWindow
         }
         if (changed)
         {
-            _genericLastAction = null;
-            _genericSourceFailure = null;
-            _genericActionsShownFor = null;
-            _genericActionsGame = game;
-            _genericActionsRoom = roomId;
-            _genericRoomScripts.Clear();
-            _genericSourceActions.Clear();
+            _ctx.GenericLastAction = null;
+            _ctx.GenericSourceFailure = null;
+            _ctx.GenericActionsShownFor = null;
+            _ctx.GenericActionsGame = game;
+            _ctx.GenericActionsRoom = roomId;
+            _ctx.GenericRoomScripts.Clear();
+            _ctx.GenericSourceActions.Clear();
             _ = LoadGenericRoomActionsAsync(game, roomId);
         }
         var namesChanged = RefreshGenericRoomActionWords();
-        if (changed || namesChanged || _genericActionsAdvanced != IsAdvancedMode || _genericActionsHost.Children.Count == 0)
+        if (changed || namesChanged || _ctx.GenericActionsAdvanced != IsAdvancedMode || _genericActionsHost.Children.Count == 0)
         {
-            _genericActionsAdvanced = IsAdvancedMode;
+            _ctx.GenericActionsAdvanced = IsAdvancedMode;
             BuildGenericRoomActions();
         }
         UpdateGenericRoomActionAvailability();
@@ -91,15 +78,15 @@ public partial class MainWindow
     private async Task LoadGenericRoomActionsAsync(GameLibrary game, int room)
     {
         var source = await Task.Run(() => ReadGenericRoomActions(game, room));
-        if (!ReferenceEquals(_genericActionsGame, game) || _genericActionsRoom != room || !ReferenceEquals(_game, game)) return;
-        _genericReadable = source.Readable;
-        _genericRoomScripts.Clear();
-        _genericRoomScripts.AddRange(source.Scripts);
-        _genericSourceActions.Clear();
-        _genericSourceActions.AddRange(source.Actions);
-        _genericSourceFailure = source.Failure;
+        if (!ReferenceEquals(_ctx.GenericActionsGame, game) || _ctx.GenericActionsRoom != room || !ReferenceEquals(_ctx.Game, game)) return;
+        _ctx.GenericReadable = source.Readable;
+        _ctx.GenericRoomScripts.Clear();
+        _ctx.GenericRoomScripts.AddRange(source.Scripts);
+        _ctx.GenericSourceActions.Clear();
+        _ctx.GenericSourceActions.AddRange(source.Actions);
+        _ctx.GenericSourceFailure = source.Failure;
         RefreshGenericRoomActionWords();
-        _genericActionsAdvanced = IsAdvancedMode;
+        _ctx.GenericActionsAdvanced = IsAdvancedMode;
         BuildGenericRoomActions();
         UpdateGenericRoomActionAvailability();
     }
@@ -162,18 +149,18 @@ public partial class MainWindow
     {
         // The session's own names where it has them; otherwise the names the planner read once the game showed its verbs (Indy 4's catalog rooms
         // play before the credits have built the verb area, so their session has none: every action read "Action", 31 October 2026).
-        var sessionWords = _playFolder == _game?.Key && _play is { PlayerHasControl: true } session && session.CurrentRoomId == _genericActionsRoom
-            ? ScummCutscenePlanner.VerbsOf(session, _genericReadable) : ScummCutsceneVerbs.None;
-        var plannerWords = _playPlanner is { IsValueCreated: true } lazy ? lazy.Value.Verbs : ScummCutsceneVerbs.None;
+        var sessionWords = _ctx.PlayFolder == _ctx.Game?.Key && _ctx.Play is { PlayerHasControl: true } session && session.CurrentRoomId == _ctx.GenericActionsRoom
+            ? ScummCutscenePlanner.VerbsOf(session, _ctx.GenericReadable) : ScummCutsceneVerbs.None;
+        var plannerWords = _ctx.PlayPlanner is { IsValueCreated: true } lazy ? lazy.Value.Verbs : ScummCutsceneVerbs.None;
         var words = ScummCutsceneVerbs.None with { Word = verb => sessionWords.Word?.Invoke(verb) ?? plannerWords.Word?.Invoke(verb) };
         var changed = false;
-        for (var index = 0; index < _genericSourceActions.Count; index++)
+        for (var index = 0; index < _ctx.GenericSourceActions.Count; index++)
         {
-            var action = _genericSourceActions[index];
+            var action = _ctx.GenericSourceActions[index];
             var word = words.Word?.Invoke(action.Verb);
             var title = $"{(string.IsNullOrWhiteSpace(word) ? "Action" : word.Trim())} · {action.Target}";
             if (title == action.Title) continue;
-            _genericSourceActions[index] = action with { Title = title };
+            _ctx.GenericSourceActions[index] = action with { Title = title };
             changed = true;
         }
         return changed;
@@ -183,7 +170,7 @@ public partial class MainWindow
     {
         _genericActionsHost!.Children.Clear();
         _genericSourceHost!.Children.Clear();
-        _genericActionButtons.Clear();
+        _ctx.GenericActionButtons.Clear();
         // Parity with LOOM (R-6.9, 24 Oct): the actions are offered through the bar's Interact button and the
         // object's menu, not through a list of every action of the room under the bar.
         _genericActionsHost.Visibility = Visibility.Collapsed;
@@ -196,11 +183,11 @@ public partial class MainWindow
     private void UpdateGenericAssumptions()
     {
         var list = new List<string>();
-        if (_genericSourceFailure is not null) list.Add(_genericSourceFailure);
-        if (_playPartyAssumed) list.Add(SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PreparationNote);
-        if (_browsedScene is { } shown && _currentRoom is not null && ReferenceEquals(shown.Room, _currentRoom)) list.Add(BrowsedSceneNote(shown));
-        if (_genericLastAction is { } action) list.AddRange(action.Uncertainties);
-        _genericAssumptions = list.Where(item => !string.IsNullOrWhiteSpace(item)).Distinct().ToArray();
+        if (_ctx.GenericSourceFailure is not null) list.Add(_ctx.GenericSourceFailure);
+        if (_ctx.PlayPartyAssumed) list.Add(SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PreparationNote);
+        if (_ctx.BrowsedScene is { } shown && _ctx.CurrentRoom is not null && ReferenceEquals(shown.Room, _ctx.CurrentRoom)) list.Add(BrowsedSceneNote(shown));
+        if (_ctx.GenericLastAction is { } action) list.AddRange(action.Uncertainties);
+        _ctx.GenericAssumptions = list.Where(item => !string.IsNullOrWhiteSpace(item)).Distinct().ToArray();
     }
 
     /// <summary>
@@ -226,7 +213,7 @@ public partial class MainWindow
                 .OfType<ScummScriptEvent>().Where(e => e.TargetKind is not null).DistinctBy(e => (e.SourceLabel, e.Offset, e.TargetKind, e.TargetId)).ToArray();
             ShowScriptEvents(RoomEntryEventButtons, events);
             foreach (var id in data.LocalScripts.Where(id => !events.Any(e => e.TargetKind == ResourceKind.Script && e.TargetId == id)))
-                if (_game?.AllScripts.FirstOrDefault(r => r.ScriptRoom == data.Room && r.ResourceId == id) is { } local)
+                if (_ctx.Game?.AllScripts.FirstOrDefault(r => r.ScriptRoom == data.Room && r.ResourceId == id) is { } local)
                     AddResourceButton(RoomEntryEventButtons, $"has {local.Name}", local);
             RoomEntryTraceOutput.Text = data.EntryText ?? string.Join(Environment.NewLine + Environment.NewLine,
                 new[] { data.Entry, data.Exit }.OfType<ScummScriptDisassembly>().Select(FormatScript));
@@ -309,16 +296,16 @@ public partial class MainWindow
     /// <summary>`ACTIONS · object` (LOOM's section): a flat button per verb of the selected object.</summary>
     private void UpdateGenericActionsSection()
     {
-        if (!GenericRoomActions || !IsAdvancedMode || _genericInteractTarget is not int id || GenericObjectActions(id) is not { Count: > 0 } actions)
+        if (!GenericRoomActions || !IsAdvancedMode || _ctx.GenericInteractTarget is not int id || GenericObjectActions(id) is not { Count: > 0 } actions)
         {
-            if (_genericActionsShownFor is null) return;
-            _genericActionsShownFor = null;
+            if (_ctx.GenericActionsShownFor is null) return;
+            _ctx.GenericActionsShownFor = null;
             ObjectActionsList.Children.Clear();
             ObjectActionsSection.Visibility = Visibility.Collapsed;
             return;
         }
-        if (_genericActionsShownFor == id && ObjectActionsList.Children.Count > 0) return;
-        _genericActionsShownFor = id;
+        if (_ctx.GenericActionsShownFor == id && ObjectActionsList.Children.Count > 0) return;
+        _ctx.GenericActionsShownFor = id;
         ObjectActionsList.Children.Clear();
         ObjectActionsHeader.Text = $"ACTIONS · {(actions[0].Target is { Length: > 0 } name ? name : $"Object {id}")}";
         foreach (var action in actions)
@@ -332,33 +319,30 @@ public partial class MainWindow
 
     // A static preview's ambient session (R-8.5b) takes the explicit exploration action too: the object's verb code runs from the preview's state.
     // A still static preview (no ambient script, no clock) prepares its preview session when the user picks an action (R-6.17, R-8.5b1).
-    private bool GenericRoomActionCanStart => GenericRoomActions && !_genericActionStarting && !_introPreparing &&
-        _game is { } game && _playFolder == game.Key && _play is not null &&
+    private bool GenericRoomActionCanStart => GenericRoomActions && !_ctx.GenericActionStarting && !_ctx.IntroPreparing &&
+        _ctx.Game is { } game && _ctx.PlayFolder == game.Key && _ctx.Play is not null &&
         (StillPreviewCanAct || PlayActive &&
-            (_play is { PlayerHasControl: true, BootRunning: false } || _playAmbient && _play is { InCutscene: false }) &&
-            _play.CurrentRoomId == _genericActionsRoom) &&
-        (ScummProfile.For(game).EngineVersion > ScummVersion.V2 || _play.InventoryCharactersAvailable);
+            (_ctx.Play is { PlayerHasControl: true, BootRunning: false } || _ctx.PlayAmbient && _ctx.Play is { InCutscene: false }) &&
+            _ctx.Play.CurrentRoomId == _ctx.GenericActionsRoom) &&
+        (ScummProfile.For(game).EngineVersion > ScummVersion.V2 || _ctx.Play.InventoryCharactersAvailable);
 
     // §8.6: where the game's scenes can be picked, an interaction is picked the same way (any time, the state set up, a running scene ended).
-    private bool GenericInteractionCanStart => GenericRoomActions && !_genericActionStarting &&
-        (PlayCutscenes && _playPlanner is not null && PlayCanStartCutscene || GenericRoomActionCanStart);
+    private bool GenericInteractionCanStart => GenericRoomActions && !_ctx.GenericActionStarting &&
+        (PlayCutscenes && _ctx.PlayPlanner is not null && PlayCanStartCutscene || GenericRoomActionCanStart);
 
-    private bool StillPreviewCanAct => _catalogPreviewOnly && _game is { } still && !UsesManiacCutsceneSetup(still) && !PlayActive && _play is not null && _genericActionsRoom is not null &&
-        _currentRoomResource?.ResourceId == _genericActionsRoom;
+    private bool StillPreviewCanAct => _ctx.CatalogPreviewOnly && _ctx.Game is { } still && !UsesManiacCutsceneSetup(still) && !PlayActive && _ctx.Play is not null && _ctx.GenericActionsRoom is not null &&
+        _ctx.CurrentRoomResource?.ResourceId == _ctx.GenericActionsRoom;
 
     private void UpdateGenericRoomActionAvailability()
     {
-        if (++_genericNamesFrame % 12 == 0 && _genericActionsHost is not null && GenericRoomActions &&
-            _genericActionsRoom is not null && RefreshGenericRoomActionWords()) BuildGenericRoomActions();
+        if (++_ctx.GenericNamesFrame % 12 == 0 && _genericActionsHost is not null && GenericRoomActions &&
+            _ctx.GenericActionsRoom is not null && RefreshGenericRoomActionWords()) BuildGenericRoomActions();
         UpdateInteractButton();
     }
 
-    // The data behind the shared Interact control (R-6.22, R-16.9): the selected object and its source actions.
-    // The button, menu and right click are the shared ones in MainWindow.RoomControls.cs.
-    private int? _genericInteractTarget;
 
     private IReadOnlyList<GenericSourceAction> GenericObjectActions(int objectId) =>
-        _genericSourceActions.Where(a => a.Executable && a.Object == objectId).DistinctBy(a => a.Verb).ToArray();
+        _ctx.GenericSourceActions.Where(a => a.Executable && a.Object == objectId).DistinctBy(a => a.Verb).ToArray();
 
     private static string GenericActionWord(GenericSourceAction action) =>
         action.Title.Split(" · ", 2)[0];
@@ -366,10 +350,10 @@ public partial class MainWindow
     /// <summary>The object (with actions) under a native screen point, from the same scene the overlays read.</summary>
     private int? GenericObjectAt((int X, int Y)? point)
     {
-        if (point is not { } p || _playOverlayScene is not { } scene || _playShown is not { } frame) return null;
+        if (point is not { } p || _ctx.PlayOverlayScene is not { } scene || _ctx.PlayShown is not { } frame) return null;
         var viewport = frame.Viewport;
         if (viewport.ToRoom(p.X, p.Y) is not { } at) return null;
-        return ScummRoomOverlays.Objects(scene, _playDoorwayTargets)
+        return ScummRoomOverlays.Objects(scene, _ctx.PlayDoorwayTargets)
             .FirstOrDefault(o => o.Contains(at.X, at.Y) && GenericObjectActions(o.ObjectId).Count > 0)?.ObjectId;
     }
 
@@ -377,7 +361,7 @@ public partial class MainWindow
     private void SelectGenericInteractAt((int X, int Y)? point)
     {
         if (!GenericRoomActions) return;
-        _genericInteractTarget = GenericObjectAt(point);
+        _ctx.GenericInteractTarget = GenericObjectAt(point);
         UpdateInteractButton();
     }
 
@@ -385,7 +369,7 @@ public partial class MainWindow
     private bool TryOpenGenericInteractAt((int X, int Y)? point)
     {
         if (!GenericRoomActions || GenericObjectAt(point) is not int objectId) return false;
-        _genericInteractTarget = objectId;
+        _ctx.GenericInteractTarget = objectId;
         UpdateInteractButton();
         ShowInteractMenu(PlayScreenImage, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
         return true;
@@ -395,7 +379,7 @@ public partial class MainWindow
     private void SelectGenericInteractTarget(int objectId)
     {
         if (GenericObjectActions(objectId).Count == 0) return;
-        _genericInteractTarget = objectId;
+        _ctx.GenericInteractTarget = objectId;
         UpdateInteractButton();
         if (InteractButton.IsEnabled) ShowInteractMenu(InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
     }
@@ -404,33 +388,33 @@ public partial class MainWindow
     {
         // R-8.38 (user, 31 Oct 2026): a picked interaction goes the way of a picked scene: the room opened (ending a scene still playing), the state
         // its code tests set (§8.6), the verb given to the game's sentence script with the hero put at the object, or run directly where it refuses.
-        if (PlayCutscenes && _playPlanner is not null && PlayCanStartCutscene && _genericActionsRoom is int pickedRoom)
+        if (PlayCutscenes && _ctx.PlayPlanner is not null && PlayCanStartCutscene && _ctx.GenericActionsRoom is int pickedRoom)
         {
             var trigger = new ScummCutscene(pickedRoom, action.Object, action.Target, action.Verb,
                 [$"Room {pickedRoom} object {action.Object} verb 0x{action.Verb:X2}"], 0, 0, 0, "");
             await PlayScummCutsceneAsync(new ScummCutsceneGroup(trigger, []), action.Title, interaction: true);
-            _genericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: picked.", action.Source,
-                _play?.Snapshot.Uncertainties.TakeLast(6).ToArray() ?? [], action.Code);
+            _ctx.GenericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: picked.", action.Source,
+                _ctx.Play?.Snapshot.Uncertainties.TakeLast(6).ToArray() ?? [], action.Code);
             UpdateGenericAssumptions();
             FillRoomPanel(CurrentRoomControls.Panel());
             return;
         }
-        if (!GenericRoomActionCanStart || _game is not { } game || _genericActionsRoom is not int roomId ||
+        if (!GenericRoomActionCanStart || _ctx.Game is not { } game || _ctx.GenericActionsRoom is not int roomId ||
             game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is not { } room) return;
         var launch = ++_cutsceneLaunchGeneration;
-        _genericActionStarting = true;
+        _ctx.GenericActionStarting = true;
         UpdateGenericRoomActionAvailability();
         try
         {
-            if (StillPreviewCanAct && _play is { } source)
+            if (StillPreviewCanAct && _ctx.Play is { } source)
             {
                 // R-8.5b1: the still preview becomes the room entered without its entry code (nothing else runs), and the action runs there.
                 var prepared = source.PrepareAmbientRoom(room, requireAmbient: false);
                 if (prepared.Session is not ScummGameSession still) { if (IsAdvancedMode) StatusText.ToolTip = prepared.Reason; return; }
-                _playLiveSource = source;
-                _play = still;
-                _playAmbient = true;
-                _playScreen = new ScummPlayScreen(game, still, _playIndexedStates);
+                _ctx.PlayLiveSource = source;
+                _ctx.Play = still;
+                _ctx.PlayAmbient = true;
+                _ctx.PlayScreen = new ScummPlayScreen(game, still, _ctx.PlayIndexedStates);
                 _sceneSound.Attach(game, still, RenderPlaySound, PlaySoundLoop);
                 if (game.Speech is { } speech) _playSpeech.Attach(speech, still.Messages);
                 StartPlayClock();
@@ -438,14 +422,14 @@ public partial class MainWindow
             // This explicit exploration action never visits a room merely to enable
             // itself. A static/manual fallback remains quiet until native control is
             // available in this very room; entry scenes are reserved for their button.
-            if (!ReferenceEquals(_game, game) || launch != _cutsceneLaunchGeneration || _currentRoomResource?.ResourceId != roomId ||
-                !PlayActive || _play is not { } session || !session.PlayerHasControl && !_playAmbient || session.CurrentRoomId != roomId) return;
+            if (!ReferenceEquals(_ctx.Game, game) || launch != _cutsceneLaunchGeneration || _ctx.CurrentRoomResource?.ResourceId != roomId ||
+                !PlayActive || _ctx.Play is not { } session || !session.PlayerHasControl && !_ctx.PlayAmbient || session.CurrentRoomId != roomId) return;
             var result = session.ActivateObjectVerb(action.Object, action.Verb);
-            _playPaused = false;
+            _ctx.PlayPaused = false;
             ShowPlayFrame();
             PlayScreenImage.Focus();
             StatusText.Text = action.Title;
-            _genericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: ran.", action.Source, result.Uncertainties.ToArray(), action.Code);
+            _ctx.GenericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: ran.", action.Source, result.Uncertainties.ToArray(), action.Code);
             UpdateGenericAssumptions();
             FillRoomPanel(CurrentRoomControls.Panel());
             StatusText.ToolTip = IsAdvancedMode ? action.Source + Environment.NewLine + string.Join(Environment.NewLine, result.Uncertainties) : null;
@@ -453,9 +437,9 @@ public partial class MainWindow
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException)
         {
-            if (ReferenceEquals(_game, game) && launch == _cutsceneLaunchGeneration && IsAdvancedMode)
+            if (ReferenceEquals(_ctx.Game, game) && launch == _cutsceneLaunchGeneration && IsAdvancedMode)
                 StatusText.ToolTip = $"The exploration action could not start: {ex.Message}";
         }
-        finally { _genericActionStarting = false; UpdateGenericRoomActionAvailability(); }
+        finally { _ctx.GenericActionStarting = false; UpdateGenericRoomActionAvailability(); }
     }
 }

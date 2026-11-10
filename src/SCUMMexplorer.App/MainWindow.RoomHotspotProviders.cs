@@ -10,35 +10,34 @@ namespace SCUMMexplorer.App;
 public partial class MainWindow
 {
     private IRoomHotspotProvider? _loomHotspotsInstance, _playHotspotsInstance;
-    private GameResource? _roomNavigationRoom;
     private LoomRoomHotspots LoomHotspots => (LoomRoomHotspots)(_loomHotspotsInstance ??= new LoomRoomHotspots(this));
     private PlayRoomHotspots PlayHotspots => (PlayRoomHotspots)(_playHotspotsInstance ??= new PlayRoomHotspots(this));
 
     /// <summary>LOOM's live session (EGA, CD, demos) and the browsed rooms that share its doorway candidates.</summary>
     private sealed class LoomRoomHotspots(MainWindow w) : IRoomHotspotProvider
     {
-        public int? RoomId => w._currentRoomResource?.ResourceId;
+        public int? RoomId => w._ctx.CurrentRoomResource?.ResourceId;
 
         public RoomHotspot Describe(ScummRoomObjectRecord record)
         {
-            var at = w._session?.Snapshot.ObjectPositions.TryGetValue(record.Id, out var current) == true ? current : new RoomObjectPosition(record.X, record.Y);
-            return new RoomHotspot(record.Id, record.LocalIndex, w._roomObjectNames.TryGetValue(record.Id, out var name) ? name : null,
+            var at = w._ctx.Session?.Snapshot.ObjectPositions.TryGetValue(record.Id, out var current) == true ? current : new RoomObjectPosition(record.X, record.Y);
+            return new RoomHotspot(record.Id, record.LocalIndex, w._ctx.RoomObjectNames.TryGetValue(record.Id, out var name) ? name : null,
                 at.X, at.Y, record.Width, record.Height, w.DoorwayTargets(record));
         }
 
         public IReadOnlyList<RoomHotspot> Hotspots() =>
-            w._session?.Snapshot is not { } snapshot ? [] :
-            w._currentRoomObjectRecords.OrderBy(item => item.LocalIndex).Where(item => w.IsVerbHotspotAvailable(item, snapshot)).Select(Describe).ToArray();
+            w._ctx.Session?.Snapshot is not { } snapshot ? [] :
+            w._ctx.CurrentRoomObjectRecords.OrderBy(item => item.LocalIndex).Where(item => w.IsVerbHotspotAvailable(item, snapshot)).Select(Describe).ToArray();
 
         public string DoorwayTip(RoomHotspot doorway) =>
-            w._currentRoomObjectRecords.FirstOrDefault(item => item.Id == doorway.ObjectId) is { } record ? w.DoorwayToolTip(record) : "";
+            w._ctx.CurrentRoomObjectRecords.FirstOrDefault(item => item.Id == doorway.ObjectId) is { } record ? w.DoorwayToolTip(record) : "";
 
-        public bool IsLive(RoomHotspot hotspot) => w._session?.Snapshot.IsUntouchable(hotspot.ObjectId) != true;
+        public bool IsLive(RoomHotspot hotspot) => w._ctx.Session?.Snapshot.IsUntouchable(hotspot.ObjectId) != true;
 
-        public bool HasActions(RoomHotspot hotspot) => w._roomVerbs.TryGetValue(hotspot.ObjectId, out var verbs) && verbs.Count > 0;
+        public bool HasActions(RoomHotspot hotspot) => w._ctx.RoomVerbs.TryGetValue(hotspot.ObjectId, out var verbs) && verbs.Count > 0;
 
         public void Highlight(RoomHotspot? hotspot) =>
-            w.ShowHotspotHighlight(hotspot is null ? null : w._currentRoomObjectRecords.FirstOrDefault(item => item.Id == hotspot.ObjectId));
+            w.ShowHotspotHighlight(hotspot is null ? null : w._ctx.CurrentRoomObjectRecords.FirstOrDefault(item => item.Id == hotspot.ObjectId));
 
         public void Choose(RoomHotspot hotspot) => w.ChooseLoomObject(hotspot.ObjectId);
 
@@ -46,8 +45,8 @@ public partial class MainWindow
         public IReadOnlyList<RoomDoorwayRow> DoorwayRows()
         {
             var rows = new List<RoomDoorwayRow>();
-            var room = w._roomNavigationRoom;
-            foreach (var target in w._roomNavigationCandidates.GroupBy(item => item.TargetRoomId))
+            var room = w._ctx.RoomNavigationRoom;
+            foreach (var target in w._ctx.RoomNavigationCandidates.GroupBy(item => item.TargetRoomId))
             {
                 var candidate = target.First();
                 // Verbs that share one code block are one source; name them all.
@@ -69,12 +68,12 @@ public partial class MainWindow
     /// <summary>The native game screen of every generic session (v1/v2 Maniac/Zak, verb-based v3/v4/v5 and their static previews).</summary>
     private sealed class PlayRoomHotspots(MainWindow w) : IRoomHotspotProvider
     {
-        public int? RoomId => w._playOverlayScene?.RoomId;
+        public int? RoomId => w._ctx.PlayOverlayScene?.RoomId;
 
         public IReadOnlyList<RoomHotspot> Hotspots() =>
-            w._playOverlayScene is not { } scene ? [] :
-            ScummRoomOverlays.Objects(scene, w._playDoorwayTargets).Select(item => new RoomHotspot(item.ObjectId,
-                w._playOverlayLocalIndex.GetValueOrDefault(item.ObjectId, item.ObjectId), w._playOverlayNames.GetValueOrDefault(item.ObjectId),
+            w._ctx.PlayOverlayScene is not { } scene ? [] :
+            ScummRoomOverlays.Objects(scene, w._ctx.PlayDoorwayTargets).Select(item => new RoomHotspot(item.ObjectId,
+                w._ctx.PlayOverlayLocalIndex.GetValueOrDefault(item.ObjectId, item.ObjectId), w._ctx.PlayOverlayNames.GetValueOrDefault(item.ObjectId),
                 item.X, item.Y, item.Width, item.Height, item.Destinations)).ToArray();
 
         public string DoorwayTip(RoomHotspot doorway) =>
@@ -87,7 +86,7 @@ public partial class MainWindow
 
         public void Highlight(RoomHotspot? hotspot)
         {
-            w._playHighlightId = hotspot?.ObjectId;
+            w._ctx.PlayHighlightId = hotspot?.ObjectId;
             w.RefreshPlayOverlays();
         }
 
@@ -95,7 +94,7 @@ public partial class MainWindow
 
         public IReadOnlyList<RoomDoorwayRow> DoorwayRows()
         {
-            if (w._playOverlayScene is not { } scene || w._game is not { } game) return [];
+            if (w._ctx.PlayOverlayScene is not { } scene || w._ctx.Game is not { } game) return [];
             var rows = new List<RoomDoorwayRow>();
             foreach (var target in Hotspots().Where(item => item.IsDoorway).SelectMany(item => item.Destinations.Select(id => (Room: id, Door: item)))
                          .GroupBy(item => item.Room).OrderBy(group => group.Key))

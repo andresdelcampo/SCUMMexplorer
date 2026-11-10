@@ -98,15 +98,15 @@ public partial class MainWindow
     {
         if (game.Id != GameId.LoomVga || game.V4Archive is not { Disc: not null }) return null;
         // The disc's audio track: every stretch a script asks for with sayVoice. Long ones and those without a line are the music and narration.
-        _cdCues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
-        var cueNode = new TreeViewItem { Header = $"CD audio  ({_cdCues.Count})", IsExpanded = false };
-        for (var i = 0; i < _cdCues.Count; i++)
+        _ctx.CdCues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
+        var cueNode = new TreeViewItem { Header = $"CD audio  ({_ctx.CdCues.Count})", IsExpanded = false };
+        for (var i = 0; i < _ctx.CdCues.Count; i++)
         {
-            var cue = _cdCues[i];
+            var cue = _ctx.CdCues[i];
             var kind = cue.IsMusicOrNarration ? "music / narration" : "voice";
             var resource = new GameResource($"CD audio {i + 1:000}", ResourceKind.Sound, game.FolderPath, CdCueIdBase + i,
                 $"{kind}, {cue.Cue.Seconds:0.#} s at disc second {cue.Cue.DiscSeconds:0.#}; first asked for by {cue.Source}.", 1, null);
-            _soundLines[resource] = cue.Text;
+            _ctx.SoundLines[resource] = cue.Text;
             var snippet = cue.Text.Length > 40 ? cue.Text[..40] + "…" : cue.Text;
             cueNode.Items.Add(new TreeViewItem
             {

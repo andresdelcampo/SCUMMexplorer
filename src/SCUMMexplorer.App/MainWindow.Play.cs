@@ -17,40 +17,15 @@ namespace SCUMMexplorer.App;
 /// </summary>
 public partial class MainWindow
 {
-    private ScummGameSession? _play;
-    private ScummPlayScreen? _playScreen;
-    private IReadOnlyDictionary<int, byte> _playIndexedStates = new Dictionary<int, byte>();
-    /// <summary>The <see cref="GameLibrary.Key"/> (folder, and language when the game holds several) of the game the play session runs.</summary>
-    private string? _playFolder;
-    private DispatcherTimer? _playTimer;
-    private bool _playPaused;
-    private int _playFrame;
-    private ScummPlayFrame? _playShown;
-    private bool _followingPlayRoom;
-    private WriteableBitmap? _playBitmap;
-    // The play game's sounds that play a track of its disc (null for a game without them).
-    private ScummCdAudioTracks? _playCdTracks;
-    // The play game's iMUSE songs (v5: Monkey Island 2, Fate of Atlantis), for where a looping song goes on (null for a game without them).
-    private ScummImuseMusic? _playImuse;
     // S6 Indy4 (17 October 2026): the spoken lines of a talkie, played as the game's texts start and stop them.
     private readonly TalkieSpeechPlayer _playSpeech = new();
 
-    /// <summary>The session's speech events before the last room visit from the list (a cutscene played from the list speaks its entry from there).</summary>
-    private int _playSpeechBeforeVisit;
 
-    private bool PlayActive => _playTimer is not null && _play is not null;
+    private bool PlayActive => _ctx.PlayTimer is not null && _ctx.Play is not null;
 
-    /// <summary>
-    /// R-8.5b (rule confirmed by the user 20 Oct): the play session is a static preview's, running only the room's ambient scripts
-    /// (<see cref="ScummSession.PrepareAmbientRoom"/>); no click or key reaches the game. <see cref="_playLiveSource"/> is the session it was made from.
-    /// </summary>
-    private bool _playAmbient;
-    /// <summary>The kids were chosen by the reviewed assumption, not by the player (R-6.52); Advanced says so.</summary>
-    private bool _playPartyAssumed;
-    private ScummGameSession? _playLiveSource;
 
     /// <summary>Play that delivers the user's clicks and keys to the game (not a static preview's ambient frames).</summary>
-    private bool PlayTakesInput => PlayActive && !_playAmbient;
+    private bool PlayTakesInput => PlayActive && !_ctx.PlayAmbient;
 
     /// <summary>Advanced: which of the room's entry starts are ambient and why, from <see cref="ScummAmbientScripts"/>.</summary>
     private static string AmbientNote(ScummManualRoomResult ambient) => ambient.Ambient is not { } found
@@ -62,19 +37,17 @@ public partial class MainWindow
     /// <summary>A static preview gives way to the session it was made from before an explicit scene or intro (the stated start of R-8.13).</summary>
     private void LeaveAmbientPreview()
     {
-        if (!_playAmbient || _game is not { } game || _playLiveSource is not { } live) return;
+        if (!_ctx.PlayAmbient || _ctx.Game is not { } game || _ctx.PlayLiveSource is not { } live) return;
         _sceneSound.StopAll("an explicit scene leaves the static preview");
-        _playAmbient = false;
-        _catalogPreviewOnly = false;
-        _play = live;
-        _playScreen = new ScummPlayScreen(game, live, _playIndexedStates);
+        _ctx.PlayAmbient = false;
+        _ctx.CatalogPreviewOnly = false;
+        _ctx.Play = live;
+        _ctx.PlayScreen = new ScummPlayScreen(game, live, _ctx.PlayIndexedStates);
         _sceneSound.Attach(game, live, RenderPlaySound, PlaySoundLoop);
         if (game.Speech is { } speech) _playSpeech.Attach(speech, live.Messages);
-        _playSpeechBeforeVisit = live.Messages.SpeechEvents.Count;
+        _ctx.PlaySpeechBeforeVisit = live.Messages.SpeechEvents.Count;
     }
 
-    // The pause state the play sounds were last given (S6 sound).
-    private bool _playSoundPaused;
 
     /// <summary>
     /// S6 sound (16 October 2026): a sound the play session's scripts started, rendered as the sound player renders it for the device the user picked
@@ -82,8 +55,8 @@ public partial class MainWindow
     /// </summary>
     private (byte[] Wave, bool Music) RenderPlaySound(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token)
     {
-        var game = _game;
-        var cdTracks = _playCdTracks;
+        var game = _ctx.Game;
+        var cdTracks = _ctx.PlayCdTracks;
         token.ThrowIfCancellationRequested();
         if (game is null) throw new InvalidOperationException("No game is open for this sound.");
         // S6 MonkeyCd (17 October 2026): a sound that plays a track of the game's disc (ScummVM playCDTrackFromSoundID) plays that stretch of the disc's audio,
@@ -109,12 +82,12 @@ public partial class MainWindow
     /// </summary>
     private SceneSoundPlayer.Loop? PlaySoundLoop(int soundId, SceneSoundPlayer.SoundMode mode)
     {
-        if (_playCdTracks is { } cd && cd.Plays(soundId)) return cd.LoopsForever(soundId) ? new SceneSoundPlayer.Loop(TimeSpan.Zero, null) : null;
+        if (_ctx.PlayCdTracks is { } cd && cd.Plays(soundId)) return cd.LoopsForever(soundId) ? new SceneSoundPlayer.Loop(TimeSpan.Zero, null) : null;
         // Sound polish (19 October 2026): a version 3 or 4 song that loops (Player_AD or iMUSE's jump back for AdLib, a repeated channel state for the
         // PC speaker) goes on from its loop target instead of ending with its rendered wave.
-        if (_playImuse is null && _game is { } game && OldSoundLoop(game, soundId, mode) is { } oldLoop)
+        if (_ctx.PlayImuse is null && _ctx.Game is { } game && OldSoundLoop(game, soundId, mode) is { } oldLoop)
             return new SceneSoundPlayer.Loop(TimeSpan.FromSeconds(oldLoop.RestartSeconds), TimeSpan.FromSeconds(oldLoop.EndSeconds));
-        if (_playImuse is not { } imuse || PlayImuseDevice(mode) is not { } device) return null;
+        if (_ctx.PlayImuse is not { } imuse || PlayImuseDevice(mode) is not { } device) return null;
         return imuse.Loop(soundId, device) is { } loop ? new SceneSoundPlayer.Loop(TimeSpan.FromSeconds(loop.RestartSeconds), TimeSpan.FromSeconds(loop.EndSeconds)) : null;
     }
 
@@ -154,45 +127,45 @@ public partial class MainWindow
 
     private async Task StartPlayCoreAsync(GameResource resource, CancellationToken token, RoomOpenKind navigationKind)
     {
-        if (_game is not { } game || resource.ResourceId is not int roomId) return;
+        if (_ctx.Game is not { } game || resource.ResourceId is not int roomId) return;
         var launch = _cutsceneLaunchGeneration;
-        bool CurrentRequest() => !token.IsCancellationRequested && ReferenceEquals(_game, game) && launch == _cutsceneLaunchGeneration;
+        bool CurrentRequest() => !token.IsCancellationRequested && ReferenceEquals(_ctx.Game, game) && launch == _cutsceneLaunchGeneration;
         try
         {
-            if (_play is null || _playFolder != game.Key)
+            if (_ctx.Play is null || _ctx.PlayFolder != game.Key)
             {
                 StopPlay();
-                _playAmbient = false;
-                _playLiveSource = null;
+                _ctx.PlayAmbient = false;
+                _ctx.PlayLiveSource = null;
                 ScummIndexedObjectSnapshot? objects = null;
                 var session = await Task.Run(() => ScummGameSession.BootForPlay(game, out objects), token);
                 if (!CurrentRequest()) return;
-                _play = session;
-                _playBoot = UsesManiacCutsceneSetup(game) ? null : await Task.Run(() => ScummBootSnapshot.Of(session), token);
+                _ctx.Play = session;
+                _ctx.PlayBoot = UsesManiacCutsceneSetup(game) ? null : await Task.Run(() => ScummBootSnapshot.Of(session), token);
                 if (!CurrentRequest()) return;
                 UpdatePlaySoundCard();
-                _playIndexedStates = objects!.States;
-                _playScreen = new ScummPlayScreen(game, session, _playIndexedStates);
-                _playFolder = game.Key;
-                _playCdTracks = ScummCdAudioTracks.For(game);
-                _playImuse = ScummImuseMusic.For(game);
+                _ctx.PlayIndexedStates = objects!.States;
+                _ctx.PlayScreen = new ScummPlayScreen(game, session, _ctx.PlayIndexedStates);
+                _ctx.PlayFolder = game.Key;
+                _ctx.PlayCdTracks = ScummCdAudioTracks.For(game);
+                _ctx.PlayImuse = ScummImuseMusic.For(game);
             }
             if (!CurrentRequest()) return;
             // 7 November 2026 (user report: the castle plans after another room, "Indy won't move"): the session a pick is prepared from is copied on another
             // thread, so its clock and input stop until the new room's session takes over (StartPlayClock); a frame stepped during the copy left a session
             // that took clicks and never ran them. The waiting picture stays on the screen meanwhile.
-            if (navigationKind == RoomOpenKind.Catalog) { _playTimer?.Stop(); _playTimer = null; }
+            if (navigationKind == RoomOpenKind.Catalog) { _ctx.PlayTimer?.Stop(); _ctx.PlayTimer = null; }
             // A static preview's session runs only its room's ambient scripts; the session it was made from carries the game on.
-            if (_playAmbient && _playLiveSource is { } live) _play = live;
-            _playAmbient = false;
+            if (_ctx.PlayAmbient && _ctx.PlayLiveSource is { } live) _ctx.Play = live;
+            _ctx.PlayAmbient = false;
             if (navigationKind == RoomOpenKind.Catalog)
             {
-                var source = _play;
+                var source = _ctx.Play;
                 // R-6.52 (user, 25 Oct 2026): a Maniac Mansion room picked before the kids are chosen uses the reviewed, labelled assumed party (Syd, Bernard)
                 // so the room is live; kids already chosen are kept. The assumption is listed under Assumptions in Advanced.
                 if (UsesManiacCutsceneSetup(game) && roomId != 45)
                 {
-                    try { if (await Task.Run(() => SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PrepareIfNeeded(game, source), token)) _playPartyAssumed = true; }
+                    try { if (await Task.Run(() => SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.PrepareIfNeeded(game, source), token)) _ctx.PlayPartyAssumed = true; }
                     catch (InvalidOperationException) { /* the player has begun choosing: keep the choices as they are */ }
                     catch (System.IO.InvalidDataException) { /* no reviewed recipe for this menu: the room stays a static preview */ }
                 }
@@ -203,17 +176,17 @@ public partial class MainWindow
                 if (!CurrentRequest()) return;
                 if (prepared.Session is not ScummGameSession ready || ready.PlayInputScript == 0)
                 {
-                    _catalogPreviewOnly = true;
+                    _ctx.CatalogPreviewOnly = true;
                     var reason = prepared.Reason ?? "The native startup has not established the game's input script.";
                     // The waiting picture stays on the screen while the still preview is made (no flash of the room view).
-                    StopPlay(keepScreen: PlayScreenImage.Visibility == Visibility.Visible && _browsedScene is not null);
+                    StopPlay(keepScreen: PlayScreenImage.Visibility == Visibility.Visible && _ctx.BrowsedScene is not null);
                     // R-8.5b (rule confirmed by the user 20 Oct): the static preview keeps the room's controls, and the room's ambient scripts (its
                     // permanent animation, decided from its code) run on a play clock; none of its other entry code runs, and no input reaches the game.
                     // Maniac Mansion and Zak keep their own startup and static-preview rules (R-8.34, 19 Oct): no ambient session there.
                     var ambient = UsesManiacCutsceneSetup(game) ? new ScummManualRoomResult(null, "Maniac Mansion and Zak keep their startup rules.")
-                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token, requireAmbient: false, picture: _browsedScene is { } picture && picture.RoomId == roomId ? picture.State : null), token);
+                        : await Task.Run(() => source.PrepareAmbientRoom(resource, token, requireAmbient: false, picture: _ctx.BrowsedScene is { } picture && picture.RoomId == roomId ? picture.State : null), token);
                     if (!CurrentRequest()) return;
-                    _playLiveSource = source;
+                    _ctx.PlayLiveSource = source;
                     StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";
                     RoomHint = "A still picture: this room's own scene does not settle into a state you can play here. Play Cutscene shows its scenes; Play Game Intro starts the game.";
                     StatusText.ToolTip = IsAdvancedMode ? reason + Environment.NewLine + AmbientNote(ambient) : null;
@@ -221,51 +194,51 @@ public partial class MainWindow
                     {
                         UpdatePlaybackControls();
                         // The still picture stays in the play frame's layout, as it waited (no size change).
-                        if (_browsedScene is { } waiting && ScummProfile.For(game).PlaysThroughVerbs) ShowWaitingPlayFrame(waiting);
+                        if (_ctx.BrowsedScene is { } waiting && ScummProfile.For(game).PlaysThroughVerbs) ShowWaitingPlayFrame(waiting);
                         return;
                     }
                     // The screen rows the room's first visit reached, as its waiting picture showed them (Indy 3 Room 80: no jump when the frames start).
-                    if (_browsedScene?.MainScreen is { } firstVisitScreen) still.UseScreen(firstVisitScreen);
-                    _play = still;
-                    _playAmbient = true;
-                    _playScreen = new ScummPlayScreen(game, still, _playIndexedStates);
+                    if (_ctx.BrowsedScene?.MainScreen is { } firstVisitScreen) still.UseScreen(firstVisitScreen);
+                    _ctx.Play = still;
+                    _ctx.PlayAmbient = true;
+                    _ctx.PlayScreen = new ScummPlayScreen(game, still, _ctx.PlayIndexedStates);
                     _sceneSound.StopAll("a static preview's ambient scripts start");
                 }
                 else
                 {
-                    _catalogPreviewOnly = false;
-                    _play = ready;
-                    _playScreen = new ScummPlayScreen(game, ready, _playIndexedStates);
+                    _ctx.CatalogPreviewOnly = false;
+                    _ctx.Play = ready;
+                    _ctx.PlayScreen = new ScummPlayScreen(game, ready, _ctx.PlayIndexedStates);
                 }
                 // A room the game shows through one script of its own (a page, a manual: Indy 3's Room 74 and Script 90) is shown as that script shows it.
-                if (_play.ShownOnlyBy(roomId) is { } viewer) _play.StartSceneAt(viewer, 0);
+                if (_ctx.Play.ShownOnlyBy(roomId) is { } viewer) _ctx.Play.StartSceneAt(viewer, 0);
             }
-            else _catalogPreviewOnly = false;
+            else _ctx.CatalogPreviewOnly = false;
             UpdatePlaySoundCard();
             // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
             // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd); an iMUSE song that jumps back
             // goes on from its loop point (S6 Monkey2).
-            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, PlaySoundLoop,
+            if (!_sceneSound.Follows(_ctx.Play)) _sceneSound.Attach(game, _ctx.Play, RenderPlaySound, PlaySoundLoop,
                 replayReachedEvents: navigationKind == RoomOpenKind.Intro);
-            if (game.Speech is { } speech && !_playSpeech.Follows(_play.Messages))
-                _playSpeech.Attach(speech, _play.Messages, navigationKind == RoomOpenKind.Intro ? 0 : _play.Messages.SpeechEvents.Count);
+            if (game.Speech is { } speech && !_playSpeech.Follows(_ctx.Play.Messages))
+                _playSpeech.Attach(speech, _ctx.Play.Messages, navigationKind == RoomOpenKind.Intro ? 0 : _ctx.Play.Messages.SpeechEvents.Count);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
             // Explicit intro playback keeps the native opening and player choices.
             // Catalog navigation has already prepared a quiet preview on a detached session.
-            _playSpeechBeforeVisit = _play.Messages.SpeechEvents.Count;
-            if (navigationKind != RoomOpenKind.Catalog && _play.CurrentRoomId != roomId)
+            _ctx.PlaySpeechBeforeVisit = _ctx.Play.Messages.SpeechEvents.Count;
+            if (navigationKind != RoomOpenKind.Catalog && _ctx.Play.CurrentRoomId != roomId)
             {
                 // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.
                 _sceneSound.StopAll("another room was picked from the list during play");
-                if (navigationKind == RoomOpenKind.Cutscene && _sceneOpening is { } scene)
+                if (navigationKind == RoomOpenKind.Cutscene && _ctx.SceneOpening is { } scene)
                 {
-                    _play.ArrivalsSkippedFor = scene.IsRoomEntry ? null : scene;
-                    _play.WantHeroForScene(scene);
+                    _ctx.Play.ArrivalsSkippedFor = scene.IsRoomEntry ? null : scene;
+                    _ctx.Play.WantHeroForScene(scene);
                 }
-                try { _play.VisitRoom(resource); }
-                finally { _play.ArrivalsSkippedFor = null; }
+                try { _ctx.Play.VisitRoom(resource); }
+                finally { _ctx.Play.ArrivalsSkippedFor = null; }
                 // The visit's entry scripts are a state preview: their lines are not spoken.
-                if (game.Speech is { } visitSpeech) _playSpeech.Attach(visitSpeech, _play.Messages);
+                if (game.Speech is { } visitSpeech) _playSpeech.Attach(visitSpeech, _ctx.Play.Messages);
             }
         }
         catch (OperationCanceledException) { return; }
@@ -282,13 +255,13 @@ public partial class MainWindow
 
     private void StartPlayClock()
     {
-        if (_play is null) return;
-        _playPaused = false;
-        _playTimer ??= new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
-        _playTimer.Tick -= PlayTimer_Tick;
-        _playTimer.Tick += PlayTimer_Tick;
-        _playTimer.Interval = TimeSpan.FromMilliseconds(_play.FrameJiffies * 1000.0 / 60);
-        _playTimer.Start();
+        if (_ctx.Play is null) return;
+        _ctx.PlayPaused = false;
+        _ctx.PlayTimer ??= new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
+        _ctx.PlayTimer.Tick -= PlayTimer_Tick;
+        _ctx.PlayTimer.Tick += PlayTimer_Tick;
+        _ctx.PlayTimer.Interval = TimeSpan.FromMilliseconds(_ctx.Play.FrameJiffies * 1000.0 / 60);
+        _ctx.PlayTimer.Start();
         RoomDisplayGroup.Visibility = Visibility.Collapsed;
         PlayScreenImage.Visibility = Visibility.Visible;
         RoomHint = null;
@@ -299,25 +272,22 @@ public partial class MainWindow
         UpdatePlaybackControls();
     }
 
+
     /// <summary>
     /// While a picked room's play session is prepared, its first-visit picture is shown on the play screen in the play frame's layout (the rows the
     /// last frame had), so the room keeps its size when the session's frames take over (2 November 2026, user report). LOOM plays in the room view and
     /// never switches.
     /// </summary>
-    /// <summary>Set while a room pick in a played game keeps the play screen showing (no loading panel, no empty room view; cleared once the new
-    /// room's picture is on the screen).</summary>
-    private bool _keepPlayScreen;
-
     private void ShowWaitingPlayFrame(ScummRoomScene scene)
     {
-        _keepPlayScreen = false;
+        _ctx.KeepPlayScreen = false;
         // The room's own screen rows, from its first visit (Indy 3 Room 85: 8 to 199); the previous room's rows made the picture jump when play began.
-        var (top, bottom) = scene.MainScreen ?? (_playShown is { } last ? (last.RoomTop, last.RoomBottom) : (16, 144));
+        var (top, bottom) = scene.MainScreen ?? (_ctx.PlayShown is { } last ? (last.RoomTop, last.RoomBottom) : (16, 144));
         var frame = ScummPlayScreen.Still(scene, top, bottom, wide: NormalRoomWidthToggle.IsChecked != true);
-        _playShown = frame;
-        if (_playBitmap is null || _playBitmap.PixelWidth != frame.PixelWidth) _playBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
-        _playBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
-        PlayScreenImage.Source = _playBitmap;
+        _ctx.PlayShown = frame;
+        if (_ctx.PlayBitmap is null || _ctx.PlayBitmap.PixelWidth != frame.PixelWidth) _ctx.PlayBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
+        _ctx.PlayBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
+        PlayScreenImage.Source = _ctx.PlayBitmap;
         RoomDisplayGroup.Visibility = Visibility.Collapsed;
         PlayScreenImage.Visibility = Visibility.Visible;
     }
@@ -325,12 +295,12 @@ public partial class MainWindow
     /// <summary>Stops the frames and gives the room view back (another game, another kind of resource).</summary>
     private void StopPlay(bool keepScreen = false)
     {
-        _playTimer?.Stop();
-        _playTimer = null;
-        if (_play is not null && _sceneSound.Follows(_play)) _sceneSound.StopAll("play was left");
+        _ctx.PlayTimer?.Stop();
+        _ctx.PlayTimer = null;
+        if (_ctx.Play is not null && _sceneSound.Follows(_ctx.Play)) _sceneSound.StopAll("play was left");
         _playSpeech.Detach();
         // A room pick in a played game keeps the screen showing until the new room's picture replaces it (no flicker).
-        if (_keepPlayScreen || keepScreen) { PlayScreenImage.Cursor = null; UpdateGameStatusButton(); if (PlayCutscenes) UpdatePlayCutsceneControls(); return; }
+        if (_ctx.KeepPlayScreen || keepScreen) { PlayScreenImage.Cursor = null; UpdateGameStatusButton(); if (PlayCutscenes) UpdatePlayCutsceneControls(); return; }
         PlayScreenImage.Visibility = Visibility.Collapsed;
         PlayScrollButtonsPanel.Visibility = ScrollRowWhenIdle;
         ClearPlayOverlays();
@@ -343,64 +313,64 @@ public partial class MainWindow
     /// <summary>Step ▸ (Advanced, as in LOOM): while paused, plays exactly one frame of the game's clock.</summary>
     private void StepPlayFrame()
     {
-        if (!PlayActive || !_playPaused || _play is null || _sceneSound.IsPreparing) return;
-        _play.AdvanceFrame();
+        if (!PlayActive || !_ctx.PlayPaused || _ctx.Play is null || _sceneSound.IsPreparing) return;
+        _ctx.Play.AdvanceFrame();
         _sceneSound.Update();
         _playSpeech.Update();
-        _playFrame++;
+        _ctx.PlayFrame++;
         ShowPlayFrame();
         RefreshPlayControlsOnFrame();
-        StatusText.Text = $"Paused after one frame (Room {_play.CurrentRoomId:00}). Play goes on.";
+        StatusText.Text = $"Paused after one frame (Room {_ctx.Play.CurrentRoomId:00}). Play goes on.";
     }
 
     private void PlayTimer_Tick(object? sender, EventArgs e)
     {
-        if (_play is null) return;
-        // R-7.16 Pause stops the game's sounds with its clock and lets them go on with it (the app's Pause key only flips _playPaused).
-        if (_playPaused != _playSoundPaused)
+        if (_ctx.Play is null) return;
+        // R-7.16 Pause stops the game's sounds with its clock and lets them go on with it (the app's Pause key only flips _ctx.PlayPaused).
+        if (_ctx.PlayPaused != _ctx.PlaySoundPaused)
         {
-            _playSoundPaused = _playPaused;
-            if (_playPaused) { _sceneSound.Pause(); _playSpeech.Pause(); } else { _sceneSound.Resume(); _playSpeech.Resume(); }
+            _ctx.PlaySoundPaused = _ctx.PlayPaused;
+            if (_ctx.PlayPaused) { _sceneSound.Pause(); _playSpeech.Pause(); } else { _sceneSound.Resume(); _playSpeech.Resume(); }
         }
         // As in LOOM, a sound the game just started holds the frames while it is rendered, so music and scene stay in step.
-        if (_playPaused || _sceneSound.IsPreparing) return;
-        _play.AdvanceFrame();
+        if (_ctx.PlayPaused || _sceneSound.IsPreparing) return;
+        _ctx.Play.AdvanceFrame();
         _sceneSound.Update();
         _playSpeech.Update();
-        _playFrame++;
-        if (_playTimer is { } timer) timer.Interval = TimeSpan.FromMilliseconds(_play.FrameJiffies * 1000.0 / 60);
+        _ctx.PlayFrame++;
+        if (_ctx.PlayTimer is { } timer) timer.Interval = TimeSpan.FromMilliseconds(_ctx.Play.FrameJiffies * 1000.0 / 60);
         ShowPlayFrame();
         RefreshPlayControlsOnFrame();
     }
 
     private void ShowPlayFrame()
     {
-        if (_playScreen is null || _play is null) return;
-        var frame = _playScreen.Compose(_playFrame, wide: NormalRoomWidthToggle.IsChecked != true);
-        _playShown = frame;
-        if (frame.RoomId is int shownRoom && _currentRoomResource?.ResourceId != shownRoom &&
-            _game?.Rooms.FirstOrDefault(r => r.ResourceId == shownRoom) is { } nativeRoom)
+        if (_ctx.PlayScreen is null || _ctx.Play is null) return;
+        var frame = _ctx.PlayScreen.Compose(_ctx.PlayFrame, wide: NormalRoomWidthToggle.IsChecked != true);
+        _ctx.PlayShown = frame;
+        if (frame.RoomId is int shownRoom && _ctx.CurrentRoomResource?.ResourceId != shownRoom &&
+            _ctx.Game?.Rooms.FirstOrDefault(r => r.ResourceId == shownRoom) is { } nativeRoom)
         {
             // Follow a native load without re-entering it through catalog preparation.
-            _currentRoomResource = nativeRoom;
-            _lastViewedRoomResource = nativeRoom;
-            _selectedResource = nativeRoom;
-            _followingPlayRoom = true;
+            _ctx.CurrentRoomResource = nativeRoom;
+            _ctx.LastViewedRoomResource = nativeRoom;
+            _ctx.SelectedResource = nativeRoom;
+            _ctx.FollowingPlayRoom = true;
             try { SelectResourceInTree(nativeRoom); }
-            finally { _followingPlayRoom = false; }
+            finally { _ctx.FollowingPlayRoom = false; }
             RoomCardList.Children.OfType<System.Windows.Controls.Button>()
                 .FirstOrDefault(card => Equals(card.Tag, nativeRoom))?.BringIntoView();
             RefreshPlayRoomActions();
         }
-        if (_playBitmap is null || _playBitmap.PixelWidth != frame.PixelWidth) _playBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
-        _playBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
-        PlayScreenImage.Source = _playBitmap;
+        if (_ctx.PlayBitmap is null || _ctx.PlayBitmap.PixelWidth != frame.PixelWidth) _ctx.PlayBitmap = new WriteableBitmap(frame.PixelWidth, ScummPlayFrame.Height, 96, 96, PixelFormats.Bgra32, null);
+        _ctx.PlayBitmap.WritePixels(new Int32Rect(0, 0, frame.PixelWidth, ScummPlayFrame.Height), frame.Pixels, frame.PixelWidth * 4, 0);
+        PlayScreenImage.Source = _ctx.PlayBitmap;
         // R-7.9: the game's cursor replaces the system pointer while the game shows it, and nothing shows while it is off.
         PlayScreenImage.Cursor = Cursors.None;
         if (IsAdvancedMode)
-            PlayScreenImage.ToolTip = $"Room {frame.RoomId:00} · input script {_play.PlayInputScript} · " +
-                                      (_play.DeliveredInput.LastOrDefault() is { } last ? $"last input runInputScript({last.Area}, {last.Value}, {last.Mode}): {last.Description}" : "no input yet") +
-                                      (_playPaused ? " · paused" : "");
+            PlayScreenImage.ToolTip = $"Room {frame.RoomId:00} · input script {_ctx.Play.PlayInputScript} · " +
+                                      (_ctx.Play.DeliveredInput.LastOrDefault() is { } last ? $"last input runInputScript({last.Area}, {last.Value}, {last.Mode}): {last.Description}" : "no input yet") +
+                                      (_ctx.PlayPaused ? " · paused" : "");
         else PlayScreenImage.ToolTip = null;
         TryUpdateGenericRoomSounds();
         UpdatePlayScrollButtons();
@@ -411,7 +381,7 @@ public partial class MainWindow
     // The image's point as a game screen point (0..319, 0..199).
     private (int X, int Y)? PlayPoint(MouseEventArgs e)
     {
-        return PlayPointAt(e.GetPosition(PlayScreenImage), PlayScreenImage.ActualWidth, PlayScreenImage.ActualHeight, _playShown?.PixelWidth ?? ScummPlayFrame.Width);
+        return PlayPointAt(e.GetPosition(PlayScreenImage), PlayScreenImage.ActualWidth, PlayScreenImage.ActualHeight, _ctx.PlayShown?.PixelWidth ?? ScummPlayFrame.Width);
     }
 
     // Match Image.Stretch=Uniform, including the unused bands around the native screen.
@@ -436,7 +406,7 @@ public partial class MainWindow
     /// </summary>
     private (int X, int Y)? GamePoint((int X, int Y)? point, bool jump)
     {
-        if (point is not { } p || _playShown is not { } frame || !frame.Wide || _play is not { } play) return point;
+        if (point is not { } p || _ctx.PlayShown is not { } frame || !frame.Wide || _ctx.Play is not { } play) return point;
         if (p.Y >= frame.RoomTop && p.Y < frame.RoomBottom)
         {
             var screenX = p.X - frame.CameraLeft;
@@ -454,15 +424,15 @@ public partial class MainWindow
     {
         if (!PlayActive) return;
         var shownPoint = PlayPoint(e);
-        if (_playAmbient) { UpdatePlayOverlayHover(shownPoint); return; }
-        _play!.PointAtScreen(GamePoint(shownPoint, jump: false));
+        if (_ctx.PlayAmbient) { UpdatePlayOverlayHover(shownPoint); return; }
+        _ctx.Play!.PointAtScreen(GamePoint(shownPoint, jump: false));
         UpdatePlayOverlayHover(shownPoint);
-        if (_playPaused) ShowPlayFrame();
+        if (_ctx.PlayPaused) ShowPlayFrame();
     }
 
     private void PlayScreenImage_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (PlayActive) _play!.PointAtScreen(null);
+        if (PlayActive) _ctx.Play!.PointAtScreen(null);
         UpdatePlayOverlayHover(null);
     }
 
@@ -482,12 +452,12 @@ public partial class MainWindow
         // R-1.5 / R-6.25.2: where the game's own input leaves a double click free (ScummProfile.DoubleClickLookVerb), the second press of a double click
         // looks at the object under it through the game's own sentence path; the first press was the normal click. Elsewhere it is just a second click.
         if (GamePoint(point, jump: true) is not { } gamePoint) return;
-        if (clickCount == 2 && PlayObjectAt(point) && _play!.DoubleClickLook(gamePoint.X, gamePoint.Y, out _) is not null)
+        if (clickCount == 2 && PlayObjectAt(point) && _ctx.Play!.DoubleClickLook(gamePoint.X, gamePoint.Y, out _) is not null)
         {
             UpdatePlaybackControls();
             return;
         }
-        if (_play!.ClickScreen(gamePoint.X, gamePoint.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
+        if (_ctx.Play!.ClickScreen(gamePoint.X, gamePoint.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
         UpdatePlaybackControls();
     }
 
@@ -507,16 +477,16 @@ public partial class MainWindow
         PlayRightClick(point.X, point.Y);
     }
 
-    private bool PlayRightClickReachesGame => PlayTakesInput && _game is { } game && ScummProfile.For(game).RightClickReachesGame;
+    private bool PlayRightClickReachesGame => PlayTakesInput && _ctx.Game is { } game && ScummProfile.For(game).RightClickReachesGame;
 
     private void UpdatePlaySoundCard()
     {
         // vars.cpp's device numbers (also ScummGameSession.AdlibCard): v1/v2
         // have no VAR_SOUNDCARD at var[0x030]; that word is their game's state.
-        if (_play is null || _game is not { } game || ScummProfile.For(game).EngineVersion < ScummVersion.V3) return;
+        if (_ctx.Play is null || _ctx.Game is not { } game || ScummProfile.For(game).EngineVersion < ScummVersion.V3) return;
         // Sound polish (19 October 2026): with the PC speaker, the scripts' isSoundRunning follows that driver's lengths (ScummVM Player_V2).
-        _play.PcSpeakerTiming = _sceneSound.Mode == SceneSoundPlayer.SoundMode.PcSpeaker;
-        _play.SoundCard = _sceneSound.Mode switch
+        _ctx.Play.PcSpeakerTiming = _sceneSound.Mode == SceneSoundPlayer.SoundMode.PcSpeaker;
+        _ctx.Play.SoundCard = _sceneSound.Mode switch
         {
             SceneSoundPlayer.SoundMode.Roland => 4,
             SceneSoundPlayer.SoundMode.Adlib => 3,
@@ -529,7 +499,7 @@ public partial class MainWindow
     private ScummPlayInput? PlayRightClick(int x, int y)
     {
         if (!PlayRightClickReachesGame) return null;
-        var input = _play!.ClickScreen(x, y, true, out var refused);
+        var input = _ctx.Play!.ClickScreen(x, y, true, out var refused);
         if (input is null && IsAdvancedMode) StatusText.ToolTip = $"Right click not delivered: {refused}";
         UpdatePlaybackControls();
         return input;
@@ -541,7 +511,7 @@ public partial class MainWindow
         if (!PlayActive || Keyboard.FocusedElement is System.Windows.Controls.TextBox or System.Windows.Controls.ComboBox) return false;
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
         if (key == Key.F11) return false;
-        if (_playAmbient) return false; // A static preview takes no keys but its Pause.
+        if (_ctx.PlayAmbient) return false; // A static preview takes no keys but its Pause.
         int? code = key switch
         {
             >= Key.F1 and <= Key.F9 => 315 + (key - Key.F1),
@@ -551,7 +521,7 @@ public partial class MainWindow
             _ => null
         };
         if (code is not int value) return false;
-        _play!.PressPlayKey(value, out _);
+        _ctx.Play!.PressPlayKey(value, out _);
         UpdatePlaybackControls();
         e.Handled = true;
         return true;
@@ -564,7 +534,7 @@ public partial class MainWindow
         var character = e.Text[0];
         if (character is < ' ' or > '~' || character is ' ' or '.') return; // '.' is Skip line, a shared key (SharedTextInput)
         e.Handled = true;
-        _play!.PressPlayKey(character, out _);
+        _ctx.Play!.PressPlayKey(character, out _);
         UpdatePlaybackControls();
     }
 }

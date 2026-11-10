@@ -23,7 +23,13 @@ internal static class Program
         var fixtures = args.Length > 2 ? args[2..] : Fixtures;
         var report = new List<string>();
         var app = new App(); app.InitializeComponent(); var window = new MainWindow();
-        object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
+        object? Field(string name)
+        {
+            // 10 November 2026: the open game's fields live in MainWindow's GameContext (_ctx), named without the underscore.
+            if (typeof(MainWindow).GetField(name, Private) is { } own) return own.GetValue(window);
+            var context = typeof(MainWindow).GetField("_ctx", Private)!.GetValue(window)!;
+            return context.GetType().GetField(char.ToUpperInvariant(name[1]) + name[2..])!.GetValue(context);
+        }
         object? Prop(string name) => typeof(MainWindow).GetProperty(name, Private)!.GetValue(window);
         window.ContentRendered += async (_, _) =>
         {

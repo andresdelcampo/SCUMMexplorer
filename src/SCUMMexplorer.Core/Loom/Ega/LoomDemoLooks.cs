@@ -15,7 +15,7 @@ internal static class LoomDemoLooks
     private static readonly ConcurrentDictionary<string, IReadOnlyDictionary<int, int>> Cache = new();
 
     /// <summary>Room number to the ego's costume when the preview first enters it (rooms the preview never enters are absent).</summary>
-    public static IReadOnlyDictionary<int, int> EgoCostumes(GameLibrary game) => Cache.GetOrAdd(game.FolderPath, _ => Read(game));
+    public static IReadOnlyDictionary<int, int> EgoCostumes(GameLibrary game) => Cache.GetOrAdd(game.Key, _ => Read(game));
 
     private static IReadOnlyDictionary<int, int> Read(GameLibrary game)
     {

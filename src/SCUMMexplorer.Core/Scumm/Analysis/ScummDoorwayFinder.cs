@@ -88,7 +88,7 @@ public sealed class ScummDoorwayFinder
         const int enough = 10;
         lock (WalkVerbs)
         {
-            if (WalkVerbs.TryGetValue(_game.FolderPath, out var known)) return known;
+            if (WalkVerbs.TryGetValue(_game.Key, out var known)) return known;
             var counts = new Dictionary<int, int>();
             int? found = null;
             foreach (var room in _game.Rooms.Where(item => item.ResourceId is not null).DistinctBy(item => item.ResourceId))
@@ -107,7 +107,7 @@ public sealed class ScummDoorwayFinder
                 var ranked = counts.OrderByDescending(pair => pair.Value).Take(2).ToArray();
                 if (ranked.Length > 0 && ranked[0].Value >= enough && ranked[0].Value >= (ranked.Length > 1 ? ranked[1].Value : 0) * 3) { found = ranked[0].Key; break; }
             }
-            WalkVerbs[_game.FolderPath] = found;
+            WalkVerbs[_game.Key] = found;
             return found;
         }
     }

@@ -11,44 +11,41 @@ public partial class MainWindow
     {
         public override string ToString() => Label;
     }
-    private GameLibrary? _costumeColorGame;
-    private GameResource? _costumeColorResource;
-    private CancellationTokenSource? _costumeColorCancellation;
     private StackPanel? _costumeColorHeader;
     private ComboBox? _costumeColorPicker;
     private TextBlock? _costumeColorEvidence, _costumeColorProgress;
-    private bool _updatingCostumeColors, _costumeColorsLoading;
+    private bool _updatingCostumeColors;
     private int _costumeColorRequest;
 
     private ScummV1CostumeColor? PrepareCostumeColors(GameResource resource)
     {
-        var game = _game;
+        var game = _ctx.Game;
         var colors = game is null ? null : ScummV1ActorColors.For(game);
         if (game is null || colors is not { SupportsContexts: true })
         {
-            _costumeColorCancellation?.Cancel();
+            _ctx.CostumeColorCancellation?.Cancel();
             _costumeColorRequest++;
-            _costumeColorsLoading = false;
-            _costumeColorGame = null;
-            _costumeColorResource = null;
+            _ctx.CostumeColorsLoading = false;
+            _ctx.CostumeColorGame = null;
+            _ctx.CostumeColorResource = null;
             if (_costumeColorHeader is not null) _costumeColorHeader.Visibility = Visibility.Collapsed;
             return colors?.ColorOf(resource.ResourceId ?? 0);
         }
-        if (ReferenceEquals(_costumeColorGame, game) && ReferenceEquals(_costumeColorResource, resource) &&
-            _costumeColorCancellation?.IsCancellationRequested == false)
+        if (ReferenceEquals(_ctx.CostumeColorGame, game) && ReferenceEquals(_ctx.CostumeColorResource, resource) &&
+            _ctx.CostumeColorCancellation?.IsCancellationRequested == false)
         {
             UpdateCostumeColorVisibility();
             return (_costumeColorPicker?.SelectedItem as CostumeColorChoice)?.Color ?? colors.ColorOf(resource.ResourceId ?? 0);
         }
 
-        _costumeColorCancellation?.Cancel();
-        _costumeColorCancellation?.Dispose();
-        var cancellation = _costumeColorCancellation = new CancellationTokenSource();
-        _costumeColorGame = game;
-        _costumeColorResource = resource;
+        _ctx.CostumeColorCancellation?.Cancel();
+        _ctx.CostumeColorCancellation?.Dispose();
+        var cancellation = _ctx.CostumeColorCancellation = new CancellationTokenSource();
+        _ctx.CostumeColorGame = game;
+        _ctx.CostumeColorResource = resource;
         EnsureCostumeColorControls();
         var color = colors.ColorOf(resource.ResourceId ?? 0);
-        _costumeColorsLoading = true;
+        _ctx.CostumeColorsLoading = true;
         SetCostumeColorChoices([new("Default colours", color, $"{color.Basis}: {color.Evidence}")]);
         _ = LoadCostumeColorContextsAsync(game, resource, colors, color, ++_costumeColorRequest, cancellation.Token);
         return color;
@@ -76,8 +73,8 @@ public partial class MainWindow
         System.Windows.Automation.AutomationProperties.SetName(_costumeColorPicker, "Costume colours");
         _costumeColorPicker.SelectionChanged += (_, _) =>
         {
-            if (_updatingCostumeColors || _costumeColorResource is not { } resource ||
-                !ReferenceEquals(_game, _costumeColorGame) || !ReferenceEquals(_selectedResource, resource)) return;
+            if (_updatingCostumeColors || _ctx.CostumeColorResource is not { } resource ||
+                !ReferenceEquals(_ctx.Game, _ctx.CostumeColorGame) || !ReferenceEquals(_ctx.SelectedResource, resource)) return;
             ShowCostume(resource);
         };
         row.Children.Add(_costumeColorPicker);
@@ -104,8 +101,8 @@ public partial class MainWindow
         try
         {
             var contexts = await Task.Run(() => colors.ContextsOf(resource.ResourceId ?? 0, cancellation), cancellation);
-            if (cancellation.IsCancellationRequested || request != _costumeColorRequest || !ReferenceEquals(_game, game) ||
-                !ReferenceEquals(_selectedResource, resource) || !ReferenceEquals(_costumeColorResource, resource)) return;
+            if (cancellation.IsCancellationRequested || request != _costumeColorRequest || !ReferenceEquals(_ctx.Game, game) ||
+                !ReferenceEquals(_ctx.SelectedResource, resource) || !ReferenceEquals(_ctx.CostumeColorResource, resource)) return;
             var choices = new List<CostumeColorChoice>();
             var same = contexts.Where(c => c.Skin == defaultColor.Skin && c.Suit == defaultColor.Suit).ToArray();
             static string Evidence(IEnumerable<ScummV1CostumeColorContext> source) => string.Join("\n", source.Select(c =>
@@ -128,14 +125,14 @@ public partial class MainWindow
         catch (Exception ex) when (ex is IOException or InvalidDataException or ArgumentException or NotSupportedException or InvalidOperationException)
         {
             if (!cancellation.IsCancellationRequested && request == _costumeColorRequest &&
-                ReferenceEquals(_costumeColorResource, resource) && ReferenceEquals(_game, game))
+                ReferenceEquals(_ctx.CostumeColorResource, resource) && ReferenceEquals(_ctx.Game, game))
                 SetCostumeColorChoices([new("Default colours", defaultColor, $"{defaultColor.Basis}: {defaultColor.Evidence}\nColour contexts unavailable: {ex.Message}")]);
         }
         finally
         {
-            if (request == _costumeColorRequest && ReferenceEquals(_costumeColorResource, resource) && ReferenceEquals(_game, game))
+            if (request == _costumeColorRequest && ReferenceEquals(_ctx.CostumeColorResource, resource) && ReferenceEquals(_ctx.Game, game))
             {
-                _costumeColorsLoading = false;
+                _ctx.CostumeColorsLoading = false;
                 UpdateCostumeColorVisibility();
             }
         }
@@ -157,16 +154,16 @@ public partial class MainWindow
     private void UpdateCostumeColorVisibility()
     {
         if (_costumeColorHeader is null) return;
-        var current = ReferenceEquals(_game, _costumeColorGame) && ReferenceEquals(_selectedResource, _costumeColorResource);
-        if (!current) _costumeColorCancellation?.Cancel();
+        var current = ReferenceEquals(_ctx.Game, _ctx.CostumeColorGame) && ReferenceEquals(_ctx.SelectedResource, _ctx.CostumeColorResource);
+        if (!current) _ctx.CostumeColorCancellation?.Cancel();
         var choice = _costumeColorPicker?.SelectedItem as CostumeColorChoice;
-        _costumeColorHeader.Visibility = current && (_costumeColorsLoading || _costumeColorPicker!.Items.Count > 1 || IsAdvancedMode)
+        _costumeColorHeader.Visibility = current && (_ctx.CostumeColorsLoading || _costumeColorPicker!.Items.Count > 1 || IsAdvancedMode)
             ? Visibility.Visible : Visibility.Collapsed;
         _costumeColorEvidence!.Text = choice?.Evidence ?? "";
         _costumeColorEvidence.ToolTip = choice?.Evidence;
         _costumeColorEvidence.Visibility = current && IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
-        _costumeColorProgress!.Visibility = current && _costumeColorsLoading ? Visibility.Visible : Visibility.Collapsed;
-        _costumeColorPicker!.IsEnabled = !_costumeColorsLoading && _costumeColorPicker.Items.Count > 1;
+        _costumeColorProgress!.Visibility = current && _ctx.CostumeColorsLoading ? Visibility.Visible : Visibility.Collapsed;
+        _costumeColorPicker!.IsEnabled = !_ctx.CostumeColorsLoading && _costumeColorPicker.Items.Count > 1;
         _costumeColorPicker!.ToolTip = IsAdvancedMode ? choice?.Evidence : null;
     }
 }

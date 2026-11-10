@@ -14,18 +14,17 @@ public partial class MainWindow
 {
     private sealed record LoomPanelEntry(ScummScriptDisassembly? Script, IReadOnlyList<ScummScriptEvent> Events, string? Summary, string Text);
 
-    private LoomPanelEntry? _loomPanelEntry;
 
     private RoomPanelData? BuildLoomPanel()
     {
-        if (_currentRoomResource?.ResourceId is not int roomId) return null;
-        var interactive = SessionModeToggle.IsChecked == true && _session is not null;
-        var entry = _loomPanelEntry;
+        if (_ctx.CurrentRoomResource?.ResourceId is not int roomId) return null;
+        var interactive = SessionModeToggle.IsChecked == true && _ctx.Session is not null;
+        var entry = _ctx.LoomPanelEntry;
         RoomPanelAction? last = null;
-        if (IsAdvancedMode && _session?.LastAction is { } action && (action.SourceRoomId == roomId || action.DestinationRoomId == roomId))
+        if (IsAdvancedMode && _ctx.Session?.LastAction is { } action && (action.SourceRoomId == roomId || action.DestinationRoomId == roomId))
         {
-            var actionName = _currentRoomObjectRecords.FirstOrDefault(record => record.Id == action.ObjectId) is { } actionObject &&
-                             _roomObjectNames.TryGetValue(actionObject.Id, out var storedName)
+            var actionName = _ctx.CurrentRoomObjectRecords.FirstOrDefault(record => record.Id == action.ObjectId) is { } actionObject &&
+                             _ctx.RoomObjectNames.TryGetValue(actionObject.Id, out var storedName)
                 ? storedName : "Something in the scene";
             var summary = action.DestinationRoomId is int
                 ? action.IsGameInput
@@ -33,7 +32,7 @@ public partial class MainWindow
                     : $"{actionName}: a new scene opened in this state preview."
                 : action.VerbId == 0 ? $"{actionName}: ran; no scene change followed."
                 : $"{actionName} · {LoomVerbNames.Label(action.VerbId)}: ran; no scene change followed.";
-            var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_names.Glossary, _names.VerbName), actionName,
+            var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_ctx.Names.Glossary, _ctx.Names.VerbName), actionName,
                 action.VerbId == 0 ? null : LoomVerbNames.Label(action.VerbId)));
             last = new RoomPanelAction(actionName, summary, action.Evidence, action.Uncertainties, action.Script)
             {
@@ -49,13 +48,13 @@ public partial class MainWindow
         if (interactive)
         {
             var issues = new List<string>();
-            if (_estimatedObjectIds.Count > 0) issues.Add($"The artwork of {_estimatedObjectIds.Count} object(s) is estimated.");
+            if (_ctx.EstimatedObjectIds.Count > 0) issues.Add($"The artwork of {_ctx.EstimatedObjectIds.Count} object(s) is estimated.");
             // The session logs everything it assumed since it began; this view lists what came after the last room entry.
-            var log = _session!.Snapshot.Uncertainties;
-            issues.AddRange(log.Skip(Math.Min(_issueBaseline, log.Count)).Distinct().TakeLast(30));
+            var log = _ctx.Session!.Snapshot.Uncertainties;
+            issues.AddRange(log.Skip(Math.Min(_ctx.IssueBaseline, log.Count)).Distinct().TakeLast(30));
             foreach (var group in LoomAssumptionGroups.Group(issues))
                 groups.Add(new(group.Title, group.Meaning, [.. group.Items.Select(issue =>
-                    (_names.NameBits(_names.NameScripts(issue)), issue))]));
+                    (_ctx.Names.NameBits(_ctx.Names.NameScripts(issue)), issue))]));
         }
         return new RoomPanelData(roomId, entry?.Script, null, [], last, [])
         {

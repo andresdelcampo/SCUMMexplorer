@@ -21,8 +21,6 @@ public partial class MainWindow : Window
     private readonly LflObjectStateReader _stateReader = new();
     private readonly ScummV3CostumeReader _costumeReader = new();
     private readonly ScummCostumeRenderer _costumeRenderer = new();
-    private ScummScriptReader _scriptReader = new();
-    private ScummObjectVerbReader _verbReader = new();
     private readonly LoomRoomSoundCandidates _roomSoundCandidates = new();
     private readonly ScummBoundedScriptExecutor _scriptExecutor = new();
     private readonly LoomRelationshipIndexer _relationshipIndexer = new();
@@ -37,90 +35,28 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private static readonly string LastFolderFile = Path.Combine(AppProfile.Root, "last-folder.txt");
-    private GameLibrary? _game;
-    private LoomReplayCatalog? _replayCatalog;
-    private LoomSceneSetupPlanner? _setupPlanner;
-    private LoomCutsceneReadiness? _readiness;
-    private string? _pendingCatalogPreparation;
-    private readonly Dictionary<string, LoomStartSetup> _startSetups = [];
-    private LoomRelationshipIndex? _relationshipIndex;
-    private GameResource? _selectedResource;
-    private GameResource? _lastViewedRoomResource;
     private int _relationshipBuildGeneration;
     private int _roomCardGeneration;
     private bool _roomCardsMayUseCache;
-    private CancellationTokenSource? _roomCardCancellation;
-    private CancellationTokenSource? _previewCancellation;
-    private RoomImage? _currentRoom;
-    private GameResource? _currentRoomResource;
-    private ScummWalkBoxSet? _currentWalkBoxes;
-    /// <summary>The CD game's first-visit scene of the room shown (its actors are drawn from it); null for other games.</summary>
-    private LoomCdScene? _cdScene;
-    // A browsed old-bundle game's room as the generic session leaves it on the first visit (Indiana Jones and the Last Crusade EGA), or null (plain background).
-    private ScummRoomScene? _browsedScene;
-    // The CD game's data source for the room view (null for the other games).
-    private IScummDataSource? _cdData;
-    private IReadOnlyList<ScummRoomObjectRecord> _currentRoomObjectRecords = [];
-    private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
 
-    /// <summary>True when <see cref="_roomObjectNames"/> are the names a browsed room stores (shown on its stored-image rows), not a live session's.</summary>
-    private bool _roomNamesAreStored;
-    private IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> _roomVerbs =
-        new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
-    private IReadOnlyList<RoomVerbDestination> _roomNavigationCandidates = [];
-    private IReadOnlyList<RoomObjectImage> _objects = [];
-    private RoomObjectSelection _objectSelection = new([]);
-    private IReadOnlySet<int> _estimatedObjectIds = new HashSet<int>();
-    private IReadOnlyDictionary<int, byte> _indexedStates = new Dictionary<int, byte>();
-    private ScummIndexedObjectSnapshot? _indexedObjectSnapshot;
-    private LoomExplorationSession? _session;
-    // Charset 0 (99.LFL) for messages, or why it could not be read (then a labelled UI font is used).
-    private ScummV3Charset? _charset;
-    // Costumes read for the actor layer (M2c), by id; null when a costume cannot be read.
-    private readonly Dictionary<int, ScummCostume?> _actorCostumes = [];
-    private string? _charsetError;
-    // The CD game's charset 2, the one script 001 sets when the intro ends (+0x015E); script 044 sets 4 for a while.
-    private ScummV4Charset? _cdCharset;
-    private readonly Dictionary<int, ScummV4Charset?> _cdCharsets = [];
 
     /// <summary>The CD charset a message was printed with (script 044 sets 4 for one title line); the default (2) when none was set or one cannot be read.</summary>
     private ScummV4Charset CdCharset(int? number, ScummV4Charset fallback)
     {
-        if (number is not int n || n == 2 || _game?.V4Archive is not { } vga) return fallback;
-        if (!_cdCharsets.TryGetValue(n, out var charset))
+        if (number is not int n || n == 2 || _ctx.Game?.V4Archive is not { } vga) return fallback;
+        if (!_ctx.CdCharsets.TryGetValue(n, out var charset))
         {
             try { charset = vga.ReadCharset(n); }
             catch (InvalidDataException) { charset = null; }
-            _cdCharsets[n] = charset;
+            _ctx.CdCharsets[n] = charset;
         }
         return charset ?? fallback;
     }
-    private int? _selectedObject;
-    private string? _audioFile;
-    private byte[]? _adlibBaseWave;
-    private CancellationTokenSource? _audioCancellation;
-    private bool _audioReady;
     private int _adlibGainRequest;
-    private bool _restoreAudioAfterGainChange;
-    private bool _resumeAudioAfterGainChange;
-    private TimeSpan _audioPositionAfterGainChange;
-    private GameResource? _selectedSound;
-    private bool _playWhenReady;
-    private AudioSurface _audioSurface;
-    private GameResource? _roomSelectedCue;
-    private GameResource? _roomRenderedCue;
-    private int? _roomCueSourceRoomId;
-    private bool _roomCueReached;
-    private bool _roomCueManuallySelected;
-    private readonly Dictionary<int, TimeSpan> _roomCueDurations = [];
-    private readonly Dictionary<int, (bool IsMusic, TimeSpan? Duration)> _roomCueTrackCache = [];
     private int _roomMusicUpdateGeneration;
     private enum AudioSurface { None, Resource, Room }
     private sealed record RoomVerbDestination(ScummRoomObjectRecord Object, ScummObjectVerbEntry Verb,
         int TargetRoomId, int InstructionOffset, string Path = "direct");
-    private ScummSceneDrawBatches? _sceneBatches;
-    private LoomDoorwayFinder? _doorwayFinder;
-    private IReadOnlyList<RoomArtworkEstimate> _artworkEstimates = [];
     private sealed record RoomVerbChoice(ScummRoomObjectRecord Object, ScummObjectVerbEntry Verb);
 
     public MainWindow()
@@ -140,7 +76,7 @@ public partial class MainWindow : Window
             reopened = true;
             ReopenLastFolder();
         };
-        Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); _costumeColorCancellation?.Cancel(); StopRoomPan(); ResetGameAudio(); };
+        Closed += (_, _) => { _ctx.RoomCardCancellation?.Cancel(); _ctx.CostumeCardCancellation?.Cancel(); _ctx.CostumeColorCancellation?.Cancel(); StopRoomPan(); ResetGameAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -163,13 +99,13 @@ public partial class MainWindow : Window
         _audioPlayer.MediaOpened += AudioPlayer_MediaOpened;
         _audioPlayer.MediaOpened += (_, _) => _sceneSound.StopAll("another sound was started in the app");
         // And the other way round: a sound the game starts stops the app's other player, so two copies never overlap.
-        _sceneSound.Starting += () => { if (_audioSurface != AudioSurface.None) StopAudio(); };
+        _sceneSound.Starting += () => { if (_ctx.AudioSurface != AudioSurface.None) StopAudio(); };
         _sceneSound.PreviewStarting += source => StatusText.ToolTip = source + Environment.NewLine +
             "This audio follows the executed state preview; its estimated route is not confirmed gameplay.";
         _audioPlayer.MediaEnded += (_, _) => StopPlayback();
         _audioPlayer.MediaFailed += (_, args) =>
         {
-            var surface = _audioSurface;
+            var surface = _ctx.AudioSurface;
             var message = args.ErrorException?.Message ?? "Audio playback failed.";
             StopAudio();
             if (surface == AudioSurface.Room)
@@ -223,16 +159,16 @@ public partial class MainWindow : Window
             });
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException or NotSupportedException or InvalidOperationException) { return; }
-        if (_game != game) return;
+        if (_ctx.Game != game) return;
         foreach (var group in ResourceTree.Items.OfType<TreeViewItem>())
             foreach (var item in group.Items.OfType<TreeViewItem>())
             {
                 if (item.Tag is not GameResource { Kind: ResourceKind.Sound, ResourceId: >= GameLibrary.SpeechIdBase, Offset: { } offset } resource || !lines.TryGetValue(offset, out var text)) continue;
                 var line = string.Join(' ', text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
-                _soundLines[resource] = line;
+                _ctx.SoundLines[resource] = line;
                 item.Header = $"{resource.Name} · {(line.Length > 40 ? line[..40] + "…" : line)}";
                 item.ToolTip = resource.Description + Environment.NewLine + "\"" + line + "\"";
-                if (_selectedSound == resource && AudioPanel.Visibility == Visibility.Visible)
+                if (_ctx.SelectedSound == resource && AudioPanel.Visibility == Visibility.Visible)
                 {
                     AudioLine.Text = SoundDisplayLine(line);
                     AudioLine.Visibility = Visibility.Visible;
@@ -242,7 +178,7 @@ public partial class MainWindow : Window
 
     private void GameTexts_Click(object sender, RoutedEventArgs e)
     {
-        if (_game is null)
+        if (_ctx.Game is null)
         {
             MessageBox.Show(this, "Open a game folder first.", "Game texts", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
@@ -250,10 +186,10 @@ public partial class MainWindow : Window
 
         try
         {
-            var extraction = new LoomTextExtractor().Extract(_game);
-            var gallery = new TextGalleryWindow(_game, extraction, roomId =>
+            var extraction = new LoomTextExtractor().Extract(_ctx.Game);
+            var gallery = new TextGalleryWindow(_ctx.Game, extraction, roomId =>
             {
-                if (_game?.Rooms.FirstOrDefault(room => room.ResourceId == roomId) is { } room)
+                if (_ctx.Game?.Rooms.FirstOrDefault(room => room.ResourceId == roomId) is { } room)
                     SelectResourceInTree(room);
             }, CurrentModule.GalleryCutscenes(), RenderFirstVisitRoomAsync) { Owner = this };
             gallery.ShowDialog();
@@ -286,41 +222,39 @@ public partial class MainWindow : Window
     private void OpenGameFolder(string folder)
     {
         ResetGameAudio();
-        _loomAmbientSource = null; _playAmbient = false; _playLiveSource = null; _playPartyAssumed = false; RoomHint = null;
-        _roomCardCancellation?.Cancel();
-        _roomCardBackgroundsReady.TrySetResult(false);
-        _roomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _ctx.LoomAmbientSource = null; _ctx.PlayAmbient = false; _ctx.PlayLiveSource = null; _ctx.PlayPartyAssumed = false; RoomHint = null;
+        _ctx.RoomCardCancellation?.Cancel();
+        _ctx.RoomCardBackgroundsReady.TrySetResult(false);
+        _ctx.RoomCardBackgroundsReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
         foreach (var module in _gameModules ?? []) module.Reset();
-        _playPlanner = null;
-        _playSavedRoomLists = null;
-        _playRoomListsDone = false;
-        _scanDone = _scanTotal = 0;
+        _ctx.PlayPlanner = null;
+        _ctx.PlaySavedRoomLists = null;
+        _ctx.PlayRoomListsDone = false;
+        _ctx.ScanDone = _ctx.ScanTotal = 0;
         StopPlay();
-        _play = null;
+        _ctx.Play = null;
         // The boot every picked scene begins from belongs to the game it was taken in (9 November 2026, user report: Indy 3's Indy, verbs and lines in
         // Maniac Mansion's garage, whose own party start leaves it unset).
-        _playBoot = null;
-        _playFolder = null;
+        _ctx.PlayBoot = null;
+        _ctx.PlayFolder = null;
         // R-3.16: a game whose data holds several languages opens in the one remembered for this folder (the default otherwise).
         var game = new GameFolderScanner { DiscFolder = RememberedLanguage(folder) }.Scan(folder);
         // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
         GameStatusButton.Visibility = Visibility.Collapsed;
-        _game = game;
+        // A clean slate (10 November 2026 audit): everything the game before owned goes with its context; only the scan above can fail, and then
+        // the context of the game shown stays.
+        _ctx.Retire();
+        _ctx = new GameContext { Game = game };
         StartInspectionCopy(game);
         CrashLog.Note($"Opened {game.Title} ({game.Version}{(game.Edition is { Length: > 0 } edition ? ", " + edition : "")}) from {folder}");
         var indexedSnapshot = CurrentModule.ReadObjectSnapshot(game);
-        _names = CurrentModule.CreateNames(game);
-        _usageIndex = LoomUsageIndex.Empty;
+        _ctx.Names = CurrentModule.CreateNames(game);
         _ = BuildUsageIndexAsync(game);
-        _replayCatalog = null;
         CurrentModule.Opened(game);
-        _scriptReader = new ScummScriptReader(ScummProfile.For(game).Dialect);
-        _verbReader = new ScummObjectVerbReader(ScummProfile.For(game).Dialect);
-        _sceneBatches = null;
-        _drawBatchesTask = null;
-        _doorwayFinder = null;
-        _indexedObjectSnapshot = indexedSnapshot;
-        _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
+        _ctx.ScriptReader = new ScummScriptReader(ScummProfile.For(game).Dialect);
+        _ctx.VerbReader = new ScummObjectVerbReader(ScummProfile.For(game).Dialect);
+        _ctx.IndexedObjectSnapshot = indexedSnapshot;
+        _ctx.IndexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
         StopScenePlayback();
         _sceneSound.StopAll("another game was opened");
         // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
@@ -350,19 +284,12 @@ public partial class MainWindow : Window
             SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.Adlib;
             _soundModeFallback = false;
         }
-        _cdData = null;
-        _cdCutsceneGroups = null;
-        _session = null;
-        _charsetError = null;
-        _charset = null;
         CurrentModule.StartSession(game, indexedSnapshot);
-        _cdCharsets.Clear();
-        try { _cdCharset = game.V4Archive?.ReadCharset(2); }
-        catch (InvalidDataException error) { _cdCharset = null; _charsetError = $"charset 2 could not be read: {error.Message}"; }
-        _actorCostumes.Clear();
+        try { _ctx.CdCharset = game.V4Archive?.ReadCharset(2); }
+        catch (InvalidDataException error) { _ctx.CdCharset = null; _ctx.CharsetError = $"charset 2 could not be read: {error.Message}"; }
         ShowGame(game);
-        _ = StartRoomBackgroundFollowupsAsync(game, _roomCardBackgroundsReady.Task, _roomCardsMayUseCache,
-            _roomCardGeneration, _roomCardCancellation!.Token);
+        _ = StartRoomBackgroundFollowupsAsync(game, _ctx.RoomCardBackgroundsReady.Task, _roomCardsMayUseCache,
+            _roomCardGeneration, _ctx.RoomCardCancellation!.Token);
         StartRelationshipIndexBuild(game);
         try
         {
@@ -398,13 +325,13 @@ public partial class MainWindow : Window
     {
         EnsureOverlayModesChecked();
         _cutsceneLaunchGeneration++;
-        _catalogPreviewOnly = false;
-        _introPreparing = false;
+        _ctx.CatalogPreviewOnly = false;
+        _ctx.IntroPreparing = false;
         UpdateGameIntroButton();
         Interlocked.Increment(ref _relationshipBuildGeneration);
-        _relationshipIndex = null;
-        _selectedResource = null;
-        _lastViewedRoomResource = null;
+        _ctx.RelationshipIndex = null;
+        _ctx.SelectedResource = null;
+        _ctx.LastViewedRoomResource = null;
         ConnectionsButton.Visibility = Visibility.Collapsed;
         StatusText.Visibility = Visibility.Visible;
         StopAudio();
@@ -416,26 +343,26 @@ public partial class MainWindow : Window
         StopRoomPan();
         RoomObjectPanel.Visibility = Visibility.Visible;
         Grid.SetColumnSpan(ContentPanel, 1);
-        _previewCancellation?.Cancel();
-        _currentRoom = null;
-        _currentRoomResource = null;
-        _currentRoomObjectRecords = [];
-        _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
-        _roomNavigationCandidates = [];
-        _objects = [];
-        _objectSelection = new([]);
-        _estimatedObjectIds = new HashSet<int>();
-        _selectedObject = null;
+        _ctx.PreviewCancellation?.Cancel();
+        _ctx.CurrentRoom = null;
+        _ctx.CurrentRoomResource = null;
+        _ctx.CurrentRoomObjectRecords = [];
+        _ctx.RoomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
+        _ctx.RoomNavigationCandidates = [];
+        _ctx.Objects = [];
+        _ctx.ObjectSelection = new([]);
+        _ctx.EstimatedObjectIds = new HashSet<int>();
+        _ctx.SelectedObject = null;
         ClearObjectList();
         ObjectsNote.Text = "Choose a room.";
-        SessionModeToggle.Visibility = _session is null && !PlayCutscenes ? Visibility.Collapsed : Visibility.Visible;
+        SessionModeToggle.Visibility = _ctx.Session is null && !PlayCutscenes ? Visibility.Collapsed : Visibility.Visible;
         // R-6.50: the same switch in every game; its tooltip names the game's own interface (LOOM's is the one written in the XAML).
         var loomTip = SessionModeToggleLoomTip;
         SessionModeToggle.ToolTip = PlayCutscenes
             ? "Interactive: play the game through its own verbs, sentence line and inventory; keys go to the game, . skips the text shown, Escape skips a cutscene, space pauses it. Uncheck to inspect: a click then cycles an object's stored images and no script runs."
             : loomTip;
-        SessionActions.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
-        SessionStatusText.Text = _session is null ? "" : "Session ready. Select a room to visit it.";
+        SessionActions.Visibility = _ctx.Session is null ? Visibility.Collapsed : Visibility.Visible;
+        SessionStatusText.Text = _ctx.Session is null ? "" : "Session ready. Select a room to visit it.";
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         RoomEntryTraceOutput.Text = "";
         RoomEntryEventButtons.Children.Clear();
@@ -447,12 +374,12 @@ public partial class MainWindow : Window
         ObjectVerbButtons.Children.Clear();
         ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
         RoomMusicPanel.Visibility = Visibility.Collapsed;
-        _roomSelectedCue = null;
-        _roomRenderedCue = null;
-        _roomCueSourceRoomId = null;
-        _roomCueManuallySelected = false;
-        _roomCueDurations.Clear();
-        _roomCueTrackCache.Clear();
+        _ctx.RoomSelectedCue = null;
+        _ctx.RoomRenderedCue = null;
+        _ctx.RoomCueSourceRoomId = null;
+        _ctx.RoomCueManuallySelected = false;
+        _ctx.RoomCueDurations.Clear();
+        _ctx.RoomCueTrackCache.Clear();
         RoomPreview.ToolTip = null;
         RoomPreview.Cursor = Cursors.Arrow;
         ScriptEventButtons.Children.Clear();
@@ -471,14 +398,14 @@ public partial class MainWindow : Window
         ShowLanguageChoice(game);
         GameInfo.ToolTip = $"{game.Version switch { ScummVersion.Unknown => "SCUMM version unconfirmed", _ => $"SCUMM {game.Version}" }} · {game.Platform}";
         ResourceTree.Items.Clear();
-        _durationKey = default; // the new tree has no durations yet
+        _ctx.DurationKey = default; // the new tree has no durations yet
         RoomCardList.Children.Clear();
         RoomCardScroll.Visibility = Visibility.Visible;
 
-        _soundLines.Clear();
+        _ctx.SoundLines.Clear();
         var rooms = new TreeViewItem { Header = $"Rooms  ({game.Scenes.Count()})", IsExpanded = false };
         foreach (var room in game.Scenes)
-            rooms.Items.Add(new TreeViewItem { Header = _names.Label(room), ToolTip = _names.Evidence(room), Tag = room });
+            rooms.Items.Add(new TreeViewItem { Header = _ctx.Names.Label(room), ToolTip = _ctx.Names.Evidence(room), Tag = room });
         ResourceTree.Items.Add(rooms);
 
         foreach (var (kind, label) in new[]
@@ -492,8 +419,8 @@ public partial class MainWindow : Window
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
             foreach (var item in group)
-                node.Items.Add(new TreeViewItem { Header = _names.Label(item),
-                    ToolTip = _names.Evidence(item) ?? item.Description, Tag = item });
+                node.Items.Add(new TreeViewItem { Header = _ctx.Names.Label(item),
+                    ToolTip = _ctx.Names.Evidence(item) ?? item.Description, Tag = item });
             ResourceTree.Items.Add(node);
         }
 
@@ -535,7 +462,7 @@ public partial class MainWindow : Window
         if (IntroRequiredForPlay(game) && GameSupport.For(game).LiveSession)
             Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
             {
-                if (ReferenceEquals(_game, game) && GameIntroButton.IsEnabled && !PlayActive) GameIntro_Click(GameIntroButton, new RoutedEventArgs());
+                if (ReferenceEquals(_ctx.Game, game) && GameIntroButton.IsEnabled && !PlayActive) GameIntro_Click(GameIntroButton, new RoutedEventArgs());
             }));
     }
 
@@ -544,17 +471,17 @@ public partial class MainWindow : Window
 
     private void PopulateRoomCards(GameLibrary game)
     {
-        _roomCardCancellation?.Cancel();
+        _ctx.RoomCardCancellation?.Cancel();
         var cancellation = new CancellationTokenSource();
-        _roomCardCancellation = cancellation;
+        _ctx.RoomCardCancellation = cancellation;
         var generation = ++_roomCardGeneration;
-        _roomCardStages.Clear();
+        _ctx.RoomCardStages.Clear();
         var rooms = game.Scenes.ToArray();
-        var indexedSnapshot = _indexedObjectSnapshot is null ? null : new ScummIndexedObjectSnapshot(
-            _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
-            _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
-            _indexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
-        var indexedStates = new Dictionary<int, byte>(_indexedStates);
+        var indexedSnapshot = _ctx.IndexedObjectSnapshot is null ? null : new ScummIndexedObjectSnapshot(
+            _ctx.IndexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _ctx.IndexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _ctx.IndexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
+        var indexedStates = new Dictionary<int, byte>(_ctx.IndexedStates);
 
         // Create every card before starting any file reads or script execution.
         foreach (var roomResource in rooms)
@@ -584,18 +511,16 @@ public partial class MainWindow : Window
             };
             System.Windows.Automation.AutomationProperties.SetName(button, $"Open room {roomResource.ResourceId:00}");
             button.Click += (_, _) => SelectResourceInTree(roomResource);
-            if (_selectedResource?.ResourceId == roomResource.ResourceId ||
-                _lastViewedRoomResource?.ResourceId == roomResource.ResourceId)
+            if (_ctx.SelectedResource?.ResourceId == roomResource.ResourceId ||
+                _ctx.LastViewedRoomResource?.ResourceId == roomResource.ResourceId)
                 button.BorderBrush = new SolidColorBrush(Color.FromRgb(183, 132, 66));
             RoomCardList.Children.Add(button);
         }
 
-        _roomCardLoadTask = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
+        _ctx.RoomCardLoadTask = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
             generation, cancellation.Token);
     }
 
-    private Task<ScummSceneDrawBatches>? _drawBatchesTask;
-    private GameLibrary? _drawBatchesGame;
 
     /// <summary>
     /// The game's script draw batches, built once on a worker thread and shared by the room cards, the first room and Game Texts
@@ -603,25 +528,25 @@ public partial class MainWindow : Window
     /// </summary>
     private Task<ScummSceneDrawBatches> DrawBatchesAsync(GameLibrary game)
     {
-        if (_drawBatchesTask is null || !ReferenceEquals(_drawBatchesGame, game))
+        if (_ctx.DrawBatchesTask is null || !ReferenceEquals(_ctx.DrawBatchesGame, game))
         {
-            _drawBatchesGame = game;
-            _drawBatchesTask = Task.Run(() => ScummSceneDrawBatches.Build(game));
+            _ctx.DrawBatchesGame = game;
+            _ctx.DrawBatchesTask = Task.Run(() => ScummSceneDrawBatches.Build(game));
         }
-        return _drawBatchesTask;
+        return _ctx.DrawBatchesTask;
     }
 
 
     /// <summary>A room as the explorer first shows it (objects in their first-visit state, as on the room cards), at full size; null outside LOOM.</summary>
     private async Task<BitmapSource?> RenderFirstVisitRoomAsync(int roomId)
     {
-        if (_game is not { Id: GameId.Loom, Version: ScummVersion.V3 } game || _indexedObjectSnapshot is null ||
+        if (_ctx.Game is not { Id: GameId.Loom, Version: ScummVersion.V3 } game || _ctx.IndexedObjectSnapshot is null ||
             game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } resource) return null;
         var snapshot = new ScummIndexedObjectSnapshot(
-            _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
-            _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
-            _indexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
-        var states = new Dictionary<int, byte>(_indexedStates);
+            _ctx.IndexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _ctx.IndexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _ctx.IndexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
+        var states = new Dictionary<int, byte>(_ctx.IndexedStates);
         var batchesTask = DrawBatchesAsync(game);
         try
         {
@@ -648,14 +573,12 @@ public partial class MainWindow : Window
         var background = game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
         if (ScummProfile.For(game).HasFirstVisitScenes) return background;
         // The objects that are visible at the start of the game are painted over the background.
-        var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
+        var states = OlderObjectStates.GetOrAdd(game.Key, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
         return ScummOldRoomObjects.ComposeVisible(background, bytes, game.V1Game, states);
     }
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte[]?> OlderObjectStates = new();
 
-    /// <summary>The objects drawn in the shown room of a v1 or v2 game, for the names the pointer reveals (empty for other games).</summary>
-    private IReadOnlyList<BrowsedObjectLabel> _olderObjects = [];
 
     /// <summary>The objects a browsed v3 room (Indy3) stores: every record with a box, named when the room stores a name. No script decides which are present.</summary>
     private IReadOnlyList<BrowsedObjectLabel> ReadStoredV3Objects(byte[] bytes, ScummRoomScene? scene = null)
@@ -665,7 +588,7 @@ public partial class MainWindow : Window
             var records = _objectDirectory.Decode(bytes);
             var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
             // The starting state from the index: objects the room owns (owner 15), whose parent chain is in the required state.
-            var snapshot = _game is null ? null : BrowsedObjectSnapshots.GetOrAdd(_game.FolderPath, folder =>
+            var snapshot = _ctx.Game is not { FolderPath: var folder } shown ? null : BrowsedObjectSnapshots.GetOrAdd(shown.Key, _ =>
             {
                 try { return Directory.EnumerateFiles(folder, "00.LFL").FirstOrDefault() is { } index ? new LflObjectStateReader().ReadSnapshot(index) : null; }
                 catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException) { return null; }
@@ -704,10 +627,9 @@ public partial class MainWindow : Window
         return labels.Where(label => scene.Records.Any(record => record.Id == label.Id && scene.IsHotspot(record))).ToList();
     }
 
-    private BrowsedObjectLabel? _browsedHover;
 
     /// <summary>The stored objects that are not doorways (a doorway has its own overlay, list and option, as in LOOM).</summary>
-    private IEnumerable<BrowsedObjectLabel> BrowsedObjects => _olderObjects.Where(label => !_roomNavigationCandidates.Any(item => item.Object.Id == label.Id));
+    private IEnumerable<BrowsedObjectLabel> BrowsedObjects => _ctx.OlderObjects.Where(label => !_ctx.RoomNavigationCandidates.Any(item => item.Object.Id == label.Id));
 
     private static string BrowsedName(BrowsedObjectLabel label) => label.Name.Length > 0 ? label.Name : $"Object {label.Id}";
 
@@ -719,7 +641,7 @@ public partial class MainWindow : Window
     {
         // R-6.23 / R-6.41 (user, 24 Oct 2026: Maniac enhanced showed no doorways until Play Game Intro): every engine version with a script reader
         // (v1 to v4 here) derives its doorways from the room's own verb scripts, in a static preview as in play. Only v1/v2 were left out.
-        if (_game is not { Version: ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3 or ScummVersion.V4 } game || room.ResourceId is not int roomId) return [];
+        if (_ctx.Game is not { Version: ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3 or ScummVersion.V4 } game || room.ResourceId is not int roomId) return [];
         try
         {
             // A browsed v4 game reads its room out of the disk (or the room files) that holds it.
@@ -753,11 +675,11 @@ public partial class MainWindow : Window
     private IEnumerable<RoomDoorwayBox> BrowsedDoorwayBoxes()
     {
         // Doorways in one rectangle share one box.
-        foreach (var same in _olderObjects.Where(label => _roomNavigationCandidates.Any(item => item.Object.Id == label.Id)).GroupBy(label => (label.X, label.Y, label.Width, label.Height)))
+        foreach (var same in _ctx.OlderObjects.Where(label => _ctx.RoomNavigationCandidates.Any(item => item.Object.Id == label.Id)).GroupBy(label => (label.X, label.Y, label.Width, label.Height)))
         {
             var label = same.FirstOrDefault(item => item.Name.Length > 0) ?? same.First();
-            var targets = _roomNavigationCandidates.Where(item => same.Any(other => other.Id == item.Object.Id)).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
-            if (targets.Length == 0 || !RoomOverlayRules.Shows(DoorwayMode, same.Any(item => _hoveredDoorwayIds.Contains(item.Id)))) continue;
+            var targets = _ctx.RoomNavigationCandidates.Where(item => same.Any(other => other.Id == item.Object.Id)).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
+            if (targets.Length == 0 || !RoomOverlayRules.Shows(DoorwayMode, same.Any(item => _ctx.HoveredDoorwayIds.Contains(item.Id)))) continue;
             yield return new RoomDoorwayBox(label.X, label.Y, label.Width, label.Height, targets, true,
                 $"{BrowsedName(label)}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))} (a static candidate; no script condition is evaluated). " +
                 "The Advanced doorway buttons open the rooms directly.",
@@ -768,10 +690,10 @@ public partial class MainWindow : Window
     /// <summary>Browse-only games: the room's stored objects as an Advanced-mode list; hovering a row outlines its box. Doorways get their own buttons and overlay. Raw stored data only.</summary>
     private void ShowStoredObjectHotspots(GameResource room, IReadOnlyList<RoomVerbDestination> doorways)
     {
-        _browsedHover = null;
+        _ctx.BrowsedHover = null;
         // Only doorways that are among the room's stored objects with a box.
-        if (_olderObjects.Count == 0) { ShowBrowsedHighlight(null, true); return; }
-        var present = _olderObjects.Select(label => label.Id).ToHashSet();
+        if (_ctx.OlderObjects.Count == 0) { ShowBrowsedHighlight(null, true); return; }
+        var present = _ctx.OlderObjects.Select(label => label.Id).ToHashSet();
         ShowRoomNavigationCandidates(room, doorways.Where(item => present.Contains(item.Object.Id)).ToArray());
         var rowIndex = 0;
         foreach (var label in BrowsedObjects)
@@ -784,7 +706,7 @@ public partial class MainWindow : Window
             {
                 Content = text,
                 ToolTip = $"Object {label.Id} · {label.X}, {label.Y} · {label.Width} × {label.Height}. " +
-                    (_browsedScene is not null ? "Selectable in the room state reached by its scripts."
+                    (_ctx.BrowsedScene is not null ? "Selectable in the room state reached by its scripts."
                         : "A stored object; the game's scripts decide whether it is present."),
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 3),
@@ -808,15 +730,15 @@ public partial class MainWindow : Window
     private void ShowBrowsedHighlight(BrowsedObjectLabel? label, bool fromList)
     {
         if (!fromList && ObjectAreaMode == DisplayMode.Never) label = null;
-        _browsedHover = label;
+        _ctx.BrowsedHover = label;
         HotspotHighlightOverlay.Children.Clear();
-        var all = ObjectAreaMode == DisplayMode.Always && _olderObjects.Count > 0;
+        var all = ObjectAreaMode == DisplayMode.Always && _ctx.OlderObjects.Count > 0;
         HotspotHighlightOverlay.Visibility = label is null && !all ? Visibility.Collapsed : Visibility.Visible;
-        if (_currentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 || HotspotHighlightOverlay.ActualHeight <= 0 || label is null && !all) return;
-        var scale = Math.Min(HotspotHighlightOverlay.ActualWidth / _currentRoom.Width, HotspotHighlightOverlay.ActualHeight / _currentRoom.Height);
+        if (_ctx.CurrentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 || HotspotHighlightOverlay.ActualHeight <= 0 || label is null && !all) return;
+        var scale = Math.Min(HotspotHighlightOverlay.ActualWidth / _ctx.CurrentRoom.Width, HotspotHighlightOverlay.ActualHeight / _ctx.CurrentRoom.Height);
         if (scale <= 0) return;
-        var offsetX = (HotspotHighlightOverlay.ActualWidth - _currentRoom.Width * scale) / 2;
-        var offsetY = (HotspotHighlightOverlay.ActualHeight - _currentRoom.Height * scale) / 2;
+        var offsetX = (HotspotHighlightOverlay.ActualWidth - _ctx.CurrentRoom.Width * scale) / 2;
+        var offsetY = (HotspotHighlightOverlay.ActualHeight - _ctx.CurrentRoom.Height * scale) / 2;
         void Box(BrowsedObjectLabel item, bool strong)
         {
             var box = new Border
@@ -856,7 +778,7 @@ public partial class MainWindow : Window
     {
         if (scene is not null) return ReadOlderFirstVisitObjects(bytes, scene);
         if (ScummProfile.For(game).HasFirstVisitScenes) return [];
-        var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
+        var states = OlderObjectStates.GetOrAdd(game.Key, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
         return ScummOldRoomObjects.Read(LflEncoding.DecodeXorFF(bytes), states).Where(entry => entry.Visible && entry.Name.Length > 0)
             .Select(entry => new BrowsedObjectLabel(entry.Id, entry.Name, entry.X, entry.Y, entry.Width, entry.Height)).ToList();
     }
@@ -865,7 +787,8 @@ public partial class MainWindow : Window
     private static RoomImage DecodeBrowsedOldV3Room(GameLibrary game, RoomImage background, byte[] bytes)
     {
         if (game.Id == GameId.Loom) return background;
-        var states = BrowsedObjectStates.GetOrAdd(game.FolderPath, folder =>
+        var folder = game.FolderPath;
+        var states = BrowsedObjectStates.GetOrAdd(game.Key, _ =>
         {
             try { return Directory.EnumerateFiles(folder, "00.LFL").FirstOrDefault() is { } index ? new LflObjectStateReader().Read(index) : null; }
             catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException) { return null; }
@@ -939,15 +862,15 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateSoundDeviceVisibility()
     {
-        var show = _game is { } game && (IsAdvancedMode || GameSupport.For(game) is { LiveSession: true, Cutscenes: true, Audio: true });
-        var disc = _game is { V4Archive.Disc.AudioStartSector: not null };
+        var show = _ctx.Game is { } game && (IsAdvancedMode || GameSupport.For(game) is { LiveSession: true, Cutscenes: true, Audio: true });
+        var disc = _ctx.Game is { V4Archive.Disc.AudioStartSector: not null };
         SoundModeCombo.Visibility = show && !disc ? Visibility.Visible : Visibility.Collapsed;
         CdSoundCombo.Visibility = show && disc ? Visibility.Visible : Visibility.Collapsed;
     }
 
     // The device belongs to whichever live session is on screen. A scene keeps its
     // driver until it ends, including in a game played through its verbs.
-    private bool SoundDeviceLocked => PlayActive ? _play!.InCutscene : SessionInScene;
+    private bool SoundDeviceLocked => PlayActive ? _ctx.Play!.InCutscene : SessionInScene;
 
     private void UpdateSoundDeviceControls()
     {
@@ -961,7 +884,6 @@ public partial class MainWindow : Window
 
     private bool IsAdvancedMode => AdvancedModeToggle.IsChecked == true;
 
-    private bool _restoringInteractiveView;
 
     private void AdvancedModeToggle_Click(object sender, RoutedEventArgs e)
     {
@@ -969,19 +891,18 @@ public partial class MainWindow : Window
         // returning from Advanced, where the user can inspect stored artwork.
         if (!IsAdvancedMode && SessionModeToggle.IsChecked != true)
         {
-            _restoringInteractiveView = true;
+            _ctx.RestoringInteractiveView = true;
             try { SessionModeToggle.IsChecked = true; }
-            finally { _restoringInteractiveView = false; }
+            finally { _ctx.RestoringInteractiveView = false; }
         }
-        if (!IsAdvancedMode && _selectedResource is { Kind: not (ResourceKind.Room or ResourceKind.Costume) })
+        if (!IsAdvancedMode && _ctx.SelectedResource is { Kind: not (ResourceKind.Room or ResourceKind.Costume) })
         {
-            var returnRoom = _lastViewedRoomResource ?? _game?.Rooms.FirstOrDefault();
+            var returnRoom = _ctx.LastViewedRoomResource ?? _ctx.Game?.Rooms.FirstOrDefault();
             if (returnRoom is not null) SelectResourceInTree(returnRoom);
         }
         UpdateAdvancedMode();
     }
 
-    private string? _roomHint;
 
     /// <summary>
     /// A line under the scene in Normal mode too (user, 25 Oct 2026: say why a room is not live instead of leaving a silent picture): shown while a room is being
@@ -989,10 +910,10 @@ public partial class MainWindow : Window
     /// </summary>
     private string? RoomHint
     {
-        get => _roomHint;
+        get => _ctx.RoomHint;
         set
         {
-            _roomHint = value;
+            _ctx.RoomHint = value;
             if (value is not null) ObjectsNote.Text = value;
             // Hidden, not collapsed: the hint keeps its two lines, so the room above does not change size as hints come and go (user report, 2 November).
             ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || value is not null ? Visibility.Visible : Visibility.Hidden;
@@ -1006,12 +927,12 @@ public partial class MainWindow : Window
         // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
         ObjectsNote.Visibility = SessionModeToggle.IsChecked != true || RoomHint is not null ? Visibility.Visible : Visibility.Hidden;
         // A browsed first visit explains itself in Advanced mode only (R-1.13).
-        if (_browsedScene is { } shownScene && _currentRoom is not null && ReferenceEquals(shownScene.Room, _currentRoom)) ObjectsNote.Text = BrowsedSceneNote(shownScene);
-        VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
+        if (_ctx.BrowsedScene is { } shownScene && _ctx.CurrentRoom is not null && ReferenceEquals(shownScene.Room, _ctx.CurrentRoom)) ObjectsNote.Text = BrowsedSceneNote(shownScene);
+        VerbStripBorder.ToolTip = advanced ? _ctx.VerbScreenNote : null;
         CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        GameTextsButton.Visibility = advanced && _game is { } textGame && GameSupport.For(textGame).Texts ? Visibility.Visible : Visibility.Collapsed;
+        GameTextsButton.Visibility = advanced && _ctx.Game is { } textGame && GameSupport.For(textGame).Texts ? Visibility.Visible : Visibility.Collapsed;
         var rootGrid = ContentPanel.Parent as Grid;
-        var showRoomDetails = advanced && _selectedResource?.Kind == ResourceKind.Room;
+        var showRoomDetails = advanced && _ctx.SelectedResource?.Kind == ResourceKind.Room;
         if (rootGrid is not null && rootGrid.ColumnDefinitions.Count > 2)
             rootGrid.ColumnDefinitions[2].Width = new GridLength(showRoomDetails ? 290 : 0);
         RoomObjectPanel.Visibility = showRoomDetails ? Visibility.Visible : Visibility.Collapsed;
@@ -1019,15 +940,15 @@ public partial class MainWindow : Window
         ResourceTree.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         StartSoundDurations();
         UpdateNormalCatalog(advanced);
-        RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
-        WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
+        RoomMaskToggle.Visibility = advanced && _ctx.CurrentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
+        WalkBoxToggle.Visibility = advanced && _ctx.CurrentRoom is not null && _ctx.CurrentWalkBoxes is not null
             ? Visibility.Visible : Visibility.Collapsed;
-        SessionStatusText.Visibility = advanced && _session is not null && SessionModeToggle.IsChecked != true
+        SessionStatusText.Visibility = advanced && _ctx.Session is not null && SessionModeToggle.IsChecked != true
             ? Visibility.Visible : Visibility.Collapsed;
-        AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced && _ctx.Session is not null ? Visibility.Visible : Visibility.Collapsed;
         // R-6.6: Step ▸ is part of the Advanced bar in every live game (a verb-based game steps its own clock).
         if (PlayCutscenes) AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        SessionActions.Visibility = advanced && _session is not null
+        SessionActions.Visibility = advanced && _ctx.Session is not null
             ? Visibility.Visible : Visibility.Collapsed;
         RoomCueTime.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomEntryTraceExpander.Visibility = advanced && !string.IsNullOrWhiteSpace(RoomEntryTraceOutput.Text)
@@ -1082,9 +1003,9 @@ public partial class MainWindow : Window
             scene.Start?.Invoke();
             return;
         }
-        if (_followingPlayRoom)
+        if (_ctx.FollowingPlayRoom)
         {
-            if (e.NewValue is TreeViewItem { Tag: GameResource nativeRoom }) _selectedResource = nativeRoom;
+            if (e.NewValue is TreeViewItem { Tag: GameResource nativeRoom }) _ctx.SelectedResource = nativeRoom;
             return;
         }
         // Opening a scene can take seconds (a new game session runs the boot scripts, the first visit runs the room's): show it.
@@ -1096,19 +1017,19 @@ public partial class MainWindow : Window
         using var busy = BeginBusy(null);
         // 3 November 2026 (user report: picking a room flickered): in a played game whose screen is showing, a pick keeps that screen, with the last
         // frame, until the new room's own picture replaces it (ShowWaitingPlayFrame); no loading panel, no empty room view in between.
-        _keepPlayScreen = PlayCutscenes && RoomDisplayLayout.Visibility == Visibility.Visible && PlayScreenImage.Visibility == Visibility.Visible;
+        _ctx.KeepPlayScreen = PlayCutscenes && RoomDisplayLayout.Visibility == Visibility.Visible && PlayScreenImage.Visibility == Visibility.Visible;
         var pick = ++_roomPickSerial;
         // The welcome text ("Choose a room") gives way to the scene's own at once; the blocking work comes after this paint.
         PreviewTitle.Text = "Scene";
         PreviewTitle.ToolTip = null;
         PreviewDescription.Text = "Loading the scene…";
-        if (!_keepPlayScreen)
+        if (!_ctx.KeepPlayScreen)
         {
             PreviewMessage.Visibility = Visibility.Visible;
             RoomDisplayLayout.Visibility = Visibility.Collapsed;
         }
         // Paint the wait text now, before the blocking work below. A synchronous render pass keeps the body running as one call:
-        // playback enters rooms through this handler and relies on that (it sets _playbackEnteringRoom around the call).
+        // playback enters rooms through this handler and relies on that (it sets _ctx.PlaybackEnteringRoom around the call).
         Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
         _roomOpenTask = ResourceTree_SelectedItemChangedCore(sender, e);
         try { await _roomOpenTask; }
@@ -1116,9 +1037,9 @@ public partial class MainWindow : Window
         {
             // A pick that never put the new room's picture on the screen (no first visit, an error) gives the room view back. Only the latest pick
             // does: an earlier one ending late must not undo the next pick's kept screen (user report: rooms still changed size when picked quickly).
-            if (pick == _roomPickSerial && _keepPlayScreen)
+            if (pick == _roomPickSerial && _ctx.KeepPlayScreen)
             {
-                _keepPlayScreen = false;
+                _ctx.KeepPlayScreen = false;
                 if (!PlayActive) StopPlay();
                 RoomDisplayLayout.Visibility = Visibility.Visible;
             }
@@ -1191,23 +1112,23 @@ public partial class MainWindow : Window
 
     private async Task ResourceTree_SelectedItemChangedCore(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        var navigationKind = _playbackEnteringRoom ? RoomOpenKind.Native : _roomOpenKind;
+        var navigationKind = _ctx.PlaybackEnteringRoom ? RoomOpenKind.Native : _ctx.RoomOpenKind;
         if (navigationKind == RoomOpenKind.Catalog)
         {
             _cutsceneLaunchGeneration++;
-            _introPreparing = false;
+            _ctx.IntroPreparing = false;
             StopPlay();
-            _gameClickTimer?.Stop();
-            _pendingGameClick = null;
-            if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } && _session is not null && SessionModeToggle.IsChecked == true)
-                _catalogPreviewOnly = true;
+            _ctx.GameClickTimer?.Stop();
+            _ctx.PendingGameClick = null;
+            if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } && _ctx.Session is not null && SessionModeToggle.IsChecked == true)
+                _ctx.CatalogPreviewOnly = true;
             _sceneSound.StopAll("manual catalog navigation cancels the previous scene");
             CurrentModule.Voice.Stop();
         }
         // Opening another view stops the playback clock, unless the playback itself entered the room.
-        if (!_playbackEnteringRoom && navigationKind == RoomOpenKind.Catalog)
+        if (!_ctx.PlaybackEnteringRoom && navigationKind == RoomOpenKind.Catalog)
         {
-            var leavingPreview = _playback is { Preview: true };
+            var leavingPreview = _ctx.Playback is { Preview: true };
             if (SessionInScene) _sceneSound.StopAll("the cutscene was left from the catalog");
             if (leavingPreview) _sceneSound.StopAll("the demo's preview was left from the catalog");
             StopScenePlayback();
@@ -1215,16 +1136,16 @@ public partial class MainWindow : Window
             // departure uses the ordinary post-boot exploration state so it cannot resume later.
             // The same for a demo's preview: its director script keeps running in that session, so leaving takes a fresh one.
             if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } &&
-                (_session?.BootRunning == true || leavingPreview) && _game is not null && _indexedObjectSnapshot is not null)
+                (_ctx.Session?.BootRunning == true || leavingPreview) && _ctx.Game is not null && _ctx.IndexedObjectSnapshot is not null)
             {
-                _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, soundCard: SoundCard);
-                _sceneSound.Attach(_game, _session);
+                _ctx.Session = new LoomExplorationSession(_ctx.Game, _ctx.IndexedObjectSnapshot, soundCard: SoundCard);
+                _sceneSound.Attach(_ctx.Game, _ctx.Session);
                 UpdatePlaybackControls();
             }
         }
         if (e.NewValue is not TreeViewItem { Tag: GameResource resource })
         {
-            _selectedResource = null;
+            _ctx.SelectedResource = null;
             UpdateConnectionsButton();
             UpdateAdvancedMode();
             if (AudioPanel.Visibility == Visibility.Visible || CostumePanel.Visibility == Visibility.Visible || ScriptPanel.Visibility == Visibility.Visible)
@@ -1241,12 +1162,12 @@ public partial class MainWindow : Window
             return;
         }
         StopRoomPan();
-        if (!_keepPlayScreen) RoomDisplayLayout.Visibility = Visibility.Collapsed;
-        _currentRoomResource = null;
-        _currentRoomObjectRecords = [];
-        _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
-        _roomNavigationCandidates = [];
-        _loomPanelEntry = null;
+        if (!_ctx.KeepPlayScreen) RoomDisplayLayout.Visibility = Visibility.Collapsed;
+        _ctx.CurrentRoomResource = null;
+        _ctx.CurrentRoomObjectRecords = [];
+        _ctx.RoomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
+        _ctx.RoomNavigationCandidates = [];
+        _ctx.LoomPanelEntry = null;
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         RoomEntryTraceOutput.Text = "";
         RoomEntryEventButtons.Children.Clear();
@@ -1257,13 +1178,13 @@ public partial class MainWindow : Window
         RoomPreview.ToolTip = null;
         RoomPreview.Cursor = Cursors.Arrow;
         ScriptEventButtons.Children.Clear();
-        _selectedResource = resource;
+        _ctx.SelectedResource = resource;
         CrashLog.Note($"Picked {resource.Kind} {resource.Name}");
         if (resource.Kind is ResourceKind.Room or ResourceKind.Costume)
             _showCostumeCards = resource.Kind == ResourceKind.Costume;
         UpdateRoomCardSelection(resource);
         UpdateAdvancedMode();
-        if (!_keepPlayScreen) StatusText.Visibility = Visibility.Visible;
+        if (!_ctx.KeepPlayScreen) StatusText.Visibility = Visibility.Visible;
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         UpdateConnectionsButton();
         // Another kind of resource leaves play: its frames stop and so do the sounds its scripts started (S6 sound; before, the game ran on unseen and
@@ -1284,8 +1205,8 @@ public partial class MainWindow : Window
         }
         if (resource.Kind == ResourceKind.Script)
         {
-            _previewCancellation?.Cancel();
-            _currentRoom = null;
+            _ctx.PreviewCancellation?.Cancel();
+            _ctx.CurrentRoom = null;
             RoomDisplayLayout.Visibility = Visibility.Collapsed;
             CostumePanel.Visibility = Visibility.Collapsed;
             RoomObjectPanel.Visibility = Visibility.Collapsed;
@@ -1298,9 +1219,9 @@ public partial class MainWindow : Window
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
-            PageTitle.Text = _names.Label(resource);
+            PageTitle.Text = _ctx.Names.Label(resource);
             PageSubtitle.Text = ScriptPageSubtitle(resource);
-            PageTitle.ToolTip = _names.Evidence(resource) ?? resource.Description;
+            PageTitle.ToolTip = _ctx.Names.Evidence(resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
             ScriptNote.Text = CurrentModule.ScriptLoadingNote ?? "Reading the game's bytecode…";
@@ -1308,11 +1229,11 @@ public partial class MainWindow : Window
             try
             {
                 var disassembly = CurrentModule.DecodeScript(resource)
-                    ?? (_game?.V4Disks is not null ? DecodeBrowsedV4Script(resource)
-                    : resource.ScriptRoom is int localRoom && _game is not null
-                        ? ScummDataSources.For(_game).RoomLocalScript(localRoom, resource.ResourceId!.Value) ?? throw new InvalidDataException("This room-local script is not stored in the room.")
-                    : _scriptReader.Decode(resource));
-                _scriptShown = disassembly;
+                    ?? (_ctx.Game?.V4Disks is not null ? DecodeBrowsedV4Script(resource)
+                    : resource.ScriptRoom is int localRoom && _ctx.Game is not null
+                        ? ScummDataSources.For(_ctx.Game).RoomLocalScript(localRoom, resource.ResourceId!.Value) ?? throw new InvalidDataException("This room-local script is not stored in the room.")
+                    : _ctx.ScriptReader.Decode(resource));
+                _ctx.ScriptShown = disassembly;
                 ScriptOutput.Text = FormatScript(disassembly);
                 ScriptPlayButton.Visibility = CurrentModule.ScriptPlayback(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
                 var events = disassembly.Instructions
@@ -1329,7 +1250,7 @@ public partial class MainWindow : Window
             }
             catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
             {
-                _scriptShown = null;
+                _ctx.ScriptShown = null;
                 ScriptPlayButton.Visibility = Visibility.Collapsed;
                 ScriptNote.Text = boundaryNote + "This indexed script resource could not be decoded.";
                 ScriptOutput.Text = ex.Message;
@@ -1342,9 +1263,9 @@ public partial class MainWindow : Window
         ScriptPanel.Visibility = Visibility.Collapsed;
         RoomObjectPanel.Visibility = Visibility.Visible;
         Grid.SetColumnSpan(ContentPanel, 1);
-        _previewCancellation?.Cancel();
-        _previewCancellation = new CancellationTokenSource();
-        var token = _previewCancellation.Token;
+        _ctx.PreviewCancellation?.Cancel();
+        _ctx.PreviewCancellation = new CancellationTokenSource();
+        var token = _ctx.PreviewCancellation.Token;
         StopPlay();
         ShowPageHeader(false); // the scene needs the height more than a title that only repeats the mode
         PageTitle.Text = "Explore the scene";
@@ -1355,10 +1276,10 @@ public partial class MainWindow : Window
         PreviewTitle.Text = "Scene";
         PreviewTitle.ToolTip = resource.Name;
         PreviewDescription.Text = "Loading the scene…";
-        if (!_keepPlayScreen) PreviewMessage.Visibility = Visibility.Visible;
+        if (!_ctx.KeepPlayScreen) PreviewMessage.Visibility = Visibility.Visible;
         // The status line under the room ("Opening Room 83…") would take its height from the room while it loads.
-        if (!_keepPlayScreen) StatusText.Visibility = Visibility.Visible;
-        _pendingCameraX = null;
+        if (!_ctx.KeepPlayScreen) StatusText.Visibility = Visibility.Visible;
+        _ctx.PendingCameraX = null;
         RoomViewport.ScrollToHorizontalOffset(0);
         RoomPreview.Source = null;
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -1369,43 +1290,43 @@ public partial class MainWindow : Window
         DoorwayOptions.Visibility = ObjectAreaOptions.Visibility = Visibility.Collapsed;
         ClearObjectList();
         ObjectsNote.Text = "Reading room objects…";
-        _currentRoom = null;
-        _objects = [];
-        _objectSelection = new([]);
-        _currentRoomResource = null;
-        _currentWalkBoxes = null;
-        _cdScene = null;
-        _browsedScene = null;
-        _currentRoomObjectRecords = [];
-        _roomObjectNames = new Dictionary<int, string>();
-        _roomNamesAreStored = false;
-        _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
-        _roomNavigationCandidates = [];
+        _ctx.CurrentRoom = null;
+        _ctx.Objects = [];
+        _ctx.ObjectSelection = new([]);
+        _ctx.CurrentRoomResource = null;
+        _ctx.CurrentWalkBoxes = null;
+        _ctx.CdScene = null;
+        _ctx.BrowsedScene = null;
+        _ctx.CurrentRoomObjectRecords = [];
+        _ctx.RoomObjectNames = new Dictionary<int, string>();
+        _ctx.RoomNamesAreStored = false;
+        _ctx.RoomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
+        _ctx.RoomNavigationCandidates = [];
         RoomNavigationButtons.Children.Clear();
         RoomNavigationPanel.Visibility = Visibility.Collapsed;
         RoomNavigationOverlay.Visibility = Visibility.Collapsed;
         ObjectActionPanel.Visibility = Visibility.Collapsed;
-        _selectedObject = null;
+        _ctx.SelectedObject = null;
         ObjectAssetPreview.Source = null;
         ObjectAssetPreview.Visibility = Visibility.Collapsed;
         ObjectAssetDescription.Text = "";
-        _olderObjects = [];
+        _ctx.OlderObjects = [];
         StatusText.Text = $"Opening {resource.Name}…";
         StatusText.ToolTip = resource.FilePath;
 
-        var roomSource = RoomSourceFor(this, _game!, resource);
+        var roomSource = RoomSourceFor(this, _ctx.Game!, resource);
         if (roomSource is null)
         {
             PreviewDescription.Text = "This room format is not supported yet.";
             return;
         }
 
-        var previewGame = _game!;
+        var previewGame = _ctx.Game!;
         _roomsOpening++;
         UpdateScanGate();
         try
         {
-            if (await roomSource.LoadAsync(this, previewGame, resource, () => token.IsCancellationRequested || !ReferenceEquals(_game, previewGame), token) is not { } load) return;
+            if (await roomSource.LoadAsync(this, previewGame, resource, () => token.IsCancellationRequested || !ReferenceEquals(_ctx.Game, previewGame), token) is not { } load) return;
             var isCd = load.Kind == RoomSourceKind.CdArchive;
             var enhancedV2 = load.Kind == RoomSourceKind.OlderV1V2;
             var browseArchive = load.BrowseArchive;
@@ -1415,36 +1336,36 @@ public partial class MainWindow : Window
             var browsedObjects = load.BrowsedObjects;
             var cdRoom = load.CdRoom;
             var room = load.Room;
-            _currentWalkBoxes = load.WalkBoxes;
+            _ctx.CurrentWalkBoxes = load.WalkBoxes;
             if (!load.Live)
             {
                 IReadOnlyList<RoomVerbDestination> browsedDoorways = isCd ? [] : await Task.Run(() => FindBrowsedDoorways(resource), token);
                 if (token.IsCancellationRequested) return;
-                _currentRoom = room;
-                _currentRoomResource = resource;
-                _lastViewedRoomResource = resource;
+                _ctx.CurrentRoom = room;
+                _ctx.CurrentRoomResource = resource;
+                _ctx.LastViewedRoomResource = resource;
                 // Names the pointer reveals: the drawn objects of a v1 or v2 game; every named object of a v4 or v5 game (their starting states come from scripts).
-                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes, browsedScene) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
-                    : _game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : [];
-                _currentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
-                _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
-                _roomNavigationCandidates = [];
+                _ctx.OlderObjects = enhancedV2 ? ReadOlderObjects(_ctx.Game!, bytes, browsedScene) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
+                    : _ctx.Game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : [];
+                _ctx.CurrentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
+                _ctx.RoomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
+                _ctx.RoomNavigationCandidates = [];
                 // First visit beats stored images; stored images (R-6.16) only where no first visit ran.
-                _objects = browsedScene?.Images ?? cdScene?.Images ?? browsedObjects?.Images ?? [];
-                _objectSelection = browsedScene?.NewSelection() ?? cdScene?.Selection ?? new RoomObjectSelection(_objects, background: room);
-                if (browsedObjects is not null) { _roomObjectNames = browsedObjects.Names; _roomNamesAreStored = true; }
-                _estimatedObjectIds = new HashSet<int>();
-                _selectedObject = null;
+                _ctx.Objects = browsedScene?.Images ?? cdScene?.Images ?? browsedObjects?.Images ?? [];
+                _ctx.ObjectSelection = browsedScene?.NewSelection() ?? cdScene?.Selection ?? new RoomObjectSelection(_ctx.Objects, background: room);
+                if (browsedObjects is not null) { _ctx.RoomObjectNames = browsedObjects.Names; _ctx.RoomNamesAreStored = true; }
+                _ctx.EstimatedObjectIds = new HashSet<int>();
+                _ctx.SelectedObject = null;
                 ClearObjectList();
-                if (browsedScene is not null) _pendingCameraX = browsedScene.State.CameraX;
+                if (browsedScene is not null) _ctx.PendingCameraX = browsedScene.State.CameraX;
                 ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : browsedScene is not null ? BrowsedSceneNote(browsedScene)
-                    : _game is { } fallbackGame && ScummProfile.For(fallbackGame).HasFirstVisitScenes
+                    : _ctx.Game is { } fallbackGame && ScummProfile.For(fallbackGame).HasFirstVisitScenes
                         // The plain background shows where the first visit could not run: a note for Advanced only (R-1.13).
                         ? (IsAdvancedMode ? "Plain background: the room's first visit could not run in the generic session." : "")
                         : browsedObjects is { Images.Count: > 0 }
                             ? "Stored object images and names, as the game's data holds them. Choose one to show it; scripts, states and routes are not read for this game."
                             : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
-                              (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
+                              (_ctx.OlderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
@@ -1453,7 +1374,7 @@ public partial class MainWindow : Window
                 UpdateActorLayer();
                 RoomDisplayLayout.Visibility = Visibility.Visible;
                 // The view starts where the entry script left the camera (room 4's Bobbin stands at x 580).
-                if (cdScene is not null) _pendingCameraX = cdScene.CameraX;
+                if (cdScene is not null) _ctx.PendingCameraX = cdScene.CameraX;
                 UpdateRoomViewportLayout();
                 StatusText.HorizontalAlignment = HorizontalAlignment.Center;
                 StatusText.Visibility = Visibility.Collapsed;
@@ -1468,12 +1389,12 @@ public partial class MainWindow : Window
                 StatusText.Text = "Ready";
                 StatusText.ToolTip = "Room background read from the game's own data.";
                 // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
-                if (browsedScene is not null && SessionModeToggle.IsChecked == true && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
+                if (browsedScene is not null && SessionModeToggle.IsChecked == true && _ctx.Game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
                 {
                     ShowWaitingPlayFrame(browsedScene);
                     await StartPlayCoreAsync(resource, token, navigationKind);
                 }
-                if (!token.IsCancellationRequested && ReferenceEquals(_game, previewGame))
+                if (!token.IsCancellationRequested && ReferenceEquals(_ctx.Game, previewGame))
                 {
                     UpdateRoomMusicActions();
                     RefreshPlayRoomActions();
@@ -1483,12 +1404,12 @@ public partial class MainWindow : Window
                 return;
             }
             var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
-            var objects = cdRoom is null ? _objectDecoder.Decode(bytes) : _cdData!.ReadObjectImages(resource.ResourceId!.Value);
+            var objects = cdRoom is null ? _objectDecoder.Decode(bytes) : _ctx.CdData!.ReadObjectImages(resource.ResourceId!.Value);
             if (token.IsCancellationRequested) return;
             var catalogStart = PrepareCatalogStart(resource);
             if (catalogStart?.Failure is { } setupFailure)
             {
-                _session!.RecordCatalogPreparation($"Preparation stopped: {setupFailure}. {catalogStart.Note}");
+                _ctx.Session!.RecordCatalogPreparation($"Preparation stopped: {setupFailure}. {catalogStart.Note}");
                 PreviewTitle.Text = "Could not prepare this scene";
                 PreviewDescription.Text = "The earlier story scene did not finish. Choose another room or restart the session.";
                 PreviewMessage.Visibility = Visibility.Visible;
@@ -1496,44 +1417,44 @@ public partial class MainWindow : Window
                 StatusText.ToolTip = setupFailure;
                 return; // A failed source stage must not be followed by the late-room visit.
             }
-            _currentRoom = room;
-            _currentRoomResource = resource;
-            _lastViewedRoomResource = resource;
-            _currentRoomObjectRecords = objectRecords;
-            _roomVerbs = cdRoom is null ? _verbReader.ReadAll(bytes, objectRecords) : _cdData!.ReadObjectVerbs(resource.ResourceId!.Value, objectRecords);
-            _roomObjectNames = cdRoom is null ? LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords)
+            _ctx.CurrentRoom = room;
+            _ctx.CurrentRoomResource = resource;
+            _ctx.LastViewedRoomResource = resource;
+            _ctx.CurrentRoomObjectRecords = objectRecords;
+            _ctx.RoomVerbs = cdRoom is null ? _ctx.VerbReader.ReadAll(bytes, objectRecords) : _ctx.CdData!.ReadObjectVerbs(resource.ResourceId!.Value, objectRecords);
+            _ctx.RoomObjectNames = cdRoom is null ? LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords)
                 : cdRoom.ObjectNames.ToDictionary(pair => pair.Key, pair => System.Text.Encoding.Latin1.GetString(pair.Value));
-            _objects = objects;
-            _catalogPreviewOnly = false;
+            _ctx.Objects = objects;
+            _ctx.CatalogPreviewOnly = false;
             // A static preview's ambient session (R-8.5b) gives way to the session it was made from before any other room opens.
-            if (navigationKind == RoomOpenKind.Catalog) LeaveLoomAmbientPreview(); else _loomAmbientSource = null;
-            if (navigationKind == RoomOpenKind.Catalog && _session is { } manualSource && SessionModeToggle.IsChecked == true)
+            if (navigationKind == RoomOpenKind.Catalog) LeaveLoomAmbientPreview(); else _ctx.LoomAmbientSource = null;
+            if (navigationKind == RoomOpenKind.Catalog && _ctx.Session is { } manualSource && SessionModeToggle.IsChecked == true)
             {
-                _catalogPreviewOnly = true; // no idle frame may mutate the source while its detached preparation is copied
+                _ctx.CatalogPreviewOnly = true; // no idle frame may mutate the source while its detached preparation is copied
                 var prepared = await Task.Run(() => manualSource.PrepareManualRoom(resource, cancellationToken: token), token);
-                if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
+                if (token.IsCancellationRequested || !ReferenceEquals(_ctx.Game, previewGame)) return;
                 if (prepared.Session is LoomExplorationSession ready)
                 {
-                    _session = ready;
-                    _catalogPreviewOnly = false;
-                    if (_pendingCatalogPreparation is { } preparation) ready.RecordCatalogPreparation(preparation);
+                    _ctx.Session = ready;
+                    _ctx.CatalogPreviewOnly = false;
+                    if (_ctx.PendingCatalogPreparation is { } preparation) ready.RecordCatalogPreparation(preparation);
                 }
                 else
                 {
-                    _catalogPreviewOnly = true;
+                    _ctx.CatalogPreviewOnly = true;
                     // R-8.5b (rule confirmed by the user 20 Oct): only the room's ambient scripts run (its permanent animation, decided from its
                     // code); none of its other entry code. The ambient session is explored like a live room; the source carries the game on.
                     var ambient = await Task.Run(() => manualSource.PrepareAmbientRoom(resource, token, requireAmbient: false), token);
-                    if (token.IsCancellationRequested || !ReferenceEquals(_game, previewGame)) return;
+                    if (token.IsCancellationRequested || !ReferenceEquals(_ctx.Game, previewGame)) return;
                     if (ambient.Session is LoomExplorationSession still)
                     {
-                        _loomAmbientSource = manualSource;
-                        _session = still;
-                        _catalogPreviewOnly = false;
+                        _ctx.LoomAmbientSource = manualSource;
+                        _ctx.Session = still;
+                        _ctx.CatalogPreviewOnly = false;
                     }
-                    if (IsAdvancedMode) _pendingStaticPreviewNote = prepared.Reason + Environment.NewLine + AmbientNote(ambient);
+                    if (IsAdvancedMode) _ctx.PendingStaticPreviewNote = prepared.Reason + Environment.NewLine + AmbientNote(ambient);
                 }
-                _pendingCatalogPreparation = null;
+                _ctx.PendingCatalogPreparation = null;
             }
             ApplyRoomState(resource, objectRecords, objects, visit: navigationKind != RoomOpenKind.Catalog);
             UpdateRoomNavigationActions(resource);
@@ -1549,15 +1470,15 @@ public partial class MainWindow : Window
             UpdateAdvancedMode();
             StatusText.Text = "Scene ready";
             StatusText.ToolTip = $"{room.Width} × {room.Height} · {objectRecords.Count} object records · {objects.Count} images";
-            if (_catalogPreviewOnly || _loomAmbientSource is not null)
+            if (_ctx.CatalogPreviewOnly || _ctx.LoomAmbientSource is not null)
             {
                 StatusText.Text = "Room preview: its story does not play here. Play Cutscene plays this room's scenes.";
-                StatusText.ToolTip = IsAdvancedMode ? _pendingStaticPreviewNote : null;
+                StatusText.ToolTip = IsAdvancedMode ? _ctx.PendingStaticPreviewNote : null;
             }
-            _pendingStaticPreviewNote = null;
+            _ctx.PendingStaticPreviewNote = null;
             // A catalog visit can start scripts which yield before their music/arrival work.
             // Use the ordinary bounded clock once the room is visible, without inventing input.
-            if (navigationKind != RoomOpenKind.Catalog && GameClickActive && !_playbackEnteringRoom && _playback is null && _session?.Snapshot.PendingScripts > 0)
+            if (navigationKind != RoomOpenKind.Catalog && GameClickActive && !_ctx.PlaybackEnteringRoom && _ctx.Playback is null && _ctx.Session?.Snapshot.PendingScripts > 0)
                 StartPlayback("Catalog arrival frames (arrival assumed)", null, resource, doorways: null, leftRoom: false);
         }
         catch (OperationCanceledException) { }
@@ -1601,45 +1522,45 @@ public partial class MainWindow : Window
 
     private LoomCatalogStartResult? PrepareCatalogStart(GameResource resource)
     {
-        _pendingCatalogPreparation = null;
-        if (SessionModeToggle.IsChecked != true || _session is null || _playbackEnteringRoom || _replaySequence is not null ||
-            _replayCatalog?.CatalogStarts.FirstOrDefault(start => start.Room == resource.ResourceId) is not { } recipe)
+        _ctx.PendingCatalogPreparation = null;
+        if (SessionModeToggle.IsChecked != true || _ctx.Session is null || _ctx.PlaybackEnteringRoom || _ctx.ReplaySequence is not null ||
+            _ctx.ReplayCatalog?.CatalogStarts.FirstOrDefault(start => start.Room == resource.ResourceId) is not { } recipe)
             return null;
         // Human-approved source scenes; edition-specific operands are in fingerprinted recipe data.
         _sceneSound.StopAll("catalog story preparation runs unseen");
-        var result = LoomCatalogStartPreparer.Prepare(_session, recipe);
-        _sceneSound.Attach(_game!, _session);
-        if (result.Prepared) _pendingCatalogPreparation = result.Note;
+        var result = LoomCatalogStartPreparer.Prepare(_ctx.Session, recipe);
+        _sceneSound.Attach(_ctx.Game!, _ctx.Session);
+        if (result.Prepared) _ctx.PendingCatalogPreparation = result.Note;
         return result;
     }
 
     private void ApplyRoomState(GameResource resource, IReadOnlyList<ScummRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, bool visit)
     {
-        _estimatedObjectIds = new HashSet<int>();
-        _loomPanelEntry = null;
+        _ctx.EstimatedObjectIds = new HashSet<int>();
+        _ctx.LoomPanelEntry = null;
         RoomEntryEventButtons.Children.Clear();
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
-        if (SessionModeToggle.IsChecked == true && _session is not null && !_catalogPreviewOnly)
+        if (SessionModeToggle.IsChecked == true && _ctx.Session is not null && !_ctx.CatalogPreviewOnly)
         {
             if (visit) FollowSessionSound();
-            if (visit) _issueBaseline = _session.Snapshot.Uncertainties.Count;
-            var snapshot = visit ? _session.VisitRoom(resource, preserveStaffLevel: !_playbackEnteringRoom && _replaySequence is null) : _session.Snapshot;
-            if (visit && _pendingCatalogPreparation is { } preparation)
+            if (visit) _ctx.IssueBaseline = _ctx.Session.Snapshot.Uncertainties.Count;
+            var snapshot = visit ? _ctx.Session.VisitRoom(resource, preserveStaffLevel: !_ctx.PlaybackEnteringRoom && _ctx.ReplaySequence is null) : _ctx.Session.Snapshot;
+            if (visit && _ctx.PendingCatalogPreparation is { } preparation)
             {
-                _pendingCatalogPreparation = null;
-                _session.RecordCatalogPreparation(preparation);
-                snapshot = _session.Snapshot;
+                _ctx.PendingCatalogPreparation = null;
+                _ctx.Session.RecordCatalogPreparation(preparation);
+                snapshot = _ctx.Session.Snapshot;
             }
-            if (visit) CurrentModule.Voice.SkipPending(_session);
-            var sceneBatches = _sceneBatches ?? ScummSceneDrawBatches.Empty;
-            var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
-                _indexedStates, sceneBatches, estimateArtwork: CurrentModule.EstimatesRoomArtwork);
-            _objectSelection = initialized.Selection;
-            _artworkEstimates = initialized.Estimates;
-            _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
-            var run = _session.LastEntryRun;
-            var script = _session.LastEntryScript;
+            if (visit) CurrentModule.Voice.SkipPending(_ctx.Session);
+            var sceneBatches = _ctx.SceneBatches ?? ScummSceneDrawBatches.Empty;
+            var initialized = CreateSessionRoomSelection(resource, _ctx.CurrentRoom!, records, images, snapshot,
+                _ctx.IndexedStates, sceneBatches, estimateArtwork: CurrentModule.EstimatesRoomArtwork);
+            _ctx.ObjectSelection = initialized.Selection;
+            _ctx.ArtworkEstimates = initialized.Estimates;
+            _ctx.EstimatedObjectIds = _ctx.ArtworkEstimates.Select(item => item.ObjectId).ToHashSet();
+            var run = _ctx.Session.LastEntryRun;
+            var script = _ctx.Session.LastEntryScript;
             var entryText = (script is null ? "No embedded entry script." : FormatScript(script)) +
                                         Environment.NewLine + "SESSION INTERPRETATION" + Environment.NewLine +
                                         (run?.FormatSummary() ?? "No entry run recorded.") +
@@ -1647,12 +1568,12 @@ public partial class MainWindow : Window
                                         "; inventory: " + (snapshot.InventoryKnown ? snapshot.Inventory.Count.ToString() : "unknown") +
                                         "; script-started sounds: " +
                                         (snapshot.ActiveSounds.Count == 0 ? "none known" : string.Join(", ", snapshot.ActiveSounds)) +
-                                        "; camera x (var[0x002]): " + (_session.CameraX?.ToString() ?? "unknown") +
-                                        (_session.CameraEstimated ? " (estimate)" : "");
+                                        "; camera x (var[0x002]): " + (_ctx.Session.CameraX?.ToString() ?? "unknown") +
+                                        (_ctx.Session.CameraEstimated ? " (estimate)" : "");
             // A room entered in the session opens where its camera is, not at the left edge.
-            if (visit) _pendingCameraX = _session.CameraX;
-            _loomPanelEntry = new LoomPanelEntry(script, _session.LastVisitEvents,
-                $"{script?.Instructions.Count ?? 0} instructions · camera x {(_session.CameraX?.ToString() ?? "unknown")}{(_session.CameraEstimated ? " (estimate)" : "")} · " +
+            if (visit) _ctx.PendingCameraX = _ctx.Session.CameraX;
+            _ctx.LoomPanelEntry = new LoomPanelEntry(script, _ctx.Session.LastVisitEvents,
+                $"{script?.Instructions.Count ?? 0} instructions · camera x {(_ctx.Session.CameraX?.ToString() ?? "unknown")}{(_ctx.Session.CameraEstimated ? " (estimate)" : "")} · " +
                 (snapshot.ActiveSounds.Count == 0 ? "no script-started sounds" : "sounds " + string.Join(", ", snapshot.ActiveSounds)), entryText);
             RefreshStateIssues();
             UpdateRoomMusicActions();
@@ -1663,9 +1584,9 @@ public partial class MainWindow : Window
                 ? "A script may be waiting for the next frame."
                 : string.Join(Environment.NewLine, snapshot.Uncertainties.TakeLast(8));
             UpdatePlaybackControls();
-            ObjectsNote.Text = _estimatedObjectIds.Count == 0 || !IsAdvancedMode
+            ObjectsNote.Text = _ctx.EstimatedObjectIds.Count == 0 || !IsAdvancedMode
                 ? "Click the scene to explore it. Hover to discover objects and exits."
-                : $"Some scene details are previews; the game state remains unresolved ({_estimatedObjectIds.Count} details).";
+                : $"Some scene details are previews; the game state remains unresolved ({_ctx.EstimatedObjectIds.Count} details).";
             ShowLastObjectAction(resource.ResourceId);
             UpdateAdvancedMode();
             return;
@@ -1675,36 +1596,36 @@ public partial class MainWindow : Window
         SessionStatusText.Text = "Inspection mode: a click cycles an object's stored images; it is not the game's click and runs no script. Each room starts from the index; changes are local to this view.";
         SessionStatusText.ToolTip = null;
         UpdatePlaybackControls();
-        _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
-        _artworkEstimates = [];
+        _ctx.ObjectSelection = new RoomObjectSelection(images, _ctx.IndexedStates, background: _ctx.CurrentRoom);
+        _ctx.ArtworkEstimates = [];
         ObjectsNote.Text = images.Count == 0
             ? "This room has no decoded object art yet."
             : "Click the artwork to browse stored scene details.";
         try
         {
-            var entryScript = _scriptReader.DecodeRoomEntry(resource);
+            var entryScript = _ctx.ScriptReader.DecodeRoomEntry(resource);
             if (entryScript is null)
-                _loomPanelEntry = new LoomPanelEntry(null, [], "", "This room has no embedded entry-script pointer.");
+                _ctx.LoomPanelEntry = new LoomPanelEntry(null, [], "", "This room has no embedded entry-script pointer.");
             else
             {
-                var run = _scriptExecutor.Execute(entryScript, _indexedStates, records);
-                _objectSelection = new RoomObjectSelection(images, run.ObjectStates,
-                    run.ObjectPositions, background: _currentRoom, drawQueue: run.DrawOrder);
+                var run = _scriptExecutor.Execute(entryScript, _ctx.IndexedStates, records);
+                _ctx.ObjectSelection = new RoomObjectSelection(images, run.ObjectStates,
+                    run.ObjectPositions, background: _ctx.CurrentRoom, drawQueue: run.DrawOrder);
                 if (run.UnresolvedReason is not null || run.ResumeOffset.HasValue)
                     CloseArtworkGaps(resource, images);
-                _loomPanelEntry = new LoomPanelEntry(entryScript, run.Events,
+                _ctx.LoomPanelEntry = new LoomPanelEntry(entryScript, run.Events,
                     $"{entryScript.Instructions.Count} instructions" + (run.UnresolvedReason is null && !run.ResumeOffset.HasValue ? " · reached the end" : " · stopped early (see the raw disassembly)"),
                     FormatScript(entryScript) + Environment.NewLine + "BOUNDED INTERPRETATION" + Environment.NewLine + run.FormatSummary());
                 ObjectsNote.Text = run.UnresolvedReason is null && !run.ResumeOffset.HasValue
                     ? $"{records.Count} local object records, {images.Count} stored images. Entry bytecode reached stopObjectCode; the bounded result is shown in the room-entry trace."
-                    : $"{records.Count} local object records, {images.Count} stored images. {_estimatedObjectIds.Count} unresolved details use an artwork estimate; see the trace for script limits.";
+                    : $"{records.Count} local object records, {images.Count} stored images. {_ctx.EstimatedObjectIds.Count} unresolved details use an artwork estimate; see the trace for script limits.";
             }
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
         {
             CloseArtworkGaps(resource, images);
-            _loomPanelEntry = new LoomPanelEntry(null, [], "", $"Room entry script could not be interpreted: {ex.Message}");
-            ObjectsNote.Text = $"{records.Count} local object records, {images.Count} stored images. The entry script is unavailable; {_estimatedObjectIds.Count} details use an artwork estimate.";
+            _ctx.LoomPanelEntry = new LoomPanelEntry(null, [], "", $"Room entry script could not be interpreted: {ex.Message}");
+            ObjectsNote.Text = $"{records.Count} local object records, {images.Count} stored images. The entry script is unavailable; {_ctx.EstimatedObjectIds.Count} details use an artwork estimate.";
         }
         RefreshLoomPanel();
         UpdateRoomMusicActions();
@@ -1723,9 +1644,9 @@ public partial class MainWindow : Window
     private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images,
         IReadOnlyCollection<int>? statesSetByCode = null)
     {
-        _artworkEstimates = FillArtworkGaps(_objectSelection, resource, images, statesSetByCode,
-            _sceneBatches ?? ScummSceneDrawBatches.Empty);
-        _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
+        _ctx.ArtworkEstimates = FillArtworkGaps(_ctx.ObjectSelection, resource, images, statesSetByCode,
+            _ctx.SceneBatches ?? ScummSceneDrawBatches.Empty);
+        _ctx.EstimatedObjectIds = _ctx.ArtworkEstimates.Select(item => item.ObjectId).ToHashSet();
     }
 
     private static (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates) CreateSessionRoomSelection(
@@ -1769,18 +1690,18 @@ public partial class MainWindow : Window
     private void SetRoomCardThumbnail(GameResource resource, BitmapSource bitmap, RoomCardPreviewStage stage)
     {
         // A selection/live-room refresh must never replace canonical first-visit artwork.
-        if (_roomCardStages.TryGetValue(resource, out var previous) && previous > stage) return;
+        if (_ctx.RoomCardStages.TryGetValue(resource, out var previous) && previous > stage) return;
         var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
         if (card is null) return;
-        _roomCardStages[resource] = stage;
+        _ctx.RoomCardStages[resource] = stage;
         if (card.Content is Image preview) preview.Source = bitmap;
-        else card.Content = CreateRoomCardImage(bitmap, _names.Label(resource));
-        card.ToolTip = $"Open {_names.Label(resource)}";
+        else card.Content = CreateRoomCardImage(bitmap, _ctx.Names.Label(resource));
+        card.ToolTip = $"Open {_ctx.Names.Label(resource)}";
     }
 
     private string EstimateSummary()
     {
-        var sources = _artworkEstimates.Select(item => item.Reason).Distinct().ToArray();
+        var sources = _ctx.ArtworkEstimates.Select(item => item.Reason).Distinct().ToArray();
         return sources.Length == 0 ? "" : $" (from {string.Join("; ", sources.Take(2))}{(sources.Length > 2 ? "; …" : "")})";
     }
 
@@ -1794,17 +1715,17 @@ public partial class MainWindow : Window
             // R-6.50: off = inspection (the room as stored, a click cycles an object's stored images, nothing runs); on = the game plays on from where it was.
             StopPlay();
             if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
-            if (_currentRoomResource is { } shown) SelectRoomWithIntent(shown, RoomOpenKind.Catalog, reloadSelected: true);
+            if (_ctx.CurrentRoomResource is { } shown) SelectRoomWithIntent(shown, RoomOpenKind.Catalog, reloadSelected: true);
             return;
         }
-        _gamePointerTarget = null;
-        _session?.SetPointer(null);
+        _ctx.GamePointerTarget = null;
+        _ctx.Session?.SetPointer(null);
         StopScenePlayback();
         if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
         if (SessionModeToggle.IsChecked != true) CurrentModule.Voice.Stop();
-        if (_currentRoomResource is not { } room || _currentRoom is null) return;
-        ApplyRoomState(room, _currentRoomObjectRecords, _objects,
-            visit: SessionModeToggle.IsChecked == true && !_restoringInteractiveView);
+        if (_ctx.CurrentRoomResource is not { } room || _ctx.CurrentRoom is null) return;
+        ApplyRoomState(room, _ctx.CurrentRoomObjectRecords, _ctx.Objects,
+            visit: SessionModeToggle.IsChecked == true && !_ctx.RestoringInteractiveView);
         UpdateRoomNavigationActions(room);
         RefreshRoomPreview();
         // The interactive mode keeps the verb screen under the room (VerbScreenShown).
@@ -1815,14 +1736,14 @@ public partial class MainWindow : Window
     private void ResetSession_Click(object sender, RoutedEventArgs e)
     {
         if (PlayCutscenes) { RestartPlay(); return; }
-        if (_game is null || _indexedObjectSnapshot is null) return;
+        if (_ctx.Game is null || _ctx.IndexedObjectSnapshot is null) return;
         StopScenePlayback();
         _sceneSound.StopAll("the session was reset");
-        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, soundCard: SoundCard);
-        _sceneSound.Attach(_game, _session);
-        if (_currentRoomResource is { } room && _currentRoom is not null)
+        _ctx.Session = new LoomExplorationSession(_ctx.Game, _ctx.IndexedObjectSnapshot, soundCard: SoundCard);
+        _sceneSound.Attach(_ctx.Game, _ctx.Session);
+        if (_ctx.CurrentRoomResource is { } room && _ctx.CurrentRoom is not null)
         {
-            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: SessionModeToggle.IsChecked == true);
+            ApplyRoomState(room, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: SessionModeToggle.IsChecked == true);
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview();
         }
@@ -1835,20 +1756,20 @@ public partial class MainWindow : Window
     /// </summary>
     private void RestartPlay()
     {
-        if (_game is null) return;
+        if (_ctx.Game is null) return;
         _cutsceneLaunchGeneration++;
         StopPlay();
         _sceneSound.StopAll("the game state was restarted");
         _playSpeech.Detach();
-        _playAmbient = false;
-        _playLiveSource = null;
-        _play = null;
-        _playFolder = null;
-        _playScreen = null;
-        _genericLastAction = null;
-        _playPartyAssumed = false;
+        _ctx.PlayAmbient = false;
+        _ctx.PlayLiveSource = null;
+        _ctx.Play = null;
+        _ctx.PlayFolder = null;
+        _ctx.PlayScreen = null;
+        _ctx.GenericLastAction = null;
+        _ctx.PlayPartyAssumed = false;
         RoomHint = null;
-        if (_currentRoomResource is { } room) SelectRoomWithIntent(room, RoomOpenKind.Catalog, reloadSelected: true);
+        if (_ctx.CurrentRoomResource is { } room) SelectRoomWithIntent(room, RoomOpenKind.Catalog, reloadSelected: true);
         else StatusText.Text = "Game state restarted. Select a room to visit it.";
     }
 
@@ -1859,21 +1780,21 @@ public partial class MainWindow : Window
 
     private void AdvanceOneFrame()
     {
-        if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } room || _currentRoom is null) return;
+        if (_ctx.CatalogPreviewOnly || _ctx.Session is null || _ctx.CurrentRoomResource is not { } room || _ctx.CurrentRoom is null) return;
         FollowSessionSound();
-        var snapshot = _session.AdvanceFrame();
+        var snapshot = _ctx.Session.AdvanceFrame();
         UpdateSessionSound();
         // A continued script can reach a room load; the session has already
         // entered that room, so show it as ActivateObjectVerb does.
         if (snapshot.RoomId is int reached && reached != room.ResourceId &&
-            _game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } targetRoom)
+            _ctx.Game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } targetRoom)
         {
             StatusText.Text = "You step into another scene.";
-            StatusText.ToolTip = $"Room {reached:00} · " + (_session.LastAction?.Evidence ?? "");
+            StatusText.ToolTip = $"Room {reached:00} · " + (_ctx.Session.LastAction?.Evidence ?? "");
             SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
             return;
         }
-        ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+        ApplyRoomState(room, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
         UpdateRoomNavigationActions(room);
         RefreshRoomPreview();
     }
@@ -1892,21 +1813,21 @@ public partial class MainWindow : Window
 
     private bool ContinueToReachedRoom()
     {
-        if (_session is null || _game is null || _currentRoomResource is not { } room ||
-            _session.Snapshot.PendingScripts == 0 || !_session.ContinueUntilRoomChanges(ExitContinuationFrames))
+        if (_ctx.Session is null || _ctx.Game is null || _ctx.CurrentRoomResource is not { } room ||
+            _ctx.Session.Snapshot.PendingScripts == 0 || !_ctx.Session.ContinueUntilRoomChanges(ExitContinuationFrames))
             return false;
-        if (_session.Snapshot.RoomId is not int reached ||
-            _game.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom || targetRoom == room)
+        if (_ctx.Session.Snapshot.RoomId is not int reached ||
+            _ctx.Game.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom || targetRoom == room)
             return false;
         StatusText.Text = "You step into another scene.";
-        StatusText.ToolTip = $"Room {reached:00} · " + (_session.LastAction?.Evidence ?? "");
+        StatusText.ToolTip = $"Room {reached:00} · " + (_ctx.Session.LastAction?.Evidence ?? "");
         SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
         return true;
     }
 
     private void ShowLastObjectAction(int? roomId)
     {
-        var action = _session?.LastAction;
+        var action = _ctx.Session?.LastAction;
         // "Action tried; the result is unresolved" is for Advanced mode; the scene itself shows what happened.
         if (!IsAdvancedMode || action is null || roomId is null ||
             action.SourceRoomId != roomId && action.DestinationRoomId != roomId)
@@ -1920,8 +1841,8 @@ public partial class MainWindow : Window
         ObjectVerbButtons.Children.Clear();
         ObjectActionsList.Children.Clear();
         ObjectActionsSection.Visibility = Visibility.Collapsed;
-        var actionName = _currentRoomObjectRecords.FirstOrDefault(record => record.Id == action.ObjectId) is { } actionObject &&
-                         _roomObjectNames.TryGetValue(actionObject.Id, out var storedName)
+        var actionName = _ctx.CurrentRoomObjectRecords.FirstOrDefault(record => record.Id == action.ObjectId) is { } actionObject &&
+                         _ctx.RoomObjectNames.TryGetValue(actionObject.Id, out var storedName)
             ? storedName : "Something in the scene";
         ObjectActionNote.Text = action.DestinationRoomId is int target
             ? action.IsGameInput
@@ -1946,7 +1867,7 @@ public partial class MainWindow : Window
         var inPanel = IsAdvancedMode && choices.Count > 0;
         ObjectActionPanel.Visibility = inPanel ? Visibility.Collapsed : Visibility.Visible;
         ObjectActionsSection.Visibility = inPanel ? Visibility.Visible : Visibility.Collapsed;
-        var objectName = choices.Count > 0 && _roomObjectNames.TryGetValue(choices[0].Object.Id, out var storedObjectName)
+        var objectName = choices.Count > 0 && _ctx.RoomObjectNames.TryGetValue(choices[0].Object.Id, out var storedObjectName)
             ? storedObjectName : "This detail";
         ObjectActionsHeader.Text = $"ACTIONS · {objectName}";
         ObjectActionNote.Text = choices.Count == 0
@@ -1967,10 +1888,10 @@ public partial class MainWindow : Window
     /// <summary>"Used by" for an object: the code that runs one of its verbs with a literal number.</summary>
     private void AddObjectUsedBy(int objectId)
     {
-        var uses = _usageIndex.UsedBy(LoomUsageTarget.Object, objectId);
+        var uses = _ctx.UsageIndex.UsedBy(LoomUsageTarget.Object, objectId);
         var text = uses.Count == 0
             ? "Used by: no code names this object (clicks and drafts reach it through the input scripts)."
-            : "Used by: " + string.Join("; ", uses.Take(6).Select(use => LoomUsageIndex.Describe(use, _names.Glossary, _names.VerbName))) + (uses.Count > 6 ? $"; {uses.Count - 6} more" : "");
+            : "Used by: " + string.Join("; ", uses.Take(6).Select(use => LoomUsageIndex.Describe(use, _ctx.Names.Glossary, _ctx.Names.VerbName))) + (uses.Count > 6 ? $"; {uses.Count - 6} more" : "");
         ObjectActionsList.Children.Add(new TextBlock
         {
             Text = text, Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 0)
@@ -1979,34 +1900,34 @@ public partial class MainWindow : Window
 
     private bool ActivateObjectVerb(ScummRoomObjectRecord record, ScummObjectVerbEntry verb, bool play = false)
     {
-        if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
+        if (_ctx.CatalogPreviewOnly || _ctx.Session is null || _ctx.CurrentRoomResource is not { } sourceRoom || _ctx.Game is null) return false;
         FollowSessionSound();
         // A verb run from the interaction menu has no scene start of its own, so the speakers its lines need (an actor who is not in the
         // room shows nothing) are placed as the catalog's start setup does: only the derived actor placements, never a pickup or a scene.
         var speakerNotes = play ? CurrentModule.SpeakersForDirectVerb(sourceRoom, record.Id, verb.VerbId) : [];
         // R-8.38: an object picked from Interact that is not in the room now is brought into it first (a present object is never changed).
-        if (play) speakerNotes = [.. speakerNotes, .. _session.BringObjectIntoRoom(record.Id)];
+        if (play) speakerNotes = [.. speakerNotes, .. _ctx.Session.BringObjectIntoRoom(record.Id)];
         // R-8.38: the hero put at the object, as a picked scene does (ScummSession.PickInteraction): a line Bobbin speaks shows nothing while he is
         // in another room (ScummVM actorTalk), as Room 47's swan answering any other draft did after a room visit.
-        if (play) _session.PutHeroAtObject(record.Id);
-        var action = _session.ActivateObjectVerb(record.Id, verb.VerbId);
+        if (play) _ctx.Session.PutHeroAtObject(record.Id);
+        var action = _ctx.Session.ActivateObjectVerb(record.Id, verb.VerbId);
         UpdateSessionSound();
         StatusText.Text = action.DestinationRoomId is int destination
             ? $"Entered Room {destination:00}"
-            : _session.Snapshot.PendingScripts > 0
+            : _ctx.Session.Snapshot.PendingScripts > 0
                 ? "No room load reached; the session has pending scripts."
                 : "Interaction finished";
         StatusText.ToolTip = action.Evidence + (action.Uncertainties.Count == 0 ? "" :
             Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties)) +
             (speakerNotes.Count == 0 ? "" : Environment.NewLine + string.Join(Environment.NewLine, speakerNotes));
         if (action.DestinationRoomId is int targetId &&
-            _game.Rooms.FirstOrDefault(item => item.ResourceId == targetId) is { } targetRoom &&
+            _ctx.Game.Rooms.FirstOrDefault(item => item.ResourceId == targetId) is { } targetRoom &&
             targetRoom != sourceRoom)
         {
             SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
             return true;
         }
-        ApplyRoomState(sourceRoom, _currentRoomObjectRecords, _objects, visit: false);
+        ApplyRoomState(sourceRoom, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
         UpdateRoomNavigationActions(sourceRoom);
         RefreshRoomPreview();
         // The scene goes on by itself on the playback clock (otherwise its frames only moved when the pointer did).
@@ -2076,7 +1997,7 @@ public partial class MainWindow : Window
         }
         foreach (var (target, verb, certainty, count) in rows)
         {
-            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {_names.Label(target)}{(count > 1 ? $" ×{count}" : "")}";
+            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {_ctx.Names.Label(target)}{(count > 1 ? $" ×{count}" : "")}";
             AddResourceButton(container, label, target);
         }
         if (others.Count > 0)
@@ -2104,8 +2025,6 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>The state the session could not settle, one short line each (the full text in the tooltip), in the inspector's own section.</summary>
-    private int _issueBaseline;
 
     /// <summary>LOOM's Advanced panel is redrawn from the session (R-6.43); the assumptions are one of its sections.</summary>
     private void RefreshStateIssues()
@@ -2117,16 +2036,16 @@ public partial class MainWindow : Window
     {
         if (scriptEvent.TargetKind is not (ResourceKind.Sound or ResourceKind.Script or ResourceKind.Room) ||
             scriptEvent.TargetId is not int resourceId) return null;
-        return (scriptEvent.TargetKind == ResourceKind.Script ? _game?.AllScripts : _game?.Resources)?.FirstOrDefault(resource =>
+        return (scriptEvent.TargetKind == ResourceKind.Script ? _ctx.Game?.AllScripts : _ctx.Game?.Resources)?.FirstOrDefault(resource =>
             resource.Kind == scriptEvent.TargetKind && resource.ResourceId == resourceId &&
             (resource.ScriptRoom is null || resource.ScriptRoom == EventSourceRoom(scriptEvent)));
     }
 
     private int? EventSourceRoom(ScummScriptEvent ev) =>
         System.Text.RegularExpressions.Regex.Match(ev.SourceLabel, @"^Room (\d+)") is { Success: true } match
-            ? int.Parse(match.Groups[1].Value) : _scriptShown?.Context is { } context &&
+            ? int.Parse(match.Groups[1].Value) : _ctx.ScriptShown?.Context is { } context &&
               System.Text.RegularExpressions.Regex.Match(context, @"^Room (\d+)") is { Success: true } scriptMatch
-                ? int.Parse(scriptMatch.Groups[1].Value) : _session?.Snapshot.RoomId;
+                ? int.Parse(scriptMatch.Groups[1].Value) : _ctx.Session?.Snapshot.RoomId;
 
     private void StartRelationshipIndexBuild(GameLibrary game)
     {
@@ -2140,14 +2059,14 @@ public partial class MainWindow : Window
         try
         {
             var index = await Task.Run(() => _relationshipIndexer.Build(game));
-            if (generation != Volatile.Read(ref _relationshipBuildGeneration) || !ReferenceEquals(_game, game)) return;
-            _relationshipIndex = index;
+            if (generation != Volatile.Read(ref _relationshipBuildGeneration) || !ReferenceEquals(_ctx.Game, game)) return;
+            _ctx.RelationshipIndex = index;
             UpdateConnectionsButton();
         }
         catch (Exception exception)
         {
-            if (generation != Volatile.Read(ref _relationshipBuildGeneration) || !ReferenceEquals(_game, game)) return;
-            _relationshipIndex = null;
+            if (generation != Volatile.Read(ref _relationshipBuildGeneration) || !ReferenceEquals(_ctx.Game, game)) return;
+            _ctx.RelationshipIndex = null;
             ConnectionsButton.Content = "Explore links unavailable";
             ConnectionsButton.ToolTip = exception.Message;
             ConnectionsButton.IsEnabled = false;
@@ -2156,17 +2075,15 @@ public partial class MainWindow : Window
 
     // The bytecode column choice is kept from script to script (and while the app runs).
     private bool _showScriptBytes;
-    private GameNames _names = new(LoomGlossary.Default, null, "the hero");
-    private LoomUsageIndex _usageIndex = LoomUsageIndex.Empty;
 
     private async Task BuildUsageIndexAsync(GameLibrary game)
     {
         try
         {
             var index = await Task.Run(() => LoomUsageIndex.Build(game));
-            if (!ReferenceEquals(_game, game)) return;
-            _usageIndex = index;
-            if (_selectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
+            if (!ReferenceEquals(_ctx.Game, game)) return;
+            _ctx.UsageIndex = index;
+            if (_ctx.SelectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or NotSupportedException or InvalidOperationException) { }
     }
@@ -2177,9 +2094,9 @@ public partial class MainWindow : Window
         try
         {
             var labels = await Task.Run(() => LoomEgaStateFlags.BitLabels(LoomStoryEvents.Read(game), recipes));
-            if (!ReferenceEquals(_game, game)) return;
+            if (!ReferenceEquals(_ctx.Game, game)) return;
             glossary.StoryBitLabel = bit => labels.GetValueOrDefault(bit);
-            if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
+            if (_ctx.ScriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
             RefreshStateIssues();
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
@@ -2194,7 +2111,7 @@ public partial class MainWindow : Window
             return;
         }
         ScriptUsedByExpander.Visibility = Visibility.Visible;
-        var uses = _usageIndex.UsedBy(LoomUsageTarget.Script, id, resource.ScriptRoom);
+        var uses = _ctx.UsageIndex.UsedBy(LoomUsageTarget.Script, id, resource.ScriptRoom);
         ScriptUsedByExpander.Header = uses.Count == 0
             ? "Used by · no literal reference (a hook, a click or a variable starts it)"
             : $"Used by · {uses.Count}";
@@ -2202,20 +2119,19 @@ public partial class MainWindow : Window
         foreach (var use in uses.Take(60))
             ScriptUsedByList.Children.Add(new TextBlock
             {
-                Text = LoomUsageIndex.Describe(use, _names.Glossary, _names.VerbName),
+                Text = LoomUsageIndex.Describe(use, _ctx.Names.Glossary, _ctx.Names.VerbName),
                 Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 2)
             });
         if (uses.Count > 60)
             ScriptUsedByList.Children.Add(new TextBlock { Text = $"… and {uses.Count - 60} more", Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11 });
     }
-    private ScummScriptDisassembly? _scriptShown;
 
     /// <summary>R-6.51: the script page's subtitle. LOOM keeps its two fixed wordings (R-9.1); every other game's comes from its own data.</summary>
     private string ScriptPageSubtitle(GameResource resource)
     {
-        var named = _names.EvidenceLabel(resource) is { } label ? $" · name: {label}" : "";
+        var named = _ctx.Names.EvidenceLabel(resource) is { } label ? $" · name: {label}" : "";
         if (CurrentModule.ScriptKind(resource) is { } kind) return kind + named;
-        if (_game is not { } game) return "Indexed script resource";
+        if (_ctx.Game is not { } game) return "Indexed script resource";
         var scope = resource.ScriptRoom is null ? "script" : "room-local script";
         return $"{game.Title} {scope} · SCUMM v{(int)ScummProfile.For(game).EngineVersion}{named}";
     }
@@ -2224,7 +2140,7 @@ public partial class MainWindow : Window
     {
         _showScriptBytes = ScriptBytesToggle.IsChecked == true;
         SaveViewOptions();
-        if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
+        if (_ctx.ScriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
     }
 
     // Readable (names, if/else blocks) is the default; Raw is the decoded instructions and stays one click away. The choice is remembered.
@@ -2236,21 +2152,21 @@ public partial class MainWindow : Window
         _readableScripts = ScriptReadableToggle.IsChecked == true;
         ScriptBytesToggle.IsEnabled = !_readableScripts;
         SaveViewOptions();
-        if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
+        if (_ctx.ScriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
     }
 
     // Every game gets the readable view; only LOOM has names for its verbs and its hero, other games keep the engine's variable names.
     private string FormatScript(ScummScriptDisassembly script)
     {
         if (!_readableScripts) return script.Format(_showScriptBytes);
-        return new LoomScriptPresenter(_names.Glossary, _names.VerbName, _names.Hero).Present(script);
+        return new LoomScriptPresenter(_ctx.Names.Glossary, _ctx.Names.VerbName, _ctx.Names.Hero).Present(script);
     }
 
     // A script the catalog knows as a scene can be played from its view: the cutscene machinery goes to the room and runs it.
     private void ScriptPlay_Click(object sender, RoutedEventArgs e)
     {
-        if (_selectedResource is not { Kind: ResourceKind.Script } script || CurrentModule.ScriptPlayback(script.ResourceId) is not { } play || !CanStartCutscene) return;
-        if (_lastViewedRoomResource is { } room) SelectResourceInTree(room);
+        if (_ctx.SelectedResource is not { Kind: ResourceKind.Script } script || CurrentModule.ScriptPlayback(script.ResourceId) is not { } play || !CanStartCutscene) return;
+        if (_ctx.LastViewedRoomResource is { } room) SelectResourceInTree(room);
         play();
     }
 
@@ -2273,7 +2189,7 @@ public partial class MainWindow : Window
         try
         {
             if (RoomDisplayLayout.Visibility != Visibility.Visible) { FullscreenButton.Visibility = Visibility.Collapsed; return; }
-            if (PlayScreenImage.IsVisible && PlayScreenImage.ActualWidth > 0 && _playShown is { } frame)
+            if (PlayScreenImage.IsVisible && PlayScreenImage.ActualWidth > 0 && _ctx.PlayShown is { } frame)
             {
                 var scale = Math.Min(PlayScreenImage.ActualWidth / frame.PixelWidth, PlayScreenImage.ActualHeight / ScummPlayFrame.Height);
                 var origin = PlayScreenImage.TranslatePoint(new Point(0, 0), RoomViewportHost);
@@ -2334,7 +2250,7 @@ public partial class MainWindow : Window
     /// <summary>A script, sound or costume view replaces the scene: offer the way back to the room the user came from.</summary>
     private void UpdateBackToSceneButton()
     {
-        if (_selectedResource is { Kind: not ResourceKind.Room } && _lastViewedRoomResource is { } room)
+        if (_ctx.SelectedResource is { Kind: not ResourceKind.Room } && _ctx.LastViewedRoomResource is { } room)
         {
             BackToSceneButton.Content = $"← Back to Room {room.ResourceId:00}";
             BackToSceneButton.Visibility = Visibility.Visible;
@@ -2344,13 +2260,13 @@ public partial class MainWindow : Window
 
     private void BackToScene_Click(object sender, RoutedEventArgs e)
     {
-        if (_lastViewedRoomResource is { } room) SelectResourceInTree(room);
+        if (_ctx.LastViewedRoomResource is { } room) SelectResourceInTree(room);
     }
 
     private void UpdateConnectionsButton()
     {
         UpdateBackToSceneButton();
-        if (!IsAdvancedMode || _selectedResource is null || _game is null)
+        if (!IsAdvancedMode || _ctx.SelectedResource is null || _ctx.Game is null)
         {
             ConnectionsButton.Visibility = Visibility.Collapsed;
             return;
@@ -2358,14 +2274,14 @@ public partial class MainWindow : Window
 
         ConnectionsButton.Visibility = Visibility.Visible;
         ConnectionsButton.ToolTip = null;
-        if (_relationshipIndex is null)
+        if (_ctx.RelationshipIndex is null)
         {
             ConnectionsButton.Content = "Finding links…";
             ConnectionsButton.IsEnabled = false;
             return;
         }
 
-        var relationships = _relationshipIndex.ForResource(_selectedResource);
+        var relationships = _ctx.RelationshipIndex.ForResource(_ctx.SelectedResource);
         var unresolved = relationships.Count(item => item.Status == LoomRelationshipStatus.Unresolved);
         ConnectionsButton.Content = "Explore links";
         ConnectionsButton.ToolTip = unresolved == 0
@@ -2376,18 +2292,18 @@ public partial class MainWindow : Window
 
     private void ConnectionsButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_selectedResource is not GameResource selected) return;
-        if (_relationshipIndex is null)
+        if (_ctx.SelectedResource is not GameResource selected) return;
+        if (_ctx.RelationshipIndex is null)
         {
             MessageBox.Show(this, "The relationship index is still being built. Try again in a moment.",
                 "Connections", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        var relationships = _relationshipIndex.ForResource(selected);
+        var relationships = _ctx.RelationshipIndex.ForResource(selected);
         var window = new Window
         {
-            Title = $"Connections · {_names.Label(selected)}",
+            Title = $"Connections · {_ctx.Names.Label(selected)}",
             Owner = this,
             Width = 620,
             Height = 620,
@@ -2426,7 +2342,7 @@ public partial class MainWindow : Window
         {
             var isOutgoing = relationship.SourceResource == selected;
             var otherResource = isOutgoing ? relationship.TargetResource : relationship.SourceResource;
-            var heading = $"{_names.Label(relationship.SourceResource)}  →  {relationship.Relationship}  →  {_names.NameScripts(relationship.TargetLabel)}";
+            var heading = $"{_ctx.Names.Label(relationship.SourceResource)}  →  {relationship.Relationship}  →  {_ctx.Names.NameScripts(relationship.TargetLabel)}";
             var content = new StackPanel { Margin = new Thickness(2) };
             content.Children.Add(new TextBlock
             {
@@ -2518,8 +2434,8 @@ public partial class MainWindow : Window
                 item.BringIntoView();
                 // A native roomless intro can leave the previous tree node selected.
                 // Clicking that catalog card is still an explicit navigation request.
-                if (alreadySelected && _roomOpenKind == RoomOpenKind.Catalog && !_followingPlayRoom &&
-                    resource.Kind == ResourceKind.Room && _currentRoomResource?.ResourceId != resource.ResourceId)
+                if (alreadySelected && _ctx.RoomOpenKind == RoomOpenKind.Catalog && !_ctx.FollowingPlayRoom &&
+                    resource.Kind == ResourceKind.Room && _ctx.CurrentRoomResource?.ResourceId != resource.ResourceId)
                     ResourceTree_SelectedItemChanged(ResourceTree, new RoutedPropertyChangedEventArgs<object>(item, item));
                 return;
             }
@@ -2541,7 +2457,7 @@ public partial class MainWindow : Window
     /// <summary>A global or room-local script of a browsed v4 game, read from the disk that holds it in the game's own script dialect.</summary>
     private ScummScriptDisassembly DecodeBrowsedV4Script(GameResource resource)
     {
-        if (_game?.V4ArchiveFor(resource) is ScummV5Archive v5 && resource.ResourceId is int v5Id)
+        if (_ctx.Game?.V4ArchiveFor(resource) is ScummV5Archive v5 && resource.ResourceId is int v5Id)
         {
             var found = resource.ScriptRoom is int v5Room
                 ? v5.ReadRoomScripts(v5Room).FirstOrDefault(s => s.Kind == "LSCR" && s.Number == v5Id)
@@ -2551,19 +2467,19 @@ public partial class MainWindow : Window
                 with { ContainerName = "its resource file", CodeFileOffset = found.Position + (found.Kind == "LSCR" ? 9 : 8), ResourceLength = found.Code.Length + (found.Kind == "LSCR" ? 9 : 8),
                        Context = resource.ScriptRoom is int roomNumber ? $"Room {roomNumber:00} local script {v5Id}" : null };
         }
-        if (_game?.V4ArchiveFor(resource) is not ScummV4Archive archive || resource.ContainerFileNumber is not int disk)
+        if (_ctx.Game?.V4ArchiveFor(resource) is not ScummV4Archive archive || resource.ContainerFileNumber is not int disk)
             throw new InvalidDataException("This script is not stored in the game's archive.");
-        var source = new ScummV4DataSource(archive, ScummProfile.For(_game).Dialect, disk, archive.IsRoomFileGame ? "its room files" : ScummV4Archive.DiskFileName(disk));
+        var source = new ScummV4DataSource(archive, ScummProfile.For(_ctx.Game).Dialect, disk, archive.IsRoomFileGame ? "its room files" : ScummV4Archive.DiskFileName(disk));
         return (resource.ScriptRoom is int room ? source.RoomLocalScript(room, resource.ResourceId!.Value) : source.GlobalScript(resource.ResourceId!.Value))
             ?? throw new InvalidDataException("This script is not stored in the game's archive.");
     }
 
     private void ShowCostume(GameResource resource)
     {
-        _previewCancellation?.Cancel();
-        _currentRoom = null;
-        _objects = [];
-        _selectedObject = null;
+        _ctx.PreviewCancellation?.Cancel();
+        _ctx.CurrentRoom = null;
+        _ctx.Objects = [];
+        _ctx.SelectedObject = null;
         ClearObjectList();
         CostumePoseGallery.Children.Clear();
         CostumePoseScrollViewer.ScrollToTop();
@@ -2591,7 +2507,7 @@ public partial class MainWindow : Window
 
         try
         {
-            if (_game?.V4ArchiveFor(resource) is { } vga)
+            if (_ctx.Game?.V4ArchiveFor(resource) is { } vga)
             {
                 var costume = vga.FindCostume(resource.ResourceId ?? -1) ?? throw new InvalidDataException("This costume has no data.");
                 var poses = vga.DecodeCostumePoses(costume);
@@ -2609,7 +2525,7 @@ public partial class MainWindow : Window
                 }
                 return;
             }
-            if (_game is not { Version: ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3 } || resource.Offset is not int resourceOffset)
+            if (_ctx.Game is not { Version: ScummVersion.V1 or ScummVersion.V2 or ScummVersion.V3 } || resource.Offset is not int resourceOffset)
                 throw new NotSupportedException("This costume has no supported DOS LOOM resource offset.");
 
             var container = LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath));
@@ -2620,7 +2536,7 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _game!.V1Game, v1Colors);
+                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _ctx.Game!.V1Game, v1Colors);
                     if (pose is null) continue;
                     CostumePoseGallery.Children.Add(CreateCostumePoseCard(slot.Index, pose));
                     availableCount++;
@@ -2728,10 +2644,10 @@ public partial class MainWindow : Window
     private void RoomViewport_ScrollChanged(object sender, ScrollChangedEventArgs e)
     {
         // A camera kept while the view could not scroll is applied once it can.
-        if (_pendingCameraX is not null && (e.ExtentWidthChange != 0 || e.ViewportWidthChange != 0) && RoomViewport.ScrollableWidth > 0.5)
+        if (_ctx.PendingCameraX is not null && (e.ExtentWidthChange != 0 || e.ViewportWidthChange != 0) && RoomViewport.ScrollableWidth > 0.5)
             ApplyPendingCamera();
         // The scroll bar and the wheel stay inside the game's camera limits too.
-        else if (_pendingCameraX is null && RoomViewport.ScrollableWidth > 0.5)
+        else if (_ctx.PendingCameraX is null && RoomViewport.ScrollableWidth > 0.5)
         {
             var (low, high) = RoomViewScrollRange();
             var inside = Math.Clamp(RoomViewport.HorizontalOffset, low, high);
@@ -2763,7 +2679,7 @@ public partial class MainWindow : Window
 
     private void UpdateRoomViewportLayout()
     {
-        if (_currentRoom is not { } room || RoomViewport is null) return;
+        if (_ctx.CurrentRoom is not { } room || RoomViewport is null) return;
         var normalSize = NormalRoomWidthToggle.IsChecked == true;
         var availableWidth = Math.Max(1, RoomViewportHost.ActualWidth);
         var availableHeight = Math.Max(1, RoomViewportHost.ActualHeight);
@@ -2804,11 +2720,9 @@ public partial class MainWindow : Window
         }, DispatcherPriority.Loaded);
         RefreshWalkBoxOverlay();
         RefreshRoomNavigationOverlay();
-        ShowHotspotHighlight(_highlightedHotspot);
+        ShowHotspotHighlight(_ctx.HighlightedHotspot);
     }
 
-    // The session's camera x for the room just entered, applied once the view is laid out.
-    private int? _pendingCameraX;
 
     /// <summary>
     /// In the 320-pixel view, scrolls so the camera's x (<c>var[0x002]</c>, the
@@ -2816,18 +2730,18 @@ public partial class MainWindow : Window
     /// </summary>
     private void ApplyPendingCamera()
     {
-        if (_pendingCameraX is not int cameraX || _currentRoom is null) return;
+        if (_ctx.PendingCameraX is not int cameraX || _ctx.CurrentRoom is null) return;
         if (NormalRoomWidthToggle.IsChecked != true)
         {
-            _pendingCameraX = null;
+            _ctx.PendingCameraX = null;
             return;
         }
         RoomViewport.UpdateLayout();
         // The first room opened is not always laid out yet: keep the camera until
         // the view can scroll (RoomViewport_ScrollChanged applies it then).
-        if (_currentRoom.Width > 320 && RoomViewport.ScrollableWidth < 0.5) return;
-        _pendingCameraX = null;
-        var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
+        if (_ctx.CurrentRoom.Width > 320 && RoomViewport.ScrollableWidth < 0.5) return;
+        _ctx.PendingCameraX = null;
+        var left = Math.Clamp(cameraX - Math.Min(320, _ctx.CurrentRoom.Width) / 2.0, 0,
             RoomViewport.ScrollableWidth / _roomDisplayScale);
         RoomViewport.ScrollToHorizontalOffset(left * _roomDisplayScale);
     }
@@ -2841,10 +2755,10 @@ public partial class MainWindow : Window
     private (double Min, double Max) RoomViewScrollRange()
     {
         var max = RoomViewport.ScrollableWidth;
-        if (!GameClickActive || _currentRoom is null || _session!.CameraRange is not { } range ||
-            _session.Snapshot.RoomId is not int roomId || roomId != _currentRoomResource?.ResourceId)
+        if (!GameClickActive || _ctx.CurrentRoom is null || _ctx.Session!.CameraRange is not { } range ||
+            _ctx.Session.Snapshot.RoomId is not int roomId || roomId != _ctx.CurrentRoomResource?.ResourceId)
             return (0, max);
-        var half = Math.Min(320, _currentRoom.Width) / 2.0;
+        var half = Math.Min(320, _ctx.CurrentRoom.Width) / 2.0;
         var low = Math.Clamp((range.Min - half) * _roomDisplayScale, 0, max);
         return (low, Math.Clamp((range.Max - half) * _roomDisplayScale, low, max));
     }
@@ -2939,7 +2853,7 @@ public partial class MainWindow : Window
 
     private void RoomPanTimer_Tick(object? sender, EventArgs e)
     {
-        if (!_roomPanActive || _currentRoom is null || NormalRoomWidthToggle.IsChecked != true)
+        if (!_roomPanActive || _ctx.CurrentRoom is null || NormalRoomWidthToggle.IsChecked != true)
         {
             StopRoomPan();
             return;
@@ -2982,7 +2896,7 @@ public partial class MainWindow : Window
     // ScummVM), never while typing in a text box. Script 005 reads the note rows q-i and c-C, < and > (text speed),
     // F5 (save screen), F6 (music and effects), F7 (animation), Ctrl+V (version) and Escape.
     private bool GameKeysActive => SessionModeToggle.IsChecked == true &&
-                                   _session is not null && _currentRoomResource is not null && HasDedicatedSession &&
+                                   _ctx.Session is not null && _ctx.CurrentRoomResource is not null && HasDedicatedSession &&
                                    Keyboard.FocusedElement is not (TextBox or ComboBox);
 
     /// <summary>
@@ -3025,7 +2939,7 @@ public partial class MainWindow : Window
     /// path would receive it (<see cref="LoomExplorationSession.PressKey"/>).
     /// </summary>
     private void SendKeyToGame(int key) =>
-        SendInputToGame(() => _session!.PressKey(key), $"Key {LoomExplorationSession.DescribeKey(key)}");
+        SendInputToGame(() => _ctx.Session!.PressKey(key), $"Key {LoomExplorationSession.DescribeKey(key)}");
 
     /// <summary>A button caption with a small turning arc in front of it while the scenes of the rooms are still being worked out; the caption alone otherwise.</summary>
     private static object ButtonWithSpinner(string text, bool spinning)
@@ -3055,7 +2969,7 @@ public partial class MainWindow : Window
     // arrows. Controls that use those keys themselves (text entry, drop-downs, sliders, tree nodes that
     // expand or collapse) keep them.
     private bool RoomPanKeysAvailable =>
-        _game is not null && RoomDisplayLayout.Visibility == Visibility.Visible && Keyboard.Modifiers == ModifierKeys.None &&
+        _ctx.Game is not null && RoomDisplayLayout.Visibility == Visibility.Visible && Keyboard.Modifiers == ModifierKeys.None &&
         Keyboard.FocusedElement is not (TextBox or ComboBox or Slider or PasswordBox) and not TreeViewItem { HasItems: true };
 
     private void RoomViewport_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -3068,34 +2982,33 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    private IReadOnlyList<LoomCdCue> _cdCues = [];
     private const int CdCueIdBase = 1000;
-    private bool IsCdCue(GameResource resource) => _game?.V4Archive is not null && resource.ResourceId >= CdCueIdBase;
+    private bool IsCdCue(GameResource resource) => _ctx.Game?.V4Archive is not null && resource.ResourceId >= CdCueIdBase;
 
     /// <summary>A whole red-book track of a game disc (Monkey Island), which the player reads straight from the image.</summary>
     private static bool IsDiscTrack(GameLibrary game, GameResource resource) => game.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId is >= GameLibrary.CdTrackIdBase and < GameLibrary.SpeechIdBase;
 
-    private bool IsCdTrack(GameResource resource) => _game?.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId is >= GameLibrary.CdTrackIdBase and < GameLibrary.SpeechIdBase;
+    private bool IsCdTrack(GameResource resource) => _ctx.Game?.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId is >= GameLibrary.CdTrackIdBase and < GameLibrary.SpeechIdBase;
 
     /// <summary>A spoken line of a talkie game's MONSTER.SOU: digital audio that plays as recorded, whatever the sound device.</summary>
-    private bool IsSpeech(GameResource resource) => _game?.Speech is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId >= GameLibrary.SpeechIdBase;
+    private bool IsSpeech(GameResource resource) => _ctx.Game?.Speech is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId >= GameLibrary.SpeechIdBase;
 
     private async Task ShowAudio(GameResource resource, bool preserveFormat = false, bool autoPlay = false)
     {
         StopAudio();
-        _audioSurface = AudioSurface.Resource;
+        _ctx.AudioSurface = AudioSurface.Resource;
         CostumePanel.Visibility = Visibility.Collapsed;
         RoomDisplayLayout.Visibility = Visibility.Collapsed;
         ScriptPanel.Visibility = Visibility.Collapsed;
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
-        _selectedSound = resource;
+        _ctx.SelectedSound = resource;
         var cdCue = IsCdCue(resource) || IsCdTrack(resource) || IsSpeech(resource);
         var adlib = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
         var roland = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
         var format = IsSpeech(resource) ? "speech" : cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr ? "PCjr/Tandy" : "PC speaker";
         AdlibGainPanel.Visibility = Visibility.Collapsed; // the level bar is hidden; the slider keeps its +6 dB default, which is still applied
-        _previewCancellation?.Cancel();
+        _ctx.PreviewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         WalkBoxToggle.Visibility = Visibility.Collapsed;
@@ -3123,20 +3036,20 @@ public partial class MainWindow : Window
         AdlibGainSlider.IsEnabled = false;
         if (!cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
         {
-            _audioTimeNote = AudioTime.Text = "Muted";
+            _ctx.AudioTimeNote = AudioTime.Text = "Muted";
             AudioPlaybackState.Text = "Muted";
             AudioDescription.Text = "No Sound selected";
             StatusText.Text = $"{resource.Name} · muted";
             return;
         }
         StatusText.Text = $"{resource.Name} · reading sound";
-        _audioCancellation = new CancellationTokenSource();
-        var token = _audioCancellation.Token;
+        _ctx.AudioCancellation = new CancellationTokenSource();
+        var token = _ctx.AudioCancellation.Token;
         try
         {
-            var wave = IsSpeech(resource) ? await Task.Run(() => _game!.Speech!.ReadWave(resource.Offset!.Value, resource.ContainerNumberOffset!.Value), token) : IsCdTrack(resource) ? await Task.Run(() => ReadCdTrackWave(resource), token) : cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
+            var wave = IsSpeech(resource) ? await Task.Run(() => _ctx.Game!.Speech!.ReadWave(resource.Offset!.Value, resource.ContainerNumberOffset!.Value), token) : IsCdTrack(resource) ? await Task.Run(() => ReadCdTrackWave(resource), token) : cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
             if (token.IsCancellationRequested) return;
-            _adlibBaseWave = adlib ? wave : null;
+            _ctx.AdlibBaseWave = adlib ? wave : null;
             if (adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, AdlibGainSlider.Value);
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(path, wave, token);
@@ -3145,11 +3058,11 @@ public partial class MainWindow : Window
                 File.Delete(path);
                 return;
             }
-            _audioFile = path;
-            _playWhenReady = autoPlay;
-            _audioKnownDuration = IsSpeech(resource) ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 2)) : cdCue ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4)) : WaveDuration(wave, adlib);
+            _ctx.AudioFile = path;
+            _ctx.PlayWhenReady = autoPlay;
+            _ctx.AudioKnownDuration = IsSpeech(resource) ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 2)) : cdCue ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4)) : WaveDuration(wave, adlib);
             _audioPlayer.Open(new Uri(path));
-            _audioReady = true;
+            _ctx.AudioReady = true;
             PlayButton.IsEnabled = true;
             PauseButton.IsEnabled = true;
             StopButton.IsEnabled = true;
@@ -3168,7 +3081,7 @@ public partial class MainWindow : Window
         {
             if (token.IsCancellationRequested) return;
             AudioDescription.Text = ex.Message;
-            _audioTimeNote = AudioTime.Text = "No playable audio";
+            _ctx.AudioTimeNote = AudioTime.Text = "No playable audio";
             AudioPlaybackState.Text = "Playback unavailable";
             StatusText.Text = $"{resource.Name} · playback unavailable";
         }
@@ -3176,7 +3089,7 @@ public partial class MainWindow : Window
 
     private byte[] ReadCdTrackWave(GameResource resource)
     {
-        var wave = _game!.AudioDisc!.ReadTrackWave(resource.ResourceId!.Value - GameLibrary.CdTrackIdBase);
+        var wave = _ctx.Game!.AudioDisc!.ReadTrackWave(resource.ResourceId!.Value - GameLibrary.CdTrackIdBase);
         if (wave.Length <= 44) throw new InvalidDataException("The disc holds no audio for this track.");
         return wave;
     }
@@ -3184,8 +3097,8 @@ public partial class MainWindow : Window
     /// <summary>The cue's stretch of the disc's audio track, as the voice player would play it (the real recording, not a rendition).</summary>
     private byte[] ReadCdCueWave(GameResource resource)
     {
-        var cue = _cdCues[resource.ResourceId!.Value - CdCueIdBase].Cue;
-        var wave = _game!.V4Archive!.Disc!.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount);
+        var cue = _ctx.CdCues[resource.ResourceId!.Value - CdCueIdBase].Cue;
+        var wave = _ctx.Game!.V4Archive!.Disc!.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount);
         if (wave.Length <= 44) throw new InvalidDataException("The disc holds no audio at this position.");
         return wave;
     }
@@ -3194,7 +3107,7 @@ public partial class MainWindow : Window
         CancellationToken token)
     {
         var mode = adlib ? SceneSoundPlayer.SoundMode.Adlib : _sceneSound.Mode;
-        var game = _game;
+        var game = _ctx.Game;
         return Task.Run(() => RenderSoundWave(resource, mode, token, game), token);
     }
 
@@ -3204,7 +3117,7 @@ public partial class MainWindow : Window
     /// </summary>
     private byte[] RenderSoundWave(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token, GameLibrary? sourceGame = null)
     {
-        var game = sourceGame ?? _game;
+        var game = sourceGame ?? _ctx.Game;
         var roms = _sceneSound.Roms;
         token.ThrowIfCancellationRequested();
         if (game is null) throw new InvalidOperationException("No game is open for this sound.");
@@ -3264,8 +3177,8 @@ public partial class MainWindow : Window
     private async Task PlayRoomCueAsync()
     {
         if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.None) return;
-        if (_roomSelectedCue is not { } sound) return;
-        if (_audioSurface == AudioSurface.Room && _audioReady && _roomRenderedCue == sound)
+        if (_ctx.RoomSelectedCue is not { } sound) return;
+        if (_ctx.AudioSurface == AudioSurface.Room && _ctx.AudioReady && _ctx.RoomRenderedCue == sound)
         {
             _audioPlayer.Play();
             _audioTimer.Start();
@@ -3273,15 +3186,15 @@ public partial class MainWindow : Window
             return;
         }
         StopAudio();
-        _audioSurface = AudioSurface.Room;
-        _roomRenderedCue = sound;
+        _ctx.AudioSurface = AudioSurface.Room;
+        _ctx.RoomRenderedCue = sound;
         RoomCueStatus.Text = "Preparing audio…";
         RoomCuePlayButton.IsEnabled = false;
         RoomCuePauseButton.IsEnabled = false;
         RoomCueStopButton.IsEnabled = true;
         RoomCueTime.Text = "Preparing…";
-        _audioCancellation = new CancellationTokenSource();
-        var token = _audioCancellation.Token;
+        _ctx.AudioCancellation = new CancellationTokenSource();
+        var token = _ctx.AudioCancellation.Token;
         try
         {
             var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
@@ -3295,11 +3208,11 @@ public partial class MainWindow : Window
                 File.Delete(path);
                 return;
             }
-            _audioFile = path;
-            _playWhenReady = true;
-            _audioKnownDuration = WaveDuration(wave, adlib);
+            _ctx.AudioFile = path;
+            _ctx.PlayWhenReady = true;
+            _ctx.AudioKnownDuration = WaveDuration(wave, adlib);
             _audioPlayer.Open(new Uri(path));
-            _audioReady = true;
+            _ctx.AudioReady = true;
             RoomCuePlayButton.IsEnabled = true;
             RoomCuePauseButton.IsEnabled = true;
             RoomCueStatus.Text = "Ready to play";
@@ -3309,7 +3222,7 @@ public partial class MainWindow : Window
         {
             if (token.IsCancellationRequested) return;
             RoomCueStatus.Text = $"Playback unavailable: {ex.Message}";
-            _audioTimeNote = RoomCueTime.Text = "No playable audio";
+            _ctx.AudioTimeNote = RoomCueTime.Text = "No playable audio";
             RoomCuePlayButton.ToolTip = RoomCueStatus.Text;
             RoomCuePlayButton.IsEnabled = true;
             RoomCuePauseButton.IsEnabled = false;
@@ -3319,7 +3232,7 @@ public partial class MainWindow : Window
 
     private void RoomCuePause_Click(object sender, RoutedEventArgs e)
     {
-        if (_audioSurface != AudioSurface.Room || !_audioReady) return;
+        if (_ctx.AudioSurface != AudioSurface.Room || !_ctx.AudioReady) return;
         _audioPlayer.Pause();
         _audioTimer.Stop();
         UpdateAudioTime();
@@ -3328,12 +3241,12 @@ public partial class MainWindow : Window
 
     private void RoomCueStop_Click(object sender, RoutedEventArgs e)
     {
-        if (_audioSurface != AudioSurface.Room) return;
-        if (_audioReady) StopPlayback();
+        if (_ctx.AudioSurface != AudioSurface.Room) return;
+        if (_ctx.AudioReady) StopPlayback();
         else
         {
             StopAudio();
-            RoomCuePlayButton.IsEnabled = _roomSelectedCue is not null;
+            RoomCuePlayButton.IsEnabled = _ctx.RoomSelectedCue is not null;
             RoomCuePauseButton.IsEnabled = false;
             RoomCueStopButton.IsEnabled = false;
             RoomCueStatus.Text = "Stopped";
@@ -3365,14 +3278,14 @@ public partial class MainWindow : Window
     /// </summary>
     private bool PrepareRoland()
     {
-        if (_game is null || !SceneSoundPlayer.HasRolandSounds(_game))
+        if (_ctx.Game is null || !SceneSoundPlayer.HasRolandSounds(_ctx.Game))
         {
             MessageBox.Show(this, "This game folder has no Roland music to play (for LOOM, the Roland upgrade with its sounds 33 to 64 is not installed).",
                 "Roland MT-32", MessageBoxButton.OK, MessageBoxImage.Information);
             return false;
         }
         if (_sceneSound.Roms is not null) return true;
-        var roms = FindMt32Roms(_game);
+        var roms = FindMt32Roms(_ctx.Game);
         if (roms is null)
         {
             var picker = new OpenFolderDialog
@@ -3401,11 +3314,6 @@ public partial class MainWindow : Window
 
     private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
 
-    // "Sound NN - mm:ss" in the Advanced tree: the length of the sound on the selected device, rendered in the background (the devices differ:
-    // the PC speaker and PCjr parts of one sound can be seconds apart), so it follows the device and is filled in as each sound is done.
-    private CancellationTokenSource? _durationCancellation;
-    private (GameLibrary? Game, SceneSoundPlayer.SoundMode Mode) _durationKey;
-    private readonly System.Collections.Concurrent.ConcurrentDictionary<(SceneSoundPlayer.SoundMode Mode, GameResource Resource), string?> _durationLabels = new();
 
     private static string DurationText(TimeSpan duration) => $"{(int)duration.TotalMinutes:00}:{duration.Seconds:00}{(duration.TotalSeconds >= 179 ? "+" : "")}";
 
@@ -3417,20 +3325,20 @@ public partial class MainWindow : Window
 
     private void StartSoundDurations()
     {
-        if (_game is not { } game || !IsAdvancedMode) return;
+        if (_ctx.Game is not { } game || !IsAdvancedMode) return;
         var mode = _sceneSound.Mode;
-        if ((game, mode) == _durationKey) return;
-        _durationCancellation?.Cancel();
-        if (_durationKey.Game != game) _durationLabels.Clear();
-        _durationKey = (game, mode);
+        if ((game, mode) == _ctx.DurationKey) return;
+        _ctx.DurationCancellation?.Cancel();
+        if (_ctx.DurationKey.Game != game) _ctx.DurationLabels.Clear();
+        _ctx.DurationKey = (game, mode);
         var items = ResourceTree.Items.OfType<TreeViewItem>().SelectMany(group => group.Items.OfType<TreeViewItem>())
             .Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound } sound && !IsCdCue(sound) && !IsCdTrack(sound) && !IsSpeech(sound)).ToArray();
         string Header(TreeViewItem item, string? duration) =>
-            _names.Label((GameResource)item.Tag) + (duration is null ? "" : " - " + duration);
+            _ctx.Names.Label((GameResource)item.Tag) + (duration is null ? "" : " - " + duration);
         foreach (var item in items)
-            item.Header = Header(item, _durationLabels.GetValueOrDefault((mode, (GameResource)item.Tag)));
+            item.Header = Header(item, _ctx.DurationLabels.GetValueOrDefault((mode, (GameResource)item.Tag)));
         if (mode == SceneSoundPlayer.SoundMode.None) return;
-        var cancellation = _durationCancellation = new CancellationTokenSource();
+        var cancellation = _ctx.DurationCancellation = new CancellationTokenSource();
         var token = cancellation.Token;
         // The tree items belong to the UI thread: the work list is made here, the worker only touches the resources.
         var work = items.Select(item => (Item: item, Resource: (GameResource)item.Tag)).ToArray();
@@ -3439,7 +3347,7 @@ public partial class MainWindow : Window
             foreach (var (item, resource) in work)
             {
                 if (token.IsCancellationRequested) return;
-                if (_durationLabels.ContainsKey((mode, resource))) continue;
+                if (_ctx.DurationLabels.ContainsKey((mode, resource))) continue;
                 string? label = null;
                 try
                 {
@@ -3452,7 +3360,7 @@ public partial class MainWindow : Window
                 await Dispatcher.InvokeAsync(() =>
                 {
                     if (token.IsCancellationRequested) return;
-                    _durationLabels[(mode, resource)] = label;
+                    _ctx.DurationLabels[(mode, resource)] = label;
                     item.Header = Header(item, label);
                 });
             }
@@ -3489,13 +3397,13 @@ public partial class MainWindow : Window
             SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
             return;
         }
-        var surface = _audioSurface;
-        var selected = _selectedSound;
+        var surface = _ctx.AudioSurface;
+        var selected = _ctx.SelectedSound;
         StopAudio();
         _sceneSound.SetMode(requested);
         StartSoundDurations();
         // The game's scripts read the sound card when they choose a sound, so the new device applies from the next one on.
-        if (_session is not null) _session.SoundCard = SoundCard;
+        if (_ctx.Session is not null) _ctx.Session.SoundCard = SoundCard;
         UpdatePlaySoundCard();
         if (!_soundModeFallback) SaveViewOptions();
         if (surface == AudioSurface.Resource && selected is not null)
@@ -3509,35 +3417,35 @@ public partial class MainWindow : Window
         if (AdlibGainValue is not null) AdlibGainValue.Text = $"+{AdlibGainSlider.Value:F1} dB";
         _adlibGainRequest++;
         _adlibGainDebounceTimer.Stop();
-        if (_adlibBaseWave is null || !_audioReady || _audioSurface != AudioSurface.Resource) return;
+        if (_ctx.AdlibBaseWave is null || !_ctx.AudioReady || _ctx.AudioSurface != AudioSurface.Resource) return;
         _adlibGainDebounceTimer.Start();
     }
 
     private async Task ApplyAdlibGainAsync()
     {
-        var sourceWave = _adlibBaseWave;
-        if (sourceWave is null || !_audioReady || _audioSurface != AudioSurface.Resource) return;
+        var sourceWave = _ctx.AdlibBaseWave;
+        if (sourceWave is null || !_ctx.AudioReady || _ctx.AudioSurface != AudioSurface.Resource) return;
 
         var request = _adlibGainRequest;
         var gainDb = AdlibGainSlider.Value;
         try
         {
             var wave = await Task.Run(() => ScummAdlibAudio.ApplyOutputGain(sourceWave, gainDb));
-            if (request != _adlibGainRequest || !ReferenceEquals(sourceWave, _adlibBaseWave)) return;
+            if (request != _adlibGainRequest || !ReferenceEquals(sourceWave, _ctx.AdlibBaseWave)) return;
 
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(path, wave);
-            if (request != _adlibGainRequest || !ReferenceEquals(sourceWave, _adlibBaseWave))
+            if (request != _adlibGainRequest || !ReferenceEquals(sourceWave, _ctx.AdlibBaseWave))
             {
                 File.Delete(path);
                 return;
             }
 
-            var oldPath = _audioFile;
+            var oldPath = _ctx.AudioFile;
             var position = _audioPlayer.Position;
             var resumePlaying = _audioTimer.IsEnabled;
             _audioTimer.Stop();
-            _audioReady = false;
+            _ctx.AudioReady = false;
             PlayButton.IsEnabled = false;
             PauseButton.IsEnabled = false;
             StopButton.IsEnabled = false;
@@ -3550,10 +3458,10 @@ public partial class MainWindow : Window
                 catch (UnauthorizedAccessException) { }
             }
 
-            _audioFile = path;
-            _audioPositionAfterGainChange = position;
-            _resumeAudioAfterGainChange = resumePlaying;
-            _restoreAudioAfterGainChange = true;
+            _ctx.AudioFile = path;
+            _ctx.AudioPositionAfterGainChange = position;
+            _ctx.ResumeAudioAfterGainChange = resumePlaying;
+            _ctx.RestoreAudioAfterGainChange = true;
             _audioPlayer.Open(new Uri(path));
             StatusText.Text = $"{AudioTitle.Text} · applying AdLib level";
         }
@@ -3565,16 +3473,16 @@ public partial class MainWindow : Window
 
     private void AudioPlayer_MediaOpened(object? sender, EventArgs e)
     {
-        if (_restoreAudioAfterGainChange)
+        if (_ctx.RestoreAudioAfterGainChange)
         {
-            _restoreAudioAfterGainChange = false;
-            _audioReady = true;
+            _ctx.RestoreAudioAfterGainChange = false;
+            _ctx.AudioReady = true;
             PlayButton.IsEnabled = true;
             PauseButton.IsEnabled = true;
             StopButton.IsEnabled = true;
             AdlibGainSlider.IsEnabled = true;
-            _audioPlayer.Position = _audioPositionAfterGainChange;
-            if (_resumeAudioAfterGainChange)
+            _audioPlayer.Position = _ctx.AudioPositionAfterGainChange;
+            if (_ctx.ResumeAudioAfterGainChange)
             {
                 _audioPlayer.Play();
                 _audioTimer.Start();
@@ -3586,12 +3494,12 @@ public partial class MainWindow : Window
                 StatusText.Text = $"{AudioTitle.Text} · paused";
             }
         }
-        else if (_playWhenReady)
+        else if (_ctx.PlayWhenReady)
         {
-            _playWhenReady = false;
+            _ctx.PlayWhenReady = false;
             _audioPlayer.Play();
             _audioTimer.Start();
-            if (_audioSurface == AudioSurface.Room) RoomCueStatus.Text = "Playing";
+            if (_ctx.AudioSurface == AudioSurface.Room) RoomCueStatus.Text = "Playing";
             else StatusText.Text = $"{AudioTitle.Text} · playing";
         }
         UpdateAudioTime();
@@ -3599,7 +3507,7 @@ public partial class MainWindow : Window
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!_audioReady) return;
+        if (!_ctx.AudioReady) return;
         _audioPlayer.Play();
         _audioTimer.Start();
         StatusText.Text = $"{AudioTitle.Text} · playing";
@@ -3607,7 +3515,7 @@ public partial class MainWindow : Window
 
     private void PauseButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!_audioReady) return;
+        if (!_ctx.AudioReady) return;
         _audioPlayer.Pause();
         _audioTimer.Stop();
         UpdateAudioTime();
@@ -3620,9 +3528,9 @@ public partial class MainWindow : Window
     {
         _audioTimer.Stop();
         _audioPlayer.Stop();
-        if (_audioReady)
+        if (_ctx.AudioReady)
         {
-            if (_audioSurface == AudioSurface.Room) RoomCueStatus.Text = "Stopped";
+            if (_ctx.AudioSurface == AudioSurface.Room) RoomCueStatus.Text = "Stopped";
             else StatusText.Text = $"{AudioTitle.Text} · stopped";
         }
         UpdateAudioTime();
@@ -3632,19 +3540,16 @@ public partial class MainWindow : Window
     {
         var current = _audioPlayer.Position;
         // The player reports the length only once the file is open; the rendered wave's own length is known at once.
-        TimeSpan? total = _audioPlayer.NaturalDuration.HasTimeSpan ? _audioPlayer.NaturalDuration.TimeSpan : _audioKnownDuration;
-        AudioTime.Text = total is TimeSpan length ? $"{current:m\\:ss} / {length:m\\:ss}" : _audioTimeNote ?? "Preparing…";
+        TimeSpan? total = _audioPlayer.NaturalDuration.HasTimeSpan ? _audioPlayer.NaturalDuration.TimeSpan : _ctx.AudioKnownDuration;
+        AudioTime.Text = total is TimeSpan length ? $"{current:m\\:ss} / {length:m\\:ss}" : _ctx.AudioTimeNote ?? "Preparing…";
         AudioProgress.Value = total is { TotalSeconds: > 0 } ? Math.Clamp(current.TotalSeconds / total.Value.TotalSeconds, 0, 1) : 0;
-        if (_audioSurface == AudioSurface.Resource && _audioReady)
+        if (_ctx.AudioSurface == AudioSurface.Resource && _ctx.AudioReady)
             AudioPlaybackState.Text = _audioTimer.IsEnabled ? "Playing" : current > TimeSpan.Zero ? "Paused" : "Ready to play";
         RoomCueTime.Text = AudioTime.Text;
     }
 
-    // The length of the rendered wave (null until it exists) and, when no wave can exist, what to show instead of a length.
-    private TimeSpan? _audioKnownDuration;
-    private string? _audioTimeNote;
 
-    private TimeSpan WaveDuration(byte[] wave, bool adlib) => wave.Length >= 44 && BitConverter.ToInt32(wave, 28) is > 0 and var byteRate && _game?.Version == ScummVersion.V5
+    private TimeSpan WaveDuration(byte[] wave, bool adlib) => wave.Length >= 44 && BitConverter.ToInt32(wave, 28) is > 0 and var byteRate && _ctx.Game?.Version == ScummVersion.V5
         ? TimeSpan.FromSeconds((wave.Length - 44) / (double)byteRate)
         : _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && wave.Length >= 44
         ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4))
@@ -3655,34 +3560,34 @@ public partial class MainWindow : Window
 
     private void StopAudio()
     {
-        _playWhenReady = false;
+        _ctx.PlayWhenReady = false;
         _adlibGainDebounceTimer.Stop();
         _adlibGainRequest++;
-        _adlibBaseWave = null;
-        _restoreAudioAfterGainChange = false;
-        _resumeAudioAfterGainChange = false;
-        _audioCancellation?.Cancel();
+        _ctx.AdlibBaseWave = null;
+        _ctx.RestoreAudioAfterGainChange = false;
+        _ctx.ResumeAudioAfterGainChange = false;
+        _ctx.AudioCancellation?.Cancel();
         _audioTimer.Stop();
         _audioPlayer.Close();
-        _audioKnownDuration = null;
-        _audioTimeNote = null;
-        _audioReady = false;
-        _audioSurface = AudioSurface.None;
-        _roomRenderedCue = null;
+        _ctx.AudioKnownDuration = null;
+        _ctx.AudioTimeNote = null;
+        _ctx.AudioReady = false;
+        _ctx.AudioSurface = AudioSurface.None;
+        _ctx.RoomRenderedCue = null;
         RoomCuePauseButton.IsEnabled = false;
         RoomCueStopButton.IsEnabled = false;
-        RoomCuePlayButton.IsEnabled = _roomSelectedCue is not null;
-        if (_audioFile is null) return;
-        try { File.Delete(_audioFile); }
+        RoomCuePlayButton.IsEnabled = _ctx.RoomSelectedCue is not null;
+        if (_ctx.AudioFile is null) return;
+        try { File.Delete(_ctx.AudioFile); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
-        _audioFile = null;
+        _ctx.AudioFile = null;
     }
 
     private void RefreshRoomPreview()
     {
-        if (_currentRoom is null) return;
-        var room = _currentRoom;
+        if (_ctx.CurrentRoom is null) return;
+        var room = _ctx.CurrentRoom;
         // SCUMM repaints active objects in reverse directory order, then
         // paints queued drawObject calls on top in call order.
         var pixels = ComposeRoomPreview(room);
@@ -3699,8 +3604,8 @@ public partial class MainWindow : Window
         UpdateActorLayer();
         UpdateMessageLayer();
 
-        var selected = _objects.FirstOrDefault(obj => obj.Id == _selectedObject);
-        var selectedPosition = selected is null ? default : _objectSelection.GetPosition(selected);
+        var selected = _ctx.Objects.FirstOrDefault(obj => obj.Id == _ctx.SelectedObject);
+        var selectedPosition = selected is null ? default : _ctx.ObjectSelection.GetPosition(selected);
         ObjectAssetPreview.Source = selected is null ? null
             : CreateBitmap(selected.Width, selected.Height, selected.Pixels, room.Palette);
         ObjectAssetPreview.Visibility = selected is null ? Visibility.Collapsed : Visibility.Visible;
@@ -3710,9 +3615,9 @@ public partial class MainWindow : Window
             : $"Object {selected.Id} · position {selectedPosition.X}, {selectedPosition.Y}";
 
         ObjectList.Children.Clear();
-        _hoveredHotspotRowId = null;
+        _ctx.HoveredHotspotRowId = null;
         ShowHotspotHighlight(null);
-        var interactive = SessionModeToggle.IsChecked == true && _session is not null;
+        var interactive = SessionModeToggle.IsChecked == true && _ctx.Session is not null;
         if (interactive)
         {
             FillHotspotRows(LoomHotspots);
@@ -3721,25 +3626,25 @@ public partial class MainWindow : Window
         }
         // R-6.42 (25 Oct 2026): a played game's static preview lists hotspots like LOOM; the stored-image rows are the inspection list (Interactive off).
         if (PlayCutscenes && SessionModeToggle.IsChecked == true) return;
-        for (var index = 0; index < _objects.Count; index++)
+        for (var index = 0; index < _ctx.Objects.Count; index++)
         {
-            var obj = _objects[index];
-            var visible = _objectSelection.IsActive(obj);
+            var obj = _ctx.Objects[index];
+            var visible = _ctx.ObjectSelection.IsActive(obj);
             // A browsed game has stored names; a later stored image of one object is numbered by BrowsedObjects.NumberStates.
-            var storedName = _roomNamesAreStored && _roomObjectNames.TryGetValue(Core.Scumm.BrowsedObjects.BaseId(obj.Id), out var browsedName) ? browsedName : null;
+            var storedName = _ctx.RoomNamesAreStored && _ctx.RoomObjectNames.TryGetValue(Core.Scumm.BrowsedObjects.BaseId(obj.Id), out var browsedName) ? browsedName : null;
             var button = new Button
             {
                 Content = interactive
-                    ? $"Hotspot {index + 1} · interact{(_estimatedObjectIds.Contains(obj.Id) ? " · estimated image" : "")}" 
-                    : $"{(storedName is null ? "Scene detail" : storedName)} {index + 1} · {(visible ? _objectSelection.HasAlternatives(obj) ? "next" : "selected" : "show")}{(_objectSelection.CanShowBackground(obj) ? " / background" : "")}",
-                ToolTip = $"Object {Core.Scumm.BrowsedObjects.BaseId(obj.Id)}{(obj.Id >> 16 is var stateNumber and > 0 ? $" · stored image {stateNumber + 1}" : "")} · {_objectSelection.GetPosition(obj).X}, {_objectSelection.GetPosition(obj).Y} · {obj.Width} × {obj.Height}" +
-                          (_estimatedObjectIds.Contains(obj.Id) ? " · artwork estimate; not a script-proven state" : ""),
+                    ? $"Hotspot {index + 1} · interact{(_ctx.EstimatedObjectIds.Contains(obj.Id) ? " · estimated image" : "")}" 
+                    : $"{(storedName is null ? "Scene detail" : storedName)} {index + 1} · {(visible ? _ctx.ObjectSelection.HasAlternatives(obj) ? "next" : "selected" : "show")}{(_ctx.ObjectSelection.CanShowBackground(obj) ? " / background" : "")}",
+                ToolTip = $"Object {Core.Scumm.BrowsedObjects.BaseId(obj.Id)}{(obj.Id >> 16 is var stateNumber and > 0 ? $" · stored image {stateNumber + 1}" : "")} · {_ctx.ObjectSelection.GetPosition(obj).X}, {_ctx.ObjectSelection.GetPosition(obj).Y} · {obj.Width} × {obj.Height}" +
+                          (_ctx.EstimatedObjectIds.Contains(obj.Id) ? " · artwork estimate; not a script-proven state" : ""),
                 Tag = obj.Id,
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 3),
                 Padding = new Thickness(8, 3, 8, 3),
-                Background = obj.Id == _selectedObject ? new SolidColorBrush(Color.FromRgb(183, 132, 66)) : new SolidColorBrush(Color.FromRgb(39, 54, 66)),
-                Foreground = obj.Id == _selectedObject ? Brushes.Black : Brushes.Beige,
+                Background = obj.Id == _ctx.SelectedObject ? new SolidColorBrush(Color.FromRgb(183, 132, 66)) : new SolidColorBrush(Color.FromRgb(39, 54, 66)),
+                Foreground = obj.Id == _ctx.SelectedObject ? Brushes.Black : Brushes.Beige,
                 BorderThickness = new Thickness(0)
             };
             button.Click += ObjectButton_Click;
@@ -3757,15 +3662,15 @@ public partial class MainWindow : Window
     private void ClearObjectList()
     {
         ObjectList.Children.Clear();
-        _hoveredHotspotRowId = null;
+        _ctx.HoveredHotspotRowId = null;
         ObjectListSection.Visibility = Visibility.Collapsed;
     }
 
     private void ObjectButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_catalogPreviewOnly) return;
+        if (_ctx.CatalogPreviewOnly) return;
         if (sender is not Button { Tag: int id }) return;
-        if (SessionModeToggle.IsChecked == true && _session is not null)
+        if (SessionModeToggle.IsChecked == true && _ctx.Session is not null)
         {
             ChooseLoomObject(id);
         }
@@ -3774,8 +3679,8 @@ public partial class MainWindow : Window
 
     private void ChooseLoomObject(int id)
     {
-        var record = _currentRoomObjectRecords.FirstOrDefault(item => item.Id == id);
-        ShowObjectVerbChoices(record is null || !_roomVerbs.TryGetValue(id, out var verbs)
+        var record = _ctx.CurrentRoomObjectRecords.FirstOrDefault(item => item.Id == id);
+        ShowObjectVerbChoices(record is null || !_ctx.RoomVerbs.TryGetValue(id, out var verbs)
             ? [] : verbs.Select(verb => new RoomVerbChoice(record, verb)).ToArray());
     }
 
@@ -3812,7 +3717,7 @@ public partial class MainWindow : Window
     private void ShowWalkBoxToggle()
     {
         WalkBoxToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
-        WalkBoxToggle.IsEnabled = _currentWalkBoxes is { Count: > 0 };
+        WalkBoxToggle.IsEnabled = _ctx.CurrentWalkBoxes is { Count: > 0 };
         RefreshWalkBoxOverlay();
     }
 
@@ -3822,9 +3727,9 @@ public partial class MainWindow : Window
     /// change their flags, otherwise the stored ones.
     /// </summary>
     private ScummWalkBoxSet? DisplayedWalkBoxes() =>
-        SessionModeToggle.IsChecked == true && _session?.CurrentWalkBoxes is { } live &&
-        _session.Snapshot.RoomId == _currentRoomResource?.ResourceId
-            ? live : _currentWalkBoxes;
+        SessionModeToggle.IsChecked == true && _ctx.Session?.CurrentWalkBoxes is { } live &&
+        _ctx.Session.Snapshot.RoomId == _ctx.CurrentRoomResource?.ResourceId
+            ? live : _ctx.CurrentWalkBoxes;
 
     /// <summary>
     /// Draws each walk box as its quadrangle with its number. Most LOOM boxes
@@ -3836,12 +3741,12 @@ public partial class MainWindow : Window
         WalkBoxOverlay.Children.Clear();
         var boxes = DisplayedWalkBoxes();
         WalkBoxToggle.ToolTip = boxes is null ? "No walk boxes were read for this room." : DescribeWalkBoxes(boxes);
-        var show = WalkBoxToggle.IsChecked == true && boxes is not null && _currentRoom is not null &&
+        var show = WalkBoxToggle.IsChecked == true && boxes is not null && _ctx.CurrentRoom is not null &&
                    WalkBoxToggle.Visibility == Visibility.Visible;
         WalkBoxOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         if (!show || WalkBoxOverlay.ActualWidth <= 0 || WalkBoxOverlay.ActualHeight <= 0) return;
 
-        var room = _currentRoom!;
+        var room = _ctx.CurrentRoom!;
         var scale = Math.Min(WalkBoxOverlay.ActualWidth / room.Width, WalkBoxOverlay.ActualHeight / room.Height);
         if (scale <= 0) return;
         var offsetX = (WalkBoxOverlay.ActualWidth - room.Width * scale) / 2;
@@ -3889,8 +3794,8 @@ public partial class MainWindow : Window
         }
 
         // Actors the session places in this room: a marker at the feet, dashed when the position is an estimate.
-        if (!ReferenceEquals(boxes, _session?.CurrentWalkBoxes)) return;
-        foreach (var actor in _session!.Actors.Where(item => item.Room == _session.Snapshot.RoomId && item.X is not null && item.Y is not null))
+        if (!ReferenceEquals(boxes, _ctx.Session?.CurrentWalkBoxes)) return;
+        foreach (var actor in _ctx.Session!.Actors.Where(item => item.Room == _ctx.Session.Snapshot.RoomId && item.X is not null && item.Y is not null))
         {
             var feet = Map(actor.X!.Value, actor.Y!.Value);
             var marker = new System.Windows.Shapes.Ellipse
@@ -3926,7 +3831,7 @@ public partial class MainWindow : Window
         {
             $"{boxes.Count} walk boxes ({boxes.Boxes.Count(box => box.IsLine)} line segments) from the room's box table at 0x{boxes.TableOffset:X4}."
         };
-        if (_currentRoom is { } room)
+        if (_ctx.CurrentRoom is { } room)
         {
             var outside = boxes.Boxes.Where(box =>
                     box.Corners.Max(point => point.X) < 0 || box.Corners.Min(point => point.X) >= room.Width ||
@@ -3945,14 +3850,13 @@ public partial class MainWindow : Window
     private DisplayMode DoorwayMode => DoorwaysAlways.IsChecked == true ? DisplayMode.Always : DoorwaysHover.IsChecked == true ? DisplayMode.Hover : DisplayMode.Never;
     private DisplayMode ObjectAreaMode => ObjectsAlways.IsChecked == true ? DisplayMode.Always : ObjectsHover.IsChecked == true ? DisplayMode.Hover : DisplayMode.Never;
     private bool _viewOptionsReady;
-    private HashSet<int> _hoveredDoorwayIds = [];
 
     private void DoorwayMode_Changed(object sender, RoutedEventArgs e)
     {
         if (!_viewOptionsReady || RoomNavigationOverlay is null) return;
         SaveViewOptions();
-        _hoveredDoorwayIds = [];
-        RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never ? Visibility.Visible : Visibility.Collapsed;
+        _ctx.HoveredDoorwayIds = [];
+        RoomNavigationOverlay.Visibility = _ctx.RoomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never ? Visibility.Visible : Visibility.Collapsed;
         RoomNavigationOverlay.Dispatcher.BeginInvoke(RefreshRoomNavigationOverlay, DispatcherPriority.Loaded);
         RefreshPlayOverlays();
         RefreshPlayOverlayLists();
@@ -3962,7 +3866,7 @@ public partial class MainWindow : Window
     {
         if (!_viewOptionsReady || HotspotHighlightOverlay is null) return;
         SaveViewOptions();
-        ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : _highlightedHotspot);
+        ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : _ctx.HighlightedHotspot);
         RefreshPlayOverlays();
         RefreshPlayOverlayLists();
     }
@@ -3972,8 +3876,8 @@ public partial class MainWindow : Window
     {
         if (DoorwayMode != DisplayMode.Hover) return;
         var ids = x is int px && y is int py ? DoorwaysAt(px, py).Select(record => record.Id).ToHashSet() : [];
-        if (ids.SetEquals(_hoveredDoorwayIds)) return;
-        _hoveredDoorwayIds = ids;
+        if (ids.SetEquals(_ctx.HoveredDoorwayIds)) return;
+        _ctx.HoveredDoorwayIds = ids;
         RefreshRoomNavigationOverlay();
     }
 
@@ -4032,10 +3936,10 @@ public partial class MainWindow : Window
     private void RoomPreview_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         RoomViewport.Focus();
-        if (_gameClickPairSent)
+        if (_ctx.GameClickPairSent)
         {
             // The second press of a double click was sent on its way down.
-            _gameClickPairSent = false;
+            _ctx.GameClickPairSent = false;
             return;
         }
         if (!TryGetRoomImagePoint(e.GetPosition(RoomPreview), out var x, out var y)) return;
@@ -4049,12 +3953,11 @@ public partial class MainWindow : Window
         HandleRoomPoint(x, y);
     }
 
-    private ScummRoomObjectRecord? _interactTarget;
 
     /// <summary>Selects the object the Interact menu acts on (null clears it).</summary>
     private void SelectInteractTarget(ScummRoomObjectRecord? record)
     {
-        _interactTarget = record;
+        _ctx.InteractTarget = record;
         UpdateInteractButton();
     }
 
@@ -4066,7 +3969,7 @@ public partial class MainWindow : Window
     /// plumbing verbs stay in Advanced.
     /// </summary>
     private IReadOnlyList<ScummObjectVerbEntry> InteractVerbs(ScummRoomObjectRecord record) =>
-        _roomVerbs.TryGetValue(record.Id, out var verbs)
+        _ctx.RoomVerbs.TryGetValue(record.Id, out var verbs)
             ? verbs.Where(verb => verb.VerbId is 0x36 or 0x38 or 0x56 || LoomDraftNames.ForVerb(verb.VerbId) is not null)
                 .DistinctBy(verb => verb.VerbId).OrderBy(verb => LoomVerbNames.Order(verb.VerbId)).ToArray()
             : [];
@@ -4134,11 +4037,11 @@ public partial class MainWindow : Window
     private void RoomPreview_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         // A second press while a single click waits for the double-click time makes a double click.
-        if (!GameClickActive || _pendingGameClick is not { } first || _gameClickTimer?.IsEnabled != true ||
-            _session!.Snapshot.RoomId != first.Room) return;
-        _gameClickTimer.Stop();
-        _pendingGameClick = null;
-        _gameClickPairSent = true;
+        if (!GameClickActive || _ctx.PendingGameClick is not { } first || _ctx.GameClickTimer?.IsEnabled != true ||
+            _ctx.Session!.Snapshot.RoomId != first.Room) return;
+        _ctx.GameClickTimer.Stop();
+        _ctx.PendingGameClick = null;
+        _ctx.GameClickPairSent = true;
         HandleRoomPoint(first.X, first.Y, doubleClick: true);
     }
 
@@ -4154,34 +4057,30 @@ public partial class MainWindow : Window
     private bool HasDedicatedSession => CurrentModule.HasDedicatedSession;
 
     /// <summary>The open game is LOOM's data (EGA or CD): what picks LOOM's module and room controls.</summary>
-    private bool IsLoomGame => _game?.Id is GameId.Loom or GameId.LoomVga;
+    private bool IsLoomGame => _ctx.Game?.Id is GameId.Loom or GameId.LoomVga;
 
-    private bool GameClickActive => SessionModeToggle.IsChecked == true && _session is not null && !_catalogPreviewOnly;
+    private bool GameClickActive => SessionModeToggle.IsChecked == true && _ctx.Session is not null && !_ctx.CatalogPreviewOnly;
 
-    // The game's click: a single click waits for the system double-click time before it is sent.
-    private DispatcherTimer? _gameClickTimer;
-    private (int X, int Y, int? Room)? _pendingGameClick;
-    private bool _gameClickPairSent;
 
     private void QueueGameClick(int x, int y)
     {
-        _pendingGameClick = (x, y, _session?.Snapshot.RoomId);
-        if (_gameClickTimer is null)
+        _ctx.PendingGameClick = (x, y, _ctx.Session?.Snapshot.RoomId);
+        if (_ctx.GameClickTimer is null)
         {
-            _gameClickTimer = new DispatcherTimer(DispatcherPriority.Input, Dispatcher)
+            _ctx.GameClickTimer = new DispatcherTimer(DispatcherPriority.Input, Dispatcher)
             {
                 Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime())
             };
-            _gameClickTimer.Tick += (_, _) =>
+            _ctx.GameClickTimer.Tick += (_, _) =>
             {
-                _gameClickTimer.Stop();
-                if (_pendingGameClick is { } pending && GameClickActive && _session!.Snapshot.RoomId == pending.Room)
+                _ctx.GameClickTimer.Stop();
+                if (_ctx.PendingGameClick is { } pending && GameClickActive && _ctx.Session!.Snapshot.RoomId == pending.Room)
                     HandleRoomPoint(pending.X, pending.Y);
-                _pendingGameClick = null;
+                _ctx.PendingGameClick = null;
             };
         }
-        _gameClickTimer.Stop();
-        _gameClickTimer.Start();
+        _ctx.GameClickTimer.Stop();
+        _ctx.GameClickTimer.Start();
     }
 
     /// <summary>
@@ -4192,7 +4091,7 @@ public partial class MainWindow : Window
     /// whether another room was entered.
     /// </summary>
     private bool SendClickToGame(int x, int y, bool doubleClick) =>
-        SendInputToGame(() => _session!.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click");
+        SendInputToGame(() => _ctx.Session!.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click");
 
     /// <summary>
     /// Sends input to the session, shows its first result, and plays the frames
@@ -4204,8 +4103,8 @@ public partial class MainWindow : Window
     private bool SendInputToGame(Func<ScummObjectActionResult> send, string what,
         IReadOnlyList<ScummRoomObjectRecord>? doorways = null)
     {
-        if (_catalogPreviewOnly || _session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
-        if (_playbackPaused)
+        if (_ctx.CatalogPreviewOnly || _ctx.Session is null || _ctx.CurrentRoomResource is not { } sourceRoom || _ctx.Game is null) return false;
+        if (_ctx.PlaybackPaused)
         {
             StatusText.Text = $"{what} not sent: the scene is paused. Play (or space) goes on.";
             StatusText.ToolTip = null;
@@ -4213,8 +4112,8 @@ public partial class MainWindow : Window
         }
         var playing = PlaybackRunning;
         FollowSessionSound();
-        var sceneBefore = (_session.CutscenesBegun, _session.EgoPuts);
-        var sentencesBefore = _session.ObjectSentencesBegun;
+        var sceneBefore = (_ctx.Session.CutscenesBegun, _ctx.Session.EgoPuts);
+        var sentencesBefore = _ctx.Session.ObjectSentencesBegun;
         var action = send();
         if (!_playInstantly) UpdateSessionSound();
         var refused = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
@@ -4233,15 +4132,16 @@ public partial class MainWindow : Window
         StatusText.Text = refused is null ? $"{what} sent to the game (assumed input)" : $"{what} not sent to the game";
         StatusText.ToolTip = (refused ?? action.Evidence) + (action.Uncertainties.Count == 0 ? "" :
             Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties));
-        ApplyRoomState(sourceRoom, _currentRoomObjectRecords, _objects, visit: false);
+        ApplyRoomState(sourceRoom, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
         UpdateRoomNavigationActions(sourceRoom);
         RefreshRoomPreview();
         // Refused input changes nothing on screen, so the frames that follow run at once
         // and a doorway's fallback is not delayed.
         StartPlayback(what, action, sourceRoom, doorways, leftRoom: false, instant: refused is not null, sceneBefore,
             sentencesBefore: sentencesBefore);
-        return _session.Snapshot.RoomId != sourceRoom.ResourceId;
+        return _ctx.Session.Snapshot.RoomId != sourceRoom.ResourceId;
     }
+
 
     /// <summary>
     /// A click on the room. In the explore mode it is the game's click
@@ -4253,25 +4153,20 @@ public partial class MainWindow : Window
     /// A click whose cutscene put the ego somewhere else is the game's answer: it waits for the next click. In the
     /// inspection mode a click cycles the stored artwork.
     /// </summary>
-    // Why the last room click fell back to a doorway's direct verb (for the harnesses and the tooltip).
-    private string? _lastDoorwayFallback;
-    // Why the last doorway click did not fall back: the game answered it with a scene.
-    private string? _lastDoorwayHeld;
-
     private void HandleRoomPoint(int x, int y, bool doubleClick = false)
     {
-        if (_catalogPreviewOnly) return;
-        _lastDoorwayFallback = null;
-        _lastDoorwayHeld = null;
-        if (SessionModeToggle.IsChecked == true && _session is not null && _session.WaitingForSkillClick)
+        if (_ctx.CatalogPreviewOnly) return;
+        _ctx.LastDoorwayFallback = null;
+        _ctx.LastDoorwayHeld = null;
+        if (SessionModeToggle.IsChecked == true && _ctx.Session is not null && _ctx.Session.WaitingForSkillClick)
         {
             // The CD intro's skill screen: a press on a button is the game's click; the intro's own playback goes on from there.
-            var action = _session.ClickSkillScreen(x, y);
-            StatusText.Text = _session.WaitingForSkillClick ? "Press one of the three skill buttons." : "Skill chosen (assumed input; the draft question that follows in the game is not simulated).";
+            var action = _ctx.Session.ClickSkillScreen(x, y);
+            StatusText.Text = _ctx.Session.WaitingForSkillClick ? "Press one of the three skill buttons." : "Skill chosen (assumed input; the draft question that follows in the game is not simulated).";
             StatusText.ToolTip = action.Evidence + Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties);
             return;
         }
-        if (SessionModeToggle.IsChecked == true && _session is not null)
+        if (SessionModeToggle.IsChecked == true && _ctx.Session is not null)
         {
             if (NearestEntranceAt(x, y) is { } entrance)
             {
@@ -4282,7 +4177,7 @@ public partial class MainWindow : Window
                 FollowDoorway(entrance);
                 return;
             }
-            SendInputToGame(() => _session.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click", DoorwaysAt(x, y));
+            SendInputToGame(() => _ctx.Session.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click", DoorwaysAt(x, y));
             return;
         }
         CycleArtworkAt(x, y);
@@ -4295,8 +4190,8 @@ public partial class MainWindow : Window
     /// </summary>
     private ScummRoomObjectRecord? NearestEntranceAt(int x, int y)
     {
-        if (_session?.Snapshot is not { } snapshot) return null;
-        var doors = _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
+        if (_ctx.Session?.Snapshot is not { } snapshot) return null;
+        var doors = _ctx.RoomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
             .Where(record => record.Width > 0 && record.Height > 0 && snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
                              ParentStateMatches(record, snapshot))
             .Where(record =>
@@ -4315,14 +4210,14 @@ public partial class MainWindow : Window
     /// </summary>
     private void FollowDoorwayFallback(IReadOnlyList<ScummRoomObjectRecord> doorways)
     {
-        if (_session is null) return;
+        if (_ctx.Session is null) return;
         var why = StatusText.Text;
-        var refused = _session.LastAction?.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
+        var refused = _ctx.Session.LastAction?.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
         // Only a doorway eligible for native hit selection may be retried.
         // Closed/untouchable exits remain browsable through the Advanced room list.
-        var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
+        var live = doorways.Where(record => !_ctx.Session.Snapshot.IsUntouchable(record.Id)).ToArray();
         if (live.Length == 0) return;
-        _lastDoorwayFallback = refused ?? $"{why}: {_session.LastAction?.Evidence}";
+        _ctx.LastDoorwayFallback = refused ?? $"{why}: {_ctx.Session.LastAction?.Evidence}";
         FollowDoorway(live[0]);
         StatusText.ToolTip = $"{why}. The doorway's verb then ran directly, an exploration action, not the game's click." +
                              (StatusText.ToolTip is string tip ? Environment.NewLine + tip : "");
@@ -4357,24 +4252,15 @@ public partial class MainWindow : Window
         public int SentencesBefore { get; init; }
     }
 
-    private Playback? _playback;
-    private LoomReplaySequence? _replaySequence;
-    private DispatcherTimer? _playbackTimer;
     // Harnesses set this to run a playback's frames at once, as the synchronous
     // continuation did before M1d, so their results stay comparable.
     private bool _playInstantly = false;
-    // True while an instant playback runs all its frames at once: their sounds are sorted out when it finishes.
-    private bool _playbackBatch;
-    // True while the playback itself opens the room the session entered.
-    private bool _playbackEnteringRoom;
-    // The room the playback last asked the view to open.
-    private int? _playbackRequestedRoom;
 
-    private bool PlaybackRunning => _playbackTimer?.IsEnabled == true;
+    private bool PlaybackRunning => _ctx.PlaybackTimer?.IsEnabled == true;
 
     /// <summary>ScummVM's frame: <c>VAR_TIMER_NEXT</c> jiffies of 1/60 s (6 in LOOM: 10 frames a second).</summary>
     private TimeSpan PlaybackFrameInterval() =>
-        TimeSpan.FromSeconds(Math.Clamp(_session?.FrameJiffies ?? 6, 1, ScummMessageTable.MaxFrameDelta) / 60.0);
+        TimeSpan.FromSeconds(Math.Clamp(_ctx.Session?.FrameJiffies ?? 6, 1, ScummMessageTable.MaxFrameDelta) / 60.0);
 
     /// <summary>
     /// Plays the frames after an input on a timer at the game's frame rate,
@@ -4388,25 +4274,25 @@ public partial class MainWindow : Window
     private void StartPlayback(string what, ScummObjectActionResult? action, GameResource sourceRoom,
         IReadOnlyList<ScummRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null, int? sentencesBefore = null)
     {
-        _catalogPreviewOnly = false;
-        _playback = new Playback
+        _ctx.CatalogPreviewOnly = false;
+        _ctx.Playback = new Playback
         {
             What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom, Preview = preview, ExpectedCutscene = expectedCutscene,
-            CameraX = _session?.CameraX,
-            SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0),
-            SentencesBefore = sentencesBefore ?? _session?.ObjectSentencesBegun ?? 0
+            CameraX = _ctx.Session?.CameraX,
+            SceneBefore = sceneBefore ?? (_ctx.Session?.CutscenesBegun ?? 0, _ctx.Session?.EgoPuts ?? 0),
+            SentencesBefore = sentencesBefore ?? _ctx.Session?.ObjectSentencesBegun ?? 0
         };
-        _playbackRequestedRoom = null;
-        _playbackPaused = false;
+        _ctx.PlaybackRequestedRoom = null;
+        _ctx.PlaybackPaused = false;
         // The scene opens where the game's camera is, whatever the view showed before (a replay can start in a wide room).
-        if (_session?.CameraX is int startCamera && ViewShowsSessionRoom()) ScrollToGameCamera(startCamera);
-        if (_game is not null && !CurrentModule.Voice.ReplacesSceneSound && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
+        if (_ctx.Session?.CameraX is int startCamera && ViewShowsSessionRoom()) ScrollToGameCamera(startCamera);
+        if (_ctx.Game is not null && !CurrentModule.Voice.ReplacesSceneSound && _ctx.Session is not null && !_sceneSound.Follows(_ctx.Session)) _sceneSound.Attach(_ctx.Game, _ctx.Session);
         if (_playInstantly || instant)
         {
-            _playbackTimer?.Stop();
-            _playbackBatch = true;
+            _ctx.PlaybackTimer?.Stop();
+            _ctx.PlaybackBatch = true;
             try { while (PlaybackStep()) { } }
-            finally { _playbackBatch = false; }
+            finally { _ctx.PlaybackBatch = false; }
             FinishPlayback();
             return;
         }
@@ -4415,9 +4301,9 @@ public partial class MainWindow : Window
             FinishPlayback();
             return;
         }
-        _playbackTimer ??= CreatePlaybackTimer();
-        _playbackTimer.Interval = PlaybackFrameInterval();
-        if (!_playbackTimer.IsEnabled) _playbackTimer.Start();
+        _ctx.PlaybackTimer ??= CreatePlaybackTimer();
+        _ctx.PlaybackTimer.Interval = PlaybackFrameInterval();
+        if (!_ctx.PlaybackTimer.IsEnabled) _ctx.PlaybackTimer.Start();
         ShowPlaybackFrame();
         UpdatePlaybackControls();
     }
@@ -4425,26 +4311,24 @@ public partial class MainWindow : Window
     /// <summary>Stops the clock where it is (the user interrupted); nothing more is played.</summary>
     private void StopScenePlayback()
     {
-        _playbackTimer?.Stop();
-        _playback = null;
-        _replaySequence = null;
+        _ctx.PlaybackTimer?.Stop();
+        _ctx.Playback = null;
+        _ctx.ReplaySequence = null;
         // The game's sounds play on after the clock stops, as its music does between scenes.
-        if (_playbackPaused) _sceneSound.Resume();
-        _playbackPaused = false;
+        if (_ctx.PlaybackPaused) _sceneSound.Resume();
+        _ctx.PlaybackPaused = false;
         UpdatePlaybackControls();
     }
 
     // ---- Playback controls (M3c) ----------------------------------------------
 
-    // True while the user paused a playback: its frames wait, and nothing else is sent to the game.
-    private bool _playbackPaused;
 
     /// <summary>Pauses the playback clock where it is; <see cref="ResumeScenePlayback"/> goes on from the same frame.</summary>
     private void PauseScenePlayback()
     {
-        if (_playback is null || _playbackPaused || !PlaybackHasActivity) return;
-        _playbackTimer?.Stop();
-        _playbackPaused = true;
+        if (_ctx.Playback is null || _ctx.PlaybackPaused || !PlaybackHasActivity) return;
+        _ctx.PlaybackTimer?.Stop();
+        _ctx.PlaybackPaused = true;
         _sceneSound.Pause();
         CurrentModule.Voice.Pause();
         StatusText.Text = "Paused. Play (or space) goes on.";
@@ -4454,14 +4338,14 @@ public partial class MainWindow : Window
 
     private void ResumeScenePlayback()
     {
-        if (_playback is null || !_playbackPaused) return;
-        _playbackPaused = false;
+        if (_ctx.Playback is null || !_ctx.PlaybackPaused) return;
+        _ctx.PlaybackPaused = false;
         _sceneSound.Resume();
         CurrentModule.Voice.Resume();
-        _playbackTimer ??= CreatePlaybackTimer();
-        _playbackTimer.Interval = PlaybackFrameInterval();
-        _playbackTimer.Start();
-        StatusText.Text = $"Playing: {_playback.What}";
+        _ctx.PlaybackTimer ??= CreatePlaybackTimer();
+        _ctx.PlaybackTimer.Interval = PlaybackFrameInterval();
+        _ctx.PlaybackTimer.Start();
+        StatusText.Text = $"Playing: {_ctx.Playback.What}";
         UpdatePlaybackControls();
     }
 
@@ -4475,15 +4359,15 @@ public partial class MainWindow : Window
     /// <summary>While paused, plays one frame (Step ▸); the playback stays paused.</summary>
     private void StepPausedPlayback()
     {
-        if (_playback is null || !ViewShowsSessionRoom()) return;
+        if (_ctx.Playback is null || !ViewShowsSessionRoom()) return;
         if (!PlaybackStep())
         {
-            _playbackPaused = false;
+            _ctx.PlaybackPaused = false;
             FinishPlayback();
             return;
         }
         ShowPlaybackFrame();
-        StatusText.Text = $"Paused after one frame (Room {_session?.Snapshot.RoomId:00}). Play goes on.";
+        StatusText.Text = $"Paused after one frame (Room {_ctx.Session?.Snapshot.RoomId:00}). Play goes on.";
     }
 
     private void PlaybackPause_Click(object sender, RoutedEventArgs e)
@@ -4512,16 +4396,16 @@ public partial class MainWindow : Window
     /// </summary>
     private void SkipCutscene()
     {
-        if (_catalogPreviewOnly || !SessionInScene || _session is not { } session || _currentRoomResource is not { } room) return;
+        if (_ctx.CatalogPreviewOnly || !SessionInScene || _ctx.Session is not { } session || _ctx.CurrentRoomResource is not { } room) return;
         var skippable = session.CutsceneSkippable;
         var action = session.PressKey(0x1B);
-        if (skippable) _replaySequence = null; // A skipped prelude no longer establishes the audited next stage.
+        if (skippable) _ctx.ReplaySequence = null; // A skipped prelude no longer establishes the audited next stage.
         StatusText.Text = skippable
             ? "Escape sent: the cutscene skips to its end (assumed input)"
             : "Escape sent, but this part of the cutscene cannot be skipped: no override is set yet";
         StatusText.ToolTip = string.Join(Environment.NewLine, action.Uncertainties);
-        if (_playback is null) StartPlayback("Escape", action, room, doorways: null, leftRoom: false);
-        else if (_playbackPaused) ResumeScenePlayback();
+        if (_ctx.Playback is null) StartPlayback("Escape", action, room, doorways: null, leftRoom: false);
+        else if (_ctx.PlaybackPaused) ResumeScenePlayback();
         UpdatePlaybackControls();
     }
 
@@ -4529,14 +4413,14 @@ public partial class MainWindow : Window
     /// The player has no control: a cutscene is open, or the boot still plays its opening (script 044 opens no
     /// cutscene of its own; script 001 turns input off and sets <c>bit[0xD6E]</c> around it).
     /// </summary>
-    private bool SessionInScene => _session is { } session && (session.InCutscene || session.BootRunning);
+    private bool SessionInScene => _ctx.Session is { } session && (session.InCutscene || session.BootRunning);
 
-    private bool PlaybackHasActivity => _replaySequence is { Complete: false, Failure: null } || SessionInScene || _playback is { Preview: true } || _session is { } session &&
+    private bool PlaybackHasActivity => _ctx.ReplaySequence is { Complete: false, Failure: null } || SessionInScene || _ctx.Playback is { Preview: true } || _ctx.Session is { } session &&
         (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||
          session.DraftPlaying);
 
     private bool CanStartCutscene => PlayCutscenes ? PlayCanStartCutscene : GameClickActive && !SessionInScene &&
-        (_playback is null || !PlaybackHasActivity && !_playbackPaused);
+        (_ctx.Playback is null || !PlaybackHasActivity && !_ctx.PlaybackPaused);
 
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
@@ -4552,8 +4436,8 @@ public partial class MainWindow : Window
 
     private bool PlaybackShouldContinue()
     {
-        if (_session is not { } session || _playback is not { } playback) return false;
-        if (_replaySequence is { } sequence)
+        if (_ctx.Session is not { } session || _ctx.Playback is not { } playback) return false;
+        if (_ctx.ReplaySequence is { } sequence)
         {
             var continuing = sequence.Continue();
             playback.Note = sequence.Failure;
@@ -4582,23 +4466,20 @@ public partial class MainWindow : Window
     private bool PlaybackStep()
     {
         if (!PlaybackShouldContinue()) return false;
-        var session = _session!;
-        var playback = _playback!;
+        var session = _ctx.Session!;
+        var playback = _ctx.Playback!;
         if (SessionInScene || session.DraftPlaying) playback.CutsceneFrames++;
         // Frames of a walk do not count as idle: the sentence that waits for it runs after it.
         else if (!session.EgoMoving && !session.CameraMoving) playback.IdleFrames++;
         var room = session.Snapshot.RoomId;
         session.AdvanceFrame();
-        _replaySequence?.FrameAdvanced();
+        _ctx.ReplaySequence?.FrameAdvanced();
         if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
         // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
-        if (!_playbackBatch) { _sceneSound.Update(); CurrentModule.Voice.Update(); }
+        if (!_ctx.PlaybackBatch) { _sceneSound.Update(); CurrentModule.Voice.Update(); }
         return true;
     }
 
-    private string? _idleSignature;
-    private LoomExplorationSession? _idleSession;
-    private DateTime _idleNextFrame;
 
     /// <summary>
     /// The game's frame loop keeps running between inputs (ambient scripts such as the loom's weaving, the swan or the
@@ -4607,18 +4488,18 @@ public partial class MainWindow : Window
     /// </summary>
     private void IdleFrameTimer_Tick(object? sender, EventArgs e)
     {
-        if (!GameClickActive || _session is not { } session || _playInstantly || _playbackBatch || PlaybackRunning || _playbackPaused ||
-            _currentRoomResource is not { } room || _currentRoom is null || session.Snapshot.RoomId != room.ResourceId ||
+        if (!GameClickActive || _ctx.Session is not { } session || _playInstantly || _ctx.PlaybackBatch || PlaybackRunning || _ctx.PlaybackPaused ||
+            _ctx.CurrentRoomResource is not { } room || _ctx.CurrentRoom is null || session.Snapshot.RoomId != room.ResourceId ||
             OwnedWindows.Count > 0 || !IsActive)
             return;
         var now = DateTime.UtcNow;
-        if (!ReferenceEquals(_idleSession, session)) { _idleSession = session; _idleSignature = null; _idleNextFrame = now; }
-        if (now < _idleNextFrame || _sceneSound.IsPreparing) return;
+        if (!ReferenceEquals(_ctx.IdleSession, session)) { _ctx.IdleSession = session; _ctx.IdleSignature = null; _ctx.IdleNextFrame = now; }
+        if (now < _ctx.IdleNextFrame || _sceneSound.IsPreparing) return;
         // Count on from the due time, not from now: the timer ticks every 15 ms, so the frames keep the game's rate (a tick
         // arriving just before the due time used to cost a whole extra tick, which made the idle frames about half as fast
         // as the playback clock). After a long stall, start over rather than catching up in a burst.
         var interval = PlaybackFrameInterval();
-        _idleNextFrame = now - _idleNextFrame > interval ? now + interval : _idleNextFrame + interval;
+        _ctx.IdleNextFrame = now - _ctx.IdleNextFrame > interval ? now + interval : _ctx.IdleNextFrame + interval;
         FollowSessionSound();
         var snapshot = session.AdvanceFrame();
         UpdateSessionSound();
@@ -4628,13 +4509,13 @@ public partial class MainWindow : Window
             return;
         }
         var signature = FrameSignature(snapshot, session);
-        if (signature != _idleSignature)
+        if (signature != _ctx.IdleSignature)
         {
-            var first = _idleSignature is null;
-            _idleSignature = signature;
+            var first = _ctx.IdleSignature is null;
+            _ctx.IdleSignature = signature;
             if (!first)
             {
-                ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+                ApplyRoomState(room, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
                 UpdateRoomNavigationActions(room);
                 RefreshRoomPreview();
             }
@@ -4648,25 +4529,25 @@ public partial class MainWindow : Window
 
     private void AdvanceIdleReachedRoom(int reached)
     {
-        if (_game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom) return;
+        if (_ctx.Game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom) return;
         StatusText.Text = "You step into another scene.";
-        StatusText.ToolTip = $"Room {reached:00} · " + (_session?.LastAction?.Evidence ?? "");
+        StatusText.ToolTip = $"Room {reached:00} · " + (_ctx.Session?.LastAction?.Evidence ?? "");
         SelectRoomWithIntent(targetRoom, RoomOpenKind.Native);
     }
 
     private void FollowSessionSound()
     {
         var voice = CurrentModule.Voice;
-        if (GameClickActive && _game is not null && !voice.ReplacesSceneSound && _session is not null && !_sceneSound.Follows(_session))
-            _sceneSound.Attach(_game, _session);
-        else if (GameClickActive && voice.ReplacesSceneSound && _session is not null && !voice.Follows(_session))
-            voice.Attach(_session);
+        if (GameClickActive && _ctx.Game is not null && !voice.ReplacesSceneSound && _ctx.Session is not null && !_sceneSound.Follows(_ctx.Session))
+            _sceneSound.Attach(_ctx.Game, _ctx.Session);
+        else if (GameClickActive && voice.ReplacesSceneSound && _ctx.Session is not null && !voice.Follows(_ctx.Session))
+            voice.Attach(_ctx.Session);
     }
 
     private void UpdateSessionSound()
     {
-        if (GameClickActive && !_playbackBatch && !CurrentModule.Voice.ReplacesSceneSound) _sceneSound.Update();
-        else if (GameClickActive && !_playbackBatch) CurrentModule.Voice.Update();
+        if (GameClickActive && !_ctx.PlaybackBatch && !CurrentModule.Voice.ReplacesSceneSound) _sceneSound.Update();
+        else if (GameClickActive && !_ctx.PlaybackBatch) CurrentModule.Voice.Update();
     }
 
     private void CdSoundCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -4680,7 +4561,7 @@ public partial class MainWindow : Window
 
     private void PlaybackTimer_Tick(object? sender, EventArgs e)
     {
-        if (_session is null || _playback is not { } playback || _game is null)
+        if (_ctx.Session is null || _ctx.Playback is not { } playback || _ctx.Game is null)
         {
             StopScenePlayback();
             return;
@@ -4716,35 +4597,35 @@ public partial class MainWindow : Window
                 return;
             }
         }
-        _playbackTimer!.Interval = PlaybackFrameInterval();
+        _ctx.PlaybackTimer!.Interval = PlaybackFrameInterval();
         ShowPlaybackFrame();
     }
 
     /// <summary>Whether the view shows the session's room; if not, asks the view to open it (once).</summary>
     private bool ViewShowsSessionRoom()
     {
-        if (_session?.Snapshot.RoomId is not int roomId || _game is null) return false;
-        if (_currentRoomResource?.ResourceId == roomId && _currentRoom is not null) return true;
-        if (_playbackRequestedRoom != roomId && _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is { } target)
+        if (_ctx.Session?.Snapshot.RoomId is not int roomId || _ctx.Game is null) return false;
+        if (_ctx.CurrentRoomResource?.ResourceId == roomId && _ctx.CurrentRoom is not null) return true;
+        if (_ctx.PlaybackRequestedRoom != roomId && _ctx.Game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is { } target)
             EnterPlaybackRoom(target);
         return false;
     }
 
     private void EnterPlaybackRoom(GameResource target)
     {
-        _playbackRequestedRoom = target.ResourceId;
+        _ctx.PlaybackRequestedRoom = target.ResourceId;
         StatusText.Text = "You step into another scene.";
-        StatusText.ToolTip = $"Room {target.ResourceId:00} · " + (_session?.LastAction?.Evidence ?? "");
-        _playbackEnteringRoom = true;
+        StatusText.ToolTip = $"Room {target.ResourceId:00} · " + (_ctx.Session?.LastAction?.Evidence ?? "");
+        _ctx.PlaybackEnteringRoom = true;
         try { SelectRoomWithIntent(target, RoomOpenKind.Native); }
-        finally { _playbackEnteringRoom = false; }
+        finally { _ctx.PlaybackEnteringRoom = false; }
     }
 
     /// <summary>Redraws the frame: the room when object states changed, the camera when it moved, and the messages.</summary>
     private void ShowPlaybackFrame()
     {
-        if (_session is not { } session || _playback is not { } playback || !ViewShowsSessionRoom() ||
-            _currentRoomResource is not { } room) return;
+        if (_ctx.Session is not { } session || _ctx.Playback is not { } playback || !ViewShowsSessionRoom() ||
+            _ctx.CurrentRoomResource is not { } room) return;
         var snapshot = session.Snapshot;
         var signature = FrameSignature(snapshot, session);
         if (signature != playback.FrameSignature)
@@ -4755,7 +4636,7 @@ public partial class MainWindow : Window
             // screen's buttons are drawn a few frames in, before the first frame shows), so the CD game refreshes on it too.
             if (!first || CurrentModule.Voice.ReplacesSceneSound)
             {
-                ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+                ApplyRoomState(room, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
                 UpdateRoomNavigationActions(room);
                 RefreshRoomPreview();
             }
@@ -4775,9 +4656,9 @@ public partial class MainWindow : Window
     private IReadOnlyList<uint> DisplayPalette(RoomImage room)
     {
         // A browsed first visit: the colour table and the shadow palette the game's scripts left (the room picture and its objects; actors use the shadow palette only).
-        if (_browsedScene is { } scene && ReferenceEquals(scene.Room, room))
+        if (_ctx.BrowsedScene is { } scene && ReferenceEquals(scene.Room, room))
             return scene.EngineVersion is 1 or 2 ? scene.DisplayPalette() : scene.BackgroundPalette();
-        if (_session is not { } session || room.Palette.Count > 256) return room.Palette;
+        if (_ctx.Session is not { } session || room.Palette.Count > 256) return room.Palette;
         return DisplayPalette(room, session.ShadowPalette);
     }
 
@@ -4800,8 +4681,8 @@ public partial class MainWindow : Window
     /// <summary>Scrolls the 320-pixel view to the game's camera without the entry pan.</summary>
     private void ScrollToGameCamera(int cameraX)
     {
-        if (_currentRoom is null || NormalRoomWidthToggle.IsChecked != true) return;
-        var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
+        if (_ctx.CurrentRoom is null || NormalRoomWidthToggle.IsChecked != true) return;
+        var left = Math.Clamp(cameraX - Math.Min(320, _ctx.CurrentRoom.Width) / 2.0, 0,
             RoomViewport.ScrollableWidth / _roomDisplayScale);
         RoomViewport.ScrollToHorizontalOffset(left * _roomDisplayScale);
     }
@@ -4812,17 +4693,17 @@ public partial class MainWindow : Window
     /// </summary>
     private void FinishPlayback()
     {
-        _playbackTimer?.Stop();
-        _playbackPaused = false;
-        if (_playback is not { } playback || _session is not { } session || _game is null)
+        _ctx.PlaybackTimer?.Stop();
+        _ctx.PlaybackPaused = false;
+        if (_ctx.Playback is not { } playback || _ctx.Session is not { } session || _ctx.Game is null)
         {
-            _playback = null;
+            _ctx.Playback = null;
             UpdatePlaybackControls();
             return;
         }
-        _playback = null;
-        var sequenceFailure = _replaySequence?.Failure;
-        _replaySequence = null;
+        _ctx.Playback = null;
+        var sequenceFailure = _ctx.ReplaySequence?.Failure;
+        _ctx.ReplaySequence = null;
         UpdatePlaybackControls();
         _sceneSound.Update();
         CurrentModule.Voice.Update();
@@ -4832,21 +4713,21 @@ public partial class MainWindow : Window
         {
             StatusText.Text = "Replay sequence stopped; later inputs were cancelled.";
             StatusText.ToolTip = sequenceFailure;
-            if (_currentRoomResource is { } current && current.ResourceId == snapshot.RoomId)
+            if (_ctx.CurrentRoomResource is { } current && current.ResourceId == snapshot.RoomId)
             {
-                ApplyRoomState(current, _currentRoomObjectRecords, _objects, visit: false);
+                ApplyRoomState(current, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
                 RefreshRoomPreview();
             }
             return;
         }
         if (snapshot.RoomId is int reached && reached != playback.SourceRoom.ResourceId)
         {
-            if (_currentRoomResource?.ResourceId != reached && _playbackRequestedRoom != reached &&
-                _game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } target)
+            if (_ctx.CurrentRoomResource?.ResourceId != reached && _ctx.PlaybackRequestedRoom != reached &&
+                _ctx.Game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } target)
                 EnterPlaybackRoom(target);
-            else if (_currentRoomResource is { } shown && shown.ResourceId == reached && _currentRoom is not null)
+            else if (_ctx.CurrentRoomResource is { } shown && shown.ResourceId == reached && _ctx.CurrentRoom is not null)
             {
-                ApplyRoomState(shown, _currentRoomObjectRecords, _objects, visit: false);
+                ApplyRoomState(shown, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
                 UpdateRoomNavigationActions(shown);
                 RefreshRoomPreview();
             }
@@ -4861,9 +4742,9 @@ public partial class MainWindow : Window
             StatusText.ToolTip = (refused ?? action.Evidence) + (action.Uncertainties.Count == 0 ? "" :
                 Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties)) + note;
         }
-        if (_currentRoomResource is { } room && _currentRoom is not null && room.ResourceId == snapshot.RoomId)
+        if (_ctx.CurrentRoomResource is { } room && _ctx.CurrentRoom is not null && room.ResourceId == snapshot.RoomId)
         {
-            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+            ApplyRoomState(room, _ctx.CurrentRoomObjectRecords, _ctx.Objects, visit: false);
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview();
         }
@@ -4873,7 +4754,7 @@ public partial class MainWindow : Window
             StatusText.ToolTip = "The code has a branch for this cutscene that this state does not take (a story state or held item the explorer did not set; Game Status can change it). " +
                                  "What the script did run is shown." + (StatusText.ToolTip is string started ? Environment.NewLine + started : "") + note;
         }
-        if (playback.Doorways is not { Count: > 0 } doorways || _currentRoomResource?.ResourceId != playback.SourceRoom.ResourceId)
+        if (playback.Doorways is not { Count: > 0 } doorways || _ctx.CurrentRoomResource?.ResourceId != playback.SourceRoom.ResourceId)
             return;
         // A look/use sentence can legitimately choose not to load a room (the grave's look needs Reading).
         // Once native input reached the sentence, replaying another verb or opening a merely possible target would override that answer.
@@ -4886,7 +4767,7 @@ public partial class MainWindow : Window
             // script 045 puts the smaller Bobbin on the next stretch of the path, which ends the click's walk). The
             // game waits there for the player's next click, so the doorway's direct verb does not run. A cutscene
             // that leaves the ego where it is (a refusal, such as Room 37 object 601's verb 0x37) still falls back.
-            _lastDoorwayHeld = $"{cutscenes} cutscene(s) begun, the ego put {egoPuts} time(s)";
+            _ctx.LastDoorwayHeld = $"{cutscenes} cutscene(s) begun, the ego put {egoPuts} time(s)";
             StatusText.Text = $"{playback.What} sent to the game: the scene changed; click again to go on";
             StatusText.ToolTip = "The click began a cutscene that put Bobbin somewhere else, and reached no room load. As in the game, " +
                                  "the next click goes on from there. The doorway's direct verb (an exploration action) runs only when " +
@@ -4906,8 +4787,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateActorLayer()
     {
-        var room = _currentRoom;
-        if (_browsedScene is { } browsed && room is not null && ReferenceEquals(browsed.Room, room))
+        var room = _ctx.CurrentRoom;
+        if (_ctx.BrowsedScene is { } browsed && room is not null && ReferenceEquals(browsed.Room, room))
         {
             var sceneLayer = browsed.ActorLayer();
             if (sceneLayer.Actors.Count == 0)
@@ -4928,25 +4809,25 @@ public partial class MainWindow : Window
             RoomActorOverlay.Visibility = Visibility.Visible;
             return;
         }
-        if (_cdScene is { } cdScene && room is not null && cdScene.Snapshot.RoomId == _currentRoomResource?.ResourceId)
+        if (_ctx.CdScene is { } cdScene && room is not null && cdScene.Snapshot.RoomId == _ctx.CurrentRoomResource?.ResourceId)
         {
             UpdateCdActorLayer(cdScene, room);
             return;
         }
-        if (!GameClickActive || room is null || _game is not { } game ||
-            _session!.Snapshot.RoomId is not int roomId || roomId != _currentRoomResource?.ResourceId)
+        if (!GameClickActive || room is null || _ctx.Game is not { } game ||
+            _ctx.Session!.Snapshot.RoomId is not int roomId || roomId != _ctx.CurrentRoomResource?.ResourceId)
         {
             RoomActorOverlay.Source = null;
             RoomActorOverlay.Visibility = Visibility.Collapsed;
             return;
         }
-        var layer = ScummActorRenderer.Render(_session.Actors, roomId, room.Width, room.Height, id =>
+        var layer = ScummActorRenderer.Render(_ctx.Session.Actors, roomId, room.Width, room.Height, id =>
         {
-            if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
-            try { costume = _session.ReadCostume(id); }
+            if (_ctx.ActorCostumes.TryGetValue(id, out var costume)) return costume;
+            try { costume = _ctx.Session.ReadCostume(id); }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
-            return _actorCostumes[id] = costume;
-        }, _objectSelection.ComposeDepthMask(room), _session.CurrentWalkBoxes, _session.ObjectClasses, room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray());
+            return _ctx.ActorCostumes[id] = costume;
+        }, _ctx.ObjectSelection.ComposeDepthMask(room), _ctx.Session.CurrentWalkBoxes, _ctx.Session.ObjectClasses, room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray());
         if (layer.Actors.Count == 0)
         {
             RoomActorOverlay.Source = null;
@@ -4974,11 +4855,11 @@ public partial class MainWindow : Window
     {
         var layer = ScummActorRenderer.Render(scene.Actors, scene.Snapshot.RoomId!.Value, room.Width, room.Height, id =>
         {
-            if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
+            if (_ctx.ActorCostumes.TryGetValue(id, out var costume)) return costume;
             try { costume = scene.Costumes(id); }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
-            return _actorCostumes[id] = costume;
-        }, _objectSelection.ComposeDepthMask(room), scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+            return _ctx.ActorCostumes[id] = costume;
+        }, _ctx.ObjectSelection.ComposeDepthMask(room), scene.WalkBoxes, scene.Snapshot.ObjectClasses);
         if (layer.Actors.Count == 0)
         {
             RoomActorOverlay.Source = null;
@@ -4998,19 +4879,15 @@ public partial class MainWindow : Window
 
     // ---- Messages on screen (M1c) ---------------------------------------------
 
-    // The talk text's rectangle in room pixels (right and bottom exclusive), for a click that skips it.
-    private (int Left, int Top, int Right, int Bottom)? _talkTextRect;
-    // Verb-screen text (screen rows 144–199) as a 320 × 56 layer, or null.
-    private BitmapSource? _verbMessageBitmap;
 
     /// <summary>The interactive LOOM mode, where the room and the verb screen are drawn as the game's one screen.</summary>
-    private bool OneGameScreen() => _currentRoom is not null && GameClickActive && HasDedicatedSession;
+    private bool OneGameScreen() => _ctx.CurrentRoom is not null && GameClickActive && HasDedicatedSession;
 
     /// <summary>The game's camera left edge in room pixels (ScummVM <c>virtscr[0].xstart</c>).</summary>
     private int GameCameraLeft(RoomImage room)
     {
         var visible = Math.Min(ScummV3MessageRenderer.ScreenWidth, room.Width);
-        return Math.Clamp((_session?.CameraX ?? visible / 2) - visible / 2, 0, room.Width - visible);
+        return Math.Clamp((_ctx.Session?.CameraX ?? visible / 2) - visible / 2, 0, room.Width - visible);
     }
 
     /// <summary>
@@ -5021,53 +4898,53 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateMessageLayer()
     {
-        _talkTextRect = null;
-        var room = _currentRoom;
-        var session = _session;
-        var messages = GameClickActive && room is not null && session!.Snapshot.RoomId == _currentRoomResource?.ResourceId
+        _ctx.TalkTextRect = null;
+        var room = _ctx.CurrentRoom;
+        var session = _ctx.Session;
+        var messages = GameClickActive && room is not null && session!.Snapshot.RoomId == _ctx.CurrentRoomResource?.ResourceId
             ? session.Messages.OnScreen : [];
-        var verbBefore = _verbMessageBitmap is not null;
+        var verbBefore = _ctx.VerbMessageBitmap is not null;
         if (messages.Count == 0 || room is null)
         {
             RoomMessageOverlay.Source = null;
             RoomMessageOverlay.Visibility = Visibility.Collapsed;
             RoomMessageOverlay.ToolTip = null;
-            _verbMessageBitmap = null;
+            _ctx.VerbMessageBitmap = null;
         }
         else
         {
             var left = GameCameraLeft(room);
-            if (_charset is { } charset)
+            if (_ctx.Charset is { } charset)
             {
                 var layer = ScummV3MessageRenderer.Render(messages, charset);
                 RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
-                _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
+                _ctx.VerbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
                 if (session!.Messages.Talk is { Y: < ScummV3MessageRenderer.VerbScreenTop } talk &&
                     ScummV3MessageRenderer.Render(talk, charset).Bounds is { } bounds)
-                    _talkTextRect = (bounds.Left + left, bounds.Top - ScummV3MessageRenderer.RoomScreenTop,
+                    _ctx.TalkTextRect = (bounds.Left + left, bounds.Top - ScummV3MessageRenderer.RoomScreenTop,
                         bounds.Right + left, bounds.Bottom - ScummV3MessageRenderer.RoomScreenTop);
             }
-            else if (_cdCharset is { } cdCharset)
+            else if (_ctx.CdCharset is { } cdCharset)
             {
                 var layer = ScummV4MessageRenderer.Render(messages, number => CdCharset(number, cdCharset));
                 RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
-                _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
+                _ctx.VerbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
                 if (session!.Messages.Talk is { Y: < ScummV3MessageRenderer.VerbScreenTop } talk &&
                     ScummV4MessageRenderer.Render(talk, number => CdCharset(number, cdCharset)).Bounds is { } bounds)
-                    _talkTextRect = (bounds.Left + left, bounds.Top - ScummV3MessageRenderer.RoomScreenTop,
+                    _ctx.TalkTextRect = (bounds.Left + left, bounds.Top - ScummV3MessageRenderer.RoomScreenTop,
                         bounds.Right + left, bounds.Bottom - ScummV3MessageRenderer.RoomScreenTop);
             }
             else
             {
-                (RoomMessageOverlay.Source, _verbMessageBitmap, _talkTextRect) =
+                (RoomMessageOverlay.Source, _ctx.VerbMessageBitmap, _ctx.TalkTextRect) =
                     FallbackMessageBitmaps(messages, session!.Messages.Talk, room, left);
-                ObjectsNote.Text = $"Messages use a UI font, not the game's ({_charsetError ?? "charset 0 is unavailable"}).";
+                ObjectsNote.Text = $"Messages use a UI font, not the game's ({_ctx.CharsetError ?? "charset 0 is unavailable"}).";
             }
             RoomMessageOverlay.Visibility = Visibility.Visible;
         }
-        VerbMessageOverlay.Source = _verbMessageBitmap;
-        VerbMessageOverlay.Visibility = _verbMessageBitmap is null ? Visibility.Collapsed : Visibility.Visible;
-        if (verbBefore != (_verbMessageBitmap is not null))
+        VerbMessageOverlay.Source = _ctx.VerbMessageBitmap;
+        VerbMessageOverlay.Visibility = _ctx.VerbMessageBitmap is null ? Visibility.Collapsed : Visibility.Visible;
+        if (verbBefore != (_ctx.VerbMessageBitmap is not null))
         {
             UpdateVerbStrip();
             UpdateRoomViewportLayout();
@@ -5177,7 +5054,7 @@ public partial class MainWindow : Window
     /// <summary>A click on the talk text: ScummVM's talk-stop key ('.') ends its delay, as assumed input.</summary>
     private bool SkipTalkAt(int x, int y)
     {
-        if (!GameClickActive || _talkTextRect is not { } rect || _session!.Messages.Talk is null ||
+        if (!GameClickActive || _ctx.TalkTextRect is not { } rect || _ctx.Session!.Messages.Talk is null ||
             x < rect.Left - 2 || x >= rect.Right + 2 || y < rect.Top - 2 || y >= rect.Bottom + 2) return false;
         return SkipTalk("a click on the text: the game's talk-stop key '.'");
     }
@@ -5188,24 +5065,24 @@ public partial class MainWindow : Window
     /// </summary>
     private bool SkipTalk(string how)
     {
-        if (!GameClickActive || _session!.Messages.Talk is null) return false;
-        _session.Messages.SkipTalkDelay();
+        if (!GameClickActive || _ctx.Session!.Messages.Talk is null) return false;
+        _ctx.Session.Messages.SkipTalkDelay();
         StatusText.Text = $"Text skipped ({how}, assumed input)";
         StatusText.ToolTip = "ScummVM's '.' key sets the talk delay to 0, so the next frame ends the message or shows its next part.";
-        if (!PlaybackRunning && _currentRoomResource is { } room)
+        if (!PlaybackRunning && _ctx.CurrentRoomResource is { } room)
             StartPlayback("Text skip", null, room, doorways: null, leftRoom: false);
         return true;
     }
 
     private bool CycleArtworkAt(int x, int y)
     {
-        var obj = _objectSelection.HitTest(x, y);
+        var obj = _ctx.ObjectSelection.HitTest(x, y);
         if (obj is null) return false;
-        _estimatedObjectIds = new HashSet<int>();
+        _ctx.EstimatedObjectIds = new HashSet<int>();
         ObjectsNote.Text = "Asset inspection: click an image area to cycle its stored alternatives. The selection is local to this view.";
-        var wasVisible = _objectSelection.IsActive(obj);
-        var next = _objectSelection.Next(obj);
-        _selectedObject = next?.Id ?? obj.Id;
+        var wasVisible = _ctx.ObjectSelection.IsActive(obj);
+        var next = _ctx.ObjectSelection.Next(obj);
+        _ctx.SelectedObject = next?.Id ?? obj.Id;
         RefreshRoomPreview();
         StatusText.Text = next is null
             ? $"Object {obj.Id} · room background shown"
@@ -5219,7 +5096,7 @@ public partial class MainWindow : Window
 
     private void RoomPreview_MouseMove(object sender, MouseEventArgs e)
     {
-        if (_currentRoom is null ||
+        if (_ctx.CurrentRoom is null ||
             !TryGetRoomImagePoint(e.GetPosition(RoomPreview), out var x, out var y))
         {
             RoomPreview.Cursor = Cursors.Arrow;
@@ -5229,19 +5106,19 @@ public partial class MainWindow : Window
             SendPointerToGame(null, null);
             return;
         }
-        if (_olderObjects.Count > 0)
+        if (_ctx.OlderObjects.Count > 0)
         {
             // A browsed v1 or v2 game: the name of the drawn object under the pointer (the first of the directory is on top).
             bool Over(BrowsedObjectLabel entry) => x >= entry.X && x < entry.X + entry.Width && y >= entry.Y && y < entry.Y + entry.Height;
-            var under = _olderObjects.FirstOrDefault(Over);
-            var doorwayIds = _olderObjects.Where(entry => Over(entry) && _roomNavigationCandidates.Any(item => item.Object.Id == entry.Id)).Select(entry => entry.Id).ToHashSet();
-            if (DoorwayMode == DisplayMode.Hover && !doorwayIds.SetEquals(_hoveredDoorwayIds)) { _hoveredDoorwayIds = doorwayIds; RefreshRoomNavigationOverlay(); }
+            var under = _ctx.OlderObjects.FirstOrDefault(Over);
+            var doorwayIds = _ctx.OlderObjects.Where(entry => Over(entry) && _ctx.RoomNavigationCandidates.Any(item => item.Object.Id == entry.Id)).Select(entry => entry.Id).ToHashSet();
+            if (DoorwayMode == DisplayMode.Hover && !doorwayIds.SetEquals(_ctx.HoveredDoorwayIds)) { _ctx.HoveredDoorwayIds = doorwayIds; RefreshRoomNavigationOverlay(); }
             var overObject = BrowsedObjects.FirstOrDefault(Over);
             RoomPreview.Cursor = Cursors.Arrow;
             RoomPreview.ToolTip = under is null ? null : doorwayIds.Contains(under.Id)
-                ? $"{BrowsedName(under)} → {string.Join(" or ", _roomNavigationCandidates.Where(item => item.Object.Id == under.Id).Select(item => $"Room {item.TargetRoomId:00}").Distinct())}"
+                ? $"{BrowsedName(under)} → {string.Join(" or ", _ctx.RoomNavigationCandidates.Where(item => item.Object.Id == under.Id).Select(item => $"Room {item.TargetRoomId:00}").Distinct())}"
                 : BrowsedName(under);
-            if (overObject?.Id != _browsedHover?.Id) ShowBrowsedHighlight(overObject, false);
+            if (overObject?.Id != _ctx.BrowsedHover?.Id) ShowBrowsedHighlight(overObject, false);
             return;
         }
         var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;
@@ -5254,27 +5131,27 @@ public partial class MainWindow : Window
             RoomPreview.Cursor = hoveredRow is null && doorways.Count == 0 ? Cursors.Arrow : Cursors.Hand;
             if (!IsAdvancedMode)
             {
-                RoomPreview.ToolTip = hoveredRow is not null && _roomObjectNames.TryGetValue(hoveredRow.Id, out var plainName) ? plainName : null;
+                RoomPreview.ToolTip = hoveredRow is not null && _ctx.RoomObjectNames.TryGetValue(hoveredRow.Id, out var plainName) ? plainName : null;
                 return;
             }
             var what = hoveredRow is null ? "Nothing listed here: a click walks Bobbin to this point." :
-                $"{(_roomObjectNames.TryGetValue(hoveredRow.Id, out var name) ? name : $"Object {hoveredRow.Id}")}: " +
+                $"{(_ctx.RoomObjectNames.TryGetValue(hoveredRow.Id, out var name) ? name : $"Object {hoveredRow.Id}")}: " +
                 "a click walks Bobbin over and uses it (verb 0x38); a double click also looks at it (verb 0x36).";
             RoomPreview.ToolTip = what + " The click goes through the game's input scripts (005–007) as assumed input." +
                                   (doorways.Count > 0 ? $" This doorway leads to {string.Join(" or ", doorways.Select(DoorwayLabel))}." : "");
             return;
         }
-        var artwork = _objectSelection.HitTest(x, y);
+        var artwork = _ctx.ObjectSelection.HitTest(x, y);
         if (artwork is not null)
         {
-            var canChange = !_objectSelection.IsActive(artwork) ||
-                            _objectSelection.HasAlternatives(artwork) ||
-                            _objectSelection.CanShowBackground(artwork);
+            var canChange = !_ctx.ObjectSelection.IsActive(artwork) ||
+                            _ctx.ObjectSelection.HasAlternatives(artwork) ||
+                            _ctx.ObjectSelection.CanShowBackground(artwork);
             RoomPreview.Cursor = canChange ? Cursors.Hand : Cursors.Arrow;
             RoomPreview.ToolTip = !canChange
                 ? $"Object {artwork.Id} has no other visible image state. Use the hotspot list for script interactions."
-                : _objectSelection.IsActive(artwork)
-                ? _objectSelection.CanShowBackground(artwork)
+                : _ctx.ObjectSelection.IsActive(artwork)
+                ? _ctx.ObjectSelection.CanShowBackground(artwork)
                     ? $"Click to cycle Object {artwork.Id} through stored images and room background."
                     : $"Click to cycle Object {artwork.Id} through stored images."
                 : $"Click to restore the first stored image at this position.";
@@ -5302,14 +5179,11 @@ public partial class MainWindow : Window
         RoomPreview.Cursor = Cursors.Arrow;
         RoomPreview.ToolTip = null;
         ShowHoveredHotspotRow(null);
-        if (_olderObjects.Count > 0 && _browsedHover is not null && !ObjectList.Children.OfType<Button>().Any(button => button.IsMouseOver || button.IsKeyboardFocused))
+        if (_ctx.OlderObjects.Count > 0 && _ctx.BrowsedHover is not null && !ObjectList.Children.OfType<Button>().Any(button => button.IsMouseOver || button.IsKeyboardFocused))
             ShowBrowsedHighlight(null, true);
         SendPointerToGame(null, null);
     }
 
-    // The room and the object under the pointer (0: none) when a frame last ran for the game pointer.
-    private (int? Room, int? Target)? _gamePointerTarget;
-    private LoomExplorationSession? _pointerSession;
 
     /// <summary>
     /// Interactive hover gives the pointer's room position to the session
@@ -5318,19 +5192,19 @@ public partial class MainWindow : Window
     /// </summary>
     private void SendPointerToGame((int X, int Y)? point, int? target)
     {
-        if (!GameClickActive || _session is null ||
-            _currentRoomResource is not { } room || _session.Snapshot.RoomId != room.ResourceId) return;
-        if (!ReferenceEquals(_pointerSession, _session)) { _gamePointerTarget = null; _pointerSession = _session; }
-        _session.SetPointer(point);
+        if (!GameClickActive || _ctx.Session is null ||
+            _ctx.CurrentRoomResource is not { } room || _ctx.Session.Snapshot.RoomId != room.ResourceId) return;
+        if (!ReferenceEquals(_ctx.PointerSession, _ctx.Session)) { _ctx.GamePointerTarget = null; _ctx.PointerSession = _ctx.Session; }
+        _ctx.Session.SetPointer(point);
         // While the playback clock runs, its frames see the pointer.
-        if (PlaybackRunning || _playbackPaused) return;
-        if (_gamePointerTarget == (room.ResourceId, target)) return;
-        _gamePointerTarget = (room.ResourceId, target);
+        if (PlaybackRunning || _ctx.PlaybackPaused) return;
+        if (_ctx.GamePointerTarget == (room.ResourceId, target)) return;
+        _ctx.GamePointerTarget = (room.ResourceId, target);
         AdvanceOneFrame();
     }
 
     private bool VerbStripShown() =>
-        GameClickActive && HasDedicatedSession && _currentRoom is not null;
+        GameClickActive && HasDedicatedSession && _ctx.CurrentRoom is not null;
 
     /// <summary>
     /// The interactive verb strip: a presentation of the session's verb slots
@@ -5340,23 +5214,23 @@ public partial class MainWindow : Window
     // The verb screen is shown for the strip, or for text a script printed there (rows 144–199).
     // In the interactive LOOM mode it is always shown, so the room keeps its size when a script prints there or clears it.
     private bool VerbScreenShown() => VerbStripShown() ||
-        _currentRoom is not null && (_verbMessageBitmap is not null || GameClickActive && HasDedicatedSession);
+        _ctx.CurrentRoom is not null && (_ctx.VerbMessageBitmap is not null || GameClickActive && HasDedicatedSession);
 
     private void UpdateVerbStrip()
     {
         if (!VerbStripShown())
         {
             // 2 November 2026 (crash log, user): after another game opens, the old game's verb-screen text can still be set while no LOOM session is.
-            if (VerbScreenShown() && _session is not null)
+            if (VerbScreenShown() && _ctx.Session is not null)
             {
                 // The verb screen holds the game's text: draw it with the verb slots it goes with,
                 // so the close-up (verb 0x36, script 008) shows above the object's name (script 007).
-                var slots = _session.VerbArea();
-                VerbStripImage.Source = CreateBitmap(slots.Width, slots.Height, slots.Pixels, _currentRoom!.Palette);
-                SetVerbScreenNote(_verbMessageBitmap is not null
+                var slots = _ctx.Session.VerbArea();
+                VerbStripImage.Source = CreateBitmap(slots.Width, slots.Height, slots.Pixels, _ctx.CurrentRoom!.Palette);
+                SetVerbScreenNote(_ctx.VerbMessageBitmap is not null
                         ? "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."
                         : "Verb screen (rows 144–199), kept under the room: the session's verb slots (presentation of the slots).",
-                    _session?.Messages.OnScreen
+                    _ctx.Session?.Messages.OnScreen
                         .Where(message => message.Y >= ScummVerbArea.Top)
                         .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);
                 VerbStripPanel.Visibility = Visibility.Visible;
@@ -5366,8 +5240,8 @@ public partial class MainWindow : Window
             VerbStripImage.Source = null;
             return;
         }
-        var picture = _session!.VerbArea();
-        VerbStripImage.Source = CreateBitmap(picture.Width, picture.Height, picture.Pixels, _currentRoom!.Palette);
+        var picture = _ctx.Session!.VerbArea();
+        VerbStripImage.Source = CreateBitmap(picture.Width, picture.Height, picture.Pixels, _ctx.CurrentRoom!.Palette);
         var drawn = picture.Items.Count == 0
             ? "no image verb is on in the session's state"
             : "verbs " + VerbRanges(picture.Items.Where(item => item.Mode == 1).Select(item => item.VerbId)) + " on" +
@@ -5390,12 +5264,11 @@ public partial class MainWindow : Window
     private void SetVerbScreenNote(string summary, IEnumerable<string> details)
     {
         var lines = details.ToArray();
-        _verbScreenNote = lines.Length == 0 ? summary
+        _ctx.VerbScreenNote = lines.Length == 0 ? summary
             : summary + Environment.NewLine + Environment.NewLine + string.Join(Environment.NewLine, lines);
-        VerbStripBorder.ToolTip = IsAdvancedMode ? _verbScreenNote : null;
+        VerbStripBorder.ToolTip = IsAdvancedMode ? _ctx.VerbScreenNote : null;
     }
 
-    private string? _verbScreenNote;
 
     /// <summary>Verb numbers as hex ranges: 0x01–0x08, 0x31, 0x32.</summary>
     private static string VerbRanges(IEnumerable<int> verbs)
@@ -5426,7 +5299,7 @@ public partial class MainWindow : Window
     // With "Click as game input" on, only verbs whose slot is on (findVerbAtPos) react.
     private ScummVerbAreaItem? ClickableVerbAt(Point position) =>
         GameClickActive && VerbStripShown() && VerbStripPoint(position) is { } point
-            ? ScummVerbArea.FindVerbAt(_session!.VerbArea().Items, point.X, point.Y) : null;
+            ? ScummVerbArea.FindVerbAt(_ctx.Session!.VerbArea().Items, point.X, point.Y) : null;
 
     private void VerbStripImage_MouseMove(object sender, MouseEventArgs e)
     {
@@ -5448,7 +5321,7 @@ public partial class MainWindow : Window
     private bool ClickVerbStrip(Point position)
     {
         if (ClickableVerbAt(position) is not { } verb || VerbStripPoint(position) is not { } point) return false;
-        SendInputToGame(() => _session!.ClickVerbArea(point.X, point.Y), $"Click on verb 0x{verb.VerbId:X2}");
+        SendInputToGame(() => _ctx.Session!.ClickVerbArea(point.X, point.Y), $"Click on verb 0x{verb.VerbId:X2}");
         return true;
     }
 
@@ -5461,19 +5334,19 @@ public partial class MainWindow : Window
     {
         UpdateVerbStrip();
         var closeUp = GameClickActive
-            ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
-        if (closeUp is not { Mode: 1, ImageObject: int image } || _session is null)
+            ? _ctx.Session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
+        if (closeUp is not { Mode: 1, ImageObject: int image } || _ctx.Session is null)
         {
             VerbAreaPanel.Visibility = Visibility.Collapsed;
             return;
         }
-        var snapshot = _session.Snapshot;
-        var picture = closeUp.ImageRoom == snapshot.RoomId ? _objects.FirstOrDefault(item => item.Id == image) : null;
-        VerbAreaImage.Source = picture is null || _currentRoom is null ? null
-            : CreateBitmap(picture.Width, picture.Height, picture.Pixels, _currentRoom.Palette);
+        var snapshot = _ctx.Session.Snapshot;
+        var picture = closeUp.ImageRoom == snapshot.RoomId ? _ctx.Objects.FirstOrDefault(item => item.Id == image) : null;
+        VerbAreaImage.Source = picture is null || _ctx.CurrentRoom is null ? null
+            : CreateBitmap(picture.Width, picture.Height, picture.Pixels, _ctx.CurrentRoom.Palette);
         var hovered = snapshot.KnownGlobalVariables.TryGetValue("var[0x066]", out var selected) ? $" for object {selected}" : "";
         VerbAreaText.Text = $"Verb area close-up: object {image}'s image (verb 0x36, script 008{hovered}). " +
-                            (_session.LastAction is { IsGameInput: true } click && click.SourceRoomId == snapshot.RoomId
+                            (_ctx.Session.LastAction is { IsGameInput: true } click && click.SourceRoomId == snapshot.RoomId
                                 ? "Game state reached from an assumed click sent to the game's input script."
                                 : "Game state reached from assumed hover input; no click was sent.") +
                             (closeUp.Estimate is null ? "" : $" Estimate: {closeUp.Estimate}.");
@@ -5487,11 +5360,11 @@ public partial class MainWindow : Window
     /// </summary>
     private ScummRoomObjectRecord? HotspotRowRecordAt(int x, int y)
     {
-        if (_session is null) return null;
+        if (_ctx.Session is null) return null;
         var listed = ObjectList.Children.OfType<Button>().Select(button => button.Tag).OfType<int>().ToHashSet();
         if (listed.Count == 0) return null;
-        var snapshot = _session.Snapshot;
-        var hits = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex).Where(record =>
+        var snapshot = _ctx.Session.Snapshot;
+        var hits = _ctx.CurrentRoomObjectRecords.OrderBy(item => item.LocalIndex).Where(record =>
         {
             // Doorways are not listed but still are what the game's pointer is over.
             if (!listed.Contains(record.Id) && (IsObjectHotspot(record) || !IsVerbHotspotAvailable(record, snapshot))) return false;
@@ -5510,7 +5383,7 @@ public partial class MainWindow : Window
     private void ShowHoveredHotspotRow(ScummRoomObjectRecord? record)
     {
         // Inspection mode lists scene details with their own colours.
-        if (SessionModeToggle.IsChecked != true || _hoveredHotspotRowId == record?.Id) return;
+        if (SessionModeToggle.IsChecked != true || _ctx.HoveredHotspotRowId == record?.Id) return;
         LightHotspotRow(record?.Id);
         // The row's own hover and focus outline take the box when the pointer leaves the room.
         if (record is not null || ObjectList.Children.OfType<Button>().All(button => !button.IsMouseOver && !button.IsKeyboardFocused))
@@ -5519,13 +5392,13 @@ public partial class MainWindow : Window
 
     private IReadOnlyList<RoomVerbChoice> FindVerbChoicesAt(int x, int y)
     {
-        var snapshot = _session?.Snapshot;
+        var snapshot = _ctx.Session?.Snapshot;
         if (snapshot is null) return [];
         var choices = new List<RoomVerbChoice>();
-        foreach (var record in _currentRoomObjectRecords.OrderBy(item => item.LocalIndex))
+        foreach (var record in _ctx.CurrentRoomObjectRecords.OrderBy(item => item.LocalIndex))
         {
             if (!IsVerbHotspotAvailable(record, snapshot) ||
-                !_roomVerbs.TryGetValue(record.Id, out var verbs)) continue;
+                !_ctx.RoomVerbs.TryGetValue(record.Id, out var verbs)) continue;
             var position = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
                 ? current : new RoomObjectPosition(record.X, record.Y);
             if (x < position.X || x >= position.X + record.Width ||
@@ -5541,7 +5414,7 @@ public partial class MainWindow : Window
     // R-6.14/R-6.15 in one rule for every game (RoomHotspotRules): a box, on the scene, owned by the room, touchable, parents in their states.
     // LOOM keeps its draft previews (48 x 40) at 0, 0 (R-6.14) and lists no owner for an object that does not exist.
     private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, ScummSessionSnapshot snapshot) =>
-        RoomHotspotRules.IsHotspot(record, _currentRoomObjectRecords, snapshot, 0x0F, 0, originIsOffScene: IsLoomGame);
+        RoomHotspotRules.IsHotspot(record, _ctx.CurrentRoomObjectRecords, snapshot, 0x0F, 0, originIsOffScene: IsLoomGame);
 
     /// <summary>
     /// Doorway hotspots at a room point that are present in the room (owned by
@@ -5549,8 +5422,8 @@ public partial class MainWindow : Window
     /// </summary>
     private IReadOnlyList<ScummRoomObjectRecord> DoorwaysAt(int x, int y)
     {
-        if (_session?.Snapshot is not { } snapshot) return [];
-        var (selected, unknown) = ScummObjectHitTest.Find(_currentRoomObjectRecords, snapshot.ObjectStates,
+        if (_ctx.Session?.Snapshot is not { } snapshot) return [];
+        var (selected, unknown) = ScummObjectHitTest.Find(_ctx.CurrentRoomObjectRecords, snapshot.ObjectStates,
             snapshot.ObjectPositions, snapshot.ObjectClasses, x, y);
         // Native hit selection already excludes untouchable exits and mismatched parents.
         // A ground click or a different overlapping object must never open a static candidate.
@@ -5559,11 +5432,11 @@ public partial class MainWindow : Window
     }
 
     private IEnumerable<ScummRoomObjectRecord> VisibleDoorways(ScummSessionSnapshot snapshot) =>
-        _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
+        _ctx.RoomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
             .Where(record => IsVerbHotspotAvailable(record, snapshot))
             .OrderBy(record => record.LocalIndex);
 
-    private int[] DoorwayTargets(ScummRoomObjectRecord record) => _roomNavigationCandidates
+    private int[] DoorwayTargets(ScummRoomObjectRecord record) => _ctx.RoomNavigationCandidates
         .Where(candidate => candidate.Object.Id == record.Id).Select(candidate => candidate.TargetRoomId)
         .Distinct().Order().ToArray();
 
@@ -5576,7 +5449,7 @@ public partial class MainWindow : Window
         var text = $"Object {record.Id}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))}. " +
                    "Clicking follows a room load reached by its script. If none is reached, the current room stays open. " +
                    "The Advanced doorway buttons open possible destinations directly for browsing.";
-        return _session?.Snapshot.IsUntouchable(record.Id) == true
+        return _ctx.Session?.Snapshot.IsUntouchable(record.Id) == true
             ? text + " This hotspot is untouchable in the current preview (class 24), so the game would not select it here; " +
               "a room click cannot follow it."
             : text;
@@ -5588,7 +5461,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void FollowDoorway(ScummRoomObjectRecord record)
     {
-        var routes = _roomNavigationCandidates.Where(candidate => candidate.Object.Id == record.Id).ToArray();
+        var routes = _ctx.RoomNavigationCandidates.Where(candidate => candidate.Object.Id == record.Id).ToArray();
         if (routes.Length == 0) return;
         if (ActivateObjectVerb(record, routes[0].Verb) || ContinueToReachedRoom()) return;
     }
@@ -5610,7 +5483,7 @@ public partial class MainWindow : Window
 
     private void OpenRoomDestination(RoomVerbDestination candidate)
     {
-        if (_game?.Rooms.FirstOrDefault(item => item.ResourceId == candidate.TargetRoomId) is not { } target)
+        if (_ctx.Game?.Rooms.FirstOrDefault(item => item.ResourceId == candidate.TargetRoomId) is not { } target)
             return;
         SelectResourceInTree(target);
     }
@@ -5620,8 +5493,8 @@ public partial class MainWindow : Window
         var checkedCount = 0;
         while (record.ParentLocalIndex != 0)
         {
-            if (++checkedCount > _currentRoomObjectRecords.Count) return false;
-            var parent = _currentRoomObjectRecords.FirstOrDefault(item => item.LocalIndex == record.ParentLocalIndex);
+            if (++checkedCount > _ctx.CurrentRoomObjectRecords.Count) return false;
+            var parent = _ctx.CurrentRoomObjectRecords.FirstOrDefault(item => item.LocalIndex == record.ParentLocalIndex);
             if (parent is null || !snapshot.ObjectStates.TryGetValue(parent.Id, out var state) ||
                 (state & 0x0F) != record.ParentRequiredState) return false;
             record = parent;
@@ -5632,8 +5505,8 @@ public partial class MainWindow : Window
     private bool TryGetRoomImagePoint(Point point, out int x, out int y)
     {
         x = y = 0;
-        if (_currentRoom is null) return false;
-        var room = _currentRoom;
+        if (_ctx.CurrentRoom is null) return false;
+        var room = _ctx.CurrentRoom;
         var scale = Math.Min(RoomPreview.ActualWidth / room.Width, RoomPreview.ActualHeight / room.Height);
         if (scale <= 0) return false;
         var imageX = (point.X - (RoomPreview.ActualWidth - room.Width * scale) / 2) / scale;
@@ -5647,8 +5520,8 @@ public partial class MainWindow : Window
     private void UpdateRoomNavigationActions(GameResource room)
     {
         RoomNavigationButtons.Children.Clear();
-        _roomNavigationCandidates = [];
-        if (SessionModeToggle.IsChecked != true || _session is null || _game is null)
+        _ctx.RoomNavigationCandidates = [];
+        if (SessionModeToggle.IsChecked != true || _ctx.Session is null || _ctx.Game is null)
         {
             RoomNavigationPanel.Visibility = Visibility.Collapsed;
             RoomNavigationOverlay.Visibility = Visibility.Collapsed;
@@ -5656,18 +5529,18 @@ public partial class MainWindow : Window
             return;
         }
         var candidates = new List<RoomVerbDestination>();
-        _doorwayFinder ??= new LoomDoorwayFinder(_game);
-        foreach (var record in _currentRoomObjectRecords)
+        _ctx.DoorwayFinder ??= new LoomDoorwayFinder(_ctx.Game);
+        foreach (var record in _ctx.CurrentRoomObjectRecords)
         {
-            if (!_roomVerbs.TryGetValue(record.Id, out var verbs)) continue;
-            foreach (var verb in _doorwayFinder.DoorVerbs(verbs))
+            if (!_ctx.RoomVerbs.TryGetValue(record.Id, out var verbs)) continue;
+            foreach (var verb in _ctx.DoorwayFinder.DoorVerbs(verbs))
             {
                 ScummScriptDisassembly script;
-                try { script = _cdData is not null ? _cdData.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _verbReader.Decode(room, record, verb.VerbId); }
+                try { script = _ctx.CdData is not null ? _ctx.CdData.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _ctx.VerbReader.Decode(room, record, verb.VerbId); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
                 // Follow started room-local and global scripts too: many exits
                 // (for example Room 03's town and cemetery paths) load the room there.
-                foreach (var target in _doorwayFinder.FindDoorway(room, script, verb))
+                foreach (var target in _ctx.DoorwayFinder.FindDoorway(room, script, verb))
                     candidates.Add(new RoomVerbDestination(record, verb, target.RoomId, target.InstructionOffset, target.Path));
             }
         }
@@ -5677,17 +5550,17 @@ public partial class MainWindow : Window
     /// <summary>The doorway buttons, options and overlay for a list of candidates; the session's rooms and the browse-only games share it.</summary>
     private void ShowRoomNavigationCandidates(GameResource room, IReadOnlyList<RoomVerbDestination> candidates)
     {
-        _roomNavigationRoom = room;
-        _roomNavigationCandidates = candidates.DistinctBy(item =>
+        _ctx.RoomNavigationRoom = room;
+        _ctx.RoomNavigationCandidates = candidates.DistinctBy(item =>
             (item.Object.Id, item.Verb.VerbId, item.TargetRoomId)).ToArray();
         FillDoorwayRows(LoomHotspots.DoorwayRows());
         RoomNavigationHeader.Text = $"DOORWAYS · {RoomNavigationButtons.Children.Count}";
         RoomNavigationPanel.ToolTip = "Possible doorways: rooms that decoded hotspot code can load. " +
                                       "A button opens the room directly for exploration; clicking a doorway box on the room runs its script.";
-        RoomNavigationPanel.Visibility = IsAdvancedMode && _roomNavigationCandidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        DoorwayOptions.Visibility = RoomOverlayRules.DoorwayOptionOffered(_roomNavigationCandidates.Count) ? Visibility.Visible : Visibility.Collapsed;
+        RoomNavigationPanel.Visibility = IsAdvancedMode && _ctx.RoomNavigationCandidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        DoorwayOptions.Visibility = RoomOverlayRules.DoorwayOptionOffered(_ctx.RoomNavigationCandidates.Count) ? Visibility.Visible : Visibility.Collapsed;
         ObjectAreaOptions.Visibility = Visibility.Visible;
-        RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never
+        RoomNavigationOverlay.Visibility = _ctx.RoomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never
             ? Visibility.Visible : Visibility.Collapsed;
         RefreshRoomNavigationOverlay();
     }
@@ -5699,18 +5572,18 @@ public partial class MainWindow : Window
     {
         RoomNavigationOverlay.Children.Clear();
         if (LoomSurface(RoomNavigationOverlay) is not { } surface) return;
-        if (_olderObjects.Count > 0) DrawDoorwayBoxes(surface, BrowsedDoorwayBoxes());
-        else if (_session is not null)
+        if (_ctx.OlderObjects.Count > 0) DrawDoorwayBoxes(surface, BrowsedDoorwayBoxes());
+        else if (_ctx.Session is not null)
             DrawDoorwayBoxes(surface, RoomHotspotRules.DoorwayBoxes(LoomHotspots.Hotspots(),
-                group => RoomOverlayRules.Shows(DoorwayMode, group.Any(item => _hoveredDoorwayIds.Contains(item.ObjectId))),
+                group => RoomOverlayRules.Shows(DoorwayMode, group.Any(item => _ctx.HoveredDoorwayIds.Contains(item.ObjectId))),
                 item => LoomHotspots.DoorwayTip(item), item => LoomHotspots.IsLive(item)));
     }
 
     /// <summary>Where room points land on one of the canvases laid over the room picture; null while it has no size.</summary>
     private RoomSurface? LoomSurface(Canvas canvas)
     {
-        if (_currentRoom is null || canvas.ActualWidth <= 0 || canvas.ActualHeight <= 0) return null;
-        var room = _currentRoom;
+        if (_ctx.CurrentRoom is null || canvas.ActualWidth <= 0 || canvas.ActualHeight <= 0) return null;
+        var room = _ctx.CurrentRoom;
         var scale = Math.Min(canvas.ActualWidth / room.Width, canvas.ActualHeight / room.Height);
         if (scale <= 0) return null;
         var offsetX = (canvas.ActualWidth - room.Width * scale) / 2;
@@ -5718,10 +5591,9 @@ public partial class MainWindow : Window
         return new RoomSurface(canvas, scale, (x, y) => new Point(offsetX + x * scale, offsetY + y * scale), offsetX, offsetX + room.Width * scale);
     }
 
-    private ScummRoomObjectRecord? _highlightedHotspot;
 
     private void HotspotHighlightOverlay_SizeChanged(object sender, SizeChangedEventArgs e) =>
-        ShowHotspotHighlight(_highlightedHotspot);
+        ShowHotspotHighlight(_ctx.HighlightedHotspot);
 
     /// <summary>
     /// Outlines a hotspot's box on the room image (at its current position in
@@ -5730,10 +5602,10 @@ public partial class MainWindow : Window
     private void ShowHotspotHighlight(ScummRoomObjectRecord? record)
     {
         // Browse-only games have stored objects, no session records.
-        if (_olderObjects.Count > 0) { ShowBrowsedHighlight(_browsedHover, true); return; }
-        _highlightedHotspot = record;
+        if (_ctx.OlderObjects.Count > 0) { ShowBrowsedHighlight(_ctx.BrowsedHover, true); return; }
+        _ctx.HighlightedHotspot = record;
         HotspotHighlightOverlay.Children.Clear();
-        var all = ObjectAreaMode == DisplayMode.Always && SessionModeToggle.IsChecked == true && _session is not null;
+        var all = ObjectAreaMode == DisplayMode.Always && SessionModeToggle.IsChecked == true && _ctx.Session is not null;
         HotspotHighlightOverlay.Visibility = record is null && !all ? Visibility.Collapsed : Visibility.Visible;
         if (record is null && !all || LoomSurface(HotspotHighlightOverlay) is not { } surface) return;
         if (all)
@@ -5742,7 +5614,6 @@ public partial class MainWindow : Window
         if (record is not null) DrawHotspotBox(surface, LoomHotspots.Describe(record), true);
     }
 
-    private int? _roomMusicActionsRoom;
 
     private async void UpdateRoomMusicActions()
     {
@@ -5750,34 +5621,34 @@ public partial class MainWindow : Window
         var generation = ++_roomMusicUpdateGeneration;
         // Called again while the room stays (a scene plays, the view refreshes): hiding the music panel and the Sounds button until the list is
         // rebuilt made them blink and the row of buttons shake, so they stay as they are and are replaced when the list is ready.
-        var sameRoom = _roomMusicActionsRoom == _currentRoomResource?.ResourceId && _currentRoomResource is not null;
-        _roomMusicActionsRoom = _currentRoomResource?.ResourceId;
+        var sameRoom = _ctx.RoomMusicActionsRoom == _ctx.CurrentRoomResource?.ResourceId && _ctx.CurrentRoomResource is not null;
+        _ctx.RoomMusicActionsRoom = _ctx.CurrentRoomResource?.ResourceId;
         if (!sameRoom)
         {
             RoomMusicPanel.Visibility = Visibility.Collapsed;
-            _roomSoundChoices = [];
+            _ctx.RoomSoundChoices = [];
             RoomSoundsButton.Visibility = Visibility.Collapsed;
         }
-        if (CurrentModule.UpdateRoomSounds(_currentRoomResource)) return;
-        if (_game is null || _currentRoomResource is not { } room) return;
+        if (CurrentModule.UpdateRoomSounds(_ctx.CurrentRoomResource)) return;
+        if (_ctx.Game is null || _ctx.CurrentRoomResource is not { } room) return;
         // The interactive LOOM mode plays the music the game's scripts start (SceneSoundPlayer), so the panel's own
         // player would only duplicate it (the user's choice, 30 Sep; .verification/room-music-analysis). Inspection mode keeps it.
         // The Sounds menu (every music and effect the room may start, played on demand) serves both modes.
-        var interactive = _game.Id == GameId.Loom && SessionModeToggle.IsChecked == true;
-        if (interactive && _audioSurface == AudioSurface.Room && _roomCueSourceRoomId != room.ResourceId) StopAudio();
-        var game = _game;
+        var interactive = _ctx.Game.Id == GameId.Loom && SessionModeToggle.IsChecked == true;
+        if (interactive && _ctx.AudioSurface == AudioSurface.Room && _ctx.RoomCueSourceRoomId != room.ResourceId) StopAudio();
+        var game = _ctx.Game;
         var soundById = game.Resources.Where(item => item.Kind == ResourceKind.Sound && item.ResourceId.HasValue)
             .GroupBy(item => item.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
-        var possible = _roomSoundCandidates.Analyze(game, room, _currentRoomObjectRecords);
-        var session = SessionModeToggle.IsChecked == true && _session?.Snapshot.RoomId == room.ResourceId
-            ? _session : null;
+        var possible = _roomSoundCandidates.Analyze(game, room, _ctx.CurrentRoomObjectRecords);
+        var session = SessionModeToggle.IsChecked == true && _ctx.Session?.Snapshot.RoomId == room.ResourceId
+            ? _ctx.Session : null;
         var events = session?.SoundEvents.ToArray() ?? [];
         var entrySequence = session?.RoomEntrySequence ?? 0;
         var idsToInspect = possible.Where(item => item.SoundId.HasValue).Select(item => item.SoundId!.Value)
             .Concat(events.Where(item => item.Event.TargetId.HasValue).Select(item => item.Event.TargetId!.Value))
             .Distinct().ToArray();
-        var cachedTracks = idsToInspect.Where(_roomCueTrackCache.ContainsKey)
-            .ToDictionary(id => id, id => _roomCueTrackCache[id]);
+        var cachedTracks = idsToInspect.Where(_ctx.RoomCueTrackCache.ContainsKey)
+            .ToDictionary(id => id, id => _ctx.RoomCueTrackCache[id]);
         Dictionary<int, (bool IsMusic, TimeSpan? Duration)> scannedTracks;
         try
         {
@@ -5803,19 +5674,19 @@ public partial class MainWindow : Window
         }
         catch (Exception)
         {
-            if (generation == _roomMusicUpdateGeneration && ReferenceEquals(game, _game) && room == _currentRoomResource)
+            if (generation == _roomMusicUpdateGeneration && ReferenceEquals(game, _ctx.Game) && room == _ctx.CurrentRoomResource)
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
             return;
         }
-        if (generation != _roomMusicUpdateGeneration || !ReferenceEquals(game, _game) || room != _currentRoomResource) return;
+        if (generation != _roomMusicUpdateGeneration || !ReferenceEquals(game, _ctx.Game) || room != _ctx.CurrentRoomResource) return;
         foreach (var (id, result) in scannedTracks)
         {
-            _roomCueTrackCache[id] = result;
-            if (result.Duration is TimeSpan duration) _roomCueDurations[id] = duration;
+            _ctx.RoomCueTrackCache[id] = result;
+            if (result.Duration is TimeSpan duration) _ctx.RoomCueDurations[id] = duration;
         }
         var choiceEvidence = possible.Where(item => item.SoundId.HasValue).GroupBy(item => item.SoundId!.Value)
             .ToDictionary(group => group.Key, group => string.Join(Environment.NewLine, group.Select(item => item.Evidence)));
-        _roomSoundChoices = choiceEvidence.Keys.Concat(events.Where(item => item.Event.TargetId.HasValue).Select(item => item.Event.TargetId!.Value))
+        _ctx.RoomSoundChoices = choiceEvidence.Keys.Concat(events.Where(item => item.Event.TargetId.HasValue).Select(item => item.Event.TargetId!.Value))
             .Distinct().Where(soundById.ContainsKey)
             .Select(id =>
             {
@@ -5825,7 +5696,7 @@ public partial class MainWindow : Window
             })
             .OrderBy(item => item.Resource.ResourceId)
             .ToList();
-        RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        RoomSoundsButton.Visibility = _ctx.RoomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         if (interactive) { RoomMusicPanel.Visibility = Visibility.Collapsed; return; }
         bool IsMusic(int id) => scannedTracks.TryGetValue(id, out var result) && result.IsMusic;
         var reached = session is not null
@@ -5850,8 +5721,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        var manuallySelected = _roomCueManuallySelected && _roomCueSourceRoomId == room.ResourceId
-            ? candidates.FirstOrDefault(item => item.Resource.ResourceId == _roomSelectedCue?.ResourceId)
+        var manuallySelected = _ctx.RoomCueManuallySelected && _ctx.RoomCueSourceRoomId == room.ResourceId
+            ? candidates.FirstOrDefault(item => item.Resource.ResourceId == _ctx.RoomSelectedCue?.ResourceId)
             : default;
         var selected = manuallySelected.Resource is not null ? manuallySelected : candidates[0];
         var selectedId = selected.Resource.ResourceId!.Value;
@@ -5876,7 +5747,6 @@ public partial class MainWindow : Window
         RoomMusicPanel.Visibility = Visibility.Visible;
     }
 
-    private List<(GameResource Resource, bool Music, TimeSpan? Duration, string Evidence)> _roomSoundChoices = [];
 
     private static string SoundSourceSummary(string evidence)
     {
@@ -5911,31 +5781,31 @@ public partial class MainWindow : Window
 
     private void SelectRoomCue(GameResource sound, string evidence, bool reached, bool manuallySelected = false)
     {
-        if (_roomSelectedCue != sound && _audioSurface == AudioSurface.Room) StopAudio();
-        _roomSelectedCue = sound;
-        _roomCueSourceRoomId = _currentRoomResource?.ResourceId;
-        _roomCueReached = reached;
-        _roomCueManuallySelected = manuallySelected;
+        if (_ctx.RoomSelectedCue != sound && _ctx.AudioSurface == AudioSurface.Room) StopAudio();
+        _ctx.RoomSelectedCue = sound;
+        _ctx.RoomCueSourceRoomId = _ctx.CurrentRoomResource?.ResourceId;
+        _ctx.RoomCueReached = reached;
+        _ctx.RoomCueManuallySelected = manuallySelected;
         RoomCueTitle.Text = $"{(reached ? "Started" : "Possible")}: {sound.Name}";
         RoomCueEvidence.Text = reached ? "from this session's route" : "from room script data";
         RoomCueEvidence.ToolTip = evidence;
         RoomCueTitle.ToolTip = evidence;
         RoomCuePlayButton.ToolTip = "Play room cue";
-        if (_roomCueDurations.TryGetValue(sound.ResourceId ?? -1, out var duration))
+        if (_ctx.RoomCueDurations.TryGetValue(sound.ResourceId ?? -1, out var duration))
             RoomCueTime.Text = $"0:00 / {FormatRoomCueDuration(duration)}";
         RoomCuePlayButton.IsEnabled = true;
-        RoomCuePauseButton.IsEnabled = _audioSurface == AudioSurface.Room && _audioReady;
-        RoomCueStopButton.IsEnabled = _audioSurface == AudioSurface.Room;
-        if (_audioSurface != AudioSurface.Room) RoomCueStatus.Text = "Select Play to listen.";
+        RoomCuePauseButton.IsEnabled = _ctx.AudioSurface == AudioSurface.Room && _ctx.AudioReady;
+        RoomCueStopButton.IsEnabled = _ctx.AudioSurface == AudioSurface.Room;
+        if (_ctx.AudioSurface != AudioSurface.Room) RoomCueStatus.Text = "Select Play to listen.";
     }
 
     private void ClearRoomCue()
     {
-        if (_audioSurface == AudioSurface.Room) StopAudio();
-        _roomSelectedCue = null;
-        _roomCueSourceRoomId = null;
-        _roomCueReached = false;
-        _roomCueManuallySelected = false;
+        if (_ctx.AudioSurface == AudioSurface.Room) StopAudio();
+        _ctx.RoomSelectedCue = null;
+        _ctx.RoomCueSourceRoomId = null;
+        _ctx.RoomCueReached = false;
+        _ctx.RoomCueManuallySelected = false;
         RoomCueTitle.Text = "No cue established";
         RoomCueTitle.ToolTip = null;
         RoomCueEvidence.Text = "";
@@ -5949,20 +5819,20 @@ public partial class MainWindow : Window
 
     private void SelectObject(int id)
     {
-        var obj = _objects.FirstOrDefault(item => item.Id == id);
+        var obj = _ctx.Objects.FirstOrDefault(item => item.Id == id);
         if (obj is null) return;
-        _estimatedObjectIds = new HashSet<int>();
+        _ctx.EstimatedObjectIds = new HashSet<int>();
         ObjectsNote.Text = "Asset inspection: click an image area to cycle its stored alternatives. The selection is local to this view.";
         var hidden = false;
         RoomObjectImage? next = null;
-        if (_objectSelection.IsActive(obj))
+        if (_ctx.ObjectSelection.IsActive(obj))
         {
-            next = _objectSelection.Next(obj);
+            next = _ctx.ObjectSelection.Next(obj);
             hidden = next is null;
         }
         else
-            _objectSelection.Select(obj);
-        _selectedObject = next?.Id ?? id;
+            _ctx.ObjectSelection.Select(obj);
+        _ctx.SelectedObject = next?.Id ?? id;
         RefreshRoomPreview();
         StatusText.Text = hidden ? $"Object {id} · background restored"
             : next is not null && next.Id != id ? $"Object {next.Id} · stored image at {PositionText(next)}"
@@ -5971,7 +5841,7 @@ public partial class MainWindow : Window
 
     private string PositionText(RoomObjectImage obj)
     {
-        var position = _objectSelection.GetPosition(obj);
+        var position = _ctx.ObjectSelection.GetPosition(obj);
         return $"{position.X}, {position.Y}";
     }
 

@@ -143,13 +143,12 @@ public partial class MainWindow
 
     private static readonly SolidColorBrush HotspotRowBrush = new(Color.FromRgb(39, 54, 66));
     private static readonly SolidColorBrush HoveredHotspotRowBrush = new(Color.FromRgb(46, 92, 116));
-    private int? _hoveredHotspotRowId;
 
     /// <summary>The row of the hotspot under the room pointer is lit and scrolled into view (every game).</summary>
     private void LightHotspotRow(int? objectId)
     {
-        if (_hoveredHotspotRowId == objectId) return;
-        _hoveredHotspotRowId = objectId;
+        if (_ctx.HoveredHotspotRowId == objectId) return;
+        _ctx.HoveredHotspotRowId = objectId;
         foreach (var button in ObjectList.Children.OfType<Button>())
         {
             if (button.Tag is not int id) continue;
