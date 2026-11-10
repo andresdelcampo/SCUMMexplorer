@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 10 November: project audit; the roadmap's way to a release
+
+An audit of the code and the documents ([record](AUDIT_2026-11-10.md)): the engine layer names a game in one place and Game Status has the right generic/specific split; the odd pictures come from the window's per-game state being reset field by field (Indy in Maniac Mansion) and from scene setups being scored by "begun, rooms, lines" and never by the picture (Indy 3 Room 82's Give Grail keeps a side branch over the ending). The roadmap's work list is now six steps, each with what ends it. LOOM's derived scene starts are emptied when a LOOM copy opens (`_startSetups` was never cleared). The Maniac Mansion and Zak McKracken handoff of 23 October is archived; those games follow the roadmap.
+
 ## 9 November: Game Status for Indy 3
 
 Indy 3 has Game Status: Indy's inventory (catalog grants, one recipient), his health and outfit, the 68 IQ awards and 46 story flags, each found by its role in the scripts (REQUIREMENTS R-12.15 to R-12.17). 10 November (user report on the Spanish 256-colour copy): items carry the name their pickup gives them ("tomo": "libro mapas", "manual", "Mein Kampf"); the game start's flags are left out of Story; the English names are the copy's own. [Record](../../.verification/indy3-status-20261109/README.md).

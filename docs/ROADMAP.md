@@ -1,6 +1,6 @@
 # Roadmap
 
-The one current-state document: the scope, how ready each game is, the ten features and their board, what is open, the work in order, the checks only the user can do, and the rules. Only the current state and open work are here. Finished work is in [CHANGELOG](archive/CHANGELOG.md) and its records under `.verification/`; history is in `docs/archive/` (the former ROADMAP, "Your checks" and earlier roadmaps). What the app must do is in [REQUIREMENTS](REQUIREMENTS.md); how a game is added, in [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md).
+The one current-state document: the scope, how ready each game is, the ten features and their board, the way to a release, what is open, the checks only the user can do, and the rules. Only the current state and open work are here. Finished work is in [CHANGELOG](archive/CHANGELOG.md) and its records under `.verification/`; history is in `docs/archive/` (the former ROADMAP, "Your checks" and earlier roadmaps). What the app must do is in [REQUIREMENTS](REQUIREMENTS.md); how a game is added, in [GAME_SUPPORT_INSTRUCTIONS](GAME_SUPPORT_INSTRUCTIONS.md).
 
 ## Scope
 
@@ -12,10 +12,10 @@ REQUIREMENTS R-1.14 and §8.6 (user, 31 October 2026): an explorer. Pick any roo
 |---|---|
 | LOOM EGA English (Roland), other EGA editions, demos, LOOM CD | Reference quality: live interaction, actors, scripts, scene playback, Game Status, audio. Interact lists every object of the room. Cutscenes ◐ except the English reference's hand-validated catalog. |
 | Indy 3, Monkey Island 1 (floppy, CD), Monkey Island 2, Indy 4 | Every room, costume and script; every listed scene begins when picked (its state set up, or started at its cutscene); Interact offers every object of the room with its verbs. Some scenes started at their cutscene show nothing. |
-| Maniac Mansion and Zak McKracken (enhanced, classic) | Played through native verbs, Status, inventory editor, room controls, cutscene lists (◐). Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope is not yet applied there. |
+| Maniac Mansion and Zak McKracken (enhanced, classic) | Played through native verbs, Status, inventory editor, room controls, cutscene lists (◐) on the shared scene setup since 1 November. Maniac Mansion's 39 scenes wait for the user's check. |
 | Other folders under `Games` | Browse-only or passed only S9 checks; not reviewed in the window. |
 
-Architecture: LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. Still LOOM-keyed in shared code: `DecodeBrowsedOldV3Room`, the session toggle, the live-session sound/clock code, the gallery's speaker names; every such move needs a before/after run of `.verification/game-module-20261026/Check`.
+Architecture ([audit, 10 November](archive/AUDIT_2026-11-10.md)): the engine (`Core/Scumm`) names a game only in `ScummProfile.For`; Game Status is one inventory window with a per-game schema, plus LOOM's own. LOOM-specific App code lives in `App/Loom/` behind `IGameModule`. Still LOOM-keyed in shared code: `DecodeBrowsedOldV3Room`, the session toggle, the live-session sound/clock code, the gallery's speaker names; every such move needs a before/after run of `.verification/game-module-20261026/Check`.
 
 ## The ten features
 
@@ -54,58 +54,65 @@ What keeps a cell from ✅:
 - **8**: depth masks of the non-LOOM games never compared with ScummVM (R-6.16).
 - **10**: the other games name objects, actors and verbs from their own data (80%, 64% and 57% of references); their variables and bits keep numbers (the script maps hold few rows to turn into data; most of what stays unnamed has no name in the game's data: image-only objects, actors no script names).
 
-## The work, in order
+## The way to a release
 
-| # | Work | Feature | Where |
+From the [10 November audit](archive/AUDIT_2026-11-10.md). In order; each step names what ends it. Scene work stays on Maniac Mansion, Indy 3 and LOOM until the user has checked them (user, 8 November); a generic fix that reaches every game for free is fine.
+
+| # | Step | Ends when | Where |
 |---|---|---|---|
-| 1 | **Scenes started at their cutscene that show nothing**: what is left needs case-by-case reading: scenes that wait on two values at once (Indy 4 Room 44's local script 203: a bit, then the hero's walk box and x), refusals the scan lists as scenes (Indy 4 Room 88's "I can't reach it", a `printEgo` while Indy is not in the room; its many "lines" are a room script's blank prints); Indy 4 has the most, 5. Also the scenes still run directly (Indy 4 5, Monkey Island 2 1, Monkey Island 1 1 and 2). Read on 7 November and left as one-offs: Indy 4 Room 65's closet (a guard's walk box at the moment the door closes), Monkey Island 2 Room 93's light switch (a random dark room before its cutscene), Room 19's key (a room script as the sentence script) ([record](../.verification/user-reports-20261107/README.md)). | 5 | `ScummSession.StartSceneAt`, `ScummSceneSetupSearch` |
-| 2b | **One scene engine for every game** (user, 31 October): Maniac/Zak (`ManiacCutsceneSetup`, built on the separate track) onto the shared scene setup (`ScummSceneSetupSearch`), keeping a game-specific setup only where the game needs one (LOOM English's reviewed catalog, Maniac's party selection). LOOM English's 328 reviewed replays are the answer key (first run 31 October: 238 of 238 listed replays begin and reach the catalog's rooms, 219 share its category; the other 90 are shared draft reactions; [record](../.verification/loom-answer-key-20261031/README.md)); scene length within 10% for 222 of 238 (93.3%, on LOOM's own session), and the other 16 run the catalog's own cutscenes from the same instruction to the same end, from another start (Bobbin put at the object, the shepherds' idle loop, 4 replays the catalog cut short; [record](../.verification/loom-answer-key-20261031/README.md)); LOOM's other editions and the CD play their scanned scenes through the shared engine, and every LOOM copy's Interact offers the draft reactions ([record](../.verification/loom-editions-20261031/README.md)); still to do, after the other games (user, 8 November: "before working further on LOOM I would focus more on fixing the other games"): the shared engine for LOOM English too, with a LOOM layer on top keyed by room, object and verb for what the engine cannot derive (titles and draft names, the 19 hand categories, the named sequences and Room 46's recipe, the story-bit names), carried to the other editions by object name; `Compare` then guards each entry; Maniac/Zak: run the shared engine on the English reference and compare each replay (begins, lines, rooms, Bobbin's look); where it matches, the catalog entry is redundant, where it differs, fix the shared engine; in the end only the named sequences (The Elders' trial, the firewood scene, Walk to Room 13, Room 46) stay as reviewed data, carried to the other LOOM editions by room, object name and verb. Before/after counts per game. | 5 | `Loom/Scenes/`, `Core/Maniac/`, `Scumm/Session/` |
-| 3 | **Readable names for the other games**: objects, actors and verbs are named from each game's data ([record](../.verification/readable-names-20261031/README.md)); still to do: variables and bits from their script maps (reviewed rows as data, as LOOM's glossary). | 10 | `LoomGlossary`, `LoomScriptPresenter`, `docs/<game>/*_SCRIPT_MAP.md` |
-| 3b | **Interaction outcomes by state** (user, 1 November: revisit after the user's test pass): one verb can answer differently by state (locked/open, conversations had, the second object); today one outcome is played. First step: list each verb's outcomes with their conditions in Advanced (the guard reading already walks the code). | 6 | `ScummSceneSetupSearch.Paths.cs`, Interact |
-| 3c | **Scene order** (user, 2 November: "some always predate others, so the bits are all set correctly when playing them, across all games"): order each game's scenes by what they set and test (a scene that sets a flag comes before the scenes that test it), and give a picked scene the state of the scenes before it, not only the values its own code tests. Three steps done 8 November (a needed flag brings the code that sets it; what every way into a scene's room needs, fresh-begun scenes included; doors, classes and rooms held in variables on the way in): 160 of 1,413 scenes (11.3%) carry that state, no loss ([record](../.verification/scene-order-20261108/README.md)). **Paused for the user's check** (user, 8 November: "for scenes prioritize Maniac Mansion, then Indy 3 -for now. Don't go beyond until I can see the results ... unless it is a very simple change / generic that can be used in all games almost for free"). Not reached: rooms with a way in that needs nothing, rooms whose variable is set elsewhere (Zak McKracken's travel, Indy 4's Atlantis). Today's stopgaps it would replace: an ended arrival marks its own flag as seen (Indy 3 Room 82's `bit[0x5E2]`). | 5 | `ScummSceneSetupSearch`, `ScummSessionArrivals` |
-| 4 | **The user's reports** as they arrive (the crash log records game and room). | 1 | — |
-| 5 | **One user pass per game** with "Your checks" below: a few rooms next to ScummVM, each copy opened once. | 3, sign-off | — |
-| 6 | **Release**, LOOM first: packaging, version, clean-profile first run, Roland without ROMs. | — | `src/SCUMMexplorer.App` |
+| 1 | **A clean slate per game.** Everything that belongs to the open game (sessions, planners, caches, overlays, cues: about 150 window fields reset one by one today) moves into one `GameContext` object that opening a game replaces. The static caches keyed by folder take `GameLibrary.Key`. | Opening Indy 3, LOOM, then Maniac Mansion in one window (WindowCheck `G:`) shows nothing of the earlier games; no per-game field is left on `MainWindow`. | `MainWindow*.cs`, `OpenGameFolder` |
+| 2 | **Scenes judged by what they show.** `Measure` checks the picture at the end of each scene: an actor whose costume no script of the run set, an actor outside every walk box, an actor that moves on its first frame, a scene with no change in 50 frames. Reported per game in percent; listed in Advanced. | The suspects of LOOM, Maniac Mansion and Indy 3 are listed; the sheep and the Grail knight's head are on the list or explained. | `.verification/scene-setup-20261031/Measure`, `ScummCutsceneRun` |
+| 3 | **Fix or hide the suspects.** A suspect with a shared cause gets a generic fix; the picture checks then count against a setup's score (today: begun, rooms, lines). A scene that still shows nothing or shows wrong leaves the Normal list (R-1.13) and stays in Advanced, labelled. No new setup kinds for single scenes. | No suspect is offered in Normal mode in the three games. | `ScummSceneSetupSearch`, `ScummCutscenePlanner` |
+| 4 | **The user's check, one game at a time**: Maniac Mansion (ready since 8 November), then Indy 3 (every scene played in the window first, as Maniac's `run-all.sh`), then LOOM. Reports are fixed by shared cause. | "Your checks" below are filled for the three games. | — |
+| 5 | **Release, LOOM first**: packaging, version, clean-profile first run, Roland without ROMs, each LOOM copy opened once. LOOM English ships with its reviewed catalog. | A zip the user has run on a clean profile. | `src/SCUMMexplorer.App` |
+| 6 | **The other games to the same bar** (Monkey Island 1 and 2, Indy 4, Zak McKracken): steps 2 to 4 for each, then they join the release. | Per game, as step 4. | — |
 
-Optional, when the code is next touched: a ScummVM picture capture, splitting `MainWindow.xaml.cs`, profile allow-lists as defaults, worktree housekeeping.
+After the release, or when the code is next touched:
+
+- **Generic code out of `Core/Loom`**: Readable scripts, names, Game Texts and the usage index serve every game but live under LOOM names (`LoomScriptPresenter`, `LoomGlossary`, `LoomTextExtractor`, `LoomUsageIndex`). Move the game-free halves to `Core/Scumm` before adding names for the other games (variables and bits from their script maps; [record](../.verification/readable-names-20261031/README.md)).
+- **LOOM English on the shared scene engine** (user, 31 October; after the other games, 8 November). The audit's advice: keep the 328 reviewed replays as shipped data and as the engine's answer key (238 of 238 begin, 222 within 10% of the length; [record](../.verification/loom-answer-key-20261031/README.md)); replace an entry only where picture and length match; not a release condition. The named sequences (the Elders' trial, the firewood scene, Walk to Room 13, Room 46) stay reviewed data in any case.
+- **Scene order** (user, 2 November; paused 8 November for the user's check): a picked scene gets the state of the scenes before it. 160 of 1,413 scenes (11.3%) carry it ([record](../.verification/scene-order-20261108/README.md)). Not reached: rooms with a way in that needs nothing, rooms whose variable is set elsewhere (Zak McKracken's travel, Indy 4's Atlantis).
+- **Interaction outcomes by state** (user, 1 November): list each verb's outcomes with their conditions in Advanced; today one outcome is played.
+- **Scenes started at their cutscene**, the remainder read and left as one-offs on 7 November ([record](../.verification/user-reports-20261107/README.md)): Indy 4 Room 44's local script 203 (a bit, then the hero's walk box and x), Room 88's refusals listed as scenes, Room 65's closet; Monkey Island 2 Room 93's light switch and Room 19's key. Step 3 hides those that show nothing; no further setup kinds for them.
+- Splitting `MainWindow.xaml.cs` (step 1 is its first cut), a ScummVM picture capture, profile allow-lists as defaults, pruning `.verification` run files (each game's last two runs), worktree housekeeping.
 
 ## Open
 
 ### All games
 - **User-reported, not yet reproduced:** thin black rooms (game and room not named); a crash (the crash log in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` records the next one).
-- Scenes started directly at their cutscene that show nothing (work item 1; [record](../.verification/scene-setup-20261031/README.md)).
+- Scenes started directly at their cutscene that show nothing (step 3; [record](../.verification/scene-setup-20261031/README.md)).
 - Browsed games' object note and status text vary between runs of the same build.
 - Static previews such as MI2's campfire: a hint is needed (decision 2 below).
 - Depth masks and stored object images of the non-LOOM games (R-6.16) not compared with ScummVM.
 
 ### LOOM EGA English (reference)
 - Your checks: Room 2 skipped cutscene leaving Bobbin small (not reproduced); Rooms 15/18/20 staff notes; Room 34 standalone fortress reveal (local 200 +0035).
-- Shaping's canonical label, reverse draft names and story roles: settle or accept as labelled. Release (work item 6).
+- Shaping's canonical label, reverse draft names and story roles: settle or accept as labelled. Release (step 5).
 
 ### LOOM EGA other editions, demos, LOOM CD
 - Each copy opened once in the window (Italian accents, plain English, French, German, v1.2, both demos).
 - CD: the scene categories against ScummVM (19 of 98 scenes called dialogue); your picture/voice/music timing run.
 
 ### Indiana Jones 3 (EGA and 256 colours)
-- 2 scenes started at their cutscene show nothing (work item 1).
+- 2 scenes started at their cutscene show nothing (step 3).
 - Rooms 47, 60, 66 start dark (live since 6 November): compare with the game. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
 ### Monkey Island 1 (floppy and CD)
-- 2 (floppy) and 2 (CD) scenes started at their cutscene show nothing (work item 1).
+- 2 (floppy) and 2 (CD) scenes started at their cutscene show nothing (step 3).
 - `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
 - Spanish eight-disk copy and the CD's five languages in the window (passed S9 headless only).
 
 ### Monkey Island 2
-- 1 scene started at its cutscene shows nothing (work item 1).
+- 1 scene started at its cutscene shows nothing (step 3).
 - Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates.
 
 ### Indiana Jones 4
-- 3 scenes started at their cutscene show nothing (work item 1).
+- 3 scenes started at their cutscene show nothing (step 3).
 - After Play Game Intro: Indy walking very fast (user report, not reproduced).
 - Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
-Separate track ([handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md)); the 31 October scope applies once the user tells that track.
+The separate track ended on 23 October ([its last handoff](archive/NEXT_SESSION_PROMPT_MANIAC_ZAK_2026-10-23.md)); these games follow this roadmap.
 - Scenes started at their cutscene (Maniac 5 of 42: Room 4's keypad door, Room 10's door, the wires, Room 30's ending, Room 01's departure; Zak 12 of 79 and 13 of 82; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold). Maniac Mansion's 39 scenes were all played in the window on 8 November ([record](../.verification/maniac-ready-20261108/README.md)); a pick there needs a room opened first (the assumed party). Cutscene definition (9 November, R-8.10, [record](../.verification/cutscene-definition-20261109/README.md)): next, make every listed cutscene of LOOM, Maniac Mansion and Indy 3 play the game's own way (left, each its own case: Maniac Mansion 5, the wires waiting about 4 minutes, the keypad waiting for the code, Room 10's chain through Room 7, the Room 30 ending, Room 01's departure; Indy 3 the mallet, which needs a second walk, plus 3 arrivals by design; LOOM 2). Open from the user's 8 November reports: which ending left rooms with nothing to do (Room 30's and the Edsel's do not); an option to show an object change off-screen (Room 4's brick opens a door out of view for three seconds).
 - Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours.
 

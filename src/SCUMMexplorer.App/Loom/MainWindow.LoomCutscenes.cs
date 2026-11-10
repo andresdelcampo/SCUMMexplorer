@@ -84,6 +84,8 @@ public partial class MainWindow
             w._replayCatalog = LoomReplayCatalog.Load(game);
             if (game.Id == GameId.Loom) _ = w.NameStoryBitsAsync(game, w._names.Glossary, w._replayCatalog.Replays);
             w._setupPlanner = null;
+            // Derived from the planner's game: another LOOM copy derives its own (10 November 2026 audit; the cache was never emptied).
+            w._startSetups.Clear();
             w._readiness = null;
         }
 
