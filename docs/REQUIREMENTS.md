@@ -15,7 +15,7 @@ What the app must do: the rules the user decided, one or two sentences each. Ids
 | R-1.5 | APP | **Objects respond as in the game, with the hero on screen.** LOOM: one click walks Bobbin to the object and uses it, a double click also looks at it. A verb game is played through its own verbs. Cycling an object's stored images belongs to the inspection mode only. No hidden modifier gestures. An object may be hidden only if the background behind it has no gap. |
 | R-1.6 | APP | Room hotspots navigate between rooms. |
 | R-1.7 | APP | Rooms begin in their earliest state; the session carries the changes of real scenes and of the user's Game Status edits. A scene adds only what it needs and keeps later state. Restart returns to the boot. |
-| R-1.8 | APP | **Game Status is an admin editor under the user's control**: it may grant items, abilities and story state without earning them. The app never edits state silently as a shortcut. |
+| R-1.8 | APP | **Game Status is an admin editor under the user's control**: it may grant items, abilities and story state without earning them. |
 | R-1.9 | SCUMM | **No room-specific engine or renderer hacks; no invented state in a first visit or in Play.** Exception (31 Oct): a scene or interaction the user picks may get what its own code tests (actors placed and dressed, items, flags, object states), derived generically from its scripts, only on the pick, listed in Advanced. |
 | R-1.11 | APP | **Estimates never change gameplay.** An assumption (a click point, a random pick) is labelled and does not alter state; a picked scene's setup is the one exception and labels the values it had to choose. |
 | R-1.2 | APP | Game data is never shipped or committed. |
@@ -130,6 +130,7 @@ The matrix is generated from `GameSupport.Families` (`Core/Domain/GameSupport.cs
 | R-8.40, R-8.41 | SCUMM | The scan lists a room's entry, each object verb, the arrival scene a loading script starts, and the scene started on leaving a room. |
 | R-8.9, R-8.20 | LOOM EGA ref | The English catalog's 328 reviewed replays stand as data. Its late-room starts (Room 46) run their reviewed real prerequisites only when that state is missing. |
 | R-8.30, R-8.31 | LOOM | A launched scene's state is derived from the edition's own scripts, and should show the same lines, actors, camera and rooms as the scene reached by playing (a target). |
+| R-8.42 | SCUMM | **Which scenes are worked on** (11 Nov). A scene that plays but looks wrong is fixed through its cause, shared with other scenes and games; no setup rule is added for a single scene. An entry that is not a scene (a refusal, blank prints) leaves the lists. A scene the user names as one that matters may get a **reviewed start**: hand-checked data for that copy (its fingerprint), as LOOM's Room 46; it is data, never engine code, and Advanced says so. A scene that still shows nothing or shows wrong is not offered in Normal mode (R-1.13) and stays in Advanced, labelled. |
 
 ## 8. Game Status
 

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 11 November: which scenes get fixed
+
+Decided with the user after the audit: scenes that play but look wrong are fixed by shared cause; the last scenes that show nothing are not chased with new setup kinds; entries that are not scenes leave the lists; a scene that matters may get a hand-reviewed start as data; the rest leave Normal mode (REQUIREMENTS R-8.42). The roadmap's way to a release has seven steps for it.
+
 ## 10 November: REQUIREMENTS is the rules, short
 
 REQUIREMENTS.md went from 191,000 characters to 18,700: the user's rules, one or two sentences each, with the ids the code cites, grouped by what the app shows (rooms, room controls, Interact, cutscenes, Game Status, sound). The full document as it stood (exact captions, implementation names, the 106 rows describing the code, the 17 Play proposals) is frozen as [REQUIREMENTS_DETAIL_2026-11-10.md](REQUIREMENTS_DETAIL_2026-11-10.md), not maintained. The generated support matrix stays in REQUIREMENTS.md.
