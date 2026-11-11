@@ -20,6 +20,12 @@ public sealed record ScummActorSnapshot(int Number, int? Room, int? X, int? Y, i
 
     /// <summary>ScummVM <c>_forceClip</c>: the z-plane <c>actorOps alwaysZClip</c> forces (0: none; <c>neverZClip</c> and ignore/follow boxes clear it).</summary>
     public int ForceClip { get; init; }
+
+    /// <summary>How many times a script set this actor's costume since the session began (for the picture checks: a costume no script of a run set).</summary>
+    public int CostumeSets { get; init; }
+
+    /// <summary>The room shown when the costume was last set by a script (null: never, or unknown).</summary>
+    public int? CostumeRoom { get; init; }
 }
 
 /// <summary>
@@ -247,6 +253,8 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         var actor = _actors[number];
         actor.CostumeNeedsInit = true;
         actor.Costume = costume;
+        actor.CostumeSets++;
+        actor.CostumeRoom = place.CurrentRoom;
         actor.Animation.Reset();
         actor.LookEstimate = costume is null ? "its costume is unknown" : null;
         // Actor::setActorCostume (ScummVM actor.cpp, read 18 October 2026):
@@ -1051,6 +1059,8 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public int WalkSpeedY { get; set; } = 2;
         // ScummVM _moving and _walkdata (Actor_v3): destination, boxes, the current leg and its step counters.
         public int Moving { get; set; }
+        public int CostumeSets { get; set; }
+        public int? CostumeRoom { get; set; }
         public int DestX { get; set; }
         public int DestY { get; set; }
         public int DestDir { get; set; }
@@ -1104,6 +1114,8 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
             {
                 Moving = Moving,
                 ForceClip = ForceClip,
+                CostumeSets = CostumeSets,
+                CostumeRoom = CostumeRoom,
                 Look = new ScummActorLook(Costume, Elevation, Facing, Frame, InitFrame, WalkFrame, StandFrame,
                     TalkStartFrame, TalkStopFrame, WalkSpeedX, WalkSpeedY, Palette.ToArray(), Animation.Clone(), LookEstimate)
                 { PaletteEstimate = PaletteEstimate, Scale = Scale }

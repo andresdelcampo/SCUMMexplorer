@@ -9,6 +9,14 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 11 November: scenes judged by what they show (roadmap step 2)
+
+Every planned scene is played once more as its plan plays it, watched by four picture checks (`ScummScenePictureCheck`): an actor in another room's costume, an actor far from every walk box, an actor moving on its first frame, a scene whose first 50 frames change nothing. What they find is kept with the plan, shown in the scene's Advanced note and counted by `Measure`. Suspects, of the scenes that begin: Indy 3 14 of 159 (8.8%, both copies), LOOM English 3 of 192 (1.6%), Maniac Mansion 0 of 45 and 0 of 43 (0.0%); 31 of 598 in all (5.2%). The plans are unchanged. [Record](../../.verification/picture-checks-20261110/README.md).
+
+## 10 November: a clean slate per game (roadmap step 1)
+
+187 of `MainWindow`'s fields (play, LOOM's session, the room view) moved into one `GameContext` object that `OpenGameFolder` replaces; the static caches keyed by folder take `GameLibrary.Key`. Indy 3, LOOM and Maniac Mansion opened in one window, and the nine-game module check, give the same results before and after. [Record](../../.verification/game-context-20261110/README.md).
+
 ## 11 November: which scenes get fixed
 
 Decided with the user after the audit: scenes that play but look wrong are fixed by shared cause; the last scenes that show nothing are not chased with new setup kinds; entries that are not scenes leave the lists; a scene that matters may get a hand-reviewed start as data; the rest leave Normal mode (REQUIREMENTS R-8.42). The roadmap's way to a release has seven steps for it.

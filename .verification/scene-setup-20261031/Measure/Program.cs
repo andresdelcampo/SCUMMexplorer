@@ -11,11 +11,16 @@ int? onlyRoom = args.Length > 2 ? int.Parse(args[2]) : null;
 var clock = Stopwatch.StartNew();
 // Maniac Mansion starts its scenes after the reviewed party selection, as the app does (ManiacCutsceneSetup, 1 November 2026).
 var maniac = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced;
-var planner = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game) : new ScummCutscenePlanner(game);
+// LOOM EGA runs on its own session, as the app's shared planner does for it (MainWindow.NewLoomScenePlanner; 10 November 2026: the picture checks).
+var loomSnapshot = game.Id == GameId.Loom ? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")) : null;
+var planner = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.Planner(game)
+    : loomSnapshot is not null ? new ScummCutscenePlanner(game, () => new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, loomSnapshot))
+    : new ScummCutscenePlanner(game);
 Func<ScummSession> newRun = () =>
 {
     // As the planner's runs start: Maniac's party start, then into control when the boot ends inside a cutscene.
-    ScummSession session = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.NewSession(game) : ScummGameSession.BootForPlay(game, out _);
+    ScummSession session = maniac ? SCUMMexplorer.Core.Maniac.ManiacCutsceneSetup.NewSession(game)
+        : loomSnapshot is not null ? new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, loomSnapshot) : ScummGameSession.BootForPlay(game, out _);
     ScummCutscenePlanner.IntoControl(session);
     return session;
 };
@@ -268,3 +273,30 @@ foreach (var g in planner.Groups.Where(g => onlyRoom is not int only || g.First.
 var listed = planner.Groups.Where(g => onlyRoom is not int only || g.First.Room == only).Take(limit).ToList();
 Console.WriteLine($"cutscenes {kinds} of {listed.Count}; old rule Scenes {listed.Count(g => !g.First.Widened && g.IsScene)} of {listed.Count(g => !g.First.Widened)} (widened candidates {listed.Count(g => g.First.Widened)}, of them cutscenes {listed.Count(g => g.First.Widened && planner.IsScene(g))})");
 Console.WriteLine($"fresh start begins {fresh}; setup begins {setup}; still nothing {still}; {clock.Elapsed.TotalSeconds:F0} s");
+// 10 November 2026 (audit, roadmap step 2): the picture checks. The planner plays every scene that begins once more as its plan plays it, watched by
+// ScummScenePictureCheck, and keeps what it found with the plan (what Advanced shows); a scene with a finding is a suspect (a list for a person to
+// look at, not a list of faults). MEASURE_PICTURE=0 leaves the list out.
+if (Environment.GetEnvironmentVariable("MEASURE_PICTURE") != "0")
+{
+    int watched = 0, suspects = 0;
+    var byKind = new SortedDictionary<ScummPictureSuspectKind, int>();
+    foreach (var g in listed)
+    {
+        var t = g.First;
+        var plan = planner.PlanSetup(t);
+        if (!plan.Result.Begun) continue;
+        var seen = plan.Result;
+        watched++;
+        var found = seen.Picture ?? [];
+        if (found.Count == 0) continue;
+        suspects++;
+        foreach (var kind in found.Select(f => f.Kind).Distinct()) byKind[kind] = byKind.GetValueOrDefault(kind) + 1;
+        Console.WriteLine($"PICTURE Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} ({t.ObjectName}) way {plan.Result.Way}" +
+                          $"{(plan.HasEdits ? " setup: " + string.Join("; ", plan.Edits.Select(e => e.Describe())) : "")}; ends in Room {string.Join(",", seen.RoomsEntered.DefaultIfEmpty(t.Room).TakeLast(1))}, lines {seen.Lines}, frames {seen.Frames}");
+        foreach (var f in found) Console.WriteLine($"      {f.Describe()}");
+    }
+    string Percent(int count) => watched == 0 ? "-" : $"{100.0 * count / watched:F1}%";
+    Console.WriteLine($"picture: {suspects} of {watched} scenes that begin are suspects ({Percent(suspects)})");
+    foreach (var kind in Enum.GetValues<ScummPictureSuspectKind>())
+        Console.WriteLine($"picture: {kind} {byKind.GetValueOrDefault(kind)} ({Percent(byKind.GetValueOrDefault(kind))})");
+}

@@ -120,6 +120,9 @@ public abstract partial class ScummSession
     /// <summary>What the watched scripts changed on screen (a room load, an animation).</summary>
     public ScummSceneActivity SceneActivity { get; private set; } = new();
 
+    /// <summary>The actor the player controls (the ego variable), or null while no script has set it.</summary>
+    public int? HeroNumber => _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var ego) ? ego : null;
+
     /// <summary>An actor operand that names the hero: the ego variable, or a number equal to the ego's.</summary>
     private bool IsHeroOperand(string operand) =>
         operand == (_runtime.IsV2 ? ScummVars.V2.Ego : ScummVars.Ego) ||

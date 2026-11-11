@@ -174,7 +174,7 @@ public partial class MainWindow
         return $"Found in the game's scripts: {first.Room:00} · {(first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}")} " +
                $"reaches {string.Join(", ", first.Scripts)} (a cutscene ... endCutscene span of {first.SpanInstructions} instructions, {first.Texts} printed line(s), {first.RoomLoads} room load(s)). " +
                "A branch can keep part of it from running, so the lines and loads are possible, not certain." + others + " " +
-               planner.StartNote(first) + " " +
+               planner.StartNote(first) + " " + (planner.PictureNote(first) is { Length: > 0 } picture ? picture + " " : "") +
                "Stated start: the running play session (its state is kept), the room entered as a state preview when the session is elsewhere (the hero's arrival is assumed), " +
                (first.IsRoomEntry ? "then the room's entry scripts played again. " :
                    $"then the object's verb 0x{first.VerbId:X2} given to the game's sentence script with the hero put at the object (or run directly where the game refuses it): an exploration action, not the game's click. ") +

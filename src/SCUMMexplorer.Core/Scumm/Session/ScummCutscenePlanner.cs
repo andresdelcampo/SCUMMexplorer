@@ -78,6 +78,26 @@ public sealed class ScummCutscenePlanner
     /// </summary>
     public ScummScenePlan PlanSetup(ScummCutscene trigger)
     {
+        var plan = PlanStart(trigger);
+        if (plan.Result.Picture is not null || !plan.Result.Begun) return plan;
+        // Roadmap step 2 (10 November 2026 audit): the scene is played once more as its plan plays it, watched by the picture checks; what they
+        // find is kept with the plan (and saved with it), for Advanced and for the measurement.
+        var check = new ScummScenePictureCheck(ScummScenePictureCheck.ActorsWithManyCostumes(_game));
+        var start = plan.Result.Verb is int verb ? trigger with { VerbId = verb } : trigger;
+        var watched = _pool is null ? ScummCutsceneRun.Run(_game, _newSession, start, plan.Edits, plan.Result.Way, check)
+            : _pool.Use(boot => ScummCutsceneRun.Run(_game, boot, start, plan.Edits, plan.Result.Way, check));
+        // A watched run that does not begin is not the plan's scene: nothing is said about its picture.
+        return _lastResort[Key(trigger)] = plan with { Result = plan.Result with { Picture = watched.Begun ? watched.Picture ?? [] : [] } };
+    }
+
+    /// <summary>What the picture checks found for a planned scene, as a sentence for Advanced; empty while unknown or when they found nothing.</summary>
+    public string PictureNote(ScummCutscene trigger) =>
+        _lastResort.TryGetValue(Key(trigger), out var plan) && plan.Result.Picture is { Count: > 0 } found
+            ? "Picture check (an estimate; a suspect to look at, not a fault): " + string.Join("; ", found.Select(f => f.Describe())) + "."
+            : "";
+
+    private ScummScenePlan PlanStart(ScummCutscene trigger)
+    {
         var fresh = Run(trigger);
         // A scene a fresh start begins still gets the state of its place in the story (scene order, ROADMAP 3c), when kept.
         if (fresh.Begun && fresh.Lines > 0) return _lastResort.GetOrAdd(Key(trigger), _ => Setup.Place(trigger, fresh));

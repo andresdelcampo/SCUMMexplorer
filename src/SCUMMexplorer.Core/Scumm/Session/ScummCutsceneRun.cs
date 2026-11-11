@@ -44,6 +44,9 @@ public sealed record ScummCutsceneRunResult(bool Begun, IReadOnlyList<int> Rooms
     /// </summary>
     public bool IsCutscene => Begun && (ChangesRoom || RoomsEntered.Count > 0 || Animation is not null);
 
+    /// <summary>What the picture checks found at the end of the run (<see cref="ScummScenePictureCheck"/>); null when the run was not watched.</summary>
+    public IReadOnlyList<ScummPictureSuspect>? Picture { get; init; }
+
     /// <summary>Beginning at all outweighs everything; then the rooms the scene went on to and the lines it printed (as LOOM's <c>LoomSceneOutcome</c>).</summary>
     public int Score => (Begun ? 10000 : 0) + RoomsEntered.Count * 20 + Lines;
 }
@@ -144,7 +147,7 @@ public static class ScummCutsceneRun
     }
 
     public static ScummCutsceneRunResult Run(GameLibrary game, Func<ScummSession> newSession, ScummCutscene trigger,
-        IReadOnlyList<ScummSetupEdit>? setup = null, ScummPickedStart way = ScummPickedStart.Game)
+        IReadOnlyList<ScummSetupEdit>? setup = null, ScummPickedStart way = ScummPickedStart.Game, ScummScenePictureCheck? picture = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(newSession);
@@ -152,6 +155,7 @@ public static class ScummCutsceneRun
         try
         {
             var session = newSession();
+            picture?.RunStarts(session);
             session.DressHeroForScene(trigger);
             if (setup is { Count: > 0 }) session.ApplySceneSetup(setup);
             if (game.Rooms.FirstOrDefault(r => r.ResourceId == trigger.Room) is not { } room) return new(false, [], 0, $"Room {trigger.Room} is not in the game's index");
@@ -159,6 +163,7 @@ public static class ScummCutsceneRun
             var traced = session.SessionTrace.Count;
             var mark = session.RoomsEntered.Count;
             var logMark = session.Messages.Log.Count;
+            picture?.SceneStarts(session);
             // An entry trigger in the room the boot ends in plays that room's entry again (its first run was inside the boot's own cutscene).
             // A verb that plays only in another room is used there, the object held (ScummSetupKind.PlayedIn).
             var playIn = !trigger.IsRoomEntry && way != ScummPickedStart.AtCutscene && ScummSetupEdit.PlayRoom(setup) is int other &&
@@ -184,6 +189,7 @@ public static class ScummCutsceneRun
                 earlier = session.CutscenesBegun;
                 traced = session.SessionTrace.Count;
                 logMark = session.Messages.Log.Count;
+                picture?.SceneStarts(session);
                 session.WatchScene(Watched, trigger.ObjectId);
                 if (ScummSceneSetupSearch.FirstCutscene(game, trigger) is not { } at || !session.StartSceneAt(at.Label, at.Offset, at.Arguments))
                     return new(false, [], 0, "no cutscene the session can start in this room", Way: way);
@@ -197,6 +203,7 @@ public static class ScummCutsceneRun
                 earlier = session.CutscenesBegun;
                 traced = session.SessionTrace.Count;
                 logMark = session.Messages.Log.Count;
+                picture?.SceneStarts(session);
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
                 var second = ScummSetupEdit.SecondOf(setup);
                 session.WatchScene(Watched, trigger.ObjectId);
@@ -240,11 +247,12 @@ public static class ScummCutsceneRun
                 if (quiet >= quietNeeded) break;
                 if (!begun && frame >= TrialFrames + wait) break;
                 session.StepFrame();
+                picture?.Frame(session);
             }
             session.WatchScript = null;
             return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way,
                 ChangesRoom: session.SceneActivity.ChangesRoom, Animation: session.SceneActivity.Animation, ChangesView: session.SceneActivity.ChangesView,
-                Animations: session.SceneActivity.Animations.ToArray());
+                Animations: session.SceneActivity.Animations.ToArray()) { Picture = picture?.Finish(session) };
         }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NotSupportedException)
         {

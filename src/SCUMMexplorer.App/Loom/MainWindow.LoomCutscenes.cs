@@ -451,8 +451,9 @@ public partial class MainWindow
         if (_ctx.LoomScenePlanner is not { IsValueCreated: true } lazy || !lazy.Value.IsDerived(SharedTrigger(lazy.Value, trigger)))
             return "How it starts is still being worked out (open the list again in a few seconds). ";
         var plan = lazy.Value.PlanSetup(SharedTrigger(lazy.Value, trigger));
-        return plan.Result.Way == ScummPickedStart.AtCutscene ? "Its own code does not begin from here, so its cutscene is started directly. " + plan.Note + " "
-            : plan.Note.Length == 0 ? "A fresh start begins its cutscene (checked by a headless run). " : plan.Note + " ";
+        var picture = lazy.Value.PictureNote(SharedTrigger(lazy.Value, trigger)) is { Length: > 0 } found ? found + " " : "";
+        return (plan.Result.Way == ScummPickedStart.AtCutscene ? "Its own code does not begin from here, so its cutscene is started directly. " + plan.Note + " "
+            : plan.Note.Length == 0 ? "A fresh start begins its cutscene (checked by a headless run). " : plan.Note + " ") + picture;
     }
 
     /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="ScummCutsceneIndex"/>).</summary>
