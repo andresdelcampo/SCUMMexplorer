@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 11 November: the shared causes (roadmap step 3)
+
+Two causes, each fixed once for every game. The picture check took actors the game's own scripts dress and place (Indy 3's Marcus and Henry) for leftovers: now only an actor a scene's setup placed can be one. And the setup search kept the first value that begins a scene over the value that is the scene: it now tries each kept value's other values in its place and keeps one when the scene shows more, with one second object per sentence. Indy 3's Give Grail plays the ending (18 lines → 99, Room 94); 27 of 893 searched scenes changed over eleven copies (3.0%), every one shows more, none less; suspects 132 → 75 of 1,981 scenes (6.7% → 3.8%); in the three games Indy 3 8.8% → 1.3%, LOOM 1.6% → 0.5%, Maniac Mansion 0.0%. LOOM English's answer key is unchanged. [Record](../../.verification/picture-checks-20261110/README.md).
+
 ## 11 November: scenes judged by what they show (roadmap step 2)
 
 Every planned scene is played once more as its plan plays it, watched by four picture checks (`ScummScenePictureCheck`): an actor in another room's costume, an actor far from every walk box, an actor moving on its first frame, a scene whose first 50 frames change nothing. What they find is kept with the plan, shown in the scene's Advanced note and counted by `Measure`. Suspects, of the scenes that begin: Indy 3 14 of 159 (8.8%, both copies), LOOM English 3 of 192 (1.6%), Maniac Mansion 0 of 45 and 0 of 43 (0.0%); 31 of 598 in all (5.2%). The plans are unchanged. [Record](../../.verification/picture-checks-20261110/README.md).

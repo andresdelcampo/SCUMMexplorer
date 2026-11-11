@@ -8,8 +8,9 @@ public sealed record ScummPictureSuspect(ScummPictureSuspectKind Kind, int? Acto
 
 public enum ScummPictureSuspectKind
 {
-    /// <summary>An actor shown in the last room wears a costume no script set during the run, set while another room was shown, and the game dresses
-    /// that actor in several costumes (one actor number plays different characters): it kept another room's look.</summary>
+    /// <summary>An actor the scene's setup put in the last room (no script of the game did) wears a costume no script set during the run, set while
+    /// another room was shown, and the game dresses that actor in several costumes (one actor number plays different characters): it may have
+    /// kept another room's look. An actor a script placed is the game's own doing (Indy 3's boot dresses Marcus and puts him in Room 1).</summary>
     CostumeFromBefore,
     /// <summary>An actor shown in the last room stands more than <see cref="ScummScenePictureCheck.BoxTolerance"/> pixels from every walk box of it,
     /// although it follows the boxes (it was put there, not walked).</summary>
@@ -145,7 +146,7 @@ public sealed class ScummScenePictureCheck
         foreach (var actor in session.Actors.Where(actor => Shown(actor, session.CurrentRoomId)).OrderBy(actor => actor.Number))
         {
             // The hero keeps his look from room to room; every other actor shown was dressed by the room or the scene, or it is a leftover.
-            if (actor.Number != hero && actor.CostumeSets == _costumeSetsAtStart.GetValueOrDefault(actor.Number) && actor.CostumeRoom != session.CurrentRoomId &&
+            if (actor.Number != hero && actor.RoomBySetup && actor.CostumeSets == _costumeSetsAtStart.GetValueOrDefault(actor.Number) && actor.CostumeRoom != session.CurrentRoomId &&
                 (_manyCostumes is null || _manyCostumes.Contains(actor.Number)))
                 found.Add(new(ScummPictureSuspectKind.CostumeFromBefore, actor.Number,
                     $"wears costume {actor.Look.Costume}, set before the run {(actor.CostumeRoom is int set ? $"in Room {set}" : "by no script")}, at ({actor.X},{actor.Y})"));

@@ -99,7 +99,9 @@ public sealed partial class ScummSceneSetupSearch
         var candidates = ranked.Select(r => r.Edit).Take(MaxCandidates).ToList();
         var best = fresh;
         var kept = new List<ScummSetupEdit>();
-        static bool Same(ScummSetupEdit a, ScummSetupEdit b) => a.Kind == b.Kind && a.Target == b.Target;
+        // One value per target; a sentence has one second thing, whichever object or actor it is (its number is the edit's target).
+        static bool Second(ScummSetupEdit e) => e.Kind is ScummSetupKind.SecondObject or ScummSetupKind.SecondActor;
+        static bool Same(ScummSetupEdit a, ScummSetupEdit b) => a.Kind == b.Kind && a.Target == b.Target || Second(a) && Second(b);
         for (var pass = 0; pass < 2; pass++)
         {
             var changed = false;
@@ -115,6 +117,18 @@ public sealed partial class ScummSceneSetupSearch
             }
             if (!changed) break;
         }
+        // Once the scene begins, each kept value's other values are tried in its place (roadmap step 3, 11 November 2026): the first value that
+        // begins a scene may be a side branch, and another the scene itself (Indy 3 Room 82, Give Grail: object 3 begins a six-line refusal, object
+        // 10 the ending, 96 lines and Room 94). Done after the passes, on what they kept, so the result never shows less than theirs.
+        if (best.Begun)
+            foreach (var candidate in candidates)
+            {
+                if (kept.Contains(candidate) || !kept.Any(k => Same(k, candidate))) continue;
+                var trial = kept.Select(k => Same(k, candidate) ? candidate : k).ToList();
+                var result = _run(trigger, trial);
+                if (result.Failure is not null || result.Score <= best.Score) continue;
+                best = result; kept = trial;
+            }
         // A scene that needs several values at once begins with none of them alone (Indy 4: a state and an item together): when it still does not
         // begin, all candidates are tried together, one value per target (the first found), as a last try before its cutscene is started directly.
         // First the values on the scene's side of every test that guards the way to its cutscene (Indy 4 Room 44: the room's variable and the

@@ -26,6 +26,9 @@ public sealed record ScummActorSnapshot(int Number, int? Room, int? X, int? Y, i
 
     /// <summary>The room shown when the costume was last set by a script (null: never, or unknown).</summary>
     public int? CostumeRoom { get; init; }
+
+    /// <summary>The actor's room was last set by a picked scene's setup, not by a script of the game.</summary>
+    public bool RoomBySetup { get; init; }
 }
 
 /// <summary>
@@ -172,6 +175,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         var actor = _actors[number];
         actor.X = x;
         actor.Y = y;
+        if (actor.Room != room) actor.RoomBySetup = PlacingForSetup;
         actor.Room = room;
         actor.Estimate = null;
         if (ego == number)
@@ -238,6 +242,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
             Put(number, 0, 0, 0, place, ego);
             return;
         }
+        if (_actors[number].Room != room) _actors[number].RoomBySetup = PlacingForSetup;
         _actors[number].Room = room;
         if (room is null) _actors[number].Unknown ??= "its room is unknown";
     }
@@ -247,6 +252,9 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
     /// costume needs its init frame. A visible actor is hidden and shown again, which re-adjusts its position
     /// into the walk boxes and starts the init frame (<c>showActor</c>). A null costume is unknown.
     /// </summary>
+    /// <summary>True while a picked scene's setup places actors (<see cref="ScummActorSnapshot.RoomBySetup"/>).</summary>
+    public bool PlacingForSetup { get; set; }
+
     public void CostumeChanged(int number, int? costume, Placement place)
     {
         Notify(number);
@@ -1061,6 +1069,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public int Moving { get; set; }
         public int CostumeSets { get; set; }
         public int? CostumeRoom { get; set; }
+        public bool RoomBySetup { get; set; }
         public int DestX { get; set; }
         public int DestY { get; set; }
         public int DestDir { get; set; }
@@ -1116,6 +1125,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
                 ForceClip = ForceClip,
                 CostumeSets = CostumeSets,
                 CostumeRoom = CostumeRoom,
+                RoomBySetup = RoomBySetup,
                 Look = new ScummActorLook(Costume, Elevation, Facing, Frame, InitFrame, WalkFrame, StandFrame,
                     TalkStartFrame, TalkStopFrame, WalkSpeedX, WalkSpeedY, Palette.ToArray(), Animation.Clone(), LookEstimate)
                 { PaletteEstimate = PaletteEstimate, Scale = Scale }

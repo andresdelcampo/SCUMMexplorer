@@ -125,8 +125,13 @@ public abstract partial class ScummSession
     {
         ArgumentNullException.ThrowIfNull(edits);
         var applied = new List<ScummSetupEdit>();
-        foreach (var edit in edits)
-            if (ApplySetupEdit(edit)) applied.Add(edit);
+        _runtime.Actors.PlacingForSetup = true;
+        try
+        {
+            foreach (var edit in edits)
+                if (ApplySetupEdit(edit)) applied.Add(edit);
+        }
+        finally { _runtime.Actors.PlacingForSetup = false; }
         if (applied.Count > 0) _uncertainties.Add("A picked scene's setup set " + string.Join("; ", applied.Select(edit => edit.Describe())) +
                                                   ": the game sets these in earlier scenes that were not played (REQUIREMENTS §8.6).");
         return applied;
