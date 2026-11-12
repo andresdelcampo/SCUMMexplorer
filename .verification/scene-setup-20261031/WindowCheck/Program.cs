@@ -110,7 +110,7 @@ internal static class Program
                     if (raw == "R")
                     {
                         var shownRoom = ((ScummSession?)Field("_play"))?.CurrentRoomId;
-                        foreach (var item in (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { shownRoom })!)
+                        foreach (var item in (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { shownRoom, null })!)
                             Log($"room {shownRoom} item {item!.GetType().GetField("Item1")!.GetValue(item)} \"{item.GetType().GetField("Item2")!.GetValue(item)!.GetType().GetProperty("Title")!.GetValue(item.GetType().GetField("Item2")!.GetValue(item))}\"");
                         Log($"room {shownRoom}: list done");
                         continue;
@@ -118,7 +118,7 @@ internal static class Program
                     // L lists the scene list's items (id and title), as the window offers them.
                     if (raw == "L")
                     {
-                        foreach (var item in (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null })!)
+                        foreach (var item in (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null, null })!)
                             Log($"item {item!.GetType().GetField("Item1")!.GetValue(item)} \"{item.GetType().GetField("Item2")!.GetValue(item)!.GetType().GetProperty("Title")!.GetValue(item.GetType().GetField("Item2")!.GetValue(item))}\"");
                         continue;
                     }
@@ -467,7 +467,7 @@ internal static class Program
                         continue;
                     }
                     var spec = raw;
-                    var items = (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null })!;
+                    var items = (System.Collections.IList)Call("PlayCutsceneItems", new object?[] { null, null })!;
                     // LOOM's list: PlayableCutsceneItems, ids cd-room-object-verb.
                     if (items.Count == 0) items = (System.Collections.IList)Call("PlayableCutsceneItems", new object?[] { null })!;
                     object? picked = null;

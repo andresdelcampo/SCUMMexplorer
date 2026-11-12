@@ -142,10 +142,31 @@ if (Environment.GetEnvironmentVariable("MEASURE_LINES") is { Length: > 0 } lines
     var t = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(c => c.Room == int.Parse(q[0]) && c.ObjectId == int.Parse(q[1]) && c.VerbId == Convert.ToInt32(q[2], 16));
     var plan = planner.PlanSetup(t);
     ScummSession? last = null;
-    var seen = ScummCutsceneRun.Run(game, () => last = newRun(), plan.Result.Verb is int v ? t with { VerbId = v } : t, plan.Edits, plan.Result.Way);
+    var bootLines = 0;
+    var seen = ScummCutsceneRun.Run(game, () => { last = newRun(); bootLines = last.Messages.Log.Count; return last; }, plan.Result.Verb is int v ? t with { VerbId = v } : t, plan.Edits, plan.Result.Way);
     Console.WriteLine($"way {seen.Way} begun {seen.Begun} lines {seen.Lines} rooms [{string.Join(",", seen.RoomsEntered)}] frames {seen.Frames}");
-    foreach (var group in last!.Messages.Log.GroupBy(m => (Text: string.Join(" / ", m.Lines), m.Kind, m.SourceLabel, m.Offset)).OrderByDescending(g => g.Count()).Take(15))
-        Console.WriteLine($"  {group.Count(),5} x {group.Key.Kind} [{group.Key.Text}] from {group.Key.SourceLabel} +0x{group.Key.Offset:X4}");
+    // After the boot, in the order printed; a text repeated in a row is shown once with its count.
+    var after = last!.Messages.Log.Skip(bootLines).Where(m => m.ShowsText).Select(m => (Text: string.Join(" / ", m.Lines).Trim(), m.SourceLabel, m.Offset)).ToList();
+    for (var i = 0; i < after.Count && i < 400;)
+    {
+        var j = i; while (j < after.Count && after[j] == after[i]) j++;
+        Console.WriteLine($"  {(j - i > 1 ? $"{j - i} x " : "")}[{after[i].Text}] from {after[i].SourceLabel} +0x{after[i].Offset:X4}");
+        i = j;
+    }
+    return;
+}
+// MEASURE_LIST=1: every entry with its title, kind, plan (way, lines, rooms, frames), whether Normal offers it, and its first printed text (12 November
+// 2026: finding the scenes the user named as ones that matter).
+if (Environment.GetEnvironmentVariable("MEASURE_LIST") == "1")
+{
+    foreach (var g in planner.Groups.Where(g => onlyRoom is not int only || g.First.Room == only))
+    {
+        var t = g.First;
+        var plan = planner.PlanSetup(t);
+        Console.WriteLine($"LIST {(planner.IsScene(g) ? "scene" : "react")} {(planner.NotOfferedReason(t) is { } why ? "HIDDEN" : "normal")} Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} " +
+                          $"[{ScummCutsceneTitles.Plain(t)}] way {(plan.Result.Begun ? plan.Result.Way.ToString() : "none")} lines {plan.Result.Lines} rooms [{string.Join(",", plan.Result.RoomsEntered)}] frames {plan.Result.Frames} " +
+                          $"edits {plan.Edits.Count} first \"{t.FirstText}\" scripts {string.Join(" | ", t.Scripts)}");
+    }
     return;
 }
 // MEASURE_GREP=text: every instruction of every script, entry, exit and object verb whose operation or operands contain the text (9 November 2026).

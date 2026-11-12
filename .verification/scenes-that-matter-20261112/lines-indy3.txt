@@ -1,0 +1,104 @@
+=== I3 39,586,0A
+way Game begun True lines 16 rooms [41,42,8] frames 6000
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 37,0,00
+way Game begun True lines 13 rooms [36,39] frames 606
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 36,0,53
+way AtCutscene begun True lines 12 rooms [8] frames 6000
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 35,522,0A
+way Game begun True lines 2 rooms [36] frames 4
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 13,164,08
+way Game begun True lines 0 rooms [] frames 99
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 61,749,08
+way Game begun True lines 0 rooms [] frames 58
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 6,0,00
+way Game begun True lines 29 rooms [9] frames 1347
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 77,847,04
+way Game begun True lines 1 rooms [35] frames 33
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 15,0,62
+way AtCutscene begun True lines 30 rooms [16] frames 1040
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 86,0,00
+way Game begun True lines 11 rooms [] frames 404
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 86,898,08
+way Game begun True lines 5 rooms [87,82,83] frames 300
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 91,926,09
+way Game begun True lines 7 rooms [] frames 224
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286
+=== I3 93,945,08
+way Game begun True lines 0 rooms [82] frames 59
+      1 x Drawn [TM &  1989 Lucasfilm Ltd.] from Room 79 local script 200 +0x0047
+      1 x Drawn [All Rights Reserved.] from Room 79 local script 200 +0x006E
+      1 x Talk [] from Script 118 +0x028C
+      1 x Drawn [BARNETT COLLEGE,] from Script 01 +0x0257
+      1 x Drawn [NEW YORK,] from Script 01 +0x0273
+      1 x Drawn [1938] from Script 01 +0x0286

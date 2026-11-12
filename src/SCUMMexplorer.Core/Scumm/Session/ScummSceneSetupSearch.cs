@@ -89,6 +89,13 @@ public sealed partial class ScummSceneSetupSearch
 
     private static (int, int, int) Key(ScummCutscene t) => (t.Room, t.ObjectId, t.VerbId);
 
+    /// <summary>
+    /// What a setup holds one value of: a target, and the sentence's one second object or actor (12 November 2026: Maniac Mansion's Pepsi was given to
+    /// actors 19, 8 and 14 at once when every candidate was tried together, and the scene began and showed nothing).
+    /// </summary>
+    private static (ScummSetupKind, string) OneValueKey(ScummSetupEdit edit) =>
+        edit.Kind is ScummSetupKind.SecondObject or ScummSetupKind.SecondActor ? (ScummSetupKind.SecondObject, "") : (edit.Kind, edit.Target);
+
     private ScummScenePlan Search(ScummCutscene trigger, ScummCutsceneRunResult fresh)
     {
         // A verb used in another room is a last try of its own (it moves the whole scene: Indy 4 Room 76's lamp also tests Room 77 on a later
@@ -133,7 +140,7 @@ public sealed partial class ScummSceneSetupSearch
         // begin, all candidates are tried together, one value per target (the first found), as a last try before its cutscene is started directly.
         // First the values on the scene's side of every test that guards the way to its cutscene (Indy 4 Room 44: the room's variable and the
         // objects its branch tests, together), then all.
-        var guards = ranked.Where(r => r.Rank == 0).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+        var guards = ranked.Where(r => r.Rank == 0).Select(r => r.Edit).GroupBy(OneValueKey).Select(g => g.First()).ToList();
         if (!best.Begun && guards.Count > 1)
         {
             var result = _run(trigger, guards);
@@ -142,7 +149,7 @@ public sealed partial class ScummSceneSetupSearch
         if (!best.Begun && candidates.Count > 1)
         {
             // Values known to lead away from the scene are left out.
-            var together = ranked.Take(MaxCandidates).Where(r => r.Rank != 2).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+            var together = ranked.Take(MaxCandidates).Where(r => r.Rank != 2).Select(r => r.Edit).GroupBy(OneValueKey).Select(g => g.First()).ToList();
             var result = _run(trigger, together);
             if (result.Failure is null && result.Begun) { best = result; kept = together; }
             // Then each target's other values swapped in, one at a time (Zak McKracken Room 27's tram: the token, object 451 on and pseudo room
@@ -210,7 +217,7 @@ public sealed partial class ScummSceneSetupSearch
     /// target (1 November 2026), for a start at the cutscene.
     /// </summary>
     public IReadOnlyList<ScummSetupEdit> GuardValues(ScummCutscene trigger) =>
-        Ranked(trigger).Where(r => r.Rank is 0 or 3 && r.Edit.Kind != ScummSetupKind.PlayedIn).Select(r => r.Edit).GroupBy(c => (c.Kind, c.Target)).Select(g => g.First()).ToList();
+        Ranked(trigger).Where(r => r.Rank is 0 or 3 && r.Edit.Kind != ScummSetupKind.PlayedIn).Select(r => r.Edit).GroupBy(OneValueKey).Select(g => g.First()).ToList();
 
     /// <summary>
     /// The candidates with their rank (1 November 2026): 0 for a value on the side of a test that leads on to the scene's cutscene, 2 for one on the
@@ -495,10 +502,12 @@ public sealed partial class ScummSceneSetupSearch
                         }
                         if (ownerOf.TryGetValue(tested, out var ownedObject))
                         {
-                            // Owned by another actor (Indy 3 Room 82's cracked seal, +0x0005: the Grail's owner is 3, Elsa); 15 is the room. Only on
-                            // the way to the cutscene (an owner test of the hero is the "held" value already).
+                            // Owned by another actor (Indy 3 Room 82's cracked seal, +0x0005: the Grail's owner is 3, Elsa); 15 is the room. On the way
+                            // to the cutscene the side that leads there; inside the scene (no guard) the branch it names, which the search keeps only
+                            // when the scene then shows more (12 November 2026: Indy 3's motorcycle, Room 77 object 847 verb 0x04 +0x0064, goes to
+                            // Berlin while the diary's owner is 14, "We have to get the diary back!").
                             if (ins.Operation is "isEqual" or "isNotEqual" && value.Value is > 0 and < 15 &&
-                                guard is bool toScene && Holds(ins.Operation, value.Value, value.Value) == toScene)
+                                (guard is not bool toScene || Holds(ins.Operation, value.Value, value.Value) == toScene))
                                 Add(new(ScummSetupKind.OwnedBy, ownedObject.ToString(CultureInfo.InvariantCulture), value.Value, where), value.Value);
                         }
                         else if (stateOf.TryGetValue(tested, out var stateObject))

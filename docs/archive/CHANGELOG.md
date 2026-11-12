@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 12 November: the scenes that matter, first pass (roadmap step 4 b)
+
+The user's named scenes were found and played in the window for Indy 3 and Maniac Mansion: the intros, the endings, the whip, the Grail temple, the zeppelin, Venice, Donovan, the car into space, the meltdown, the demo tape, the microwave, the Green Tentacle. Shared fixes on the way: a pick whose plan is still being worked out shows "Preparing the scene…" (a first pick waited up to half a minute with nothing on screen); an owner test inside a scene is a setup value (Indy 3's motorcycle now goes to Berlin); one second object per setup also when every value is tried together. 4 of 893 searched scenes changed (0.4%), 3 show more, Indy 4 Room 93's hole one line less. Left: Henry in the Berlin scene, the plane off the zeppelin, Maniac Mansion after its ending, LOOM. [Record](../../.verification/scenes-that-matter-20261112/README.md).
+
 ## 12 November: the scene lists cleared (roadmap step 4, a and c)
 
 Prints of blanks no longer count as lines (some games print one every frame while a script waits; Indy 4 Room 88's exits counted 5,982), and a blank talk line no longer keeps a scene going: two plans changed (Monkey Island 1's loose board, Zak McKracken Room 17's door), none for the worse. A room's Play Cutscene list in Normal leaves out a scene whose plan begins nothing, starts at its cutscene and shows nothing, or that the picture checks name a suspect; Advanced keeps it, marked "not in Normal" with the reason. Offered in Normal: Indy 3 79 of 81 (97.5%), LOOM's scanned list 168 of 169 (99.4%), Maniac Mansion all, 1,259 of 1,327 over eleven copies (94.9%). Reviewed starts (b) wait for the user's list. [Record](../../.verification/scene-shown-20261112/README.md).

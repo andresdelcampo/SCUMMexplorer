@@ -1,0 +1,92 @@
+=== MM 51,0,00
+way Game begun True lines 76 rooms [47] frames 6000
+  [YOWL!] from Script 128 +0x0044
+  [The house and everyone /          within a 5 mile radius] from Script 62 +0x0142
+  [have been destroyed /        in a massive nuclear meltdown.] from Script 62 +0x0142
+  [THE GAME IS OVER] from Script 62 +0x01BB
+  [Press f4 to play again.] from Script 62 +0x01D5
+  [THE GAME IS OVER] from Script 62 +0x01BB
+  [Press f4 to play again.] from Script 62 +0x01D5
+  [THE GAME IS OVER] from Script 62 +0x01BB
+=== MM 30,0,00
+way AtCutscene begun True lines 76 rooms [47] frames 6000
+  [The house and everyone /          within a 5 mile radius] from Script 62 +0x0142
+  [have been destroyed /        in a massive nuclear meltdown.] from Script 62 +0x0142
+  [THE GAME IS OVER] from Script 62 +0x01BB
+  [Press f4 to play again.] from Script 62 +0x01D5
+  [THE GAME IS OVER] from Script 62 +0x01BB
+  [Press f4 to play again.] from Script 62 +0x01D5
+  [THE GAME IS OVER] from Script 62 +0x01BB
+  [Press f4 to play again.] from Script 62 +0x01D5
+=== MM 51,176,05
+way Game begun True lines 80 rooms [30,0,1] frames 6000
+  [Oh...what happened?] from Script 126 +0x0018
+  [I feel much better now!] from Script 126 +0x0018
+  [I'm free of this machine's control!] from Script 126 +0x0018
+  [But wait!] from Script 126 +0x0061
+  [The self-destruct sequence was initated!] from Script 126 +0x0061
+  [I'll try to turn it off.] from Script 126 +0x0061
+  [I did it!] from Script 126 +0x0173
+  [I'm sorry my mad, insane plan / caused you so much trouble.] from Script 63 +0x01DA
+=== MM 29,66,01
+way Game begun True lines 11 rooms [31] frames 940
+  [Oh no!] from Script 47 +0x007A
+  [The pool is empty again!] from Script 47 +0x007A
+  [We're going to have another meltdown!!] from Script 47 +0x00A2
+  [How can I take over the world / when I'm on a budget?] from Script 47 +0x00D1
+  [I always get stuck with cheap equipment.] from Script 47 +0x00D1
+  [Boy is the meteor going to be pissed.] from Script 47 +0x00D1
+  [TENTACLE!!! FRONT AAAAAAAND CENTER!] from Script 47 +0x01A8
+  [Yes sir, Dr. Fred sir,] from Script 47 +0x01D8
+=== MM 12,0,00
+way Game begun False lines 15 rooms [] frames 660
+  15 x [You can't pass until you feed me!] from Script 51 +0x0081
+=== MM 12,457,0D
+way Game begun True lines 2 rooms [38,26] frames 386
+  [Oh, the doorbell!] from Script 87 +0x0035
+  [I wonder if that's my package?] from Script 87 +0x004C
+=== MM 7,93,03
+way Game begun True lines 0 rooms [] frames 0
+=== MM 38,462,0D
+way Game begun True lines 6 rooms [26,4] frames 488
+  [Intruder, halt!] from Script 88 +0x004D
+  [What are you doing in my house?] from Script 88 +0x008E
+  [Are you an agent of the evil meteor / or are you here to help me defeat him?] from Script 88 +0x008E
+  [Not talking, eh?] from Script 88 +0x00E7
+  [Well to the dungeon, spy!] from Script 88 +0x00E7
+  [Too bad you weren't on my side!] from Script 89 +0x0029
+=== MM 36,124,0D
+way Game begun True lines 9 rooms [37,19] frames 722
+  [Daddy's been acting very strangely ever / since his secret project in the lab^] from Script 140 +0x0024
+  [YEAH SO!!!] from Script 140 +0x0069
+  [Well, Mommy, I'm worried about him.] from Script 140 +0x0076
+  [He hasn't been at dinner for 5 years^] from Script 140 +0x0076
+  [YEAH, SO!!!] from Script 140 +0x00B7
+  [^and he's been bringing those bodies / down into the basement late at night.] from Script 140 +0x00C5
+  [WHAT'S YOUR POINT ED?!] from Script 140 +0x0108
+  [I'M A VERY BUSY LADY!] from Script 140 +0x0108
+=== MM 1,60,03
+way Game begun True lines 77 rooms [0,42] frames 6000
+  [Wow! A lucrative publishing contract!] from Script 118 +0x001A
+  [I'm going to be famous!] from Script 118 +0x0052
+  [I don't have to be evil anymore.] from Script 118 +0x0052
+  [Dr. Fred, release the women, all / the women. We're going to be rich!] from Script 118 +0x0086
+  [Welcome back from our break.] from Script 124 +0x0054
+  [We've been talking with the celebrity^] from Script 124 +0x0054
+  [^rock who gave up a life of crime for / a career as a writer.] from Script 124 +0x0054
+  [So, Mr. Meteor, how does it feel / to be famous instead of infamous?] from Script 124 +0x00C6
+=== MM 20,164,04
+way Game begun True lines 4 rooms [] frames 355
+  [Hey, this is great stuff!] from Script 107 +0x0099
+  [I could use someone like you in my band!] from Script 107 +0x00B2
+  [I have a demo tape, but it's no use.] from Script 107 +0x00DB
+  [I'll never get a recording contract, / even if we get a band together.] from Script 107 +0x00DB
+=== MM 5,189,03
+way Game begun True lines 4 rooms [] frames 354
+  [Hey, this is great stuff!] from Script 107 +0x0099
+  [I could use someone like you in my band!] from Script 107 +0x00B2
+  [I have a demo tape, but it's no use.] from Script 107 +0x00DB
+  [I'll never get a recording contract, / even if we get a band together.] from Script 107 +0x00DB
+=== MM 7,85,01
+way Game begun True lines 1 rooms [1] frames 164
+  [Oh no! Radioactive steam! Ahheeeeeeee^] from Script 61 +0x0008

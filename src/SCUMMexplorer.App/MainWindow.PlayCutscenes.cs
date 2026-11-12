@@ -226,6 +226,10 @@ public partial class MainWindow
         return true;
     }
 
+    /// <summary>The busy badge while a picked scene's plan is worked out on the spot; nothing when the plan is known.</summary>
+    private IDisposable? PreparingScene(ScummCutscene trigger) =>
+        _ctx.PlayPlanner is { IsValueCreated: true } lazy && lazy.Value.IsPlanned(trigger) ? null : BeginBusy("Preparing the scene…");
+
     /// <param name="interaction">A pick from Interact (R-8.38): an object that is not in the room yet is brought into it first.</param>
     private async Task PlayScummCutsceneAsync(ScummCutsceneGroup group, string? shownTitle, bool interaction = false)
     {
@@ -241,8 +245,11 @@ public partial class MainWindow
         ScummScenePlan? earlyPlan = null;
         if (!interaction && _ctx.PlayBoot is not null && _ctx.PlayPlanner is { } earlyPlanner)
         {
-            try { earlyPlan = await Task.Run(() => earlyPlanner.Value.PlanSetup(trigger)); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { earlyPlan = null; }
+            // A scene whose plan is not worked out yet (a first launch, before the background derivation reaches it) takes seconds, up to half a minute
+            // for a long ending: the pick says so (12 November 2026: a first pick looked like nothing happened).
+            using (PreparingScene(trigger))
+                try { earlyPlan = await Task.Run(() => earlyPlanner.Value.PlanSetup(trigger)); }
+                catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { earlyPlan = null; }
             if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_ctx.Game, game)) return;
             fromBoot = await StartSceneFromBootAsync(game, trigger, earlyPlan, () => launch == _cutsceneLaunchGeneration && ReferenceEquals(_ctx.Game, game));
             if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_ctx.Game, game)) return;
@@ -279,8 +286,9 @@ public partial class MainWindow
         ScummScenePlan? plan = earlyPlan;
         if (plan is null && _ctx.PlayPlanner is { } plannerLazy)
         {
-            try { plan = await Task.Run(() => plannerLazy.Value.PlanSetup(trigger)); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { plan = null; }
+            using (PreparingScene(trigger))
+                try { plan = await Task.Run(() => plannerLazy.Value.PlanSetup(trigger)); }
+                catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { plan = null; }
             if (launch != _cutsceneLaunchGeneration || !ReferenceEquals(_ctx.Game, game) || !PlayActive || !ReferenceEquals(_ctx.Play, session)) return;
         }
         IReadOnlyList<string> uncertainties;

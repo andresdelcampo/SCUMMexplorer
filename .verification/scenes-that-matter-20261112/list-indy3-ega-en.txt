@@ -1,0 +1,161 @@
+160 groups, planner ready in 1,4 s
+LIST react normal Room 01 object 21 verb 0x01 [Room 01 · Open door] way Game lines 1 rooms [] frames 34 edits 0 first "" scripts Room 1 local script 206 | global script 26
+LIST scene normal Room 01 object 23 verb 0x0A [Room 01 · Walk to door] way Game lines 10 rooms [3] frames 263 edits 1 first "STUDENTS!  STUDENTS!  PLEASE BE PATIENT!  I'm sure Dr. Jones will be back soon!" scripts global script 55
+LIST react normal Room 01 object 24 verb 0x04 [Room 01 · Turn on drinking fountain] way Game lines 1 rooms [] frames 52 edits 0 first "" scripts Room 1 object 24 verb 0x04 | global script 127
+LIST scene HIDDEN Room 02 object 68 verb 0x01 [Room 02 · Open package] way Game lines 0 rooms [] frames 1 edits 2 first "" scripts Room 2 object 68 verb 0x01 | global script 130
+LIST react normal Room 02 object 68 verb 0x09 [Room 02 · Look package] way Game lines 2 rooms [] frames 59 edits 1 first "" scripts Room 2 object 68 verb 0x09 | global script 130
+LIST react normal Room 02 object 68 verb 0x0B [Room 02 · Pick up package] way Game lines 1 rooms [] frames 49 edits 0 first "" scripts Room 2 local script 201
+LIST react normal Room 02 object 70 verb 0x09 [Room 02 · Look statue] way Game lines 2 rooms [] frames 59 edits 0 first "" scripts Room 2 object 70 verb 0x09
+LIST react normal Room 02 object 71 verb 0x08 [Room 02 · Use jar] way Game lines 2 rooms [] frames 59 edits 1 first "" scripts Room 2 object 71 verb 0x08
+LIST scene normal Room 06 object 0 verb 0x00 [Room 06 · Entry] way Game lines 29 rooms [9] frames 1347 edits 0 first "Dr. Jones," scripts global script 73 | global script 91
+LIST react normal Room 07 object 0 verb 0x00 [Room 07 · Entry] way Game lines 1 rooms [] frames 46 edits 2 first "" scripts Room 7 local script 200
+LIST scene normal Room 07 object 131 verb 0x0B [Room 07 · Pick up plant] way Game lines 1 rooms [] frames 33 edits 2 first "" scripts Room 7 object 131 verb 0x0B
+LIST scene normal Room 07 object 134 verb 0x07 [Room 07 · Pull table cloth] way Game lines 0 rooms [] frames 8 edits 3 first "" scripts Room 7 object 134 verb 0x07
+LIST react normal Room 07 object 136 verb 0x01 [Room 07 · Open old book] way Game lines 2 rooms [] frames 90 edits 3 first "" scripts Room 7 object 136 verb 0x01
+LIST react normal Room 07 object 139 verb 0x04 [Room 07 · Turn on typewriter] way Game lines 2 rooms [] frames 44 edits 2 first "" scripts Room 7 object 139 verb 0x04
+LIST react normal Room 07 object 139 verb 0x08 [Room 07 · Use typewriter] way Game lines 0 rooms [] frames 36 edits 2 first "" scripts Room 7 object 139 verb 0x08
+LIST react normal Room 07 object 144 verb 0x09 [Room 07 · Look chair] way Game lines 1 rooms [] frames 30 edits 2 first "" scripts Room 7 object 144 verb 0x09
+LIST react normal Room 07 object 147 verb 0x09 [Room 07 · Look window] way Game lines 3 rooms [] frames 67 edits 2 first "" scripts Room 7 object 147 verb 0x09
+LIST react normal Room 07 object 151 verb 0x09 [Room 07 · Look bed] way Game lines 1 rooms [] frames 44 edits 2 first "" scripts Room 7 object 151 verb 0x09
+LIST scene normal Room 12 object 0 verb 0x00 [Room 12 · Entry] way Game lines 3 rooms [] frames 90 edits 0 first "All right.  I'll stay in the car." scripts Room 12 local script 200
+LIST scene normal Room 13 object 0 verb 0x00 [Room 13 · Entry] way Game lines 3 rooms [] frames 120 edits 1 first "See what?" scripts Room 13 local script 200 | global script 52
+LIST scene normal Room 13 object 164 verb 0x08 [Room 13 · Use brick] way Game lines 0 rooms [] frames 99 edits 2 first "" scripts Room 13 local script 204
+LIST scene normal Room 15 object 0 verb 0x62 [Room 15 · Entry] way AtCutscene lines 30 rooms [16] frames 1040 edits 0 first "Ah, Venice!" scripts global script 98
+LIST scene normal Room 15 object 179 verb 0x0A [Room 15 · Walk to manhole cover] way Game lines 0 rooms [53] frames 58 edits 1 first "" scripts Room 15 object 179 verb 0x0A
+LIST react normal Room 15 object 184 verb 0x04 [Room 15 · Turn on lover] way Game lines 2 rooms [] frames 27 edits 0 first "" scripts Room 15 object 184 verb 0x04
+LIST react normal Room 15 object 203 verb 0x09 [Room 15 · Look wine bottle] way Game lines 2 rooms [] frames 41 edits 0 first "I knew that!" scripts Room 15 local script 210
+LIST react normal Room 15 object 203 verb 0x0B [Room 15 · Pick up wine bottle] way Game lines 2 rooms [] frames 58 edits 0 first "Of course not.  It was a dreadful wine." scripts Room 15 local script 209
+LIST react normal Room 15 object 204 verb 0x08 [Room 15 · Use fountain] way AtCutscene lines 1 rooms [] frames 57 edits 0 first "" scripts global script 127
+LIST scene normal Room 17 object 239 verb 0x01 [Room 17 · Open book] way Game lines 1 rooms [64] frames 6000 edits 0 first "" scripts global script 126
+LIST react normal Room 17 object 239 verb 0x07 [Room 17 · Pull book] way Game lines 4 rooms [] frames 94 edits 1 first "" scripts Room 17 object 239 verb 0x07 | global script 126
+LIST scene normal Room 17 object 239 verb 0x09 [Room 17 · Look book] way Game lines 2 rooms [64] frames 6000 edits 2 first "" scripts Room 17 object 239 verb 0x09 | global script 126
+LIST scene normal Room 17 object 240 verb 0x01 [Room 17 · Open book] way Game lines 12 rooms [74] frames 6000 edits 0 first "1. Turn on APU (switch L)." scripts Room 17 object 240 verb 0x01 | global script 90
+LIST react normal Room 17 object 240 verb 0x07 [Room 17 · Pull book] way Game lines 4 rooms [] frames 89 edits 1 first "1. Turn on APU (switch L)." scripts Room 17 object 240 verb 0x07 | global script 90
+LIST scene normal Room 17 object 240 verb 0x09 [Room 17 · Look book] way Game lines 13 rooms [74] frames 6000 edits 2 first "1. Turn on APU (switch L)." scripts Room 17 object 240 verb 0x09 | global script 90
+LIST react normal Room 17 object 241 verb 0x01 [Room 17 · Open book] way Game lines 2 rooms [] frames 64 edits 0 first "" scripts Room 17 object 241 verb 0x01
+LIST react normal Room 17 object 241 verb 0x07 [Room 17 · Pull book] way AtCutscene lines 1 rooms [] frames 25 edits 0 first "" scripts Room 17 object 241 verb 0x07
+LIST react normal Room 17 object 241 verb 0x09 [Room 17 · Look book] way Game lines 2 rooms [] frames 56 edits 1 first "" scripts Room 17 object 241 verb 0x09
+LIST react normal Room 17 object 243 verb 0x01 [Room 17 · Open books] way Game lines 2 rooms [] frames 63 edits 1 first "" scripts Room 17 local script 200
+LIST scene normal Room 18 object 0 verb 0x00 [Room 18 · Entry] way Game lines 0 rooms [73] frames 23 edits 0 first "" scripts Room 18 local script 205
+LIST scene normal Room 18 object 253 verb 0x01 [Room 18 · Open slab-I] way Game lines 3 rooms [19] frames 273 edits 2 first "Not again!" scripts Room 18 local script 204 | Room 18 local script 201
+LIST react normal Room 18 object 272 verb 0x0B [Room 18 · Pick up metal post] way Game lines 1 rooms [] frames 35 edits 0 first "" scripts Room 18 local script 200
+LIST react normal Room 19 object 0 verb 0x00 [Room 19 · Entry] way Game lines 1 rooms [] frames 67 edits 0 first "" scripts Room 19 local script 201 | Room 19 local script 200
+LIST scene normal Room 19 object 278 verb 0x0A [Room 19 · Walk to hole overhead] way Game lines 1 rooms [0,15] frames 46 edits 0 first "You're coming with me!" scripts global script 53 | global script 83
+LIST react normal Room 20 object 0 verb 0x34 [Room 20 · Leaving] way AtCutscene lines 3 rooms [] frames 53 edits 0 first "See what?" scripts global script 52
+LIST scene normal Room 21 object 0 verb 0x00 [Room 21 · Entry] way Game lines 0 rooms [] frames 14 edits 1 first "" scripts Room 21 local script 200
+LIST scene normal Room 21 object 311 verb 0x01 [Room 21 · Open door] way Game lines 7 rooms [31] frames 200 edits 4 first "Going somewhere?" scripts global script 72 | global script 85 | global script 83
+LIST react normal Room 21 object 311 verb 0x08 [Room 21 · Use door] way Game lines 0 rooms [] frames 19 edits 1 first "" scripts global script 116
+LIST scene normal Room 22 object 0 verb 0x00 [Room 22 · Entry] way Game lines 5 rooms [] frames 252 edits 0 first "Meanwhile, elsewhere in the castle^" scripts global script 77 | global script 129
+LIST react normal Room 22 object 320 verb 0x0A [Room 22 · Walk to front door] way Game lines 4 rooms [] frames 112 edits 0 first "" scripts Room 22 object 320 verb 0x0A
+LIST scene normal Room 23 object 0 verb 0x00 [Room 23 · Entry] way Game lines 6 rooms [] frames 67 edits 1 first "See what?" scripts global script 107 | global script 13 | global script 52 | global script 120 | Room 23 local script 204 | global script 121
+LIST react normal Room 23 object 323 verb 0x01 [Room 23 · Open door] way Game lines 5 rooms [] frames 63 edits 1 first "" scripts Room 23 object 323 verb 0x01
+LIST react normal Room 23 object 323 verb 0x02 [Room 23 · Close door] way Game lines 5 rooms [] frames 63 edits 2 first "" scripts Room 23 object 323 verb 0x02
+LIST react normal Room 23 object 324 verb 0x09 [Room 23 · Look tapestry] way Game lines 2 rooms [] frames 47 edits 0 first "" scripts Room 23 object 324 verb 0x09
+LIST react normal Room 23 object 326 verb 0x01 [Room 23 · Open door] way Game lines 5 rooms [] frames 69 edits 1 first "" scripts Room 23 object 326 verb 0x01
+LIST react normal Room 23 object 326 verb 0x02 [Room 23 · Close door] way Game lines 5 rooms [] frames 69 edits 2 first "" scripts Room 23 object 326 verb 0x02
+LIST react normal Room 23 object 328 verb 0x01 [Room 23 · Open door] way Game lines 5 rooms [] frames 69 edits 1 first "" scripts Room 23 object 328 verb 0x01
+LIST react normal Room 23 object 328 verb 0x02 [Room 23 · Close door] way Game lines 5 rooms [] frames 69 edits 2 first "" scripts Room 23 object 328 verb 0x02
+LIST react normal Room 23 object 334 verb 0x0A [Room 23 · Walk to window] way Game lines 2 rooms [] frames 32 edits 3 first "" scripts Room 23 object 334 verb 0x0A
+LIST scene normal Room 23 object 338 verb 0x06 [Room 23 · Push loose brick] way Game lines 5 rooms [] frames 69 edits 2 first "" scripts Room 23 object 338 verb 0x06
+LIST scene normal Room 23 object 338 verb 0x07 [Room 23 · Pull loose brick] way Game lines 2 rooms [] frames 39 edits 2 first "" scripts Room 23 object 338 verb 0x07
+LIST react normal Room 24 object 342 verb 0x09 [Room 24 · Look window] way Game lines 2 rooms [] frames 51 edits 0 first "" scripts Room 24 object 342 verb 0x09
+LIST react normal Room 24 object 344 verb 0x09 [Room 24 · Look windows] way Game lines 2 rooms [] frames 60 edits 0 first "" scripts Room 24 object 344 verb 0x09
+LIST react normal Room 24 object 346 verb 0x01 [Room 24 · Open door] way Game lines 0 rooms [] frames 9 edits 0 first "" scripts Room 24 object 346 verb 0x01
+LIST react normal Room 24 object 346 verb 0x02 [Room 24 · Close door] way Game lines 0 rooms [] frames 9 edits 1 first "" scripts Room 24 object 346 verb 0x02
+LIST react normal Room 24 object 350 verb 0x02 [Room 24 · Close chest] way Game lines 0 rooms [] frames 17 edits 0 first "" scripts Room 24 object 350 verb 0x02
+LIST react normal Room 24 object 357 verb 0x09 [Room 24 · Look uniform] way Game lines 5 rooms [] frames 127 edits 0 first "" scripts Room 24 object 357 verb 0x09
+LIST react normal Room 24 object 360 verb 0x08 [Room 24 · Use first aid kit] way Game lines 1 rooms [] frames 54 edits 1 first "" scripts Room 24 object 360 verb 0x08
+LIST scene normal Room 25 object 361 verb 0x0A [Room 25 · Walk to door] way Game lines 8 rooms [20,21] frames 153 edits 0 first "" scripts Room 25 object 361 verb 0x0A
+LIST react normal Room 25 object 362 verb 0x06 [Room 25 · Push statue] way Game lines 0 rooms [] frames 10 edits 0 first "" scripts Room 25 object 362 verb 0x06
+LIST scene normal Room 25 object 363 verb 0x0A [Room 25 · Walk to fireplace] way Game lines 0 rooms [77] frames 27 edits 1 first "" scripts Room 25 object 363 verb 0x0A
+LIST scene normal Room 25 object 365 verb 0x01 [Room 25 · Open suit of armor] way Game lines 1 rooms [] frames 42 edits 0 first "" scripts Room 25 object 365 verb 0x01
+LIST react normal Room 25 object 372 verb 0x06 [Room 25 · Push statue] way Game lines 1 rooms [] frames 51 edits 0 first "" scripts Room 25 object 372 verb 0x06
+LIST scene normal Room 26 object 395 verb 0x04 [Room 26 · Turn on spigot] way Game lines 0 rooms [] frames 4 edits 0 first "" scripts Room 26 object 395 verb 0x04 | Room 26 local script 204 | Room 26 local script 205 | Room 26 local script 206 | Room 26 local script 207
+LIST scene normal Room 26 object 395 verb 0x08 [Room 26 · Use spigot] way Game lines 0 rooms [] frames 34 edits 1 first "" scripts Room 26 object 395 verb 0x08
+LIST scene normal Room 26 object 401 verb 0x08 [Room 26 · Use hot coals] way Game lines 0 rooms [] frames 40 edits 5 first "" scripts Room 26 object 401 verb 0x08
+LIST react normal Room 27 object 405 verb 0x09 [Room 27 · Look servant uniform] way Game lines 2 rooms [] frames 45 edits 0 first "" scripts Room 27 object 405 verb 0x09
+LIST react normal Room 27 object 406 verb 0x09 [Room 27 · Look grey uniform] way Game lines 2 rooms [] frames 45 edits 0 first "" scripts Room 27 object 406 verb 0x09
+LIST react normal Room 29 object 447 verb 0x06 [Room 29 · Push large painting] way Game lines 0 rooms [] frames 7 edits 0 first "" scripts Room 29 object 447 verb 0x06
+LIST scene normal Room 29 object 448 verb 0x07 [Room 29 · Pull large painting] way Game lines 0 rooms [] frames 8 edits 0 first "" scripts Room 29 object 448 verb 0x07
+LIST react normal Room 29 object 449 verb 0x01 [Room 29 · Open vault door] way Game lines 1 rooms [] frames 31 edits 1 first "" scripts Room 29 object 449 verb 0x01 | global script 26
+LIST react normal Room 29 object 452 verb 0x09 [Room 29 · Look painting] way Game lines 1 rooms [] frames 66 edits 0 first "" scripts Room 29 object 452 verb 0x09
+LIST react normal Room 29 object 454 verb 0x09 [Room 29 · Look painting] way Game lines 1 rooms [] frames 42 edits 0 first "" scripts Room 29 object 454 verb 0x09
+LIST react normal Room 29 object 455 verb 0x09 [Room 29 · Look painting] way Game lines 1 rooms [] frames 42 edits 0 first "" scripts Room 29 object 455 verb 0x09
+LIST react normal Room 29 object 458 verb 0x09 [Room 29 · Look plaque on statue] way Game lines 1 rooms [] frames 47 edits 0 first "" scripts Room 29 object 458 verb 0x09
+LIST react normal Room 29 object 461 verb 0x09 [Room 29 · Look painting] way Game lines 1 rooms [] frames 41 edits 0 first "" scripts Room 29 object 461 verb 0x09
+LIST scene normal Room 31 object 0 verb 0x00 [Room 31 · Entry] way Game lines 1 rooms [] frames 68 edits 0 first "See what?" scripts global script 106 | global script 13 | global script 52 | global script 120
+LIST react normal Room 31 object 466 verb 0x01 [Room 31 · Open grating] way Game lines 2 rooms [] frames 64 edits 0 first "" scripts Room 31 object 466 verb 0x01
+LIST react normal Room 31 object 466 verb 0x08 [Room 31 · Use grating] way Game lines 2 rooms [] frames 64 edits 1 first "" scripts Room 31 object 466 verb 0x08
+LIST scene normal Room 32 object 489 verb 0x0A [Room 32 · Walk to Unnamed object] way Game lines 17 rooms [0,34,21] frames 444 edits 1 first "Soon afterwards^" scripts global script 115
+LIST scene HIDDEN Room 33 object 0 verb 0x00 [Room 33 · Entry] way Game lines 3 rooms [] frames 80 edits 7 first "JUNIOR!  You've come to rescue me!" scripts Room 33 local script 200
+LIST scene normal Room 33 object 500 verb 0x01 [Room 33 · Open door] way Game lines 7 rooms [31,21] frames 185 edits 2 first "Going somewhere?" scripts global script 26 | global script 72 | global script 85 | global script 83
+LIST scene normal Room 33 object 500 verb 0x0A [Room 33 · Walk to door] way Game lines 0 rooms [21] frames 28 edits 1 first "" scripts Room 33 object 500 verb 0x0A
+LIST react normal Room 33 object 501 verb 0x0A [Room 33 · Walk to window] way Game lines 1 rooms [] frames 30 edits 2 first "Er, Junior, you don't expect ME to leave through the  window, do you?" scripts Room 33 object 501 verb 0x0A
+LIST react normal Room 33 object 513 verb 0x01 [Room 33 · Open cabinet] way Game lines 1 rooms [] frames 38 edits 0 first "" scripts Room 33 object 513 verb 0x01 | global script 26
+LIST scene normal Room 35 object 522 verb 0x0A [Room 35 · Walk to exit] way Game lines 2 rooms [36] frames 4 edits 0 first "" scripts Room 35 object 522 verb 0x0A
+LIST react normal Room 35 object 534 verb 0x0B [Room 35 · Pick up tickets] way Game lines 3 rooms [] frames 74 edits 0 first "You got what?" scripts Room 35 local script 203
+LIST scene normal Room 36 object 0 verb 0x53 [Room 36 · Entry] way AtCutscene lines 12 rooms [8] frames 6000 edits 0 first "After recovering consciousness," scripts global script 83
+LIST scene normal Room 36 object 538 verb 0x0A [Room 36 · Walk to stairs] way Game lines 2 rooms [39] frames 282 edits 0 first "" scripts Room 36 object 538 verb 0x0A
+LIST scene normal Room 37 object 0 verb 0x00 [Room 37 · Entry] way Game lines 13 rooms [36,39] frames 606 edits 1 first "What was close?" scripts Room 37 local script 201 | global script 48 | global script 92
+LIST scene normal Room 37 object 551 verb 0x0A [Room 37 · Walk to airfield] way Game lines 6 rooms [36,39] frames 268 edits 2 first "What was close?" scripts global script 48 | global script 92
+LIST react normal Room 37 object 570 verb 0xFA [Room 37 · Action switch] way Game lines 13 rooms [36,39] frames 704 edits 1 first "" scripts Room 37 object 570 verb 0xFA
+LIST scene normal Room 38 object 582 verb 0x08 [Room 38 · Use bowl] way Game lines 3 rooms [] frames 6000 edits 1 first "I've already played everything I know." scripts Room 38 local script 202 | global script 66 | global script 26 | global script 67
+LIST scene normal Room 39 object 0 verb 0x00 [Room 39 · Entry] way Game lines 1 rooms [] frames 6000 edits 0 first "What was close?" scripts Room 39 local script 200 | global script 92 | global script 13 | global script 101 | global script 99
+LIST scene normal Room 39 object 586 verb 0x0A [Room 39 · Walk to hatch] way Game lines 16 rooms [41,42,8] frames 6000 edits 1 first "Hey!!" scripts Room 39 object 586 verb 0x0A | global script 67 | global script 27 | global script 99 | global script 26 | global script 100
+LIST scene normal Room 39 object 587 verb 0x04 [Room 39 · Turn on wrench] way Game lines 1 rooms [] frames 6000 edits 1 first "" scripts Room 39 object 587 verb 0x04
+LIST scene normal Room 40 object 0 verb 0x64 [Room 40 · Leaving] way AtCutscene lines 2 rooms [] frames 59 edits 0 first "Someone vandalized my radio!  I'd better fix it as fast as I can!" scripts global script 100 | global script 99 | global script 83
+LIST scene normal Room 40 object 592 verb 0x0A [Room 40 · Walk to door] way Game lines 1 rooms [39] frames 6000 edits 1 first "" scripts Room 40 object 592 verb 0x0A
+LIST react normal Room 40 object 594 verb 0x01 [Room 40 · Open short-wave radio] way Game lines 3 rooms [] frames 118 edits 0 first "" scripts Room 40 local script 201
+LIST react normal Room 40 object 594 verb 0x04 [Room 40 · Turn on short-wave radio] way Game lines 10 rooms [] frames 161 edits 0 first "" scripts Room 40 local script 200
+LIST scene normal Room 45 object 0 verb 0x00 [Room 45 · Entry] way Game lines 0 rooms [] frames 0 edits 0 first "Indy!" scripts global script 117 | global script 83
+LIST react normal Room 48 object 657 verb 0x01 [Room 48 · Open statue] way Game lines 0 rooms [] frames 12 edits 0 first "" scripts Room 48 object 657 verb 0x01 | Room 48 local script 200
+LIST react normal Room 48 object 658 verb 0x01 [Room 48 · Open statue] way Game lines 0 rooms [] frames 10 edits 0 first "" scripts Room 48 object 658 verb 0x01 | Room 48 local script 200
+LIST scene normal Room 48 object 659 verb 0x01 [Room 48 · Open statue] way Game lines 0 rooms [] frames 18 edits 0 first "" scripts Room 48 object 659 verb 0x01 | Room 48 local script 200
+LIST react normal Room 50 object 0 verb 0x00 [Room 50 · Entry] way Game lines 0 rooms [] frames 8 edits 1 first "" scripts global script 87
+LIST react normal Room 50 object 668 verb 0x0A [Room 50 · Walk to hole] way Game lines 2 rooms [] frames 49 edits 0 first "" scripts Room 50 object 668 verb 0x0A
+LIST scene normal Room 51 object 669 verb 0x06 [Room 51 · Push torch] way Game lines 0 rooms [60] frames 55 edits 1 first "" scripts Room 51 object 669 verb 0x06
+LIST react normal Room 51 object 669 verb 0x08 [Room 51 · Use torch] way Game lines 1 rooms [] frames 40 edits 2 first "" scripts Room 51 object 669 verb 0x08
+LIST scene normal Room 52 object 676 verb 0x08 [Room 52 · Use arm] way Game lines 0 rooms [] frames 26 edits 1 first "" scripts Room 52 object 676 verb 0x08
+LIST scene normal Room 53 object 679 verb 0x0A [Room 53 · Walk to manhole] way Game lines 21 rooms [15,67,12] frames 1045 edits 1 first "Dr. Jones!" scripts Room 53 object 679 verb 0x0A | global script 124 | global script 84
+LIST react normal Room 54 object 685 verb 0x04 [Room 54 · Turn on wheel] way Game lines 0 rooms [] frames 28 edits 0 first "" scripts Room 54 object 685 verb 0x04
+LIST react normal Room 58 object 718 verb 0x01 [Room 58 · Open casket] way Game lines 1 rooms [] frames 34 edits 0 first "" scripts Room 58 object 718 verb 0x01
+LIST scene normal Room 58 object 718 verb 0x09 [Room 58 · Look casket] way Game lines 5 rooms [78] frames 169 edits 1 first "" scripts Room 58 object 718 verb 0x09
+LIST react normal Room 58 object 720 verb 0x01 [Room 58 · Open old rusty lock] way Game lines 0 rooms [] frames 13 edits 0 first "" scripts Room 58 object 720 verb 0x01
+LIST react normal Room 58 object 721 verb 0x01 [Room 58 · Open grating] way Game lines 3 rooms [] frames 52 edits 0 first "" scripts Room 58 object 721 verb 0x01
+LIST scene normal Room 60 object 0 verb 0x00 [Room 60 · Entry] way Game lines 1 rooms [] frames 31 edits 2 first "" scripts Room 60 local script 201
+LIST react normal Room 61 object 749 verb 0x08 [Room 61 · Use wooden plug] way Game lines 0 rooms [] frames 58 edits 2 first "" scripts Room 61 object 749 verb 0x08
+LIST react HIDDEN Room 62 object 0 verb 0x00 [Room 62 · Entry] way AtCutscene lines 0 rooms [] frames 15 edits 0 first "" scripts Room 62 local script 200
+LIST scene normal Room 62 object 769 verb 0x06 [Room 62 · Push skulls] way Game lines 0 rooms [] frames 9 edits 0 first "" scripts Room 62 local script 202
+LIST scene normal Room 63 object 775 verb 0x0A [Room 63 · Walk to ladder] way Game lines 0 rooms [49] frames 46 edits 0 first "" scripts Room 63 object 775 verb 0x0A
+LIST scene normal Room 71 object 0 verb 0x00 [Room 71 · Entry] way Game lines 2 rooms [] frames 101 edits 3 first "Sorry, Junior!  Come on, let's go steal a car." scripts Room 71 local script 204
+LIST react normal Room 71 object 792 verb 0x08 [Room 71 · Use car door] way Game lines 1 rooms [] frames 45 edits 2 first "" scripts Room 71 object 792 verb 0x08 | global script 26
+LIST scene normal Room 71 object 793 verb 0x08 [Room 71 · Use car door] way Game lines 2 rooms [67,72] frames 1266 edits 2 first "" scripts Room 71 object 793 verb 0x08 | global script 26
+LIST scene normal Room 71 object 793 verb 0x0A [Room 71 · Walk to car door] way Game lines 2 rooms [67,72] frames 1260 edits 3 first "" scripts Room 71 object 793 verb 0x0A | global script 110
+LIST scene normal Room 72 object 0 verb 0x00 [Room 72 · Entry] way Game lines 9 rooms [] frames 225 edits 0 first "Uh, hold it.  You've got to come over here." scripts global script 94 | global script 13 | global script 110 | global script 117 | global script 83
+LIST scene normal Room 73 object 0 verb 0x00 [Room 73 · Entry] way Game lines 1 rooms [] frames 41 edits 1 first "" scripts Room 73 local script 205 | Room 73 local script 206
+LIST react normal Room 73 object 830 verb 0x01 [Room 73 · Open door] way Game lines 0 rooms [] frames 5 edits 1 first "" scripts Room 73 object 830 verb 0x01 | global script 26
+LIST react normal Room 73 object 830 verb 0x02 [Room 73 · Close door] way Game lines 0 rooms [] frames 14 edits 0 first "" scripts Room 73 object 830 verb 0x02 | global script 27
+LIST scene normal Room 73 object 830 verb 0x0A [Room 73 · Walk to door] way Game lines 0 rooms [1] frames 11 edits 0 first "" scripts Room 73 object 830 verb 0x0A
+LIST scene normal Room 73 object 834 verb 0x08 [Room 73 · Use locker room] way Game lines 1 rooms [] frames 119 edits 0 first "Ten minutes later^" scripts Room 73 local script 203 | global script 111
+LIST scene normal Room 73 object 835 verb 0x08 [Room 73 · Use bell] way Game lines 0 rooms [] frames 26 edits 1 first "" scripts Room 73 object 835 verb 0x08
+LIST scene normal Room 73 object 836 verb 0x0B [Room 73 · Pick up mallet] way Direct lines 1 rooms [] frames 41 edits 0 first "" scripts Room 73 local script 205
+LIST scene normal Room 73 object 837 verb 0x05 [Room 73 · Turn off light switch] way Game lines 2 rooms [] frames 73 edits 0 first "HEY!! WHO TURNED OUT THE LIGHTS!!" scripts Room 73 object 837 verb 0x05
+LIST scene normal Room 77 object 0 verb 0x00 [Room 77 · Entry] way Game lines 2 rooms [] frames 72 edits 1 first "" scripts Room 77 local script 200
+LIST scene normal Room 77 object 845 verb 0x0A [Room 77 · Walk to front of castle] way Game lines 3 rooms [12] frames 91 edits 0 first "" scripts Room 77 local script 201
+LIST scene normal Room 77 object 847 verb 0x04 [Room 77 · Turn on motorcycle] way Game lines 1 rooms [35] frames 33 edits 1 first "No, Junior.  We're going to Berlin." scripts Room 77 object 847 verb 0x04
+LIST scene normal Room 78 object 0 verb 0x00 [Room 78 · Entry] way Game lines 5 rooms [73] frames 166 edits 1 first "The shield is the second marker Donovan spoke of!" scripts Room 78 local script 200
+LIST scene normal Room 80 object 0 verb 0x00 [Room 80 · Entry] way Game lines 13 rooms [70] frames 220 edits 1 first "Dad!  How'd you get here before me?" scripts Room 80 local script 201
+LIST scene normal Room 81 object 0 verb 0x00 [Room 81 · Entry] way Game lines 12 rooms [] frames 326 edits 0 first "According to the map in your Grail Diary, this is the place." scripts Room 81 local script 202
+LIST react normal Room 81 object 858 verb 0x09 [Room 81 · Look temple] way Game lines 1 rooms [] frames 33 edits 0 first "" scripts Room 81 object 858 verb 0x09
+LIST scene normal Room 81 object 858 verb 0x0A [Room 81 · Walk to temple] way Game lines 2 rooms [82] frames 163 edits 0 first "" scripts Room 81 local script 200
+LIST scene normal Room 82 object 0 verb 0x00 [Room 82 · Entry] way Game lines 1 rooms [] frames 70 edits 0 first "Yep, this is the place." scripts Room 82 local script 200 | Room 82 local script 201 | Room 82 local script 204 | Room 82 local script 205 | global script 65
+LIST scene normal Room 82 object 864 verb 0x09 [Room 82 · Look Cracked Seal] way Game lines 0 rooms [93] frames 5 edits 1 first "" scripts Room 82 object 864 verb 0x09
+LIST scene normal Room 82 object 873 verb 0x03 [Room 82 · Give Grail] way Direct lines 99 rooms [94] frames 6000 edits 2 first "I give you my thanks.  I see you indeed have the heart of a true Knight." scripts global script 13 | Room 82 local script 203 | global script 65 | Room 82 local script 204
+LIST react normal Room 83 object 876 verb 0x0A [Room 83 · Walk to temple] way Game lines 1 rooms [] frames 36 edits 0 first "" scripts Room 83 object 876 verb 0x0A
+LIST scene normal Room 85 object 0 verb 0x00 [Room 85 · Entry] way Game lines 2 rooms [] frames 66 edits 2 first "Indy!!!  Hurry up!  Your father is getting worse!!" scripts Room 85 local script 202
+LIST scene normal Room 86 object 0 verb 0x00 [Room 86 · Entry] way Game lines 11 rooms [] frames 404 edits 2 first "I knew you would come." scripts Room 86 local script 201
+LIST react HIDDEN Room 86 object 881 verb 0x0A [Room 86 · Walk to tunnel] way none lines 1 rooms [] frames 600 edits 0 first "" scripts Room 86 object 881 verb 0x0A
+LIST scene normal Room 86 object 898 verb 0x08 [Room 86 · Use Holy Water] way Game lines 5 rooms [87,82,83] frames 300 edits 2 first "He chose^" scripts global script 122
+LIST scene normal Room 91 object 926 verb 0x09 [Room 91 · Look inscription] way Game lines 7 rooms [] frames 224 edits 1 first "My father's diary is right^" scripts Room 91 local script 200
+LIST scene normal Room 93 object 945 verb 0x08 [Room 93 · Use Grail] way Game lines 0 rooms [82] frames 59 edits 1 first "" scripts Room 93 object 945 verb 0x08
+LIST scene normal Room 94 object 0 verb 0x00 [Room 94 · Entry] way Game lines 79 rooms [] frames 6000 edits 0 first "Your final scores:" scripts Room 94 local script 200
