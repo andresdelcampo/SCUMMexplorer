@@ -56,13 +56,13 @@ What keeps a cell from ✅:
 
 ## The way to a release
 
-From the [10 November audit](archive/AUDIT_2026-11-10.md). In order; each step names what ends it. Steps 1 (a clean slate per game), 2 (the picture checks) and 3 (the shared causes) are done and in the changelog; the numbers stay. Scene work stays on Maniac Mansion, Indy 3 and LOOM until the user has checked them (user, 8 November); a generic fix that reaches every game for free is fine.
+From the [10 November audit](archive/AUDIT_2026-11-10.md). In order; each step names what ends it. Steps 1 (a clean slate per game), 2 (the picture checks), 3 (the shared causes) and step 4's (a) and (c) (12 November) are done and in the changelog; the numbers stay. Scene work stays on Maniac Mansion, Indy 3 and LOOM until the user has checked them (user, 8 November); a generic fix that reaches every game for free is fine.
 
 **Which scenes get fixed** (user, 11 November, on the audit's advice): scenes that play but look wrong are fixed, by shared cause, because one wrong picture costs the trust in the right ones. The last scenes that show nothing are not chased: each is its own puzzle and one more setup kind. A scene that matters gets a hand-reviewed start; the rest leave Normal mode. The percentage of scenes played the game's own way is a measure, not a target.
 
 | # | Step | Ends when | Where |
 |---|---|---|---|
-| 4 | **Clear the lists of what is left.** (a) Entries that are not scenes leave every list: refusals and blank prints the scan takes for scenes (Indy 4 Room 88's "I can't reach it"). (b) A scene the user names as one that matters (an ending, a known gag) gets a **reviewed start**: hand-checked data for that copy, as LOOM's Room 46 (R-8.42). (c) What still shows nothing or shows wrong leaves the Normal list and stays in Advanced, labelled (R-1.13). It is not worked further. | No suspect is offered in Normal mode in the three games; the user's named scenes play. | `ScummCutsceneIndex`, reviewed-start data per game |
+| 4 | **Reviewed starts for the scenes that matter.** A scene the user names as one that matters (an ending, a known gag) gets a **reviewed start**: hand-checked data for that copy, as LOOM's Room 46 (R-8.42). Since 12 November Normal leaves out a scene that shows nothing or shows wrong (Advanced keeps it, labelled "not in Normal"; [record](../.verification/scene-shown-20261112/README.md)); a reviewed start brings it back. Waiting for the user's list per game. | The user's named scenes play. | reviewed-start data per game |
 | 5 | **The user's check, one game at a time**: Maniac Mansion (ready since 8 November), then Indy 3 (every scene played in the window first, as Maniac's `run-all.sh`), then LOOM. Reports are fixed by shared cause. | "Your checks" below are filled for the three games. | — |
 | 6 | **Release, LOOM first**: packaging, version, clean-profile first run, Roland without ROMs, each LOOM copy opened once. LOOM English ships with its reviewed catalog. | A zip the user has run on a clean profile. | `src/SCUMMexplorer.App` |
 | 7 | **The other games to the same bar** (Monkey Island 1 and 2, Indy 4, Zak McKracken): steps 2 to 5 for each, then they join the release. | Per game, as step 5. | — |
@@ -73,20 +73,20 @@ After the release, or when the code is next touched:
 - **LOOM English on the shared scene engine** (user, 31 October; after the other games, 8 November). The audit's advice: keep the 328 reviewed replays as shipped data and as the engine's answer key (238 of 238 begin, 222 within 10% of the length; [record](../.verification/loom-answer-key-20261031/README.md)); replace an entry only where picture and length match; not a release condition. The named sequences (the Elders' trial, the firewood scene, Walk to Room 13, Room 46) stay reviewed data in any case.
 - **Scene order** (user, 2 November; paused 8 November for the user's check): a picked scene gets the state of the scenes before it. 160 of 1,413 scenes (11.3%) carry it ([record](../.verification/scene-order-20261108/README.md)). Not reached: rooms with a way in that needs nothing, rooms whose variable is set elsewhere (Zak McKracken's travel, Indy 4's Atlantis).
 - **Interaction outcomes by state** (user, 1 November): list each verb's outcomes with their conditions in Advanced; today one outcome is played.
-- **Scenes started at their cutscene**, the remainder read and left as one-offs on 7 November ([record](../.verification/user-reports-20261107/README.md)): Indy 4 Room 44's local script 203 (a bit, then the hero's walk box and x), Room 88's refusals listed as scenes, Room 65's closet; Monkey Island 2 Room 93's light switch and Room 19's key. Not worked further: step 4 drops the refusals, hides the rest from Normal, and gives a reviewed start to any the user names.
+- **Scenes started at their cutscene**, the remainder read and left as one-offs on 7 November ([record](../.verification/user-reports-20261107/README.md)): Indy 4 Room 44's local script 203 (a bit, then the hero's walk box and x), Room 88's refusals listed as scenes, Room 65's closet; Monkey Island 2 Room 93's light switch and Room 19's key. Not worked further: Normal leaves out those that show nothing (12 November); step 4 gives a reviewed start to any the user names.
 - Splitting `MainWindow.xaml.cs` further (the open game's state is in `GameContext` since 10 November; background work still writes through the window, so a task that outlives its game should hold its own context), a ScummVM picture capture, profile allow-lists as defaults, pruning `.verification` run files (each game's last two runs), worktree housekeeping.
 
 ## Open
 
 ### All games
 - **User-reported, not yet reproduced:** thin black rooms (game and room not named); a crash (the crash log in `%LOCALAPPDATA%\SCUMMexplorer\crash-logs` records the next one).
-- Scenes started directly at their cutscene that show nothing (step 4; [record](../.verification/scene-setup-20261031/README.md)).
+- Scenes not offered in Normal (they show nothing or the picture checks name a suspect; Advanced lists them, labelled): 68 of 1,327 scenes in the room lists (5.1%) over eleven copies ([record](../.verification/scene-shown-20261112/README.md)). A reviewed start brings one back (step 4).
 - Browsed games' object note and status text vary between runs of the same build.
 - Static previews such as MI2's campfire: a hint is needed (decision 2 below).
 - Depth masks and stored object images of the non-LOOM games (R-6.16) not compared with ScummVM.
 
 ### LOOM EGA English (reference)
-- Picture suspect: 1 of 192 planned scenes (0.5%), Room 2's "sky" (actor 3 moves on its first frame; probably right). The reviewed replays the Normal list plays are not watched by the picture checks.
+- Room 2's "sky" on the shared engine: a picture suspect (actor 3 moves on its first frame; probably right), so not in the Normal lists of the scanned editions (Spanish checked in the window). English's Normal list plays the reviewed catalog.
 - Your checks: Room 2 skipped cutscene leaving Bobbin small (not reproduced); Rooms 15/18/20 staff notes; Room 34 standalone fortress reveal (local 200 +0035).
 - Shaping's canonical label, reverse draft names and story roles: settle or accept as labelled. Release (step 6).
 
@@ -95,28 +95,25 @@ After the release, or when the code is next touched:
 - CD: the scene categories against ScummVM (19 of 98 scenes called dialogue); your picture/voice/music timing run.
 
 ### Indiana Jones 3 (EGA and 256 colours)
-- 2 scenes started at their cutscene show nothing (step 4).
-- Picture suspects (step 4): 2 of 159 scenes (1.3%) in each copy: Room 2's package shows nothing; Room 33's entry has Henry placed by the setup, in his own costume ([record](../.verification/picture-checks-20261110/README.md)).
+- Not offered in Normal: 2 of 81 listed scenes (2.5%) in each copy: Room 2's package (shows nothing) and Room 33's entry (Henry placed by the setup, in his own costume; probably right). A reviewed start brings either back (step 4).
 - Rooms 47, 60, 66 start dark (live since 6 November): compare with the game. The 16 × 16 cross-hair (decision 4); `printEgo` lines as first texts (decision 5).
 
 ### Monkey Island 1 (floppy and CD)
-- 2 (floppy) and 2 (CD) scenes started at their cutscene show nothing (step 4).
+- Normal offers all 87 listed scenes in each copy.
 - `VAR_VIDEOMODE` is 19 for every v4 game, wrong for the EGA release.
 - Spanish eight-disk copy and the CD's five languages in the window (passed S9 headless only).
 
 ### Monkey Island 2
-- Picture suspects: 4 of 255 scenes (1.6%) (step 7).
-- 1 scene started at its cutscene shows nothing (step 4).
+- Not offered in Normal: 4 of 176 listed scenes (2.3%), all picture suspects (step 7).
 - Your retest of Play Game Intro; decision 2 (the campfire room). iMUSE hooks are labelled estimates.
 
 ### Indiana Jones 4
-- Picture suspects: 15 of 492 scenes (3.0%) (step 7).
-- 3 scenes started at their cutscene show nothing (step 4).
+- Not offered in Normal: 15 of 304 listed scenes (4.9%), all picture suspects (step 7).
 - After Play Game Intro: Indy walking very fast (user report, not reproduced).
 - Spanish talkie and floppy in the window.
 
 ### Maniac Mansion and Zak McKracken (classic, enhanced)
-- Picture suspects: none in Maniac Mansion (0 of 45 and 0 of 43); Zak McKracken 26 of 145 (17.9%) and 25 of 151 (16.6%), nearly all scenes whose first 50 frames change nothing (step 7).
+- Normal offers every listed scene of Maniac Mansion (42 and 40); Zak McKracken leaves out 23 of 128 (18.0%) and 23 of 132 (17.4%), nearly all scenes over at once with nothing changed (step 7).
 The separate track ended on 23 October ([its last handoff](archive/NEXT_SESSION_PROMPT_MANIAC_ZAK_2026-10-23.md)); these games follow this roadmap.
 - Scenes started at their cutscene (Maniac 5 of 42: Room 4's keypad door, Room 10's door, the wires, Room 30's ending, Room 01's departure; Zak 12 of 79 and 13 of 82; Maniac's timer loops, Scripts 139 and 141, set a flag, clear it on each failed condition and loop until all hold). Maniac Mansion's 39 scenes were all played in the window on 8 November ([record](../.verification/maniac-ready-20261108/README.md)); a pick there needs a room opened first (the assumed party). Cutscene definition (9 November, R-8.10, [record](../.verification/cutscene-definition-20261109/README.md)): next, make every listed cutscene of LOOM, Maniac Mansion and Indy 3 play the game's own way (left, each its own case: Maniac Mansion 5, the wires waiting about 4 minutes, the keypad waiting for the code, Room 10's chain through Room 7, the Room 30 ending, Room 01's departure; Indy 3 the mallet, which needs a second walk, plus 3 arrivals by design; LOOM 2). Open from the user's 8 November reports: which ending left rooms with nothing to do (Room 30's and the Edsel's do not); an option to show an object change off-screen (Room 4's brick opens a door out of view for three seconds).
 - Zak Room 19 and similar never settle; black regions (Maniac classic Room 18, Zak classic 44, enhanced 13, 16, 44); Zak camera in Rooms 3 and 33; old-actor offsets; shown-lit previews; native darkness/flashlight, flight timer and bus approaches; Zak classic's 11 estimated colours.

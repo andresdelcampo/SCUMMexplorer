@@ -243,14 +243,18 @@ public static class ScummCutsceneRun
                 if (!begun && trigger.Widened && (session.SceneActivity.Animates || session.SceneActivity.ChangesView)) begun = true;
                 // A scene may be a chain of cutscenes (LOOM Room 18's bell: Script 62, then Room 20's, then Scripts 58 and 59, one frame apart): it is
                 // over only after QuietFrames frames with no cutscene and no line, as LOOM English's reviewed replays were run (31 October 2026).
-                quiet = begun && !session.InScene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
+                // A talk line of blanks shows nothing: a script that prints one every frame (Indy 4 Script 139 +0x006D, Monkey Island 2 Script 23
+                // +0x0075) does not keep a scene going (12 November 2026, roadmap step 4).
+                quiet = begun && !session.InScene && (session.Messages.HaveMsg == 0 || session.Messages.Talk is { ShowsText: false }) ? quiet + 1 : 0;
                 if (quiet >= quietNeeded) break;
                 if (!begun && frame >= TrialFrames + wait) break;
                 session.StepFrame();
                 picture?.Frame(session);
             }
             session.WatchScript = null;
-            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: session.Messages.Log.Count - logMark, Way: way,
+            // The lines a scene shows: prints of blanks are not counted (they were thousands per scene, one a frame, and outweighed every real line).
+            var shownLines = session.Messages.Log.Skip(logMark).Count(message => message.ShowsText);
+            return new(begun, session.RoomsEntered.Skip(mark).Where(r => r != trigger.Room).Distinct().ToArray(), frame - Math.Max(0, quiet - 1), Lines: shownLines, Way: way,
                 ChangesRoom: session.SceneActivity.ChangesRoom, Animation: session.SceneActivity.Animation, ChangesView: session.SceneActivity.ChangesView,
                 Animations: session.SceneActivity.Animations.ToArray()) { Picture = picture?.Finish(session) };
         }

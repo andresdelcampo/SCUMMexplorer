@@ -482,11 +482,21 @@ public partial class MainWindow
                "The frames play on the playback clock at the game's frame rate" + (_ctx.Game?.Id == GameId.LoomVga ? "; voices play from the disc as a click's would." : ".");
     }
 
-    private List<(string Id, CutscenePickerItem Item)> CdCutsceneItems(int? room = null) =>
-        CdCutsceneGroups().Where(group => room is null || group.First.Room == room || group.Others.Any(o => o.Room == room) || CdPlaysIn(group, room.Value))
-            .Select(group => ($"cd-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}",
-                new CutscenePickerItem(CdCutsceneTitle(group.First) + (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
-                    LoomCategory(group.First.Room, group.First.ObjectId, group.First.VerbId, group.IsScene), CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
+    private List<(string Id, CutscenePickerItem Item)> CdCutsceneItems(int? room = null)
+    {
+        // R-8.42 (user, 11 November 2026): a room's list in Normal leaves out a scene the shared engine's plan says shows nothing or shows wrong; until
+        // that planner exists nothing is known, and the list is as before. Advanced lists it, labelled.
+        var shared = _ctx.LoomScenePlanner is { IsValueCreated: true } lazy ? lazy.Value : null;
+        string? Hidden(ScummCutsceneGroup group) => room is null || shared is null ? null : shared.NotOfferedReason(SharedTrigger(shared, group.First));
+        var advanced = IsAdvancedMode;
+        return CdCutsceneGroups().Where(group => room is null || group.First.Room == room || group.Others.Any(o => o.Room == room) || CdPlaysIn(group, room.Value))
+            .Select(group => (Group: group, Hidden: Hidden(group)))
+            .Where(entry => advanced || entry.Hidden is null)
+            .Select(entry => ($"cd-{entry.Group.First.Room}-{entry.Group.First.ObjectId}-{entry.Group.First.VerbId}", NotOfferedLabel(
+                new CutscenePickerItem(CdCutsceneTitle(entry.Group.First) + (room is int shown && entry.Group.First.Room != shown && entry.Group.Others.All(o => o.Room != shown) ? $" (played from Room {entry.Group.First.Room:00})" : ""),
+                    LoomCategory(entry.Group.First.Room, entry.Group.First.ObjectId, entry.Group.First.VerbId, entry.Group.IsScene), CdCutsceneNote(entry.Group), () => PlayCdCutscene(entry.Group)),
+                entry.Hidden))).ToList();
+    }
 
     /// <summary>Whether a headless run of the scene from its start (already derived in the background) was in this room at some point.</summary>
     private bool CdPlaysIn(ScummCutsceneGroup group, int room) =>

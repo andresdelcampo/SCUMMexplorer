@@ -181,11 +181,12 @@ internal static class Program
                         continue;
                     }
                     // l lists the room's Play Cutscene entries (the room controls' own state).
-                    if (raw == "l")
+                    // l lists the room's Play Cutscene entries as Normal mode offers them; la as Advanced lists them (12 November 2026: R-8.42's labels).
+                    if (raw == "l" || raw == "la")
                     {
                         var controls = typeof(MainWindow).GetProperty("CurrentRoomControls", Private)!.GetValue(window)!;
                         var room = (int?)((SCUMMexplorer.Core.Domain.GameResource?)Field("_currentRoomResource"))?.ResourceId;
-                        var state = (RoomControlState)controls.GetType().GetMethod("ReadState")!.Invoke(controls, [room, false])!;
+                        var state = (RoomControlState)controls.GetType().GetMethod("ReadState")!.Invoke(controls, [room, raw == "la"])!;
                         Log($"  room {room} cutscenes ({state.RoomCutscenes.Count}): {string.Join(" | ", state.RoomCutscenes.Select(e => e.Title))}");
                         continue;
                     }

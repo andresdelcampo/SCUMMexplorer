@@ -27,7 +27,7 @@ public partial class MainWindow
             var active = w.PlayActive;
             var shown = w._ctx.CurrentRoomResource is not null;
             var canStart = w.PlayCanStartCutscene;
-            var entries = room is int roomId ? w.PlayCutsceneItems(roomId).Select(choice => ToEntry(choice.Item)).ToList() : [];
+            var entries = room is int roomId ? w.PlayCutsceneItems(roomId, advanced).Select(choice => ToEntry(choice.Item)).ToList() : [];
             var computing = w._ctx.PlayPlanner is not null && !w._ctx.PlayRoomListsDone && w._ctx.PlaySavedRoomLists is null;
             var listing = computing && entries.Count == 0;
             // R-8.5b: the bar stays in a static preview too; what cannot act there is disabled, not hidden.

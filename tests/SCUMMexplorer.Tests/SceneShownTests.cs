@@ -42,4 +42,29 @@ public sealed class SceneShownTests
         Assert.NotNull(plan.Result.Picture);
         Assert.DoesNotContain(plan.Result.Picture!, suspect => suspect.Kind == ScummPictureSuspectKind.CostumeFromBefore);
     }
+
+    [Fact]
+    public void APrintOfBlanksIsNoLine()
+    {
+        // Indy 4 Script 139 +0x006D prints a talk line of blanks every frame; counted, the run of Room 88's exit had 5,982 "lines" (12 November 2026).
+        var blank = new ScummMessage(ScummMessageKind.Talk, 1, 0, [Array.Empty<byte>(), " "u8.ToArray()], 0, 0, false, 8, 320, 15, 1, "test", 0, 0, null);
+        var text = blank with { LineGlyphs = ["Hi"u8.ToArray()] };
+        Assert.False(blank.ShowsText);
+        Assert.True(text.ShowsText);
+    }
+
+    [Fact]
+    public void AScenePictureSuspectIsNotOfferedInNormalMode()
+    {
+        // R-8.42: Indy 3 Room 2's package (verb 0x01, used in Room 18) shows nothing in its first frames; Normal leaves it out, Advanced keeps it.
+        if (Indy3Ega() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var package = Scene(planner, 2, 68, 0x01);
+        Assert.Null(planner.NotOfferedReason(package)); // not planned yet: offered as before
+        planner.PlanSetup(package);
+        Assert.Contains("NothingChanges", planner.NotOfferedReason(package));
+        var door = Scene(planner, 1, 21, 0x01);
+        planner.PlanSetup(door);
+        Assert.Null(planner.NotOfferedReason(door));
+    }
 }

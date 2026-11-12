@@ -149,21 +149,31 @@ public partial class MainWindow
     private static string GenericCutsceneTitle(ScummCutscene trigger) => ScummCutsceneTitles.Plain(trigger);
 
     /// <summary>The list's entries (all, or those that play out in <paramref name="room"/>). The room's list waits for the scan (no entries until then).</summary>
-    private List<(string Id, CutscenePickerItem Item)> PlayCutsceneItems(int? room = null)
+    private List<(string Id, CutscenePickerItem Item)> PlayCutsceneItems(int? room = null, bool? advancedMode = null)
     {
         if (_ctx.PlayPlanner is not { } lazy || room is not null && !lazy.IsValueCreated) return [];
         ScummCutscenePlanner planner;
         try { planner = lazy.Value; }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or NotSupportedException) { return []; }
-        // R-6.36 (user, 24 Oct): Normal lists every entry Advanced lists for the room; no fresh-start-run filter, no mode filter.
         // R-8.2 and R-8.2b (user, 9 November 2026): a room lists its cutscenes (R-8.10), also those Interact triggers (the trigger in Interact, the scene
         // here); dialogue and reactions are Interact's only. The Advanced whole-game picker (no room) lists everything.
+        // R-8.42 and R-1.13 (user, 11 November 2026): Normal leaves out a scene that shows nothing or shows wrong (NotOfferedReason); Advanced lists it,
+        // labelled. This replaces R-6.36's "Normal lists every entry Advanced lists".
+        // The whole-game list (no room) is the Advanced picker's and the harnesses': it keeps every entry, labelled.
+        var advanced = advancedMode ?? IsAdvancedMode;
         return planner.Groups.Where(group => room is null || PlayCutscenePlaysIn(planner, group, room.Value) && planner.IsScene(group))
-            .Select(group => ($"scumm-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}", new CutscenePickerItem(
-                GenericCutsceneTitle(group.First) +
-                (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
-                planner.IsScene(group) ? "Scenes" : "Dialogue and reactions", PlayCutsceneNote(planner, group), () => PlayScummCutscene(group)))).ToList();
+            .Select(group => (Group: group, Hidden: planner.NotOfferedReason(group.First)))
+            .Where(entry => advanced || room is null || entry.Hidden is null)
+            .Select(entry => ($"scumm-{entry.Group.First.Room}-{entry.Group.First.ObjectId}-{entry.Group.First.VerbId}", NotOfferedLabel(new CutscenePickerItem(
+                GenericCutsceneTitle(entry.Group.First) +
+                (room is int shown && entry.Group.First.Room != shown && entry.Group.Others.All(o => o.Room != shown) ? $" (played from Room {entry.Group.First.Room:00})" : ""),
+                planner.IsScene(entry.Group) ? "Scenes" : "Dialogue and reactions", PlayCutsceneNote(planner, entry.Group), () => PlayScummCutscene(entry.Group)),
+                entry.Hidden))).ToList();
     }
+
+    /// <summary>R-8.42 in Advanced: a scene Normal does not offer keeps its entry, its title marked and its note opening with the reason.</summary>
+    private static CutscenePickerItem NotOfferedLabel(CutscenePickerItem item, string? hidden) => hidden is null ? item
+        : item with { Title = item.Title + " · not in Normal", Note = $"Not offered in Normal mode: {hidden}. " + item.Note };
 
     /// <summary>The note behind an entry (R-8.13): the source, what is possible rather than certain, the fresh-start run and the stated start.</summary>
     private static string PlayCutsceneNote(ScummCutscenePlanner planner, ScummCutsceneGroup group)

@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 12 November: the scene lists cleared (roadmap step 4, a and c)
+
+Prints of blanks no longer count as lines (some games print one every frame while a script waits; Indy 4 Room 88's exits counted 5,982), and a blank talk line no longer keeps a scene going: two plans changed (Monkey Island 1's loose board, Zak McKracken Room 17's door), none for the worse. A room's Play Cutscene list in Normal leaves out a scene whose plan begins nothing, starts at its cutscene and shows nothing, or that the picture checks name a suspect; Advanced keeps it, marked "not in Normal" with the reason. Offered in Normal: Indy 3 79 of 81 (97.5%), LOOM's scanned list 168 of 169 (99.4%), Maniac Mansion all, 1,259 of 1,327 over eleven copies (94.9%). Reviewed starts (b) wait for the user's list. [Record](../../.verification/scene-shown-20261112/README.md).
+
 ## 11 November: the shared causes (roadmap step 3)
 
 Two causes, each fixed once for every game. The picture check took actors the game's own scripts dress and place (Indy 3's Marcus and Henry) for leftovers: now only an actor a scene's setup placed can be one. And the setup search kept the first value that begins a scene over the value that is the scene: it now tries each kept value's other values in its place and keeps one when the scene shows more, with one second object per sentence. Indy 3's Give Grail plays the ending (18 lines → 99, Room 94); 27 of 893 searched scenes changed over eleven copies (3.0%), every one shows more, none less; suspects 132 → 75 of 1,981 scenes (6.7% → 3.8%); in the three games Indy 3 8.8% → 1.3%, LOOM 1.6% → 0.5%, Maniac Mansion 0.0%. LOOM English's answer key is unchanged. [Record](../../.verification/picture-checks-20261110/README.md).

@@ -26,6 +26,9 @@ public sealed record ScummMessage(
 {
     public IReadOnlyList<string> Lines => LineGlyphs.Select(ScummTextDecoder.DecodeGlyphs).ToArray();
 
+    /// <summary>Whether the message shows any text: a print of blanks only (a script clearing the talk line every frame) shows nothing.</summary>
+    public bool ShowsText => Lines.Any(line => !string.IsNullOrWhiteSpace(line));
+
     public string Text => string.Join("\n", Lines);
 
     public string Source => $"{SourceLabel} +0x{Offset:X4}";

@@ -90,6 +90,27 @@ public sealed class ScummCutscenePlanner
         return _lastResort[Key(trigger)] = plan with { Result = plan.Result with { Picture = watched.Begun ? watched.Picture ?? [] : [] } };
     }
 
+    /// <summary>
+    /// R-8.42 and R-1.13 (user, 11 November 2026): why Normal mode does not offer the scene, or null when it does. Not offered, once its plan is
+    /// known: a scene no start begins, one started at its cutscene that shows no line, no other room and no animation, and one the picture checks
+    /// name a suspect (<see cref="ScummScenePictureCheck"/>). Until its plan is known a scene is offered as before (a pick works the plan out on the
+    /// spot): the plans are derived in the background, LOOM's one scene at a time, and the lists would otherwise stay empty for minutes on a first
+    /// launch. Advanced lists them all, with this reason. Asks only what is known (no run): safe on the UI thread.
+    /// </summary>
+    public string? NotOfferedReason(ScummCutscene trigger)
+    {
+        ArgumentNullException.ThrowIfNull(trigger);
+        if (!_lastResort.TryGetValue(Key(trigger), out var plan)) return null;
+        var shown = plan.Result;
+        if (!shown.Begun) return "no start was found that begins it";
+        // An animation is something shown (Indy 4 Room 57's statue head turns without a line).
+        if (shown.Way == ScummPickedStart.AtCutscene && shown.Lines == 0 && shown.RoomsEntered.Count == 0 && !shown.ChangesView && shown.Animation is null)
+            return "started at its cutscene, it shows no line, no other room and no animation";
+        if (shown.Picture is { Count: > 0 } found)
+            return "the picture check names " + string.Join("; ", found.Select(f => f.Describe()));
+        return null;
+    }
+
     /// <summary>What the picture checks found for a planned scene, as a sentence for Advanced; empty while unknown or when they found nothing.</summary>
     public string PictureNote(ScummCutscene trigger) =>
         _lastResort.TryGetValue(Key(trigger), out var plan) && plan.Result.Picture is { Count: > 0 } found

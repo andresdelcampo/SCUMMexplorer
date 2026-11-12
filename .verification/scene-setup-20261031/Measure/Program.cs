@@ -134,6 +134,20 @@ if (Environment.GetEnvironmentVariable("MEASURE_WINDOWPATH") is { Length: > 0 } 
     foreach (var line in s1.SessionTrace.TakeLast(25)) Console.WriteLine("  | " + (line.Length > 180 ? line[..180] : line));
     return;
 }
+// MEASURE_LINES=room,object,verb(hex): the scene played as its plan plays it, then the texts it printed, distinct, with their count and the place that
+// printed them (12 November 2026, roadmap step 4: entries whose runs print a line nearly every frame).
+if (Environment.GetEnvironmentVariable("MEASURE_LINES") is { Length: > 0 } linesSpec)
+{
+    var q = linesSpec.Split(',');
+    var t = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(c => c.Room == int.Parse(q[0]) && c.ObjectId == int.Parse(q[1]) && c.VerbId == Convert.ToInt32(q[2], 16));
+    var plan = planner.PlanSetup(t);
+    ScummSession? last = null;
+    var seen = ScummCutsceneRun.Run(game, () => last = newRun(), plan.Result.Verb is int v ? t with { VerbId = v } : t, plan.Edits, plan.Result.Way);
+    Console.WriteLine($"way {seen.Way} begun {seen.Begun} lines {seen.Lines} rooms [{string.Join(",", seen.RoomsEntered)}] frames {seen.Frames}");
+    foreach (var group in last!.Messages.Log.GroupBy(m => (Text: string.Join(" / ", m.Lines), m.Kind, m.SourceLabel, m.Offset)).OrderByDescending(g => g.Count()).Take(15))
+        Console.WriteLine($"  {group.Count(),5} x {group.Key.Kind} [{group.Key.Text}] from {group.Key.SourceLabel} +0x{group.Key.Offset:X4}");
+    return;
+}
 // MEASURE_GREP=text: every instruction of every script, entry, exit and object verb whose operation or operands contain the text (9 November 2026).
 if (Environment.GetEnvironmentVariable("MEASURE_GREP") is { Length: > 0 } grep)
 {
@@ -299,4 +313,22 @@ if (Environment.GetEnvironmentVariable("MEASURE_PICTURE") != "0")
     Console.WriteLine($"picture: {suspects} of {watched} scenes that begin are suspects ({Percent(suspects)})");
     foreach (var kind in Enum.GetValues<ScummPictureSuspectKind>())
         Console.WriteLine($"picture: {kind} {byKind.GetValueOrDefault(kind)} ({Percent(byKind.GetValueOrDefault(kind))})");
+}
+// 12 November 2026 (roadmap step 4, R-8.42): the scenes a room's list offers in Normal mode, and those it leaves out (shown in Advanced, labelled),
+// by reason. The scenes are the entries the rooms list (IsScene); dialogue and reactions are Interact's.
+{
+    var scenes = listed.Where(planner.IsScene).ToList();
+    var hidden = new SortedDictionary<string, int>(StringComparer.Ordinal);
+    foreach (var g in scenes)
+    {
+        planner.PlanSetup(g.First);
+        if (planner.NotOfferedReason(g.First) is not { } reason) continue;
+        var kind = reason.StartsWith("the picture check", StringComparison.Ordinal) ? "a picture suspect" : reason;
+        hidden[kind] = hidden.GetValueOrDefault(kind) + 1;
+        Console.WriteLine($"NORMAL hidden Room {g.First.Room:00} object {g.First.ObjectId} verb 0x{g.First.VerbId:X2} ({g.First.ObjectName}): {reason}");
+    }
+    string P(int count) => scenes.Count == 0 ? "-" : $"{100.0 * count / scenes.Count:F1}%";
+    var left = hidden.Values.Sum();
+    Console.WriteLine($"normal: {scenes.Count - left} of {scenes.Count} scenes offered ({P(scenes.Count - left)}); not offered {left} ({P(left)})");
+    foreach (var (reason, count) in hidden) Console.WriteLine($"normal: not offered, {reason}: {count} ({P(count)})");
 }
