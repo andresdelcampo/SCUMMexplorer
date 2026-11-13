@@ -58,8 +58,29 @@ LOOM English's Normal lists play the reviewed catalog; each scene was played fro
 
 Measured on all eleven copies (`../scene-setup-20261031/*-run77.txt` against `*-run76.txt`): 4 of 893 searched scenes changed their plan (0.4%): Indy 3's motorcycle in both copies (Berlin, 1 → 5 lines) and Monkey Island 2 Room 21's juju bag (2 → 7 lines) show more; Indy 4 Room 93's hole shows less (1 → 0 lines: the added candidate pushed "the room entered as pseudo room 221" past the search's 16 candidates). Normal offers the same as before.
 
+## Indy 3's leftovers (13 November 2026)
+
+| Named | Before | Now |
+|---|---|---|
+| Going to Berlin | Henry absent: his lines ("No, Junior. We're going to Berlin.") had no one to say them | Henry walks to the motorcycle ("We have to travel light. I left all that baggage behind."), then the whole Berlin exchange, on to Room 72 ✔ (window: `indy3-fixes/berlin`) |
+| Leaving in the plane | no entry | Room 37 · Action button, the cockpit panel (object 573): "Hold on, Dad! Here we go!" and the flight in Room 70 ✔ (window: `indy3-fixes/plane2`, the biplane in the sky at 18 s). Listed among Interact's actions and in the whole-game picker, not in Room 37's Play Cutscene list: a room's list judges a scene by its fresh run, which here is the cockpit's chatter (2 lines) |
+| The three Grail trials | no entries | not done: see below |
+
+Shared fixes:
+
+- **The room's other ways in** are setup values beside the door its entry tests (`ScummSceneSetupSearch`: Room 77's entry, +0x0006, compares the door the hero came in by with 848, the castle tunnel).
+- **An arrival by the door the setup names plays to its end before the pick** (`ScummCutsceneRun.LetRoomMeetHero`, also from the window and LOOM's path): Room 77's local script 200 brings Henry; picked at once, the scene's own cutscene froze it. Played out for every kept arrival, it moved scenes elsewhere (Indy 3 Room 23's doors, Indy 4 Room 02's car); only for a named door it changes nothing else.
+- **An object whose only code is its fallback verb** is a scene trigger (`ScummCutsceneIndex`): the cockpit panel runs Script 49 for any verb.
+- **A begun scene's test values together** (`ScummSceneSetupSearch.Place`): for a scene a fresh start begins, the values on the scene's side of its tests are tried together, then with each other candidate added (three at most), kept when the scene shows more. The take-off needs five switches on, the panel out of class 6 and the throttle at 556 at once.
+
+Measured on all eleven copies (`../scene-setup-20261031/*-run78.txt` against `*-run77.txt`): 37 of 2,146 entries changed (1.7%), 32 show more (Indy 3's motorcycle, Indy 4 Room 23's entry 3 → 11 lines, Monkey Island 1 Room 37's entry 3 → 14 lines and Room 48, ...), 5 trade a line for another room or lose one (Indy 3 Room 39's wrench 1 → 0 lines; Monkey Island 1's troll and Monkey Island 2's ship's horn one line less, one room more); 24 new entries, the fallback-only objects (Maniac Mansion's six kids on the selection screen, Indy 3's cockpit panel and copy-protection screen, Zak McKracken's fence). Normal offers the same share as before in every game. LOOM English's answer key: 236 of 238 reviewed replays reach the same rooms (237 before; "Look at loom", Room 09, now plays a 48-line branch to Room 59 on the shared engine; LOOM English's Normal lists play the reviewed catalog).
+
+### The three Grail trials: not reached by any trigger
+
+Rooms 83 (the Breath of God) and 84 (the Word of God), and probably 85 (its entry installs its own input script too; the Path of God, "the leap from the lion's head", Script 130, was not traced to a room), do their trials through the room's own input script, not through objects: Room 83's entry installs local script 200 as the input script (`var[0x020]` = 200), which walks Indy in on a click and, once he is past x 288, plays "The penitent man is humble before God... Kneel!" and the blades (+0x0045 to +0x00F0). Room 84 picks the spelling of "Jehovah" its floor uses (entry +0x0015). The scan looks at entries, object verbs and arrival scripts only, so no entry lists them. Two ways on, a decision for the user: a shared trigger kind, "a click in a room whose entry installs its own input script" (generic, but each needs a point to click and a bounded run), or a reviewed start per trial for Indy 3 (R-8.42: a visit and a click, as data for the copy).
+
 ## Not done (for a reviewed start, or a later shared fix)
 
-- Indy 3: Henry absent from the Berlin scene; leaving the zeppelin in the plane (no entry found); the trials of Rooms 87 to 90 (no entries).
+- Indy 3: the three Grail trials (Rooms 83, 84 and probably 85, input-script trials, above).
 - Maniac Mansion: during an ending the room's Play Cutscene button is disabled until another room is opened (by rule R-8.34; no change made).
 - LOOM: done (13 November); the ending's start is reviewed data in `MainWindow.LoomCutscenes.cs` (`EndingSteps`) and its room link in `loom-replays.json`.

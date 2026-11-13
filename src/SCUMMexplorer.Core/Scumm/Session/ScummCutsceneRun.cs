@@ -107,20 +107,35 @@ public static class ScummCutsceneRun
     /// hero is put at the object again. A global script's cutscene (Indy 3's guards, Scripts 58 and 64) is not the room's reaction and is left to the
     /// scene. Returns the frames played.
     /// </summary>
-    public static int LetRoomMeetHero(ScummSession session, ScummCutscene trigger)
+    /// <param name="setup">The scene's setup: when it names the door the hero comes in by (<see cref="ScummSetupKind.EnteredBy"/>), that arrival's cutscene
+    /// plays to its end first.</param>
+    public static int LetRoomMeetHero(ScummSession session, ScummCutscene trigger, IReadOnlyList<ScummSetupEdit>? setup = null)
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(trigger);
         if (trigger.IsRoomEntry || session.CurrentRoomId != trigger.Room) return 0;
+        // An arrival by the door the setup names still playing its cutscene plays to its end first, as the game plays it before the player can act
+        // (13 November 2026: Indy 3 Room 77, by the castle tunnel, object 848: local script 200 brings Henry to the motorcycle; picked at once, the
+        // scene's own cutscene froze it and Henry's lines had no one to say them). Only then: other kept arrivals (a pseudo room number, a value an
+        // arrival script tests) played out first moved scenes elsewhere (Indy 3 Room 23's doors, Indy 4 Room 02's car).
+        var arrival = 0;
+        if (session.InCutscene && setup?.Any(edit => edit.Kind == ScummSetupKind.EnteredBy) == true)
+            for (var quiet = 0; arrival < MeetFrames && session.CurrentRoomId == trigger.Room; arrival++)
+            {
+                quiet = !session.InCutscene && session.Messages.HaveMsg == 0 ? quiet + 1 : 0;
+                if (quiet >= 2) break;
+                session.StepFrame();
+            }
+        if (session.CurrentRoomId != trigger.Room) return Math.Max(arrival, 2);
         var reached = trigger.Scripts.Select(ScriptKey).Where(key => key is not null).ToHashSet();
         var traced = session.SessionTrace.Count;
         var begunBefore = session.CutscenesBegun;
         session.PutHeroAtObject(trigger.ObjectId);
         session.StepFrame();
-        if (session.CutscenesBegun == begunBefore) return 1;
+        if (session.CutscenesBegun == begunBefore) return Math.Max(arrival, 1);
         var owners = session.SessionTrace.Skip(traced).Where(line => line.StartsWith("cutscene at ", StringComparison.Ordinal))
             .Select(line => line["cutscene at ".Length..]).ToList();
-        if (owners.Count == 0 || owners.Any(owner => RoomOf(owner) != trigger.Room || reached.Contains(ScriptKey(owner)))) return 1;
+        if (owners.Count == 0 || owners.Any(owner => RoomOf(owner) != trigger.Room || reached.Contains(ScriptKey(owner)))) return Math.Max(arrival, 1);
         var frames = 1;
         for (var quiet = 0; frames < MeetFrames && session.CurrentRoomId == trigger.Room; frames++)
         {
@@ -197,7 +212,7 @@ public static class ScummCutsceneRun
             else if (!trigger.IsRoomEntry)
             {
                 // What the room does as the hero reaches the object plays before the scene (LetRoomMeetHero); the direct way runs the verb where he stands.
-                if (way != ScummPickedStart.Direct && LetRoomMeetHero(session, trigger) > 1 && session.CurrentRoomId != playIn.ResourceId) session.VisitRoom(playIn);
+                if (way != ScummPickedStart.Direct && LetRoomMeetHero(session, trigger, setup) > 1 && session.CurrentRoomId != playIn.ResourceId) session.VisitRoom(playIn);
                 // The rooms the visit itself entered (a pseudo room, an entry that moves on) are not the scene's.
                 mark = session.RoomsEntered.Count;
                 earlier = session.CutscenesBegun;

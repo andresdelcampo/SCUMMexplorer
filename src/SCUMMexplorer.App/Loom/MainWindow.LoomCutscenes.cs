@@ -564,7 +564,7 @@ public partial class MainWindow
             {
                 session.PutHeroAtObject(trigger.ObjectId);
                 // As the plan's runs: what the room does as Bobbin reaches the object (Room 23's shepherds meet him) plays first, unseen.
-                if (ScummCutsceneRun.LetRoomMeetHero(session, sharedTrigger) > 1)
+                if (ScummCutsceneRun.LetRoomMeetHero(session, sharedTrigger, plan.Edits) > 1)
                 {
                     if (session.CurrentRoomId != room.ResourceId) session.VisitRoom(room);
                     before = (session.CutscenesBegun, session.EgoPuts);

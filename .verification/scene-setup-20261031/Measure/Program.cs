@@ -35,7 +35,10 @@ if (Environment.GetEnvironmentVariable("MEASURE_OBJECT_CODE") is { Length: > 0 }
         Console.WriteLine($"  {ins.Offset:X4} {ins.Operation} {ins.Operands}");
     var codePlanner = new ScummCutscenePlanner(game);
     foreach (var t in codePlanner.Triggers.Where(t => t.Room == int.Parse(p[0]) && t.ObjectId == int.Parse(p[1]) && t.VerbId == Convert.ToInt32(p[2], 16)))
+    {
         foreach (var c in codePlanner.Setup.Candidates(t)) Console.WriteLine($"  candidate {c.Kind} {c.Target} {c.Value}: {c.Describe()}");
+        foreach (var c in codePlanner.Setup.GuardValues(t)) Console.WriteLine($"  guard {c.Describe()}");
+    }
     return;
 }
 if (Environment.GetEnvironmentVariable("MEASURE_OBJECTS") is { Length: > 0 } objectRoom)
@@ -178,6 +181,33 @@ if (Environment.GetEnvironmentVariable("MEASURE_SEQ") is { Length: > 0 } seq && 
     }
     { var rt = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(s)!; Console.WriteLine($"bits D66 {rt.GlobalVariables.GetValueOrDefault("bit[0xD66]")} D65 {rt.GlobalVariables.GetValueOrDefault("bit[0xD65]")} D64 {rt.GlobalVariables.GetValueOrDefault("bit[0xD64]")} D79 {rt.GlobalVariables.GetValueOrDefault("bit[0xD79]")} pending {s.Snapshot.PendingScripts} | {string.Join(" | ", s.Snapshot.Uncertainties.TakeLast(4))}"); }
     if (Environment.GetEnvironmentVariable("MEASURE_SEQ_TRACE") is { Length: > 0 } tr) foreach (var line in s.SessionTrace.Where(l => l.Contains(tr)).TakeLast(40)) Console.WriteLine("  | " + (line.Length > 220 ? line[..220] : line));
+    return;
+}
+// MEASURE_RUN=room,object,verb(hex);state:565=1;var:var[0x063]=556;class:573=6;bit:bit[0x5CF]=1 (13 November 2026): one run of a scene with exactly
+// these setup values, its lines in order (to find a reviewed start).
+if (Environment.GetEnvironmentVariable("MEASURE_RUN") is { Length: > 0 } runSpec)
+{
+    var parts = runSpec.Split(';');
+    var q = parts[0].Split(',');
+    var t = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(c => c.Room == int.Parse(q[0]) && c.ObjectId == int.Parse(q[1]) && c.VerbId == Convert.ToInt32(q[2], 16));
+    var edits = new List<ScummSetupEdit>();
+    foreach (var part in parts.Skip(1))
+    {
+        var kv = part.Split(':', 2); var tv = kv[1].Split('=');
+        edits.Add(kv[0] switch
+        {
+            "state" => new(ScummSetupKind.ObjectState, tv[0], int.Parse(tv[1]), "probe"),
+            "var" => new(ScummSetupKind.Variable, tv[0], int.Parse(tv[1]), "probe"),
+            "bit" => new(ScummSetupKind.Bit, tv[0], int.Parse(tv[1]), "probe"),
+            "class" => new(ScummSetupKind.ObjectClass, tv[0], int.Parse(tv[1]), "probe"),
+            "by" => new(ScummSetupKind.EnteredBy, ScummVars.WalkToObject, int.Parse(tv[1]), "probe", t.Room),
+            _ => throw new ArgumentException(kv[0]),
+        });
+    }
+    ScummSession? last = null; var bootLines = 0;
+    var seen = ScummCutsceneRun.Run(game, () => { last = newRun(); bootLines = last.Messages.Log.Count; return last; }, t, edits);
+    Console.WriteLine($"begun {seen.Begun} lines {seen.Lines} rooms [{string.Join(",", seen.RoomsEntered)}] frames {seen.Frames} {seen.Failure}");
+    foreach (var m in last!.Messages.Log.Skip(bootLines).Where(m => m.ShowsText).Take(30)) Console.WriteLine($"  [{string.Join(" / ", m.Lines).Trim()}] from {m.SourceLabel}");
     return;
 }
 // MEASURE_LIST=1: every entry with its title, kind, plan (way, lines, rooms, frames), whether Normal offers it, and its first printed text (12 November

@@ -372,7 +372,7 @@ public partial class MainWindow
                 }
                 var second = ScummSetupEdit.SecondOf(plan?.Edits);
                 // As the plan's runs: what the room does as the hero reaches the object (LOOM Room 23's shepherds meet him) plays first, unseen.
-                if (plan?.Result.Way != ScummPickedStart.Direct && ScummCutsceneRun.LetRoomMeetHero(session, trigger) > 1)
+                if (plan?.Result.Way != ScummPickedStart.Direct && ScummCutsceneRun.LetRoomMeetHero(session, trigger, plan?.Edits) > 1)
                 {
                     _sceneSound.StopAll("the room's own cutscene played before a picked scene");
                     if (session.CurrentRoomId != playRoom.ResourceId) session.VisitRoom(playRoom);

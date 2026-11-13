@@ -164,6 +164,9 @@ public static partial class ScummCutsceneIndex
                 // Verbs whose entries point at the same code run one script (Indy3's light switch: Push, Pull, Use and Turn off), so the code is
                 // named after the lowest of them and the triggers group as one scene.
                 var real = entries.Where(v => !v.IsFallback).ToArray();
+                // An object whose only code is its fallback verb runs it for any verb (13 November 2026: Indy 3 Room 37's cockpit panel, object 573,
+                // starts Script 49, the biplane's take-off, "Hold on, Dad! Here we go!"): that code is the object's scene.
+                if (real.Length == 0) real = entries.ToArray();
                 foreach (var verb in real)
                 {
                     var owner = verbs.NamesSharedCode ? real.Where(v => v.ScriptOffset == verb.ScriptOffset).Min(v => v.VerbId) : verb.VerbId;

@@ -465,7 +465,7 @@ internal static class Program
                         if (action is null) { Log($"{raw}: no such action in the room shown ({Field("_genericActionsRoom")})"); continue; }
                         Log($"{raw}: interact \"{action.GetType().GetProperty("Title")!.GetValue(action)}\"");
                         typeof(MainWindow).GetMethod("RunGenericRoomAction", Private)!.Invoke(window, [action]);
-                        for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
+                        for (var i = 1; i <= (int.TryParse(Environment.GetEnvironmentVariable("WINDOWCHECK_I"), out var iSeconds) ? iSeconds * 2 / 3 : 6); i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2 || i % 8 == 0) Capture(raw.Replace(':', '-').Replace(',', '-') + $"-{i:00}"); }
                         continue;
                     }
                     var spec = raw;

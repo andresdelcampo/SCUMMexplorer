@@ -37,8 +37,9 @@ public sealed class ScummManiacEnhancedCutsceneTests
     {
         if (Planner.Value is not { } planner) return;
         // 8 November 2026: scenes that take control by hiding the interface count too (ScummSceneMarks).
-        Assert.Equal(90, planner.Triggers.Count);
-        Assert.Equal(48, planner.Groups.Count);
+        // 13 November 2026: an object whose only code is its fallback verb is a trigger (the six kids of the selection screen, Room 45).
+        Assert.Equal(96, planner.Triggers.Count);
+        Assert.Equal(54, planner.Groups.Count);
         Assert.Equal("Abrir", planner.Verbs.WordFor(1));
         Assert.Equal("Qué es", planner.Verbs.WordFor(15));
         Assert.Equal("teléfono", Assert.Single(planner.Triggers, t => t.Room == 5 && t.ObjectId == 136 && t.VerbId == 11).ObjectName);

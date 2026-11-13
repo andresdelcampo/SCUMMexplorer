@@ -695,9 +695,12 @@ public sealed partial class ScummSceneSetupSearch
         if (!_isV2 && !trigger.IsRoomEntry && Read($"Room {trigger.Room} entry script", trigger) is { } entry)
             foreach (var ins in entry.Instructions.Where(i => i.Operation is "isEqual" or "isNotEqual"))
                 if (ins.Operands.Split(',', StringSplitOptions.TrimEntries) is [var tested, var door, ..] && tested == ScummVars.WalkToObject &&
-                    Literal(door) is int byDoor and > 0 &&
-                    !found.Any(f => f.Edit.Kind == ScummSetupKind.EnteredBy && f.Edit.Value == byDoor))
-                    found.Add((new(ScummSetupKind.EnteredBy, tested, byDoor, $"Room {trigger.Room} entry script +0x{ins.Offset:X4}", trigger.Room), 1));
+                    Literal(door) is int byDoor and > 0)
+                    // The door tested, then the room's other ways in, the test's other side (13 November 2026: Indy 3 Room 77's entry, +0x0006,
+                    // starts local 200, which brings Henry to the motorcycle, only when the hero did not come in by object 848, the castle tunnel).
+                    foreach (var way in new[] { byDoor }.Concat(ScummEgoArrivalIndex.For(_game).Into(trigger.Room).Select(a => a.ObjectId).Where(o => o > 0)).Distinct())
+                        if (!found.Any(f => f.Edit.Kind == ScummSetupKind.EnteredBy && f.Edit.Value == way))
+                            found.Add((new(ScummSetupKind.EnteredBy, tested, way, $"Room {trigger.Room} entry script +0x{ins.Offset:X4}", trigger.Room), 1));
         // A room the game uses under several pseudo room numbers (Zak McKracken's airports: Room 8 as 141 to 148): an object's scene may not care which,
         // but one arrival's entry begins a cut-away (as 144, Script 140, the Room 16 "meanwhile"), so each number is tried, after the other values.
         if (!trigger.IsRoomEntry)

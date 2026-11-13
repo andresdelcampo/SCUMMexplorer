@@ -35,6 +35,9 @@ public sealed partial class ScummSceneSetupSearch
         _roomNeeds.Value.TryGetValue(room, out var needs) ? needs : [];
 
     /// <summary>The trigger's plan when a fresh start already begins it: the state of the room it is in (<see cref="RoomNeeds"/>) and of the code before, if kept.</summary>
+    /// <summary>Candidates added one at a time to a begun scene's values tried together (<see cref="Place"/>).</summary>
+    public const int MaxTogetherAdditions = 3;
+
     public ScummScenePlan Place(ScummCutscene trigger, ScummCutsceneRunResult fresh)
     {
         ArgumentNullException.ThrowIfNull(trigger);
@@ -42,6 +45,22 @@ public sealed partial class ScummSceneSetupSearch
         return _placed.GetOrAdd(Key(trigger), _ => new(() =>
         {
             var (best, kept) = Placed(trigger, fresh, []);
+            // A scene a fresh start begins may hold more behind several tests at once (13 November 2026: Indy 3 Room 37's cockpit button, Script 49:
+            // the take-off, "Hold on, Dad! Here we go!" and the flight, only with five switches on and the throttle full; one value alone changes
+            // nothing): the values on the scene's side of its tests, together, kept when the scene then shows more.
+            // A test whose scene's side is the jump (Script 49 +0x0046, the throttle at 556) is not among those values: the other candidates are each
+            // added in turn, a few at most.
+            if (GuardValues(trigger).Where(guard => !kept.Any(edit => OneValueKey(edit) == OneValueKey(guard))).ToList() is { Count: > 1 } together)
+            {
+                var others = Candidates(trigger).Where(c => c.Kind != ScummSetupKind.PlayedIn && !kept.Concat(together).Any(edit => OneValueKey(edit) == OneValueKey(c)))
+                    .GroupBy(OneValueKey).Select(g => g.First()).Take(MaxTogetherAdditions).ToList();
+                foreach (var extra in new ScummSetupEdit?[] { null }.Concat(others))
+                {
+                    var trial = kept.Concat(together).Concat(extra is null ? [] : [extra]).ToList();
+                    var result = _run(trigger, trial);
+                    if (result.Failure is null && result.Begun && result.Score > best.Score) { best = result; kept = trial; break; }
+                }
+            }
             var plan = new ScummScenePlan(kept, fresh, best, "");
             return kept.Count == 0 ? plan : plan with
             {
