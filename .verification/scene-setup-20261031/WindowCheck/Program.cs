@@ -208,7 +208,7 @@ internal static class Program
                         var choice = overview.Groups[at[0]].Choices[at[1]];
                         Log($"{raw}: {overview.Groups[at[0]].Heading} · {choice.Label}");
                         choice.Run();
-                        for (var i = 1; i <= 6; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2) Capture(raw.Replace(':', '-').Replace(',', '-')); }
+                        for (var i = 1; i <= (int.TryParse(Environment.GetEnvironmentVariable("WINDOWCHECK_I"), out var cSeconds) ? cSeconds * 2 / 3 : 6); i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i == 2 || i % 8 == 0) Capture(raw.Replace(':', '-').Replace(',', '-') + $"-{i:00}"); }
                         continue;
                     }
                     // e presses Skip (Esc), as the playback bar does (6 November 2026: a scene skipped, then played again).

@@ -8676,16 +8676,6 @@
       ],
       "frames": 834,
       "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands."
-    },
-    {
-      "id": "Room 66 object 834 Verb 0x54",
-      "startRoom": 66,
-      "rooms": [
-        2,
-        66
-      ],
-      "frames": 2100,
-      "source": "Reviewed start (R-8.42, 12 November 2026): the ending, Room 66 object 834 verb 0x54 starting script 106; rooms and length (\"The End\" at about 2,100 frames) from its headless run and its window run."
     }
   ]
 }

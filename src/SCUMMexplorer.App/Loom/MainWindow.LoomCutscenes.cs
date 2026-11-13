@@ -41,14 +41,7 @@ public partial class MainWindow
             "+0x0023; endCutscene +0x0536 in Room 38. Bobbin wears Rusty's look here: the unseen first steps of this " +
             "sequence cast the Awakening and the costume change on Rusty in Room 34 (the game's own scenes, run without showing them) and apply " +
             "the supported Game Status edit \"staff held\", since Stoke takes the distaff in this scene.",
-            Steps: FirewoodSteps, SilentSteps: FirewoodSilentSteps),
-        // R-8.42 (user, 12 November 2026: the endings are scenes that matter); the catalog has no entry for it.
-        new("The ending", 66, 834, 0x54, 106,
-            "Room 66 object 834 (Bobbin himself) verb 0x54, the Transcend draft, starts script 106 (+0x0005): input and the cursor off, " +
-            "Room 66's local 206 started, then Bobbin's transformation (costume 0x7D, +0x00B5), Room 02 and the credits to \"The End\". " +
-            "Reviewed start (R-8.42): script 106 waits until bit[0xD66] (+0x0020) and bit[0xD65] (+0x002B) are clear, the draft's playback over " +
-            "(script 021 clears them); a session left mid-draft by an earlier scene would wait for ever, so both are cleared first.",
-            Steps: EndingSteps)
+            Steps: FirewoodSteps, SilentSteps: FirewoodSilentSteps)
     ];
 
     // Room 34's Awakening (script 085) and costume change (local 202) give Bobbin Rusty's look (costume 0x67), which
@@ -63,15 +56,6 @@ public partial class MainWindow
         new("scene", EndBoundary: "endCutscene at Script 86 +0x0536", ExpectedRoom: 38)
     ];
     internal const int FirewoodSilentSteps = 8;
-
-    // The ending (R-8.42, 12 November 2026): the draft's playback over (the bits script 021 clears), then the Transcend on Bobbin, watched to its end.
-    internal static LoomReplayStep[] EndingSteps =>
-    [
-        new("visit", 66),
-        new("bit", 0xD66, 0, EndBoundary: "Script 21, the draft's playback ended"),
-        new("bit", 0xD65, 0, EndBoundary: "Script 21, the draft's playback ended"),
-        new("verb", 834, 0x54), new("frames", Frames: LoomExplorationSession.CutsceneFrameLimit)
-    ];
 
     /// <summary>LOOM EGA and CD (and the demos): the state, derivations and Game Texts cutscenes that are LOOM's alone.</summary>
     private sealed class LoomGameModule(MainWindow w) : GameModuleBase

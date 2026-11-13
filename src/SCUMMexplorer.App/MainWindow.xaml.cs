@@ -4410,10 +4410,11 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// The player has no control: a cutscene is open, or the boot still plays its opening (script 044 opens no
-    /// cutscene of its own; script 001 turns input off and sets <c>bit[0xD6E]</c> around it).
+    /// The player has no control: a cutscene is open, the boot still plays its opening (script 044 opens no
+    /// cutscene of its own; script 001 turns input off and sets <c>bit[0xD6E]</c> around it), or a script has switched input off
+    /// (13 November 2026: the ending, Script 106, takes control that way; the clock stopped following it and the ending stood still).
     /// </summary>
-    private bool SessionInScene => _ctx.Session is { } session && (session.InCutscene || session.BootRunning);
+    private bool SessionInScene => _ctx.Session is { } session && (session.InCutscene || session.BootRunning || session.InputTakenByScript);
 
     private bool PlaybackHasActivity => _ctx.ReplaySequence is { Complete: false, Failure: null } || SessionInScene || _ctx.Playback is { Preview: true } || _ctx.Session is { } session &&
         (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||

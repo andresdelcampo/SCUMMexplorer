@@ -48,7 +48,7 @@ LOOM English's Normal lists play the reviewed catalog; each scene was played fro
 | Unwinding the whirlwind | Room 13 · Twisting (reverse) at waterspout | the waterspout spins down in a green swirl and is gone. Played straight after its arrival (Room 12 · Reached Room 13) it shows the waterspout first; picked on its own, the swirl is over within six seconds ✔ |
 | Opening the sky on Loom island | Room 02 · Opening at sky | Rooms 02, 11, 03, 10: the swans ✔ (the shared engine's picture check names actor 3, the flying swan, moving on its first frame; probably right) |
 | Also: Mandible at the cage | Room 43 · Opening at cage (Script 91) | "Give me that!", "Mandible! That distaff will never work for you." ✔ |
-| The ending | **new:** Room 66 · The ending | was in no list (the catalog has no entry). Now a named sequence like the Elders' trial, a reviewed start (R-8.42): Room 66 object 834 (Bobbin) verb 0x54, the Transcend, starts Script 106; its two waits (+0x0020, +0x002B) hold until `bit[0xD66]` and `bit[0xD65]` are clear, the draft's playback over, and a session left mid-draft by an earlier scene waited for ever. The start clears both first (a new `bit` step of LOOM's replays, labelled with the code it stands in for). In the window: "Fly away while you can, Weaver boy.", "One day we will meet again!", "Bobbin. It's time!", Room 02; headless (`MEASURE_SEQ`) on to the credits and "The End" at about 2,100 frames ✔ |
+| The ending | Room 66 · Interact: myself · Draft: Transcend | stood still after the cast: its script (106) takes control by switching input off (+0x0007), not with a cutscene, and LOOM's playback clock stopped following it. Input switched off by a script now counts as a scene for that clock (`ScummSession.InputTakenByScript`, 13 November). In the window: "Fly away while you can, Weaver boy.", "One day we will meet again!", "Bobbin. It's time!", then Room 02; headless on to the credits and "The End". (A hand-made named entry made on 13 November first was removed the same day: the user's scenes are a test set for the normal mechanisms, not hand-made starts.) ✔ |
 
 ## Fixes made for them (shared code, every game)
 
@@ -83,4 +83,4 @@ Rooms 83 (the Breath of God) and 84 (the Word of God), and probably 85 (its entr
 
 - Indy 3: the three Grail trials (Rooms 83, 84 and probably 85, input-script trials, above).
 - Maniac Mansion: during an ending the room's Play Cutscene button is disabled until another room is opened (by rule R-8.34; no change made).
-- LOOM: done (13 November); the ending's start is reviewed data in `MainWindow.LoomCutscenes.cs` (`EndingSteps`) and its room link in `loom-replays.json`.
+- LOOM: done (13 November); the ending through Interact.

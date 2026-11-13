@@ -114,6 +114,12 @@ public abstract partial class ScummSession
     /// <summary>In a cutscene, or (versions 1 and 2) with the interface hidden by a script until one shows it again (<see cref="ScummSceneMarks"/>).</summary>
     public bool InScene => InCutscene || _runtime.V2InterfaceOff;
 
+    /// <summary>
+    /// A script has switched the player's input off (<c>cursorCommand userInputOff</c>, ScummVM <c>_userPut</c> at 0 or below) in versions 3 and later:
+    /// it has taken control without a <c>cutscene</c> (13 November 2026: LOOM's ending, Script 106 +0x0007, the Transcend).
+    /// </summary>
+    public bool InputTakenByScript => !_runtime.IsV2 && _runtime.UserPut <= 0;
+
     /// <summary>The scripts whose instructions count as a picked scene's own (<see cref="SceneActivity"/>), by their session label; null for none.</summary>
     public Func<string, bool>? WatchScript { get; set; }
 

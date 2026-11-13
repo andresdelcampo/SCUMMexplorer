@@ -9,13 +9,17 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 13 November: the scenes that matter are a test set; LOOM's ending through Interact
+
+The user, 13 November: the named scenes are for testing, launched through Play Cutscene and Interact, not hand-made starts. R-8.42 and the roadmap's step 4 say so now. LOOM's ending had been added as a hand-made named entry; it is gone again. The ending plays through Interact (Room 66, Transcend on Bobbin): its script takes control by switching input off rather than with a cutscene, and LOOM's playback clock now counts that as a scene. [Record](../../.verification/scenes-that-matter-20261112/README.md).
+
 ## 13 November: Indy 3's Berlin with Henry, and the plane's take-off
 
 Four shared fixes: a room's other ways in are setup values; an arrival by the door the setup names plays to its end before the pick (Henry walks to the motorcycle and says his lines); an object whose only code is its fallback verb is a scene trigger (the cockpit panel); a begun scene's test values are tried together, then with each other candidate added (the take-off needs five switches, the panel's class and the throttle at once: "Hold on, Dad! Here we go!", the flight). 37 of 2,146 entries changed over eleven copies (1.7%), 32 show more; LOOM's answer key 236 of 238 rooms the same (237 before). The Grail trials are input-script trials no trigger reaches: a decision for the user. [Record](../../.verification/scenes-that-matter-20261112/README.md).
 
 ## 13 November: LOOM's scenes that matter
 
-Every scene the user named for LOOM plays in the window from LOOM English's own lists: the intro, the green sheep and the dragon, Rusty's story, Mandible and Chaos, the Elders' trial, the whirlwind unwound, the sky, Mandible at the cage. The ending was in no list; it is now a named sequence with a reviewed start (R-8.42): the Transcend on Bobbin in Room 66, Script 106, whose waits hold until the draft-playing bits are clear, so the start clears them (a new labelled `bit` step of LOOM's replays). It plays on to Room 02 and "The End". [Record](../../.verification/scenes-that-matter-20261112/README.md).
+Every scene the user named for LOOM plays in the window from LOOM English's own lists: the intro, the green sheep and the dragon, Rusty's story, Mandible and Chaos, the Elders' trial, the whirlwind unwound, the sky, Mandible at the cage. The ending was in no list (see above: it now plays through Interact). [Record](../../.verification/scenes-that-matter-20261112/README.md).
 
 ## 12 November: the scenes that matter, first pass (roadmap step 4 b)
 

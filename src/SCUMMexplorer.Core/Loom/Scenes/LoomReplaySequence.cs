@@ -1,6 +1,6 @@
 namespace SCUMMexplorer.Core.Loom;
 
-/// <summary>Explicit exploration inputs and bounded waits. The only state writes are the labelled setups (staff, place, actor, bit), each naming the game code it stands in for.</summary>
+/// <summary>Explicit exploration inputs and bounded waits. No prerequisite state writes.</summary>
 public sealed record LoomReplayStep(string Kind, int ObjectId = 0, int Verb = 0,
     int X = 0, int Y = 0, int Frames = 3000, string? EndBoundary = null, int? ExpectedRoom = null);
 
@@ -32,7 +32,7 @@ public sealed class LoomReplaySequence
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
-        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "place" or "actor" or "bit" or "frames" or "scene") ||
+        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "place" or "actor" or "frames" or "scene") ||
             s.Frames < 1 || s.Frames > LoomExplorationSession.CutsceneFrameLimit ||
             s.Kind == "scene" && (s.EndBoundary is null || s.ExpectedRoom is null)))
             throw new ArgumentException("A sequence needs explicit inputs and bounded, source-established completion waits.", nameof(steps));
@@ -76,13 +76,6 @@ public sealed class LoomReplaySequence
                     return _frames >= step.Frames ? Fail("The actor placement never became possible: the session did not settle.") : true;
                 try { _session.PlaceActorInRoom(step.ObjectId, step.X, step.Y, step.Verb, step.EndBoundary ?? "the game's code"); }
                 catch (InvalidOperationException ex) { return Fail($"The actor placement was refused: {ex.Message}"); }
-                Next(); continue;
-            }
-            if (step.Kind == "bit")
-            {
-                // A labelled setup (a reviewed start, R-8.42): bit ObjectId set to Verb, where EndBoundary names the game code that sets it in play
-                // (LOOM's ending: the Transcend's script 106 waits until bit[0xD66] and bit[0xD65] are clear, the draft's playback over).
-                _session.ApplySceneSetup([new ScummSetupEdit(ScummSetupKind.Bit, $"bit[0x{step.ObjectId:X3}]", step.Verb, step.EndBoundary ?? "a reviewed start")]);
                 Next(); continue;
             }
             if (step.Kind == "visit")
