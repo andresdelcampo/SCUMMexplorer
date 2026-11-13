@@ -1,0 +1,58 @@
+  5,83s derivation done=False, LOOM lists=False
+  8,86s w:45 +3s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 11,87s w:45 +6s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 14,89s w:45 +9s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 17,90s w:45 +12s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 20,92s w:45 +15s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 23,94s w:45 +18s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 26,94s w:45 +21s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 29,96s w:45 +24s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 32,98s w:45 +27s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 35,99s w:45 +30s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 39,00s w:45 +33s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 42,03s w:45 +36s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 45,05s w:45 +39s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 48,07s w:45 +42s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 51,09s w:45 +45s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 52,64s RL:13 item "Room 10 · Walk to Room 13 (played from Room 10)" [Scenes]
+ 52,64s RL:13 item "Room 12 · Reached Room 13 (played from Room 12)" [Scenes]
+ 52,64s RL:13 item "Room 13 · Reached Room 15" [Scenes]
+ 52,64s RL:13 item "Room 13 · Reached Room 10" [Scenes]
+ 52,64s RL:13 item "Room 13 · Twisting at waterspout" [Scenes]
+ 52,64s RL:13 item "Room 13 · Twisting (reverse) at waterspout" [Scenes]
+ 52,64s RL:13: 6 items
+ 52,64s RL:13: shared planner runs 187 of 405
+ 54,73s RL:13: object 0 verb 0x00 run False planned False cutscene False animation Room 13 entry script +0x00EE putActor lines 48
+ 56,16s RL:13: object 323 verb 0x37 run False planned False cutscene False animation - lines 0
+ 56,16s RL:13: object 323 verb 0x38 run True planned True cutscene True animation Script 54 +0x000C setCameraAt lines 24
+ 56,16s RL:13: object 324 verb 0x36 run True planned True cutscene True animation Script 107 +0x0007 setCameraAt lines 24
+ 56,31s RL:13: object 324 verb 0x38 run False planned False cutscene False animation Script 107 +0x0007 setCameraAt lines 24
+ 56,31s RL:13: object 325 verb 0x36 run True planned True cutscene False animation - lines 1
+ 56,31s RL:13: object 325 verb 0x3A run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 56,43s RL:13: object 325 verb 0x3B run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 56,44s RL:13: object 325 verb 0x41 run True planned True cutscene True animation Script 41 +0x004C animateActor lines 1
+ 56,44s RL:13: object 325 verb 0x42 run True planned True cutscene True animation Room 13 local script 202 +0x004F putActor lines 0
+ 56,57s RL:13: object 325 verb 0x45 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 56,70s RL:13: object 325 verb 0x46 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 56,70s RL:13: object 325 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 56,71s RP:13,5: playing "Room 13 · Twisting (reverse) at waterspout"
+ 58,63s RP:13,5 +1,5s: room=13 cutscene=True texts=[ / _ / `] printed=83 last=[=] status=[Scene ready]
+ 60,14s RP:13,5 +3,0s: room=13 cutscene=True texts=[ / _ / `] printed=83 last=[=] status=[Scene ready]
+ 61,66s RP:13,5 +4,5s: room=13 cutscene=True texts=[ / _ / `] printed=83 last=[=] status=[Scene ready]
+ 63,17s RP:13,5 +6,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Scene ready]
+ 64,71s RP:13,5 +7,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Scene ready]
+ 66,23s RP:13,5 +9,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 67,74s RP:13,5 +10,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 69,25s RP:13,5 +12,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 70,80s RP:13,5 +13,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 72,31s RP:13,5 +15,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 73,82s RP:13,5 +16,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 75,35s RP:13,5 +18,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 76,89s RP:13,5 +19,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 78,39s RP:13,5 +21,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 79,91s RP:13,5 +22,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 81,42s RP:13,5 +24,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 82,95s RP:13,5 +25,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 84,45s RP:13,5 +27,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 85,98s RP:13,5 +28,5s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+ 87,51s RP:13,5 +30,0s: room=13 cutscene=False texts=[ / _ / `] printed=83 last=[=] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]

@@ -32,11 +32,23 @@ How they were found: `Measure` with `MEASURE_LIST=1` (every entry with title, pl
 | Microwave | Room 07 · Open microwave oven | "Oh no! Radioactive steam!" ✔ |
 | Tentacles | Room 12 · Entry (the Green Tentacle on the stairs: "You can't pass until you feed me!"); the demo tape; Room 29's valve ("TENTACLE!!! FRONT AND CENTER!") | ✔. Room 07 · Give can of Pepsi shows the Green Tentacle in the kitchen door and nothing else: its code only turns him and opens the stairs (Script 54), and the setup had put him away (`var[0x0AE]` = 255) |
 
-Found while doing it: after an ending (the car), a later pick in the same window did nothing: Maniac Mansion's ending is a cutscene that never ends, and Maniac Mansion and Zak McKracken do not start a scene while a cutscene runs. Each scene was then played in its own window.
+Found while doing it: after an ending (the car), a later pick from the whole-game list in the same window did nothing: Maniac Mansion's ending is a cutscene that never ends ("Press f4 to play again"), and Maniac Mansion and Zak McKracken do not start a scene while a cutscene runs (R-8.34), so the room's Play Cutscene button stays disabled during it. Opening another room ends it, and its scenes then play (13 November, `../scenes-that-matter-20261112/maniac-after-ending`: the car, then Room 20, then the demo tape). Each scene here was played in its own window.
 
-## LOOM
+## LOOM (EGA English, Roland), in the window (13 November 2026)
 
-LOOM English's Normal lists play the reviewed catalog. Found there: the green sheep (Room 24 · Draft response 5 at sheep, on to the dragon's Rooms 27 and 28), the boy (Room 34 · Draft responses at boy, Script 85, Room 52), the Elders' trial (the named sequence), the sky (Room 02 · Draft response 1 at sky). Not identified yet: Death killing the bishop (candidates Room 44 · Look at Mandible, Room 41's sword drafts), the whirlwind, and the ending (Room 02's local script 203 and Room 66's Transcend, script 106, are not in the catalog). Not played in the window yet.
+LOOM English's Normal lists play the reviewed catalog; each scene was played from its room's Play Cutscene list (`WindowCheck` `RL:room` lists it, `RP:room,index` plays it, `WINDOWCHECK_RP=seconds`). Names matched through the scripts' own texts (`MEASURE_GREP`).
+
+| Named | Entry | Seen |
+|---|---|---|
+| Intro | Room 01 · The Intro | the title, then Room 53: "Rise, son of Cygna. It is the dawn of your seventeenth year." ✔ |
+| Sheep green, captured by the dragon | Room 24 · Dyeing at sheep | Rooms 24, 27, 28: the dragon, "Well, well. Silly me. This is what I get for being in a hurry." ✔ |
+| The dragon kills the boy | Room 34 · Walk to Rusty | "Rusty, this is awful! How did it happen?", then Rusty's own story in Room 57 (the strange kid who switched clothes with him, the forty-foot dragon) ✔ |
+| Death kills the bishop | Room 44 · Look at Mandible (Script 95) | "I see Cob is being lax in his duties... the dawn of a new era", the Pattern torn open, Chaos ("I am Chaos.", Room 45 local 203) ✔ |
+| The Elders' trial | Room 08 · The Elders' trial (named sequence) | Bobbin at the sanctuary, then the trial at the loom ("I have no defense or excuses, Elder Atropos.", "Why do you disobey us, Hetchel?") ✔ |
+| Unwinding the whirlwind | Room 13 · Twisting (reverse) at waterspout | the waterspout spins down in a green swirl and is gone. Played straight after its arrival (Room 12 · Reached Room 13) it shows the waterspout first; picked on its own, the swirl is over within six seconds ✔ |
+| Opening the sky on Loom island | Room 02 · Opening at sky | Rooms 02, 11, 03, 10: the swans ✔ (the shared engine's picture check names actor 3, the flying swan, moving on its first frame; probably right) |
+| Also: Mandible at the cage | Room 43 · Opening at cage (Script 91) | "Give me that!", "Mandible! That distaff will never work for you." ✔ |
+| The ending | **new:** Room 66 · The ending | was in no list (the catalog has no entry). Now a named sequence like the Elders' trial, a reviewed start (R-8.42): Room 66 object 834 (Bobbin) verb 0x54, the Transcend, starts Script 106; its two waits (+0x0020, +0x002B) hold until `bit[0xD66]` and `bit[0xD65]` are clear, the draft's playback over, and a session left mid-draft by an earlier scene waited for ever. The start clears both first (a new `bit` step of LOOM's replays, labelled with the code it stands in for). In the window: "Fly away while you can, Weaver boy.", "One day we will meet again!", "Bobbin. It's time!", Room 02; headless (`MEASURE_SEQ`) on to the credits and "The End" at about 2,100 frames ✔ |
 
 ## Fixes made for them (shared code, every game)
 
@@ -49,5 +61,5 @@ Measured on all eleven copies (`../scene-setup-20261031/*-run77.txt` against `*-
 ## Not done (for a reviewed start, or a later shared fix)
 
 - Indy 3: Henry absent from the Berlin scene; leaving the zeppelin in the plane (no entry found); the trials of Rooms 87 to 90 (no entries).
-- Maniac Mansion: a later scene cannot be picked while the ending's cutscene runs.
-- LOOM: the three unidentified scenes; nothing played in the window yet.
+- Maniac Mansion: during an ending the room's Play Cutscene button is disabled until another room is opened (by rule R-8.34; no change made).
+- LOOM: done (13 November); the ending's start is reviewed data in `MainWindow.LoomCutscenes.cs` (`EndingSteps`) and its room link in `loom-replays.json`.

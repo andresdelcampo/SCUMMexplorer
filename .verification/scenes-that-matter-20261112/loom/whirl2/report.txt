@@ -1,0 +1,88 @@
+  4,55s derivation done=False, LOOM lists=False
+  7,56s w:45 +3s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 10,57s w:45 +6s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 13,58s w:45 +9s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 16,59s w:45 +12s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 19,61s w:45 +15s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 22,63s w:45 +18s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 25,65s w:45 +21s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 28,66s w:45 +24s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 31,69s w:45 +27s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 34,72s w:45 +30s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 37,73s w:45 +33s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 40,74s w:45 +36s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 43,76s w:45 +39s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 46,77s w:45 +42s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 49,79s w:45 +45s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 50,92s RL:13 item "Room 10 · Walk to Room 13 (played from Room 10)" [Scenes]
+ 50,93s RL:13 item "Room 12 · Reached Room 13 (played from Room 12)" [Scenes]
+ 50,93s RL:13 item "Room 13 · Reached Room 15" [Scenes]
+ 50,93s RL:13 item "Room 13 · Reached Room 10" [Scenes]
+ 50,93s RL:13 item "Room 13 · Twisting at waterspout" [Scenes]
+ 50,93s RL:13 item "Room 13 · Twisting (reverse) at waterspout" [Scenes]
+ 50,93s RL:13: 6 items
+ 50,93s RL:13: shared planner runs 243 of 405
+ 52,72s RL:13: object 0 verb 0x00 run False planned False cutscene False animation Room 13 entry script +0x00EE putActor lines 48
+ 53,95s RL:13: object 323 verb 0x37 run False planned False cutscene False animation - lines 0
+ 53,95s RL:13: object 323 verb 0x38 run True planned True cutscene True animation Script 54 +0x000C setCameraAt lines 24
+ 53,95s RL:13: object 324 verb 0x36 run True planned True cutscene True animation Script 107 +0x0007 setCameraAt lines 24
+ 54,07s RL:13: object 324 verb 0x38 run False planned False cutscene False animation Script 107 +0x0007 setCameraAt lines 24
+ 54,07s RL:13: object 325 verb 0x36 run True planned True cutscene False animation - lines 1
+ 54,07s RL:13: object 325 verb 0x3A run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 54,18s RL:13: object 325 verb 0x3B run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 54,19s RL:13: object 325 verb 0x41 run True planned True cutscene True animation Script 41 +0x004C animateActor lines 1
+ 54,19s RL:13: object 325 verb 0x42 run True planned True cutscene True animation Room 13 local script 202 +0x004F putActor lines 0
+ 54,31s RL:13: object 325 verb 0x45 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 54,41s RL:13: object 325 verb 0x46 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 54,41s RL:13: object 325 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 54,41s RP:13,1: playing "Room 12 · Reached Room 13 (played from Room 12)"
+ 57,33s RP:13,1 +1,5s: room=12 cutscene=True texts=[] printed=11 last=[] status=[Scene ready]
+ 58,83s RP:13,1 +3,0s: room=12 cutscene=True texts=[] printed=11 last=[] status=[Scene ready]
+ 60,37s RP:13,1 +4,5s: room=12 cutscene=True texts=[ / _ / `] printed=36 last=[Here we go again.] status=[Scene ready]
+ 61,92s RP:13,1 +6,0s: room=12 cutscene=True texts=[ / _ / `] printed=36 last=[Here we go again.] status=[Scene ready]
+ 63,44s RP:13,1 +7,5s: room=12 cutscene=True texts=[ / _ / `] printed=36 last=[Here we go again.] status=[Scene ready]
+ 64,95s RP:13,1 +9,0s: room=12 cutscene=True texts=[ / _ / `] printed=36 last=[Here we go again.] status=[Scene ready]
+ 66,48s RP:13,1 +10,5s: room=12 cutscene=True texts=[ / _ / `] printed=36 last=[Here we go again.] status=[Scene ready]
+ 68,02s RP:13,1 +12,0s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Scene ready]
+ 69,53s RP:13,1 +13,5s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Scene ready]
+ 71,08s RP:13,1 +15,0s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Scene ready]
+ 72,61s RP:13,1 +16,5s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Object 322's verb 0x38 (run directly) sent to the game: entered Room 13]
+ 74,14s RP:13,1 +18,0s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Object 322's verb 0x38 (run directly) sent to the game: entered Room 13]
+ 75,69s RP:13,1 +19,5s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Object 322's verb 0x38 (run directly) sent to the game: entered Room 13]
+ 77,20s RP:13,1 +21,0s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Object 322's verb 0x38 (run directly) sent to the game: entered Room 13]
+ 78,72s RP:13,1 +22,5s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Object 322's verb 0x38 (run directly) sent to the game: entered Room 13]
+ 80,28s RP:13,1 +24,0s: room=13 cutscene=False texts=[ / _ / `] printed=37 last=[] status=[Object 322's verb 0x38 (run directly) sent to the game: entered Room 13]
+ 80,28s RP:13,4: playing "Room 13 · Twisting at waterspout"
+ 82,16s RP:13,4 +1,5s: room=13 cutscene=True texts=[ / _ / `] printed=37 last=[] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 83,69s RP:13,4 +3,0s: room=13 cutscene=True texts=[ / _ / `] printed=37 last=[] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 85,20s RP:13,4 +4,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 86,73s RP:13,4 +6,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 88,24s RP:13,4 +7,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 89,75s RP:13,4 +9,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 91,29s RP:13,4 +10,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 92,82s RP:13,4 +12,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+ 94,32s RP:13,4 +13,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+ 95,87s RP:13,4 +15,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+ 97,40s RP:13,4 +16,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+ 98,93s RP:13,4 +18,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+100,48s RP:13,4 +19,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+102,00s RP:13,4 +21,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+103,53s RP:13,4 +22,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+105,09s RP:13,4 +24,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x41 (run directly) sent to the game (assumed input); no room load was reached]
+105,09s RP:13,5: playing "Room 13 · Twisting (reverse) at waterspout"
+106,83s RP:13,5 +1,5s: room=13 cutscene=True texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting (reverse) at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+108,36s RP:13,5 +3,0s: room=13 cutscene=True texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting (reverse) at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+109,86s RP:13,5 +4,5s: room=13 cutscene=True texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting (reverse) at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+111,41s RP:13,5 +6,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting (reverse) at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+112,91s RP:13,5 +7,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Playing Room 13 · Twisting (reverse) at waterspout from a stated start (see the tooltip). Escape skips once the cutscene allows it.]
+114,44s RP:13,5 +9,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+115,99s RP:13,5 +10,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+117,50s RP:13,5 +12,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+119,02s RP:13,5 +13,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+120,55s RP:13,5 +15,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+122,08s RP:13,5 +16,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+123,61s RP:13,5 +18,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+125,15s RP:13,5 +19,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+126,66s RP:13,5 +21,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+128,18s RP:13,5 +22,5s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]
+129,72s RP:13,5 +24,0s: room=13 cutscene=False texts=[ / _ / `] printed=38 last=[It's twisting hard enough already! Must be SOME way to untwist it ...] status=[Object 325's verb 0x42 (run directly) sent to the game (assumed input); no room load was reached]

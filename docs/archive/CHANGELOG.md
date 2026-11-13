@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 13 November: LOOM's scenes that matter
+
+Every scene the user named for LOOM plays in the window from LOOM English's own lists: the intro, the green sheep and the dragon, Rusty's story, Mandible and Chaos, the Elders' trial, the whirlwind unwound, the sky, Mandible at the cage. The ending was in no list; it is now a named sequence with a reviewed start (R-8.42): the Transcend on Bobbin in Room 66, Script 106, whose waits hold until the draft-playing bits are clear, so the start clears them (a new labelled `bit` step of LOOM's replays). It plays on to Room 02 and "The End". [Record](../../.verification/scenes-that-matter-20261112/README.md).
+
 ## 12 November: the scenes that matter, first pass (roadmap step 4 b)
 
 The user's named scenes were found and played in the window for Indy 3 and Maniac Mansion: the intros, the endings, the whip, the Grail temple, the zeppelin, Venice, Donovan, the car into space, the meltdown, the demo tape, the microwave, the Green Tentacle. Shared fixes on the way: a pick whose plan is still being worked out shows "Preparing the scene…" (a first pick waited up to half a minute with nothing on screen); an owner test inside a scene is a setup value (Indy 3's motorcycle now goes to Berlin); one second object per setup also when every value is tried together. 4 of 893 searched scenes changed (0.4%), 3 show more, Indy 4 Room 93's hole one line less. Left: Henry in the Berlin scene, the plane off the zeppelin, Maniac Mansion after its ending, LOOM. [Record](../../.verification/scenes-that-matter-20261112/README.md).

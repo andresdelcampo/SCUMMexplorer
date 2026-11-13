@@ -1,0 +1,61 @@
+  6,55s derivation done=False, LOOM lists=False
+  9,59s w:45 +3s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 12,59s w:45 +6s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 15,62s w:45 +9s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 18,64s w:45 +12s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 21,67s w:45 +15s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 24,69s w:45 +18s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 27,72s w:45 +21s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 30,74s w:45 +24s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 33,75s w:45 +27s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 36,78s w:45 +30s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 39,81s w:45 +33s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 42,81s w:45 +36s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 45,83s w:45 +39s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 48,84s w:45 +42s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 51,87s w:45 +45s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 52,54s RL:2 item "The Intro (played from Room 69)" [Scenes]
+ 52,54s RL:2 item "Room 02 · Reached Room 03" [Scenes]
+ 52,55s RL:2 item "Room 02 · Look at leaf" [Scenes]
+ 52,55s RL:2 item "Room 02 · Opening at sky" [Scenes]
+ 52,55s RL:2: 4 items
+ 52,55s RL:2: shared planner runs 185 of 405
+ 53,30s RL:2: object 0 verb 0x00 run False planned False cutscene False animation Room 02 entry script +0x0034 putActor lines 0
+ 53,30s RL:2: object 153 verb 0x38 run True planned True cutscene True animation Room 02 Object 153 Verb 0x38 +0x0019 panCameraTo lines 0
+ 53,30s RL:2: object 154 verb 0x36 run True planned True cutscene True animation Room 02 Object 154 Verb 0x36 +0x001C walkActorTo lines 1
+ 53,39s RL:2: object 154 verb 0x41 run False planned False cutscene False animation Room 02 Object 154 Verb 0x41 +0x001C walkActorTo lines 1
+ 53,46s RL:2: object 154 verb 0x42 run False planned False cutscene False animation Room 02 Object 154 Verb 0x42 +0x001C walkActorTo lines 1
+ 53,47s RL:2: object 154 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 53,47s RL:2: object 156 verb 0x3A run True planned True cutscene True animation Script 49 +0x009F putActor lines 1
+ 53,47s RL:2: object 156 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 53,47s RP:2,3: playing "Room 02 · Opening at sky"
+ 60,40s RP:2,3 +1,5s: room=2 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 61,92s RP:2,3 +3,0s: room=2 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 63,43s RP:2,3 +4,5s: room=2 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 64,94s RP:2,3 +6,0s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 66,46s RP:2,3 +7,5s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 67,96s RP:2,3 +9,0s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 69,50s RP:2,3 +10,5s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 71,01s RP:2,3 +12,0s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 72,52s RP:2,3 +13,5s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 74,03s RP:2,3 +15,0s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 75,55s RP:2,3 +16,5s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 77,06s RP:2,3 +18,0s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 78,60s RP:2,3 +19,5s: room=11 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 80,13s RP:2,3 +21,0s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 81,65s RP:2,3 +22,5s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 83,16s RP:2,3 +24,0s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 84,66s RP:2,3 +25,5s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 86,19s RP:2,3 +27,0s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 87,73s RP:2,3 +28,5s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 89,24s RP:2,3 +30,0s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 90,77s RP:2,3 +31,5s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 92,30s RP:2,3 +33,0s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 93,82s RP:2,3 +34,5s: room=3 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 95,34s RP:2,3 +36,0s: room=10 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 96,89s RP:2,3 +37,5s: room=10 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 98,40s RP:2,3 +39,0s: room=10 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+ 99,91s RP:2,3 +40,5s: room=10 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+101,42s RP:2,3 +42,0s: room=10 cutscene=True texts=[`] printed=58 last=[=] status=[Scene ready]
+102,95s RP:2,3 +43,5s: room=2 cutscene=True texts=[`] printed=59 last=[] status=[Scene ready]
+104,47s RP:2,3 +45,0s: room=2 cutscene=True texts=[`] printed=59 last=[] status=[Scene ready]

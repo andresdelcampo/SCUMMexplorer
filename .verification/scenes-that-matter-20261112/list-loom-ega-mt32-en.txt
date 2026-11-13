@@ -1,0 +1,194 @@
+193 groups, planner ready in 2,2 s
+LIST scene normal Room 02 object 0 verb 0x00 [Room 02 · Entry] way Game lines 0 rooms [] frames 30 edits 1 first "" scripts global script 45
+LIST scene normal Room 02 object 153 verb 0x38 [Room 02 · Action Unnamed object] way Game lines 0 rooms [3] frames 56 edits 0 first "" scripts Room 2 object 153 verb 0x38
+LIST scene normal Room 02 object 154 verb 0x36 [Room 02 · Action leaf] way Game lines 1 rooms [] frames 39 edits 0 first "Last leaf of the year." scripts Room 2 object 154 verb 0x36
+LIST scene HIDDEN Room 02 object 156 verb 0x3A [Room 02 · Action sky] way Game lines 1 rooms [11,3,10] frames 443 edits 0 first "Is it over now?" scripts global script 49 | global script 29 | global script 45
+LIST react normal Room 03 object 165 verb 0x56 [Room 03 · Action sky] way Game lines 1 rooms [] frames 42 edits 0 first "Think I'll have to get closer first." scripts Room 3 object 165 verb 0x56
+LIST scene normal Room 04 object 169 verb 0x37 [Room 04 · Action Unnamed object] way Game lines 0 rooms [] frames 4 edits 0 first "@" scripts Room 4 object 169 verb 0x37
+LIST scene normal Room 04 object 170 verb 0x37 [Room 04 · Action Unnamed object] way Game lines 0 rooms [] frames 41 edits 0 first "@" scripts Room 4 object 170 verb 0x37
+LIST scene normal Room 04 object 171 verb 0x36 [Room 04 · Action hole] way Game lines 1 rooms [] frames 30 edits 0 first "There's an owl in there!" scripts Room 4 local script 200
+LIST scene normal Room 04 object 176 verb 0x36 [Room 04 · Action thorns] way Game lines 2 rooms [] frames 74 edits 0 first "Poor little fella." scripts Room 4 local script 202
+LIST react normal Room 04 object 177 verb 0x36 [Room 04 · Action grave] way Game lines 2 rooms [] frames 83 edits 0 first "I can't read this gravestone." scripts Room 4 object 177 verb 0x36
+LIST scene normal Room 04 object 177 verb 0x3A [Room 04 · Action grave] way Game lines 1 rooms [] frames 105 edits 0 first "Maybe I'd better not try that." scripts Room 4 local script 209
+LIST react normal Room 04 object 197 verb 0x56 [Room 04 · Action sky] way Game lines 1 rooms [] frames 42 edits 0 first "Think I'll have to get closer first." scripts Room 4 object 197 verb 0x56
+LIST react normal Room 06 object 205 verb 0x36 [Room 06 · Action dye pot] way Game lines 1 rooms [] frames 41 edits 0 first "It's bubbling." scripts Room 6 local script 201
+LIST react normal Room 06 object 206 verb 0x3E [Room 06 · Action wool] way Game lines 1 rooms [] frames 40 edits 0 first "@" scripts Room 6 local script 200 | global script 29 | Room 6 local script 211
+LIST scene normal Room 06 object 206 verb 0x3F [Room 06 · Action wool] way Game lines 1 rooms [] frames 66 edits 0 first "@" scripts Room 6 local script 200 | global script 29 | Room 6 local script 212
+LIST react normal Room 06 object 209 verb 0x36 [Room 06 · Action book] way Game lines 2 rooms [] frames 96 edits 0 first "This is the Book of Patterns that  Hetchel lets me read sometimes." scripts Room 6 object 209 verb 0x36
+LIST scene normal Room 06 object 214 verb 0x36 [Room 06 · Action flask] way Game lines 1 rooms [] frames 43 edits 0 first "Oops!" scripts Room 6 local script 215
+LIST scene normal Room 08 object 255 verb 0x38 [Room 08 · Action Unnamed object] way Game lines 40 rooms [9,67,54,3,11] frames 2465 edits 0 first "Looks as if the Elders are busy." scripts global script 46 | Room 8 local script 208 | Room 8 local script 209
+LIST react normal Room 08 object 256 verb 0x36 [Room 08 · Action tapestry] way Game lines 2 rooms [] frames 122 edits 0 first "The threads describe the creation of the world  and the passage of the Two Shadows." scripts Room 8 object 256 verb 0x36
+LIST react normal Room 08 object 256 verb 0x3E [Room 08 · Action tapestry] way Game lines 1 rooms [] frames 53 edits 0 first "This tapestry's already as colorful  as it can get." scripts Room 8 local script 211 | Room 8 local script 208 | global script 29
+LIST scene normal Room 08 object 256 verb 0x3F [Room 08 · Action tapestry] way Game lines 1 rooms [] frames 68 edits 0 first "I've already spun all the color out." scripts Room 8 local script 212 | Room 8 local script 209 | global script 29
+LIST react normal Room 08 object 257 verb 0x36 [Room 08 · Action tapestry] way Game lines 2 rooms [] frames 121 edits 0 first "The pattern shows the rise of the Guilds,  and the story of the Weavers' founding." scripts Room 8 object 257 verb 0x36
+LIST scene normal Room 08 object 257 verb 0x3E [Room 08 · Action tapestry] way Game lines 1 rooms [] frames 68 edits 0 first "This tapestry's already as colorful  as it can get." scripts Room 8 local script 213 | Room 8 local script 208 | global script 29
+LIST react normal Room 08 object 257 verb 0x3F [Room 08 · Action tapestry] way Game lines 1 rooms [] frames 51 edits 0 first "I've already spun all the color out." scripts Room 8 local script 214 | Room 8 local script 209 | global script 29
+LIST react normal Room 08 object 258 verb 0x36 [Room 08 · Action tapestry] way Game lines 3 rooms [] frames 180 edits 0 first "This is the last section of  the Long Tapestry." scripts Room 8 object 258 verb 0x36
+LIST scene normal Room 08 object 258 verb 0x3E [Room 08 · Action tapestry] way Game lines 1 rooms [] frames 68 edits 0 first "This tapestry's already as colorful  as it can get." scripts Room 8 local script 215 | Room 8 local script 208 | global script 29
+LIST scene normal Room 08 object 258 verb 0x3F [Room 08 · Action tapestry] way Game lines 2 rooms [] frames 71 edits 0 first "I've already spun all the color out." scripts Room 8 local script 216 | Room 8 local script 209 | global script 29
+LIST scene normal Room 09 object 268 verb 0x37 [Room 09 · Action Unnamed object] way Game lines 2 rooms [] frames 109 edits 0 first "That egg just made a sound." scripts Room 9 local script 214 | global script 47 | global script 101
+LIST scene normal Room 09 object 270 verb 0x36 [Room 09 · Action egg] way Game lines 1 rooms [] frames 71 edits 0 first "It's trying to open!" scripts Room 9 object 270 verb 0x36
+LIST scene normal Room 09 object 270 verb 0x3A [Room 09 · Action egg] way Game lines 26 rooms [81,8] frames 1897 edits 0 first "Thank goodness you're still here." scripts global script 47 | global script 29
+LIST scene normal Room 09 object 271 verb 0x38 [Room 09 · Action distaff] way Game lines 25 rooms [] frames 42 edits 0 first "Feels heavier than it looks." scripts Room 9 object 271 verb 0x38
+LIST react normal Room 09 object 272 verb 0x36 [Room 09 · Action loom] way Game lines 1 rooms [] frames 55 edits 0 first "It's quiet. The echoes in the Loom  have all died away." scripts Room 9 local script 209 | global script 101
+LIST scene normal Room 09 object 272 verb 0x52 [Room 09 · Action loom] way Game lines 14 rooms [14,51,59,61] frames 923 edits 0 first "Bobbin! Bobbin, you did it!" scripts global script 104 | global script 29
+LIST scene normal Room 09 object 273 verb 0x4D [Room 09 · Action Hetchel] way Game lines 1 rooms [] frames 66 edits 0 first "That didn't help. She must be under  some kind of magic spell." scripts Room 9 object 273 verb 0x4D | Room 9 local script 222
+LIST scene normal Room 09 object 273 verb 0x4F [Room 09 · Action Hetchel] way Game lines 1 rooms [] frames 66 edits 0 first "Thanks goodness! I can talk again!" scripts Room 9 local script 223 | Room 9 local script 222
+LIST scene normal Room 09 object 273 verb 0x51 [Room 09 · Action Hetchel] way Game lines 1 rooms [] frames 66 edits 0 first "Begone from this chamber, Evil One.  The Loom shall never be yours!" scripts Room 9 local script 224 | Room 9 local script 222
+LIST scene normal Room 09 object 273 verb 0x56 [Room 09 · Action Hetchel] way Game lines 1 rooms [] frames 66 edits 0 first "Hmm. That didn't do her any good." scripts Room 9 local script 222
+LIST scene normal Room 09 object 274 verb 0x36 [Room 09 · Action feather] way Game lines 2 rooms [] frames 138 edits 0 first "Hetchel's feather! It's still there!" scripts global script 105
+LIST scene normal Room 09 object 275 verb 0x56 [Room 09 · Action Dead One] way Game lines 0 rooms [] frames 29 edits 0 first "Throw away that stick, young fool." scripts Room 9 local script 221
+LIST scene normal Room 10 object 0 verb 0x00 [Room 10 · Entry] way Game lines 0 rooms [] frames 56 edits 1 first "" scripts Room 10 local script 200
+LIST scene normal Room 10 object 295 verb 0x38 [Room 10 · Action Unnamed object] way Game lines 24 rooms [11,13] frames 81 edits 0 first "@" scripts global script 52 | Room 10 local script 213 | Room 10 local script 212 | global script 29
+LIST scene normal Room 10 object 296 verb 0x3A [Room 10 · Action clam] way Game lines 0 rooms [] frames 66 edits 0 first "@" scripts Room 10 local script 212 | global script 29 | global script 41
+LIST scene normal Room 10 object 296 verb 0x3B [Room 10 · Action clam] way Game lines 1 rooms [] frames 57 edits 0 first "Shame to ruin the gull's breakfast." scripts Room 10 object 296 verb 0x3B | Room 10 local script 213 | global script 41
+LIST react normal Room 10 object 297 verb 0x36 [Room 10 · Action gull] way Game lines 0 rooms [] frames 44 edits 0 first "" scripts Room 10 local script 205
+LIST scene normal Room 12 object 322 verb 0x38 [Room 12 · Action Unnamed object] way Game lines 25 rooms [13] frames 67 edits 0 first "Here we go again." scripts Room 12 object 322 verb 0x38
+LIST scene normal Room 13 object 0 verb 0x00 [Room 13 · Entry] way Game lines 48 rooms [14,12] frames 245 edits 1 first "@" scripts global script 53
+LIST react HIDDEN Room 13 object 323 verb 0x37 [Room 13 · Action Unnamed object] way none lines 0 rooms [14,12] frames 600 edits 0 first "" scripts Room 13 object 323 verb 0x37
+LIST scene normal Room 13 object 323 verb 0x38 [Room 13 · Action Unnamed object] way Game lines 24 rooms [15] frames 74 edits 0 first "_" scripts global script 54 | global script 29
+LIST scene normal Room 13 object 324 verb 0x36 [Room 13 · Action Unnamed object] way Game lines 24 rooms [10] frames 20 edits 0 first "_" scripts global script 107
+LIST react normal Room 13 object 325 verb 0x36 [Room 13 · Action waterspout] way Game lines 1 rooms [] frames 79 edits 0 first "Whew! Listen to that twisty wind!" scripts Room 13 object 325 verb 0x36 | global script 11
+LIST scene normal Room 13 object 325 verb 0x42 [Room 13 · Action waterspout] way Game lines 0 rooms [] frames 44 edits 0 first "@" scripts Room 13 local script 202
+LIST scene normal Room 15 object 0 verb 0x00 [Room 15 · Entry] way Game lines 0 rooms [] frames 46 edits 1 first "" scripts Room 15 local script 200
+LIST scene normal Room 15 object 338 verb 0x38 [Room 15 · Action Unnamed object] way Game lines 0 rooms [23] frames 24 edits 0 first "" scripts Room 15 object 338 verb 0x38
+LIST scene normal Room 16 object 350 verb 0x47 [Room 16 · Action workers] way Game lines 1 rooms [] frames 80 edits 0 first "That felt right. I think it worked." scripts Room 16 local script 204 | global script 41
+LIST scene normal Room 17 object 0 verb 0x00 [Room 17 · Entry] way Game lines 9 rooms [56] frames 619 edits 1 first "Greetings, stranger." scripts Room 17 local script 200 | global script 66
+LIST scene normal Room 17 object 357 verb 0x3A [Room 17 · Action grave] way Game lines 1 rooms [] frames 105 edits 0 first "Maybe I ought not to try that." scripts Room 17 local script 206
+LIST scene normal Room 18 object 367 verb 0x36 [Room 18 · Action Unnamed object] way Game lines 14 rooms [] frames 694 edits 0 first "Wait a minute!" scripts Room 18 local script 205
+LIST scene normal Room 18 object 369 verb 0x36 [Room 18 · Action bell] way Game lines 10 rooms [20] frames 505 edits 0 first "" scripts global script 62 | global script 63
+LIST scene normal Room 18 object 370 verb 0x36 [Room 18 · Action sphere] way Game lines 1 rooms [19] frames 188 edits 0 first "Aieeeeaaah!" scripts global script 65
+LIST scene normal Room 18 object 371 verb 0x36 [Room 18 · Action crystal] way Game lines 12 rooms [20] frames 536 edits 0 first "There's a little glass bell in here." scripts global script 56 | global script 57
+LIST scene normal Room 20 object 0 verb 0x39 [Room 20 · Entry] way AtCutscene lines 10 rooms [18] frames 457 edits 0 first "My head is swimming." scripts global script 57 | Room 20 local script 207 | global script 58
+LIST scene normal Room 20 object 0 verb 0x3F [Room 20 · Entry] way AtCutscene lines 10 rooms [18] frames 468 edits 0 first "Look!" scripts global script 63 | Room 20 local script 207 | global script 58
+LIST scene normal Room 20 object 386 verb 0x36 [Room 20 · Action scythe] way Game lines 1 rooms [] frames 67 edits 0 first "That thing is SHARP." scripts Room 20 local script 202
+LIST scene normal Room 20 object 388 verb 0x36 [Room 20 · Action bell] way Game lines 0 rooms [18] frames 85 edits 0 first "They're REALLY sharpening that thing." scripts global script 60 | global script 61
+LIST scene normal Room 20 object 389 verb 0x36 [Room 20 · Action bell] way Game lines 0 rooms [18] frames 83 edits 0 first "That thing is SHARP." scripts global script 58 | global script 59 | Room 20 local script 202
+LIST scene normal Room 20 object 390 verb 0x47 [Room 20 · Action workers] way Game lines 1 rooms [] frames 64 edits 0 first "I guess I'm already invisible." scripts Room 20 local script 212
+LIST scene normal Room 20 object 390 verb 0x48 [Room 20 · Action workers] way Game lines 10 rooms [18] frames 505 edits 0 first "_" scripts Room 20 local script 206 | Room 20 local script 207 | global script 58
+LIST scene normal Room 20 object 390 verb 0x49 [Room 20 · Action workers] way Game lines 1 rooms [] frames 81 edits 0 first "That draft won't do much good  if they can't see me." scripts Room 20 local script 211
+LIST scene normal Room 20 object 390 verb 0x56 [Room 20 · Action workers] way Game lines 1 rooms [] frames 64 edits 0 first "That draft won't work on them." scripts Room 20 local script 213
+LIST scene normal Room 22 object 0 verb 0x00 [Room 22 · Entry] way Game lines 0 rooms [] frames 41 edits 1 first "Greetings, stranger." scripts Room 22 local script 200 | global script 67
+LIST scene normal Room 22 object 403 verb 0x36 [Room 22 · Action bell] way Game lines 3 rooms [] frames 137 edits 0 first "There's a little glass bell in here." scripts Room 22 local script 205 | Room 22 local script 200 | global script 67
+LIST scene normal Room 22 object 404 verb 0x36 [Room 22 · Action crystal] way Game lines 12 rooms [56] frames 779 edits 0 first "There's a little glass bell in here." scripts Room 22 local script 204 | global script 67 | Room 22 local script 200
+LIST scene normal Room 22 object 405 verb 0x36 [Room 22 · Action chalice] way Game lines 11 rooms [56] frames 740 edits 0 first "Nice! Never seen glass sparkle like this." scripts global script 108
+LIST scene normal Room 22 object 405 verb 0x45 [Room 22 · Action chalice] way Game lines 1 rooms [] frames 53 edits 0 first "@" scripts Room 22 local script 214 | global script 41
+LIST scene normal Room 22 object 405 verb 0x46 [Room 22 · Action chalice] way Game lines 1 rooms [] frames 62 edits 1 first "@" scripts global script 41 | Room 22 local script 214
+LIST scene normal Room 23 object 0 verb 0x00 [Room 23 · Entry] way Game lines 4 rooms [] frames 150 edits 1 first "He's leaving." scripts Room 23 local script 214 | Room 23 local script 200
+LIST scene normal Room 23 object 422 verb 0x47 [Room 23 · Action shepherds] way Game lines 1 rooms [] frames 73 edits 0 first "We are the masters of stealth,  little wizard." scripts Room 23 local script 229 | Room 23 local script 232
+LIST scene normal Room 23 object 422 verb 0x49 [Room 23 · Action shepherds] way Game lines 2 rooms [] frames 141 edits 0 first "Aieeeee!" scripts Room 23 local script 210
+LIST scene normal Room 23 object 422 verb 0x56 [Room 23 · Action shepherds] way Game lines 1 rooms [] frames 71 edits 0 first "" scripts Room 23 local script 229
+LIST scene normal Room 24 object 0 verb 0x00 [Room 24 · Entry] way Game lines 0 rooms [] frames 279 edits 1 first "" scripts Room 24 local script 200
+LIST scene normal Room 24 object 431 verb 0x3A [Room 24 · Action cemetery] way Game lines 1 rooms [] frames 110 edits 0 first "Perhaps I shouldn't be trying that." scripts Room 24 local script 214
+LIST scene normal Room 24 object 432 verb 0x36 [Room 24 · Action sheep] way Game lines 5 rooms [] frames 371 edits 0 first "" scripts Room 24 local script 204
+LIST scene normal Room 24 object 432 verb 0x3E [Room 24 · Action sheep] way Game lines 1 rooms [] frames 63 edits 1 first "Plenty green enough already." scripts Room 24 local script 211 | Room 24 local script 213
+LIST scene normal Room 24 object 432 verb 0x3F [Room 24 · Action sheep] way Game lines 1 rooms [] frames 79 edits 0 first "They already look about as pale  as they can get." scripts Room 24 local script 212 | Room 24 local script 213
+LIST scene normal Room 24 object 432 verb 0x47 [Room 24 · Action sheep] way Game lines 1 rooms [] frames 85 edits 0 first "Didn't work. Guess they don't want  to look at me anyway." scripts Room 24 object 432 verb 0x47
+LIST scene normal Room 24 object 432 verb 0x49 [Room 24 · Action sheep] way Game lines 1 rooms [] frames 72 edits 0 first "They're too smart to scare that easily." scripts Room 24 object 432 verb 0x49
+LIST scene normal Room 24 object 432 verb 0x56 [Room 24 · Action sheep] way Game lines 1 rooms [] frames 69 edits 0 first "That draft won't work on the sheep." scripts Room 24 object 432 verb 0x56
+LIST scene normal Room 24 object 433 verb 0x38 [Room 24 · Action sheep] way Game lines 0 rooms [] frames 32 edits 0 first "" scripts Room 24 object 433 verb 0x38
+LIST scene normal Room 24 object 433 verb 0x3E [Room 24 · Action sheep] way Game lines 27 rooms [27,28] frames 281 edits 0 first "Well, well. Silly me." scripts global script 70
+LIST scene normal Room 24 object 434 verb 0x47 [Room 24 · Action dozing] way Game lines 1 rooms [] frames 74 edits 0 first "" scripts Room 24 local script 215
+LIST scene normal Room 25 object 0 verb 0x00 [Room 25 · Entry] way Game lines 0 rooms [] frames 15 edits 1 first "Not a very curious wizard, are you?" scripts Room 25 local script 200 | Room 25 local script 204 | global script 69
+LIST scene normal Room 25 object 446 verb 0x37 [Room 25 · Action Unnamed object] way Game lines 0 rooms [24] frames 11 edits 5 first "The flock has been led to pasture, Wizard.  Good luck with the dragon!" scripts Room 25 local script 208
+LIST scene normal Room 25 object 447 verb 0x36 [Room 25 · Action lamb] way Game lines 50 rooms [55,24] frames 1195 edits 1 first "Hello there." scripts global script 69 | Room 25 local script 204 | Room 25 local script 205 | Room 25 local script 206
+LIST scene normal Room 25 object 447 verb 0x3C [Room 25 · Action lamb] way Game lines 1 rooms [] frames 88 edits 0 first "This lamb doesn't look too well.  Maybe I shouldn't bother her." scripts Room 25 object 447 verb 0x3C
+LIST scene normal Room 25 object 447 verb 0x56 [Room 25 · Action lamb] way Game lines 1 rooms [] frames 66 edits 0 first "That draft won't work on the lamb." scripts Room 25 object 447 verb 0x56
+LIST scene normal Room 26 object 464 verb 0x36 [Room 26 · Action shepherds] way Game lines 30 rooms [] frames 245 edits 0 first "You are too late, wizard." scripts Room 26 local script 211
+LIST react normal Room 26 object 464 verb 0x3E [Room 26 · Action shepherds] way Game lines 1 rooms [] frames 40 edits 0 first "That wouldn't be very respectful." scripts Room 26 object 464 verb 0x3E
+LIST scene normal Room 26 object 464 verb 0x4D [Room 26 · Action shepherds] way Game lines 29 rooms [] frames 308 edits 0 first "Fleece! What happened? We were overrun!" scripts Room 26 local script 202
+LIST scene normal Room 26 object 464 verb 0x56 [Room 26 · Action shepherds] way Game lines 1 rooms [] frames 70 edits 0 first "" scripts Room 26 local script 209
+LIST scene normal Room 28 object 0 verb 0x00 [Room 28 · Entry] way Game lines 2 rooms [27] frames 177 edits 5 first "Eeeek! Fire!" scripts Room 28 local script 212 | global script 76
+LIST scene normal Room 28 object 465 verb 0x38 [Room 28 · Action Unnamed object] way Game lines 0 rooms [65] frames 34 edits 0 first "" scripts global script 72
+LIST scene normal Room 28 object 466 verb 0x36 [Room 28 · Action dragon] way Game lines 12 rooms [79] frames 668 edits 0 first "Where'd you get your manners?  Stop staring at me! Really!" scripts global script 75
+LIST scene normal Room 28 object 466 verb 0x38 [Room 28 · Action dragon] way Game lines 0 rooms [] frames 2 edits 0 first "" scripts Room 28 local script 203
+LIST scene normal Room 28 object 466 verb 0x43 [Room 28 · Action dragon] way Game lines 1 rooms [] frames 63 edits 0 first "Yawn!" scripts Room 28 local script 210 | Room 28 local script 212 | global script 76
+LIST scene normal Room 28 object 466 verb 0x49 [Room 28 · Action dragon] way Game lines 4 rooms [] frames 190 edits 0 first "Eeeek! Fire!" scripts Room 28 local script 215 | global script 76
+LIST scene normal Room 28 object 468 verb 0x44 [Room 28 · Action dragon] way Game lines 1 rooms [] frames 87 edits 0 first "Yawn! That nap made me hungry." scripts Room 28 local script 209
+LIST scene normal Room 28 object 468 verb 0x49 [Room 28 · Action dragon] way Game lines 1 rooms [] frames 65 edits 0 first "" scripts Room 28 local script 213
+LIST scene normal Room 28 object 470 verb 0x36 [Room 28 · Action gold] way Game lines 30 rooms [79] frames 582 edits 0 first "Wondering who my decorator is, right?  Well, you're looking at her." scripts global script 109
+LIST scene normal Room 28 object 470 verb 0x3D [Room 28 · Action gold] way Game lines 2 rooms [] frames 219 edits 0 first "My! Aren't we clever today!" scripts Room 28 local script 200 | Room 28 local script 218 | global script 29
+LIST scene normal Room 28 object 470 verb 0x56 [Room 28 · Action gold] way Game lines 1 rooms [] frames 68 edits 0 first "" scripts Room 28 local script 218
+LIST scene normal Room 28 object 473 verb 0x3C [Room 28 · Action straw] way Game lines 2 rooms [] frames 168 edits 0 first "Thanks, sweetie." scripts Room 28 local script 201 | Room 28 local script 218
+LIST scene normal Room 30 object 503 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 36 edits 0 first "" scripts Room 30 object 503 verb 0x38
+LIST scene normal Room 30 object 504 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 22 edits 0 first "" scripts Room 30 object 504 verb 0x38
+LIST scene normal Room 30 object 505 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 32 edits 0 first "" scripts Room 30 object 505 verb 0x38
+LIST scene normal Room 30 object 507 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [28] frames 31 edits 0 first "" scripts global script 77
+LIST scene normal Room 30 object 508 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 1 rooms [31] frames 75 edits 0 first "Guess I won't be going back that way." scripts global script 82
+LIST scene normal Room 30 object 509 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 24 rooms [32] frames 69 edits 0 first "@" scripts global script 79
+LIST scene normal Room 30 object 510 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 24 rooms [32] frames 78 edits 0 first "@" scripts global script 80
+LIST scene normal Room 30 object 511 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 34 edits 0 first "" scripts Room 30 object 511 verb 0x38
+LIST scene normal Room 30 object 512 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 20 edits 0 first "" scripts Room 30 object 512 verb 0x38
+LIST scene normal Room 30 object 513 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 20 edits 0 first "" scripts Room 30 object 513 verb 0x38
+LIST scene normal Room 30 object 514 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 23 edits 0 first "" scripts Room 30 object 514 verb 0x38
+LIST scene normal Room 30 object 515 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 26 edits 0 first "" scripts Room 30 object 515 verb 0x38
+LIST scene normal Room 30 object 516 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 0 rooms [] frames 23 edits 0 first "" scripts Room 30 object 516 verb 0x38
+LIST scene normal Room 30 object 517 verb 0x38 [Room 30 · Action Unnamed object] way Game lines 24 rooms [31] frames 18 edits 0 first "@" scripts global script 84
+LIST scene normal Room 31 object 521 verb 0x38 [Room 31 · Action Unnamed object] way Game lines 24 rooms [30] frames 16 edits 0 first "@" scripts global script 83
+LIST scene normal Room 31 object 523 verb 0x36 [Room 31 · Action pool] way Game lines 1 rooms [] frames 85 edits 0 first "Is that MY reflection? Ugh." scripts Room 31 local script 200
+LIST scene normal Room 31 object 523 verb 0x3A [Room 31 · Action pool] way Game lines 0 rooms [] frames 40 edits 0 first "@" scripts Room 31 local script 203
+LIST scene normal Room 31 object 525 verb 0x36 [Room 31 · Action sphere] way Game lines 0 rooms [86] frames 83 edits 0 first "@" scripts global script 111 | Room 31 local script 200
+LIST scene normal Room 31 object 525 verb 0x56 [Room 31 · Action sphere] way Game lines 1 rooms [] frames 69 edits 0 first "" scripts Room 31 local script 204
+LIST scene normal Room 32 object 537 verb 0x38 [Room 32 · Action Unnamed object] way Game lines 0 rooms [30] frames 22 edits 0 first "" scripts Room 32 object 537 verb 0x38
+LIST scene normal Room 32 object 538 verb 0x38 [Room 32 · Action Unnamed object] way Game lines 24 rooms [30] frames 76 edits 0 first "@" scripts global script 81
+LIST scene normal Room 33 object 543 verb 0x38 [Room 33 · Action Unnamed object] way Game lines 0 rooms [34] frames 40 edits 0 first "" scripts Room 33 object 543 verb 0x38
+LIST scene normal Room 33 object 544 verb 0x41 [Room 33 · Action steps] way Game lines 1 rooms [] frames 65 edits 0 first "@" scripts Room 33 local script 202 | Room 33 local script 205
+LIST scene normal Room 33 object 544 verb 0x42 [Room 33 · Action steps] way Game lines 1 rooms [] frames 70 edits 1 first "@" scripts Room 33 local script 205 | Room 33 local script 200
+LIST scene normal Room 33 object 544 verb 0x56 [Room 33 · Action steps] way Game lines 1 rooms [] frames 67 edits 0 first "@" scripts Room 33 local script 205
+LIST scene normal Room 34 object 0 verb 0x00 [Room 34 · Entry] way Game lines 0 rooms [] frames 600 edits 0 first "" scripts Room 34 local script 200
+LIST scene normal Room 34 object 558 verb 0x37 [Room 34 · Action Unnamed object] way Game lines 18 rooms [57] frames 1096 edits 1 first "Well, well. Look who's here." scripts global script 98
+LIST scene normal Room 34 object 560 verb 0x37 [Room 34 · Action Unnamed object] way Game lines 18 rooms [57] frames 1101 edits 0 first "Well, well. Look who's here." scripts global script 98 | Room 34 local script 207
+LIST scene normal Room 34 object 560 verb 0x38 [Room 34 · Action Unnamed object] way Game lines 25 rooms [46] frames 97 edits 1 first "@" scripts Room 34 local script 202
+LIST scene normal Room 34 object 562 verb 0x36 [Room 34 · Action boy] way Game lines 2 rooms [29] frames 74 edits 0 first "Strange place to take a nap." scripts global script 112
+LIST scene normal Room 34 object 562 verb 0x43 [Room 34 · Action boy] way Game lines 19 rooms [52] frames 952 edits 0 first "Who's playing music? You woke me up!" scripts global script 85 | global script 41
+LIST scene normal Room 34 object 562 verb 0x44 [Room 34 · Action boy] way Game lines 19 rooms [52] frames 980 edits 0 first "Hey! You look just like me." scripts Room 34 local script 201 | global script 85
+LIST scene normal Room 34 object 562 verb 0x4C [Room 34 · Action boy] way Game lines 19 rooms [52] frames 952 edits 0 first "Who's playing music? You woke me up!" scripts global script 85 | Room 34 local script 202
+LIST scene normal Room 34 object 563 verb 0x3A [Room 34 · Action grave] way Game lines 1 rooms [] frames 111 edits 0 first "I'm not sure I should be trying that." scripts Room 34 local script 218
+LIST react normal Room 34 object 587 verb 0x4C [Room 34 · Action Rusty] way Game lines 1 rooms [] frames 43 edits 0 first "Ugh. Don't want to look like him now!" scripts Room 34 object 587 verb 0x4C
+LIST scene normal Room 34 object 587 verb 0x4D [Room 34 · Action Rusty] way Game lines 13 rooms [] frames 560 edits 0 first "You did it." scripts Room 34 local script 209
+LIST scene normal Room 35 object 0 verb 0x00 [Room 35 · Entry] way Game lines 30 rooms [] frames 314 edits 0 first "Hail, young Nailbender!" scripts Room 35 local script 204
+LIST scene normal Room 35 object 589 verb 0x38 [Room 35 · Action Unnamed object] way Game lines 1 rooms [] frames 25 edits 0 first "Out." scripts Room 35 local script 210
+LIST scene normal Room 35 object 590 verb 0x3A [Room 35 · Action gate] way Game lines 30 rooms [] frames 330 edits 0 first "@" scripts Room 35 local script 207 | Room 35 local script 212
+LIST scene normal Room 35 object 590 verb 0x3B [Room 35 · Action gate] way Game lines 31 rooms [] frames 313 edits 0 first "" scripts Room 35 local script 212
+LIST scene normal Room 36 object 0 verb 0x00 [Room 36 · Entry] way Game lines 0 rooms [] frames 38 edits 1 first "" scripts Room 36 local script 200
+LIST scene normal Room 37 object 0 verb 0x00 [Room 37 · Entry] way Game lines 13 rooms [58,38] frames 793 edits 1 first "Well, well, well." scripts global script 86
+LIST react normal Room 37 object 602 verb 0x37 [Room 37 · Action Unnamed object] way Game lines 1 rooms [] frames 52 edits 0 first "I'd better not go back there dressed like this." scripts Room 37 object 602 verb 0x37
+LIST scene normal Room 37 object 605 verb 0x45 [Room 37 · Action woodbin] way Game lines 1 rooms [] frames 67 edits 5 first "@" scripts Room 37 local script 205 | global script 41
+LIST scene normal Room 38 object 611 verb 0x36 [Room 38 · Action straw] way Game lines 13 rooms [34,68,37] frames 6000 edits 0 first "Looks kinda comfortable." scripts global script 87
+LIST scene normal Room 38 object 611 verb 0x3C [Room 38 · Action straw] way Game lines 1 rooms [] frames 69 edits 1 first "@" scripts global script 41 | Room 38 local script 202
+LIST scene normal Room 38 object 611 verb 0x3D [Room 38 · Action straw] way Game lines 1 rooms [] frames 68 edits 0 first "@" scripts Room 38 local script 202 | global script 41
+LIST scene normal Room 38 object 612 verb 0x36 [Room 38 · Action distaff] way Game lines 25 rooms [] frames 40 edits 0 first "Now I'm back in business!" scripts Room 38 object 612 verb 0x36
+LIST scene normal Room 38 object 618 verb 0x3A [Room 38 · Action door] way Game lines 0 rooms [] frames 42 edits 0 first "" scripts Room 38 local script 203
+LIST scene normal Room 41 object 632 verb 0x36 [Room 41 · Action conversation] way Game lines 5 rooms [] frames 201 edits 0 first "" scripts Room 41 object 632 verb 0x36 | Room 41 local script 210 | global script 8 | Room 41 local script 207 | Room 41 local script 206 | Room 41 local script 209
+LIST scene normal Room 41 object 633 verb 0x36 [Room 41 · Action conversation] way Game lines 20 rooms [] frames 1149 edits 0 first "Hard to be nosy with all this noise!" scripts Room 41 object 633 verb 0x36
+LIST scene normal Room 41 object 634 verb 0x41 [Room 41 · Action sword] way Game lines 30 rooms [42,43,60] frames 1657 edits 0 first "Foreman! What evil is this?" scripts Room 41 local script 204 | Room 41 local script 213 | global script 90
+LIST react normal Room 41 object 634 verb 0x42 [Room 41 · Action sword] way Game lines 1 rooms [] frames 41 edits 0 first "Maybe that isn't such a good idea." scripts Room 41 local script 205
+LIST scene normal Room 41 object 634 verb 0x56 [Room 41 · Action sword] way Game lines 1 rooms [] frames 67 edits 0 first "" scripts Room 41 local script 213
+LIST scene normal Room 43 object 640 verb 0x38 [Room 43 · Action Unnamed object] way AtCutscene lines 25 rooms [45,46] frames 93 edits 0 first "Yipes!" scripts global script 96
+LIST scene normal Room 43 object 641 verb 0x36 [Room 43 · Action sphere] way Game lines 0 rooms [19] frames 107 edits 0 first "@" scripts global script 94
+LIST scene normal Room 43 object 644 verb 0x3A [Room 43 · Action cage] way Game lines 35 rooms [44,42,60] frames 2140 edits 1 first "You see, Cob? An elusive breed,  these Weavers." scripts global script 91
+LIST scene normal Room 43 object 651 verb 0x38 [Room 43 · Action orb] way Game lines 17 rooms [87,44] frames 855 edits 0 first "Keep away from that, you!" scripts global script 93
+LIST scene normal Room 44 object 653 verb 0x38 [Room 44 · Action Unnamed object] way Game lines 0 rooms [43] frames 17 edits 0 first "" scripts global script 92
+LIST scene normal Room 44 object 654 verb 0x36 [Room 44 · Action Mandible] way Game lines 15 rooms [42,45] frames 814 edits 0 first "I see Cob is being lax in his duties." scripts global script 95
+LIST scene normal Room 45 object 657 verb 0x36 [Room 45 · Action distaff] way Game lines 25 rooms [] frames 49 edits 0 first "Can't seem to hold on to this thing." scripts Room 45 object 657 verb 0x36
+LIST scene normal Room 46 object 683 verb 0x36 [Room 46 · Action hole] way Game lines 0 rooms [49] frames 13 edits 0 first "_" scripts global script 110
+LIST react normal Room 46 object 683 verb 0x3A [Room 46 · Action hole] way Game lines 1 rooms [] frames 38 edits 0 first "This hole is already wide open." scripts Room 46 local script 201
+LIST react normal Room 46 object 683 verb 0x3B [Room 46 · Action hole] way Game lines 1 rooms [] frames 48 edits 0 first "Maybe I should do some more  exploring first." scripts Room 46 local script 202 | global script 29
+LIST scene normal Room 46 object 685 verb 0x36 [Room 46 · Action hole] way Game lines 0 rooms [34] frames 11 edits 0 first "_" scripts global script 97
+LIST scene normal Room 46 object 686 verb 0x3B [Room 46 · Action hole] way Game lines 0 rooms [] frames 40 edits 0 first "@" scripts Room 46 local script 203 | global script 29
+LIST scene normal Room 47 object 0 verb 0x00 [Room 47 · Entry] way Game lines 80 rooms [] frames 285 edits 0 first "We've been expecting you, Bobbin." scripts Room 47 local script 205
+LIST scene normal Room 47 object 698 verb 0x36 [Room 47 · Action swan] way Game lines 50 rooms [61] frames 1723 edits 0 first "You must have many questions, Bobbin." scripts global script 100
+LIST scene normal Room 49 object 705 verb 0x38 [Room 49 · Action Unnamed object] way Game lines 24 rooms [46] frames 12 edits 0 first "" scripts Room 49 object 705 verb 0x38
+LIST scene normal Room 49 object 708 verb 0x36 [Room 49 · Action Goodmold] way Game lines 15 rooms [20] frames 753 edits 0 first "Save your magic for the Dead Ones,  Weaver boy." scripts global script 99
+LIST scene normal Room 50 object 722 verb 0x38 [Room 50 · Action Unnamed object] way Game lines 0 rooms [11,7] frames 86 edits 0 first "" scripts global script 89
+LIST scene normal Room 51 object 742 verb 0x38 [Room 51 · Action Unnamed object] way Game lines 1 rooms [66] frames 143 edits 0 first "Leaving so soon, Weaver boy?" scripts global script 102
+LIST react normal Room 51 object 743 verb 0x56 [Room 51 · Action Dead One] way Game lines 0 rooms [] frames 3 edits 0 first "No use, Bobbin. That side of the Pattern  is beyond the reach of our threads now." scripts global script 103
+LIST react normal Room 62 object 809 verb 0x3C [Room 62 · Action gold] way Game lines 1 rooms [] frames 47 edits 0 first "@" scripts Room 62 local script 202 | global script 29 | Room 62 local script 207
+LIST scene normal Room 62 object 809 verb 0x3D [Room 62 · Action gold] way Game lines 0 rooms [] frames 27 edits 0 first "@" scripts Room 62 local script 201 | global script 29 | Room 62 local script 208
+LIST scene normal Room 62 object 810 verb 0x3C [Room 62 · Action straw] way Game lines 1 rooms [] frames 47 edits 1 first "@" scripts Room 62 local script 203 | global script 29 | Room 62 local script 207
+LIST react normal Room 62 object 810 verb 0x3D [Room 62 · Action straw] way Game lines 1 rooms [] frames 47 edits 0 first "@" scripts Room 62 local script 204 | global script 29 | Room 62 local script 208
+LIST scene normal Room 62 object 811 verb 0x36 [Room 62 · Action wheel] way Game lines 1 rooms [] frames 42 edits 0 first "This old wheel is pretty squeaky." scripts Room 62 local script 200
+LIST scene normal Room 63 object 822 verb 0x40 [Room 63 · Action darkness] way Game lines 24 rooms [62] frames 41 edits 0 first "@" scripts global script 48
+LIST scene normal Room 65 object 829 verb 0x40 [Room 65 · Action darkness] way Game lines 0 rooms [30] frames 47 edits 1 first "" scripts global script 78
+LIST scene normal Room 66 object 834 verb 0x54 [Room 66 · Action myself] way Game lines 0 rooms [] frames 3 edits 0 first "" scripts Room 66 object 834 verb 0x54 | global script 106 | Room 66 local script 206 | global script 19 | global script 8 | global script 40 | global script 39 | Room 66 local script 207 | global script 113 | global script 114 | Room 66 local script 203
+LIST scene normal Room 66 object 834 verb 0x56 [Room 66 · Action myself] way Game lines 1 rooms [] frames 64 edits 0 first "That draft won't work on me." scripts Room 66 object 834 verb 0x56

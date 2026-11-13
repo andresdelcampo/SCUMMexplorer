@@ -155,6 +155,31 @@ if (Environment.GetEnvironmentVariable("MEASURE_LINES") is { Length: > 0 } lines
     }
     return;
 }
+// MEASURE_SEQ=room;bit:0xD66=1;verb:834,0x54;frames:3000 (12 November 2026): a LOOM replay's steps on LOOM's session, with the room, the lines and the
+// scripts' last trace lines every 300 frames.
+if (Environment.GetEnvironmentVariable("MEASURE_SEQ") is { Length: > 0 } seq && loomSnapshot is not null)
+{
+    var s = new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, loomSnapshot);
+    var parts = seq.Split(';');
+    s.VisitRoomById(int.Parse(parts[0]));
+    var total = 3000;
+    foreach (var part in parts.Skip(1))
+    {
+        var kv = part.Split(':');
+        if (kv[0] == "bit") { var b = kv[1].Split('='); s.ApplySceneSetup([new ScummSetupEdit(ScummSetupKind.Bit, $"bit[{b[0]}]", int.Parse(b[1]), "probe")]); }
+        else if (kv[0] == "verb") { var v = kv[1].Split(','); var r = s.ActivateObjectVerb(int.Parse(v[0]), Convert.ToInt32(v[1], 16)); Console.WriteLine("verb: " + string.Join(" | ", r.Uncertainties.TakeLast(2))); }
+        else if (kv[0] == "frames") total = int.Parse(kv[1]);
+    }
+    for (var f = 1; f <= total; f++)
+    {
+        s.AdvanceFrame();
+        if (f % 300 == 0) Console.WriteLine("   actors: " + string.Join(" ", s.Actors.Where(a => a.Room == s.CurrentRoomId && a.Visible == true).Select(a => $"{a.Number}:c{a.Look.Costume}@({a.X},{a.Y})")));
+        if (f % 300 == 0) Console.WriteLine($"{f}: room {s.CurrentRoomId} cutscene {s.InCutscene} lines {s.Messages.Log.Count} last [{s.Messages.Log.LastOrDefault()?.Text.Replace('\n', ' ')}] | {string.Join(" | ", s.SessionTrace.TakeLast(2))}");
+    }
+    { var rt = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(s)!; Console.WriteLine($"bits D66 {rt.GlobalVariables.GetValueOrDefault("bit[0xD66]")} D65 {rt.GlobalVariables.GetValueOrDefault("bit[0xD65]")} D64 {rt.GlobalVariables.GetValueOrDefault("bit[0xD64]")} D79 {rt.GlobalVariables.GetValueOrDefault("bit[0xD79]")} pending {s.Snapshot.PendingScripts} | {string.Join(" | ", s.Snapshot.Uncertainties.TakeLast(4))}"); }
+    if (Environment.GetEnvironmentVariable("MEASURE_SEQ_TRACE") is { Length: > 0 } tr) foreach (var line in s.SessionTrace.Where(l => l.Contains(tr)).TakeLast(40)) Console.WriteLine("  | " + (line.Length > 220 ? line[..220] : line));
+    return;
+}
 // MEASURE_LIST=1: every entry with its title, kind, plan (way, lines, rooms, frames), whether Normal offers it, and its first printed text (12 November
 // 2026: finding the scenes the user named as ones that matter).
 if (Environment.GetEnvironmentVariable("MEASURE_LIST") == "1")

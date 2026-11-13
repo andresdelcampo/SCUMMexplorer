@@ -1,0 +1,214 @@
+  4,68s derivation done=False, LOOM lists=False
+  7,71s w:20 +3s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 10,73s w:20 +6s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 13,73s w:20 +9s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 16,75s w:20 +12s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 19,77s w:20 +15s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 22,78s w:20 +18s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 25,79s w:20 +21s: room=2 cutscene=False texts=[] printed=10 last=[] status=[Ready]
+ 25,80s RL:1 item "The Intro (played from Room 69)" [Scenes]
+ 25,80s RL:1: 1 items
+ 25,81s RL:1: shared planner runs 91 of 405
+ 26,22s RL:2 item "The Intro (played from Room 69)" [Scenes]
+ 26,22s RL:2 item "Room 02 · Reached Room 03" [Scenes]
+ 26,23s RL:2 item "Room 02 · Look at leaf" [Scenes]
+ 26,23s RL:2 item "Room 02 · Opening at sky" [Scenes]
+ 26,23s RL:2: 4 items
+ 26,23s RL:2: shared planner runs 95 of 405
+ 26,90s RL:2: object 0 verb 0x00 run False planned False cutscene False animation Room 02 entry script +0x0034 putActor lines 0
+ 26,90s RL:2: object 153 verb 0x38 run True planned True cutscene True animation Room 02 Object 153 Verb 0x38 +0x0019 panCameraTo lines 0
+ 26,90s RL:2: object 154 verb 0x36 run True planned True cutscene True animation Room 02 Object 154 Verb 0x36 +0x001C walkActorTo lines 1
+ 26,96s RL:2: object 154 verb 0x41 run False planned False cutscene False animation Room 02 Object 154 Verb 0x41 +0x001C walkActorTo lines 1
+ 27,03s RL:2: object 154 verb 0x42 run False planned False cutscene False animation Room 02 Object 154 Verb 0x42 +0x001C walkActorTo lines 1
+ 27,03s RL:2: object 154 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 27,03s RL:2: object 156 verb 0x3A run True planned True cutscene True animation Script 49 +0x009F putActor lines 1
+ 27,03s RL:2: object 156 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 27,81s RL:8 item "Room 08 · The Elders' trial" [Scenes]
+ 27,81s RL:8 item "Room 08 · Bleaching at tapestry" [Scenes]
+ 27,81s RL:8 item "Room 08 · Dyeing at tapestry" [Scenes]
+ 27,81s RL:8 item "Room 08 · Dyeing at tapestry" [Scenes]
+ 27,81s RL:8 item "Room 08 · Bleaching at tapestry" [Scenes]
+ 27,81s RL:8 item "Room 09 · Opening at egg (played from Room 09)" [Scenes]
+ 27,81s RL:8: 6 items
+ 27,82s RL:8: shared planner runs 108 of 405
+ 28,85s RL:8: object 255 verb 0x38 run False planned False cutscene False animation Script 46 +0x0025 panCameraTo lines 40
+ 28,85s RL:8: object 256 verb 0x36 run True planned True cutscene False animation - lines 2
+ 28,85s RL:8: object 256 verb 0x3E run True planned True cutscene False animation - lines 1
+ 28,85s RL:8: object 256 verb 0x3F run True planned True cutscene True animation Room 08 local script 207 +0x004D animateActor lines 1
+ 28,85s RL:8: object 256 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 28,85s RL:8: object 257 verb 0x36 run True planned True cutscene False animation - lines 2
+ 28,85s RL:8: object 257 verb 0x3E run True planned True cutscene True animation Room 08 local script 207 +0x004D animateActor lines 1
+ 28,86s RL:8: object 257 verb 0x3F run True planned True cutscene False animation - lines 1
+ 28,86s RL:8: object 257 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 28,86s RL:8: object 258 verb 0x36 run True planned True cutscene False animation - lines 3
+ 28,86s RL:8: object 258 verb 0x3E run True planned True cutscene True animation Room 08 local script 207 +0x004D animateActor lines 1
+ 28,86s RL:8: object 258 verb 0x3F run True planned True cutscene True animation Room 08 local script 207 +0x004D animateActor lines 2
+ 28,86s RL:8: object 258 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 30,10s RL:13 item "Room 10 · Walk to Room 13 (played from Room 10)" [Scenes]
+ 30,10s RL:13 item "Room 12 · Reached Room 13 (played from Room 12)" [Scenes]
+ 30,10s RL:13 item "Room 13 · Reached Room 15" [Scenes]
+ 30,10s RL:13 item "Room 13 · Reached Room 10" [Scenes]
+ 30,10s RL:13 item "Room 13 · Twisting at waterspout" [Scenes]
+ 30,10s RL:13 item "Room 13 · Twisting (reverse) at waterspout" [Scenes]
+ 30,10s RL:13: 6 items
+ 30,10s RL:13: shared planner runs 123 of 405
+ 32,07s RL:13: object 0 verb 0x00 run False planned False cutscene False animation Room 13 entry script +0x00EE putActor lines 48
+ 33,28s RL:13: object 323 verb 0x37 run False planned False cutscene False animation - lines 0
+ 33,28s RL:13: object 323 verb 0x38 run True planned True cutscene True animation Script 54 +0x000C setCameraAt lines 24
+ 33,28s RL:13: object 324 verb 0x36 run True planned True cutscene True animation Script 107 +0x0007 setCameraAt lines 24
+ 33,41s RL:13: object 324 verb 0x38 run False planned False cutscene False animation Script 107 +0x0007 setCameraAt lines 24
+ 33,41s RL:13: object 325 verb 0x36 run True planned True cutscene False animation - lines 1
+ 33,41s RL:13: object 325 verb 0x3A run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 33,55s RL:13: object 325 verb 0x3B run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 33,55s RL:13: object 325 verb 0x41 run True planned True cutscene True animation Script 41 +0x004C animateActor lines 1
+ 33,56s RL:13: object 325 verb 0x42 run True planned True cutscene True animation Room 13 local script 202 +0x004F putActor lines 0
+ 33,69s RL:13: object 325 verb 0x45 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 33,81s RL:13: object 325 verb 0x46 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 33,81s RL:13: object 325 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 34,25s RL:24 item "Room 24 · Use sheep" [Scenes]
+ 34,25s RL:24 item "Room 24 · Dyeing at sheep" [Scenes]
+ 34,25s RL:24: 2 items
+ 34,25s RL:24: shared planner runs 152 of 405
+ 35,95s RL:24: object 0 verb 0x00 run False planned False cutscene False animation Room 24 entry script +0x0032 putActor lines 0
+ 36,06s RL:24: object 431 verb 0x3A run False planned False cutscene False animation Room 24 local script 214 +0x0036 putActor lines 1
+ 36,15s RL:24: object 431 verb 0x3B run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 36,25s RL:24: object 431 verb 0x45 run False planned False cutscene False animation Room 24 local script 214 +0x0036 putActor lines 1
+ 36,34s RL:24: object 431 verb 0x46 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 36,43s RL:24: object 431 verb 0x56 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 36,60s RL:24: object 432 verb 0x36 run False planned False cutscene False animation Room 24 local script 204 +0x0005 panCameraTo lines 5
+ 38,05s RL:24: object 432 verb 0x3E run False planned False cutscene False animation Room 24 local script 216 +0x0061 putActor lines 1
+ 38,14s RL:24: object 432 verb 0x3F run False planned False cutscene False animation Room 24 local script 216 +0x0061 putActor lines 1
+ 38,23s RL:24: object 432 verb 0x47 run False planned False cutscene False animation Room 24 local script 216 +0x0061 putActor lines 1
+ 38,35s RL:24: object 432 verb 0x48 run False planned False cutscene False animation Room 24 local script 216 +0x0061 putActor lines 1
+ 38,35s RL:24: object 432 verb 0x49 run True planned True cutscene True animation Room 24 local script 216 +0x0061 putActor lines 1
+ 38,45s RL:24: object 432 verb 0x56 run False planned False cutscene False animation Room 24 local script 216 +0x0061 putActor lines 1
+ 38,52s RL:24: object 433 verb 0x38 run False planned False cutscene False animation Room 24 Object 433 Verb 0x38 +0x0005 panCameraTo lines 0
+ 38,70s RL:24: object 433 verb 0x3E run False planned False cutscene False animation Script 70 +0x001B setCameraAt lines 27
+ 38,78s RL:24: object 433 verb 0x3F run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 38,87s RL:24: object 433 verb 0x47 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 38,98s RL:24: object 433 verb 0x48 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 38,98s RL:24: object 433 verb 0x49 run True planned True cutscene True animation Script 41 +0x004C animateActor lines 1
+ 39,06s RL:24: object 433 verb 0x56 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 39,15s RL:24: object 434 verb 0x47 run False planned False cutscene False animation Room 24 local script 215 +0x0054 putActor lines 1
+ 39,26s RL:24: object 434 verb 0x48 run False planned False cutscene False animation Room 24 local script 215 +0x0054 putActor lines 1
+ 39,35s RL:24: object 434 verb 0x49 run False planned False cutscene False animation Room 24 local script 215 +0x0054 putActor lines 1
+ 39,35s RL:24: object 434 verb 0x56 run True planned True cutscene True animation Room 24 local script 215 +0x0054 putActor lines 1
+ 39,76s RL:28 item "Room 24 · Dyeing at sheep (played from Room 24)" [Scenes]
+ 39,76s RL:28 item "Room 28 · Reached Room 65" [Scenes]
+ 39,76s RL:28 item "Room 28 · Look at dragon" [Scenes]
+ 39,76s RL:28 item "Room 28 · Look at dragon" [Scenes]
+ 39,76s RL:28 item "Room 28 · Look at gold" [Scenes]
+ 39,76s RL:28 item "Room 28 · Look at gold" [Scenes]
+ 39,76s RL:28 item "Room 28 · Look at gold" [Scenes]
+ 39,76s RL:28 item "Room 30 · Reached Room 28 (played from Room 30)" [Scenes]
+ 39,77s RL:28 item "Room 65 · Reached Room 28 (played from Room 65)" [Scenes]
+ 39,77s RL:28: 9 items
+ 39,77s RL:28: shared planner runs 193 of 405
+ 40,43s RL:28: object 0 verb 0x00 run False planned False cutscene False animation Room 28 entry script +0x00BB setState (object local[0x000] changes picture again) lines 2
+ 40,43s RL:28: object 465 verb 0x38 run True planned True cutscene True animation Script 72 +0x0026 setCameraAt lines 0
+ 40,43s RL:28: object 466 verb 0x36 run True planned True cutscene True animation Script 75 +0x013B setCameraAt lines 12
+ 40,52s RL:28: object 466 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 40,52s RL:28: object 466 verb 0x43 run True planned True cutscene True animation Room 28 local script 210 +0x001B walkActorToObject lines 1
+ 40,52s RL:28: object 466 verb 0x49 run True planned True cutscene True animation Room 28 local script 215 +0x004F putActor lines 4
+ 40,62s RL:28: object 466 verb 0x56 run False planned False cutscene False animation Room 28 local script 213 +0x0058 putActor lines 1
+ 40,83s RL:28: object 467 verb 0x36 run False planned False cutscene False animation Script 75 +0x013B setCameraAt lines 12
+ 40,93s RL:28: object 467 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 40,93s RL:28: object 467 verb 0x43 run True planned True cutscene True animation Room 28 local script 210 +0x001B walkActorToObject lines 1
+ 41,04s RL:28: object 467 verb 0x49 run False planned False cutscene False animation Room 28 local script 215 +0x004F putActor lines 4
+ 41,16s RL:28: object 467 verb 0x56 run False planned False cutscene False animation Room 28 local script 213 +0x0058 putActor lines 1
+ 41,24s RL:28: object 468 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 41,29s RL:28: object 468 verb 0x44 run True planned True cutscene True animation Room 28 local script 202 +0x0053 animateActor lines 1
+ 41,38s RL:28: object 468 verb 0x49 run False planned False cutscene False animation Room 28 local script 213 +0x0058 putActor lines 1
+ 41,47s RL:28: object 468 verb 0x56 run False planned False cutscene False animation Room 28 local script 213 +0x0058 putActor lines 1
+ 41,56s RL:28: object 469 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 41,56s RL:28: object 469 verb 0x44 run True planned True cutscene True animation Room 28 local script 202 +0x0053 animateActor lines 1
+ 41,64s RL:28: object 469 verb 0x49 run False planned False cutscene False animation Room 28 local script 213 +0x0058 putActor lines 1
+ 41,73s RL:28: object 469 verb 0x56 run False planned False cutscene False animation Room 28 local script 213 +0x0058 putActor lines 1
+ 41,95s RL:28: object 470 verb 0x36 run False planned False cutscene False animation Script 109 +0x0085 setCameraAt lines 30
+ 42,05s RL:28: object 470 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 42,05s RL:28: object 470 verb 0x3D run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 2
+ 42,13s RL:28: object 470 verb 0x56 run False planned False cutscene False animation Room 28 local script 218 +0x0047 putActor lines 1
+ 42,33s RL:28: object 471 verb 0x36 run False planned False cutscene False animation Script 109 +0x0085 setCameraAt lines 30
+ 42,42s RL:28: object 471 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 42,50s RL:28: object 471 verb 0x3D run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 2
+ 42,54s RL:28: object 471 verb 0x56 run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 1
+ 42,74s RL:28: object 472 verb 0x36 run False planned False cutscene False animation Script 109 +0x0085 setCameraAt lines 30
+ 42,84s RL:28: object 472 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 42,84s RL:28: object 472 verb 0x3D run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 2
+ 42,93s RL:28: object 472 verb 0x56 run False planned False cutscene False animation Room 28 local script 218 +0x0047 putActor lines 1
+ 43,01s RL:28: object 473 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 43,01s RL:28: object 473 verb 0x3C run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 2
+ 43,09s RL:28: object 473 verb 0x56 run False planned False cutscene False animation Room 28 local script 218 +0x0047 putActor lines 1
+ 43,17s RL:28: object 474 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 43,24s RL:28: object 474 verb 0x3C run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 2
+ 43,33s RL:28: object 474 verb 0x56 run False planned False cutscene False animation Room 28 local script 218 +0x0047 putActor lines 1
+ 43,43s RL:28: object 475 verb 0x38 run False planned False cutscene False animation Room 28 local script 203 +0x0002 panCameraTo lines 0
+ 43,43s RL:28: object 475 verb 0x3C run True planned True cutscene True animation Room 28 local script 218 +0x0047 putActor lines 2
+ 43,51s RL:28: object 475 verb 0x56 run False planned False cutscene False animation Room 28 local script 218 +0x0047 putActor lines 1
+ 44,69s RL:34 item "Room 33 · Reached Room 34 (played from Room 33)" [Scenes]
+ 44,69s RL:34 item "Room 34 · Reached Room 57" [Scenes]
+ 44,69s RL:34 item "Room 34 · Reached Room 57" [Scenes]
+ 44,69s RL:34 item "Room 34 · Look at boy" [Scenes]
+ 44,69s RL:34 item "Room 34 · Sleep at boy" [Scenes]
+ 44,69s RL:34 item "Room 34 · Sleep (reverse) at boy" [Scenes]
+ 44,69s RL:34 item "Room 34 · Reflection at boy" [Scenes]
+ 44,70s RL:34 item "Room 34 · Other draft response at boy" [Scenes]
+ 44,70s RL:34 item "Room 34 · Walk to Rusty" [Scenes]
+ 44,70s RL:34 item "Room 46 · Look at hole (played from Room 46)" [Scenes]
+ 44,70s RL:34: 10 items
+ 44,70s RL:34: shared planner runs 248 of 405
+ 49,08s RL:34: object 0 verb 0x00 run False planned False cutscene False animation Room 34 entry script +0x017C putActor lines 0
+ 50,61s RL:34: object 558 verb 0x37 run False planned False cutscene False animation Script 98 +0x0018 putActor lines 18
+ 50,61s RL:34: object 560 verb 0x37 run True planned True cutscene True animation Script 98 +0x0018 putActor lines 18
+ 53,12s RL:34: object 560 verb 0x38 run False planned False cutscene False animation Room 34 local script 202 +0x004F putActor lines 25
+ 53,12s RL:34: object 561 verb 0x37 run True planned True cutscene True animation Script 98 +0x0018 putActor lines 18
+ 53,13s RL:34: object 562 verb 0x36 run True planned True cutscene True animation Script 112 +0x002B setCameraAt lines 2
+ 53,13s RL:34: object 562 verb 0x43 run True planned True cutscene True animation Room 34 local script 217 +0x0059 animateActor lines 19
+ 53,13s RL:34: object 562 verb 0x44 run True planned True cutscene True animation Room 34 local script 203 +0x004A putActor lines 19
+ 53,13s RL:34: object 562 verb 0x4C run True planned True cutscene True animation Room 34 local script 217 +0x0059 animateActor lines 19
+ 53,13s RL:34: object 562 verb 0x56 run True planned True cutscene True animation Room 34 local script 217 +0x0059 animateActor lines 19
+ 53,13s RL:34: object 563 verb 0x3A run True planned True cutscene True animation Room 34 local script 218 +0x0036 putActor lines 1
+ 53,13s RL:34: object 563 verb 0x3B run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 53,23s RL:34: object 563 verb 0x45 run False planned False cutscene False animation Room 34 local script 218 +0x0036 putActor lines 1
+ 53,33s RL:34: object 563 verb 0x46 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 53,33s RL:34: object 563 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 53,34s RL:34: object 587 verb 0x37 run True planned True cutscene True animation Script 98 +0x0018 putActor lines 18
+ 53,34s RL:34: object 587 verb 0x43 run True planned True cutscene True animation Script 41 +0x004C animateActor lines 1
+ 53,34s RL:34: object 587 verb 0x44 run True planned True cutscene True animation Script 41 +0x004C animateActor lines 1
+ 53,34s RL:34: object 587 verb 0x4C run True planned True cutscene False animation - lines 1
+ 53,34s RL:34: object 587 verb 0x4D run True planned True cutscene True animation Room 34 local script 209 +0x004F putActor lines 13
+ 53,34s RL:34: object 587 verb 0x56 run True planned True cutscene False animation Script 41 +0x004C animateActor lines 1
+ 54,87s RL:43 item "Room 41 · Twisting at sword (played from Room 41)" [Scenes]
+ 54,87s RL:43 item "Room 41 · Blunting at sword (played from Room 41)" [Scenes]
+ 54,88s RL:43 item "Room 43 · Look at sphere" [Scenes]
+ 54,88s RL:43 item "Room 43 · Opening at cage" [Scenes]
+ 54,88s RL:43 item "Room 43 · Use orb" [Scenes]
+ 54,88s RL:43 item "Room 44 · Reached Room 43 (played from Room 44)" [Scenes]
+ 54,88s RL:43 item "Room 45 · Reached Room 43 (played from Room 45)" [Scenes]
+ 54,88s RL:43: 7 items
+ 54,88s RL:43: shared planner runs 300 of 405
+ 57,93s RL:43: object 640 verb 0x38 run False planned False cutscene False animation Script 96 +0x003A putActor lines 25
+ 58,51s RL:43: object 641 verb 0x36 run False planned False cutscene False animation Script 94 +0x0017 setCameraAt lines 0
+ 69,43s RL:43: object 644 verb 0x3A run False planned False cutscene False animation Script 91 +0x005E putActor lines 35
+ 69,57s RL:43: object 644 verb 0x3B run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 69,69s RL:43: object 644 verb 0x56 run False planned False cutscene False animation Script 41 +0x004C animateActor lines 1
+ 70,10s RL:43: object 651 verb 0x38 run False planned False cutscene False animation Script 93 +0x0043 walkActorTo lines 17
+ 70,11s RL:44 item "Room 43 · Use orb (played from Room 43)" [Scenes]
+ 70,11s RL:44 item "Room 44 · Reached Room 43" [Scenes]
+ 70,11s RL:44 item "Room 44 · Look at Mandible" [Scenes]
+ 70,11s RL:44: 3 items
+ 70,11s RL:44: shared planner runs 318 of 405
+ 70,20s RL:44: object 653 verb 0x38 run False planned False cutscene False animation Script 92 +0x0007 setCameraAt lines 0
+ 70,48s RL:44: object 654 verb 0x36 run False planned False cutscene False animation Script 95 +0x018F animateActor lines 15
+ 70,49s RL:45 item "Room 44 · Look at Mandible (played from Room 44)" [Scenes]
+ 70,49s RL:45 item "Room 45 · Reached Room 43" [Scenes]
+ 70,49s RL:45: 2 items
+ 70,49s RL:45: shared planner runs 321 of 405
+ 70,61s RL:45: object 656 verb 0x38 run True planned False cutscene True animation Script 92 +0x0007 setCameraAt lines 0
+ 70,68s RL:45: object 657 verb 0x36 run False planned False cutscene False animation Room 45 Object 657 Verb 0x36 +0x0019 animateActor lines 25
+ 70,80s RL:45: object 657 verb 0x38 run False planned False cutscene False animation Room 45 Object 657 Verb 0x38 +0x0019 animateActor lines 25
+ 71,52s RL:66 item "Room 51 · Reached Room 66 (played from Room 51)" [Scenes]
+ 71,53s RL:66: 1 items
+ 71,53s RL:66: shared planner runs 330 of 405
+ 72,44s RL:66: object 834 verb 0x54 run False planned False cutscene False animation Script 106 +0x006C putActor lines 0
+ 72,59s RL:66: object 834 verb 0x56 run False planned False cutscene False animation Room 66 local script 208 +0x0071 animateActor lines 1

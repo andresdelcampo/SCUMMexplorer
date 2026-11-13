@@ -94,7 +94,9 @@ internal static class Program
                         var item = listed[at[1]]!;
                         Log($"{raw}: playing \"{item.GetType().GetProperty("Title")!.GetValue(item)}\"");
                         ((Action)item.GetType().GetProperty("Play")!.GetValue(item)!)();
-                        for (var i = 1; i <= 10; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i % 2 == 0) Capture($"rp-{at[0]}-{at[1]}-{i:00}"); }
+                        // WINDOWCHECK_RP=seconds: how long it is watched (12 November 2026: LOOM's named scenes; 15 by default), five pictures over that time.
+                        var rpSteps = (int.TryParse(Environment.GetEnvironmentVariable("WINDOWCHECK_RP"), out var rpSeconds) ? rpSeconds : 15) * 2 / 3;
+                        for (var i = 1; i <= rpSteps; i++) { await Pump(1.5); State($"{raw} +{i * 1.5:F1}s"); if (i % Math.Max(1, rpSteps / 5) == 0) Capture($"rp-{at[0]}-{at[1]}-{i:00}"); }
                         continue;
                     }
                     // K counts LOOM's catalog entries by category, as the window shows them (9 November 2026).
