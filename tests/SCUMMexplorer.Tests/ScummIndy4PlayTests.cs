@@ -372,6 +372,24 @@ public sealed class ScummIndy4PlayTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <c>setState</c> (14 November 2026): <c>markObjectRectAsDirty</c> marks the strips under the object's width dirty and <c>redrawBGStrip</c> repaints
+    /// them at the main screen's full height, so a drawn string anywhere in those columns is erased, though the object itself is an 8-pixel row elsewhere.
+    /// Indy 3's ending credits (Room 94 local 200) set object 946 (0, 192, 320 wide) to state 0 between pages; before the fix every page stayed on the screen.
+    /// </summary>
+    [Fact]
+    public void AStateSetRepaintsTheObjectsColumnsAndErasesDrawnStringsInThem()
+    {
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var table = runtime.Messages;
+        table.Print(new ScummPrintRequest(254, [new("position", 160, 30), new("center")], "INDIANA JONES"u8.ToArray(), "test", 0, 4, null), runtime);
+        table.RoomOnScreen = () => (0, 0, 200);
+        Assert.Equal("", table.StripsRedrawn(0, 64)); // columns 0 to 63: the centred title is not in them
+        Assert.Single(table.Drawn);
+        Assert.Equal("; 1 drawn string(s) covered", table.StripsRedrawn(0, 320));
+        Assert.Empty(table.Drawn);
+    }
+
+    /// <summary>
     /// The magazine's icon (19 October 2026). Smith's scene gives Indy the magazine (object 23, Room 1 local 205 +0x012F <c>pickupObject 23, 0</c>). In New York,
     /// Script 10 +0x0125 finds its verb 0x5B (getVerbEntrypoint) and +0x0131 runs it (startObject) for the icon's object in <c>var[0x0A1]</c>, then +0x01DD gives
     /// the slot that image from Room 98 (0x62). The held object's code is the copy taken from Room 1 (whereIsObject WIO_INVENTORY); before the fix startObject

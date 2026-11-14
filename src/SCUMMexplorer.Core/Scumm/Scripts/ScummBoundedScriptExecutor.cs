@@ -684,7 +684,14 @@ public sealed partial class ScummBoundedScriptExecutor
                 }
                 // o5_setState marks the rectangle dirty and clears the draw queue.
                 drawQueue.Clear();
-                trace.Add($"object {objectId} set to state {state}{(stateEstimated ? " (estimate: follows a seeded pick)" : "")}");
+                // The dirty strips are repainted at full height: drawn strings in them are erased (ScummMessageTable.StripsRedrawn).
+                var stripsErased = "";
+                if (runtime is not null && roomObjects.FirstOrDefault(item => item.Id == (int)objectId) is { } stateRecord)
+                {
+                    var stateX = runtime.ObjectPositions.TryGetValue(stateRecord.Id, out var statePosition) ? statePosition.X : stateRecord.X;
+                    stripsErased = runtime.Messages.StripsRedrawn(stateX, stateRecord.Width);
+                }
+                trace.Add($"object {objectId} set to state {state}{(stateEstimated ? " (estimate: follows a seeded pick)" : "")}{stripsErased}");
                 pc = next;
                 continue;
             }

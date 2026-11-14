@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 14 November: Indy 3's scenes that matter in the window; a state set erases drawn text
+
+Roadmap step 5 for Indy 3: the 23 entries of the user's named scenes (intro, endings, the whip, the Grail trials as clicks, Marcus, the knight, the false Grail, the zeppelin, the plane, Berlin, Venice, Donovan) each played in its own real window (`run.sh`); all 23 play, 15 of 18 named outcomes have an entry (83.3%; the Word of God passed, the leap's fall and the true Grail need several actions or a random draw). One fix, shared code: Room 94's ending credits piled up page on page. `setState` now repaints the object's strip columns at full height as ScummVM's `markObjectRectAsDirty` and `redrawBGStrip` do, so text drawn with `print 0xFE` in them is erased (`ScummMessageTable.StripsRedrawn`); the credits now show one page at a time. Measured on all eleven copies (`scene-setup-20261031/*-run80.txt` against run 79): no scene's plan, way or Normal offer changed; LOOM English's answer key the same. [Record](../../.verification/indy3-check-20261114/README.md).
+
 ## 14 November: clicks in the room as scene triggers; Indy 3's Grail trials
 
 The user, 14 November: the Grail trials are a click on a place of the room, not an object; build a reusable trigger, the hero walking there, one entry per outcome, in Play Cutscene only. A room whose entry installs its own input script (`VAR_VERB_SCRIPT`) now gets click triggers: the objects its scripts compare with and floor points, played by the game's own input script (the camera turned there, the click made once the game reads clicks); points that play the same are one entry. Indy 3: the Breath of God passed and failed, a wrong letter on the Word of God, the leap of faith, all seen in the window; the leap's fall needs two clicks and has no entry. Version 3 prints now show the strings they name ("Jehovah is spelled `IEHOVA`"). 20 click entries offered across Indy 3, Indy 4 and Monkey Island 1 and 2; every earlier scene kept its plan. [Record](../../.verification/click-scenes-20261114/README.md).

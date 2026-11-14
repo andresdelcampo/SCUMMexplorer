@@ -497,6 +497,19 @@ public sealed partial class ScummMessageTable
         return covered == 0 ? "" : $"; {covered} drawn string(s) covered";
     }
 
+    /// <summary>
+    /// An object's state set (ScummVM <c>o5_setState</c> → <c>markObjectRectAsDirty</c>, read on GitHub master 14 November 2026): every strip
+    /// under the object's width is marked dirty, and <c>redrawBGAreas</c> → <c>redrawBGStrip</c> repaints each such strip from the room picture
+    /// at the main screen's full height, copying it to the front buffer. Drawn strings in those columns are erased, whatever the object's own
+    /// height. Indy 3's ending credits clear each page so: Room 94 local script 200 sets object 946 (0, 192, 320 wide) to state 0 before the next.
+    /// </summary>
+    public string StripsRedrawn(int roomX, int width)
+    {
+        NativeMutation?.Invoke();
+        if (RoomOnScreen?.Invoke() is not { } origin || width <= 0) return "";
+        return ObjectDrawn(roomX, 0, width, origin.Bottom - origin.Top);
+    }
+
     private int Cover(ScummScreenBox box)
     {
         var covered = 0;
