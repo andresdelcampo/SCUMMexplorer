@@ -117,6 +117,14 @@ public sealed class ScummCutscenePlanner
                     before.Lines == shown.Lines && before.ChangesView == shown.ChangesView && before.RoomsEntered.Order().SequenceEqual(shown.RoomsEntered.Order()) &&
                     (earlier.Edits.Count, other.VerbId).CompareTo((plan.Edits.Count, trigger.VerbId)) < 0)
                     return $"plays as {ScummCutsceneTitles.Plain(other)} (a click on another point of the room)";
+        // Objects of the same code whose scene can differ by object (ScummCutscene.IsByObject: Indy 3 Room 86's cups) are offered once per outcome.
+        if (trigger.IsByObject)
+            foreach (var other in Groups.Select(g => g.First).Where(c => c.IsByObject && c.Room == trigger.Room && c.VerbId == trigger.VerbId &&
+                         c.ObjectId != trigger.ObjectId && c.Scripts.SequenceEqual(trigger.Scripts)))
+                if (_lastResort.TryGetValue(Key(other), out var earlier) && earlier.Result is { Begun: true } before && before.Picture is not { Count: > 0 } &&
+                    before.Lines == shown.Lines && before.ChangesView == shown.ChangesView && before.RoomsEntered.Order().SequenceEqual(shown.RoomsEntered.Order()) &&
+                    (earlier.Edits.Count, other.ObjectId).CompareTo((plan.Edits.Count, trigger.ObjectId)) < 0)
+                    return $"plays as {ScummCutsceneTitles.Plain(other)} (another object with the same code)";
         return null;
     }
 

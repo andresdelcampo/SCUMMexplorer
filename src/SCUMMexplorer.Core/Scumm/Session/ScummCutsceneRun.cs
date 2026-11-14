@@ -147,7 +147,7 @@ public static class ScummCutsceneRun
         var reached = trigger.Scripts.Select(ScriptKey).Where(key => key is not null).ToHashSet();
         var traced = session.SessionTrace.Count;
         var begunBefore = session.CutscenesBegun;
-        session.PutHeroAtObject(trigger.ObjectId);
+        session.PutHeroForPick(trigger.ObjectId, ScummSetupEdit.SecondOf(setup));
         session.StepFrame();
         if (session.CutscenesBegun == begunBefore) return Math.Max(arrival, 1);
         var owners = session.SessionTrace.Skip(traced).Where(line => line.StartsWith("cutscene at ", StringComparison.Ordinal))
@@ -160,7 +160,7 @@ public static class ScummCutsceneRun
             if (quiet >= 2) break;
             session.StepFrame();
         }
-        if (session.CurrentRoomId == trigger.Room) session.PutHeroAtObject(trigger.ObjectId);
+        if (session.CurrentRoomId == trigger.Room) session.PutHeroForPick(trigger.ObjectId, ScummSetupEdit.SecondOf(setup));
         return frames;
     }
 

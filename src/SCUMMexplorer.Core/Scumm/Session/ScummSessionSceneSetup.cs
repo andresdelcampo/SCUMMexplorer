@@ -474,7 +474,7 @@ public abstract partial class ScummSession
         // The hero is put at the object on every path (LOOM has no sentence script: left in the boot's room, the scene's own actorFollowCamera of
         // the hero would start that room's scene, Script 3 +0x001B; found by the comparison with LOOM English's catalog, 31 October 2026).
         // Versions 1 and 2 too since 1 November 2026 (Maniac Mansion and Zak McKracken on the shared scene setup, ROADMAP 2b).
-        PutHeroAtObject(objectA);
+        PutHeroForPick(objectA, objectB);
         if (sentence == 0)
         {
             ActivateObjectVerb(objectA, verb, objectB);
@@ -761,6 +761,13 @@ public abstract partial class ScummSession
         _runtime.Camera.MovingToActor = true;
         return true;
     }
+
+    /// <summary>
+    /// The hero stood where a pick of a verb on <paramref name="objectId"/> with <paramref name="objectB"/> puts him: beside B when B is an actor in the
+    /// room (a Give: the sentence walks him to the receiver), else at the object (14 November 2026, user report: Indy 3 Room 82's Give Grail to the
+    /// knight stood Indy at the Grail on the floor, and Room 82 local script 201 +0x04C1 starts Elsa's fall, local 204, when he comes within 50 of it).
+    /// </summary>
+    public bool PutHeroForPick(int objectId, int objectB) => objectB != 0 && PutHeroBesideActor(objectB) || PutHeroAtObject(objectId);
 
     public bool PutHeroAtObject(int objectId)
     {

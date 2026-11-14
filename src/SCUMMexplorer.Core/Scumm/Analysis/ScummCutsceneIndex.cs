@@ -57,8 +57,16 @@ public sealed record ScummCutsceneVerbs(int? Look, int? WalkTo, int? Use, int? S
 public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
     int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null,
     IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null, bool Departure = false, bool Widened = false,
-    (int X, int Y)? Click = null)
+    (int X, int Y)? Click = null, bool ByObject = false)
 {
+    /// <summary>
+    /// Whether the scene can differ by which object it is: the verb's code hands its own object (<c>var[0x007]</c>) to a script that compares that
+    /// argument with a variable (14 November 2026, user report: Indy 3 Room 86's cups, each Use is <c>startScript 0x7A, [8, var[0x007], local[0x000]]</c>,
+    /// and global script 122 +0x00E9 compares <c>local[0x001]</c> with <c>var[0x035]</c>, the cup Script 119 drew). Such objects are entries of their own,
+    /// not one scene with the others of the same code; those that play the same are offered once (<c>ScummCutscenePlanner.NotOfferedReason</c>).
+    /// </summary>
+    public bool IsByObject => ByObject;
+
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
 
     public bool IsRoomEntry => ObjectId == 0 && Click is null;
@@ -157,7 +165,7 @@ public static partial class ScummCutsceneIndex
                     game?.Rooms.FirstOrDefault(r => r.ResourceId == room) is { } resource)
                     destinations = doorways(resource, script);
                 found.Add(new(room, objectId, objectName, verbId, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", destinations,
-                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs));
+                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs, ByObject: objectId != 0 && HandsSelfToComparison(data, room, script)));
             }
             FindClickScenes(data, room, roomData, found, verbs);
             var objectVerbs = Try(() => data.ReadObjectVerbs(room, roomData.Objects)) ?? new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
@@ -182,6 +190,10 @@ public static partial class ScummCutsceneIndex
                 // An object whose only code is its fallback verb runs it for any verb (13 November 2026: Indy 3 Room 37's cockpit panel, object 573,
                 // starts Script 49, the biplane's take-off, "Hold on, Dad! Here we go!"): that code is the object's scene.
                 if (real.Length == 0) real = entries.ToArray();
+                // The fallback is also what the object answers to every verb it has no entry for (14 November 2026, user report: Indy 3 Room 86's cups
+                // have Look and Pick up, and Use or Give runs their fallback, global script 122, the choice of the Grail): scanned beside the others,
+                // a scene only when its code reaches one.
+                else real = [.. real, .. entries.Where(v => v.IsFallback && real.All(r => r.ScriptOffset != v.ScriptOffset))];
                 foreach (var verb in real)
                 {
                     var owner = verbs.NamesSharedCode ? real.Where(v => v.ScriptOffset == verb.ScriptOffset).Min(v => v.VerbId) : verb.VerbId;
@@ -317,7 +329,8 @@ public static partial class ScummCutsceneIndex
         // scripts: the EGA catalog lists each spell (Twisting, Sharpening, its reverse) separately, and the player casts them one by one.
         static string ScriptsKey(ScummCutscene c) => string.Join("|", c.Scripts);
         // A click point is its own entry: the room's points share their scripts and differ by where the click goes.
-        static string Key(ScummCutscene c) => ScriptsKey(c) + (c.IsClick ? $"#click{c.VerbId}" : c.IsRoomEntry || !c.Roles.Separates(c.VerbId) ? "" : $"#{c.VerbId}");
+        static string Key(ScummCutscene c) => ScriptsKey(c) + (c.IsClick ? $"#click{c.VerbId}" : c.IsRoomEntry || !c.Roles.Separates(c.VerbId) ? "" : $"#{c.VerbId}") +
+                                              (c.IsByObject ? $"#object{c.ObjectId}" : "");
         static int Rank(ScummCutscene c) => c.IsRoomEntry ? 0 : c.Roles.Rank(c.VerbId);
         // Count uses before separating verbs: a generic response reached by many spells is still a shared helper.
         var helpers = triggers.Where(c => !c.IsClick).GroupBy(ScriptsKey).Where(g => g.Count() > SharedHelperTriggers)
@@ -415,6 +428,29 @@ public static partial class ScummCutsceneIndex
         for (var k = 0; k < points.Count; k++)
             found.Add(new(room, points[k].Object, points[k].Name, ClickVerbBase + k, scripts, texts.Count, summary.RoomLoads, summary.Instructions,
                 texts.FirstOrDefault() ?? "", null, summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs, Click: (points[k].X, points[k].Y)));
+    }
+
+    /// <summary>Whether <paramref name="script"/> starts a script with its own object (<c>var[0x007]</c>) as an argument that the started script compares
+    /// with a variable (<see cref="ScummCutscene.IsByObject"/>).</summary>
+    private static bool HandsSelfToComparison(IScummDataSource data, int room, ScummScriptDisassembly script)
+    {
+        foreach (var i in script.Instructions)
+        {
+            if (i.Operation is not ("startScript" or "chainScript") || LiteralScriptNumber().Match(i.Operands) is not { Success: true } m) continue;
+            var open = i.Operands.IndexOf('[', StringComparison.Ordinal);
+            var close = i.Operands.LastIndexOf(']');
+            if (open < 0 || close <= open) continue;
+            var args = i.Operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries);
+            var index = Array.IndexOf(args, "var[0x007]");
+            if (index < 0) continue;
+            var id = int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            var started = Try(() => id >= data.GlobalScriptCount ? data.RoomLocalScript(room, id) : data.GlobalScript(id));
+            var local = $"local[0x{index:X3}]";
+            if (started?.Instructions.Any(s => s.Operation is "isEqual" or "isNotEqual" && s.Operands.Split(',', StringSplitOptions.TrimEntries) is [var a, var b, ..] &&
+                    (a == local && b.StartsWith("var[", StringComparison.Ordinal) || b == local && a.StartsWith("var[", StringComparison.Ordinal))) == true)
+                return true;
+        }
+        return false;
     }
 
     private sealed class Span { public int RoomLoads; public int Instructions; public int LoadsAfter; public List<int> Targets = []; }

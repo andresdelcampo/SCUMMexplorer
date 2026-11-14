@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 14 November: Indy 3's true Grail; fallback verbs and objects of their own
+
+The scan reads an object's fallback verb beside its other verbs (Use and Give on Indy 3's cups run it), and an object whose code hands itself to a script that compares it with a variable is an entry of its own, offered once per outcome: Room 86 offers the true cup ("You have chosen wisely") beside the false one. A pick whose second is an actor in the room stands the hero beside it. Room 82's Give Grail stays open: its ending state needs several story facts at once (scene order). Run 83: no earlier result changed; Indy 3 +11 entries, Monkey Island 2 +16, Monkey Island 1 +4 each, Zak McKracken +1. [Record](../../.verification/indy3-check-20261114/README.md).
+
 ## 14 November: the user's Indy 3 reports (Rooms 37, 84, 82)
 
 Room 37: a room its scripts leave keeps its own screen rows in its picture (the cockpit, `setScreen 16,192`, no verb area); Interact offers verb 0xFF when it is an object's only player verb (the cockpit's switches and button), and an Interact pick uses the scan's own trigger, so the button plays the take-off. Room 84: an input script that reads the pointer gets a 3 × 3 grid of click points, and of points that play the same the one with the fewest setup values is offered: Indy falls from his own starting stone, no teleport. Room 82 · Give Grail: the direct way stands the hero beside a receiver actor (the knight); in the window the knight still arrives after the pick (open). The true Grail in Room 86 needs outcomes by state (open). Measured: Indy 3 one scene more, Monkey Island 2 five inert grid points, every other result the same. [Record](../../.verification/indy3-check-20261114/README.md).

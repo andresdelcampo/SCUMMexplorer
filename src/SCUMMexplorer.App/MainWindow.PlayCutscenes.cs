@@ -342,7 +342,7 @@ public partial class MainWindow
             {
                 if (session.CurrentRoomId != trigger.Room) session.VisitRoom(room);
                 session.BringObjectIntoRoom(trigger.ObjectId);
-                session.PutHeroAtObject(trigger.ObjectId);
+                session.PutHeroForPick(trigger.ObjectId, ScummSetupEdit.SecondOf(plan?.Edits));
             }
             if (plan?.Result.Way == ScummPickedStart.AtCutscene && ScummSceneSetupSearch.FirstCutscene(game, trigger) is { } at)
             {

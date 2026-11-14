@@ -17,8 +17,9 @@ public sealed class ScummZakEnhancedCutsceneTests(ITestOutputHelper output)
         // 8 November 2026: scenes that take control by hiding the interface count too (ScummSceneMarks).
         // 9 November 2026: the widened candidates (R-8.41) are entries too.
         // 13 November 2026: an object whose only code is its fallback verb is a trigger (Room 44's fence).
-        Assert.Equal(285, planner.Triggers.Count);
-        Assert.Equal(181, planner.Groups.Count);
+        // 14 November 2026: an object's fallback verb is scanned beside its other verbs (one more trigger here).
+        Assert.Equal(286, planner.Triggers.Count);
+        Assert.Equal(182, planner.Groups.Count);
         Assert.Equal(43, planner.Groups.Count(g => g.IsScene));
         Assert.Equal("Read", planner.Verbs.WordFor(12));
         Assert.Contains(planner.Groups, g => ScummCutsceneTitles.Title(g.First) == "Room 03 · Push doorbell");

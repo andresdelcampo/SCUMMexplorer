@@ -70,11 +70,30 @@ if (args.Length > 4 && args[1] == "scene")
         var s = ScummGameSession.BootForPlay(game, out _);
         s.DressHeroForScene(trigger);
         s.ApplySceneSetup(edits);
+        s.ArrivalsSkippedFor = trigger; s.ArrivalSetup = edits;
         s.VisitRoom(game.Rooms.First(r => r.ResourceId == trigger.Room));
+        s.ArrivalsSkippedFor = null; s.ArrivalSetup = null;
         s.ApplySceneSetup(edits);
         string Where() => string.Join("  ", s.Actors.Where(x => x.Room == trigger.Room).Select(x => $"a{x.Number}({x.X},{x.Y})"));
         Console.WriteLine($"after visit: room {s.CurrentRoomId} cutscene {s.InCutscene}: {Where()}");
-        ScummCutsceneRun.StartDirect(s, trigger, ScummSetupEdit.SecondOf(edits));
+        if (Environment.GetEnvironmentVariable("PLANPICK_AGAIN") == "1")
+        {
+            for (var f = 0; f < 200; f++) s.StepFrame();
+            Console.WriteLine($"200 frames later: {Where()}");
+            s.ApplySceneSetup(edits);
+            s.PrepareEntry(edits);
+            s.EnterRoomAgain(game.Rooms.First(r => r.ResourceId == trigger.Room));
+            s.ApplySceneSetup(edits);
+            Console.WriteLine($"entered again: cutscene {s.InCutscene}: {Where()}");
+        }
+        if (Environment.GetEnvironmentVariable("PLANPICK_GAME") == "1")
+        {
+            var met = ScummCutsceneRun.LetRoomMeetHero(s, trigger, edits);
+            Console.WriteLine($"met {met} frames: room {s.CurrentRoomId} cutscene {s.InCutscene} msg [{s.Messages.Talk?.Text}]: {Where()}");
+            foreach (var line in s.SessionTrace.Where(l => l.Contains("local script 201", StringComparison.Ordinal) || l.Contains("stopScript", StringComparison.Ordinal) || l.Contains("ndCutscene", StringComparison.Ordinal) || l.Contains("Room 82", StringComparison.Ordinal)).TakeLast(30)) Console.WriteLine("  T " + (line.Length > 180 ? line[..180] : line));
+            s.PickInteraction(trigger.ObjectId, trigger.VerbId, ScummSetupEdit.SecondOf(edits));
+        }
+        else ScummCutsceneRun.StartDirect(s, trigger, ScummSetupEdit.SecondOf(edits));
         Console.WriteLine($"after pick: {Where()}");
         for (var f = 1; f <= 1200; f++) { s.StepFrame(); if (f % 60 == 0) Console.WriteLine($"f{f}: room {s.CurrentRoomId} {Where()} msg [{s.Messages.Talk?.Text}]"); }
         return;
@@ -101,6 +120,15 @@ if (args.Length > 4 && args[1] == "scene")
         var h = lastRun.Actors.First(a => a.Number == 1);
         Console.WriteLine($"  last run: {runs.Count} runs; hero room {h.Room} at ({h.X},{h.Y})");
     }
+    return;
+}
+// PLANPICK_VERBS=room: the object verbs the scan reads in a room (14 November 2026).
+if (Environment.GetEnvironmentVariable("PLANPICK_VERBS") is { Length: > 0 } verbRoom)
+{
+    var data = ScummDataSources.For(game);
+    var stored = data.ReadRoom(int.Parse(verbRoom));
+    foreach (var (id, entries) in data.ReadObjectVerbs(int.Parse(verbRoom), stored.Objects))
+        Console.WriteLine($"object {id}: {string.Join(", ", entries.Select(e => $"0x{e.VerbId:X2}{(e.IsFallback ? " fallback" : "")} @{e.ScriptOffset}"))}");
     return;
 }
 var boot = ScummGameSession.BootForPlay(game, out _);
