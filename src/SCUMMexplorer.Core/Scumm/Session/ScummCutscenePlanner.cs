@@ -108,6 +108,13 @@ public sealed class ScummCutscenePlanner
             return "started at its cutscene, it shows no line, no other room and no animation";
         if (shown.Picture is { Count: > 0 } found)
             return "the picture check names " + string.Join("; ", found.Select(f => f.Describe()));
+        // Clicks in one room that play the same (user, 14 November 2026: one entry per failing animation, not one per wrong letter) are one entry,
+        // the first point's: the same lines, rooms and view.
+        if (trigger.IsClick)
+            foreach (var other in Groups.Select(g => g.First).Where(c => c.IsClick && c.Room == trigger.Room && c.VerbId < trigger.VerbId))
+                if (_lastResort.TryGetValue(Key(other), out var earlier) && earlier.Result is { Begun: true } before && before.Picture is not { Count: > 0 } &&
+                    before.Lines == shown.Lines && before.ChangesView == shown.ChangesView && before.RoomsEntered.Order().SequenceEqual(shown.RoomsEntered.Order()))
+                    return $"plays as {ScummCutsceneTitles.Plain(other)} (a click on another point of the room)";
         return null;
     }
 
@@ -128,7 +135,8 @@ public sealed class ScummCutscenePlanner
         return _lastResort.GetOrAdd(Key(trigger), _ =>
         {
             var plan = Setup.Plan(trigger, fresh);
-            if (plan.Result.Begun) return plan;
+            // A click in the room is the player's click or nothing: no cutscene of its scripts is started directly (14 November 2026).
+            if (plan.Result.Begun || trigger.IsClick) return plan;
             // R-8.10 (user, 9 November 2026): played its own way, the scene animates or shows another room without taking control (Maniac Mansion's
             // Room 12: the Green Tentacle on the stairs, "You can't pass until you feed me!"; only kid 5's branch takes control). That is the scene, played
             // the game's own way rather than from a cutscene of another branch.

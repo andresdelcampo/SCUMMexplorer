@@ -12,7 +12,7 @@ How they were found: `Measure` with `MEASURE_LIST=1` (every entry with title, pl
 | Ending | Room 82 · Give Grail (99 lines, Room 94); Room 94 · Entry (final scores) | the ending's dialogue ("That was a just and noble thing you did, Junior"); the scores ✔ |
 | Ending (game over) | Room 36 · Entry | "After recovering consciousness, our hero ... polish Hitler's artifacts", scores ✔ |
 | Pulling with the whip | Room 13 · Use brick (whip); Room 61 · Use wooden plug (whip) | Indy whips a ledge and climbs the castle wall; the whip pulls the plug and the water pours ✔ |
-| Grail trials | Room 81 · Entry, 82 · Entry, 85 · Entry, 86 · Entry (the knight), 86 · Use Holy Water ("He chose... poorly"), 91 · Look inscription | play ✔. The three trials themselves (the blades, the word, the leap) have no entry: the scan finds no cutscene in Rooms 87 to 90 |
+| Grail trials | Room 81 · Entry, 82 · Entry, 85 · Entry, 86 · Entry (the knight), 86 · Use Holy Water ("He chose... poorly"), 91 · Look inscription | play ✔. The three trials themselves (Rooms 83 to 85) are clicks in the room, not objects: since 14 November a click trigger plays them (passing and failing the blades, a wrong letter, the leap; [record](../click-scenes-20261114/README.md)) |
 | Boarding the zeppelin | Room 37 · Walk to airfield | "That was close! ... we just made it on board! / Tickets, please." ✔ |
 | On the zeppelin | Room 39 · Walk to hatch | the zeppelin's girders, then the fistfight with a guard ✔ |
 | Leaving the zeppelin in the plane | — | not found among the entries (Room 45's entry, "Indy!", begins and shows nothing) |

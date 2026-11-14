@@ -20,7 +20,7 @@ Keep the documents tidy (user, 31 October; rule in ROADMAP and CLAUDE.md): when 
 
 The roadmap's "The way to a release", in order:
 
-4. **The scenes that matter, as a test set** (step 4, R-8.42; user, 13 November: launched through Play Cutscene and Interact, failures fixed by shared cause, no hand-made starts): where they stand is in `.verification/scenes-that-matter-20261112/README.md`. Left: Indy 3's Grail trials (passing and failing each), done by each trial room's own input script, which no scene trigger reaches. Then Indy 3's scenes played in the window for the user's check (step 5).
+4. **The scenes that matter, as a test set** (step 4, R-8.42; user, 13 November: launched through Play Cutscene and Interact, failures fixed by shared cause, no hand-made starts): where they stand is in `.verification/scenes-that-matter-20261112/README.md`. Indy 3's Grail trials play as clicks in their rooms since 14 November (`.verification/click-scenes-20261114/README.md`); the leap's fall needs two clicks and has no entry. Next: Indy 3's scenes played in the window for the user's check (step 5).
 
 Harness notes for these: `Measure` with `MEASURE_SCRIPTS=1`, `MEASURE_TRIALS=1`, then `python summarise.py <run> <previous run>` and `python ways.py <run> <previous run>` in `.verification/scene-setup-20261031` (latest `*-run76.txt`, all eleven copies, with the Normal offer as `normal:` lines; `MEASURE_LINES=room,object,verb` lists what a scene printed; Maniac/Zak start from Maniac's party); `.verification/user-reports-20261107/PlanPick scene` runs one scene with a given setup; `SCUMM_TRACE_SCRIPTS=Script 02` traces a script; `.verification/loom-answer-key-20261031/Compare` (`COMPARE_LOOM_SESSION=1`, `COMPARE_ONE=room,object,verb`) guards LOOM English's catalog.
 

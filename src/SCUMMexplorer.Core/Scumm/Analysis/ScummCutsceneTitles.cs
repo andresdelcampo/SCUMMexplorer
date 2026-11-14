@@ -34,6 +34,8 @@ public static class ScummCutsceneTitles
     {
         ArgumentNullException.ThrowIfNull(trigger);
         var roles = trigger.Roles;
+        // A click in the room: "Go to the right", "Go to the cross" (the place or object clicked).
+        if (trigger.IsClick) return Format(trigger.Room, "Go to " + (trigger.ObjectName.Length > 0 ? trigger.ObjectName : "a place"));
         // Rooms the verb leads to by the doorway finder. An unnamed object's plain verb, which the LOOM EGA catalog titles by the rooms a run reached,
         // falls back to the rooms its span names in literal loads (20 of the catalog's 24 title differences with the scan were such a load the
         // doorway finder does not follow). Named objects and other verbs keep their names, as the catalog does.

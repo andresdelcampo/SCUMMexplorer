@@ -181,12 +181,15 @@ public partial class MainWindow
         var first = group.First;
         var others = group.Others.Count == 0 ? "" : " The same scripts are reached from " + string.Join(", ",
             group.Others.Select(o => $"{(o.Room != first.Room ? $"Room {o.Room:00} " : "")}object {o.ObjectId}{(o.ObjectName.Length > 0 ? $" ({o.ObjectName})" : "")} {o.VerbLabel}")) + ".";
-        return $"Found in the game's scripts: {first.Room:00} · {(first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}")} " +
+        var source = first.Click is { } click ? $"a click at room ({click.X}, {click.Y}){(first.ObjectId != 0 ? $", on object {first.ObjectId}" : "")}, answered by the room's input script,"
+            : first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}";
+        return $"Found in the game's scripts: {first.Room:00} · {source} " +
                $"reaches {string.Join(", ", first.Scripts)} (a cutscene ... endCutscene span of {first.SpanInstructions} instructions, {first.Texts} printed line(s), {first.RoomLoads} room load(s)). " +
                "A branch can keep part of it from running, so the lines and loads are possible, not certain." + others + " " +
                planner.StartNote(first) + " " + (planner.PictureNote(first) is { Length: > 0 } picture ? picture + " " : "") +
                "Stated start: the running play session (its state is kept), the room entered as a state preview when the session is elsewhere (the hero's arrival is assumed), " +
-               (first.IsRoomEntry ? "then the room's entry scripts played again. " :
+               (first.IsClick ? "then the point clicked once the game reads clicks, the hero walking there by the game's own code. " :
+                first.IsRoomEntry ? "then the room's entry scripts played again. " :
                    $"then the object's verb 0x{first.VerbId:X2} given to the game's sentence script with the hero put at the object (or run directly where the game refuses it): an exploration action, not the game's click. ") +
                "The frames play in the play screen on the game's clock, with its sounds.";
     }
@@ -359,6 +362,18 @@ public partial class MainWindow
                 }
                 // The visit that opened the room is the scene here, not a state preview: a talkie speaks its lines from the visit on (S7 Indy4).
                 else if (game.Speech is { } speech) _playSpeech.Attach(speech, session.Messages, _ctx.PlaySpeechBeforeVisit);
+                uncertainties = session.Snapshot.Uncertainties;
+            }
+            else if (trigger.Click is { } click)
+            {
+                // A click in the room (14 November 2026): the game's input script answers it as the player's click, at the first frame the game
+                // reads clicks; the hero walks there by the room's own code.
+                if (session.CurrentRoomId != trigger.Room)
+                {
+                    _sceneSound.StopAll("a click scene in another room was started from the list");
+                    session.VisitRoom(room);
+                }
+                session.ClickRoomPointWhenReady(trigger.Room, click.X, click.Y);
                 uncertainties = session.Snapshot.Uncertainties;
             }
             else

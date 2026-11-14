@@ -175,6 +175,32 @@ public abstract partial class ScummSession
     public ScummPlayInput? ClickScreen(int x, int y, out string? refused) => ClickScreen(x, y, false, out refused);
 
     /// <summary>
+    /// A left click at a room point (<see cref="ScummCutscene.Click"/>, 14 November 2026): the camera is turned there first when the point is off screen
+    /// (<see cref="JumpCameraTo"/>), and the click goes to the game's input script as the player's would, so the hero walks there by the game's own code.
+    /// </summary>
+    public ScummPlayInput? ClickRoomPoint(int roomX, int roomY, out string? refused)
+    {
+        if (roomX < ViewLeft || roomX >= ViewLeft + 320) JumpCameraTo(roomX);
+        return ClickScreen(roomX - ViewLeft, roomY + _runtime.MainScreen.Top, out refused);
+    }
+
+    /// <summary>Null when the game reads a click now; otherwise why not (user input off, no input script).</summary>
+    public string? ClickRefusal => InputRefusal();
+
+    /// <summary>
+    /// A room click (<see cref="ClickRoomPoint"/>) made at the first frame the game reads clicks, so an arrival still playing is seen to its end first
+    /// (a picked <see cref="ScummCutscene.IsClick"/> scene). It waits for <paramref name="room"/> to be on screen (the app opens it over several frames);
+    /// given up after <paramref name="frames"/> frames, or when the room is left once reached.
+    /// </summary>
+    public void ClickRoomPointWhenReady(int room, int roomX, int roomY, int frames = 3000)
+    {
+        _pendingRoomClick = (roomX, roomY, room, frames, false);
+        _visitTrace.Add($"input: a click at Room {room:00} ({roomX}, {roomY}) waits until the game reads clicks there");
+    }
+
+    private (int X, int Y, int Room, int Frames, bool Reached)? _pendingRoomClick;
+
+    /// <summary>
     /// One press of the left or right button (R-7.10, R-7.16). A right press reaches the game only where <see cref="ScummProfile.RightClickReachesGame"/>
     /// (from version 4: the same click with mode 2, ScummVM <c>checkExecVerbs</c>); elsewhere it is refused and the right button stays the app's.
     /// </summary>
@@ -292,6 +318,21 @@ public abstract partial class ScummSession
     // checkExecVerbs: each queued input runs the script VAR_VERB_SCRIPT holds now, with (area, value, mode) as its first locals.
     private void DeliverQueuedInput()
     {
+        if (_pendingRoomClick is { } pending)
+        {
+            var here = _runtime.CurrentRoom == pending.Room;
+            if (pending.Frames <= 0 || pending.Reached && !here)
+            {
+                _pendingRoomClick = null;
+                _visitTrace.Add($"input: the click at Room {pending.Room:00} ({pending.X}, {pending.Y}) was given up ({(here ? "the game did not read clicks in time" : "the room was left")})");
+            }
+            else if (here && InputRefusal() is null)
+            {
+                _pendingRoomClick = null;
+                if (ClickRoomPoint(pending.X, pending.Y, out var refused) is null) _visitTrace.Add($"input: the click at Room {pending.Room:00} was refused: {refused}");
+            }
+            else _pendingRoomClick = pending with { Frames = pending.Frames - 1, Reached = pending.Reached || here };
+        }
         if (_delayedClick is { } delayed)
         {
             if (delayed.Frames <= 1) { _delayedClick = null; ClickScreen(delayed.X, delayed.Y, out _); }

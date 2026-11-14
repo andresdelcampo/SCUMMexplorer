@@ -56,14 +56,22 @@ public sealed record ScummCutsceneVerbs(int? Look, int? WalkTo, int? Use, int? S
 /// <param name="Verbs">The game's verb roles and words (<see cref="ScummCutsceneVerbs"/>); <see cref="ScummCutsceneVerbs.None"/> when not given.</param>
 public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
     int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null,
-    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null, bool Departure = false, bool Widened = false)
+    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null, bool Departure = false, bool Widened = false,
+    (int X, int Y)? Click = null)
 {
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
 
-    public bool IsRoomEntry => ObjectId == 0;
+    public bool IsRoomEntry => ObjectId == 0 && Click is null;
 
     /// <summary>A room's arrival scene that the script loading the room starts (no object; <see cref="VerbId"/> is the scene's script): the room's entry does not begin it.</summary>
-    public bool IsArrivalScript => ObjectId == 0 && VerbId != 0;
+    public bool IsArrivalScript => ObjectId == 0 && VerbId != 0 && Click is null;
+
+    /// <summary>
+    /// A click at a point of the room (<see cref="Click"/>, room coordinates) that the room's own input script answers (14 November 2026, user: Indy 3's
+    /// Grail trials, a "go to" a place that is not an object). <see cref="VerbId"/> numbers the room's points from <see cref="ScummCutsceneIndex.ClickVerbBase"/>;
+    /// <see cref="ObjectId"/> is the object clicked, or 0 for a floor point.
+    /// </summary>
+    public bool IsClick => Click is not null;
 
     /// <summary>
     /// A scene the room's exit script starts as the hero leaves (no object; <see cref="VerbId"/> is the scene's script; 8 November 2026, user: Maniac
@@ -101,6 +109,12 @@ public sealed record ScummCutsceneGroup(ScummCutscene First, IReadOnlyList<Scumm
 public static partial class ScummCutsceneIndex
 {
     public const int Depth = 3;
+
+    /// <summary>The first <see cref="ScummCutscene.VerbId"/> of a room's click points (<see cref="ScummCutscene.IsClick"/>); no game verb is this high.</summary>
+    public const int ClickVerbBase = 0x200;
+
+    /// <summary>The most points tried in one room whose entry installs its own input script.</summary>
+    public const int MaxClickPoints = 10;
 
     [GeneratedRegex(@"^(?:0x)?([0-9A-Fa-f]+)(?:,|$)")]
     private static partial Regex LiteralScriptNumber();
@@ -145,6 +159,7 @@ public static partial class ScummCutsceneIndex
                 found.Add(new(room, objectId, objectName, verbId, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", destinations,
                     summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs));
             }
+            FindClickScenes(data, room, roomData, found, verbs);
             var objectVerbs = Try(() => data.ReadObjectVerbs(room, roomData.Objects)) ?? new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
             // R-6.13b: a doorway's door verb (its Walk to, or its default code) is navigation, never a widened candidate (Indy 4's exits, Monkey Island's doors).
             var finder = animatingVerbs && game is not null ? new ScummDoorwayFinder(game, data) : null;
@@ -301,10 +316,11 @@ public static partial class ScummCutsceneIndex
         // A verb the game's roles separate (LOOM's drafts, 0x39 and up) is its own scene even when another verb of the object reaches the same
         // scripts: the EGA catalog lists each spell (Twisting, Sharpening, its reverse) separately, and the player casts them one by one.
         static string ScriptsKey(ScummCutscene c) => string.Join("|", c.Scripts);
-        static string Key(ScummCutscene c) => ScriptsKey(c) + (c.IsRoomEntry || !c.Roles.Separates(c.VerbId) ? "" : $"#{c.VerbId}");
+        // A click point is its own entry: the room's points share their scripts and differ by where the click goes.
+        static string Key(ScummCutscene c) => ScriptsKey(c) + (c.IsClick ? $"#click{c.VerbId}" : c.IsRoomEntry || !c.Roles.Separates(c.VerbId) ? "" : $"#{c.VerbId}");
         static int Rank(ScummCutscene c) => c.IsRoomEntry ? 0 : c.Roles.Rank(c.VerbId);
         // Count uses before separating verbs: a generic response reached by many spells is still a shared helper.
-        var helpers = triggers.GroupBy(ScriptsKey).Where(g => g.Count() > SharedHelperTriggers)
+        var helpers = triggers.Where(c => !c.IsClick).GroupBy(ScriptsKey).Where(g => g.Count() > SharedHelperTriggers)
             .Select(g => g.Key).ToHashSet(StringComparer.Ordinal);
         return triggers.Where(c => !helpers.Contains(ScriptsKey(c))).GroupBy(Key)
             .Select(g =>
@@ -316,20 +332,96 @@ public static partial class ScummCutsceneIndex
             .ToArray();
     }
 
+    /// <summary>
+    /// A room whose entry installs one of its own local scripts as the input script (<c>VAR_VERB_SCRIPT</c>) answers clicks itself, and a click may
+    /// begin a scene no object starts (14 November 2026, user: Indy 3's Grail trials. Room 83's entry, +0x0000, installs local 200: a click walks Indy
+    /// in, and past x 288 the Breath of God plays, passed when the click was on object 878, deadly elsewhere). The scene may be in the input script, in
+    /// a script it starts, or in a script the entry starts that watches where the hero goes (Room 85). Each candidate point is a trigger: the objects
+    /// of the room those scripts compare with, then floor points across the walk boxes, at most <see cref="MaxClickPoints"/>. Their runs decide which
+    /// points are scenes; points that play the same are one entry (<c>ScummCutscenePlanner.NotOfferedReason</c>).
+    /// </summary>
+    private static void FindClickScenes(IScummDataSource data, int room, ScummRoomData roomData, List<ScummCutscene> found, ScummCutsceneVerbs verbs)
+    {
+        // Versions 1 and 2 keep no input script in a variable (their clicks go to script 4): nothing to read.
+        if (data is ScummV2DataSource || Try(() => data.RoomEntryScript(room)) is not { } entry) return;
+        int? Literal(string operand) => LiteralScriptNumber().Match(operand) is { Success: true } m
+            ? int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) : null;
+        var prefix = ScummVars.VerbScript + " = ";
+        var installed = entry.Instructions.Where(i => i.Operation == "move" && i.Operands.StartsWith(prefix, StringComparison.Ordinal))
+            .Select(i => Literal(i.Operands[prefix.Length..])).OfType<int>().Where(n => n >= data.GlobalScriptCount).Distinct().ToList();
+        if (installed.Count == 0) return;
+        var started = entry.Instructions.Where(i => i.Operation is "startScript" or "chainScript").Select(i => Literal(i.Operands)).OfType<int>()
+            .Where(n => n >= data.GlobalScriptCount && !installed.Contains(n));
+        var scripts = new List<string>();
+        var texts = new List<string>();
+        var summary = new Span();
+        var visited = new HashSet<(bool, int)>();
+        var reached = new List<ScummScriptDisassembly>();
+        foreach (var number in installed.Concat(started).Distinct())
+        {
+            if (!visited.Add((true, number)) || Try(() => data.RoomLocalScript(room, number)) is not { } code) continue;
+            reached.Add(code);
+            Walk(data, room, code, $"Room {room} local script {number}", 1, false, visited, scripts, texts, summary, inputMarks: true);
+        }
+        if (scripts.Count == 0) return;
+        // The objects of this room the scripts compare with (Room 83: the input script's isEqual local[0x003], 0x036E).
+        var ids = roomData.Objects.Select(o => o.Id).ToHashSet();
+        var compared = new List<int>();
+        foreach (var ins in reached.SelectMany(c => c.Instructions))
+            if (ins.Operation is "isEqual" or "isNotEqual" && ins.Operands.Split(',', StringSplitOptions.TrimEntries) is [_, var value, ..] &&
+                value.StartsWith("0x", StringComparison.Ordinal) &&
+                int.TryParse(value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var id) && ids.Contains(id) && !compared.Contains(id))
+                compared.Add(id);
+        var room_width = Math.Max(1, roomData.Width);
+        var room_height = Math.Max(1, roomData.Height);
+        var points = new List<(int Object, string Name, int X, int Y)>();
+        // A place is named by where it is in the room; one already named so gets its depth, then its point.
+        string Place(int x, int y)
+        {
+            var side = (x * 5 / room_width) switch { 0 => "the far left", 1 => "the left", 2 => "the middle", 3 => "the right", _ => "the far right" };
+            if (points.Any(q => q.Name == side)) side += (y * 3 / room_height) switch { 0 => " (back)", 1 => " (centre)", _ => " (front)" };
+            if (points.Any(q => q.Name == side)) side += $" ({x}, {y})";
+            return side;
+        }
+        foreach (var id in compared)
+        {
+            var record = roomData.Objects.First(o => o.Id == id);
+            var (x, y) = (record.X + record.Width / 2, record.Y + record.Height / 2);
+            var name = roomData.ObjectNames.TryGetValue(id, out var raw) ? ScummTextDecoder.DecodeGlyphs(raw).Trim().TrimEnd('@').Trim() : "";
+            // An object without a name (Indy 3 Room 83's object 878, the kneeling place) is a place of the room.
+            points.Add((id, name.Length > 0 ? name : Place(x, y), x, y));
+        }
+        // Floor points: the middle of each walk box, spread across the room from left to right.
+        var floor = (roomData.WalkBoxes?.Boxes ?? []).Where(b => !b.IsLine)
+            .Select(b => (X: (b.UpperLeft.X + b.UpperRight.X + b.LowerRight.X + b.LowerLeft.X) / 4, Y: (b.UpperLeft.Y + b.UpperRight.Y + b.LowerRight.Y + b.LowerLeft.Y) / 4))
+            .OrderBy(p => p.X).ToList();
+        var free = MaxClickPoints - points.Count;
+        var spread = free <= 0 ? [] : floor.Count <= free ? floor
+            : Enumerable.Range(0, free).Select(k => floor[k * (floor.Count - 1) / Math.Max(1, free - 1)]).Distinct().ToList();
+        foreach (var p in spread) points.Add((0, Place(p.X, p.Y), p.X, p.Y));
+        for (var k = 0; k < points.Count; k++)
+            found.Add(new(room, points[k].Object, points[k].Name, ClickVerbBase + k, scripts, texts.Count, summary.RoomLoads, summary.Instructions,
+                texts.FirstOrDefault() ?? "", null, summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs, Click: (points[k].X, points[k].Y)));
+    }
+
     private sealed class Span { public int RoomLoads; public int Instructions; public int LoadsAfter; public List<int> Targets = []; }
 
     /// <param name="spanOpen">True when the script was started from inside a cutscene span: everything it does runs inside that span, even though the
     /// script holds no <c>cutscene</c> opcode itself (a span of two instructions that starts the script that does the walking and talking).</param>
     private static void Walk(IScummDataSource data, int room, ScummScriptDisassembly script, string label, int depth, bool spanOpen,
-        HashSet<(bool, int)> visited, List<string> scripts, List<string> texts, Span summary)
+        HashSet<(bool, int)> visited, List<string> scripts, List<string> texts, Span summary, bool inputMarks = false)
     {
+        // A click's answer may take the player's control without a cutscene: Indy 3 Room 84's jump to a stone, local script 203 +0x00B5
+        // (userInputOff, freezeScripts) to +0x0146 (userInputOn). In a click scan that span is the scene's, as a cutscene's would be.
+        static bool InputOff(ScummScriptInstruction i) => i.Operation == "cursorCommand" && i.Operands.StartsWith("userInputOff", StringComparison.Ordinal);
+        static bool InputOn(ScummScriptInstruction i) => i.Operation == "cursorCommand" && i.Operands.StartsWith("userInputOn", StringComparison.Ordinal);
         var ins = script.Instructions;
         var open = spanOpen; var counted = false;
         var calls = new List<(ScummScriptInstruction Call, bool InSpan)>();
         foreach (var i in ins)
         {
-            if (ScummSceneMarks.Starts(i)) { open = true; if (!counted) { scripts.Add(label); counted = true; } continue; }
-            if (ScummSceneMarks.Ends(i)) { open = false; continue; }
+            if (ScummSceneMarks.Starts(i) || inputMarks && InputOff(i)) { open = true; if (!counted) { scripts.Add(label); counted = true; } continue; }
+            if (ScummSceneMarks.Ends(i) || inputMarks && InputOn(i)) { open = false; continue; }
             if (i.Operation is "startScript" or "chainScript") calls.Add((i, open));
             if (!open)
             {
@@ -358,7 +450,7 @@ public static partial class ScummCutsceneIndex
             var local = id >= data.GlobalScriptCount;
             if (!visited.Add((local, id))) continue;
             var next = Try(() => local ? data.RoomLocalScript(room, id) : data.GlobalScript(id));
-            if (next is not null) Walk(data, room, next, local ? $"Room {room} local script {id}" : $"global script {id}", depth + 1, inSpan, visited, scripts, texts, summary);
+            if (next is not null) Walk(data, room, next, local ? $"Room {room} local script {id}" : $"global script {id}", depth + 1, inSpan, visited, scripts, texts, summary, inputMarks);
         }
     }
 

@@ -206,8 +206,14 @@ if (Environment.GetEnvironmentVariable("MEASURE_RUN") is { Length: > 0 } runSpec
     }
     ScummSession? last = null; var bootLines = 0;
     var seen = ScummCutsceneRun.Run(game, () => { last = newRun(); bootLines = last.Messages.Log.Count; return last; }, t, edits);
-    Console.WriteLine($"begun {seen.Begun} lines {seen.Lines} rooms [{string.Join(",", seen.RoomsEntered)}] frames {seen.Frames} {seen.Failure}");
+    Console.WriteLine($"begun {seen.Begun} lines {seen.Lines} rooms [{string.Join(",", seen.RoomsEntered)}] frames {seen.Frames} view {seen.ChangesView} animation {seen.Animation} {seen.Failure}");
     foreach (var m in last!.Messages.Log.Skip(bootLines).Where(m => m.ShowsText).Take(30)) Console.WriteLine($"  [{string.Join(" / ", m.Lines).Trim()}] from {m.SourceLabel}");
+    return;
+}
+// MEASURE_TRIGGERS=1: every trigger the scan found, with its click point (14 November 2026), no runs.
+if (Environment.GetEnvironmentVariable("MEASURE_TRIGGERS") == "1")
+{
+    foreach (var t in planner.Triggers) Console.WriteLine($"TRIGGER Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} click {t.Click} [{t.ObjectName}] scripts {string.Join(" | ", t.Scripts)}");
     return;
 }
 // MEASURE_LIST=1: every entry with its title, kind, plan (way, lines, rooms, frames), whether Normal offers it, and its first printed text (12 November
@@ -220,7 +226,7 @@ if (Environment.GetEnvironmentVariable("MEASURE_LIST") == "1")
         var plan = planner.PlanSetup(t);
         Console.WriteLine($"LIST {(planner.IsScene(g) ? "scene" : "react")} {(planner.NotOfferedReason(t) is { } why ? "HIDDEN" : "normal")} Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} " +
                           $"[{ScummCutsceneTitles.Plain(t)}] way {(plan.Result.Begun ? plan.Result.Way.ToString() : "none")} lines {plan.Result.Lines} rooms [{string.Join(",", plan.Result.RoomsEntered)}] frames {plan.Result.Frames} " +
-                          $"edits {plan.Edits.Count} first \"{t.FirstText}\" scripts {string.Join(" | ", t.Scripts)}");
+                          $"edits {plan.Edits.Count} ({string.Join("; ", plan.Edits.Select(e => e.Describe()))}) first \"{t.FirstText}\" scripts {string.Join(" | ", t.Scripts)}");
     }
     return;
 }

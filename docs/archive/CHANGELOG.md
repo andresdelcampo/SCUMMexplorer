@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 14 November: clicks in the room as scene triggers; Indy 3's Grail trials
+
+The user, 14 November: the Grail trials are a click on a place of the room, not an object; build a reusable trigger, the hero walking there, one entry per outcome, in Play Cutscene only. A room whose entry installs its own input script (`VAR_VERB_SCRIPT`) now gets click triggers: the objects its scripts compare with and floor points, played by the game's own input script (the camera turned there, the click made once the game reads clicks); points that play the same are one entry. Indy 3: the Breath of God passed and failed, a wrong letter on the Word of God, the leap of faith, all seen in the window; the leap's fall needs two clicks and has no entry. Version 3 prints now show the strings they name ("Jehovah is spelled `IEHOVA`"). 20 click entries offered across Indy 3, Indy 4 and Monkey Island 1 and 2; every earlier scene kept its plan. [Record](../../.verification/click-scenes-20261114/README.md).
+
 ## 13 November: the scenes that matter are a test set; LOOM's ending through Interact
 
 The user, 13 November: the named scenes are for testing, launched through Play Cutscene and Interact, not hand-made starts. R-8.42 and the roadmap's step 4 say so now. LOOM's ending had been added as a hand-made named entry; it is gone again. The ending plays through Interact (Room 66, Transcend on Bobbin): its script takes control by switching input off rather than with a cutscene, and LOOM's playback clock now counts that as a scene. [Record](../../.verification/scenes-that-matter-20261112/README.md).

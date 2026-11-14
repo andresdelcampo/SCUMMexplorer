@@ -137,8 +137,10 @@ public sealed class ScummMonkeyFloppyCutsceneTests(ITestOutputHelper output)
         {
             static string Key(ScummCutsceneGroup g) => $"{g.First.Room}/{g.First.ObjectId}/{g.First.VerbId} {g.IsScene} {string.Join(";", g.First.Scripts)} " +
                                                         string.Join(",", g.Others.Select(o => $"{o.Room}/{o.ObjectId}/{o.VerbId}"));
-            Assert.Equal(english.Triggers.Count, planner.Triggers.Count);
-            Assert.Equal(english.Groups.Select(Key), planner.Groups.Select(Key));
+            // Click points (14 November 2026) come from each copy's walk boxes, which differ: the Spanish Room 20 has one box fewer, so one floor point
+            // fewer. The scenes the scripts hold are compared.
+            Assert.Equal(english.Triggers.Count(t => !t.IsClick), planner.Triggers.Count(t => !t.IsClick));
+            Assert.Equal(english.Groups.Where(g => !g.First.IsClick).Select(Key), planner.Groups.Where(g => !g.First.IsClick).Select(Key));
         }
         var poster = planner.Run(GroupOf(planner, 33, 438, 0x09).First);
         Assert.True(poster.Begun, poster.Failure);

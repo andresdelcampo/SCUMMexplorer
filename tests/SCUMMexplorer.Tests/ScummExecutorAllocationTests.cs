@@ -46,7 +46,9 @@ public sealed class ScummExecutorAllocationTests
         if (Game(folder, marker) is not { } game) return;
         var boot = ScummBootSnapshot.Of(ScummGameSession.BootForPlay(game, out _));
         var planner = new ScummCutscenePlanner(game);
-        foreach (var group in planner.Groups.Where((_, i) => i % Math.Max(1, planner.Groups.Count / 3) == 0).Take(3))
+        // Object triggers and entries (a click point, 14 November 2026, has no verb to activate).
+        var groups = planner.Groups.Where(g => !g.First.IsClick).ToList();
+        foreach (var group in groups.Where((_, i) => i % Math.Max(1, groups.Count / 3) == 0).Take(3))
         {
             var trigger = group.First;
             var room = game.Rooms.First(r => r.ResourceId == trigger.Room);

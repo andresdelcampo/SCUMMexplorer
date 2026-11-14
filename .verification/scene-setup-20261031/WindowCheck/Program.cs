@@ -50,7 +50,7 @@ internal static class Program
             if (play is not null && Environment.GetEnvironmentVariable("WINDOWCHECK_VARS") is { Length: > 0 } watched)
             {
                 var runtime = (ScummScriptRuntimeState)typeof(ScummSession).GetField("_runtime", Private)!.GetValue(play)!;
-                Log("    " + string.Join(" ", watched.Split(',').Select(w => w.StartsWith("obj:", StringComparison.Ordinal)
+                Log($"    input: {play.ClickRefusal ?? "read"}; delivered [{string.Join(" | ", play.DeliveredInput.TakeLast(2).Select(d => d.Description))}]; pending {typeof(ScummSession).GetField("_pendingRoomClick", Private)?.GetValue(play)}; " + string.Join(" ", watched.Split(',').Select(w => w.StartsWith("obj:", StringComparison.Ordinal)
                     ? $"{w}={runtime.ObjectStates.GetValueOrDefault(int.Parse(w[4..]))}" : $"{w}={runtime.GlobalVariables.GetValueOrDefault(w)}")));
             }
         }

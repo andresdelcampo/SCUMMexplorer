@@ -62,8 +62,9 @@ public sealed class ScummGameSession : ScummSession
             // convertVerbMessage for prints: Script 18 says a dialogue choice through code 5 of the chosen verb (+0x0068).
             _runtime.VerbName = PlayVerbName;
             // convertStringMessage in prints (S6 Indy4, 17 October 2026): Script 17 +0x00D9 says the chosen dialogue line through code 5, and the line's verb name
-            // is code 7 of a string Room 10 local 208 loaded (with the line's speech codes).
-            if (profile.Version >= ScummVersion.V5) _runtime.StringText = PlayStringText;
+            // is code 7 of a string Room 10 local 208 loaded (with the line's speech codes). Version 3 reads the string's number from a variable
+            // (14 November 2026: Indy 3 Room 84 local script 205 +0x00A1, "Jehovah is spelled `ÿ var[0x035]`", string 0x20 the entry loaded).
+            if (profile.Version >= ScummVersion.V3) _runtime.StringText = PlayStringText;
         }
         _musicStart = profile.MusicStart;
         _bootInput = profile.BootInput;

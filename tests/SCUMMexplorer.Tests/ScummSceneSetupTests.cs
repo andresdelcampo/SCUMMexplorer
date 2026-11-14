@@ -493,7 +493,8 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
         // single change, a reaction (Room 86's tunnel), not a scene left out.
         if (Indy3() is not { } game) return;
         var planner = new ScummCutscenePlanner(game);
-        var scenes = planner.Groups.Where(group => !group.First.Widened).ToList();
+        // A click point (14 November 2026) where the hero only walks begins nothing by design: one point of a room is not a scene left out.
+        var scenes = planner.Groups.Where(group => !group.First.Widened && !group.First.IsClick).ToList();
         var ways = scenes.Select(group => planner.PlanSetup(group.First)).GroupBy(plan => (plan.Result.Begun, plan.HasEdits, plan.Result.Way))
             .ToDictionary(g => g.Key, g => g.Count());
         foreach (var (key, count) in ways) output.WriteLine($"{key}: {count}");

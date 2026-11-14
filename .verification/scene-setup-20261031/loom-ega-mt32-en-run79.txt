@@ -1,0 +1,279 @@
+193 groups, planner ready in 2,4 s
+SETUP Room 02 object 0 verb 0x00 () 3,3 s, 14 candidates: actor 1 in walk box 4 (tested at global script 45 +0x0016) | bit[0xD6D] = 1 (tested at Room 2 entry script +0x0042) | bit[0xDA4] = 1 (tested at Room 2 entry script +0x0051) | bit[0xD61] = 1 (tested at Room 2 entry script +0x0067) | object 154 out of class 24 (tested at Room 2 entry script +0x006F) | object 154 in class 24 (tested at Room 2 entry script +0x006F) | arrived from Room 70 (var[0x070]) (tested at Room 2 entry script +0x00AC) | actor 1 in walk box 5 (tested at global script 45 +0x0042) | actor 1 in walk box 10 (tested at global script 45 +0x006E) | actor 1 in walk box 11 (tested at global script 45 +0x0096) | var[0x064] = 2 (tested at global script 17 +0x00D3) | bit[0xD71] = 1 (tested at Room 2 entry script +0x003D) | bit[0xD71] = 0 (tested at Room 2 entry script +0x003D) | bit[0xD6D] = 0 (tested at Room 2 entry script +0x0084)
+      scripts: global script 45; cutscene: (global script 45, 29, System.Int32[])
+      result: way Game lines 0 rooms [] frames 30
+      kept: actor 1 in walk box 4 (tested at global script 45 +0x0016); rooms [] lines 0
+SETUP Room 10 object 0 verb 0x00 () 0,6 s, 31 candidates: actor 1 in walk box 3 (tested at Room 10 local script 200 +0x0032) | arrived from Room 70 (var[0x070]) (tested at Room 10 entry script +0x0023) | var[0x0AB] = 1 (tested at Room 10 entry script +0x002A) | bit[0xD6D] = 1 (tested at Room 10 entry script +0x003F) | var[0x07D] = 17 (tested at Room 10 entry script +0x0050) | var[0x0D5] = 308 (tested at Room 10 entry script +0x008C) | var[0x0D5] = 309 (tested at Room 10 entry script +0x0099) | bit[0xDBC] = 1 (tested at Room 10 entry script +0x00B5) | bit[0xDD2] = 1 (tested at Room 10 entry script +0x00F9) | bit[0xDC9] = 1 (tested at Room 10 entry script +0x0119) | bit[0xD61] = 1 (tested at Room 10 local script 200 +0x004F) | actor 1 in walk box 7 (tested at Room 10 local script 200 +0x0106) | bit[0xD7F] = 1 (tested at Room 10 local script 200 +0x013E) | var[0x0A4] = 1 (tested at global script 40 +0x0000) | var[0x0A3] = 1 (tested at global script 40 +0x000D) | var[0x0A2] = 2 (tested at global script 40 +0x001A) | var[0x07B] = 2 (tested at global script 19 +0x0014) | var[0x07B] = 3 (tested at global script 19 +0x0014) | var[0x07B] = 1 (tested at global script 19 +0x0014) | var[0x064] = 2 (tested at global script 17 +0x00D3) | var[0x07A] = 1 (tested at global script 18 +0x0095) | var[0x07A] = 2 (tested at global script 18 +0x0095) | var[0x07A] = 3 (tested at global script 18 +0x00E8) | var[0x07A] = 4 (tested at global script 18 +0x012F) | var[0x07A] = 5 (tested at global script 18 +0x0176) | var[0x07A] = 6 (tested at global script 18 +0x01BD) | var[0x07A] = 7 (tested at global script 18 +0x0204) | var[0x07A] = 8 (tested at global script 18 +0x024B) | var[0x07A] = 9 (tested at global script 18 +0x0292) | actor 1 in walk box 1 (tested at Room 10 local script 200 +0x0024) | bit[0xD6D] = 0 (tested at Room 10 entry script +0x014E)
+      scripts: Room 10 local script 200; cutscene: (Room 10 local script 200, 57, System.Int32[])
+      result: way Game lines 0 rooms [] frames 56
+      kept: actor 1 in walk box 3 (tested at Room 10 local script 200 +0x0032); rooms [] lines 0
+SETUP Room 13 object 0 verb 0x00 () 0,8 s, 12 candidates: object 325 out of class 24 (tested at Room 13 entry script +0x00BB) | actor 1 in walk box 2 (tested at Room 13 local script 201 +0x0016) | bit[0xDBC] = 1 (tested at Room 13 entry script +0x006B) | var[0x07A] = 3 (tested at Room 13 entry script +0x00A3) | var[0x07A] = 4 (tested at Room 13 entry script +0x00A3) | var[0x07A] = 2 (tested at Room 13 entry script +0x00A3) | var[0x07B] = 2 (tested at global script 19 +0x0014) | var[0x07B] = 3 (tested at global script 19 +0x0014) | var[0x07B] = 1 (tested at global script 19 +0x0014) | var[0x066] = 1 (tested at global script 8 +0x0000) | var[0x068] = 1 (tested at global script 8 +0x0028) | object 325 in class 24 (tested at Room 13 entry script +0x00BB)
+      scripts: global script 53; cutscene: (global script 53, 0, )
+      result: way Game lines 48 rooms [14,12] frames 245
+      kept: actor 1 in walk box 2 (tested at Room 13 local script 201 +0x0016); rooms [14,12] lines 48
+STILL Room 13 object 323 verb 0x37 () 0,5 s, 2 candidates: object 325 out of class 24 (tested at Room 13 object 323 verb 0x37 +0x0000) | object 325 in class 24 (tested at Room 13 object 323 verb 0x37 +0x0000)
+      scripts: Room 13 object 323 verb 0x37; cutscene: 
+      result: way Direct lines 0 rooms [14,12] frames 600
+SETUP Room 15 object 0 verb 0x00 () 0,3 s, 11 candidates: actor 1 in walk box 3 (tested at Room 15 local script 200 +0x0016) | arrived from Room 70 (var[0x070]) (tested at Room 15 entry script +0x0026) | var[0x0AB] = 3 (tested at Room 15 entry script +0x002D) | var[0x0AB] = 4 (tested at Room 15 entry script +0x002D) | var[0x0AB] = 2 (tested at Room 15 entry script +0x002D) | arrived from Room 16 (var[0x070]) (tested at Room 15 entry script +0x004B) | bit[0xD6D] = 1 (tested at Room 15 entry script +0x0066) | actor 1 in walk box 5 (tested at Room 15 local script 200 +0x0066) | bit[0xD61] = 1 (tested at global script 17 +0x007D) | var[0x064] = 2 (tested at global script 17 +0x00D3) | bit[0xD6D] = 0 (tested at Room 15 entry script +0x0066)
+      scripts: Room 15 local script 200; cutscene: (Room 15 local script 200, 29, System.Int32[])
+      result: way Game lines 0 rooms [] frames 46
+      kept: actor 1 in walk box 3 (tested at Room 15 local script 200 +0x0016); rooms [] lines 0
+SETUP Room 17 object 0 verb 0x00 () 0,6 s, 19 candidates: actor 1 in walk box 4 (tested at Room 17 local script 200 +0x001B) | arrived from Room 70 (var[0x070]) (tested at Room 17 entry script +0x0036) | var[0x0AB] = 5 (tested at Room 17 entry script +0x003D) | var[0x0AB] = 6 (tested at Room 17 entry script +0x003D) | var[0x0AB] = 4 (tested at Room 17 entry script +0x003D) | var[0x0AB] = 8 (tested at Room 17 entry script +0x004A) | var[0x0AB] = 9 (tested at Room 17 entry script +0x004A) | var[0x0AB] = 7 (tested at Room 17 entry script +0x004A) | var[0x071] = 345 (tested at Room 17 entry script +0x005D) | bit[0xDB8] = 1 (tested at Room 17 entry script +0x006D) | bit[0xD6D] = 1 (tested at Room 17 entry script +0x007B) | actor 1 in walk box 5 (tested at Room 17 local script 200 +0x0046) | actor 1 in walk box 6 (tested at Room 17 local script 200 +0x0071) | actor 1 in walk box 7 (tested at Room 17 local script 200 +0x007E) | actor 1 in walk box 8 (tested at Room 17 local script 200 +0x008B) | bit[0xD61] = 1 (tested at global script 17 +0x007D) | var[0x064] = 2 (tested at global script 17 +0x00D3) | bit[0xD6D] = 0 (tested at Room 17 entry script +0x007B) | script 68 not running (tested at global script 66 +0x00C1)
+      scripts: Room 17 local script 200 | global script 66; cutscene: (Room 17 local script 200, 34, System.Int32[])
+      result: way Game lines 9 rooms [56] frames 619
+      kept: actor 1 in walk box 8 (tested at Room 17 local script 200 +0x008B); rooms [56] lines 9
+SETUP Room 22 object 0 verb 0x00 () 1,4 s, 18 candidates: actor 1 in walk box 10 (tested at Room 22 local script 200 +0x0028) | bit[0xDB8] = 1 (tested at Room 22 entry script +0x0006) | bit[0xDB4] = 1 (tested at Room 22 entry script +0x0083) | arrived from Room 70 (var[0x070]) (tested at Room 22 entry script +0x00A2) | var[0x0AB] = 10 (tested at Room 22 entry script +0x00A9) | var[0x0AB] = 11 (tested at Room 22 entry script +0x00A9) | var[0x0AB] = 9 (tested at Room 22 entry script +0x00A9) | var[0x0AB] = 1 (tested at Room 22 entry script +0x00B6) | var[0x0AB] = 2 (tested at Room 22 entry script +0x00B6) | var[0x071] = 353 (tested at Room 22 entry script +0x00D2) | var[0x071] = 348 (tested at Room 22 entry script +0x00DF) | var[0x071] = 368 (tested at Room 22 entry script +0x00EC) | bit[0xD6D] = 1 (tested at Room 22 entry script +0x00FC) | actor 1 in walk box 11 (tested at Room 22 local script 200 +0x007C) | bit[0xD61] = 1 (tested at global script 17 +0x007D) | var[0x064] = 2 (tested at global script 17 +0x00D3) | bit[0xD6D] = 0 (tested at Room 22 entry script +0x00FC) | script 68 not running (tested at global script 67 +0x006F)
+      scripts: Room 22 local script 200 | global script 67; cutscene: (Room 22 local script 200, 47, System.Int32[])
+      result: way Game lines 0 rooms [] frames 41
+      kept: actor 1 in walk box 11 (tested at Room 22 local script 200 +0x007C); rooms [] lines 0
+SETUP Room 23 object 0 verb 0x00 () 0,9 s, 24 candidates: object 419 in class 24 (tested at Room 23 entry script +0x006F) | object 422 out of class 24 (tested at Room 23 entry script +0x00B8) | actor 1 at x 243 (tested at Room 23 local script 213 +0x001B) | arrived from Room 70 (var[0x070]) (tested at Room 23 entry script +0x0047) | var[0x0AB] = 10 (tested at Room 23 entry script +0x004E) | var[0x0AB] = 11 (tested at Room 23 entry script +0x004E) | var[0x0AB] = 9 (tested at Room 23 entry script +0x004E) | var[0x0AB] = 14 (tested at Room 23 entry script +0x0055) | var[0x0AB] = 15 (tested at Room 23 entry script +0x0055) | var[0x0AB] = 13 (tested at Room 23 entry script +0x0055) | arrived from Room 16 (var[0x070]) (tested at Room 23 entry script +0x0062) | bit[0xD66] = 1 (tested at Room 23 local script 214 +0x014E) | actor 1 in walk box 6 (tested at Room 23 local script 200 +0x0019) | actor 1 in walk box 7 (tested at Room 23 local script 200 +0x0051) | actor 1 in walk box 9 (tested at Room 23 local script 200 +0x007D) | actor 1 in walk box 10 (tested at Room 23 local script 200 +0x00AC) | var[0x066] = 1 (tested at global script 8 +0x0000) | var[0x068] = 1 (tested at global script 8 +0x0028) | var[0x064] = 2 (tested at global script 28 +0x0000) | var[0x07B] = 2 (tested at global script 28 +0x0007) | bit[0xD71] = 1 (tested at Room 23 entry script +0x003C) | object 419 out of class 24 (tested at Room 23 entry script +0x006F) | object 422 in class 24 (tested at Room 23 entry script +0x00B8) | bit[0xD71] = 0 (tested at Room 23 entry script +0x003C)
+      scripts: Room 23 local script 214 | Room 23 local script 200; cutscene: (Room 23 local script 214, 0, )
+      result: way Game lines 4 rooms [] frames 150
+      kept: object 422 out of class 24 (tested at Room 23 entry script +0x00B8); rooms [] lines 4
+SETUP Room 24 object 0 verb 0x00 () 0,8 s, 19 candidates: actor 1 in walk box 3 (tested at Room 24 local script 200 +0x0016) | var[0x0C4] = 444 (tested at Room 24 entry script +0x003B) | bit[0xD6D] = 1 (tested at Room 24 entry script +0x0073) | arrived from Room 70 (var[0x070]) (tested at Room 24 entry script +0x0084) | var[0x0AB] = 2 (tested at Room 24 entry script +0x008B) | var[0x0AB] = 3 (tested at Room 24 entry script +0x008B) | var[0x0AB] = 1 (tested at Room 24 entry script +0x008B) | arrived from Room 25 (var[0x070]) (tested at Room 24 entry script +0x009E) | bit[0xDCD] = 1 (tested at Room 24 entry script +0x00FC) | var[0x06A] = 491 (tested at Room 24 local script 200 +0x005D) | var[0x06A] = 492 (tested at Room 24 local script 200 +0x005D) | var[0x06A] = 490 (tested at Room 24 local script 200 +0x005D) | var[0x06B] = 105 (tested at Room 24 local script 200 +0x0069) | var[0x06B] = 106 (tested at Room 24 local script 200 +0x0069) | var[0x06B] = 104 (tested at Room 24 local script 200 +0x0069) | actor 1 in walk box 4 (tested at Room 24 local script 200 +0x0082) | bit[0xD61] = 1 (tested at global script 17 +0x007D) | var[0x064] = 2 (tested at global script 17 +0x00D3) | bit[0xD6D] = 0 (tested at Room 24 entry script +0x0073)
+      scripts: Room 24 local script 200; cutscene: (Room 24 local script 200, 29, System.Int32[])
+      result: way Game lines 0 rooms [] frames 279
+      kept: actor 1 in walk box 3 (tested at Room 24 local script 200 +0x0016); rooms [] lines 0
+SETUP Room 25 object 0 verb 0x00 () 0,6 s, 14 candidates: actor 1 in walk box 4 (tested at Room 25 local script 200 +0x004C) | bit[0xDA9] = 1 (tested at Room 25 entry script +0x0054) | bit[0xDA8] = 1 (tested at Room 25 entry script +0x006E) | bit[0xD92] = 1 (tested at Room 25 entry script +0x00A5) | bit[0xD91] = 1 (tested at Room 25 entry script +0x00BF) | bit[0xDA5] = 1 (tested at Room 25 local script 200 +0x0027) | object 447 out of class 3 (tested at Room 25 local script 204 +0x007D) | object 447 in class 3 (tested at Room 25 local script 204 +0x007D) | bit[0xD66] = 1 (tested at Room 25 local script 204 +0x0372) | bit[0xDBA] = 1 (tested at Room 25 entry script +0x00A0) | actor 1 in walk box 2 (tested at Room 25 local script 200 +0x0016) | actor 1 in walk box 3 (tested at Room 25 local script 200 +0x0035) | bit[0xDBA] = 0 (tested at Room 25 entry script +0x00A0) | bit[0xD91] = 0 (tested at Room 25 local script 200 +0x0053)
+      scripts: Room 25 local script 200 | Room 25 local script 204 | global script 69; cutscene: (Room 25 local script 200, 88, System.Int32[])
+      result: way Game lines 0 rooms [] frames 15
+      kept: actor 1 in walk box 4 (tested at Room 25 local script 200 +0x004C); rooms [] lines 0
+SETUP Room 25 object 446 verb 0x37 () 0,6 s, 5 candidates: bit[0xD91] = 1 (tested at Room 25 object 446 verb 0x37 +0x0005) | bit[0xD92] = 1 (tested at Room 25 object 446 verb 0x37 +0x000A) | bit[0xDA5] = 1 (tested at Room 25 object 446 verb 0x37 +0x000F) | bit[0xDBA] = 1 (tested at Room 25 object 446 verb 0x37 +0x0000) | bit[0xDBA] = 0 (tested at Room 25 object 446 verb 0x37 +0x0000)
+      scripts: Room 25 local script 208; cutscene: (Room 25 local script 208, 0, System.Int32[])
+      result: way Game lines 0 rooms [24] frames 11
+      kept: bit[0xD91] = 1 (tested at Room 25 object 446 verb 0x37 +0x0005); bit[0xD92] = 1 (tested at Room 25 object 446 verb 0x37 +0x000A); bit[0xDA5] = 1 (tested at Room 25 object 446 verb 0x37 +0x000F); var[0x067] = 0 (tested at global script 69 +0x002D, which sets it: earlier code that sets bit[0xD92]); var[0x0C4] = 444 (tested at global script 69 +0x06FF, which sets it: earlier code that sets bit[0xD92]); rooms [24] lines 0
+SETUP Room 25 object 447 verb 0x36 (lamb) 1,7 s, 28 candidates: bit[0xD91] = 1 (tested at Room 25 object 447 verb 0x36 +0x003A) | object 447 out of class 3 (tested at Room 25 object 447 verb 0x36 +0x0000) | object 447 in class 3 (tested at Room 25 object 447 verb 0x36 +0x0000) | bit[0xDA5] = 1 (tested at Room 25 object 447 verb 0x36 +0x004A) | bit[0xDA6] = 1 (tested at Room 25 object 447 verb 0x36 +0x0058) | bit[0xDA7] = 1 (tested at Room 25 object 447 verb 0x36 +0x0063) | bit[0xD66] = 1 (tested at Room 25 local script 204 +0x0372) | var[0x066] = 1 (tested at global script 8 +0x0000) | var[0x068] = 1 (tested at global script 8 +0x0028) | var[0x07B] = 2 (tested at global script 19 +0x0014) | var[0x07B] = 3 (tested at global script 19 +0x0014) | var[0x07B] = 1 (tested at global script 19 +0x0014) | var[0x0A4] = 1 (tested at global script 40 +0x0000) | var[0x0A3] = 1 (tested at global script 40 +0x000D) | var[0x0A2] = 2 (tested at global script 40 +0x001A) | var[0x07A] = 1 (tested at global script 18 +0x0095) | var[0x07A] = 2 (tested at global script 18 +0x0095) | var[0x07A] = 3 (tested at global script 18 +0x00E8) | var[0x07A] = 4 (tested at global script 18 +0x012F) | var[0x07A] = 5 (tested at global script 18 +0x0176) | var[0x07A] = 6 (tested at global script 18 +0x01BD) | var[0x07A] = 7 (tested at global script 18 +0x0204) | var[0x07A] = 8 (tested at global script 18 +0x024B) | var[0x07A] = 9 (tested at global script 18 +0x0292) | bit[0xDBA] = 1 (tested at Room 25 object 447 verb 0x36 +0x002F) | bit[0xD92] = 1 (tested at Room 25 object 447 verb 0x36 +0x003F) | bit[0xDBA] = 0 (tested at Room 25 object 447 verb 0x36 +0x002F) | bit[0xD92] = 0 (tested at Room 25 object 447 verb 0x36 +0x003F)
+      scripts: global script 69 | Room 25 local script 204 | Room 25 local script 205 | Room 25 local script 206; cutscene: (global script 69, 0, System.Int32[])
+      result: way Game lines 50 rooms [55,24] frames 1195
+      kept: bit[0xD91] = 1 (tested at Room 25 object 447 verb 0x36 +0x003A); rooms [55,24] lines 50
+SETUP Room 28 object 0 verb 0x00 () 0,3 s, 3 candidates: bit[0xD93] = 1 (tested at Room 28 entry script +0x0120) | var[0x0CA] = 1 (tested at Room 28 local script 212 +0x001C) | var[0x0CA] = 2 (tested at Room 28 entry script +0x0014)
+      scripts: Room 28 local script 212 | global script 76; cutscene: (Room 28 local script 212, 93, System.Int32[])
+      result: way Game lines 2 rooms [27] frames 177
+      kept: bit[0xD93] = 1 (tested at Room 28 entry script +0x0120); var[0x0CA] = 1 (tested at Room 28 local script 212 +0x001C); bit[0xD67] = 1 (tested at Room 28 local script 210 +0x0002, which sets it: earlier code that sets bit[0xD93]); var[0x067] = 0 (tested at Room 28 local script 200 +0x0015, which sets it: earlier code that sets var[0x0CA]); bit[0xD75] = 1 (tested at Room 28 local script 200 +0x025F, which sets it: earlier code that sets var[0x0CA]); rooms [27] lines 2
+SETUP Room 34 object 0 verb 0x00 () 2,1 s, 16 candidates: actor 1 in walk box 8 (tested at Room 34 local script 200 +0x0020) | the camera at x 463 (tested at Room 34 local script 200 +0x002E) | bit[0xD7A] = 1 (tested at Room 34 entry script +0x005E) | bit[0xDC6] = 1 (tested at Room 34 entry script +0x0063) | bit[0xDC7] = 1 (tested at Room 34 entry script +0x0185) | bit[0xD9C] = 1 (tested at Room 34 entry script +0x01A4) | bit[0xDD3] = 1 (tested at Room 34 entry script +0x01F2) | var[0x0D1] = 1 (tested at Room 34 entry script +0x0243) | bit[0xD97] = 1 (tested at Room 34 entry script +0x02AB) | bit[0xD71] = 1 (tested at Room 34 entry script +0x000D) | bit[0xDCF] = 1 (tested at Room 34 entry script +0x0350) | bit[0xD6D] = 1 (tested at Room 34 entry script +0x0355) | bit[0xD71] = 0 (tested at Room 34 entry script +0x000D) | bit[0xD7A] = 0 (tested at Room 34 entry script +0x034B) | bit[0xDCF] = 0 (tested at Room 34 entry script +0x0350) | bit[0xD6D] = 0 (tested at Room 34 entry script +0x0355)
+      scripts: Room 34 local script 200; cutscene: (Room 34 local script 200, 53, System.Int32[])
+      result: way Game lines 0 rooms [] frames 600
+SETUP Room 34 object 558 verb 0x37 () 0,7 s, 3 candidates: bit[0xD7A] = 1 (tested at Room 34 object 558 verb 0x37 +0x0000) | bit[0xDC6] = 1 (tested at Room 34 object 558 verb 0x37 +0x0005) | bit[0xDC6] = 0 (tested at Room 34 object 558 verb 0x37 +0x0005)
+      scripts: global script 98; cutscene: (global script 98, 53, System.Int32[])
+      result: way Game lines 18 rooms [57] frames 1096
+      kept: bit[0xD7A] = 1 (tested at Room 34 object 558 verb 0x37 +0x0000); rooms [57] lines 18
+SETUP Room 34 object 560 verb 0x38 () 1,0 s, 10 candidates: bit[0xD97] = 1 (tested at Room 34 object 560 verb 0x38 +0x0005) | bit[0xD66] = 1 (tested at Room 34 local script 202 +0x000B) | bit[0xD65] = 1 (tested at Room 34 local script 202 +0x0016) | var[0x066] = 1 (tested at global script 8 +0x0000) | var[0x068] = 1 (tested at global script 8 +0x0028) | var[0x0A4] = 1 (tested at global script 40 +0x0000) | var[0x0A3] = 1 (tested at global script 40 +0x000D) | var[0x0A2] = 2 (tested at global script 40 +0x001A) | bit[0xD9C] = 1 (tested at Room 34 object 560 verb 0x38 +0x0000) | bit[0xD9C] = 0 (tested at Room 34 object 560 verb 0x38 +0x0000)
+      scripts: Room 34 local script 202; cutscene: (Room 34 local script 202, 0, System.Int32[])
+      result: way Game lines 25 rooms [46] frames 97
+      kept: bit[0xD97] = 1 (tested at Room 34 object 560 verb 0x38 +0x0005); rooms [46] lines 25
+SETUP Room 36 object 0 verb 0x00 () 0,8 s, 28 candidates: actor 1 in walk box 3 (tested at Room 36 local script 200 +0x0016) | arrived from Room 70 (var[0x070]) (tested at Room 36 entry script +0x0011) | var[0x0AB] = 5 (tested at Room 36 entry script +0x0018) | var[0x0AB] = 6 (tested at Room 36 entry script +0x0018) | var[0x0AB] = 4 (tested at Room 36 entry script +0x0018) | arrived from Room 37 (var[0x070]) (tested at Room 36 entry script +0x0028) | bit[0xDBE] = 1 (tested at Room 36 entry script +0x00EB) | var[0x06A] = 118 (tested at Room 36 local script 200 +0x0034) | var[0x06A] = 119 (tested at Room 36 local script 200 +0x0034) | var[0x06A] = 117 (tested at Room 36 local script 200 +0x0034) | actor 1 in walk box 4 (tested at Room 36 local script 200 +0x004D) | actor 1 in walk box 9 (tested at Room 36 local script 200 +0x0078) | var[0x06A] = 376 (tested at Room 36 local script 200 +0x0093) | var[0x06A] = 377 (tested at Room 36 local script 200 +0x0093) | var[0x06A] = 375 (tested at Room 36 local script 200 +0x0093) | var[0x06B] = 124 (tested at Room 36 local script 200 +0x009F) | var[0x06B] = 125 (tested at Room 36 local script 200 +0x009F) | var[0x06B] = 123 (tested at Room 36 local script 200 +0x009F) | actor 1 in walk box 10 (tested at Room 36 local script 200 +0x00BF) | var[0x06A] = 322 (tested at Room 36 local script 200 +0x00DA) | var[0x06A] = 323 (tested at Room 36 local script 200 +0x00DA) | var[0x06A] = 321 (tested at Room 36 local script 200 +0x00DA) | var[0x06B] = 79 (tested at Room 36 local script 200 +0x00E6) | var[0x06B] = 80 (tested at Room 36 local script 200 +0x00E6) | var[0x06B] = 78 (tested at Room 36 local script 200 +0x00E6) | bit[0xD61] = 1 (tested at global script 17 +0x007D) | bit[0xD6D] = 1 (tested at global script 17 +0x00C9) | var[0x064] = 2 (tested at global script 17 +0x00D3)
+      scripts: Room 36 local script 200; cutscene: (Room 36 local script 200, 29, System.Int32[])
+      result: way Game lines 0 rooms [] frames 38
+      kept: actor 1 in walk box 3 (tested at Room 36 local script 200 +0x0016); rooms [] lines 0
+SETUP Room 37 object 0 verb 0x00 () 0,5 s, 6 candidates: actor 1 in walk box 8 (tested at Room 37 local script 200 +0x0016) | bit[0xD94] = 1 (tested at Room 37 entry script +0x0019) | bit[0xD9A] = 1 (tested at Room 37 entry script +0x0095) | bit[0xD98] = 1 (tested at global script 86 +0x000B) | bit[0xD99] = 1 (tested at Room 37 entry script +0x0067) | bit[0xD99] = 0 (tested at Room 37 entry script +0x0067)
+      scripts: global script 86; cutscene: (global script 86, 0, )
+      result: way Game lines 13 rooms [58,38] frames 793
+      kept: actor 1 in walk box 8 (tested at Room 37 local script 200 +0x0016); rooms [58,38] lines 13
+ATCUT Room 43 object 640 verb 0x38 () 1,4 s, 4 candidates: bit[0xD7A] = 1 (tested at Room 43 object 640 verb 0x38 +0x0000) | bit[0xD61] = 1 (tested at Room 43 object 640 verb 0x38 +0x0005) | bit[0xDA2] = 1 (tested at Room 43 object 640 verb 0x38 +0x000D) | bit[0xDB5] = 1 (tested at Room 43 local script 202 +0x0025)
+      scripts: global script 96; cutscene: (global script 96, 0, System.Int32[])
+      result: way AtCutscene lines 25 rooms [45,46] frames 93
+KIND cutscene way Game Room 02 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 02 entry script +0x0034 putActor
+KIND cutscene way Game Room 02 object 153 verb 0x38 (): rooms [3] loads True view False lines 0 animation Room 02 Object 153 Verb 0x38 +0x0019 panCameraTo
+KIND cutscene way Game Room 02 object 154 verb 0x36 (leaf): rooms [] loads False view False lines 1 animation Room 02 Object 154 Verb 0x36 +0x001C walkActorTo
+KIND cutscene way Game Room 02 object 156 verb 0x3A (sky): rooms [11,3,10] loads True view True lines 1 animation Script 49 +0x009F putActor
+KIND reaction way Game Room 03 object 165 verb 0x56 (sky): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 04 object 169 verb 0x37 (): rooms [] loads False view False lines 0 animation Room 04 Object 169 Verb 0x37 +0x002A panCameraTo
+KIND cutscene way Game Room 04 object 170 verb 0x37 (): rooms [] loads False view False lines 0 animation Room 04 Object 170 Verb 0x37 +0x002A panCameraTo
+KIND cutscene way Game Room 04 object 171 verb 0x36 (hole): rooms [] loads False view False lines 1 animation Room 04 local script 201 +0x0082 drawObject (object local[0x004] changes picture again)
+KIND cutscene way Game Room 04 object 176 verb 0x36 (thorns): rooms [] loads False view False lines 2 animation Room 04 local script 202 +0x002A walkActorTo
+KIND reaction way Game Room 04 object 177 verb 0x36 (grave): rooms [] loads False view False lines 2 animation -
+KIND cutscene way Game Room 04 object 177 verb 0x3A (grave): rooms [] loads False view False lines 1 animation Room 04 local script 209 +0x004C putActor
+KIND reaction way Game Room 04 object 197 verb 0x56 (sky): rooms [] loads False view False lines 1 animation -
+KIND reaction way Game Room 06 object 205 verb 0x36 (dye pot): rooms [] loads False view False lines 1 animation -
+KIND reaction way Game Room 06 object 206 verb 0x3E (wool): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 06 object 206 verb 0x3F (wool): rooms [] loads False view False lines 1 animation Room 06 local script 200 +0x0036 putActor
+KIND reaction way Game Room 06 object 209 verb 0x36 (book): rooms [] loads False view False lines 2 animation -
+KIND cutscene way Game Room 06 object 214 verb 0x36 (flask): rooms [] loads False view False lines 1 animation Room 06 local script 215 +0x0072 animateActor
+KIND cutscene way Game Room 08 object 255 verb 0x38 (): rooms [9,67,54,3,11] loads True view True lines 40 animation Script 46 +0x0025 panCameraTo
+KIND reaction way Game Room 08 object 256 verb 0x36 (tapestry): rooms [] loads False view False lines 2 animation -
+KIND reaction way Game Room 08 object 256 verb 0x3E (tapestry): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 08 object 256 verb 0x3F (tapestry): rooms [] loads False view False lines 1 animation Room 08 local script 207 +0x004D animateActor
+KIND reaction way Game Room 08 object 257 verb 0x36 (tapestry): rooms [] loads False view False lines 2 animation -
+KIND cutscene way Game Room 08 object 257 verb 0x3E (tapestry): rooms [] loads False view False lines 1 animation Room 08 local script 207 +0x004D animateActor
+KIND reaction way Game Room 08 object 257 verb 0x3F (tapestry): rooms [] loads False view False lines 1 animation -
+KIND reaction way Game Room 08 object 258 verb 0x36 (tapestry): rooms [] loads False view False lines 3 animation -
+KIND cutscene way Game Room 08 object 258 verb 0x3E (tapestry): rooms [] loads False view False lines 1 animation Room 08 local script 207 +0x004D animateActor
+KIND cutscene way Game Room 08 object 258 verb 0x3F (tapestry): rooms [] loads False view False lines 2 animation Room 08 local script 207 +0x004D animateActor
+KIND cutscene way Game Room 09 object 268 verb 0x37 (): rooms [] loads False view False lines 2 animation Room 09 local script 200 +0x0020 animateActor
+KIND cutscene way Game Room 09 object 270 verb 0x36 (egg): rooms [] loads False view False lines 1 animation Room 09 local script 200 +0x0020 animateActor
+KIND cutscene way Game Room 09 object 270 verb 0x3A (egg): rooms [81,8] loads True view True lines 26 animation Script 47 +0x0089 putActor
+KIND cutscene way Game Room 09 object 271 verb 0x38 (distaff): rooms [] loads False view False lines 25 animation Room 09 Object 271 Verb 0x38 +0x0019 animateActor
+KIND reaction way Game Room 09 object 272 verb 0x36 (loom): rooms [59] loads True view True lines 48 animation Script 101 +0x0050 putActorAtObject
+KIND cutscene way Game Room 09 object 272 verb 0x52 (loom): rooms [14,51,59,61] loads True view True lines 14 animation Script 104 +0x0075 putActor
+KIND cutscene way Game Room 09 object 273 verb 0x4D (Hetchel): rooms [] loads False view False lines 1 animation Room 09 local script 222 +0x004D putActor
+KIND cutscene way Game Room 09 object 273 verb 0x4F (Hetchel): rooms [] loads False view False lines 1 animation Room 09 local script 222 +0x004D putActor
+KIND cutscene way Game Room 09 object 273 verb 0x51 (Hetchel): rooms [] loads False view False lines 1 animation Room 09 local script 222 +0x004D putActor
+KIND cutscene way Game Room 09 object 273 verb 0x56 (Hetchel): rooms [] loads False view False lines 1 animation Room 09 local script 222 +0x004D putActor
+KIND cutscene way Game Room 09 object 274 verb 0x36 (feather): rooms [] loads False view False lines 2 animation Script 105 +0x0072 walkActorTo
+KIND cutscene way Game Room 09 object 275 verb 0x56 (Dead One): rooms [] loads False view False lines 0 animation Room 09 local script 221 +0x004C putActor
+KIND cutscene way Game Room 10 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 10 entry script +0x0086 putActor
+KIND cutscene way Game Room 10 object 295 verb 0x38 (): rooms [11,13] loads True view True lines 24 animation Script 52 +0x0024 putActor
+KIND cutscene way Game Room 10 object 296 verb 0x3A (clam): rooms [] loads False view False lines 0 animation Room 10 local script 211 +0x003B putActor
+KIND cutscene way Game Room 10 object 296 verb 0x3B (clam): rooms [] loads False view False lines 1 animation Script 41 +0x004C animateActor
+KIND reaction way Game Room 10 object 297 verb 0x36 (gull): rooms [] loads False view False lines 0 animation -
+KIND cutscene way Game Room 12 object 322 verb 0x38 (): rooms [13] loads True view False lines 25 animation -
+KIND cutscene way Game Room 13 object 0 verb 0x00 (): rooms [14,12] loads True view True lines 48 animation Room 13 entry script +0x00EE putActor
+KIND reaction widened way none Room 13 object 323 verb 0x37 (): rooms [14,12] loads False view False lines 0 animation -
+KIND cutscene way Game Room 13 object 323 verb 0x38 (): rooms [15] loads True view True lines 24 animation Script 54 +0x000C setCameraAt
+KIND cutscene way Game Room 13 object 324 verb 0x36 (): rooms [10] loads True view True lines 24 animation Script 107 +0x0007 setCameraAt
+KIND reaction way Game Room 13 object 325 verb 0x36 (waterspout): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 13 object 325 verb 0x42 (waterspout): rooms [] loads False view False lines 0 animation Room 13 local script 202 +0x004F putActor
+KIND cutscene way Game Room 15 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 15 local script 201 +0x0055 putActor
+KIND cutscene way Game Room 15 object 338 verb 0x38 (): rooms [23] loads True view False lines 0 animation -
+KIND cutscene way Game Room 16 object 350 verb 0x47 (workers): rooms [] loads False view False lines 1 animation Room 16 local script 204 +0x00A7 putActor
+KIND cutscene way Game Room 17 object 0 verb 0x00 (): rooms [56] loads True view True lines 9 animation Script 66 +0x006F putActor
+KIND cutscene way Game Room 17 object 357 verb 0x3A (grave): rooms [] loads False view False lines 1 animation Room 17 local script 206 +0x0036 putActor
+KIND cutscene way Game Room 18 object 367 verb 0x36 (): rooms [] loads False view False lines 14 animation Room 18 local script 205 +0x002C walkActorToObject
+KIND cutscene way Game Room 18 object 369 verb 0x36 (bell): rooms [20] loads True view True lines 10 animation Room 18 local script 203 +0x0020 putActor
+KIND cutscene way Game Room 18 object 370 verb 0x36 (sphere): rooms [19] loads True view True lines 1 animation Script 65 +0x0017 setCameraAt
+KIND cutscene way Game Room 18 object 371 verb 0x36 (crystal): rooms [20] loads True view True lines 12 animation Room 18 local script 202 +0x0008 putActor
+KIND cutscene way AtCutscene Room 20 object 0 verb 0x39 (): rooms [18] loads True view True lines 10 animation Room 20 local script 200 +0x0078 putActor
+KIND cutscene way AtCutscene Room 20 object 0 verb 0x3F (): rooms [18] loads True view True lines 10 animation Room 20 local script 201 +0x0078 putActor
+KIND cutscene way Game Room 20 object 386 verb 0x36 (scythe): rooms [] loads False view False lines 1 animation Room 20 local script 202 +0x0062 putActor
+KIND cutscene way Game Room 20 object 388 verb 0x36 (bell): rooms [18] loads True view True lines 0 animation Room 20 local script 201 +0x0078 putActor
+KIND cutscene way Game Room 20 object 389 verb 0x36 (bell): rooms [18] loads True view True lines 0 animation Room 20 local script 200 +0x0078 putActor
+KIND cutscene way Game Room 20 object 390 verb 0x47 (workers): rooms [] loads False view False lines 1 animation Room 20 local script 204 +0x004F putActor
+KIND cutscene way Game Room 20 object 390 verb 0x48 (workers): rooms [18] loads True view True lines 10 animation Room 20 local script 204 +0x004F putActor
+KIND cutscene way Game Room 20 object 390 verb 0x49 (workers): rooms [] loads False view False lines 1 animation Room 20 local script 204 +0x004F putActor
+KIND cutscene way Game Room 20 object 390 verb 0x56 (workers): rooms [] loads False view False lines 1 animation Room 20 local script 204 +0x004F putActor
+KIND cutscene way Game Room 22 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 22 local script 200 +0x009C putActor
+KIND cutscene way Game Room 22 object 403 verb 0x36 (bell): rooms [] loads False view False lines 3 animation Room 22 local script 208 +0x000F animateActor
+KIND cutscene way Game Room 22 object 404 verb 0x36 (crystal): rooms [56] loads True view True lines 12 animation Room 22 local script 206 +0x000C putActor
+KIND cutscene way Game Room 22 object 405 verb 0x36 (chalice): rooms [56] loads True view True lines 11 animation Script 108 +0x0048 walkActorTo
+KIND cutscene way Game Room 22 object 405 verb 0x45 (chalice): rooms [] loads False view False lines 1 animation Script 41 +0x004C animateActor
+KIND cutscene way Game Room 22 object 405 verb 0x46 (chalice): rooms [] loads False view False lines 1 animation Script 41 +0x004C animateActor
+KIND cutscene way Game Room 23 object 0 verb 0x00 (): rooms [] loads False view False lines 4 animation Room 23 local script 206 +0x0058 putActor
+KIND cutscene way Game Room 23 object 422 verb 0x47 (shepherds): rooms [] loads False view False lines 1 animation Room 23 local script 230 +0x00EA animateActor
+KIND cutscene way Game Room 23 object 422 verb 0x49 (shepherds): rooms [] loads False view False lines 2 animation Room 23 local script 230 +0x00EA animateActor
+KIND cutscene way Game Room 23 object 422 verb 0x56 (shepherds): rooms [] loads False view False lines 1 animation Room 23 local script 230 +0x00EA animateActor
+KIND cutscene way Game Room 24 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 24 entry script +0x0032 putActor
+KIND cutscene way Game Room 24 object 431 verb 0x3A (cemetery): rooms [] loads False view False lines 1 animation Room 24 local script 214 +0x0036 putActor
+KIND cutscene way Game Room 24 object 432 verb 0x36 (sheep): rooms [] loads False view False lines 5 animation Room 24 local script 204 +0x0005 panCameraTo
+KIND cutscene way Game Room 24 object 432 verb 0x3E (sheep): rooms [] loads False view False lines 1 animation Room 24 local script 216 +0x0061 putActor
+KIND cutscene way Game Room 24 object 432 verb 0x3F (sheep): rooms [] loads False view False lines 1 animation Room 24 local script 216 +0x0061 putActor
+KIND cutscene way Game Room 24 object 432 verb 0x47 (sheep): rooms [] loads False view False lines 1 animation Room 24 local script 216 +0x0061 putActor
+KIND cutscene way Game Room 24 object 432 verb 0x49 (sheep): rooms [] loads False view False lines 1 animation Room 24 local script 216 +0x0061 putActor
+KIND cutscene way Game Room 24 object 432 verb 0x56 (sheep): rooms [] loads False view False lines 1 animation Room 24 local script 216 +0x0061 putActor
+KIND cutscene way Game Room 24 object 433 verb 0x38 (sheep): rooms [] loads False view False lines 0 animation Room 24 Object 433 Verb 0x38 +0x0005 panCameraTo
+KIND cutscene way Game Room 24 object 433 verb 0x3E (sheep): rooms [27,28] loads True view True lines 27 animation Script 70 +0x001B setCameraAt
+KIND cutscene way Game Room 24 object 434 verb 0x47 (dozing): rooms [] loads False view False lines 1 animation Room 24 local script 215 +0x0054 putActor
+KIND cutscene way Game Room 25 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 25 entry script +0x0036 putActor
+KIND cutscene way Game Room 25 object 446 verb 0x37 (): rooms [24] loads True view False lines 0 animation -
+KIND cutscene way Game Room 25 object 447 verb 0x36 (lamb): rooms [55,24] loads True view True lines 50 animation Script 69 +0x008E putActor
+KIND cutscene way Game Room 25 object 447 verb 0x3C (lamb): rooms [] loads False view False lines 1 animation Room 25 local script 207 +0x004F putActor
+KIND cutscene way Game Room 25 object 447 verb 0x56 (lamb): rooms [] loads False view False lines 1 animation Room 25 local script 207 +0x004F putActor
+KIND cutscene way Game Room 26 object 464 verb 0x36 (shepherds): rooms [] loads False view False lines 30 animation Room 26 local script 210 +0x0010 walkActorTo
+KIND reaction way Game Room 26 object 464 verb 0x3E (shepherds): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 26 object 464 verb 0x4D (shepherds): rooms [] loads False view False lines 29 animation Room 26 local script 202 +0x00C8 putActor
+KIND cutscene way Game Room 26 object 464 verb 0x56 (shepherds): rooms [] loads False view False lines 1 animation Room 26 local script 209 +0x0053 putActor
+KIND cutscene way Game Room 28 object 0 verb 0x00 (): rooms [27] loads True view True lines 2 animation Room 28 entry script +0x00BB setState (object local[0x000] changes picture again)
+KIND cutscene way Game Room 28 object 465 verb 0x38 (): rooms [65] loads True view True lines 0 animation Script 72 +0x0026 setCameraAt
+KIND cutscene way Game Room 28 object 466 verb 0x36 (dragon): rooms [79] loads True view True lines 12 animation Script 75 +0x013B setCameraAt
+KIND cutscene way Game Room 28 object 466 verb 0x38 (dragon): rooms [] loads False view False lines 0 animation Room 28 local script 203 +0x0002 panCameraTo
+KIND cutscene way Game Room 28 object 466 verb 0x43 (dragon): rooms [] loads False view False lines 1 animation Room 28 local script 210 +0x001B walkActorToObject
+KIND cutscene way Game Room 28 object 466 verb 0x49 (dragon): rooms [] loads False view False lines 4 animation Room 28 local script 215 +0x004F putActor
+KIND cutscene way Game Room 28 object 468 verb 0x44 (dragon): rooms [] loads False view False lines 1 animation Room 28 local script 202 +0x0053 animateActor
+KIND cutscene way Game Room 28 object 468 verb 0x49 (dragon): rooms [] loads False view False lines 1 animation Room 28 local script 213 +0x0058 putActor
+KIND cutscene way Game Room 28 object 470 verb 0x36 (gold): rooms [79] loads True view True lines 30 animation Script 109 +0x0085 setCameraAt
+KIND cutscene way Game Room 28 object 470 verb 0x3D (gold): rooms [] loads False view False lines 2 animation Room 28 local script 218 +0x0047 putActor
+KIND cutscene way Game Room 28 object 470 verb 0x56 (gold): rooms [] loads False view False lines 1 animation Room 28 local script 218 +0x0047 putActor
+KIND cutscene way Game Room 28 object 473 verb 0x3C (straw): rooms [] loads False view False lines 2 animation Room 28 local script 218 +0x0047 putActor
+KIND cutscene way Game Room 30 object 503 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 503 Verb 0x38 +0x0006 putActorAtObject
+KIND cutscene way Game Room 30 object 504 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 504 Verb 0x38 +0x0006 putActorAtObject
+KIND cutscene way Game Room 30 object 505 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 505 Verb 0x38 +0x0006 putActorAtObject
+KIND cutscene way Game Room 30 object 507 verb 0x38 (): rooms [28] loads True view True lines 0 animation Script 77 +0x000B setCameraAt
+KIND cutscene way Game Room 30 object 508 verb 0x38 (): rooms [31] loads True view True lines 1 animation Script 82 +0x002B setCameraAt
+KIND cutscene way Game Room 30 object 509 verb 0x38 (): rooms [32] loads True view True lines 24 animation Script 79 +0x0005 panCameraTo
+KIND cutscene way Game Room 30 object 510 verb 0x38 (): rooms [32] loads True view True lines 24 animation Script 80 +0x000A panCameraTo
+KIND cutscene way Game Room 30 object 511 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 511 Verb 0x38 +0x002B putActorAtObject
+KIND cutscene way Game Room 30 object 512 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 512 Verb 0x38 +0x000F putActorAtObject
+KIND cutscene way Game Room 30 object 513 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 513 Verb 0x38 +0x000F putActorAtObject
+KIND cutscene way Game Room 30 object 514 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 514 Verb 0x38 +0x0006 putActorAtObject
+KIND cutscene way Game Room 30 object 515 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 515 Verb 0x38 +0x0006 putActorAtObject
+KIND cutscene way Game Room 30 object 516 verb 0x38 (): rooms [] loads False view False lines 0 animation Room 30 Object 516 Verb 0x38 +0x0006 putActorAtObject
+KIND cutscene way Game Room 30 object 517 verb 0x38 (): rooms [31] loads True view True lines 24 animation Script 84 +0x001B setCameraAt
+KIND cutscene way Game Room 31 object 521 verb 0x38 (): rooms [30] loads True view True lines 24 animation Script 83 +0x0002 panCameraTo
+KIND cutscene way Game Room 31 object 523 verb 0x36 (pool): rooms [] loads False view False lines 1 animation Room 31 local script 200 +0x0054 putActor
+KIND cutscene way Game Room 31 object 523 verb 0x3A (pool): rooms [] loads False view False lines 0 animation Room 31 local script 203 +0x007E putActor
+KIND cutscene way Game Room 31 object 525 verb 0x36 (sphere): rooms [86] loads True view True lines 0 animation Script 111 +0x0017 setCameraAt
+KIND cutscene way Game Room 31 object 525 verb 0x56 (sphere): rooms [] loads False view False lines 1 animation Room 31 local script 204 +0x003F putActor
+KIND cutscene way Game Room 32 object 537 verb 0x38 (): rooms [30] loads True view False lines 0 animation -
+KIND cutscene way Game Room 32 object 538 verb 0x38 (): rooms [30] loads True view True lines 24 animation Script 81 +0x0002 panCameraTo
+KIND cutscene way Game Room 33 object 543 verb 0x38 (): rooms [34] loads True view False lines 0 animation Room 33 Object 543 Verb 0x38 +0x0033 putActor
+KIND cutscene way Game Room 33 object 544 verb 0x41 (steps): rooms [] loads False view False lines 1 animation Room 33 local script 205 +0x0058 putActor
+KIND cutscene way Game Room 33 object 544 verb 0x42 (steps): rooms [] loads False view False lines 1 animation Room 33 local script 205 +0x0058 putActor
+KIND cutscene way Game Room 33 object 544 verb 0x56 (steps): rooms [] loads False view False lines 1 animation Room 33 local script 205 +0x0058 putActor
+KIND cutscene way Game Room 34 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 34 entry script +0x017C putActor
+KIND cutscene way Game Room 34 object 558 verb 0x37 (): rooms [57] loads True view True lines 18 animation Script 98 +0x0018 putActor
+KIND cutscene way Game Room 34 object 560 verb 0x37 (): rooms [57] loads True view True lines 18 animation Script 98 +0x0018 putActor
+KIND cutscene way Game Room 34 object 560 verb 0x38 (): rooms [46] loads True view False lines 25 animation Room 34 local script 202 +0x004F putActor
+KIND cutscene way Game Room 34 object 562 verb 0x36 (boy): rooms [29] loads True view True lines 2 animation Script 112 +0x002B setCameraAt
+KIND cutscene way Game Room 34 object 562 verb 0x43 (boy): rooms [52] loads True view True lines 19 animation Room 34 local script 217 +0x0059 animateActor
+KIND cutscene way Game Room 34 object 562 verb 0x44 (boy): rooms [52] loads True view True lines 19 animation Room 34 local script 203 +0x004A putActor
+KIND cutscene way Game Room 34 object 562 verb 0x4C (boy): rooms [52] loads True view True lines 19 animation Room 34 local script 217 +0x0059 animateActor
+KIND cutscene way Game Room 34 object 563 verb 0x3A (grave): rooms [] loads False view False lines 1 animation Room 34 local script 218 +0x0036 putActor
+KIND reaction way Game Room 34 object 587 verb 0x4C (Rusty): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 34 object 587 verb 0x4D (Rusty): rooms [] loads False view False lines 13 animation Room 34 local script 209 +0x004F putActor
+KIND cutscene way Game Room 35 object 0 verb 0x00 (): rooms [] loads False view False lines 30 animation Room 35 local script 204 +0x001D putActor
+KIND cutscene way Game Room 35 object 589 verb 0x38 (): rooms [] loads False view False lines 1 animation Room 35 local script 211 +0x00F3 walkActorTo
+KIND cutscene way Game Room 35 object 590 verb 0x3A (gate): rooms [] loads False view False lines 30 animation Room 35 local script 212 +0x0047 putActor
+KIND cutscene way Game Room 35 object 590 verb 0x3B (gate): rooms [] loads False view False lines 31 animation Room 35 local script 212 +0x0047 putActor
+KIND cutscene way Game Room 36 object 0 verb 0x00 (): rooms [] loads False view False lines 0 animation Room 36 entry script +0x006F putActor
+KIND cutscene way Game Room 37 object 0 verb 0x00 (): rooms [58,38] loads True view True lines 13 animation Room 37 entry script +0x0044 putActor
+KIND reaction way Game Room 37 object 602 verb 0x37 (): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 37 object 605 verb 0x45 (woodbin): rooms [] loads False view False lines 1 animation Script 41 +0x004C animateActor
+KIND cutscene way Game Room 38 object 611 verb 0x36 (straw): rooms [34,68,37] loads True view True lines 13 animation Script 87 +0x00FA setCameraAt
+KIND cutscene way Game Room 38 object 611 verb 0x3C (straw): rooms [] loads False view False lines 1 animation Script 41 +0x004C animateActor
+KIND cutscene way Game Room 38 object 611 verb 0x3D (straw): rooms [] loads False view False lines 1 animation Script 41 +0x004C animateActor
+KIND cutscene way Game Room 38 object 612 verb 0x36 (distaff): rooms [] loads False view False lines 25 animation Room 38 Object 612 Verb 0x36 +0x0019 animateActor
+KIND cutscene way Game Room 38 object 618 verb 0x3A (door): rooms [] loads False view False lines 0 animation Room 38 local script 203 +0x004C putActor
+KIND cutscene widened way Game Room 41 object 632 verb 0x36 (conversation): rooms [] loads False view False lines 5 animation Room 41 local script 210 +0x00D1 animateActor
+KIND cutscene way Game Room 41 object 633 verb 0x36 (conversation): rooms [] loads False view False lines 20 animation Room 41 local script 200 +0x00F8 walkActorTo
+KIND cutscene way Game Room 41 object 634 verb 0x41 (sword): rooms [42,43,60] loads True view True lines 30 animation Room 41 local script 213 +0x0047 putActor
+KIND reaction way Game Room 41 object 634 verb 0x42 (sword): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 41 object 634 verb 0x56 (sword): rooms [] loads False view False lines 1 animation Room 41 local script 213 +0x0047 putActor
+KIND cutscene way AtCutscene Room 43 object 640 verb 0x38 (): rooms [45,46] loads True view True lines 25 animation Script 96 +0x003A putActor
+KIND cutscene way Game Room 43 object 641 verb 0x36 (sphere): rooms [19] loads True view True lines 0 animation Script 94 +0x0017 setCameraAt
+KIND cutscene way Game Room 43 object 644 verb 0x3A (cage): rooms [44,42,60] loads True view True lines 35 animation Script 91 +0x005E putActor
+KIND cutscene way Game Room 43 object 651 verb 0x38 (orb): rooms [87,44] loads True view True lines 17 animation Script 93 +0x0043 walkActorTo
+KIND cutscene way Game Room 44 object 653 verb 0x38 (): rooms [43] loads True view True lines 0 animation Script 92 +0x0007 setCameraAt
+KIND cutscene way Game Room 44 object 654 verb 0x36 (Mandible): rooms [42,45] loads True view True lines 15 animation Script 95 +0x018F animateActor
+KIND cutscene way Game Room 45 object 657 verb 0x36 (distaff): rooms [] loads False view False lines 25 animation Room 45 Object 657 Verb 0x36 +0x0019 animateActor
+KIND cutscene way Game Room 46 object 683 verb 0x36 (hole): rooms [49] loads True view True lines 0 animation Script 110 +0x0018 setCameraAt
+KIND reaction way Game Room 46 object 683 verb 0x3A (hole): rooms [] loads False view False lines 1 animation -
+KIND reaction way Game Room 46 object 683 verb 0x3B (hole): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 46 object 685 verb 0x36 (hole): rooms [34] loads True view True lines 0 animation Script 97 +0x0015 setCameraAt
+KIND cutscene way Game Room 46 object 686 verb 0x3B (hole): rooms [] loads False view False lines 0 animation Room 46 local script 203 +0x0046 putActor
+KIND cutscene way Game Room 47 object 0 verb 0x00 (): rooms [] loads False view False lines 80 animation Room 47 entry script +0x00F4 putActor
+KIND cutscene way Game Room 47 object 698 verb 0x36 (swan): rooms [61] loads True view True lines 50 animation Script 100 +0x00B4 setCameraAt
+KIND cutscene way Game Room 49 object 705 verb 0x38 (): rooms [46] loads True view False lines 24 animation -
+KIND cutscene way Game Room 49 object 708 verb 0x36 (Goodmold): rooms [20] loads True view True lines 15 animation Script 99 +0x01D1 setCameraAt
+KIND cutscene way Game Room 50 object 722 verb 0x38 (): rooms [11,7] loads True view True lines 0 animation Script 89 +0x0012 setCameraAt
+KIND cutscene way Game Room 51 object 742 verb 0x38 (): rooms [66] loads True view True lines 1 animation Room 51 local script 201 +0x000A animateActor
+KIND reaction way Game Room 51 object 743 verb 0x56 (Dead One): rooms [] loads False view False lines 0 animation -
+KIND reaction way Game Room 62 object 809 verb 0x3C (gold): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 62 object 809 verb 0x3D (gold): rooms [] loads False view False lines 0 animation Room 62 local script 206 +0x0024 animateActor
+KIND cutscene way Game Room 62 object 810 verb 0x3C (straw): rooms [] loads False view False lines 1 animation -
+KIND reaction way Game Room 62 object 810 verb 0x3D (straw): rooms [] loads False view False lines 1 animation -
+KIND cutscene way Game Room 62 object 811 verb 0x36 (wheel): rooms [] loads False view False lines 1 animation Room 62 local script 200 +0x003C animateActor
+KIND cutscene way Game Room 63 object 822 verb 0x40 (darkness): rooms [62] loads True view True lines 24 animation Script 48 +0x004E putActor
+KIND cutscene way Game Room 65 object 829 verb 0x40 (darkness): rooms [30] loads True view True lines 0 animation Script 78 +0x0048 putActor
+KIND cutscene widened way Game Room 66 object 834 verb 0x54 (myself): rooms [] loads False view False lines 0 animation Script 106 +0x006C putActor
+KIND cutscene way Game Room 66 object 834 verb 0x56 (myself): rooms [] loads False view False lines 1 animation Room 66 local script 208 +0x0071 animateActor
+cutscenes 169 of 193; old rule Scenes 82 of 190 (widened candidates 3, of them cutscenes 2)
+fresh start begins 174; setup begins 18; still nothing 1; 52 s
+PICTURE Room 02 object 156 verb 0x3A (sky) way Game; ends in Room 10, lines 1, frames 443
+      MovesOnFirstFrame: actor 3 moved 40 frames in a row on its costume's first frame
+picture: 1 of 192 scenes that begin are suspects (0,5%)
+picture: CostumeFromBefore 0 (0,0%)
+picture: OutsideWalkBoxes 0 (0,0%)
+picture: MovesOnFirstFrame 1 (0,5%)
+picture: NothingChanges 0 (0,0%)
+NORMAL hidden Room 02 object 156 verb 0x3A (sky): the picture check names MovesOnFirstFrame: actor 3 moved 40 frames in a row on its costume's first frame
+normal: 168 of 169 scenes offered (99,4%); not offered 1 (0,6%)
+normal: not offered, a picture suspect: 1 (0,6%)

@@ -76,6 +76,8 @@ public static class ScummCutsceneRun
     {
         // An arrival scene the room's loader starts: the room's entry does not begin it, so it starts at its cutscene, as the loader starts it.
         if (trigger.IsArrivalScript) return Run(game, newSession, trigger, setup, ScummPickedStart.AtCutscene);
+        // A click in the room has only the game's own way: the input script answers it.
+        if (trigger.IsClick) return Run(game, newSession, trigger, setup);
         var sentence = Run(game, newSession, trigger, setup);
         if (sentence.Begun || trigger.IsRoomEntry) return sentence;
         // A held second object may need to come first in the sentence (Indy 4 Script 2 +0x04A3 refuses an object of no usable class in front; the
@@ -113,7 +115,7 @@ public static class ScummCutsceneRun
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(trigger);
-        if (trigger.IsRoomEntry || session.CurrentRoomId != trigger.Room) return 0;
+        if (trigger.IsRoomEntry || trigger.IsClick || session.CurrentRoomId != trigger.Room) return 0;
         // An arrival by the door the setup names still playing its cutscene plays to its end first, as the game plays it before the player can act
         // (13 November 2026: Indy 3 Room 77, by the castle tunnel, object 848: local script 200 brings Henry to the motorcycle; picked at once, the
         // scene's own cutscene froze it and Henry's lines had no one to say them). Only then: other kept arrivals (a pseudo room number, a value an
@@ -209,6 +211,20 @@ public static class ScummCutsceneRun
                 if (ScummSceneSetupSearch.FirstCutscene(game, trigger) is not { } at || !session.StartSceneAt(at.Label, at.Offset, at.Arguments))
                     return new(false, [], 0, "no cutscene the session can start in this room", Way: way);
             }
+            else if (trigger.Click is { } click)
+            {
+                // A click in the room (ScummCutscene.IsClick): when the game reads clicks again (an arrival's cutscene over), the point is clicked
+                // and the hero walks there by the room's input script; nothing is put anywhere.
+                for (var held = 0; session.ClickRefusal is not null && held < MeetFrames && session.CurrentRoomId == trigger.Room; held++) session.StepFrame();
+                mark = session.RoomsEntered.Count;
+                earlier = session.CutscenesBegun;
+                traced = session.SessionTrace.Count;
+                logMark = session.Messages.Log.Count;
+                picture?.SceneStarts(session);
+                session.WatchScene(Watched, trigger.ObjectId);
+                if (session.ClickRoomPoint(click.X, click.Y, out var refused) is null)
+                    return new(false, [], 0, $"the click was not delivered: {refused}", Way: way);
+            }
             else if (!trigger.IsRoomEntry)
             {
                 // What the room does as the hero reaches the object plays before the scene (LetRoomMeetHero); the direct way runs the verb where he stands.
@@ -256,11 +272,13 @@ public static class ScummCutsceneRun
                 }
                 // A widened candidate takes no control: it begins when its own scripts animate or show another room (R-8.10).
                 if (!begun && trigger.Widened && (session.SceneActivity.Animates || session.SceneActivity.ChangesView)) begun = true;
+                // A click was delivered with the player's control on: a script taking it now is the room's answer (Indy 3 Room 84's jump, local 203).
+                if (!begun && trigger.IsClick && session.InputTakenByScript) begun = true;
                 // A scene may be a chain of cutscenes (LOOM Room 18's bell: Script 62, then Room 20's, then Scripts 58 and 59, one frame apart): it is
                 // over only after QuietFrames frames with no cutscene and no line, as LOOM English's reviewed replays were run (31 October 2026).
                 // A talk line of blanks shows nothing: a script that prints one every frame (Indy 4 Script 139 +0x006D, Monkey Island 2 Script 23
                 // +0x0075) does not keep a scene going (12 November 2026, roadmap step 4).
-                quiet = begun && !session.InScene && (session.Messages.HaveMsg == 0 || session.Messages.Talk is { ShowsText: false }) ? quiet + 1 : 0;
+                quiet = begun && !session.InScene && !(trigger.IsClick && session.InputTakenByScript) && (session.Messages.HaveMsg == 0 || session.Messages.Talk is { ShowsText: false }) ? quiet + 1 : 0;
                 if (quiet >= quietNeeded) break;
                 if (!begun && frame >= TrialFrames + wait) break;
                 session.StepFrame();

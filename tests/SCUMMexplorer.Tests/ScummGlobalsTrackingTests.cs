@@ -83,7 +83,9 @@ public sealed class ScummGlobalsTrackingTests
     {
         if (Game(folder, marker) is not { } game) return;
         var planner = new ScummCutscenePlanner(game);
-        var triggers = planner.Groups.Where((_, i) => i % Math.Max(1, planner.Groups.Count / 4) == 0).Take(4).Select(group => group.First).ToList();
+        // Object triggers and entries (a click point, 14 November 2026, has no verb to activate).
+        var groups = planner.Groups.Where(g => !g.First.IsClick).ToList();
+        var triggers = groups.Where((_, i) => i % Math.Max(1, groups.Count / 4) == 0).Take(4).Select(group => group.First).ToList();
         string Play(bool fullCopies)
         {
             ScummRunVariables.FullCopiesOnThisThread = fullCopies;
