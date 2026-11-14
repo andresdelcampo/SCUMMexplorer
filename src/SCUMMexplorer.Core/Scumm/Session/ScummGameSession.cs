@@ -780,6 +780,8 @@ public sealed record ScummRoomCapture(ScummSessionSnapshot Snapshot, IReadOnlyLi
     public int ViewLeft { get; init; }
     public int ViewWidth { get; init; } = 320;
     public int ViewHeight { get; init; } = 200;
+    /// <summary>The main screen's rows (<c>roomOps setScreen</c>) at this frame, or null when not taken.</summary>
+    public (int Top, int Bottom)? MainScreen { get; init; }
 }
 
 /// <summary>The settled state of a visited room, the frames it took and, when a script left the room, the room it went to.</summary>

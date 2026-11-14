@@ -742,6 +742,26 @@ public abstract partial class ScummSession
     /// has none), shown, and followed by the camera, so the object's response is said and seen. Returns false when the game has no hero or the object
     /// is not in the room's data.
     /// </summary>
+    /// <summary>
+    /// The hero stood beside an actor of the current room, as the game's sentence walks him to the receiver of a Give (ScummVM <c>getObjectOrActorXY</c>
+    /// and <c>getDist</c>: a number below the actor count is an actor). He stands 40 pixels to the actor's left, or right near the room's left edge.
+    /// Returns false when the number is no actor or the actor is not in the current room.
+    /// </summary>
+    public bool PutHeroBesideActor(int actor)
+    {
+        var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : 0;
+        if (ego == 0 || actor == ego || !_runtime.Actors.Contains(actor) || _runtime.CurrentRoom is not int room) return false;
+        var other = _runtime.Actors[actor];
+        if (other.Room != room) return false;
+        var x = other.X >= 48 ? other.X - 40 : other.X + 40;
+        var place = CurrentPlacement();
+        _runtime.Actors.Put(ego, x, other.Y, room, place, ego);
+        _runtime.Camera.Mode = ScummCamera.FollowActor;
+        _runtime.Camera.Follows = ego;
+        _runtime.Camera.MovingToActor = true;
+        return true;
+    }
+
     public bool PutHeroAtObject(int objectId)
     {
         var ego = _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : 0;

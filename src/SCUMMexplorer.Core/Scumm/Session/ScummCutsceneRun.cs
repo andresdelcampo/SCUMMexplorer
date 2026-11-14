@@ -97,6 +97,21 @@ public static class ScummCutsceneRun
         return direct.Score >= sentence.Score ? direct : sentence;
     }
 
+    /// <summary>
+    /// The direct way (<see cref="ScummPickedStart.Direct"/>): the hero stood beside a receiver actor, as the game's sentence walks him to it, then
+    /// the verb's code run (14 November 2026, user report: Indy 3 Room 82's Give Grail to the knight ran with Indy at the room's left entrance, the
+    /// knight on the right; the room's arrival turns the game's own way back to Room 83 without the Grail chosen).
+    /// </summary>
+    public static ScummObjectActionResult StartDirect(ScummSession session, ScummCutscene trigger, int second)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        ArgumentNullException.ThrowIfNull(trigger);
+        // A receiver that is an actor in the room (a Give to the knight) is where the sentence walks him. Otherwise he stays where he stands: put at
+        // the object, other direct starts played less (run 81: Indy 4 Room 41's hatch, Indy 3 Room 73's mallet).
+        if (second != 0) session.PutHeroBesideActor(second);
+        return session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
+    }
+
     /// <summary>The most frames a room's own reaction to the hero put at a picked object plays before the scene (<see cref="LetRoomMeetHero"/>).</summary>
     public const int MeetFrames = 3000;
 
@@ -238,7 +253,7 @@ public static class ScummCutsceneRun
                 // A picked interaction goes through the game's own sentence script where it has one (§8.6, R-8.38), with the second object a setup gave.
                 var second = ScummSetupEdit.SecondOf(setup);
                 session.WatchScene(Watched, trigger.ObjectId);
-                if (way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
+                if (way == ScummPickedStart.Direct) StartDirect(session, trigger, second);
                 else session.PickInteraction(trigger.ObjectId, trigger.VerbId, second, heldFirst: way == ScummPickedStart.GameHeldFirst);
                 // The hero is in the room only from the pick on (put at the object): the values that stand actors in it are set again now (Zak
                 // McKracken Room 10's purple button waits for the hero past x 50).

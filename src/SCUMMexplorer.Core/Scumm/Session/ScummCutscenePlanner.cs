@@ -108,12 +108,14 @@ public sealed class ScummCutscenePlanner
             return "started at its cutscene, it shows no line, no other room and no animation";
         if (shown.Picture is { Count: > 0 } found)
             return "the picture check names " + string.Join("; ", found.Select(f => f.Describe()));
-        // Clicks in one room that play the same (user, 14 November 2026: one entry per failing animation, not one per wrong letter) are one entry,
-        // the first point's: the same lines, rooms and view.
+        // Clicks in one room that play the same (user, 14 November 2026: one entry per failing animation, not one per wrong letter) are one entry:
+        // the same lines, rooms and view. The point that needs the fewest setup values is offered, then the first (user report, 14 November: Indy 3
+        // Room 84's wrong letter was offered from a point whose setup moved Indy to another column, while a point to his right falls from his own).
         if (trigger.IsClick)
-            foreach (var other in Groups.Select(g => g.First).Where(c => c.IsClick && c.Room == trigger.Room && c.VerbId < trigger.VerbId))
+            foreach (var other in Groups.Select(g => g.First).Where(c => c.IsClick && c.Room == trigger.Room && c.VerbId != trigger.VerbId))
                 if (_lastResort.TryGetValue(Key(other), out var earlier) && earlier.Result is { Begun: true } before && before.Picture is not { Count: > 0 } &&
-                    before.Lines == shown.Lines && before.ChangesView == shown.ChangesView && before.RoomsEntered.Order().SequenceEqual(shown.RoomsEntered.Order()))
+                    before.Lines == shown.Lines && before.ChangesView == shown.ChangesView && before.RoomsEntered.Order().SequenceEqual(shown.RoomsEntered.Order()) &&
+                    (earlier.Edits.Count, other.VerbId).CompareTo((plan.Edits.Count, trigger.VerbId)) < 0)
                     return $"plays as {ScummCutsceneTitles.Plain(other)} (a click on another point of the room)";
         return null;
     }

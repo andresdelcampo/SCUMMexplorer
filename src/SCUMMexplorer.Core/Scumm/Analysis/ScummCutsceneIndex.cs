@@ -391,6 +391,19 @@ public static partial class ScummCutsceneIndex
             // An object without a name (Indy 3 Room 83's object 878, the kneeling place) is a place of the room.
             points.Add((id, name.Length > 0 ? name : Place(x, y), x, y));
         }
+        // An input script that reads the pointer itself (VAR_VIRT_MOUSE_X/Y) turns any point into its own places, not walk boxes (14 November 2026,
+        // user report: Indy 3 Room 84's local script 202 +0x0007 makes a stone of (x - 120) / 24, y / 24, one step from Indy's; its only walk box is
+        // the ledge, so no point fell on the letters and the wrong letter was played by moving Indy). A grid of three by three points across the
+        // room is tried, before the floor points.
+        if (reached.SelectMany(c => c.Instructions).Any(i => i.Operation == "expression" &&
+                (i.Operands.Contains(ScummVars.MouseX, StringComparison.Ordinal) || i.Operands.Contains(ScummVars.MouseY, StringComparison.Ordinal))))
+            foreach (var gy in new[] { 1, 3, 5 })
+                foreach (var gx in new[] { 1, 3, 5 })
+                    if (points.Count < MaxClickPoints)
+                    {
+                        var (x, y) = (room_width * gx / 6, room_height * gy / 6);
+                        points.Add((0, Place(x, y), x, y));
+                    }
         // Floor points: the middle of each walk box, spread across the room from left to right.
         var floor = (roomData.WalkBoxes?.Boxes ?? []).Where(b => !b.IsLine)
             .Select(b => (X: (b.UpperLeft.X + b.UpperRight.X + b.LowerRight.X + b.LowerLeft.X) / 4, Y: (b.UpperLeft.Y + b.UpperRight.Y + b.LowerRight.Y + b.LowerLeft.Y) / 4))

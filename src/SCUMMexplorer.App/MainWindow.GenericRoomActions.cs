@@ -128,7 +128,11 @@ public partial class MainWindow
                     // Their complete code remains inspectable in Advanced.
                     // R-8.38: offered whenever its first instruction decodes; a decode note further on (Indy 3's package Open: a jump target outside
                     // the resource) does not hide it, the session runs what it decodes and the note stays in Advanced.
-                    var executable = verb.VerbId < 250 && code is not null && code.Instructions.Any(i => i.Offset == code.EntryOffset);
+                    // Verb 0xFF is the default entry getVerbEntrypoint falls back to for any verb: an object with no other player verb answers every
+                    // verb with it (14 November 2026, user report: Indy 3 Room 37's cockpit switches and button were missing from Interact).
+                    var playerVerb = verb.VerbId < 250 ||
+                                     verb.VerbId == 0xFF && (verbs.GetValueOrDefault(record.Id) ?? []).All(other => other.VerbId >= 250);
+                    var executable = playerVerb && code is not null && code.Instructions.Any(i => i.Offset == code.EntryOffset);
                     var source = $"Room {room:00}, object {record.Id}, verb 0x{verb.VerbId:X2}; " +
                         (code is not null ? $"entry +0x{code.EntryOffset:X4}. Direct exploration action; no sentence is composed and the actor does not walk to the object."
                             : "Source unavailable: " + failure);
@@ -390,8 +394,13 @@ public partial class MainWindow
         // its code tests set (§8.6), the verb given to the game's sentence script with the hero put at the object, or run directly where it refuses.
         if (PlayCutscenes && _ctx.PlayPlanner is not null && PlayCanStartCutscene && _ctx.GenericActionsRoom is int pickedRoom)
         {
-            var trigger = new ScummCutscene(pickedRoom, action.Object, action.Target, action.Verb,
-                [$"Room {pickedRoom} object {action.Object} verb 0x{action.Verb:X2}"], 0, 0, 0, "");
+            // The scan's own trigger for this object and verb when it has one: it knows the scripts the verb reaches, so the setup search finds the
+            // same state as Play Cutscene (14 November 2026, user report: Indy 3 Room 37's button from Interact played the cockpit's chatter, not the
+            // take-off, whose five switches and throttle the scanned trigger's setup sets).
+            var trigger = _ctx.PlayPlanner.Value.Groups.SelectMany(group => group.Others.Prepend(group.First))
+                              .FirstOrDefault(scanned => scanned.Room == pickedRoom && scanned.ObjectId == action.Object && scanned.VerbId == action.Verb && !scanned.IsClick)
+                          ?? new ScummCutscene(pickedRoom, action.Object, action.Target, action.Verb,
+                              [$"Room {pickedRoom} object {action.Object} verb 0x{action.Verb:X2}"], 0, 0, 0, "");
             await PlayScummCutsceneAsync(new ScummCutsceneGroup(trigger, []), action.Title, interaction: true);
             _ctx.GenericLastAction = new RoomPanelAction(action.Title, $"{action.Target} · {GenericActionWord(action)}: picked.", action.Source,
                 _ctx.Play?.Snapshot.Uncertainties.TakeLast(6).ToArray() ?? [], action.Code);

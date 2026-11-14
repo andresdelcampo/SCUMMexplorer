@@ -67,7 +67,7 @@ public abstract partial class ScummSession
         _runtime.GlobalVariables.GetValueOrDefault(_runtime.CurrentLightsVariable), _runtime.Flashlight, CurrentWalkBoxes)
         { RoomPointer = ScreenPointer is { } pointer ? (pointer.X, pointer.Y - MainScreen.Top)
               : Pointer is { } roomPointer ? (roomPointer.X - ViewLeft, roomPointer.Y) : (0, 0),
-          ViewLeft = ViewLeft, ViewWidth = 320, ViewHeight = MainScreen.Bottom - MainScreen.Top };
+          ViewLeft = ViewLeft, ViewWidth = 320, ViewHeight = MainScreen.Bottom - MainScreen.Top, MainScreen = MainScreen };
 
     private long Signature(Dictionary<int, Queue<int>> changes, int frame)
     {

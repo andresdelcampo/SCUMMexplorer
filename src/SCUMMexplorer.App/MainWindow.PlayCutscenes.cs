@@ -393,7 +393,7 @@ public partial class MainWindow
                     if (session.CurrentRoomId != playRoom.ResourceId) session.VisitRoom(playRoom);
                     session.HurryUntilCutscene(ScummCutsceneRun.HurriedScripts(game, trigger), trigger.ObjectId);
                 }
-                if (plan?.Result.Way == ScummPickedStart.Direct) session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId, second);
+                if (plan?.Result.Way == ScummPickedStart.Direct) ScummCutsceneRun.StartDirect(session, trigger, second);
                 else session.PickInteraction(trigger.ObjectId, plan?.Result.Verb ?? trigger.VerbId, second, heldFirst: plan?.Result.Way == ScummPickedStart.GameHeldFirst);
                 // As the plan's runs: the scene's own scripts do not wait out their timers, from the pick on (a cutscene the room's arrival began since
                 // ended the earlier hurry; Maniac Mansion's stairs, Room 12: Script 111 waits five minutes before the delivery).

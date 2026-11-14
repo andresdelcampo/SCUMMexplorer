@@ -175,6 +175,8 @@ public static class ScummRoomFirstVisit
         return new ScummRoomScene(roomId, room, records, images, settled.State, selection, settled.Outcome, settled.Frames, settled.LeftTo,
             id => { try { return session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
             bootRoom, notes) { IndexedStates = indexed.States, IntrinsicStateMask = stateMask, EngineVersion = (int)ScummProfile.For(game).EngineVersion,
-                MainScreen = session.MainScreen };
+                // A room its scripts left is shown with the screen rows it had then, not the next room's (14 November 2026, user report: Indy 3
+                // Room 37's cockpit, setScreen 16,192, was cut at the verb area by Room 36's 16,144 and its lower switches were not offered).
+                MainScreen = settled.Outcome == ScummSettleOutcome.RoomLeft && settled.State.MainScreen is { } leftScreen ? leftScreen : session.MainScreen };
     }
 }

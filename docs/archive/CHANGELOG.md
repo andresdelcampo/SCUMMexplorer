@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 14 November: the user's Indy 3 reports (Rooms 37, 84, 82)
+
+Room 37: a room its scripts leave keeps its own screen rows in its picture (the cockpit, `setScreen 16,192`, no verb area); Interact offers verb 0xFF when it is an object's only player verb (the cockpit's switches and button), and an Interact pick uses the scan's own trigger, so the button plays the take-off. Room 84: an input script that reads the pointer gets a 3 × 3 grid of click points, and of points that play the same the one with the fewest setup values is offered: Indy falls from his own starting stone, no teleport. Room 82 · Give Grail: the direct way stands the hero beside a receiver actor (the knight); in the window the knight still arrives after the pick (open). The true Grail in Room 86 needs outcomes by state (open). Measured: Indy 3 one scene more, Monkey Island 2 five inert grid points, every other result the same. [Record](../../.verification/indy3-check-20261114/README.md).
+
 ## 14 November: Indy 3's scenes that matter in the window; a state set erases drawn text
 
 Roadmap step 5 for Indy 3: the 23 entries of the user's named scenes (intro, endings, the whip, the Grail trials as clicks, Marcus, the knight, the false Grail, the zeppelin, the plane, Berlin, Venice, Donovan) each played in its own real window (`run.sh`); all 23 play, 15 of 18 named outcomes have an entry (83.3%; the Word of God passed, the leap's fall and the true Grail need several actions or a random draw). One fix, shared code: Room 94's ending credits piled up page on page. `setState` now repaints the object's strip columns at full height as ScummVM's `markObjectRectAsDirty` and `redrawBGStrip` do, so text drawn with `print 0xFE` in them is erased (`ScummMessageTable.StripsRedrawn`); the credits now show one page at a time. Measured on all eleven copies (`scene-setup-20261031/*-run80.txt` against run 79): no scene's plan, way or Normal offer changed; LOOM English's answer key the same. [Record](../../.verification/indy3-check-20261114/README.md).

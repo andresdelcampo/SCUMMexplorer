@@ -64,6 +64,21 @@ if (args.Length > 4 && args[1] == "scene")
     var trigger = planner.Groups.SelectMany(g => new[] { g.First }.Concat(g.Others)).First(t => t.Room == room && t.ObjectId == obj && t.VerbId == verb);
     var edits = args.Skip(5).Select(a => a.Split(':')).Select(p => new ScummSetupEdit(Enum.Parse<ScummSetupKind>(p[0]), p[1], int.Parse(p[2]), "PlanPick", p.Length > 3 ? int.Parse(p[3]) : null)).ToList();
     var runs = new List<ScummSession>();
+    // PLANPICK_PROBE=1: the direct way by hand, the hero's and actor 10's places frame by frame (14 November 2026).
+    if (Environment.GetEnvironmentVariable("PLANPICK_PROBE") == "1")
+    {
+        var s = ScummGameSession.BootForPlay(game, out _);
+        s.DressHeroForScene(trigger);
+        s.ApplySceneSetup(edits);
+        s.VisitRoom(game.Rooms.First(r => r.ResourceId == trigger.Room));
+        s.ApplySceneSetup(edits);
+        string Where() => string.Join("  ", s.Actors.Where(x => x.Room == trigger.Room).Select(x => $"a{x.Number}({x.X},{x.Y})"));
+        Console.WriteLine($"after visit: room {s.CurrentRoomId} cutscene {s.InCutscene}: {Where()}");
+        ScummCutsceneRun.StartDirect(s, trigger, ScummSetupEdit.SecondOf(edits));
+        Console.WriteLine($"after pick: {Where()}");
+        for (var f = 1; f <= 1200; f++) { s.StepFrame(); if (f % 60 == 0) Console.WriteLine($"f{f}: room {s.CurrentRoomId} {Where()} msg [{s.Messages.Talk?.Text}]"); }
+        return;
+    }
     var result = ScummCutsceneRun.RunPicked(game, () => { var s = ScummGameSession.BootForPlay(game, out _); runs.Add(s); return s; }, trigger, edits);
     Console.WriteLine($"begun {result.Begun} way {result.Way}{(result.Verb is int used ? $" by verb 0x{used:X2}" : "")} rooms [{string.Join(",", result.RoomsEntered)}] lines {result.Lines} frames {result.Frames} failure {result.Failure}");
     // The first run is the game's own way (the sentence); a later one the start at the cutscene.
@@ -76,6 +91,15 @@ if (args.Length > 4 && args[1] == "scene")
     {
         var hero = own.Actors.First(a => a.Number == 1);
         Console.WriteLine($"  hero room {hero.Room} at ({hero.X},{hero.Y}); object {args[3]} owner {own.Snapshot.ObjectOwners.GetValueOrDefault(int.Parse(args[3]))} classes [{string.Join(",", Enumerable.Range(1, 32).Where(c => (own.Snapshot.ObjectClasses.GetValueOrDefault(int.Parse(args[3])) & (1u << (c - 1))) != 0))}]; messages: {string.Join(" / ", own.Messages.Log.TakeLast(3).Select(m => m.Text))}");
+    }
+    // PLANPICK_LAST=1: the last run's hero and its trace after the pick (14 November 2026: Room 82's Give Grail, the direct way).
+    if (Environment.GetEnvironmentVariable("PLANPICK_LAST") == "1" && runs.LastOrDefault() is { } lastRun)
+    {
+        var t = lastRun.SessionTrace.ToList();
+        var at = t.FindLastIndex(l => l.Contains("ego", StringComparison.Ordinal) && l.Contains("stands", StringComparison.Ordinal));
+        foreach (var line in t.Where(l => l.Contains("ego (actor 1)", StringComparison.Ordinal) || l.Contains("actor 10", StringComparison.Ordinal)).TakeLast(25)) Console.WriteLine("  L " + (line.Length > 170 ? line[..170] : line));
+        var h = lastRun.Actors.First(a => a.Number == 1);
+        Console.WriteLine($"  last run: {runs.Count} runs; hero room {h.Room} at ({h.X},{h.Y})");
     }
     return;
 }

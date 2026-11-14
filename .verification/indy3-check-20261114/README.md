@@ -21,7 +21,7 @@ Indy 3 EGA English, 23 entries: `ega/<room>-<object>-<verb>/report.txt` and pict
 | Pulling with the whip | Room 13 · Use brick; Room 61 · Use wooden plug | Indy whips up the castle wall; the plug pulled, the water pours ✔ |
 | Breath of God, passed | Room 83 · Go to the middle (a click) | "The penitent man is humble before God…", "Kneel!", "I'm through!", on to Room 84 ✔ |
 | Breath of God, failed | Room 83 · Go to the right (a click) | "Kneel!", the blades ("CENSORED"), Room 82: "Be back in a jiffy!" ✔ |
-| Word of God, failed | Room 84 · Go to the far left (a click) | Indy steps on a wrong stone, Room 82: "Be back in a jiffy!" ✔ |
+| Word of God, failed | Room 84 · Go to the middle (centre) (a click; was Go to the far left, which moved Indy) | Indy jumps from his starting stone to the "J" beside it and falls, Room 82: "Be back in a jiffy!" ✔ |
 | Word of God, passed | — | no entry: it needs six clicks, I-E-H-O-V-A, one stone each |
 | Path of God, the leap | Room 85 · Go to the far right (a click) | Indy crosses the hidden bridge into Room 86 ✔ |
 | Path of God, the fall | — | no entry: Room 85 local script 201 drops Indy only when he stands off the bridge line as the chasm is clicked (a walk, then a click) |
@@ -60,6 +60,21 @@ a first run produced no output after 5 minutes and was stopped after 1 h 26 min,
 
 ## For you to check
 
-Open Indy 3 (EGA), pick from Play Cutscene: Room 83 · Go to the middle and · Go to the right; Room 84 · Go to the far left; Room 85 · Go to the far
+Open Indy 3 (EGA), pick from Play Cutscene: Room 83 · Go to the middle and · Go to the right; Room 84 · Go to the middle (centre); Room 85 · Go to the far
 right and · Entry; Room 86 · Use Holy Water; Room 94 · Entry (the credits); Room 77 · Turn on motorcycle; Room 37 · Walk to airfield, and Room 37's
 Interact · Action button (the plane). The first pick of a scene works out its plan ("Preparing the scene…"); later picks start at once.
+
+## Your reports of 14 November, read
+
+| Report | What the game's code does | Done |
+|---|---|---|
+| Room 37: only two Go actions; the button is partly hidden, there should be no verb area | The entry ends with `roomOps setScreen, 16, 192`: no room for the verbs (ScummVM `initScreens` puts the verb screen at 192 to 200). The room's first visit leaves it (local script 200, to Room 36), and the picture "as it was when last current" took Room 36's screen (16 to 144). Interact left out every switch and the button: their only code is verb 0xFF, the default entry `getVerbEntrypoint` falls back to for any verb, and Interact took only verbs below 250 | A room its scripts leave keeps its own screen rows (`ScummRoomCapture.MainScreen`, `ScummRoomScene`): the cockpit fills the view. Verb 0xFF is offered when it is an object's only player verb (`MainWindow.GenericRoomActions.cs`): Interact lists the handle, the knob, eight switches and the button. An Interact pick uses the scan's own trigger for the object and verb when there is one, so it gets Play Cutscene's setup: the button plays the take-off ("Hold on, Dad! Here we go!", Room 70) (`reports/r37b`, `r37c`, `r37e`) |
+| Room 84: choose one of the first letters on the left instead of teleporting Indy | The input script, local 202 +0x0007, makes a stone of (x − 120) / 24 and y / 24, one step from Indy's (`var[0x064]`, `var[0x065]`; he starts at column 0, row 4, local 200). The room's only walk box is the ledge, so no candidate point fell on the stones, and the setup search made the one point fall by moving Indy (`var[0x064]` = 5) | An input script that reads the pointer itself gets a 3 × 3 grid of points as candidates (`ScummCutsceneIndex.FindClickScenes`); of points that play the same, the one with the fewest setup values is offered (`ScummCutscenePlanner.NotOfferedReason`). Room 84 offers "Go to the middle (centre)": Indy jumps from his own stone to the "J" beside it and falls, no setup (`ega-fix4/84-0-516`) |
+| Room 82 · Give Grail: the characters stand on the left instead of next to the knight on the right | The receiver is actor 10, the knight (a number below the actor count is an actor: ScummVM `getObjectOrActorXY`). Without the Grail chosen, the room's arrival turns the game's own way back to Room 83, so the scene was played the direct way, which ran the verb wherever Indy stood (the left entrance) | The direct way stands the hero beside a receiver actor in the room (`ScummCutsceneRun.StartDirect`, `ScummSession.PutHeroBesideActor`); other direct starts run where he stands, as before (standing him at the object for every direct start, run 81, made Indy 4 Room 41's hatch and Indy 3 Room 73's mallet play less): headless, Indy stands at x 330 beside the knight (x 370) for his lines. **Open:** in the window the knight is placed by the arrival after the pick, so Indy stays where he was and the knight speaks off screen (`reports/r82`); started without opening Room 82 first, the knight does not come at all (`ega-fix4/82-873-3`, as before the change) |
+| Room 86: an entry with the right Grail | Global script 122 +0x00DA compares the held cup with `var[0x0FD]` + 887; Script 119 draws `var[0x0FD]` at random (1 to 10) | **Open:** a verb plays one outcome; a second entry for the true cup needs outcomes by state (roadmap, after the release) or a setup value read from a random draw |
+
+Measured (`../scene-setup-20261031/*-run82.txt` against run 80; LOOM, Maniac Mansion and Monkey Island 1 from run 81, the same code for them):
+Indy 3 (both copies) one scene more that plays, Room 84's fall from Indy's own stone, no setup (Normal 86 of 103 → 87 of 112: the grid's points
+that play the same or nothing are not offered); Monkey Island 2 five grid points that begin nothing (Normal 174 of 213 → 174 of 218); Indy 4 every
+plan the same, the picture check names one more suspect (290 → 289 offered); LOOM, Maniac Mansion, Monkey Island 1 and Zak McKracken: every result
+the same. Ways the same everywhere (Indy 3 Game 62 → 63, the new fall).

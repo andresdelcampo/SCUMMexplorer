@@ -220,10 +220,11 @@ if (Environment.GetEnvironmentVariable("MEASURE_TRIGGERS") == "1")
 // 2026: finding the scenes the user named as ones that matter).
 if (Environment.GetEnvironmentVariable("MEASURE_LIST") == "1")
 {
-    foreach (var g in planner.Groups.Where(g => onlyRoom is not int only || g.First.Room == only))
+    // Every plan first: whether an entry is offered may depend on a later one (clicks that play the same, 14 November 2026).
+    var planned = planner.Groups.Where(g => onlyRoom is not int only || g.First.Room == only).Select(g => (g, planner.PlanSetup(g.First))).ToList();
+    foreach (var (g, plan) in planned)
     {
         var t = g.First;
-        var plan = planner.PlanSetup(t);
         Console.WriteLine($"LIST {(planner.IsScene(g) ? "scene" : "react")} {(planner.NotOfferedReason(t) is { } why ? "HIDDEN" : "normal")} Room {t.Room:00} object {t.ObjectId} verb 0x{t.VerbId:X2} " +
                           $"[{ScummCutsceneTitles.Plain(t)}] way {(plan.Result.Begun ? plan.Result.Way.ToString() : "none")} lines {plan.Result.Lines} rooms [{string.Join(",", plan.Result.RoomsEntered)}] frames {plan.Result.Frames} " +
                           $"edits {plan.Edits.Count} ({string.Join("; ", plan.Edits.Select(e => e.Describe()))}) first \"{t.FirstText}\" scripts {string.Join(" | ", t.Scripts)}");
