@@ -125,6 +125,24 @@ public sealed class ScummSceneSetupTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ACharacterTheSceneSpeaksWithIsBroughtInDressedAsHisRoomDressesHim()
+    {
+        // 14 November 2026 (user report: Room 82's Give Grail beside the knight): the ending, Room 82 local script 201, needs Henry (actor 2), who has lain
+        // there since the first arrival; global script 65 makes him speak. He is a candidate brought into Room 82 in the costume the room's code gives
+        // him (the first actorOps of the room's entry and local scripts), and the knight's state is the one the search keeps.
+        if (Indy3() is not { } game) return;
+        var planner = new ScummCutscenePlanner(game);
+        var trigger = Trigger(planner, 82, 873, 0x03);
+        var candidates = planner.Setup.Candidates(trigger);
+        Assert.Contains(candidates, edit => edit is { Kind: ScummSetupKind.ActorBrought, Target: "2", Value: 82, Room: not null });
+        var plan = planner.PlanSetup(trigger);
+        output.WriteLine(plan.Note);
+        Assert.Equal(ScummPickedStart.Game, plan.Result.Way);
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.EnteredBy, Value: 862 });
+        Assert.Contains(plan.Edits, edit => edit is { Kind: ScummSetupKind.ActorBrought, Target: "2" });
+    }
+
+    [Fact]
     public void ARoomEntryThatTestsAPseudoRoomNumberIsEnteredUnderIt()
     {
         // Indy 3 Room 21's entry tells its uses apart by VAR_ROOM (+0x001C isEqual VAR_ROOM, 0x81, and 0x82, 0x83): each is a setup candidate, and a

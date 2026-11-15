@@ -127,14 +127,29 @@ public sealed partial class ScummSceneSetupSearch
         // Once the scene begins, each kept value's other values are tried in its place (roadmap step 3, 11 November 2026): the first value that
         // begins a scene may be a side branch, and another the scene itself (Indy 3 Room 82, Give Grail: object 3 begins a six-line refusal, object
         // 10 the ending, 96 lines and Room 94). Done after the passes, on what they kept, so the result never shows less than theirs.
+        // 14 November 2026 (user report: Indy 3 Room 82's Give Grail beside the knight): for the same second thing, a value that lets the game's own way
+        // begin the scene wins over one that begins it only directly (the game's own way where it can); and a door the hero comes in by is another
+        // point of the story, so the other values are tried with it, one at a time (Room 82's ending, door 862, needs Henry in the room).
+        bool Better(ScummCutsceneRunResult result, List<ScummSetupEdit> trial) =>
+            result.Failure is null && (result.Score > best.Score || best.Way == ScummPickedStart.Direct && result.Begun &&
+                result.Way is ScummPickedStart.Game or ScummPickedStart.GameHeldFirst && ScummSetupEdit.SecondOf(trial) == ScummSetupEdit.SecondOf(kept));
         if (best.Begun)
             foreach (var candidate in candidates)
             {
                 if (kept.Contains(candidate) || !kept.Any(k => Same(k, candidate))) continue;
                 var trial = kept.Select(k => Same(k, candidate) ? candidate : k).ToList();
                 var result = _run(trigger, trial);
-                if (result.Failure is not null || result.Score <= best.Score) continue;
-                best = result; kept = trial;
+                var swapped = Better(result, trial);
+                if (swapped) { best = result; kept = trial; }
+                if (candidate.Kind != ScummSetupKind.EnteredBy) continue;
+                foreach (var extra in candidates.Where(c => !trial.Any(t => Same(t, c))))
+                {
+                    var together = trial.Append(extra).ToList();
+                    var both = _run(trigger, together);
+                    if (!Better(both, together)) continue;
+                    best = both; kept = together;
+                    break;
+                }
             }
         // A scene that needs several values at once begins with none of them alone (Indy 4: a state and an item together): when it still does not
         // begin, all candidates are tried together, one value per target (the first found), as a last try before its cutscene is started directly.
@@ -225,6 +240,38 @@ public sealed partial class ScummSceneSetupSearch
     /// 1), then code order.
     /// </summary>
     /// <param name="goal">The instruction whose way is read instead of the first cutscene's (scene order: the write of a flag an earlier unit sets).</param>
+    private readonly Dictionary<(int Room, int Actor), int?> _roomCostumes = [];
+
+    /// <summary>The first costume a room's own code (its entry and local scripts) gives an actor (<c>actorOps n, [costume, c]</c>), or null.</summary>
+    private int? RoomCostume(int room, int actor)
+    {
+        if (_roomCostumes.TryGetValue((room, actor), out var known)) return known;
+        int? costume = null;
+        var prefix = $"0x{actor:X2}, [costume, ";
+        IEnumerable<ScummScriptDisassembly?> Scripts()
+        {
+            ScummScriptDisassembly? Get(Func<ScummScriptDisassembly?> read)
+            {
+                try { return read(); }
+                catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { return null; }
+            }
+            yield return Get(() => _data.RoomEntryScript(room));
+            IReadOnlyList<int> locals;
+            try { locals = _data.RoomLocalScriptIds(room).ToList(); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or ArgumentException) { locals = []; }
+            foreach (var id in locals) yield return Get(() => _data.RoomLocalScript(room, id));
+        }
+        foreach (var script in Scripts())
+        {
+            var dressed = script?.Instructions.FirstOrDefault(i => i.Operation == "actorOps" && i.Operands.StartsWith(prefix, StringComparison.Ordinal));
+            if (dressed is null) continue;
+            var value = dressed.Operands[prefix.Length..].Split(new[] { ';', ']', ',' }, 2)[0].Trim();
+            if (Literal(value) is int found) { costume = found; break; }
+        }
+        _roomCostumes[(room, actor)] = costume;
+        return costume;
+    }
+
     private List<(ScummSetupEdit Edit, int Rank)> Ranked(ScummCutscene trigger, (string Label, int Offset)? goal = null)
     {
         ArgumentNullException.ThrowIfNull(trigger);
@@ -321,6 +368,17 @@ public sealed partial class ScummSceneSetupSearch
                 operation = ins.Operation;
                 constant = parts.Length >= 2 && Literal(parts[1]) is int k ? k : parts.Length >= 2 && parts[1] == ScummVars.Room ? trigger.Room : null;
                 roomTest = parts.Length >= 2 && parts[1] == ScummVars.Room;
+                // A character the scene speaks with or moves, named by number (not the hero), is in the room: a candidate of a rank of its own (5),
+                // after every other, which only the searches that keep what shows more use (not the values tried together, ranks 0 and 3: run 84 put
+                // LOOM Room 9's shepherds in their costumes of Room 2 that way) (14 November 2026, user report: Indy 3 Room 82's ending, local script 201,
+                // waits at +0x03AF for Henry, actor 2, to walk past x 320; he has lain there since the first arrival, and no code of the scene puts him in).
+                // He comes in dressed as that room's own code dresses him; a room whose code never does gives no such candidate (run 84: put in with
+                // the costume of another room, the picture check rightly named him).
+                if (!trigger.IsClick && trigger.Room > 0 && ins.Operation is "print" or "walkActorTo" or "walkActorToObject" or "animateActor" &&
+                    parts.Length >= 1 && Literal(parts[0]) is int speaker and > 1 and < ScummActorTable.Count &&
+                    found.All(f => f.Edit.Kind is not (ScummSetupKind.ActorRoom or ScummSetupKind.ActorBrought) || f.Edit.Target != speaker.ToString(CultureInfo.InvariantCulture)) &&
+                    RoomCostume(trigger.Room, speaker) is int dress)
+                    found.Add((new(ScummSetupKind.ActorBrought, speaker.ToString(CultureInfo.InvariantCulture), trigger.Room, where, dress), 5));
                 switch (ins.Operation)
                 {
                     case "move" when !objectCode && trigger.ObjectId != 0 && !trigger.IsRoomEntry && ins.Operands.Split(" = ") is [var into, var from] &&

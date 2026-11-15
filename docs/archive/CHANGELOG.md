@@ -9,6 +9,10 @@ The running log of finished work, newest first, each entry linking its record un
 
 
 
+## 14 November: scene order for characters; Indy 3's Give Grail beside the knight
+
+A character the scene speaks with or moves is a setup candidate, brought into the room in the costume that room's own code gives him; a swapped door is tried with the other values; for the same receiver the game's own way wins over a direct start. Room 82's Give Grail now plays from the ending's state (door 862, Henry in the room): Indy beside the knight on the right. Run 85: Indy 3's Give Grail the game's own way, Monkey Island 2 four scenes show more, the rest the same. [Record](../../.verification/indy3-check-20261114/README.md).
+
 ## 14 November: Indy 3's true Grail; fallback verbs and objects of their own
 
 The scan reads an object's fallback verb beside its other verbs (Use and Give on Indy 3's cups run it), and an object whose code hands itself to a script that compares it with a variable is an entry of its own, offered once per outcome: Room 86 offers the true cup ("You have chosen wisely") beside the false one. A pick whose second is an actor in the room stands the hero beside it. Room 82's Give Grail stays open: its ending state needs several story facts at once (scene order). Run 83: no earlier result changed; Indy 3 +11 entries, Monkey Island 2 +16, Monkey Island 1 +4 each, Zak McKracken +1. [Record](../../.verification/indy3-check-20261114/README.md).

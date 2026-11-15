@@ -63,6 +63,11 @@ public enum ScummSetupKind
     /// 14, global script 110 +0x000C): the actor stood next to the hero in the scene's room and passed as object B (8 November 2026).
     /// </summary>
     SecondActor,
+    /// <summary>
+    /// A character the scene speaks with or moves (actor <c>Target</c>) brought into room <c>Value</c>, in the costume that room's own code gives him
+    /// (<see cref="ScummSetupEdit.Room"/> holds it): Indy 3 Room 82's ending needs Henry, who has lain there since the first arrival (14 November 2026).
+    /// </summary>
+    ActorBrought,
 }
 
 /// <summary>
@@ -96,6 +101,7 @@ public sealed record ScummSetupEdit(ScummSetupKind Kind, string Target, int Valu
         ScummSetupKind.SecondActor => $"given to actor {Target}, next to the hero",
         ScummSetupKind.ActorCostume => $"{(Target == "ego" ? "the hero" : Target.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {Target}" : $"actor {Target}")} in costume {Value}",
         ScummSetupKind.ActorRoom => $"{(Target == "ego" ? "the hero" : Target.StartsWith("var[", StringComparison.Ordinal) ? $"the actor in {Target}" : $"actor {Target}")} in Room {Value}",
+        ScummSetupKind.ActorBrought => $"actor {Target} in Room {Value}, in costume {Room} as that room's code dresses him",
         ScummSetupKind.CameFrom => $"arrived from Room {Value} ({Target})",
         ScummSetupKind.EnteredAs => $"the room entered as pseudo room {Value}",
         ScummSetupKind.EnteredBy => $"the hero comes in by object {Value}",
@@ -326,6 +332,15 @@ public abstract partial class ScummSession
                 var actor = edit.Target == "ego" ? variables.GetValueOrDefault(_runtime.EgoVariable) : int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
                 if (_deferredBoxPuts.Any(d => d.Actor == actor && d.Box == edit.Value)) return false;
                 _deferredBoxPuts.Add((actor, edit.Value, BoxPutDelayFrames));
+                return true;
+            }
+            case ScummSetupKind.ActorBrought:
+            {
+                var brought = int.Parse(edit.Target, System.Globalization.CultureInfo.InvariantCulture);
+                if (!_runtime.Actors.Contains(brought) || _runtime.Actors[brought].Room == edit.Value) return false;
+                var bringer = variables.TryGetValue(_runtime.EgoVariable, out var heroNumber) ? (int?)heroNumber : null;
+                if (edit.Room is int dress && _runtime.Actors[brought].Look.Costume != dress) _runtime.Actors.CostumeChanged(brought, dress, CurrentPlacement());
+                _runtime.Actors.PutInRoom(brought, edit.Value, CurrentPlacement(), bringer);
                 return true;
             }
             case ScummSetupKind.ActorCostume or ScummSetupKind.ActorRoom:
