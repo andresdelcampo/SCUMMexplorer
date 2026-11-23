@@ -207,3 +207,8 @@ SCUMMexplorer is licensed under the GNU General Public License, version 3 or lat
 ## Audio and third-party notices
 
 AdLib uses [NukedOPL3Sharp](https://www.nuget.org/packages/NukedOPL3Sharp/) (LGPL 2.1). The Roland MT-32 uses [Munt](https://github.com/munt/munt) (`mt32emu`, LGPL-2.1-or-later) through [Mt32emu.net](https://github.com/gregdivis/mt32emu.net). See [third-party audio notices](THIRD_PARTY_NOTICES.md).
+
+
+## More projects
+
+For more of my projects, visit [Software Workshop](https://andresdelcampo.github.io/software-showcase/).
